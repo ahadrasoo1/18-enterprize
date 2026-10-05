@@ -4,7 +4,7 @@ import base64
 import io
 
 from odoo import models, api
-from PyPDF2 import PdfFileWriter, PdfFileReader
+from odoo.tools.pdf import PdfWriter as PdfFileWriter, PdfFileReader  # bt: core PDF layer (core no longer patches PyPDF2)
 
 
 class IrAttachment(models.Model):

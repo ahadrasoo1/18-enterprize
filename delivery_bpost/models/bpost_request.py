@@ -7,7 +7,7 @@ import logging
 import re
 import requests
 from lxml import html
-from PyPDF2 import PdfFileWriter, PdfFileReader
+from odoo.tools.pdf import PdfWriter as PdfFileWriter, PdfFileReader  # bt: core PDF layer (core no longer patches PyPDF2)
 from xml.etree import ElementTree as etree
 from werkzeug.urls import url_join
 

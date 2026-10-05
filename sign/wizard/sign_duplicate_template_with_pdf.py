@@ -3,7 +3,7 @@
 import io
 import base64
 
-from PyPDF2 import PdfFileReader
+from odoo.tools.pdf import PdfFileReader  # bt: core PDF layer (core no longer patches PyPDF2)
 try:
     from PyPDF2.errors import PdfReadError
 except ImportError:

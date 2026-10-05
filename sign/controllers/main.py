@@ -7,7 +7,7 @@ import logging
 import mimetypes
 import re
 
-from PyPDF2 import PdfFileReader
+from odoo.tools.pdf import PdfFileReader  # bt: core PDF layer (core no longer patches PyPDF2)
 
 from odoo import http, models, tools, Command, _, fields
 from odoo.http import request, content_disposition

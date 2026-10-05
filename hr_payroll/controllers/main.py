@@ -4,7 +4,7 @@
 import io
 import re
 
-from PyPDF2 import PdfFileReader, PdfFileWriter
+from odoo.tools.pdf import PdfFileReader, PdfWriter as PdfFileWriter  # bt: core PDF layer (core no longer patches PyPDF2)
 
 from odoo.http import request, route, Controller, content_disposition
 from odoo.tools.safe_eval import safe_eval

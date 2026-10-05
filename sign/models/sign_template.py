@@ -5,7 +5,7 @@ import re
 import base64
 import io
 
-from PyPDF2 import PdfFileReader
+from odoo.tools.pdf import PdfFileReader  # bt: core PDF layer (core no longer patches PyPDF2)
 from collections import defaultdict
 from random import randint
 

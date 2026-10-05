@@ -10,7 +10,7 @@ from ast import literal_eval
 from collections import Counter, OrderedDict, defaultdict
 
 import requests
-from PyPDF2 import PdfFileReader
+from odoo.tools.pdf import PdfFileReader  # bt: core PDF layer (core no longer patches PyPDF2)
 from dateutil.relativedelta import relativedelta
 from markupsafe import Markup
 from werkzeug.urls import url_encode

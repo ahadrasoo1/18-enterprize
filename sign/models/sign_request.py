@@ -7,7 +7,7 @@ import os
 import time
 import uuid
 
-from PyPDF2 import PdfFileReader, PdfFileWriter
+from odoo.tools.pdf import PdfFileReader, PdfWriter as PdfFileWriter  # bt: core PDF layer (core no longer patches PyPDF2)
 try:
     from PyPDF2.errors import PdfReadError
 except ImportError:
