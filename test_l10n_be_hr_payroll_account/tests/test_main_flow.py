@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 import base64
@@ -10,7 +9,6 @@ from contextlib import contextmanager
 
 from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 from odoo.addons.mail.tests.common import mail_new_test_user
-from odoo.exceptions import AccessError, UserError, ValidationError
 from odoo.fields import Date, Datetime
 from odoo.tests import Form, tagged
 from odoo.tools import file_open
@@ -103,7 +101,6 @@ class TestHR(AccountTestInvoicingCommon):
         #         ...
         #         allocation.number_of_days = allocation.number_of_days_display
         #         ...
-        allocation_form.number_of_days_display = number_of_days
         # <field name="employee_id" invisible="1" groups="hr_holidays.group_hr_holidays_user"/>
         # @api.depends('employee_ids')
         # def _compute_from_employee_ids(self):
@@ -114,6 +111,12 @@ class TestHR(AccountTestInvoicingCommon):
         allocation_form.date_from = time.strftime('2015-1-1')
         allocation_form.date_to = time.strftime('%Y-12-31')
         allocation_form.holiday_status_id = leave_type
+        if leave_type.request_unit == 'hour':
+            allocation_form.number_of_hours_display = \
+                (number_of_days *
+                 allocation_form.employee_id._get_calendars(allocation_form.date_from)[allocation_form.employee_id.id].hours_per_day)
+        else:
+            allocation_form.number_of_days_display = number_of_days
         allocation_form.name = 'New Request'
         return allocation_form.save()
 
@@ -273,6 +276,7 @@ class TestHR(AccountTestInvoicingCommon):
         work_entry_type_form = Form(self.env['hr.work.entry.type'].with_user(user))
         work_entry_type_form.name = name
         work_entry_type_form.code = code
+        work_entry_type_form.country_id = user.company_id.country_id
         return work_entry_type_form.save()
 
     def link_leave_work_entry_type(self, user, work_entry_type, leave_type):

@@ -26,15 +26,22 @@ test("click on activity Lead/Opportunity clock should open crm.lead view", async
         "crm.lead,false,map": `<map routing="1"><field name="name"/></map>`,
     });
     mockService("action", {
-        doAction(action) {
-            step(action);
+        loadAction(actionId) {
+            step(actionId);
+            return Promise.resolve({ domain: [] });
         },
-        loadState(state, options) {
-            return Promise.resolve(true);
+        doAction(action, options) {
+            step(JSON.stringify(action));
+        },
+        async loadState(state, options) {
+            return true;
         },
     });
     await start();
     await click(".o_menu_systray i[aria-label='Activities']");
     await click(".o-mail-ActivityGroup");
-    await assertSteps(["crm.crm_lead_action_my_activities"]);
+    await assertSteps([
+        "crm.crm_lead_action_my_activities",
+        JSON.stringify({ domain: [["active", "in", [true, false]]] }),
+    ]);
 });

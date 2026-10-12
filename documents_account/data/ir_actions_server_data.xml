@@ -9,7 +9,9 @@
             <field name="groups_id" eval="[Command.link(ref('base.group_user'))]"/>
             <field name="state">code</field>
             <field name="code">
-                action = records.account_create_account_move('in_invoice')
+# To send in a specific journal, replace "None" by the code of the journal between quotation marks on the next line
+SPECIFIC_JOURNAL_CODE = None
+action = records.account_create_account_move('in_invoice', journal_id=model.env['account.journal'].search([('code', '=', SPECIFIC_JOURNAL_CODE), ('company_id', '=', env.company.id)]) if SPECIFIC_JOURNAL_CODE else None)
             </field>
         </record>
 
@@ -33,7 +35,6 @@
         <function model="documents.document" name="action_folder_embed_action" eval="[
             ref('documents.document_finance_folder'),
             ref('documents_account.ir_actions_server_create_vendor_bill'),
-            [ref('account.group_account_invoice')],
         ]"/>
 
         <!-- Create Vendor Refund -->
@@ -44,7 +45,9 @@
             <field name="groups_id" eval="[Command.link(ref('account.group_account_invoice'))]"/>
             <field name="state">code</field>
             <field name="code">
-                action = records.account_create_account_move('in_refund')
+# To send in a specific journal, replace "None" by the code of the journal between quotation marks on the next line.
+SPECIFIC_JOURNAL_CODE = None
+action = records.account_create_account_move('in_refund', journal_id=model.env['account.journal'].search([('code', '=', SPECIFIC_JOURNAL_CODE), ('company_id', '=', env.company.id)]) if SPECIFIC_JOURNAL_CODE else None)
             </field>
         </record>
 
@@ -68,7 +71,6 @@
         <function model="documents.document" name="action_folder_embed_action" eval="[
             ref('documents.document_finance_folder'),
             ref('documents_account.ir_actions_server_create_vendor_refund'),
-            [ref('account.group_account_invoice')],
         ]"/>
 
         <!-- Create Customer Invoice -->
@@ -79,7 +81,9 @@
             <field name="groups_id" eval="[Command.link(ref('account.group_account_invoice'))]"/>
             <field name="state">code</field>
             <field name="code">
-                action = records.account_create_account_move('out_invoice')
+# To send in a specific journal, replace "None" by the code of the journal between quotation marks on the next line.
+SPECIFIC_JOURNAL_CODE = None
+action = records.account_create_account_move('out_invoice', journal_id=model.env['account.journal'].search([('code', '=', SPECIFIC_JOURNAL_CODE), ('company_id', '=', env.company.id)]) if SPECIFIC_JOURNAL_CODE else None)
             </field>
         </record>
 
@@ -103,7 +107,6 @@
         <function model="documents.document" name="action_folder_embed_action" eval="[
             ref('documents.document_finance_folder'),
             ref('documents_account.ir_actions_server_create_customer_invoice'),
-            [ref('account.group_account_invoice')],
         ]"/>
 
         <!-- Create Customer Credit Note -->
@@ -114,7 +117,9 @@
             <field name="groups_id" eval="[Command.link(ref('account.group_account_invoice'))]"/>
             <field name="state">code</field>
             <field name="code">
-                action = records.account_create_account_move('out_refund')
+# To send in a specific journal, replace "None" by the code of the journal between quotation marks on the next line.
+SPECIFIC_JOURNAL_CODE = None
+action = records.account_create_account_move('out_refund', journal_id=model.env['account.journal'].search([('code', '=', SPECIFIC_JOURNAL_CODE), ('company_id', '=', env.company.id)]) if SPECIFIC_JOURNAL_CODE else None)
             </field>
         </record>
 
@@ -139,7 +144,6 @@
         <function model="documents.document" name="action_folder_embed_action" eval="[
             ref('documents.document_finance_folder'),
             ref('documents_account.ir_actions_server_create_credit_note'),
-            [ref('account.group_account_invoice')],
         ]"/>
 
         <!-- Create Vendor Receipt -->
@@ -150,14 +154,15 @@
             <field name="groups_id" eval="[Command.link(ref('account.group_account_invoice'))]"/>
             <field name="state">code</field>
             <field name="code">
-                action = records.account_create_account_move('in_receipt', skip_activities=True)
+# To send in a specific journal, replace "None" by the code of the journal between quotation marks on the next line.
+SPECIFIC_JOURNAL_CODE = None
+action = records.account_create_account_move('in_receipt', journal_id=model.env['account.journal'].search([('code', '=', SPECIFIC_JOURNAL_CODE), ('company_id', '=', env.company.id)]) if SPECIFIC_JOURNAL_CODE else None, skip_activities=True)
             </field>
         </record>
 
         <function model="documents.document" name="action_folder_embed_action" eval="[
             ref('documents.document_finance_folder'),
             ref('documents_account.ir_actions_server_create_vendor_receipt'),
-            [ref('account.group_account_invoice')],
         ]"/>
 
         <!-- Create Misc Entry -->
@@ -168,7 +173,9 @@
             <field name="groups_id" eval="[Command.link(ref('account.group_account_invoice'))]"/>
             <field name="state">code</field>
             <field name="code">
-                action = records.account_create_account_move('entry', skip_activities=True)
+# To send in a specific journal, replace "None" by the code of the journal between quotation marks on the next line.
+SPECIFIC_JOURNAL_CODE = None
+action = records.account_create_account_move('entry', journal_id=model.env['account.journal'].search([('code', '=', SPECIFIC_JOURNAL_CODE), ('company_id', '=', env.company.id)]) if SPECIFIC_JOURNAL_CODE else None, skip_activities=True)
             </field>
         </record>
 
@@ -191,7 +198,6 @@
         <function model="documents.document" name="action_folder_embed_action" eval="[
             ref('documents.document_finance_folder'),
             ref('documents_account.ir_actions_server_create_misc_entry'),
-            [ref('account.group_account_invoice')],
         ]"/>
 
         <!-- Import Bank Statement -->
@@ -202,7 +208,9 @@
             <field name="groups_id" eval="[Command.link(ref('account.group_account_invoice'))]"/>
             <field name="state">code</field>
             <field name="code">
-                action = records.account_create_account_bank_statement()
+# To send in a specific journal, replace "None" by the code of the journal between quotation marks on the next line.
+SPECIFIC_JOURNAL_CODE = None
+action = records.account_create_account_bank_statement(journal_id=model.env['account.journal'].search([('code', '=', SPECIFIC_JOURNAL_CODE), ('company_id', '=', env.company.id)]) if SPECIFIC_JOURNAL_CODE else None)
             </field>
         </record>
 
@@ -225,7 +233,6 @@
         <function model="documents.document" name="action_folder_embed_action" eval="[
             ref('documents.document_finance_folder'),
             ref('documents_account.ir_actions_server_bank_statement'),
-            [ref('account.group_account_invoice')],
         ]"/>
     </data>
 </odoo>

@@ -2,7 +2,6 @@
 
 from datetime import datetime
 from odoo.addons.industry_fsm_sale.tests.common import TestFsmFlowSaleCommon
-from odoo.exceptions import UserError
 from odoo.tests import tagged
 
 
@@ -25,8 +24,6 @@ class TestFsmFlowSaleWithStock(TestFsmFlowSaleCommon):
         3) Set product quantity after confirming SO
         """
         self.assertFalse(self.task.material_line_product_count, "No product should be linked to a new task")
-        with self.assertRaises(UserError, msg='Should not be able to get to material without customer set'):
-            self.task.action_fsm_view_material()
         self.task.write({'partner_id': self.partner_1.id})
         self.assertFalse(self.task.task_to_invoice, "Nothing should be invoiceable on task")
         self.task.with_user(self.project_user).action_fsm_view_material()

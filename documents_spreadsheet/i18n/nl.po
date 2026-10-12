@@ -1,30 +1,40 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* documents_spreadsheet
-# 
+# * documents_spreadsheet
+#
 # Translators:
-# Wil Odoo, 2024
-# Erwin van der Ploeg <erwin@odooexperts.nl>, 2024
-# 
+# Manon Rondou, 2025
+# Wil Odoo, 2025
+# Erwin van der Ploeg <erwin@odooexperts.nl>, 2025
+# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Bren Driesen <brdri@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-26 09:15+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Erwin van der Ploeg <erwin@odooexperts.nl>, 2024\n"
-"Language-Team: Dutch (https://app.transifex.com/odoo/teams/41243/nl/)\n"
+"POT-Creation-Date: 2025-12-29 18:47+0000\n"
+"PO-Revision-Date: 2026-03-30 06:13+0000\n"
+"Last-Translator: Bren Driesen <brdri@odoo.com>\n"
+"Language-Team: Dutch <https://translate.odoo.com/projects/odoo-18/"
+"documents_spreadsheet/nl/>\n"
+"Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: nl\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.16.2\n"
 
 #. module: documents_spreadsheet
 #. odoo-python
 #: code:addons/documents_spreadsheet/wizard/save_spreadsheet_template.py:0
 msgid "\"%s\" saved as template"
 msgstr "\"%s\" opgeslagen als sjabloon"
+
+#. module: documents_spreadsheet
+#. odoo-python
+#: code:addons/documents_spreadsheet/models/documents_document.py:0
+msgid "%(folder)s is used by %(company)s"
+msgstr "%(folder)s wordt gebruikt door %(company)s"
 
 #. module: documents_spreadsheet
 #. odoo-python
@@ -46,7 +56,19 @@ msgstr "Er bestaat al een combinatie van de spreadsheet en de gebruiker"
 #. module: documents_spreadsheet
 #: model:ir.model.constraint,message:documents_spreadsheet.constraint_documents_document_frozen_spreadsheet_access_via_link_access_internal
 msgid "A frozen spreadsheet can not be editable"
-msgstr ""
+msgstr "Een bevroren spreadsheet kan niet worden bewerkt"
+
+#. module: documents_spreadsheet
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/demo/files/pipeline_dashboard.json:0
+msgid "Actuals vs Target"
+msgstr "Werkelijk vs. Doelstelling"
+
+#. module: documents_spreadsheet
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/demo/files/pipeline_dashboard.json:0
+msgid "Actuals vs Target status"
+msgstr "Werkelijke versus streefstatus"
 
 #. module: documents_spreadsheet
 #: model_terms:ir.ui.view,arch_db:documents_spreadsheet.save_spreadsheet_template_view_form
@@ -73,7 +95,7 @@ msgstr "Bedrijven"
 #. module: documents_spreadsheet
 #: model:ir.model,name:documents_spreadsheet.model_res_config_settings
 msgid "Config Settings"
-msgstr "Configuratie instellingen"
+msgstr "Configuratie-instellingen"
 
 #. module: documents_spreadsheet
 #: model_terms:ir.ui.view,arch_db:documents_spreadsheet.save_spreadsheet_template_view_form
@@ -134,6 +156,13 @@ msgid "Display Name"
 msgstr "Schermnaam"
 
 #. module: documents_spreadsheet
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_document__display_thumbnail
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_save_spreadsheet_template__display_thumbnail
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__display_thumbnail
+msgid "Display Thumbnail"
+msgstr "Miniatuur weergeven"
+
+#. module: documents_spreadsheet
 #: model:ir.model,name:documents_spreadsheet.model_documents_document
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_cell_thread__document_id
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_contributor__document_id
@@ -143,13 +172,13 @@ msgstr "Document"
 #. module: documents_spreadsheet
 #: model:ir.model,name:documents_spreadsheet.model_documents_access
 msgid "Document / Partner"
-msgstr ""
+msgstr "Document / Partner"
 
 #. module: documents_spreadsheet
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_res_company__document_spreadsheet_folder_id
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_res_config_settings__document_spreadsheet_folder_id
 msgid "Document Spreadsheet Folder"
-msgstr ""
+msgstr "Map met documenten spreadsheets"
 
 #. module: documents_spreadsheet
 #: model_terms:ir.ui.view,arch_db:documents_spreadsheet.spreadsheet_template_view_tree
@@ -178,6 +207,12 @@ msgstr ""
 "je bestand met Odoo Spreadsheet om dit mogelijk te maken."
 
 #. module: documents_spreadsheet
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/demo/files/pipeline_dashboard.json:0
+msgid "Expected Revenue by Stage"
+msgstr "Verwachte omzet per Fase"
+
+#. module: documents_spreadsheet
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__file_name
 msgid "File Name"
 msgstr "Bestandsnaam"
@@ -187,35 +222,40 @@ msgstr "Bestandsnaam"
 #: code:addons/documents_spreadsheet/static/src/bundle/actions/spreadsheet_freeze_and_share/spreadsheet_freeze_and_share.xml:0
 #: code:addons/documents_spreadsheet/static/src/documents_control_panel/documents_control_panel.xml:0
 msgid "Freeze and share"
-msgstr ""
+msgstr "Vergrendelen en delen"
 
 #. module: documents_spreadsheet
 #: model:ir.model.fields.selection,name:documents_spreadsheet.selection__documents_document__handler__frozen_folder
 msgid "Frozen Folder"
-msgstr ""
+msgstr "Bevroren map"
 
 #. module: documents_spreadsheet
 #: model:ir.model.fields.selection,name:documents_spreadsheet.selection__documents_document__handler__frozen_spreadsheet
 msgid "Frozen Spreadsheet"
-msgstr ""
+msgstr "Bevroren spreadsheet"
 
 #. module: documents_spreadsheet
 #. odoo-python
 #: code:addons/documents_spreadsheet/models/documents_access.py:0
 msgid "Frozen Spreadsheets can not be editable."
-msgstr ""
+msgstr "Bevroren spreadsheets kunnen niet worden bewerkt."
 
 #. module: documents_spreadsheet
 #. odoo-python
 #: code:addons/documents_spreadsheet/models/documents_document.py:0
 msgid "Frozen at %(date)s: %(name)s"
-msgstr ""
+msgstr "Bevroren op %(date)s: %(name)s"
 
 #. module: documents_spreadsheet
 #. odoo-python
 #: code:addons/documents_spreadsheet/models/documents_document.py:0
 msgid "Frozen spreadsheets"
-msgstr ""
+msgstr "Bevroren spreadsheets"
+
+#. module: documents_spreadsheet
+#: model:ir.model,name:documents_spreadsheet.model_ir_http
+msgid "HTTP Routing"
+msgstr "HTTP routing"
 
 #. module: documents_spreadsheet
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_document__handler
@@ -228,6 +268,12 @@ msgstr "Handler"
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__id
 msgid "ID"
 msgstr "ID"
+
+#. module: documents_spreadsheet
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/static/src/documents_control_panel/documents_control_panel.xml:0
+msgid "Insert in spreadsheet"
+msgstr "Invoegen in spreadsheet"
 
 #. module: documents_spreadsheet
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_save_spreadsheet_template__write_uid
@@ -249,9 +295,15 @@ msgid "Last update date"
 msgstr "Datum laatste update"
 
 #. module: documents_spreadsheet
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/demo/files/pipeline_dashboard.json:0
+msgid "Lost Opportunities by Stage"
+msgstr "Gemiste verkoopkansen per Fase"
+
+#. module: documents_spreadsheet
 #: model_terms:ir.ui.view,arch_db:documents_spreadsheet.spreadsheet_template_view_tree
 msgid "Make a copy"
-msgstr "Een kopie maken"
+msgstr "Kopie maken"
 
 #. module: documents_spreadsheet
 #: model_terms:ir.ui.view,arch_db:documents_spreadsheet.spreadsheet_template_view_search
@@ -279,7 +331,13 @@ msgstr "Nieuwe spreadsheet gemaakt in documenten"
 #. module: documents_spreadsheet
 #. odoo-javascript
 #. odoo-python
-#: code:addons/documents_spreadsheet/models/spreadsheet_template.py:0
+#: code:addons/documents_spreadsheet/models/documents_document.py:0
+#: code:addons/documents_spreadsheet/static/src/bundle/actions/spreadsheet_action.js:0
+msgid "New spreadsheet created in My Drive"
+msgstr "Nieuw spreadsheet aangemaakt in Mijn Drive."
+
+#. module: documents_spreadsheet
+#. odoo-javascript
 #: code:addons/documents_spreadsheet/static/src/bundle/actions/spreadsheet_template/spreadsheet_template_action.js:0
 msgid "New spreadsheet template created"
 msgstr "Nieuwe spreadsheetsjabloon gemaakt"
@@ -289,6 +347,18 @@ msgstr "Nieuwe spreadsheetsjabloon gemaakt"
 #: code:addons/documents_spreadsheet/static/src/documents_view/documents_spreadsheet_controller_mixin.js:0
 msgid "Open with Odoo Spreadsheet"
 msgstr "Openen met Odoo Spreadsheet"
+
+#. module: documents_spreadsheet
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/demo/files/pipeline_dashboard.json:0
+msgid "Opportunities by Stage"
+msgstr "Verkoopkansen per Fase"
+
+#. module: documents_spreadsheet
+#. odoo-python
+#: code:addons/documents_spreadsheet/models/documents_document.py:0
+msgid "Portal users cannot be the owner of a spreadsheet."
+msgstr "Portaalgebruikers kunnen geen eigenaar zijn van een spreadsheet."
 
 #. module: documents_spreadsheet
 #. odoo-javascript
@@ -311,7 +381,7 @@ msgstr "Opslaan als sjabloon"
 #. odoo-javascript
 #: code:addons/documents_spreadsheet/static/src/documents_control_panel/documents_control_panel.js:0
 msgid "Select one and only one spreadsheet"
-msgstr ""
+msgstr "Selecteer één en slechts één spreadsheet"
 
 #. module: documents_spreadsheet
 #. odoo-javascript
@@ -412,8 +482,8 @@ msgid ""
 "Spreadsheet files cannot be handled from the Trash. Would you like to "
 "restore this document?"
 msgstr ""
-"Spreadsheetbestanden kunnen niet worden beheerd vanuit de prullenbak. Wil je"
-" dit document herstellen?"
+"Spreadsheetbestanden kunnen niet worden beheerd vanuit de prullenbak. Wil je "
+"dit document herstellen?"
 
 #. module: documents_spreadsheet
 #. odoo-python
@@ -428,6 +498,8 @@ msgstr "Spreadsheets"
 #: code:addons/documents_spreadsheet/models/documents_access.py:0
 msgid "Spreadsheets can not be shared in edit mode to non-internal users."
 msgstr ""
+"Spreadsheets kunnen niet in bewerkingsmodus worden gedeeld met niet-interne "
+"gebruikers."
 
 #. module: documents_spreadsheet
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_cell_thread__template_id
@@ -442,6 +514,27 @@ msgstr "Sjabloonnaam"
 #. module: documents_spreadsheet
 #. odoo-python
 #: code:addons/documents_spreadsheet/models/documents_document.py:0
+msgid ""
+"The company for a folder cannot be changed if it is already used as the "
+"spreadsheet workspace for at least one other company: %s"
+msgstr ""
+"Het bedrijf van een folder kan niet worden gewijzigd als het reeds als "
+"werkruimte voor spreadsheets wordt gebruikt voor minstens één ander bedrijf: "
+"%s"
+
+#. module: documents_spreadsheet
+#. odoo-python
+#: code:addons/documents_spreadsheet/models/res_company.py:0
+msgid ""
+"The company of %(folder)s should either be undefined or set to %(company)s. "
+"Otherwise, it is not possible to link the workspace to the company."
+msgstr ""
+"Het bedrijf van %(folder)s moet ongedefinieerd zijn of ingesteld zijn op %"
+"(company)s. Zo niet, kan de werkruimte niet aan het bedrijf worden gekoppeld."
+
+#. module: documents_spreadsheet
+#. odoo-python
+#: code:addons/documents_spreadsheet/models/documents_document.py:0
 msgid "The file is not a xlsx file"
 msgstr "Het bestand is geen xlsx-bestand"
 
@@ -451,7 +544,7 @@ msgstr "Het bestand is geen xlsx-bestand"
 #: code:addons/documents_spreadsheet/static/src/documents_permission_panel/documents_member_invite.js:0
 #: code:addons/documents_spreadsheet/static/src/documents_permission_panel/documents_partner_access.js:0
 msgid "The frozen spreadsheets are readonly."
-msgstr ""
+msgstr "De bevroren spreadsheets zijn alleen-lezen."
 
 #. module: documents_spreadsheet
 #. odoo-python
@@ -463,9 +556,11 @@ msgstr "De spreadsheet die je probeert te openen bestaat niet."
 #. odoo-javascript
 #: code:addons/documents_spreadsheet/static/src/documents_permission_panel/documents_access_settings.js:0
 msgid ""
-"The spreadsheets can not be shared in edit mode with a link, change Internal"
-" to give write access."
+"The spreadsheets can not be shared in edit mode with a link, change Internal "
+"to give write access."
 msgstr ""
+"De spreadsheets kunnen niet worden gedeeld in de bewerkingsmodus met een "
+"link, verander Intern om schrijftoegang te geven."
 
 #. module: documents_spreadsheet
 #. odoo-python
@@ -483,6 +578,8 @@ msgstr "Het xlsx-bestand is te groot"
 #: model_terms:ir.ui.view,arch_db:documents_spreadsheet.documents_error_live_data
 msgid "This spreadsheet contains live data, only internal users can view it."
 msgstr ""
+"Deze spreadsheet bevat live gegevens, alleen interne gebruikers kunnen deze "
+"bekijken."
 
 #. module: documents_spreadsheet
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_document__thumbnail
@@ -495,6 +592,8 @@ msgstr "Miniatuur"
 #: model:ir.model.constraint,message:documents_spreadsheet.constraint_documents_document_spreadsheet_access_via_link
 msgid "To share a spreadsheet in edit mode, add the user in the accesses"
 msgstr ""
+"Om een spreadsheet in bewerkingsmodus te delen, voeg je de gebruiker toe in "
+"de toegangen"
 
 #. module: documents_spreadsheet
 #. odoo-javascript
@@ -529,14 +628,20 @@ msgstr "Werkruimte"
 #. module: documents_spreadsheet
 #. odoo-python
 #: code:addons/documents_spreadsheet/models/documents_document.py:0
+msgid "You are not allowed to freeze spreadsheets in Company"
+msgstr "Het is niet toegestaan ​​om spreadsheets te vergrendelen"
+
+#. module: documents_spreadsheet
+#. odoo-python
+#: code:addons/documents_spreadsheet/models/documents_document.py:0
 msgid "You can not edit a frozen spreadsheet"
-msgstr ""
+msgstr "Je kunt een bevroren spreadsheet niet bewerken"
 
 #. module: documents_spreadsheet
 #. odoo-javascript
 #: code:addons/documents_spreadsheet/static/src/bundle/actions/spreadsheet_action.js:0
 msgid "You can not freeze a frozen spreadsheet"
-msgstr ""
+msgstr "Je kunt een vergrendelde spreadsheet niet nogmaals vergrendelen"
 
 #. module: documents_spreadsheet
 #. odoo-javascript
@@ -544,9 +649,17 @@ msgstr ""
 #: code:addons/documents_spreadsheet/static/src/documents_permission_panel/documents_partner_access.js:0
 msgid "You can not share spreadsheet in edit mode to non-internal user."
 msgstr ""
+"Je kunt spreadsheet in bewerkingsmodus niet delen met een niet-interne "
+"gebruiker."
 
 #. module: documents_spreadsheet
 #. odoo-python
 #: code:addons/documents_spreadsheet/models/documents_document.py:0
 msgid "You don't have access to this document"
 msgstr "Je hebt geen toegang tot dit document"
+
+#. module: documents_spreadsheet
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/demo/files/pipeline_dashboard.json:0
+msgid "of target"
+msgstr "van doel"

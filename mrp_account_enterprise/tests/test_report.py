@@ -264,3 +264,152 @@ class TestReportsCommon(TestMrpAccount):
 
         self.assertEqual(len(workcenter_times), 1, "There should be only a single line for the workcenter cost")
         self.assertEqual(workcenter_times[0][3], production.workorder_ids[0].duration / 60, "Duration should be the total duration of this operation.")
+
+    @freeze_time('2022-05-28')
+    def test_cost_analysis_mismatch_in_produced_and_planned_quantity(self):
+        '''
+        verify that the Cost Analysis report correctly reflects the actual
+        quantity produced and cost per unit when it differs from the planned quantity.
+
+        '''
+        # enable by-product
+        self.env.user.groups_id += self.env.ref('mrp.group_mrp_byproducts')
+        self.product_3.standard_price = 10
+        self.product_4.standard_price = 10
+        bom_1 = self.env['mrp.bom'].create({
+            'product_id': self.product_6.id,
+            'product_tmpl_id': self.product_6.product_tmpl_id.id,
+            'product_uom_id': self.uom_unit.id,
+            'product_qty': 1.0,
+            'consumption': 'flexible',
+            'operation_ids': [
+            ],
+            'type': 'normal',
+            'bom_line_ids': [
+                (0, 0, {'product_id': self.product_3.id, 'product_qty': 1}),
+                (0, 0, {'product_id': self.product_4.id, 'product_qty': 1})
+            ],
+            'byproduct_ids': [
+                Command.create({
+                    'product_id': self.product_2.id,
+                    'product_uom_id': self.product_2.uom_id.id,
+                    'product_qty': 1,
+                }),
+            ],
+        })
+        # Make some stock and reserve
+        for product in bom_1.bom_line_ids.product_id:
+            self.env['stock.quant'].with_context(inventory_mode=True).create({
+                'product_id': product.id,
+                'inventory_quantity': 1000,
+                'location_id': self.stock_location_components.id,
+            })._apply_inventory()
+
+        # first MO set qty as 1 produce 5
+        production_form = Form(self.env['mrp.production'])
+        production_form.bom_id = bom_1
+        production_form.product_qty = 1
+        mo = production_form.save()
+        mo.action_confirm()
+        mo_form = Form(mo)
+        mo_form.qty_producing = 5
+        # 4 dozen of byproduct
+        with mo_form.move_byproduct_ids.edit(0) as line:
+            line.product_uom = self.env.ref('uom.product_uom_dozen')
+            line.quantity = 4
+            line.cost_share = 48
+        mo_done = mo_form.save()
+        mo_done.button_mark_done()
+
+        self.env.flush_all()
+
+        cost_analysis = self.env['report.mrp_account_enterprise.mrp_cost_structure'].get_lines(mo_done)
+
+        self.assertEqual(cost_analysis[0]['mo_qty'], 5)
+        self.assertEqual(cost_analysis[0]['total_cost'], 100)
+        # 4 * dozen = 48 units of by product
+        self.assertEqual(cost_analysis[0]['qty_by_byproduct'][self.product_2], 48)
+        self.assertEqual(cost_analysis[0]['total_cost_by_product'][self.product_2], 48)
+
+        # first MO set qty as 5 produce 1 without a backorder
+        production_form = Form(self.env['mrp.production'])
+        production_form.bom_id = bom_1
+        production_form.product_qty = 5
+        no_backorder_mo = production_form.save()
+        no_backorder_mo.action_confirm()
+        no_backorder_mo_form = Form(no_backorder_mo)
+        no_backorder_mo_form.qty_producing = 1
+        no_backorder_mo_done = no_backorder_mo_form.save()
+        action = no_backorder_mo_done.button_mark_done()
+        backorder = Form(self.env['mrp.production.backorder'].with_context(**action['context']))
+        backorder.save().action_close_mo()
+
+        self.env.flush_all()
+
+        cost_analysis = self.env['report.mrp_account_enterprise.mrp_cost_structure'].get_lines(no_backorder_mo_done)
+        self.assertEqual(cost_analysis[0]['mo_qty'], 1)
+        self.assertEqual(cost_analysis[0]['total_cost'], 20)
+        # Test that cost analysis is correct when multiple MOs are grouped
+        cost_analysis = self.env['report.mrp_account_enterprise.mrp_cost_structure'].get_lines(no_backorder_mo_done | mo_done)
+        self.assertEqual(cost_analysis[0]['mo_qty'], 6)
+        self.assertEqual(cost_analysis[0]['total_cost'], 120)
+        self.assertEqual(cost_analysis[0]['total_cost_components'], 120)
+
+    def test_scrap_is_in_report(self):
+        """
+            This test ensures that the report correctly reflects the quantities and uoms
+            for the scraps of manufactured products and their components.
+            The manufactured product's uom is set to dozen, while the scraps are in units.
+        """
+        self.product_2.standard_price = 10
+        self.planning_bom.product_qty = 1
+
+        # Create a manufacturing order (MO) with product UoM as dozen
+        mo = self.env['mrp.production'].create({
+            'bom_id': self.planning_bom.id,
+            'product_uom_id': self.env.ref('uom.product_uom_dozen').id,
+        })
+        self.env['stock.quant']._update_available_quantity(self.product_2, mo.location_dest_id, 100)
+        mo.action_confirm()
+
+        # scrap one unit of component
+        scrap_component = self.env['stock.scrap'].create({
+            'product_id': self.product_2.id,
+            'scrap_qty': 2,
+            'production_id': mo.id,
+            'product_uom_id': self.env.ref('uom.product_uom_unit').id,
+        })
+        scrap_component.action_validate()
+        mo.button_mark_done()
+
+        # scrap one unit of manufactured product
+        scrap_finished_product = self.env['stock.scrap'].create({
+            'product_id': self.planning_bom.product_id.id,
+            'scrap_qty': 1,
+            'production_id': mo.id,
+            'product_uom_id': self.env.ref('uom.product_uom_unit').id,
+        })
+        scrap_finished_product.action_validate()
+        self.env.flush_all()
+
+        cost_analysis = self.env['report.mrp_account_enterprise.mrp_cost_structure'].get_lines(mo)
+        # Assert the MO quantity is in the product uom (12 units per dozen)
+        self.assertEqual(cost_analysis[0]['mo_qty'], 12)
+        # Assert the total cost (12 units * 10 per unit * 2 components)
+        self.assertEqual(cost_analysis[0]['total_cost'], 240)
+
+        # Assert that the scraps are present and quantities match expectations
+        scrap_lines = cost_analysis[0]['scraps']
+        self.assertEqual(len(scrap_lines), 2)
+
+        # Check component scrap
+        component_scrap_line = scrap_lines[0]
+        self.assertEqual(component_scrap_line['product_id'], self.product_2)
+        self.assertEqual(component_scrap_line['quantity'], 2)
+        self.assertEqual(component_scrap_line['product_uom'], self.env.ref('uom.product_uom_unit'))
+
+        # Check finished product scrap
+        finished_product_scrap_line = scrap_lines[1]
+        self.assertEqual(finished_product_scrap_line['product_id'], self.planning_bom.product_id)
+        self.assertEqual(finished_product_scrap_line['quantity'], 1)
+        self.assertEqual(finished_product_scrap_line['product_uom'], self.env.ref('uom.product_uom_unit'))

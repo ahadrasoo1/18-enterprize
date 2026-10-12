@@ -176,6 +176,12 @@ class QualityPoint(models.Model):
         if self.test_type_id.technical_name not in ('register_byproducts', 'register_consumed_materials'):
             self.component_id = False
 
+    def write(self, vals):
+        res = super().write(vals)
+        if 'picking_type_ids' in vals:
+            self.filtered(lambda p: not p.is_workorder_step).operation_id = False
+        return res
+
 
 class QualityAlert(models.Model):
     _inherit = "quality.alert"
@@ -203,7 +209,7 @@ class QualityCheck(models.Model):
     move_id = fields.Many2one(
         'stock.move', 'Stock Move', check_company=True)
     move_line_id = fields.Many2one(
-        'stock.move.line', 'Stock Move Line', check_company=True)
+        'stock.move.line', 'Stock Move Line', check_company=True, index='btree_not_null')
     component_id = fields.Many2one(
         'product.product', 'Component', check_company=True)
     component_uom_id = fields.Many2one('uom.uom', related='move_id.product_uom', readonly=True)
@@ -219,7 +225,7 @@ class QualityCheck(models.Model):
     is_user_working = fields.Boolean(related="workorder_id.is_user_working")
     consumption = fields.Selection(related="workorder_id.consumption")
     working_state = fields.Selection(related="workorder_id.working_state")
-    is_deleted = fields.Boolean('Deleted in production')
+    is_deleted = fields.Boolean('Deleted in production')  # TODO DELETE in MASTER
 
     # Computed fields
     title = fields.Char('Title', compute='_compute_title')
@@ -238,15 +244,18 @@ class QualityCheck(models.Model):
 
     @api.model_create_multi
     def create(self, values):
-        points = self.env['quality.point'].search([
-            ('id', 'in', [value.get('point_id') for value in values]),
-            ('component_id', '!=', False)
-        ])
+        quality_points = {value['point_id'] for value in values if value.get('point_id')}
+        quality_points_component_mapping = {
+            point.id: point.component_id.id
+            for point in self.env['quality.point'].browse(list(quality_points))
+            if point.component_id
+        }
         for value in values:
-            if not value.get('component_id') and value.get('point_id'):
-                point = points.filtered(lambda p: p.id == value.get('point_id'))
-                if point:
-                    value['component_id'] = point.component_id.id
+            if value.get('component_id') or not value.get('point_id'):
+                continue
+            component = quality_points_component_mapping.get(value['point_id'])
+            if component:
+                value['component_id'] = component
         return super(QualityCheck, self).create(values)
 
     @api.depends('test_type_id', 'component_id', 'component_id.name', 'workorder_id', 'workorder_id.name')
@@ -319,7 +328,7 @@ class QualityCheck(models.Model):
 
     def _get_print_qty(self):
         if self.product_id.uom_id.category_id == self.env.ref('uom.product_uom_categ_unit'):
-            qty = int(self.workorder_id.qty_producing)
+            qty = int(self.workorder_id.qty_producing) or int(self.workorder_id.qty_production)
         else:
             qty = 1
         return qty
@@ -479,8 +488,26 @@ class QualityCheck(models.Model):
             if float_compare(self.qty_done, 0, precision_rounding=rounding) < 0:
                 raise UserError(_('Please enter a positive quantity.'))
 
+            def _find_quant(lot, location):
+                quants = lot.quant_ids.filtered(lambda quant:
+                    float_compare(quant.quantity, 0, precision_rounding=rounding) > 0
+                    and float_compare(quant.quantity, quant.reserved_quantity, precision_rounding=rounding) > 0
+                    and quant.location_id.usage in ['internal', 'transit']
+                    and (quant.location_id._child_of(self.move_id.location_id) if self.move_id else True)
+                )
+                if not location:
+                    return quants[0] if quants else quants
+                lot_quant = self.env['stock.quant']
+                for quant in quants:
+                    if not lot_quant or quant.location_id._child_of(location):
+                        lot_quant = quant
+                        if quant.location_id == location:
+                            break
+                return lot_quant
+
             # Write the lot and qty to the move line
             if self.move_line_id:
+                sml_vals = {}
                 # In case of a tracked component, another SML may already exists for
                 # the reservation of self.lot_id, so let's try to find and use it
                 if self.move_line_id.product_id.tracking != 'none':
@@ -488,26 +515,40 @@ class QualityCheck(models.Model):
                                               for sml in self.move_line_id.move_id.move_line_ids
                                               if sml.lot_id == self.lot_id and not sml.picked),
                                              self.move_line_id)
+                    # in case the lot of the quality check does not match any reserved lot
+                    if self.test_type == 'register_consumed_materials' and self.move_line_id.lot_id != self.lot_id:
+                        quant = _find_quant(lot=self.lot_id, location=self.move_line_id.location_id)
+                        if quant:
+                            sml_vals.update({'quant_id': quant.id})
+                        else:
+                            sml_vals.update({'location_id': self.move_id.location_id})
                 rounding = self.move_line_id.product_uom_id.rounding
                 if float_compare(self.qty_done, self.move_line_id.quantity, precision_rounding=rounding) >= 0:
-                    self.move_line_id.write({
+                    sml_vals.update({
                         'quantity': self.qty_done,
                         'lot_id': self.lot_id.id,
                         'picked': True,
                     })
+                    self.move_line_id.write(sml_vals)
                 else:
                     new_qty_reserved = self.move_line_id.quantity - self.qty_done
-                    default = {
-                        'quantity': new_qty_reserved,
-                    }
-                    self.move_line_id.copy(default=default)
-                    self.move_line_id.write({
+                    new_picked = self.move_line_id.picked
+                    sml_vals.update({
                         'quantity': self.qty_done,
+                        'lot_id': self.lot_id.id,
                         'picked': True,
                     })
-                    self.move_line_id.lot_id = self.lot_id
+                    self.move_line_id.write(sml_vals)
+                    if continue_production and float_compare(new_qty_reserved, 0, precision_rounding=rounding) >= 0:
+                        self.move_line_id.copy(default={'quantity': new_qty_reserved, 'picked': new_picked})
             else:
-                line = self.env['stock.move.line'].create(self._create_extra_move_lines())
+                sml_vals = self._create_extra_move_lines()
+                if self.test_type == 'register_consumed_materials' and self.lot_id:
+                    quant = _find_quant(lot=self.lot_id, location=self.env['stock.location'])
+                    if quant:
+                        for val in sml_vals:
+                            val.update({'quant_id': quant.id})
+                line = self.env['stock.move.line'].create(sml_vals)
                 self.move_line_id = line[:1]
             if continue_production:
                 self.workorder_id._create_subsequent_checks()

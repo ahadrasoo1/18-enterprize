@@ -1,10 +1,4 @@
 import {
-    createBoxesData,
-    defineAccountInvoiceExtractModels,
-} from "./account_invoice_extract_test_helpers";
-import { expect, beforeEach, test } from "@odoo/hoot";
-import { animationFrame } from "@odoo/hoot-mock";
-import {
     click,
     contains,
     focus,
@@ -14,7 +8,13 @@ import {
     start,
     startServer,
 } from "@mail/../tests/mail_test_helpers";
+import { beforeEach, expect, test } from "@odoo/hoot";
+import { animationFrame } from "@odoo/hoot-mock";
 import { onRpc } from "@web/../tests/web_test_helpers";
+import {
+    createBoxesData,
+    defineAccountInvoiceExtractModels,
+} from "./account_invoice_extract_test_helpers";
 
 defineAccountInvoiceExtractModels();
 
@@ -24,6 +24,14 @@ beforeEach(() => {
 
 test("basic", async () => {
     const pyEnv = await startServer();
+    pyEnv["res.partner"]._views.form = /* xml */ `
+        <form>
+            <group>
+                <field name="name" readonly="0"/>
+                <field name="vat" readonly="0"/>
+            </group>
+        </form>
+    `;
     const resCurrencyId1 = pyEnv["res.currency"].create({ name: "USD" });
     const resCurrencyId2 = pyEnv["res.currency"].create({ name: "EUR" });
     const resPartnerId1 = pyEnv["res.partner"].create({
@@ -55,44 +63,35 @@ test("basic", async () => {
         res_id: accountMoveId1,
     });
     onRpc("account.move", "get_boxes", () => {
-        return Promise.resolve(createBoxesData());
+        return createBoxesData();
     });
     onRpc("account.move", "get_partner_create_data", () => {
-        return Promise.resolve({});
+        return {};
     });
     onRpc("account.move", "set_user_selected_box", (args) => {
         const boxId = args.args[1];
         switch (boxId) {
             case 1:
-                return Promise.resolve(resPartnerId1);
+                return resPartnerId1;
             case 2:
-                return Promise.resolve(false);
+                return false;
             case 4:
-                return Promise.resolve("some invoice_id");
+                return "some invoice_id";
             case 7:
-                return Promise.resolve(false);
+                return false;
             case 8:
-                return Promise.resolve(resPartnerId1);
+                return resPartnerId1;
             case 10:
-                return Promise.resolve(123);
+                return 123;
             case 12:
-                return Promise.resolve("2022-01-01 00:00:00");
+                return "2022-01-01 00:00:00";
             case 14:
-                return Promise.resolve("2022-01-15 00:00:00");
+                return "2022-01-15 00:00:00";
             case 16:
-                return Promise.resolve(resCurrencyId2);
+                return resCurrencyId2;
         }
     });
     await start();
-    await openFormView("res.partner", resPartnerId1, {
-        arch: `
-            <form>
-                <group>
-                    <field name="name" readonly="0"/>
-                    <field name="vat" readonly="0"/>
-                </group>
-            </form>`,
-    });
     await openFormView("account.move", accountMoveId1, {
         arch: `
         <form string="Account Invoice" js_class="account_move_form">

@@ -13,7 +13,6 @@ This module allows ecommerce users to enter their UPS account number and deliver
         'data/payment_provider_data.xml',  # Depends on `payment_method_cash_on_delivery`.
 
         'views/delivery_ups_templates.xml',
-        'views/res_config_settings_views.xml',
     ],
     'demo': [
         'data/demo.xml',

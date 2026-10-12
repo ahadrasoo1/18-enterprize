@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 
+import json
+
+from collections import defaultdict
 from unittest.mock import patch
 
 from odoo.addons.account.tests.common import AccountTestInvoicingCommon
@@ -42,6 +45,7 @@ class TestAllReportsGeneration(AccountTestInvoicingCommon):
         l10n_pl_reports_tax_office = self.env.ref('l10n_pl.pl_tax_office_0215', raise_if_not_found=False)
         l10n_bd_corporate_tax_liability = self.env['account.account'].search([('account_type', '=', 'liability_current')], limit=1)
         l10n_ae_liability_account = self.env['account.account'].search([('account_type', '=', 'liability_current')], limit=1)
+        l10n_cz_reports_tax_office = self.env.ref('l10n_cz_reports_2025.tax_office_1', raise_if_not_found=False)
         company_test_values = {
             'LU': {'vat': 'LU12345613'},
             'BR': {'vat': '01234567891251'},
@@ -52,6 +56,7 @@ class TestAllReportsGeneration(AccountTestInvoicingCommon):
             'PL': {'l10n_pl_reports_tax_office_id': l10n_pl_reports_tax_office and l10n_pl_reports_tax_office.id},
             'BD': {'l10n_bd_corporate_tax_liability': l10n_bd_corporate_tax_liability, 'l10n_bd_corporate_tax_expense': l10n_bd_corporate_tax_liability},
             'AE': {'l10n_ae_tax_report_liabilities_account': l10n_ae_liability_account, 'l10n_ae_tax_report_counterpart_account': l10n_ae_liability_account},
+            'CZ': {'l10n_cz_tax_office_id': l10n_cz_reports_tax_office and l10n_cz_reports_tax_office.id}
         }
 
         # ecdf_prefix and matr_number only exist in enterprise
@@ -107,19 +112,24 @@ class TestAllReportsGeneration(AccountTestInvoicingCommon):
                         continue
                     with self.subTest(button=option_button['name']):
                         with patch.object(type(self.env['ir.actions.report']), '_run_wkhtmltopdf', lambda *args, **kwargs: b"This is a pdf"):
-                            action_dict = report.dispatch_report_action(
-                                options,
-                                option_button['action'],
-                                action_param=option_button.get('action_param'),
-                                on_sections_source=True,
-                            )
-
-                            if action_dict['type'] == 'ir_actions_account_report_download':
-                                file_gen_res = report.dispatch_report_action(options, action_dict['data']['file_generator'], on_sections_source=True)
-                                self.assertEqual(
-                                    set(file_gen_res.keys()), {'file_name', 'file_content', 'file_type'},
-                                    "File generator's result should always contain the same 3 keys."
+                            if not option_button.get('client_tag'):
+                                action_dict = report.dispatch_report_action(
+                                    options,
+                                    option_button['action'],
+                                    action_param=option_button.get('action_param'),
+                                    on_sections_source=True,
                                 )
+
+                                if action_dict['type'] == 'ir_actions_account_report_download':
+                                    file_gen_res = report.dispatch_report_action(
+                                        json.loads(action_dict['data']['options']),
+                                        action_dict['data']['file_generator'],
+                                        on_sections_source=True,
+                                    )
+                                    self.assertEqual(
+                                        set(file_gen_res.keys()), {'file_name', 'file_content', 'file_type'},
+                                        "File generator's result should always contain the same 3 keys."
+                                    )
 
             # Unset the test values, in case they are used in conditions to define custom behaviors
             self.env.company.write({
@@ -131,3 +141,32 @@ class TestAllReportsGeneration(AccountTestInvoicingCommon):
                 field_name: None
                 for field_name in partner_test_values.get(report.country_id.code, {}).keys()
             })
+
+    def test_custom_engines_related_groupby(self):
+        blacklist_xmlids = [
+            'account_reports.account_financial_report_executivesummary_avdebt0_ndays',
+            'account_reports.account_financial_report_executivesummary_avgcre0_ndays',
+            'account_reports.last_statement_balance_amount',
+            'account_reports.last_statement_balance_forced_currency_amount',
+        ]
+
+        custom_engine_expressions = self.env['account.report.expression'].search([
+            ('engine', '=', 'custom'),
+            ('id', 'not in', tuple(self.env['ir.model.data']._xmlid_to_res_id(xmlid) for xmlid in blacklist_xmlids)),
+        ])
+
+        expressions_per_engine = defaultdict(lambda: self.env['account.report.expression'])
+        for expression in custom_engine_expressions:
+            expressions_per_engine[(expression.report_line_id.report_id, expression.formula)] += expression
+
+        for (report, _formula), expressions in expressions_per_engine.items():
+            with self.subTest(report=report.name):
+                options = report.get_options({})
+
+                # Remove aggregations and external value expressions from those report lines, so that we always can set a groupby on the line
+                (expressions.report_line_id.expression_ids.filtered(lambda x: x.engine in ('aggregation', 'external'))).unlink()
+
+                expressions.report_line_id.user_groupby = 'account_code' # account_code is a  non-stored related field on aml
+                self.env.flush_all()
+                report._compute_expression_totals_for_each_column_group(expressions, options, groupby_to_expand='account_code')
+                # This computation fill fail if the custom engine forgot to handle such groupby, typically via a call to _field_to_sql

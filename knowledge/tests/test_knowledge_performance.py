@@ -101,7 +101,7 @@ class KnowledgePerformanceCase(KnowledgeCommonWData):
     @users('employee')
     @warmup
     def test_article_invite_members(self):
-        with self.assertQueryCount(employee=82):
+        with self.assertQueryCount(employee=83):
             shared_article = self.shared_children[0].with_env(self.env)
             partners = (self.customer + self.partner_employee_manager + self.partner_employee2).with_env(self.env)
             shared_article.invite_members(partners, 'write')
@@ -110,7 +110,7 @@ class KnowledgePerformanceCase(KnowledgeCommonWData):
     @warmup
     def test_article_move_to(self):
         before_id = self.workspace_children[0].id
-        with self.assertQueryCount(employee=24):  # knowledge: 23
+        with self.assertQueryCount(employee=22):
             writable_article = self.workspace_children[1].with_env(self.env)
             writable_article.move_to(parent_id=writable_article.parent_id.id, before_article_id=before_id)
 

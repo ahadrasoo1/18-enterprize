@@ -2,7 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from datetime import timedelta
-from odoo.fields import Datetime
+from odoo.fields import Command, Datetime
 from odoo.tests import Form
 from odoo.addons.sale_stock_renting.tests.test_rental_common import TestRentalCommon
 
@@ -43,6 +43,7 @@ class TestRentalKits(TestRentalCommon):
 
     def test_flow_1(self):
         rental_order_1 = self.sale_order_id.copy()
+        rental_line_1 = rental_order_1.order_line
         rental_order_1.order_line.write({'product_uom_qty': 3, 'is_rental': True})
         rental_order_1.rental_start_date = self.rental_start_date
         rental_order_1.rental_return_date = self.rental_return_date
@@ -69,6 +70,11 @@ class TestRentalKits(TestRentalCommon):
         outgoing_picking.move_ids[1].quantity = 2
         Form.from_action(self.env, outgoing_picking.button_validate()).save().process()
         self.assertEqual(rental_order_1.order_line.qty_delivered, 1)
+        self.env.add_to_compute(rental_line_1._fields['qty_delivered'], rental_line_1)
+        self.assertEqual(
+            rental_line_1.qty_delivered, 1,
+            "Quantity delivered shouldn't change after recompute",
+        )
 
         outgoing_picking_2 = rental_order_1.picking_ids.filtered(lambda p: p.state == 'assigned' and p.picking_type_code == 'outgoing')
         self.assertEqual(outgoing_picking_2.move_ids.mapped('product_uom_qty'), [1.0, 2.0])
@@ -82,6 +88,11 @@ class TestRentalKits(TestRentalCommon):
         outgoing_picking_2.move_ids[1].quantity = 2
         Form.from_action(self.env, outgoing_picking_2.button_validate()).save().process()
         self.assertEqual(rental_order_1.order_line.qty_delivered, 2)
+        self.env.add_to_compute(rental_line_1._fields['qty_delivered'], rental_line_1)
+        self.assertEqual(
+            rental_line_1.qty_delivered, 2,
+            "Quantity delivered shouldn't change after recompute",
+        )
 
         incoming_picking.move_ids[0].quantity = 1
         incoming_picking.move_ids[1].quantity = 2
@@ -159,11 +170,131 @@ class TestRentalKits(TestRentalCommon):
         rental.order_line.write({'product_uom_qty': 1, 'is_rental': True})
         rental.action_confirm()
 
+        # The BoM line sequence should be respected when exploding a BoM that contains a kit.
         self.assertRecordValues(rental.picking_ids.move_ids, [
-            {'product_id': self.component_2.id, 'product_qty': 2, 'bom_line_id': bom_line_02.id, 'location_id': stock_location.id},
             {'product_id': self.component_2.id, 'product_qty': 1, 'bom_line_id': bom_line_03.id, 'location_id': stock_location.id},
             {'product_id': component_3.id, 'product_qty': 1, 'bom_line_id': bom_line_04.id, 'location_id': stock_location.id},
-            {'product_id': self.component_2.id, 'product_qty': 2, 'bom_line_id': bom_line_02.id, 'location_id': rental_location.id},
+            {'product_id': self.component_2.id, 'product_qty': 2, 'bom_line_id': bom_line_02.id, 'location_id': stock_location.id},
             {'product_id': self.component_2.id, 'product_qty': 1, 'bom_line_id': bom_line_03.id, 'location_id': rental_location.id},
             {'product_id': component_3.id, 'product_qty': 1, 'bom_line_id': bom_line_04.id, 'location_id': rental_location.id},
+            {'product_id': self.component_2.id, 'product_qty': 2, 'bom_line_id': bom_line_02.id, 'location_id': rental_location.id},
         ])
+
+    def test_pickup_kit_from_rental(self):
+        """Create a rental with a kit and confirm it. Then, pickup the kit.
+        """
+        # disable the setting to don't create a picking and allow the user to pickup the kit
+        self.env.user.groups_id -= self.env.ref('sale_stock_renting.group_rental_stock_picking')
+        settings = self.env['res.config.settings'].with_user(self.env.user).create({})
+        settings.group_rental_stock_picking = False
+        settings.set_values()
+        # create a rental with kit
+        rental = self.sale_order_id.copy()
+        rental.order_line.write({'product_uom_qty': 1, 'is_rental': True})
+        self.assertEqual(rental.order_line.product_id.is_kits, True)
+        rental.action_confirm()
+        # pickup the kit
+        self.assertEqual(rental.order_line.qty_delivered, 0)
+        action_dict = rental.action_open_pickup()
+        pickup_wizard = self.env['rental.order.wizard'].with_context(
+            action_dict['context']
+        ).create({})
+        pickup_wizard._get_wizard_lines()
+        pickup_wizard.apply()
+        self.assertEqual(rental.order_line.qty_delivered, 1)
+
+    def test_kit_bom_created_after_picking_creation(self):
+        """
+        With rental transfer enabled confirm a rental order for a product without a BOM
+        add a kit BOM for it and validate the rental transfers.
+        """
+        rental_product = self.component_1
+        rental_product.rent_ok = True
+        rental_order = self.env['sale.order'].with_context(in_rental_app=True).create({
+            'partner_id': self.cust1.id,
+            'rental_start_date': self.rental_start_date,
+            'rental_return_date': self.rental_return_date,
+            'order_line': [Command.create({
+                'product_id': rental_product.id,
+                'product_uom_qty': 1,
+            })],
+        })
+        rental_order.action_confirm()
+        self.env['mrp.bom'].create({
+            'product_tmpl_id': rental_product.product_tmpl_id.id,
+            'product_id': rental_product.id,
+            'product_qty': 1.0,
+            'type': 'phantom',
+            'bom_line_ids': [Command.create({
+                'product_id': self.component_2.id,
+                'product_qty': 1,
+            })],
+        })
+        # invalidate the record to be considered as a kit
+        rental_product.invalidate_recordset()
+        delivery = rental_order.picking_ids[0]
+        self.assertEqual(delivery.move_ids.product_id, rental_product)
+        # try to validate which will explode the kit moves
+        delivery.button_validate()
+        self.assertEqual(delivery.move_ids.product_id, self.component_2)
+        delivery.move_ids.quantity = 1.0
+        delivery.button_validate()
+        self.assertRecordValues(delivery.move_ids, [
+            {'product_id': self.component_2.id, 'state': 'done'}
+        ])
+
+    def test_kit_multipick_flow(self):
+        """
+        Test that confirming a rental order with a kit product whose components
+        use two different pack locations does not crash when assigning a return_id.
+        Two pick operations are generated (one per pack location).
+        """
+        self.warehouse_id.delivery_steps = 'pick_pack_ship'
+
+        # Locations
+        customer_location = self.env.ref('stock.stock_location_customers')
+        output_location = self.env.ref('stock.stock_location_output')
+        pack_location_copy = self.env.ref('stock.location_pack_zone').copy()
+
+        # Create a new pick operation
+        pick_operation_copy = self.warehouse_id.pick_type_id.copy({'default_location_dest_id': pack_location_copy.id})
+
+        # Create a new route to use the new pick operation
+        custom_route = self.env['stock.route'].create({
+            'name': 'Test',
+            'rule_ids': [
+                Command.create({
+                    'name': 'test 1',
+                    'action': 'pull',
+                    'picking_type_id': pick_operation_copy.id,
+                    'location_src_id': self.warehouse_id.lot_stock_id.id,
+                    'location_dest_id': customer_location.id,
+                }),
+                Command.create({
+                    'name': 'test 2',
+                    'action': 'push',
+                    'picking_type_id': self.warehouse_id.pack_type_id.id,
+                    'location_src_id': pack_location_copy.id,
+                    'location_dest_id': output_location.id,
+                }),
+                Command.create({
+                    'name': 'test 3',
+                    'action': 'push',
+                    'picking_type_id': self.warehouse_id.out_type_id.id,
+                    'location_src_id': output_location.id,
+                    'location_dest_id': customer_location.id,
+                }),
+            ],
+        })
+
+        # Add the route to a component product
+        self.component_1.route_ids = [Command.link(custom_route.id)]
+
+        # create a rental with the kit product
+        rental = self.sale_order_id.copy()
+        rental.order_line.write({'product_uom_qty': 1, 'is_rental': True})
+        self.assertEqual(rental.order_line.product_id.is_kits, True)
+        rental.action_confirm()
+
+        picks = rental.picking_ids.filtered(lambda pick: pick.picking_type_id in (pick_operation_copy, self.warehouse_id.pick_type_id))
+        self.assertEqual(len(picks), 2)

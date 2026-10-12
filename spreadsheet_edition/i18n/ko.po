@@ -1,25 +1,30 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* spreadsheet_edition
-# 
+# * spreadsheet_edition
+#
 # Translators:
 # Martin Trigaux, 2024
-# Wil Odoo, 2024
 # Daye Jeong, 2024
-# 
+# Wil Odoo, 2025
+# Sarah Park, 2025
+#
+# "Kwanghee Park (kwpa)" <kwpa@odoo.com>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-26 09:16+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Daye Jeong, 2024\n"
-"Language-Team: Korean (https://app.transifex.com/odoo/teams/41243/ko/)\n"
+"POT-Creation-Date: 2026-06-19 17:50+0000\n"
+"PO-Revision-Date: 2026-02-21 18:31+0000\n"
+"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"Language-Team: Korean <https://translate.odoo.com/projects/odoo-18/"
+"spreadsheet_edition/ko/>\n"
+"Language: ko\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: ko\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 5.14.3\n"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -61,7 +66,7 @@ msgstr "%(pivot_title)s의 %(group_by)s (%(granularity)s)"
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/comments/side_panel/comment_threads_side_panel.js:0
 msgid "%s threads"
-msgstr ""
+msgstr "%s 스레드"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -79,7 +84,7 @@ msgstr "- 숫자: %s"
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/comments/side_panel/comment_threads_side_panel.js:0
 msgid "1 thread"
-msgstr ""
+msgstr "1 스레드"
 
 #. module: spreadsheet_edition
 #: model:ir.model.constraint,message:spreadsheet_edition.constraint_spreadsheet_revision_parent_unique
@@ -146,6 +151,16 @@ msgid "Ascending"
 msgstr "오름차순"
 
 #. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/filter_editor/filter_editor_side_panel.js:0
+msgid ""
+"At least one data source has an invalid model. Please delete it before "
+"editing this global filter."
+msgstr ""
+"하나 이상의 데이터 소스에 유효하지 않은 모델이 있습니다. 전체 필터를 편집하"
+"기 전에 제거하십시오. "
+
+#. module: spreadsheet_edition
 #: model:ir.model.fields,field_description:spreadsheet_edition.field_spreadsheet_cell_thread__message_attachment_count
 msgid "Attachment Count"
 msgstr "첨부 파일 수"
@@ -170,6 +185,7 @@ msgstr "축"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/actions/version_history/side_panel/version_history_side_panel.xml:0
 #: code:addons/spreadsheet_edition/static/src/bundle/version_history/side_panel/version_history_side_panel.xml:0
 msgid "Back"
 msgstr "뒤로"
@@ -196,9 +212,9 @@ msgstr "하단"
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/assets/components/spreadsheet_selector_dialog/spreadsheet_selector_dialog.xml:0
 #: code:addons/spreadsheet_edition/static/src/bundle/actions/input_dialog/input_dialog.xml:0
+#: code:addons/spreadsheet_edition/static/src/bundle/actions/version_history/restore_version_dialog/restore_version_dialog.xml:0
 #: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/filter_editor/filter_editor_side_panel.xml:0
 #: code:addons/spreadsheet_edition/static/src/bundle/ir_menu_selector/ir_menu_selector.xml:0
-#: code:addons/spreadsheet_edition/static/src/bundle/version_history/restore_version_dialog/restore_version_dialog.xml:0
 msgid "Cancel"
 msgstr "취소"
 
@@ -208,7 +224,15 @@ msgstr "취소"
 msgid ""
 "Changing the pivot definition requires to reload the data. It may take some "
 "time."
-msgstr "피벗 정의를 수정하려면 데이터를 다시 로드해야 하므로 완료하는 데 다소 시간이 걸릴 수 있습니다."
+msgstr ""
+"피벗 정의를 수정하려면 데이터를 다시 로드해야 하므로 완료하는 데 다소 시간이 "
+"걸릴 수 있습니다."
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/pivot_missing_cell_dialog/pivot_missing_cell_dialog.xml:0
+msgid "Close"
+msgstr "닫기"
 
 #. module: spreadsheet_edition
 #: model:ir.model,name:spreadsheet_edition.model_spreadsheet_revision
@@ -257,12 +281,6 @@ msgstr "작성자"
 #: model:ir.model.fields,field_description:spreadsheet_edition.field_spreadsheet_revision__create_date
 msgid "Created on"
 msgstr "작성일자"
-
-#. module: spreadsheet_edition
-#. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/chart/side_panels/odoo_line/odoo_line_config_panel.js:0
-msgid "Cumulative data"
-msgstr "누적 데이터"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -329,6 +347,24 @@ msgstr "학위"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/chart/side_panels/common/config_panel.xml:0
+msgid "Delete Chart"
+msgstr "그래프 삭제"
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/list/side_panels/list_details_side_panel.xml:0
+msgid "Delete List"
+msgstr "목록 삭제"
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/pivot/side_panels/pivot_details_side_panel.xml:0
+msgid "Delete Pivot"
+msgstr "피벗 삭제"
+
+#. module: spreadsheet_edition
+#. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/list/side_panels/edit_list_sorting_section/edit_list_sorting_section.xml:0
 msgid "Descending"
 msgstr "내림차순"
@@ -337,17 +373,25 @@ msgstr "내림차순"
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/components/locale_status/locale_status.js:0
 msgid ""
-"Difference between user locale (%(user_locale)s) and spreadsheet locale "
-"(%(spreadsheet_locale)s). This spreadsheet is using the formats below:"
+"Difference between user locale (%(user_locale)s) and spreadsheet locale (%"
+"(spreadsheet_locale)s). This spreadsheet is using the formats below:"
 msgstr ""
-"사용자에 대한 로컬 설정 (%(user_locale)s)과 스프레드시트 로컬 설정(%(spreadsheet_locale)s)의 "
-"차이입니다. 이 스프레드시트는 아래와 같은 형식을 사용하고 있습니다:"
+"사용자에 대한 로컬 설정 (%(user_locale)s)과 스프레드시트 로컬 설정(%"
+"(spreadsheet_locale)s)의 차이입니다. 이 스프레드시트는 아래와 같은 형식을 사"
+"용하고 있습니다:"
 
 #. module: spreadsheet_edition
 #: model:ir.model.fields,field_description:spreadsheet_edition.field_spreadsheet_cell_thread__display_name
 #: model:ir.model.fields,field_description:spreadsheet_edition.field_spreadsheet_revision__display_name
 msgid "Display Name"
 msgstr "표시명"
+
+#. module: spreadsheet_edition
+#: model:ir.model.fields,field_description:spreadsheet_edition.field_spreadsheet_dashboard__display_thumbnail
+#: model:ir.model.fields,field_description:spreadsheet_edition.field_spreadsheet_dashboard_share__display_thumbnail
+#: model:ir.model.fields,field_description:spreadsheet_edition.field_spreadsheet_mixin__display_thumbnail
+msgid "Display Thumbnail"
+msgstr "썸네일 표시"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -417,7 +461,7 @@ msgstr "필터 속성"
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/filter_editor/text_filter_editor_side_panel.xml:0
 msgid "Filter value"
-msgstr ""
+msgstr "필터 값"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -491,6 +535,12 @@ msgstr ""
 #: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/filter_editor/relation_filter_editor_side_panel.xml:0
 msgid "Include children"
 msgstr "하위 항목 포함"
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/pivot_missing_cell_dialog/pivot_missing_cell_dialog.xml:0
+msgid "Insert a pivot cell"
+msgstr "피벗 셀 삽입"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -608,7 +658,9 @@ msgstr "목록 이름"
 msgid ""
 "List duplicated. Use the \"Re-insert list\" menu item to insert it in a "
 "sheet."
-msgstr "목록이 복사되었습니다. \"목록 다시 삽입\" 메뉴 항목을 사용하여 시트에 삽입합니다."
+msgstr ""
+"목록이 복사되었습니다. \"목록 다시 삽입\" 메뉴 항목을 사용하여 시트에 삽입합"
+"니다."
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -624,26 +676,34 @@ msgstr "목록 속성"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/actions/version_history/side_panel/version_history_side_panel.xml:0
 #: code:addons/spreadsheet_edition/static/src/bundle/version_history/side_panel/version_history_side_panel.xml:0
 msgid "Load More"
 msgstr "더 불러오기"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/chart/side_panels/odoo_chart_with_axis/design_panel.xml:0
-msgid "Logarithmic"
-msgstr ""
+#: code:addons/spreadsheet_edition/static/src/bundle/chart/side_panels/common/config_panel.xml:0
+#: code:addons/spreadsheet_edition/static/src/bundle/list/plugins/list_autofill_plugin.js:0
+msgid "Loading..."
+msgstr "불러오는 중..."
 
 #. module: spreadsheet_edition
 #. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/chart/side_panels/odoo_chart_with_axis/design_panel.xml:0
+msgid "Logarithmic"
+msgstr "로그"
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/actions/version_history/side_panel/version_history_item.js:0
 #: code:addons/spreadsheet_edition/static/src/bundle/o_spreadsheet/menu_item_registry.js:0
-#: code:addons/spreadsheet_edition/static/src/bundle/version_history/side_panel/version_history_item.js:0
 msgid "Make a copy"
 msgstr "복사본 만들기"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/version_history/restore_version_dialog/restore_version_dialog.xml:0
+#: code:addons/spreadsheet_edition/static/src/bundle/actions/version_history/restore_version_dialog/restore_version_dialog.xml:0
 msgid "Make a copy instead"
 msgstr "복사본 만들기"
 
@@ -734,12 +794,6 @@ msgstr "%s의 이름:"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/version_history/side_panel/version_history_item.js:0
-msgid "Name this version"
-msgstr "이 버전의 이름"
-
-#. module: spreadsheet_edition
-#. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/o_spreadsheet/menu_item_registry.js:0
 msgid "New"
 msgstr "신규"
@@ -761,6 +815,12 @@ msgstr "%s의 새로운 멘션"
 #: code:addons/spreadsheet_edition/static/src/assets/components/spreadsheet_selector_dialog/spreadsheet_selector_panel.js:0
 msgid "New sheet inserted in '%s'"
 msgstr "'%s'에 새 시트가 삽입됨"
+
+#. module: spreadsheet_edition
+#. odoo-python
+#: code:addons/spreadsheet_edition/models/spreadsheet_mixin.py:0
+msgid "New spreadsheet created"
+msgstr "새 스프레드시트 생성"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -802,6 +862,12 @@ msgstr "전송 오류가 발생한 메시지 수입니다."
 
 #. module: spreadsheet_edition
 #. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/actions/version_history/side_panel/version_history_item.xml:0
+msgid "OLD"
+msgstr "OLD"
+
+#. module: spreadsheet_edition
+#. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/actions/input_dialog/input_dialog.js:0
 #: code:addons/spreadsheet_edition/static/src/bundle/actions/version_history/version_history_action.js:0
 msgid "Odoo Spreadsheet"
@@ -823,7 +889,7 @@ msgstr "주문"
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/actions/version_history/version_history_action.js:0
 msgid "Original data"
-msgstr ""
+msgstr "원본 데이터"
 
 #. module: spreadsheet_edition
 #: model:ir.model.fields,field_description:spreadsheet_edition.field_spreadsheet_revision__parent_revision_id
@@ -864,14 +930,14 @@ msgstr "올바른 번호를 입력하세요."
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/chart/side_panels/odoo_chart_with_axis/design_panel.xml:0
 msgid "Polynomial"
-msgstr ""
+msgstr "다항식"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/filter_editor/relation_filter_editor_side_panel.xml:0
 #: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/filter_editor/text_filter_editor_side_panel.xml:0
 msgid "Possible values"
-msgstr ""
+msgstr "가능한 값"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -902,18 +968,18 @@ msgstr "분기 & 연도"
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/filter_editor/date_filter_editor_side_panel.xml:0
 msgid "Quarters"
-msgstr ""
+msgstr "분수"
 
 #. module: spreadsheet_edition
 #: model:ir.model.fields,field_description:spreadsheet_edition.field_spreadsheet_cell_thread__rating_ids
 msgid "Ratings"
-msgstr "평가"
+msgstr "평점"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/o_spreadsheet/menu_item_registry.js:0
 msgid "Re-insert dynamic pivot"
-msgstr ""
+msgstr "동적 피벗 재삽입"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -925,8 +991,14 @@ msgstr "목록 재삽입"
 #. module: spreadsheet_edition
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/o_spreadsheet/menu_item_registry.js:0
+msgid "Re-insert pivot cell"
+msgstr "피벗 셀 재삽입"
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/o_spreadsheet/menu_item_registry.js:0
 msgid "Re-insert static pivot"
-msgstr ""
+msgstr "정적 피벗 재삽입"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -938,7 +1010,7 @@ msgstr "이 스레드 다시 열기"
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/list/plugins/list_autofill_plugin.js:0
 msgid "Record #%(record_number)s"
-msgstr ""
+msgstr "레코드 #%(record_number)s"
 
 #. module: spreadsheet_edition
 #: model:ir.model.fields,field_description:spreadsheet_edition.field_spreadsheet_revision__res_id
@@ -978,7 +1050,6 @@ msgstr "제거"
 #. module: spreadsheet_edition
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/actions/control_panel/spreadsheet_name.xml:0
-#: code:addons/spreadsheet_edition/static/src/bundle/version_history/side_panel/version_history_item.js:0
 msgid "Rename"
 msgstr "이름 바꾸기"
 
@@ -1002,7 +1073,7 @@ msgstr "해결됨"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/version_history/side_panel/version_history_item.js:0
+#: code:addons/spreadsheet_edition/static/src/bundle/actions/version_history/side_panel/version_history_item.js:0
 msgid "Restore this version"
 msgstr "이 버전 복원"
 
@@ -1016,7 +1087,7 @@ msgstr "값을 범위로 제한"
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/filter_editor/relation_filter_editor_side_panel.xml:0
 msgid "Restrict values with a domain"
-msgstr ""
+msgstr "도메인으로 값 제한하기"
 
 #. module: spreadsheet_edition
 #: model:ir.model.fields,field_description:spreadsheet_edition.field_spreadsheet_revision__revision_uuid
@@ -1133,7 +1204,7 @@ msgstr "필터 설정"
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/chart/side_panels/odoo_chart_with_axis/design_panel.xml:0
 msgid "Show trend line"
-msgstr ""
+msgstr "추세선 표시"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -1163,6 +1234,7 @@ msgstr "정렬"
 #. module: spreadsheet_edition
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/assets/spreadsheet_cog_menu/spreadsheet_cog_menu.xml:0
+#: code:addons/spreadsheet_edition/static/src/bundle/components/spreadsheet_navbar/spreadsheet_navbar.xml:0
 #: model:ir.ui.menu,name:spreadsheet_edition.menu_technical_spreadsheet
 msgid "Spreadsheet"
 msgstr "스프레드시트"
@@ -1211,13 +1283,6 @@ msgstr "누적 라인"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/chart/side_panels/odoo_bar/odoo_bar_config_panel.js:0
-#: code:addons/spreadsheet_edition/static/src/bundle/chart/side_panels/odoo_line/odoo_line_config_panel.js:0
-msgid "Stacked linechart"
-msgstr "꺾은선 그래프"
-
-#. module: spreadsheet_edition
-#. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/global_filters/global_filter_side_panel.xml:0
 msgid "Text"
 msgstr "문자"
@@ -1228,7 +1293,39 @@ msgstr "문자"
 msgid ""
 "The history of your spreadsheet is corrupted and you are likely missing "
 "recent revisions. This feature cannot be used."
-msgstr "스프레드시트의 기록이 손상되어 최근 수정 내용이 누락되었을 수 있습니다. 현재는 이 기능을 사용할 수 없습니다."
+msgstr ""
+"스프레드시트의 기록이 손상되어 최근 수정 내용이 누락되었을 수 있습니다. 현재"
+"는 이 기능을 사용할 수 없습니다."
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/chart/side_panels/common/config_panel.js:0
+msgid ""
+"The model (%(model)s) of this chart is not valid (it may have been renamed/"
+"deleted). Please re-insert a new chart."
+msgstr ""
+"이 차트의 모델 (%(model)s)이 유효하지 않습니다. (이름이 변경되었거나 삭제되었"
+"을 수 있습니다) 새 차트를 삽입하십시오. "
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/list/side_panels/list_details_side_panel.js:0
+msgid ""
+"The model (%(model)s) of this list is not valid (it may have been renamed/"
+"deleted). Please re-insert a new list."
+msgstr ""
+"이 목록의 모델 (%(model)s)이 유효하지 않습니다. (이름이 변경되었거나 삭제되었"
+"을 수 있습니다) 새 목록을 삽입하십시오. "
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/pivot/side_panels/pivot_details_side_panel.js:0
+msgid ""
+"The model (%(model)s) of this pivot is not valid (it may have been renamed/"
+"deleted). Please re-insert a new pivot."
+msgstr ""
+"이 피벗의 모델 (%(model)s)이 유효하지 않습니다. (이름이 변경되었거나 삭제되었"
+"을 수 있습니다) 새 피벗을 삽입하십시오. "
 
 #. module: spreadsheet_edition
 #. odoo-python
@@ -1236,13 +1333,16 @@ msgstr "스프레드시트의 기록이 손상되어 최근 수정 내용이 누
 msgid ""
 "The operation could not be applied because of a concurrent update. Please "
 "try again."
-msgstr "현재 업데이트를 진행 중이므로 이 작업을 적용할 수 없습니다. 나중에 다시 시도해 주세요."
+msgstr ""
+"현재 업데이트를 진행 중이므로 이 작업을 적용할 수 없습니다. 나중에 다시 시도"
+"해 주세요."
 
 #. module: spreadsheet_edition
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/actions/version_history/version_history_action.js:0
 msgid ""
-"There are missing revisions that prevent to restore the whole edition history.\n"
+"There are missing revisions that prevent to restore the whole edition "
+"history.\n"
 "\n"
 "Would you like to load the more recent modifications?"
 msgstr ""
@@ -1252,6 +1352,7 @@ msgstr ""
 
 #. module: spreadsheet_edition
 #. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/actions/version_history/side_panel/version_history_side_panel.xml:0
 #: code:addons/spreadsheet_edition/static/src/bundle/version_history/side_panel/version_history_side_panel.xml:0
 msgid "There are no prior revisions for this spreadsheet."
 msgstr "이 스프레드시트에는 이전에 수정된 내용이 없습니다."
@@ -1306,13 +1407,20 @@ msgstr "유형"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/filter_editor/date_filter_editor_side_panel.xml:0
-msgid "Value options"
-msgstr ""
+#: code:addons/spreadsheet_edition/static/src/bundle/pivot/plugins/pivot_autofill_plugin.js:0
+msgid "Unknown"
+msgstr "알 수 없음"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/version_history/index.js:0
+#: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/filter_editor/date_filter_editor_side_panel.xml:0
+msgid "Value options"
+msgstr "가치 옵션"
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/actions/version_history/side_panel/version_history_side_panel.xml:0
+#: code:addons/spreadsheet_edition/static/src/bundle/version_history/side_panel/version_history_side_panel.xml:0
 msgid "Version History"
 msgstr "버전 기록"
 
@@ -1365,21 +1473,9 @@ msgstr "년"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/version_history/restore_version_dialog/restore_version_dialog.xml:0
+#: code:addons/spreadsheet_edition/static/src/bundle/actions/version_history/restore_version_dialog/restore_version_dialog.xml:0
 msgid "Yes, restore"
 msgstr "예, 복원합니다."
-
-#. module: spreadsheet_edition
-#. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/comments/side_panel/comment_threads_side_panel.xml:0
-msgid "activeSheet"
-msgstr "activeSheet"
-
-#. module: spreadsheet_edition
-#. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/comments/side_panel/comment_threads_side_panel.xml:0
-msgid "allSheets"
-msgstr "allSheets"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -1389,45 +1485,15 @@ msgstr "오름차순"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/chart/side_panels/odoo_chart_with_axis/design_panel.xml:0
-msgid "bottom"
-msgstr "하단"
-
-#. module: spreadsheet_edition
-#. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/pivot/side_panels/pivot_details_side_panel.js:0
 msgid "descending"
 msgstr "내림차순"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/chart/side_panels/odoo_chart_with_axis/design_panel.xml:0
-msgid "exponential"
-msgstr ""
-
-#. module: spreadsheet_edition
-#. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/list/side_panels/edit_list_sorting_section/edit_list_sorting_section.xml:0
-msgid "false"
-msgstr "X"
-
-#. module: spreadsheet_edition
-#. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/assets/components/spreadsheet_selector_dialog/spreadsheet_selector_dialog.js:0
 msgid "graph"
 msgstr "그래프"
-
-#. module: spreadsheet_edition
-#. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/chart/side_panels/odoo_chart_with_axis/design_panel.xml:0
-msgid "left"
-msgstr "왼쪽"
-
-#. module: spreadsheet_edition
-#. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/chart/side_panels/odoo_chart_with_axis/design_panel.xml:0
-msgid "linear"
-msgstr ""
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -1440,12 +1506,6 @@ msgstr "링크"
 #: code:addons/spreadsheet_edition/static/src/assets/components/spreadsheet_selector_dialog/spreadsheet_selector_dialog.js:0
 msgid "list"
 msgstr "목록"
-
-#. module: spreadsheet_edition
-#. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/chart/side_panels/odoo_chart_with_axis/design_panel.xml:0
-msgid "logarithmic"
-msgstr ""
 
 #. module: spreadsheet_edition
 #: model_terms:ir.ui.view,arch_db:spreadsheet_edition.mail_notification_layout
@@ -1462,45 +1522,15 @@ msgstr "하지않음"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/chart/side_panels/odoo_chart_with_axis/design_panel.xml:0
-msgid "none"
-msgstr "없음"
-
-#. module: spreadsheet_edition
-#. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/assets/components/spreadsheet_selector_dialog/spreadsheet_selector_dialog.js:0
 msgid "pivot"
 msgstr "피벗"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/chart/side_panels/odoo_chart_with_axis/design_panel.xml:0
-msgid "polynomial"
-msgstr ""
-
-#. module: spreadsheet_edition
-#. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/assets/components/spreadsheet_selector_dialog/spreadsheet_selector_dialog.xml:0
 msgid "records of the list."
 msgstr "목록의 레코드."
-
-#. module: spreadsheet_edition
-#. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/chart/side_panels/odoo_chart_with_axis/design_panel.xml:0
-msgid "right"
-msgstr "오른쪽"
-
-#. module: spreadsheet_edition
-#. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/chart/side_panels/odoo_chart_with_axis/design_panel.xml:0
-msgid "top"
-msgstr "상단"
-
-#. module: spreadsheet_edition
-#. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/list/side_panels/edit_list_sorting_section/edit_list_sorting_section.xml:0
-msgid "true"
-msgstr "O"
 
 #. module: spreadsheet_edition
 #: model:ir.model,name:spreadsheet_edition.model_ir_websocket

@@ -2,13 +2,13 @@ import { registry } from "@web/core/registry";
 import { _t } from "@web/core/l10n/translation";
 
 registry.category("web_tour.tours").add("website_helpdesk_forum_tour", {
-    url: '/forum/help-1',
-    test: true,
+    url: "/forum/help-1",
     steps: () => [
         {
             content: "Ask the question in this forum by clicking on the button.",
-            trigger: '.o_wforum_ask_btn',
+            trigger: ".o_wforum_ask_btn",
             run: "click",
+            expectUnloadPage: true,
         },
         {
             trigger: "input[name=post_name]",
@@ -16,17 +16,12 @@ registry.category("web_tour.tours").add("website_helpdesk_forum_tour", {
             run: "edit Test",
         },
         {
-            isActive: ["auto"],
-            trigger: `input[name=post_name]:not(:empty)`,
-        },
-        {
+            content: "Put your question here.",
             trigger: ".note-editable p",
-            content: _t("Put your question here."),
-            run: "editor Test",
+            run: "editor First Question <p>code here</p>",
         },
         {
-            isActive: ["auto"],
-            trigger: `.note-editable p:not(:contains(/^<br>$/))`,
+            trigger: ".note-editable p:not(:has(br))",
         },
         {
             trigger: ".o_select_menu_toggler",
@@ -40,16 +35,19 @@ registry.category("web_tour.tours").add("website_helpdesk_forum_tour", {
         {
             content: "Select found select menu item",
             trigger: ".o_popover.o_select_menu_menu",
-            run: 'click',
+            run: "click",
         },
         {
             trigger: "button:contains(/^Post/)",
             content: _t("Click to post your question."),
             run: "click",
+            expectUnloadPage: true,
         },
         {
-            isActive: ["auto"],
-            trigger: ".modal .modal-header button.btn-close",
+            trigger: ".o_wforum_question:contains(test user)",
+        },
+        {
+            trigger: ".modal.modal_shown.show:contains(thanks for posting!) button.btn-close",
             run: "click",
         },
         {

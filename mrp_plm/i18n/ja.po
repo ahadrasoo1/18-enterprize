@@ -1,23 +1,28 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* mrp_plm
-# 
+# * mrp_plm
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Junko Augias, 2025
+#
+# "Junko Augias (juau)" <juau@odoo.com>, 2025, 2026.
+# Weblate <noreply-mt-weblate@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Japanese (https://app.transifex.com/odoo/teams/41243/ja/)\n"
+"POT-Creation-Date: 2026-04-10 18:47+0000\n"
+"PO-Revision-Date: 2026-06-06 09:52+0000\n"
+"Last-Translator: \"Junko Augias (juau)\" <juau@odoo.com>\n"
+"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-18/mrp_plm/"
+"ja/>\n"
+"Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: ja\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 2026.6.1\n"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__document_count
@@ -35,7 +40,8 @@ msgstr "設計変更オーダ数"
 #. odoo-python
 #: code:addons/mrp_plm/models/mrp_eco.py:0
 msgid "%(approval_name)s %(approver_name)s %(approval_status)s this ECO"
-msgstr "%(approval_name)s %(approver_name)s %(approval_status)sこの設計変更オーダ　"
+msgstr ""
+"%(approval_name)s %(approver_name)s %(approval_status)sこの設計変更オーダ　"
 
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_type_dashboard_view_kanban
@@ -51,15 +57,19 @@ msgstr ""
 #: code:addons/mrp_plm/models/mrp_eco.py:0
 msgid ""
 "<p class=\"o_view_nocontent_smiling_face\">\n"
-"                        Upload files to your ECO, that will be applied to the product later\n"
+"                        Upload files to your ECO, that will be applied to "
+"the product later\n"
 "                    </p><p>\n"
-"                        Use this feature to store any files, like drawings or specifications.\n"
+"                        Use this feature to store any files, like drawings "
+"or specifications.\n"
 "                    </p>"
 msgstr ""
 "<p class=\"o_view_nocontent_smiling_face\">\n"
-"                        プロダクトに後日適用されるファイルをECOにアップロードしましょう。\n"
+"                        プロダクトに後日適用されるファイルをECOにアップロード"
+"しましょう。\n"
 "                    </p><p>\n"
-"                        この機能を使って、図面や設計書などいろいろなファイルを保存しましょう。\n"
+"                        この機能を使って、図面や設計書などいろいろなファイル"
+"を保存しましょう。\n"
 "                    </p>"
 
 #. module: mrp_plm
@@ -77,7 +87,15 @@ msgstr "<span class=\"o_stat_text\">改訂</span>"
 msgid ""
 "A Python dictionary that will be evaluated to provide default values when "
 "creating new records for this alias."
-msgstr "このエイリアスの新しいレコードを作成する時にデフォルト値を与えるためのPython辞書です。"
+msgstr ""
+"このエイリアスの新しいレコードを作成する時にデフォルト値を与えるためのPython"
+"辞書です。"
+
+#. module: mrp_plm
+#. odoo-python
+#: code:addons/mrp_plm/models/mrp_eco.py:0
+msgid "A user cannot be assigned more than once to the same stage"
+msgstr "同一ステージに同一ユーザを複数回割当てることはできません。"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__message_needaction
@@ -88,7 +106,7 @@ msgstr "要アクション"
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__active
 msgid "Active"
-msgstr "有効化"
+msgstr "有効"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__activity_ids
@@ -108,7 +126,7 @@ msgstr "活動状態"
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__activity_type_icon
 msgid "Activity Type Icon"
-msgstr "活動種別アイコン"
+msgstr "活動タイプアイコン"
 
 #. module: mrp_plm
 #: model:ir.model.fields.selection,name:mrp_plm.selection__mrp_eco_bom_change__change_type__add
@@ -269,7 +287,7 @@ msgstr "承認者"
 #. module: mrp_plm
 #: model:ir.model.fields.selection,name:mrp_plm.selection__mrp_eco_approval_template__approval_type__optional
 msgid "Approves, but the approval is optional"
-msgstr "承認。ただし、承認は任意。"
+msgstr "承認。ただし、承認は任意"
 
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_search
@@ -370,12 +388,12 @@ msgstr ""
 #: model:mrp.eco.stage,legend_blocked:mrp_plm.ecostage_progress
 #: model:mrp.eco.stage,legend_blocked:mrp_plm.ecostage_validated
 msgid "Blocked"
-msgstr "不許可"
+msgstr "ブロック中"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_stage__is_blocking
 msgid "Blocking Stage"
-msgstr "阻止ステージ"
+msgstr "ブロッキングメッセージ"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_bom_change__byproduct_id
@@ -441,7 +459,9 @@ msgstr "拒否可"
 msgid ""
 "Cannot create an ECO if the Manufacturing Order doesn't use a Bill of "
 "Materials"
-msgstr "製造オーダが部品表を使用していない場合は設計変更オーダを作成することはできません。"
+msgstr ""
+"製造オーダが部品表を使用していない場合は設計変更オーダを作成することはできま"
+"せん。"
 
 #. module: mrp_plm
 #: model:ir.ui.menu,name:mrp_plm.menu_mrp_plm_changes
@@ -619,7 +639,7 @@ msgstr "古い部品表と新しい改訂部品表の違い"
 #. module: mrp_plm
 #: model:ir.model.fields,help:mrp_plm.field_mrp_eco__routing_change_ids
 msgid "Difference between old operation and new operation revision"
-msgstr "古いオペレーションと新しい改訂オペレーションの違い"
+msgstr "古い工程と新しい改訂工程の違い"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__display_name
@@ -658,13 +678,13 @@ msgstr "ECO"
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_graph
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_pivot
 msgid "ECO Analysis"
-msgstr "ECO分析"
+msgstr "設計変更オーダ分析"
 
 #. module: mrp_plm
 #: model:ir.model,name:mrp_plm.model_mrp_eco_approval
 #: model:mail.activity.type,name:mrp_plm.mail_activity_eco_approval
 msgid "ECO Approval"
-msgstr "ECO 承認"
+msgstr "設計変更オーダ承認"
 
 #. module: mrp_plm
 #: model:ir.model,name:mrp_plm.model_mrp_eco_approval_template
@@ -674,7 +694,7 @@ msgstr "ECO 承認テンプレート"
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__bom_change_ids
 msgid "ECO BoM Changes"
-msgstr "ECO部品表変更"
+msgstr "設計変更オーダ部品表変更"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__bom_change_ids_on_byproduct
@@ -705,20 +725,20 @@ msgstr "設計変更オーダルーティング変更"
 #: model:ir.model,name:mrp_plm.model_mrp_eco_stage
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_approval__eco_stage_id
 msgid "ECO Stage"
-msgstr "ECOステージ"
+msgstr "設計変更オーダステージ"
 
 #. module: mrp_plm
 #: model:ir.actions.act_window,name:mrp_plm.mrp_eco_stage_action
 #: model:ir.ui.menu,name:mrp_plm.menu_mrp_plm_eco_stages
 msgid "ECO Stages"
-msgstr "ECOステージ"
+msgstr "設計変更オーダステージ"
 
 #. module: mrp_plm
 #: model:ir.actions.act_window,name:mrp_plm.mrp_eco_tag_action
 #: model:ir.model,name:mrp_plm.model_mrp_eco_tag
 #: model:ir.ui.menu,name:mrp_plm.menu_mrp_plm_eco_tag
 msgid "ECO Tags"
-msgstr "ECOタグ"
+msgstr "設計変更オーダタグ"
 
 #. module: mrp_plm
 #: model:ir.model,name:mrp_plm.model_mrp_eco_type
@@ -729,7 +749,7 @@ msgstr "設計変更オーダタイプ"
 #: model:ir.actions.act_window,name:mrp_plm.mrp_eco_type_action_form
 #: model:ir.ui.menu,name:mrp_plm.menu_mrp_plm_eco_types
 msgid "ECO Types"
-msgstr "ECOタイプ"
+msgstr "設計変更オーダタイプ"
 
 #. module: mrp_plm
 #: model_terms:ir.actions.act_window,help:mrp_plm.mrp_eco_stage_action
@@ -940,9 +960,11 @@ msgstr "ID"
 #. module: mrp_plm
 #: model:ir.model.fields,help:mrp_plm.field_mrp_eco_type__alias_parent_thread_id
 msgid ""
-"ID of the parent record holding the alias (example: project holding the task"
-" creation alias)"
-msgstr "エイリアスを保持する親レコードのID(例：プロジェクトは、タスク作成エイリアスを保持)"
+"ID of the parent record holding the alias (example: project holding the task "
+"creation alias)"
+msgstr ""
+"エイリアスを保持する親レコードのID(例：プロジェクトは、タスク作成エイリアスを"
+"保持)"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__activity_exception_icon
@@ -973,14 +995,18 @@ msgstr "チェックした場合は、一部のメッセージに配信エラー
 msgid ""
 "If set, this content will automatically be sent out to unauthorized users "
 "instead of the default message."
-msgstr "設定されている場合、このコンテンツはデフォルトのメッセージではなく、許可されていないユーザーに自動的に送信されます。"
+msgstr ""
+"設定されている場合、このコンテンツはデフォルトのメッセージではなく、許可され"
+"ていないユーザーに自動的に送信されます。"
 
 #. module: mrp_plm
 #: model:ir.model.fields,help:mrp_plm.field_mrp_eco__active
 msgid ""
 "If the active field is set to False, it will allow you to hide the "
 "engineering change order without removing it."
-msgstr "アクティブフィールドがFalseに設定されている場合、設計変更オーダを削除せずに非表示にすることができます。"
+msgstr ""
+"有効フィールドがFalseに設定されている場合、設計変更オーダを削除せずに非表示に"
+"することができます。"
 
 #. module: mrp_plm
 #: model:ir.model.fields,help:mrp_plm.field_mrp_eco__will_update_version
@@ -988,6 +1014,8 @@ msgid ""
 "If unchecked, the version of the product/BoM will remain unchanged once the "
 "ECO is applied"
 msgstr ""
+"チェックされていない場合、ECOが適用されると、プロダクト/部品表のバージョンは"
+"変更されません。"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_bom__image_128
@@ -1091,7 +1119,7 @@ msgstr "最終更新日"
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_search
 msgid "Late Activities"
-msgstr "遅れた活動"
+msgstr "期限超過の活動"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_production__latest_bom_id
@@ -1113,7 +1141,8 @@ msgstr "ローカルパートに基づく着信検知"
 #: model_terms:ir.actions.act_window,help:mrp_plm.mrp_eco_action_report
 msgid ""
 "Manage your products and bills of materials changes with the ECO's.\n"
-"              Gather the related documentation and receive the necessary approvals\n"
+"              Gather the related documentation and receive the necessary "
+"approvals\n"
 "              before applying your changes."
 msgstr ""
 "プロダクトと部品表の変更をECOで管理しましょう。\n"
@@ -1122,7 +1151,7 @@ msgstr ""
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_routing_change__upd_time_cycle_manual
 msgid "Manual Duration Change"
-msgstr "手作業の所要時間変更"
+msgstr "手動所要時間の変更"
 
 #. module: mrp_plm
 #: model:ir.model,name:mrp_plm.model_mrp_production
@@ -1208,7 +1237,7 @@ msgstr "新規部品表"
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_bom_change__new_operation_id
 msgid "New Consumed in Operation"
-msgstr "工程中の新規消費"
+msgstr "新規の作業中の消費"
 
 #. module: mrp_plm
 #: model:mrp.eco.type,name:mrp_plm.ecotype0
@@ -1314,7 +1343,7 @@ msgstr "構成品を開く"
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_form
 msgid "Open Operation"
-msgstr "オペレーションを開く"
+msgstr "工程を開く"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_routing_change__operation_name
@@ -1324,12 +1353,12 @@ msgstr "工程"
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_form
 msgid "Operation Changes"
-msgstr "オペレーション変更"
+msgstr "工程変更"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_routing_change__operation_id
 msgid "Operation Id"
-msgstr "オペレーションID"
+msgstr "工程ID"
 
 #. module: mrp_plm
 #. odoo-python
@@ -1343,7 +1372,9 @@ msgid ""
 "Optional ID of a thread (record) to which all incoming messages will be "
 "attached, even if they did not reply to it. If set, this will disable the "
 "creation of new records completely."
-msgstr "すべての受信メッセージに添付されるスレッド(レコード)のオプションIDです。設定した場合は新しいレコードの作成を無効にします。"
+msgstr ""
+"すべての受信メッセージに添付されるスレッド(レコード)のオプションIDです。設定"
+"した場合は新しいレコードの作成を無効にします。"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_product_document__origin_attachment_id
@@ -1366,7 +1397,9 @@ msgstr "元の名前"
 msgid ""
 "Override the default value displayed for the blocked state for kanban "
 "selection, when the ECO is in that stage."
-msgstr "設計変更オーダがそのステージにある場合、かんばん選択のブロックステータスに表示されるデフォルト値を上書きします。"
+msgstr ""
+"設計変更オーダがそのステージにある場合、かんばん選択のブロックステータスに表"
+"示されるデフォルト値を上書きします。"
 
 #. module: mrp_plm
 #: model:ir.model.fields,help:mrp_plm.field_mrp_eco__legend_done
@@ -1374,7 +1407,9 @@ msgstr "設計変更オーダがそのステージにある場合、かんばん
 msgid ""
 "Override the default value displayed for the done state for kanban "
 "selection, when the ECO is in that stage."
-msgstr "設計変更オーダがそのステージにある場合、かんばん選択の完了ステータスに表示されるデフォルト値を上書きします。"
+msgstr ""
+"設計変更オーダがそのステージにある場合、かんばん選択の完了ステータスに表示さ"
+"れるデフォルト値を上書きします。"
 
 #. module: mrp_plm
 #: model:ir.model.fields,help:mrp_plm.field_mrp_eco__legend_normal
@@ -1382,7 +1417,9 @@ msgstr "設計変更オーダがそのステージにある場合、かんばん
 msgid ""
 "Override the default value displayed for the normal state for kanban "
 "selection, when the ECO is in that stage."
-msgstr "設計変更オーダがそのステージにある場合、かんばん選択の通常ステータスに表示されるデフォルト値を上書きします。"
+msgstr ""
+"設計変更オーダがそのステージにある場合、かんばん選択の通常ステータスに表示さ"
+"れるデフォルト値を上書きします。"
 
 #. module: mrp_plm
 #: model:ir.ui.menu,name:mrp_plm.menu_mrp_plm_dashboard
@@ -1413,11 +1450,13 @@ msgstr "親レコードスレッドID"
 #. module: mrp_plm
 #: model:ir.model.fields,help:mrp_plm.field_mrp_eco_type__alias_parent_model_id
 msgid ""
-"Parent model holding the alias. The model holding the alias reference is not"
-" necessarily the model given by alias_model_id (example: project "
+"Parent model holding the alias. The model holding the alias reference is not "
+"necessarily the model given by alias_model_id (example: project "
 "(parent_model) and task (model))"
 msgstr ""
-"エイリアスを保持する親モデル。エイリアスの参照を保持しているモデルは、必ずしもalias_model_idによって与えられたモデルではありません(例：プロジェクト(parent_model)とタスク(model))"
+"エイリアスを保持する親モデル。エイリアスの参照を保持しているモデルは、必ずし"
+"もalias_model_idによって与えられたモデルではありません(例：プロジェクト"
+"(parent_model)とタスク(model))"
 
 #. module: mrp_plm
 #: model:ir.model.fields,help:mrp_plm.field_mrp_eco_type__alias_contact
@@ -1425,12 +1464,14 @@ msgid ""
 "Policy to post a message on the document using the mailgateway.\n"
 "- everyone: everyone can post\n"
 "- partners: only authenticated partners\n"
-"- followers: only followers of the related document or members of following channels\n"
+"- followers: only followers of the related document or members of following "
+"channels\n"
 msgstr ""
 "メールゲートウェイを使用したメッセージドキュメント投稿のポリシー\n"
-"- everyone: 誰にでも投稿可能\n"
-"- partners: 許可されたパートナーのみ\n"
-"- followers: 関連ドキュメントのフォロワーか、フォローしているチャンネルのメンバーのみ\n"
+"- 全員: 誰でも投稿可能\n"
+"- 取引先: 認証済みの取引先のみ\n"
+"- フォロワー: 関連ドキュメントのフォロワーか、フォローしているチャネルのメン"
+"バーのみ\n"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_bom__previous_bom_id
@@ -1440,7 +1481,7 @@ msgstr "以前の部品表"
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_bom_change__old_operation_id
 msgid "Previous Consumed in Operation"
-msgstr "行程中の以前の消費"
+msgstr "以前の作業中の消費"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__previous_change_ids
@@ -1470,7 +1511,7 @@ msgstr "優先度"
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_form
 msgid "Produced in Operation"
-msgstr "オペレーションで作成済"
+msgstr "生産工程"
 
 #. module: mrp_plm
 #: model:ir.model,name:mrp_plm.model_product_template
@@ -1546,7 +1587,9 @@ msgstr "リベース"
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_form
 msgid "Rebase new revision of BoM with previous eco bom and old bom changes."
-msgstr "新規更新部品表と、以前の設計変更オーダ部品表および古い部品表の変更をリベースする"
+msgstr ""
+"新規更新部品表と、以前の設計変更オーダ部品表および古い部品表の変更をリベース"
+"する"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_type__alias_force_thread_id
@@ -1674,7 +1717,7 @@ msgstr "改訂を開始"
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_search
 msgid "State"
-msgstr "都道府県・州"
+msgstr "ステータス"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__state
@@ -1691,7 +1734,7 @@ msgid ""
 "Planned: Future activities."
 msgstr ""
 "活動に基づくステータス\n"
-"遅延: 期限が既に過ぎています\n"
+"期限超過：期限日がすでに過ぎています\n"
 "今日: 活動日は今日です\n"
 "予定: 将来の活動。"
 
@@ -1704,8 +1747,8 @@ msgstr "正常にリベースされました！"
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_form
 msgid ""
-"System will automatically resolved the conflict(s) and apply changes. Do you"
-" agree?"
+"System will automatically resolved the conflict(s) and apply changes. Do you "
+"agree?"
 msgstr "システムは自動的に競合を解決し、変更を適用します。同意しますか？"
 
 #. module: mrp_plm
@@ -1732,7 +1775,9 @@ msgstr "タスク進行中。ブロックまたは完了済にするにはクリ
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_stage_view_form
 msgid "Task is blocked. Click to unblock or set as done."
-msgstr "タスクはブロックされています。ブロック解除または完了済にするにはクリックして下さい。"
+msgstr ""
+"タスクはブロックされています。ブロック解除または完了済にするにはクリックして"
+"下さい。"
 
 #. module: mrp_plm
 #: model:ir.model.fields,help:mrp_plm.field_mrp_eco__user_can_approve
@@ -1768,23 +1813,29 @@ msgstr "製品の現在のバージョン"
 #. module: mrp_plm
 #: model:ir.model.fields,help:mrp_plm.field_mrp_eco_type__alias_model_id
 msgid ""
-"The model (Odoo Document Kind) to which this alias corresponds. Any incoming"
-" email that does not reply to an existing record will cause the creation of "
-"a new record of this model (e.g. a Project Task)"
+"The model (Odoo Document Kind) to which this alias corresponds. Any incoming "
+"email that does not reply to an existing record will cause the creation of a "
+"new record of this model (e.g. a Project Task)"
 msgstr ""
-"このエイリアスに対応した(Odooドキュメント種別)モデル。既存のレコードに返信しない任意の受信メールは、このモデルの新しいレコード(例えば、プロジェクトタスク)の作成を引き起こします"
+"このエイリアスに対応した(Odooドキュメント種別)モデル。既存のレコードに返信し"
+"ない任意の受信メールは、このモデルの新しいレコード(例えば、プロジェクトタス"
+"ク)の作成を引き起こします"
 
 #. module: mrp_plm
 #: model:ir.model.fields,help:mrp_plm.field_mrp_eco_type__alias_name
 msgid ""
 "The name of the email alias, e.g. 'jobs' if you want to catch emails for "
 "<jobs@example.odoo.com>"
-msgstr "eメールのエイリアス.例えば<jobs@example.odoo.com>のメールを受け取りたい場合'jobs’を選択"
+msgstr ""
+"eメールのエイリアス.例えば<jobs@example.odoo.com>のメールを受け取りたい場"
+"合'jobs’を選択"
 
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_stage_view_form
 msgid "This step is done. Click to block or set in progress."
-msgstr "このステップは完了です。ブロックまたは進行中に設定するにはクリックして下さい。"
+msgstr ""
+"このステップは完了です。ブロックまたは進行中に設定するにはクリックして下さ"
+"い。"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_type__nb_validation
@@ -1802,7 +1853,7 @@ msgstr "未処理"
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_search
 msgid "Today Activities"
-msgstr "本日の活動"
+msgstr "今日の活動"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__type_id
@@ -1814,7 +1865,7 @@ msgstr "タイプ"
 #. module: mrp_plm
 #: model:ir.model.fields,help:mrp_plm.field_mrp_eco__activity_exception_decoration
 msgid "Type of the exception activity on record."
-msgstr "記録上の例外活動の種類。"
+msgstr "レコード上の例外の活動タイプ。"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_stage__type_ids
@@ -1840,7 +1891,7 @@ msgstr "更新"
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__will_update_version
 msgid "Update Version"
-msgstr ""
+msgstr "バージョンを更新"
 
 #. module: mrp_plm
 #: model:res.groups,name:mrp_plm.group_plm_user
@@ -1851,6 +1902,11 @@ msgstr "ユーザ"
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_approval_template__user_ids
 msgid "Users"
 msgstr "ユーザ"
+
+#. module: mrp_plm
+#: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_form
+msgid "V"
+msgstr "V"
 
 #. module: mrp_plm
 #: model:mrp.eco.stage,name:mrp_plm.ecostage_bom_update_validated
@@ -1911,8 +1967,8 @@ msgstr "作業区"
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_stage_view_form
 msgid ""
-"You can also add a description to help your coworkers understand the meaning"
-" and purpose of the stage."
+"You can also add a description to help your coworkers understand the meaning "
+"and purpose of the stage."
 msgstr "こちらに、このステージの意味・目的を定義してください。"
 
 #. module: mrp_plm
@@ -1920,7 +1976,9 @@ msgstr "こちらに、このステージの意味・目的を定義してくだ
 msgid ""
 "You can define here labels that will be displayed for the state instead\n"
 "                            of the default labels."
-msgstr "デフォルトのラベルの代わりにステータスに表示されるラベルをここで定義することができます。"
+msgstr ""
+"デフォルトのラベルの代わりにステータスに表示されるラベルをここで定義すること"
+"ができます。"
 
 #. module: mrp_plm
 #. odoo-python

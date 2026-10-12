@@ -4,6 +4,8 @@
 from odoo import api, fields, models, _
 from odoo.osv import expression
 from odoo.exceptions import UserError
+from odoo.tools.misc import OrderedSet
+from odoo.tools.float_utils import float_is_zero
 
 
 class StockPicking(models.Model):
@@ -19,9 +21,12 @@ class StockPicking(models.Model):
         for picking in self:
             todo = False
             fail = False
-            checkable_products = picking.mapped('move_line_ids').mapped('product_id')
-            for check in picking.check_ids:
-                if check.quality_state == 'none' and (check.product_id in checkable_products or check.measure_on == 'operation'):
+            checkable_products = picking.move_line_ids.filtered(lambda ml: ml._is_checkable()).product_id
+            # Only prefetch needed QC fields to avoid to bloat the cache by fetching other QC data.
+            checks = picking.check_ids
+            checks.fetch(['quality_state', 'product_id', 'measure_on'])
+            for check in checks:
+                if check._is_to_do(checkable_products):
                     todo = True
                 elif check.quality_state == 'fail':
                     fail = True
@@ -53,20 +58,39 @@ class StockPicking(models.Model):
             if picking.quality_check_todo:
                 picking.show_validate = False
 
+    def _checks_to_do(self):
+        check_ids_to_do = OrderedSet()
+        for picking in self:
+            has_picked = True
+            if all(not move.picked for move in picking.move_ids):
+                checkable_lines = picking.move_line_ids
+                has_picked = False
+            else:
+                checkable_lines = picking.move_line_ids.filtered(
+                    lambda ml: ml._is_checkable(check_picked=has_picked)
+                )
+            checkable_products = checkable_lines.product_id
+            checks_to_do = self.check_ids.filtered(
+                lambda qc: qc._is_to_do(checkable_products, check_picked=has_picked)
+            )
+            check_ids_to_do.update(checks_to_do.ids)
+        return self.env['quality.check'].browse(check_ids_to_do)
+
     def check_quality(self):
-        checkable_products = self.mapped('move_line_ids').mapped('product_id')
-        checks = self.check_ids.filtered(lambda check: check.quality_state == 'none' and (check.product_id in checkable_products or check.measure_on == 'operation'))
+        checks = self._checks_to_do()
         if checks:
             return checks.action_open_quality_check_wizard()
-        return False
+        return True
 
     def _create_backorder(self, backorder_moves=None):
         res = super(StockPicking, self)._create_backorder(backorder_moves=backorder_moves)
         if self.env.context.get('skip_check'):
             return res
         for backorder in res:
-            backorder.move_line_ids.check_ids.picking_id = backorder
-            backorder.backorder_id.check_ids.filtered(lambda qc: qc.quality_state == 'none').sudo().unlink()
+            # Do not link the QC of move lines with quantity of 0 in backorder.
+            backorder.move_line_ids.filtered(lambda ml: not float_is_zero(ml.quantity, precision_rounding=ml.product_uom_id.rounding)).check_ids.picking_id = backorder
+            if backorder.backorder_id.state in ('done', 'cancel'):
+                backorder.backorder_id.check_ids.filtered(lambda qc: qc.quality_state == 'none').sudo().unlink()
             backorder.move_ids._create_quality_checks()
         return res
 
@@ -78,16 +102,13 @@ class StockPicking(models.Model):
     def _pre_action_done_hook(self):
         res = super()._pre_action_done_hook()
         if res is True:
-            pickings_to_check_quality = self._check_for_quality_checks()
-            if pickings_to_check_quality:
-                return pickings_to_check_quality.with_context(pickings_to_check_quality=pickings_to_check_quality.ids).check_quality()
+            return self.with_context(picking_validation=True).check_quality()
         return res
 
     def _check_for_quality_checks(self):
         quality_pickings = self.env['stock.picking']
         for picking in self:
-            product_to_check = picking.mapped('move_line_ids').filtered(lambda ml: ml.picked).mapped('product_id')
-            if picking.mapped('check_ids').filtered(lambda qc: qc.quality_state == 'none' and (qc.product_id in product_to_check or qc.measure_on == 'operation')):
+            if picking._checks_to_do():
                 quality_pickings |= picking
         return quality_pickings
 

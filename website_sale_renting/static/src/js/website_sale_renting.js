@@ -1,5 +1,6 @@
 /** @odoo-module **/
 
+import { redirect } from '@web/core/utils/urls';
 import { WebsiteSale } from '@website_sale/js/website_sale';
 import { RentingMixin } from '@website_sale_renting/js/renting_mixin';
 import wSaleUtils from "@website_sale/js/website_sale_utils";
@@ -35,6 +36,9 @@ WebsiteSale.include({
             '/shop/cart/update_renting',
             this._getSerializedRentingDates()
         );
+        if (!values) {
+            return;
+        }
         wSaleUtils.updateCartNavBar(values);
         const format = this._isDurationWithHours() ? formatDateTime : formatDate;
         document.querySelector("input[name=renting_start_date]").value = format(deserializeDateTime(start_date, { tz: this.websiteTz }), { tz: this.websiteTz });
@@ -125,11 +129,10 @@ WebsiteSale.include({
         if (message) {
             this.el.querySelector('span[name=renting_warning_message]').innerText = message;
             this.el.querySelector('.o_renting_warning').classList.add('d-block');
-            // only disable when there is a message. Hence, it doesn't override other disabling.
-            this._toggleDisable($parent.closest('form'), !message);
         } else {
             this.el.querySelector('.o_renting_warning').classList.remove('d-block');
         }
+        this._toggleDisable($parent.closest('form'), !message);
         return !message;
     },
 
@@ -180,15 +183,13 @@ WebsiteSale.include({
             searchParams.set("start_date", serializeDateTime(start_date));
             searchParams.set("end_date", serializeDateTime(end_date));
         }
-        window.location = `/shop?${searchParams}`;
-        this.isRedirecting = true;
+        redirect(`/shop?${searchParams.toString()}`);
     },
 
     _onDatePickerClear: function (ev) {
         const searchParams = new URLSearchParams(window.location.search);
         searchParams.delete('start_date');
         searchParams.delete('end_date');
-        const searchString = searchParams.toString();
-        window.location = `${window.location.pathname}` + searchString.length ? `?${searchParams.toString()}` : ``;
+        window.location.search = searchParams.toString();
     },
 });

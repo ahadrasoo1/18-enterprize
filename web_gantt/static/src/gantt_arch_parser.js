@@ -1,4 +1,4 @@
-import { getLocalWeekNumber } from "@web/core/l10n/dates";
+import { getLocalYearAndWeek } from "@web/core/l10n/dates";
 import { _t } from "@web/core/l10n/translation";
 import { evaluateExpr } from "@web/core/py_js/py";
 import { exprToBoolean } from "@web/core/utils/strings";
@@ -42,7 +42,7 @@ const SCALES = {
         colHeaderFormatter: (date) => date.toFormat("dd"),
 
         unit: "week",
-        groupHeaderFormatter: (date) => date.toFormat(`'W${getLocalWeekNumber(date)}' yyyy`),
+        groupHeaderFormatter: formatLocalWeekYear,
 
         defaultRange: { unit: "week", count: 3 },
     },
@@ -57,7 +57,7 @@ const SCALES = {
         colHeaderFormatter: (date) => date.toFormat("dd"),
 
         unit: "week",
-        groupHeaderFormatter: (date) => date.toFormat(`'W${getLocalWeekNumber(date)}' yyyy`),
+        groupHeaderFormatter: formatLocalWeekYear,
 
         defaultRange: { unit: "week", count: 6 },
     },
@@ -107,6 +107,17 @@ const SCALES = {
         defaultRange: { unit: "year", count: 1 },
     },
 };
+
+/**
+ * Formats a date to a `'W'W kkkk` datetime string, in the user's locale settings.
+ *
+ * @param {Date|luxon.DateTime} date
+ * @returns {string}
+ */
+function formatLocalWeekYear(date) {
+    const { year, week } = getLocalYearAndWeek(date);
+    return `W${week} ${year}`;
+}
 
 function getPreferedScaleId(scaleId, scales) {
     // we assume that scales is not empty
@@ -229,6 +240,17 @@ function getInfoFromRootNode(rootNode) {
         allowedScales.push(...Object.keys(SCALES));
     }
 
+    let defaultScale = attrs.default_scale;
+    if (defaultScale) {
+        if (!allowedScales.includes(defaultScale) && SCALES[defaultScale]) {
+            allowedScales.push(defaultScale);
+        }
+    } else if (allowedScales.includes("month")) {
+        defaultScale = "month";
+    } else {
+        defaultScale = allowedScales[0];
+    }
+
     // Cell precision
     const cellPrecisions = {};
 
@@ -267,8 +289,10 @@ function getInfoFromRootNode(rootNode) {
     const ranges = {};
     for (const rangeId in RANGES) {
         const referenceRange = RANGES[rangeId];
+        const { groupHeaderFormatter } = SCALES[referenceRange.scaleId];
         ranges[rangeId] = {
             ...referenceRange,
+            groupHeaderFormatter,
             id: rangeId,
             scaleId: getPreferedScaleId(referenceRange.scaleId, scales),
             description: referenceRange.description.toString(),
@@ -299,7 +323,7 @@ function getInfoFromRootNode(rootNode) {
         dateStopField: attrs.date_stop,
         defaultGroupBy: attrs.default_group_by ? attrs.default_group_by.split(",") : [],
         defaultRange: attrs.default_range,
-        defaultScale: attrs.default_scale || "month",
+        defaultScale,
         dependencyEnabled,
         dependencyField,
         dependencyInvertedField,

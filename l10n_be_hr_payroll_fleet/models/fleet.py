@@ -1,11 +1,12 @@
 # -*- coding:utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import babel.dates
+import datetime
+
+from dateutil.relativedelta import relativedelta
 
 from odoo import api, fields, models
 from odoo.tools.misc import format_date
-from odoo.tools.float_utils import float_round
 
 from odoo.fields import Datetime, Date
 
@@ -93,7 +94,7 @@ class FleetVehicle(models.Model):
         if fuel_type and fuel_type in ['gasoline', 'diesel', 'lpg']:
             health_indice = self.env['hr.rule.parameter']._get_parameter_from_code('health_indice', date)
             health_indice_reference = self.env['hr.rule.parameter']._get_parameter_from_code('health_indice_reference', date)
-            co2_fee = ((co2 * 9.0) - fuel_coefficient.get(fuel_type)) * health_indice / health_indice_reference / 12.0
+            co2_fee = (((co2 * 9.0) - fuel_coefficient.get(fuel_type)) / 12.0 * health_indice) / health_indice_reference
         return max(co2_fee, co2_fee_min)
 
     @api.depends('co2', 'fuel_type', 'company_id.country_id')
@@ -133,40 +134,43 @@ class FleetVehicle(models.Model):
     def _get_car_atn_from_values(self, acquisition_date, car_value, fuel_type, co2, date=None):
         if not self._from_be():
             return 0
-        # Compute the correction coefficient from the age of the car
+
         date = date or Date.today()
         if acquisition_date:
-            number_of_month = ((date.year - acquisition_date.year) * 12.0 + date.month -
-                               acquisition_date.month +
-                               int(bool(date.day - acquisition_date.day + 1)))
-            if number_of_month <= 12:
-                age_coefficient = 1.00
-            elif number_of_month <= 24:
-                age_coefficient = 0.94
-            elif number_of_month <= 36:
-                age_coefficient = 0.88
-            elif number_of_month <= 48:
-                age_coefficient = 0.82
-            elif number_of_month <= 60:
-                age_coefficient = 0.76
-            else:
-                age_coefficient = 0.70
-            car_value = car_value * age_coefficient
-            # Compute atn value from corrected car_value
-            magic_coeff = 6.0 / 7.0  # Don't ask me why
-            if fuel_type in ['electric', 'hydrogen']:
-                atn = car_value * 0.04 * magic_coeff
-            else:
-                if fuel_type in ['diesel', 'full_hybrid', 'plug_in_hybrid_diesel']:
-                    reference = self.env['hr.rule.parameter']._get_parameter_from_code('co2_reference_diesel', date)
-                else:
-                    reference = self.env['hr.rule.parameter']._get_parameter_from_code('co2_reference_petrol_lpg', date)
+            car_age = relativedelta(date, acquisition_date).years
+            value_loss_per_year = 0.06  # 6% of car value lost each year
+            age_coefficient = 1.00 - car_age * value_loss_per_year
+            age_coefficient = max(age_coefficient, 0.70)
 
-                if co2 <= reference:
-                    atn = car_value * max(0.04, (0.055 - 0.001 * (reference - co2))) * magic_coeff
+            min_co2_prc = self.env['hr.rule.parameter']._get_parameter_from_code('min_co2_prc', date, raise_if_not_found=False) or 0.04
+            max_co2_prc = self.env['hr.rule.parameter']._get_parameter_from_code('max_co2_prc', date, raise_if_not_found=False) or 0.18
+
+            if date >= datetime.date(2025, 1, 1):
+                if (fuel_type in ['electric', 'hydrogen'] or
+                        (fuel_type in ['plug_in_hybrid_diesel', 'plug_in_hybrid_gasoline'] and co2 <= 50)):
+                    co2_percentage = min_co2_prc
                 else:
-                    atn = car_value * min(0.18, (0.055 + 0.001 * (co2 - reference))) * magic_coeff
-            return max(self.env['hr.rule.parameter']._get_parameter_from_code('min_car_atn', date), atn) / 12.0
+                    if fuel_type == 'diesel':
+                        co2_ref = self.env['hr.rule.parameter']._get_parameter_from_code('co2_reference_diesel', date)
+                    else:
+                        co2_ref = self.env['hr.rule.parameter']._get_parameter_from_code('co2_reference_petrol_lpg', date)
+
+                    co2_percentage = (0.055 + 0.001 * (co2 - co2_ref))
+                    co2_percentage = max(min_co2_prc, min(max_co2_prc, co2_percentage))
+            else:
+                if fuel_type in ['electric', 'hydrogen']:
+                    co2_percentage = min_co2_prc
+                else:
+                    if fuel_type in ['diesel', 'full_hybrid', 'plug_in_hybrid_diesel']:
+                        co2_ref = self.env['hr.rule.parameter']._get_parameter_from_code('co2_reference_diesel', date)
+                    else:
+                        co2_ref = self.env['hr.rule.parameter']._get_parameter_from_code('co2_reference_petrol_lpg', date)
+                    co2_percentage = (0.055 + 0.001 * (co2 - co2_ref))
+                    co2_percentage = max(min_co2_prc, min(max_co2_prc, co2_percentage))
+            min_car_atn = self.env['hr.rule.parameter']._get_parameter_from_code('min_car_atn', date)
+            atn = car_value * age_coefficient * co2_percentage * 6 / 7
+            return max(min_car_atn, atn) / 12
+
         return 0.0
 
     @api.onchange('model_id')
@@ -203,14 +207,16 @@ class FleetVehicleModel(models.Model):
     _inherit = 'fleet.vehicle.model'
 
     default_recurring_cost_amount_depreciated = fields.Float(string="Cost (Depreciated)",
+        tracking=True,
         help="Default recurring cost amount that should be applied to a new vehicle from this model")
-    default_car_value = fields.Float(string="Catalog Value (VAT Incl.)")
+    default_car_value = fields.Float(string="Catalog Value (VAT Incl.)", tracking=True)
     can_be_requested = fields.Boolean(
         string="Can be requested", company_dependent=True,
+        tracking=True,
         help="Can be requested on a contract as a new vehicle")
     default_atn = fields.Float(compute='_compute_atn', string="BIK")
     default_total_depreciated_cost = fields.Float(compute='_compute_default_total_depreciated_cost', compute_sudo=True, string="Total Cost (Depreciated)")
-    default_co2 = fields.Float(compute='_compute_default_co2', readonly=False, store=True)
+    default_co2 = fields.Float(compute='_compute_default_co2', readonly=False, store=True, tracking=True)
     co2_fee = fields.Float(compute='_compute_co2_fee', string="CO2 fee")
     tax_deduction = fields.Float(compute='_compute_tax_deduction')
 

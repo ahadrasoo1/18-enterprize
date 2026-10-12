@@ -1,11 +1,14 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
-    'name': 'Turkey - Accounting Reports',
+    'name': 'Türkiye - Accounting Reports',
     'version': '1.0',
     'category': 'Accounting/Localizations/Reporting',
     'description': """
-Accounting reports for Turkey
+Accounting reports for Türkiye
+
+- Balance Sheet
+- Profit and Loss
     """,
     'depends': [
         'l10n_tr', 'account_reports'
@@ -17,8 +20,12 @@ Accounting reports for Turkey
         'views/account_journal_views.xml',
         'views/product_view.xml',
     ],
+    'assets': {
+        'web.assets_backend': [
+            'l10n_tr_reports/static/src/components/**/*',
+        ],
+    },
     'installable': True,
     'auto_install': True,
-    'website': 'https://www.odoo.com/app/accounting',
     'license': 'OEEL-1',
 }

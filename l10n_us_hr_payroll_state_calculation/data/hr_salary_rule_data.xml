@@ -26,7 +26,7 @@ else:
 
 # Step 3
 # Final taxable amount by applying the deduction
-taxable = gross_income - deduction
+taxable = max(gross_income - deduction, 0)
 
 # Step 4
 # Tax amount per year

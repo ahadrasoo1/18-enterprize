@@ -10,7 +10,8 @@ from dateutil.rrule import rrule, MONTHLY
 from odoo import models, fields, release, _
 from odoo.exceptions import RedirectWarning, UserError
 from odoo.modules.registry import Registry
-from odoo.tools import get_lang, SQL
+from odoo.sql_db import BaseCursor
+from odoo.tools import format_date, SQL
 from odoo.tools.misc import street_split
 
 
@@ -264,7 +265,7 @@ class GeneralLedgerCustomHandler(models.AbstractModel):
             period_to = fields.Date.to_string(period_to.date())
             periods.append(Period(
                 number=self._l10n_nl_compute_period_number(period_from),
-                name=period.strftime('%B') + ' ' + date_from[0:4],
+                name=format_date(self.env, period, date_format='MMMM Y'),
                 date_from=period_from,
                 date_to=period_to
             ))
@@ -377,13 +378,12 @@ class GeneralLedgerCustomHandler(models.AbstractModel):
         return header_values
 
     def _get_xaf_stream(self, options):
-        new_options = self._get_options_sum_balance(options)
-        header_values = self._l10n_nl_get_header_values(new_options)
+        header_values = self._l10n_nl_get_header_values(options)
         header_content = self.env['ir.qweb']._render('l10n_nl_reports.xaf_audit_file', header_values)
         header, footer = header_content.split('</transactions>')
         return chain(
             [header],
-            self._get_xaf_lines_stream(new_options),
+            self._get_xaf_lines_stream(options),
             [Markup("""
                 </transactions>""") + footer],
         )
@@ -405,6 +405,7 @@ class GeneralLedgerCustomHandler(models.AbstractModel):
         def amount_type(credit):
             return 'C' if credit else 'D'
 
+        assert isinstance(self.env.cr, BaseCursor)
         with Registry(self.env.cr.dbname).cursor() as cr:
             self = self.with_env(self.env(cr=cr))
             batch_size = int(self.env['ir.config_parameter'].sudo().get_param('l10n_nl_reports.general_ledger_batch_size', 10**4))
@@ -466,7 +467,7 @@ class GeneralLedgerCustomHandler(models.AbstractModel):
                                     account_code=row['account_code'],
                                     line_ref=row['line_ref'] and row['line_ref'][:docref_length] or '/',
                                     line_date=row['line_date'],
-                                    line_name=row['line_name'],
+                                    line_name=row['line_name'] or '',
                                     amount=row['line_credit'] or row['line_debit'],
                                     amount_type=amount_type(row['line_credit']),
                                     matching=row['line_reconcile_id'] and Markup("<recRef>{}</recRef>").format(row['line_reconcile_id']) or '',

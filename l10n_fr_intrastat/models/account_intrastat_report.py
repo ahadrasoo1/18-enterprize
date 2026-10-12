@@ -63,14 +63,15 @@ class IntrastatReportCustomHandler(models.AbstractModel):
 
     def _get_exporting_dict_data(self, result_dict, query_res):
         super()._get_exporting_dict_data(result_dict, query_res)
-        result_dict.update({
-            'system': result_dict['system'][0:2],
-            'supplementary_units_code': query_res['supplementary_units_code'],
-            'product_id': query_res['product_id'],
-            'move_id': query_res['move_id'],
-            'partner_id': query_res['partner_id'],
-            'grouping_key': query_res['grouping_key'],
-        })
+        if self.env.company.account_fiscal_country_id.code == 'FR':
+            result_dict.update({
+                'system': result_dict['system'][0:2],
+                'supplementary_units_code': query_res['supplementary_units_code'],
+                'product_id': query_res['product_id'],
+                'move_id': query_res['move_id'],
+                'partner_id': query_res['partner_id'],
+                'grouping_key': query_res['grouping_key'],
+            })
         return result_dict
 
     @api.model
@@ -179,7 +180,7 @@ class IntrastatReportCustomHandler(models.AbstractModel):
             missing_required_values['region_code'].append(item['grouping_key'])
 
         if not item['transport_code']:
-            missing_required_values['transport_code'].append(item['move_id'])
+            missing_required_values['transport_code'].append(item['grouping_key'])
 
         # default intrastat use QV OR QN for missing partner VAT code but France does not accept this notation
         if item['system'] == '21' and (not item['partner_vat'] or item['partner_vat'].startswith('QV') or item['partner_vat'].startswith('QN')):
@@ -208,6 +209,7 @@ class IntrastatReportCustomHandler(models.AbstractModel):
                     context={**self.env.context, 'create': False, 'delete': False, 'expand': True},
                     views=[(move_lines_view.id, "list"), (False, 'form')],
                     options=options,
+                    domain=[('id', '=', move_lines.ids)],
                 ),
             }
 
@@ -232,6 +234,7 @@ class IntrastatReportCustomHandler(models.AbstractModel):
                     name=_('Invalid transaction intrastat code entries.'),
                     context={**self.env.context, 'create': False, 'delete': False, 'expand': True},
                     views=[(move_lines_view.id, "list"), (False, 'form')],
+                    domain=[('id', '=', move_lines.ids)],
                 ),
             }
 
@@ -257,6 +260,7 @@ class IntrastatReportCustomHandler(models.AbstractModel):
                     name=_('Invalid transaction intrastat code entries.'),
                     context={**self.env.context, 'create': False, 'delete': False, 'expand': True},
                     views=[(move_lines_view.id, "list"), (False, 'form')],
+                    domain=[('id', '=', move_lines.ids)],
                 ),
             }
 
@@ -300,7 +304,7 @@ class IntrastatReportCustomHandler(models.AbstractModel):
 
             # Determine values fields
             if is_weight_required:
-                grouped_items = defaultdict(lambda: {'value': 0, 'weight': 0})
+                grouped_items = defaultdict(lambda: {'value': 0, 'weight': 0, 'supplementary_units': 0})
             else:
                 grouped_items = defaultdict(lambda: {'value': 0})
 
@@ -310,6 +314,7 @@ class IntrastatReportCustomHandler(models.AbstractModel):
                 grouped_items[item_group_key]['value'] += item['value']
                 if is_weight_required:
                     grouped_items[item_group_key]['weight'] += item['weight']
+                    grouped_items[item_group_key]['supplementary_units'] += float(item.get('supplementary_units') or 0)
 
             # Convert the grouped_items dictionary back to a list of dictionaries
             items[regime] = [dict(zip(grouping_key, grouped_item_key)) | grouped_item_values
@@ -321,8 +326,9 @@ class IntrastatReportCustomHandler(models.AbstractModel):
         def round_half_up(value):
             return int(float_round(value, precision_digits=0, rounding_method='HALF-UP'))
 
-        for regime_items in items.values():
-            for item in regime_items:
+        for regime in items:
+            new_item_list = []
+            for item in items[regime]:
                 # The weight must be rounded off in kilograms.
                 # Weights below 1 kilogram should be rounded off above.
                 if item.get('weight'):
@@ -333,8 +339,10 @@ class IntrastatReportCustomHandler(models.AbstractModel):
                     item['supplementary_units'] = round_half_up(item['supplementary_units']) or 1
 
                 item['value'] = round_half_up(item['value'])
-                if item['value'] <= 0:
-                    regime_items.remove(item)
+                if item['value'] > 0:
+                    new_item_list.append(item)
+
+            items[regime] = new_item_list
 
     @api.model
     def _generate_envelope_data(self, options, company, values):

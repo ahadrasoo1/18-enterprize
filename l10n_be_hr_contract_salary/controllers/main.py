@@ -4,6 +4,7 @@
 from collections import OrderedDict
 
 from odoo import fields, _
+from odoo.tools import format_date
 from odoo.addons.hr_contract_salary.controllers import main
 from odoo.addons.sign.controllers.main import Sign
 from odoo.http import route, request
@@ -211,13 +212,13 @@ class HrContractSalary(main.HrContractSalary):
                     cars = available.filtered_domain(domain)
                     car_values.extend([(
                         'old-%s' % (car.id),
-                        '%s/%s \u2022 %s € \u2022 %s%s%s' % (
+                        '%s/%s • %s € • %s%s%s' % (
                             car.model_id.brand_id.name,
                             car.model_id.name,
                             round(car.total_depreciated_cost, 2),
                             car._get_acquisition_date() if vehicle_type == 'Car' else '',
-                            _('\u2022 Available in %s', car.next_assignation_date.strftime('%B %Y')) if car.next_assignation_date else u'',
-                            ' \u2022 %s %s' % (car.odometer, ODOMETER_UNITS[car.odometer_unit]) if vehicle_type == 'Car' else '',
+                            _('• Available in %s', format_date(request.env, car.next_assignation_date, date_format='MMMM yyyy')) if car.next_assignation_date else '',
+                            ' • %s %s' % (car.odometer, ODOMETER_UNITS[car.odometer_unit]) if vehicle_type == 'Car' else '',
                         )
                     ) for car in cars])
 
@@ -227,7 +228,7 @@ class HrContractSalary(main.HrContractSalary):
                     ])
                     car_values.extend([(
                         'new-%s' % (model.id),
-                        '%s \u2022 %s € \u2022 New %s' % (
+                        '%s • %s € • New %s' % (
                             model.display_name,
                             round(model.default_total_depreciated_cost, 2),
                             vehicle_type,
@@ -243,19 +244,19 @@ class HrContractSalary(main.HrContractSalary):
             if not only_new_cars:
                 result.extend([(
                     'old-%s' % (car.id),
-                    '%s/%s \u2022 %s € \u2022 %s%s%s' % (
+                    '%s/%s • %s € • %s%s%s' % (
                         car.model_id.brand_id.name,
                         car.model_id.name,
                         round(car.total_depreciated_cost, 2),
                         car._get_acquisition_date() if vehicle_type == 'Car' else '',
-                        _('\u2022 Available in %s', car.next_assignation_date.strftime('%B %Y')) if car.next_assignation_date else u'',
-                        ' \u2022 %s %s' % (car.odometer, ODOMETER_UNITS[car.odometer_unit]) if vehicle_type == 'Car' else '',
+                        _('• Available in %s', format_date(request.env, car.next_assignation_date, date_format='MMMM yyyy')) if car.next_assignation_date else '',
+                        ' • %s %s' % (car.odometer, ODOMETER_UNITS[car.odometer_unit]) if vehicle_type == 'Car' else '',
                     )
                 ) for car in available])
             if allow_new_cars:
                 result.extend([(
                     'new-%s' % (model.id),
-                    '%s \u2022 %s € \u2022 New %s' % (
+                    '%s • %s € • New %s' % (
                         model.display_name,
                         round(model.default_total_depreciated_cost, 2),
                         vehicle_type,
@@ -401,19 +402,23 @@ class HrContractSalary(main.HrContractSalary):
             })
         return new_contract, contract_diff
 
+    def _get_wage_to_apply(self):
+        return "wage_with_holidays"
+
     def _get_compute_results(self, new_contract):
         result = super()._get_compute_results(new_contract)
         result['double_holiday_wage'] = round(new_contract.double_holiday_wage, 2)
+        wage_to_apply = self._get_wage_to_apply()
         # Horrible hack: Add a sequence / display condition fields on salary resume model in master
         resume = result['resume_lines_mapped']['Monthly Salary']
-        if 'SALARY' in resume and resume.get('wage_with_holidays') and resume['wage_with_holidays'][1] != resume['SALARY'][1]:
-            ordered_fields = ['wage_with_holidays', 'SALARY', 'NET']
+        if 'SALARY' in resume and resume.get(wage_to_apply) and resume[wage_to_apply][1] != resume['SALARY'][1]:
+            ordered_fields = [wage_to_apply, 'SALARY', 'NET']
             if new_contract.env.context.get('simulation_working_schedule', '100') != '100':
                 salary_tuple = result['resume_lines_mapped']['Monthly Salary']['SALARY']
                 salary_tuple = (_('Gross (Part Time)'), salary_tuple[1], salary_tuple[2])
                 result['resume_lines_mapped']['Monthly Salary']['SALARY'] = salary_tuple
         else:
-            ordered_fields = ['wage_with_holidays', 'NET']
+            ordered_fields = [wage_to_apply, 'NET']
         result['resume_lines_mapped']['Monthly Salary'] = {field: resume.get(field, 0) for field in ordered_fields}
         return result
 
@@ -426,9 +431,13 @@ class HrContractSalary(main.HrContractSalary):
         offer = request.env['hr.contract.salary.offer'].sudo().browse(offer_id)
         minimum_gross_wage = request.env['hr.rule.parameter'].sudo()._get_parameter_from_code(
             'cp200_min_gross_wage', offer.contract_start_date, raise_if_not_found=False)
-        gross_to_compare = result['new_gross']
 
-        if minimum_gross_wage and gross_to_compare < minimum_gross_wage:
+        if result.get('l10n_be_wage_with_mobility_budget', False):
+            gross_to_compare = result['l10n_be_wage_with_mobility_budget']
+        else:
+            gross_to_compare = result['new_gross']
+
+        if minimum_gross_wage and gross_to_compare < minimum_gross_wage and offer.country_code == 'BE':
             result['configurator_warning'] = _("Your monthly gross wage is below the minimum legal amount %(min_gross)s €", min_gross=minimum_gross_wage)
 
         if benefits['contract'].get('fold_wishlist_car_total_depreciated_cost', False) and 'wishlist_car_total_depreciated_cost' in benefits['contract']:

@@ -306,9 +306,6 @@ class TestReportEditorUIUnit(HttpCase):
         original_main_view_doc_arch = self.main_view_document.arch
         self.start_tour(self.tour_url, "web_studio.test_basic_report_edition", login="admin")
         self.assertEqual(self.report.name, "modified in test")
-        self.assertTrue(self.main_view_xml_id.noupdate)
-        self.assertTrue(self.main_view_document_xml_id.noupdate)
-        self.assertTrue(self.report_xml_id.noupdate)
 
         main_arch, studio_arch = get_combined_and_studio_arch(self.main_view)
 
@@ -380,7 +377,6 @@ class TestReportEditorUIUnit(HttpCase):
         self.start_tour(self.tour_url, "web_studio.test_basic_report_edition_xml", login="admin")
         self.assertTrue(self.main_view_xml_id.noupdate)
         self.assertTrue(self.main_view_document_xml_id.noupdate)
-        self.assertTrue(self.report_xml_id.noupdate)
 
         self.assertXMLEqual(self.main_view.arch, """
             <t t-name="web_studio.test_report">
@@ -713,6 +709,20 @@ class TestReportEditorUIUnit(HttpCase):
             </t>
         """)
 
+    def test_disable_fields_commands_when_unavailable(self):
+        self.main_view.arch = """
+            <t t-name="web_studio.test_report">
+                <t t-call="web.html_container">
+                    <t t-call="web.internal_layout">
+                        <t t-set='lines' t-value='docs'/>
+                        <t t-esc="lines.mapped('name')"/>
+                        <p><br/></p>
+                    </t>
+                </t>
+            </t>
+        """
+        self.start_tour(self.tour_url, "web_studio.test_disable_fields_commands_when_unavailable", login="admin")
+
     def test_edition_without_lang(self):
         self.env["res.lang"]._activate_lang("fr_FR")
         self.env["res.users"].browse(2).lang = "fr_FR"
@@ -847,7 +857,7 @@ class TestReportEditorUIUnit(HttpCase):
             "field_description": "New File filename",
             "name": "x_new_file_filename",
             "ttype": "char",
-            "model": "res.partner",
+            "model": "res.company",
             "model_id": self.env["ir.model"]._get('res.company').id,
             "state": "manual",
         })
@@ -1164,7 +1174,7 @@ class TestReportEditorUIUnit(HttpCase):
         arch, studio_arch = get_combined_and_studio_arch(self.main_view_document)
         self.assertXMLEqual(arch, """
          <t t-name="web_studio.test_report_document">
-           <div class="added"/>
+           <div class="added"><br/></div>
            <div class="outside-t-call">outside</div>
            <t t-call="web_studio.t_call_0">
              <t t-set="somevar" t-value="'someValue'"/>
@@ -1176,7 +1186,7 @@ class TestReportEditorUIUnit(HttpCase):
         <data>
             <data>
                 <xpath position="before" expr="/t[@t-name='web_studio.test_report_document']/div" meta-class="outside-t-call">
-                <div class="added"/>
+                <div class="added"><br/></div>
                 </xpath>
             </data>
          </data>
@@ -1210,7 +1220,7 @@ class TestReportEditorUIUnit(HttpCase):
            <div class="outside-t-call">outside</div>
            <t t-call="web_studio.t_call_0">
              <t t-set="somevar" t-value="'someValue'"/>
-             <div class="added"/>
+             <div class="added"><br/></div>
              <div class="in-t-call">inside</div>
            </t>
          </t>
@@ -1219,7 +1229,7 @@ class TestReportEditorUIUnit(HttpCase):
         <data>
             <data>
                 <xpath position="after" expr="/t[@t-name='web_studio.test_report_document']//t[@t-call='web_studio.t_call_0']/t[@t-set='somevar']" meta-t-set="somevar" meta-t-value="'someValue'">
-                <div class="added"/>
+                <div class="added"><br/></div>
                 </xpath>
             </data>
         </data>
@@ -1250,11 +1260,11 @@ class TestReportEditorUIUnit(HttpCase):
         arch, studio_arch = get_combined_and_studio_arch(self.main_view_document)
         self.assertXMLEqual(arch, """
          <t t-name="web_studio.test_report_document">
-           <div class="added0"/>
+           <div class="added0"><br/></div>
            <div class="outside-t-call">outside</div>
            <t t-call="web_studio.t_call_0">
              <t t-set="somevar" t-value="'someValue'"/>
-             <div class="added1"/>
+             <div class="added1"><br/></div>
              <div class="in-t-call">inside</div>
            </t>
          </t>
@@ -1263,12 +1273,12 @@ class TestReportEditorUIUnit(HttpCase):
             <data>
                 <data>
                     <xpath position="before" expr="/t[@t-name='web_studio.test_report_document']/div" meta-class="outside-t-call">
-                    <div class="added0"/>
+                    <div class="added0"><br/></div>
                     </xpath>
                 </data>
                 <data>
                     <xpath position="after" expr="/t[@t-name='web_studio.test_report_document']//t[@t-call='web_studio.t_call_0']/t[@t-set='somevar']" meta-t-set="somevar" meta-t-value="'someValue'">
-                    <div class="added1"/>
+                    <div class="added1"><br/></div>
                     </xpath>
                 </data>
             </data>
@@ -1295,6 +1305,7 @@ class TestReportEditorUIUnit(HttpCase):
         self.start_tour(self.tour_url, "web_studio.test_image_crop", login="admin")
 
     def test_add_non_searchable_field(self):
+        self.assertFalse(self.env["res.partner"].fields_get(["avatar_1024"])["avatar_1024"]["searchable"])
         with self.with_user("admin"):
             partner = self.env["res.partner"].search([], limit=1)
         partner.image_1024 = "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAF0lEQVR4nGJxKFrEwMDAxAAGgAAAAP//D+IBWx9K7TUAAAAASUVORK5CYII="
@@ -1348,6 +1359,36 @@ class TestReportEditorUIUnit(HttpCase):
         </main>
         """)
 
+    def test_dont_translate_on_save(self):
+        self.main_view_document.arch = """
+            <t t-name="web_studio.test_report_document">
+                <div><p class="test-origin">content</p></div>
+                <p><br/></p>
+            </t>"""
+
+        self.env["res.lang"]._activate_lang("fr_FR")
+        self.start_tour(self.tour_url, "web_studio.test_dont_translate_on_save", login="admin")
+        html, _ = self.report.with_context(lang="fr_FR")._render_qweb_html(self.report.id, [1])
+        main = etree.fromstring(html).find(".//main")
+        self.assertXMLEqual(etree.tostring(main), """
+        <main>
+           <div>
+            <p>
+               <br/>
+             </p>
+           </div>
+           <div>
+             <span>
+               <strong>new content</strong>
+             </span>
+             <p class="test-origin">content</p>
+           </div>
+           <p>
+             <br/>
+           </p>
+         </main>
+        """)
+
     def test_evaluate_bad_queries(self):
         self.main_view_document.arch = """
         <t t-name="web_studio.test_report_document">
@@ -1393,3 +1434,76 @@ class TestReportEditorUIUnit(HttpCase):
             <div t-attf-class="res_partner_{{ bool(docs.search([('create_date', '!=', False)], limit=1)) }}" oe-origin-class="" class="res_partner_True">term3</div>
         </div>
         """)
+
+    def test_do_not_delete_unspecial_spans(self):
+        self.main_view_document.arch = """
+            <t t-name="web_studio.test_report_document">
+                <span>some text</span>
+            </t>"""
+        self.start_tour(self.tour_url, "web_studio.test_do_not_delete_unspecial_spans", login="admin")
+        _, studio_view_arch = get_combined_and_studio_arch(self.main_view_document)
+        self.assertXMLEqual(studio_view_arch, """
+         <data>
+           <data>
+           <xpath position="replace" expr="/t[@t-name='web_studio.test_report_document']/span">
+             <span>some textadded</span>
+           </xpath>
+           </data>
+         </data>
+        """)
+
+    def test_edit_header_only_company(self):
+        external_layout = self.env["ir.ui.view"]._get("web.external_layout_standard")
+        with self.with_user("admin"):
+            self.env.user.company_id.external_report_layout_id = external_layout
+        self.main_view_document.arch = '''
+            <t t-name="web_studio.test_report_document">
+                <t t-call="web.external_layout">
+                    <div><p t-field="doc.name" /></div>
+                    <p><br/></p>
+                </t>
+            </t>
+        '''
+
+        self.start_tour(self.tour_url, "web_studio.test_edit_header_only_company", login="admin")
+        combined = external_layout._get_combined_arch()
+        added_field = combined.xpath("//span[hasclass('studio-added')]")[0]
+        added_field = added_field[0]
+        self.assertTrue(added_field.get("t-field").startswith("company."))
+        self.assertEqual(added_field.text, "studio company id")
+
+    def test_xml_resource_with_empty_arch_view(self):
+        self.authenticate('admin', 'admin')
+        inherit = self.env["ir.ui.view"].create({
+            "inherit_id": self.main_view.id,
+            "type": "qweb",
+            "arch": "<data/>"
+        })
+
+        # Save inherited report with empty arch ''
+        save_report = self.url_open(
+            "/web_studio/save_report",
+            data=json.dumps({
+                "params": {
+                    "report_id": self.report.id,
+                    "context": {'allowed_company_ids': self.env.company.ids},
+                    "xml_verbatim": {str(inherit.id): ''}
+                }
+            }),
+            headers={"Content-Type": "application/json"}
+        )
+        self.assertEqual(save_report.status_code, 200)
+
+        xml_edit_resurces = self.url_open(
+            "/web_studio/get_xml_editor_resources",
+            data=json.dumps({
+                "params": {"key": self.main_view.key}
+            }),
+            headers={"Content-Type": "application/json"}
+        )
+        self.assertEqual(xml_edit_resurces.status_code, 200)
+
+        views = xml_edit_resurces.json()['result']['views']
+        view_ids = [view['id'] for view in views]
+
+        self.assertIn(inherit.id, view_ids)

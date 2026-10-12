@@ -84,7 +84,7 @@
         "A44": { "content": "=ODOO.LIST(4,7,\"order_id\")" },
         "A45": { "content": "=ODOO.LIST(4,8,\"order_id\")" },
         "A46": { "content": "=ODOO.LIST(4,9,\"order_id\")" },
-        "A47": { "content": "=ODOO.LIST(2,10,\"order_id\")" },
+        "A47": { "content": "=ODOO.LIST(4,10,\"order_id\")" },
         "A49": {
           "content": "[Top Recurrence](odoo://view/{\"viewType\":\"list\",\"action\":{\"domain\":[\"&\",\"&\",[\"is_subscription\",\"=\",true],[\"subscription_state\",\"not in\",[\"2_renewal\",\"5_renewed\"]],\"|\",[\"subscription_state\",\"=\",\"3_progress\"],[\"subscription_state\",\"=\",\"4_paused\"]],\"context\":{\"group_by\":[]},\"modelName\":\"sale.order\",\"views\":[[false,\"list\"],[false,\"kanban\"],[false,\"form\"],[false,\"pivot\"],[false,\"graph\"],[false,\"cohort\"],[false,\"activity\"],[false,\"search\"]]},\"threshold\":0,\"name\":\"Subscriptions\"})"
         },
@@ -106,10 +106,10 @@
         "B28": { "content": "=ODOO.LIST(1,4,\"amount_signed\")" },
         "B29": { "content": "=ODOO.LIST(1,5,\"amount_signed\")" },
         "B30": { "content": "=ODOO.LIST(1,6,\"amount_signed\")" },
-        "B31": { "content": "=ODOO.LIST(1,7,\"recurring_monthly\")" },
-        "B32": { "content": "=ODOO.LIST(1,8,\"recurring_monthly\")" },
-        "B33": { "content": "=ODOO.LIST(1,9,\"recurring_monthly\")" },
-        "B34": { "content": "=ODOO.LIST(1,10,\"recurring_monthly\")" },
+        "B31": { "content": "=ODOO.LIST(1,7,\"amount_signed\")" },
+        "B32": { "content": "=ODOO.LIST(1,8,\"amount_signed\")" },
+        "B33": { "content": "=ODOO.LIST(1,9,\"amount_signed\")" },
+        "B34": { "content": "=ODOO.LIST(1,10,\"amount_signed\")" },
         "B37": { "content": "=_t(\"Value\")" },
         "B38": { "content": "=ODOO.LIST(4,1,\"amount_signed\")" },
         "B39": { "content": "=ODOO.LIST(4,2,\"amount_signed\")" },
@@ -120,7 +120,7 @@
         "B44": { "content": "=ODOO.LIST(4,7,\"amount_signed\")" },
         "B45": { "content": "=ODOO.LIST(4,8,\"amount_signed\")" },
         "B46": { "content": "=ODOO.LIST(4,9,\"amount_signed\")" },
-        "B47": { "content": "=ODOO.LIST(2,10,\"amount_signed\")" },
+        "B47": { "content": "=ODOO.LIST(4,10,\"amount_signed\")" },
         "B50": { "content": "=_t(\"# Subscriptions\")" },
         "B51": {
           "content": "=PIVOT.VALUE(10,\"order_reference\",\"#template_id\",1)"
@@ -159,6 +159,10 @@
         "C28": { "content": "=ODOO.LIST(1,4,\"recurring_monthly\")" },
         "C29": { "content": "=ODOO.LIST(1,5,\"recurring_monthly\")" },
         "C30": { "content": "=ODOO.LIST(1,6,\"recurring_monthly\")" },
+        "C31": { "content": "=ODOO.LIST(1,7,\"recurring_monthly\")" },
+        "C32": { "content": "=ODOO.LIST(1,8,\"recurring_monthly\")" },
+        "C33": { "content": "=ODOO.LIST(1,9,\"recurring_monthly\")" },
+        "C34": { "content": "=ODOO.LIST(1,10,\"recurring_monthly\")" },
         "C37": { "content": "=_t(\"MRR\")" },
         "C38": { "content": "=ODOO.LIST(4,1,\"recurring_monthly\")" },
         "C39": { "content": "=ODOO.LIST(4,2,\"recurring_monthly\")" },
@@ -169,7 +173,7 @@
         "C44": { "content": "=ODOO.LIST(4,7,\"recurring_monthly\")" },
         "C45": { "content": "=ODOO.LIST(4,8,\"recurring_monthly\")" },
         "C46": { "content": "=ODOO.LIST(4,9,\"recurring_monthly\")" },
-        "C47": { "content": "=ODOO.LIST(2,10,\"recurring_monthly\")" },
+        "C47": { "content": "=ODOO.LIST(4,10,\"recurring_monthly\")" },
         "C50": { "content": "=_t(\"MRR\")" },
         "C51": {
           "content": "=PIVOT.VALUE(10,\"recurring_monthly\",\"#template_id\",1)"
@@ -228,7 +232,7 @@
         "E44": { "content": "=ODOO.LIST(2,7,\"order_id\")" },
         "E45": { "content": "=ODOO.LIST(2,8,\"order_id\")" },
         "E46": { "content": "=ODOO.LIST(2,9,\"order_id\")" },
-        "E47": { "content": "=ODOO.LIST(4,10,\"order_id\")" },
+        "E47": { "content": "=ODOO.LIST(2,10,\"order_id\")" },
         "F24": { "content": "=_t(\"Value\")" },
         "F25": { "content": "=ODOO.LIST(3,1,\"amount_signed\")" },
         "F26": { "content": "=ODOO.LIST(3,2,\"amount_signed\")" },
@@ -250,7 +254,7 @@
         "F44": { "content": "=ODOO.LIST(2,7,\"amount_signed\")" },
         "F45": { "content": "=ODOO.LIST(2,8,\"amount_signed\")" },
         "F46": { "content": "=ODOO.LIST(2,9,\"amount_signed\")" },
-        "F47": { "content": "=ODOO.LIST(4,10,\"amount_signed\")" },
+        "F47": { "content": "=ODOO.LIST(2,10,\"amount_signed\")" },
         "G24": { "content": "=_t(\"MRR\")" },
         "G25": { "content": "=ODOO.LIST(3,1,\"recurring_monthly\")" },
         "G26": { "content": "=ODOO.LIST(3,2,\"recurring_monthly\")" },
@@ -272,7 +276,7 @@
         "G44": { "content": "=ODOO.LIST(2,7,\"recurring_monthly\")" },
         "G45": { "content": "=ODOO.LIST(2,8,\"recurring_monthly\")" },
         "G46": { "content": "=ODOO.LIST(2,9,\"recurring_monthly\")" },
-        "G47": { "content": "=ODOO.LIST(4,10,\"recurring_monthly\")" }
+        "G47": { "content": "=ODOO.LIST(2,10,\"recurring_monthly\")" }
       },
       "styles": {
         "A7": 1,

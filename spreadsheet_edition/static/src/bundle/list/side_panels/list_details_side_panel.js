@@ -7,11 +7,12 @@ import { _t } from "@web/core/l10n/translation";
 import { Component, onWillStart } from "@odoo/owl";
 import { getListHighlights } from "../list_highlight_helpers";
 
-import { hooks, components } from "@odoo/o-spreadsheet";
+import { hooks, components, helpers } from "@odoo/o-spreadsheet";
 import { SidePanelDomain } from "../../components/side_panel_domain/side_panel_domain";
 
 const { useHighlights } = hooks;
 const { ValidationMessages, EditableName, CogWheelMenu, Section } = components;
+const { isDefined } = helpers;
 
 export class ListDetailsSidePanel extends Component {
     static template = "spreadsheet_edition.ListDetailsSidePanel";
@@ -33,16 +34,18 @@ export class ListDetailsSidePanel extends Component {
         this.notification = useService("notification");
         const loadData = async (listId) => {
             const dataSource = await this.env.model.getters.getAsyncListDataSource(listId);
-            this.modelDisplayName = await dataSource.getModelLabel();
+            this.isModelValid = dataSource.isModelValid();
+            if (this.isModelValid) {
+                this.modelDisplayName = await dataSource.getModelLabel();
+                // Store the fields here because the data source can be reset when updating the list.
+                // Forcing a reload with onWillUpdateProps would introduce flickering
+                // and the fields never change anyway.
+                this.listFields = dataSource.getFields();
+            }
         };
         onWillStart(async () => {
             // it's assumed `this.props.listId` never changes (t-key is required when using this component)
             await loadData(this.props.listId);
-            const dataSource = this.env.model.getters.getListDataSource(this.props.listId);
-            // Store the fields here because the data source can be reset when updating the list.
-            // Forcing a reload with onWillUpdateProps would introduce flickering
-            // and the fields never change anyway.
-            this.listFields = dataSource.getFields();
         });
         useHighlights(this);
     }
@@ -73,6 +76,16 @@ export class ListDetailsSidePanel extends Component {
         };
     }
 
+    get invalidListModel() {
+        const model = this.env.model.getters.getListDefinition(this.props.listId).model;
+        return _t(
+            "The model (%(model)s) of this list is not valid (it may have been renamed/deleted). Please re-insert a new list.",
+            {
+                model,
+            }
+        );
+    }
+
     getLastUpdate() {
         const lastUpdate = this.env.model.getters.getListDataSource(this.props.listId).lastUpdate;
         if (lastUpdate) {
@@ -84,7 +97,8 @@ export class ListDetailsSidePanel extends Component {
     getColumnFields() {
         return this.getters
             .getListDefinition(this.props.listId)
-            .columns.map((col) => this.listFields[col]);
+            .columns.map((col) => this.listFields[col])
+            .filter(isDefined);
     }
 
     onNameChanged(name) {

@@ -1,5 +1,6 @@
 import secrets
 import psycopg2
+import json
 
 from odoo import fields, models, api, Command, SUPERUSER_ID, _
 from odoo.exceptions import ValidationError, UserError
@@ -33,14 +34,14 @@ class PosConfig(models.Model):
             ('company_id', '=', self.env.company.id)
         ], limit=1)
 
-    def _default_urbanpiper_delivery_providers(self):
-        return self.env['pos.delivery.provider'].search([('available_country_ids', 'in', self.env.company.ids)])
-
     def _default_urbanpiper_fiscal_position(self):
         fiscal_position = self.env.ref('pos_urban_piper.pos_account_fiscal_position_urbanpiper', False)
         if fiscal_position and fiscal_position.sudo().company_id.id == self.env.company.id:
             return fiscal_position
 
+    name = fields.Char(
+        translate=True,
+    )
     urbanpiper_store_identifier = fields.Char(
         string='Urban Piper POS ID',
         help='Pos ID from Urban Piper (Atlas)',
@@ -75,7 +76,6 @@ class PosConfig(models.Model):
         'pos.delivery.provider',
         string='Delivery Providers',
         help='The delivery providers used for online delivery through UrbanPiper.',
-        default=_default_urbanpiper_delivery_providers,
     )
 
     _sql_constraints = [('urbanpiper_store_identifier_uniq',
@@ -100,17 +100,12 @@ class PosConfig(models.Model):
                 pos_config_id[0]
             ))
 
-    def open_ui(self):
-        if self.module_pos_urban_piper and self.urbanpiper_store_identifier and self.current_session_id:
-            self.update_store_status(True)
-        return super().open_ui()
-
     @api.model_create_multi
     def create(self, vals_list):
         pos_configs = super().create(vals_list)
         for config in pos_configs:
             if config.module_pos_urban_piper:
-                config.setup_journals_and_payment_methods()
+                config._setup_journals_and_payment_methods()
                 config._configure_fiscal_position_and_pricelist()
         return pos_configs
 
@@ -162,7 +157,7 @@ class PosConfig(models.Model):
         """
         self.ensure_one()
         fiscal_position = self.urbanpiper_fiscal_position_id or self.env.ref('pos_urban_piper.pos_account_fiscal_position_urbanpiper', False)
-        if fiscal_position.sudo().company_id.id != self.company_id.id:
+        if not fiscal_position or fiscal_position.sudo().company_id.id != self.company_id.id:
             fiscal_position = self.env['account.fiscal.position'].create({
                 'name': 'UrbanPiper'
             })
@@ -185,14 +180,12 @@ class PosConfig(models.Model):
                         })]
                     })
                 self.urbanpiper_pricelist_id = pricelist.id
-        source_taxes = self.env['account.tax'].search([('type_tax_use', '=', 'sale'), ('company_id', '=', self.company_id.id)])
-        if fiscal_position and fiscal_position.tax_ids.tax_src_id.ids != source_taxes.ids:
-            lines = []
-            for tax in source_taxes - fiscal_position.tax_ids.tax_src_id:
-                lines.append((0, 0, {
-                    'tax_src_id': tax.id,
-                }))
-            fiscal_position.tax_ids = lines
+        self._add_line_to_fiscal_position(fiscal_position)
+
+    def _add_line_to_fiscal_position(self, fiscal_position):
+        # Outside of India, prices are tax-inclusive. So if users want tax-specific behavior,
+        # they must manually add a tax line to the fiscal position.
+        pass
 
     def prepare_taxes_data(self, pos_products):
         """
@@ -200,36 +193,45 @@ class PosConfig(models.Model):
         """
         return []
 
-    def update_items_dict(self, product, item_dict):
+    def update_urbanpiper_item_data(self, item, product):
         """
-        Update tags in urban piper for sync menu.
+        Override this method to update item data with product information. (as per requirements for different regions)
         """
-        return item_dict
+        self.ensure_one()
+        return item
 
     def update_store_status(self, status):
         """
         Activate and Deactivate store
         """
-        self._check_required_request_params()
-        up = UrbanPiperClient(self)
+        up = UrbanPiperClient(self.with_context(provider_name=self.env.context.get('providerName')))
         up.configure_webhook()
-        up.urbanpiper_store_status_update(status=status)
+        up.urbanpiper_store_status_update(status)
 
-    def order_status_update(self, order_id, new_status, message=None):
+    def order_status_update(self, order_id, new_status, code=None):
         """
         Update order status from urban piper webhook
         """
         self.ensure_one()
         order = self.env['pos.order'].browse(order_id)
-        if new_status == 'Food Ready':
+        if new_status == 'Food Ready' and order.state != 'paid':
             self._make_order_payment(order)
         up = UrbanPiperClient(self)
-        is_success, message = up.request_status_update(order.delivery_identifier, new_status, message)
+        is_success, message = False, ''
+        if order.delivery_provider_id.technical_name in ['careem'] and new_status == 'Food Ready':
+            is_success = True
+        else:
+            is_success, message = up.request_status_update(order.delivery_identifier, new_status, code)
         if is_success:
             order.write({
                 'delivery_status': const.ORDER_STATUS_MAPPING[new_status][1],
             })
-        self._send_delivery_order_count()
+            if new_status == 'Cancelled':
+                # Prevent loading cancelled orders in `getServerOrders` triggered by `_send_delivery_order_count`
+                order.state = 'cancel'
+        if new_status == 'Acknowledged':
+            up.urbanpiper_order_reference_update(order)
+        self._send_delivery_order_count(order_id)
         return {'is_success': is_success, 'message': message}
 
     def _make_order_payment(self, order):
@@ -248,6 +250,7 @@ class PosConfig(models.Model):
             'amount': order.amount_total,
             'payment_method_id': payment_method.id,
         }).check()
+        order._compute_prices()
 
     def _send_delivery_order_count(self, order_id=None):
         """
@@ -257,6 +260,14 @@ class PosConfig(models.Model):
         if self.current_session_id:
             self._notify('DELIVERY_ORDER_COUNT', order_id)
 
+    def _store_action_update(self, data):
+        """
+        Send store status update to pos ui
+        """
+        self.ensure_one()
+        if self.current_session_id:
+            self._notify('STORE_ACTION', data)
+
     def get_delivery_data(self):
         """
         Fetch delivery order count and providers for pos ui
@@ -264,15 +275,6 @@ class PosConfig(models.Model):
         self.ensure_one()
         delivery_order_count = self._get_urbanpiper_order_count()
         delivery_providers = self._get_active_delivery_providers()
-        for provider in delivery_providers:
-            provider_code = provider.get("code")
-            if provider_code in delivery_order_count['urbanpiper']:
-                order_counts = delivery_order_count['urbanpiper'][provider_code]
-                order_count = sum(order_counts.values())
-                provider['is_active'] = order_count > 0
-            else:
-                provider['is_active'] = False
-        delivery_providers_active = any(provider['is_active'] for provider in delivery_providers)
         total_new_order = sum(
             provider_data.get('awaiting', 0)
             for provider_data in delivery_order_count['urbanpiper'].values()
@@ -280,7 +282,6 @@ class PosConfig(models.Model):
         combined_data = {
             'delivery_order_count': delivery_order_count,
             'delivery_providers': delivery_providers,
-            'delivery_providers_active': delivery_providers_active,
             'total_new_order': total_new_order,
         }
         return combined_data
@@ -333,29 +334,34 @@ class PosConfig(models.Model):
         """
         Handle response from urban piper
         """
-        if response_json.get('message'):
-            msg_type = ''
+        title, msg_type, message = _('Urban Piper'), 'danger', ''
+        if response_json.get('errors'):
+            title = list(response_json.get('errors').keys())[0]
+            message = list(response_json.get('errors').values())[0]
+        elif response_json.get('message'):
+            message = response_json.get('message')
             if response_json.get('status') == 'success':
                 msg_type = 'success'
+                message = message.split('.')[0]
             elif response_json.get('status') == 'error':
                 if raise_exception:
                     raise ValidationError(response_json['message'])
-                else:
-                    msg_type = 'danger'
-            message = response_json['message']
-            if msg_type == 'success':
-                message = message.split('.')[0]
+        if message:
             return {
                 'type': 'ir.actions.client',
                 'tag': 'display_notification',
                 'params': {
-                    'title': _('Urban Piper'),
+                    'title': title,
                     'message': message,
                     'type': msg_type,
                     'sticky': False,
                     'next': {'type': 'ir.actions.act_window_close'},  # force a form reload
                 }
             }
+        
+    def prepare_store_data(self, data):
+        self.ensure_one()
+        return data
 
     def _check_required_request_params(self, store_required=True):
         msg = ''
@@ -388,3 +394,27 @@ class PosConfig(models.Model):
                             'line': 1})
         except psycopg2.Error:
             pass
+
+    def _reset_urbanpiper_product_linkages(self):
+        """
+        Reset product linkage to Urbanpiper and products become available
+        for syncing again.
+        """
+        if linked_statuses := self.env['product.urban.piper.status'].search([
+            ('config_id', 'in', self.ids),
+            ('is_product_linked', '=', True)
+        ]):
+            linked_statuses.write({'is_product_linked': False})
+
+    def get_urban_piper_provider_states(self):
+        raw = self.env['ir.config_parameter'].sudo().get_param('pos_urban_piper.toggle_state') or "{}"
+        config_state = json.loads(raw)
+        config_state = config_state.get(str(self.id), {})
+        return config_state
+
+    def set_urban_piper_provider_states(self, value_json):
+        config_state = json.loads(self.env['ir.config_parameter'].sudo().get_param('pos_urban_piper.toggle_state', "{}"))
+        config_state[str(self.id)] = json.loads(value_json or "{}")
+        self.env['ir.config_parameter'].sudo().set_param('pos_urban_piper.toggle_state', json.dumps(config_state))
+        self._notify('URBAN_PIPER_PROVIDER_STATES', config_state[str(self.id)])
+        return config_state[str(self.id)]

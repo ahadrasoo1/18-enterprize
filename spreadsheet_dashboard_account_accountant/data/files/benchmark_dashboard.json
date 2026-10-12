@@ -46,7 +46,7 @@
           "content": "=_t(\"possible issues in cash availability at short term\")"
         },
         "B34": {
-          "content": "=_t(\"Net Credit Purchases / Average accounts payable balance for period\")"
+          "content": "=_t(\"Sales on account / Average accounts receivable balance for period\")"
         },
         "B35": {
           "content": "=_t(\"< 45: company gets paid for sales quickly\")"
@@ -98,7 +98,7 @@
           "content": "=_t(\"possible issues in cash availability at short term\")"
         },
         "D34": {
-          "content": "=_t(\"Sales on account / Average accounts receivable balance for period\")"
+          "content": "=_t(\"Net Credit Purchases / Average accounts payable balance for period\")"
         },
         "D35": {
           "content": "=_t(\"< 45: company liquidates debts to suppliers quickly\")"
@@ -496,7 +496,7 @@
         "B8": { "content": "=FORMAT.LARGE.NUMBER(IFERROR(B20-B21))" },
         "B9": { "content": "=IFERROR(B26/ABS(B21))" },
         "B10": { "content": "=IFERROR(B28/ABS(B14)*30)" },
-        "B11": { "content": "=IFERROR(B27/ABS(B18)*30)" },
+        "B11": { "content": "=IFERROR(B27/ABS(B15)*30)" },
         "B13": { "content": "=_t(\"Value\")" },
         "B14": { "content": "=B42" },
         "B15": { "content": "=B46" },
@@ -525,9 +525,7 @@
         "B39": { "content": "=-ODOO.BALANCE(ODOO.ACCOUNT.GROUP($C39),B$30)" },
         "B40": { "content": "=-ODOO.BALANCE(ODOO.ACCOUNT.GROUP($C40),B$30)" },
         "B41": { "content": "=-ODOO.BALANCE(ODOO.ACCOUNT.GROUP($C41),B$30)" },
-        "B42": {
-          "content": "=-ODOO.BALANCE(ODOO.ACCOUNT.GROUP(\"income\"),B$30)"
-        },
+        "B42": { "content": "=-ODOO.BALANCE(ODOO.ACCOUNT.GROUP($C42),B$30)" },
         "B43": { "content": "=-ODOO.BALANCE(ODOO.ACCOUNT.GROUP($C43),B$30)" },
         "B44": { "content": "=ODOO.BALANCE(ODOO.ACCOUNT.GROUP($C44),B$30)" },
         "B45": { "content": "=ODOO.BALANCE(ODOO.ACCOUNT.GROUP($C45),B$30)" },
@@ -576,23 +574,23 @@
         "C27": { "content": "=_t(\"payable\")" },
         "C28": { "content": "=_t(\"receivable\")" },
         "C30": { "content": "=_t(\"Technical name\")" },
-        "C31": { "content": "=_t(\"asset_receivable\")" },
-        "C32": { "content": "=_t(\"asset_cash\")" },
-        "C33": { "content": "=_t(\"asset_current\")" },
-        "C34": { "content": "=_t(\"asset_prepayments\")" },
-        "C35": { "content": "=_t(\"asset_non_current\")" },
-        "C36": { "content": "=_t(\"asset_fixed\")" },
-        "C37": { "content": "=_t(\"liability_payable\")" },
-        "C38": { "content": "=_t(\"liability_credit_card\")" },
-        "C39": { "content": "=_t(\"liability_current\")" },
-        "C40": { "content": "=_t(\"liability_non_current\")" },
-        "C41": { "content": "=_t(\"equity\")" },
-        "C42": { "content": "=_t(\"income\")" },
-        "C43": { "content": "=_t(\"income_other\")" },
-        "C44": { "content": "=_t(\"expense\")" },
-        "C45": { "content": "=_t(\"expense_depreciation\")" },
-        "C46": { "content": "=_t(\"expense_direct_cost\")" },
-        "C47": { "content": "=_t(\"off_balance\")" },
+        "C31": { "content": "asset_receivable" },
+        "C32": { "content": "asset_cash" },
+        "C33": { "content": "asset_current" },
+        "C34": { "content": "asset_prepayments" },
+        "C35": { "content": "asset_non_current" },
+        "C36": { "content": "asset_fixed" },
+        "C37": { "content": "liability_payable" },
+        "C38": { "content": "liability_credit_card" },
+        "C39": { "content": "liability_current" },
+        "C40": { "content": "liability_non_current" },
+        "C41": { "content": "equity" },
+        "C42": { "content": "income" },
+        "C43": { "content": "income_other" },
+        "C44": { "content": "expense" },
+        "C45": { "content": "expense_depreciation" },
+        "C46": { "content": "expense_direct_cost" },
+        "C47": { "content": "off_balance" },
         "E1": { "content": "=_t(\"Month-Year\")" },
         "E2": { "content": "=_t(\"Month\")" },
         "E3": { "content": "=_t(\"Year\")" },

@@ -4,12 +4,25 @@ from base64 import b64encode
 from datetime import datetime, time, timedelta
 from calendar import monthrange
 from collections import defaultdict
+from dataclasses import dataclass
+from typing import NamedTuple
 
-from odoo import api, fields, models, _
-from odoo.exceptions import RedirectWarning, UserError
+from odoo import api, fields, models
+from odoo.exceptions import RedirectWarning, UserError, ValidationError
 from odoo.osv.expression import AND, OR
-from odoo.tools.misc import DotDict
 from odoo.tools import format_date
+
+
+class SplittedWorkEntry(NamedTuple):
+    start: datetime
+    stop: datetime
+    work_entry: models.Model
+
+
+@dataclass
+class WorkEntryCollection:
+    work_entries: models.Model
+    duration: int
 
 
 class HrWorkEntryExportMixin(models.AbstractModel):
@@ -23,17 +36,17 @@ class HrWorkEntryExportMixin(models.AbstractModel):
     @api.model
     def default_get(self, field_list=None):
         country_restriction = self._country_restriction()
-        if country_restriction and self.env.company.country_id.code != country_restriction:
-            raise UserError(_(
+        if country_restriction and country_restriction not in self.env.companies.mapped('country_id.code'):
+            raise UserError(self.env._(
                 'You must be logged in a %(country_code)s company to use this feature',
                 country_code=country_restriction
             ))
         return super().default_get(field_list)
 
     def _get_company_domain(self):
-        domain = [('id', '=', self.env.company.id)]
+        domain = [('id', 'in', self.env.companies.ids)]
         if restriction := self._country_restriction():
-            domain = AND([domain, [('country_id.code', '=', restriction)]])
+            domain = AND([domain, [('partner_id.country_id.code', '=', restriction)]])
         return domain
 
     create_uid = fields.Many2one('res.users', index=True)
@@ -135,14 +148,15 @@ class HrWorkEntryExportMixin(models.AbstractModel):
         raise NotImplementedError()
 
     def _get_name(self):
-        return _('Work Entries Export')
+        return self.env._('Work Entries Export')
 
     def _get_view_ref(self):
         return 'hr_payroll.hr_work_entry_export_mixin_form_view'
 
     def action_export_file(self):
         self.ensure_one()
-        self.eligible_employee_line_ids.check_work_entries()
+        self.eligible_employee_line_ids._check_data()
+        self.eligible_employee_line_ids._check_work_entries()
         self.export_file = b64encode(self._generate_export_file().encode())
         self.export_filename = self._generate_export_filename()
         return {
@@ -177,7 +191,7 @@ class HrWorkEntryExportMixin(models.AbstractModel):
     def action_open_employees(self):
         self.ensure_one()
         return {
-            'name': _('Eligible Employees'),
+            'name': self.env._('Eligible Employees'),
             'res_model': self.eligible_employee_line_ids._name,
             'domain': [('id', 'in', self.eligible_employee_line_ids.ids)],
             'context': {'default_export_id': self.id},
@@ -211,13 +225,51 @@ class HrWorkEntryExportEmployeeMixin(models.AbstractModel):
             for line in lines:
                 line.work_entry_ids = relevant_work_entries_by_employee.get(line.employee_id)
 
+    def _relations_to_check(self):
+        """
+        To be overridden in order to check for missing data in related fields.
+        example:
+        ```py
+        def _relations_to_check(self):
+             relations = super()._relations_to_check()
+             return relations + ['employee_id.group_s_code']
+        ```
+
+        :return: A list of the field to check in dot notation
+        """
+        return []
+
+    def _check_data(self):
+        def explore_and_check(path):
+            base_record_path, field = path.rsplit('.', maxsplit=1)
+            base_records = self.mapped(base_record_path)
+            return base_records.filtered(lambda r: not r[field])
+
+        messages = []
+        for model_display_name, field_chain in self._relations_to_check():
+            if problematic_records := explore_and_check(field_chain):
+                final_field_name = field_chain.rsplit('.', maxsplit=1)[-1]
+                field_display_name = problematic_records._fields[final_field_name].string
+                record_names = '\n    • '.join(problematic_records.mapped('name'))
+
+                message = self.env._(
+                    "The following %(model_name)s are missing a %(field_name)s:\n    • %(names)s",
+                    model_name=model_display_name,
+                    field_name=field_display_name,
+                    names=record_names
+                )
+                messages.append(message)
+
+        if messages:
+            raise ValidationError('\n\n'.join(messages))
+
     def _split_work_entries_on_midnight(self, limit_start=None, limit_stop=None):
         """ Split work entries that span multiple days into multiple work entries that each span a single day.
         the work entries are sorted by date_start given _order of hr.work.entry
 
         :param limit_start: Optional start date to limit the split
         :param limit_stop: Optional stop date to limit the split
-        :return: A list of DotDict(start, stop, work_entry) (pseudo record set)
+        :return: A list of SplittedWorkEntry(start, stop, work_entry) (pseudo record set)
         """
         self.ensure_one()
         splitted_work_entries = []
@@ -228,36 +280,20 @@ class HrWorkEntryExportEmployeeMixin(models.AbstractModel):
                 if limit_stop else work_entry.date_stop
 
             if start.date() == stop.date():
-                splitted_work_entries.append(DotDict({
-                    'start': start,
-                    'stop': stop,
-                    'work_entry': work_entry,
-                }))
+                splitted_work_entries.append(SplittedWorkEntry(start, stop, work_entry))
                 continue
 
             midnight_after_start = datetime.combine(start.date() + timedelta(days=1), time.min)
-            splitted_work_entries.append(DotDict({
-                'start': start,
-                'stop': midnight_after_start,
-                'work_entry': work_entry,
-            }))
+            splitted_work_entries.append(SplittedWorkEntry(midnight_after_start, stop, work_entry))
 
             current_start = datetime.combine(start.date(), time.min) + timedelta(days=1)
             day_before_stop = datetime.combine(stop.date() - timedelta(days=1), time.max)
             while current_start < day_before_stop:
                 next_midnight = datetime.combine(current_start, time.max)
-                splitted_work_entries.append(DotDict({
-                    'start': current_start,
-                    'stop': next_midnight,
-                    'work_entry': work_entry,
-                }))
+                splitted_work_entries.append(SplittedWorkEntry(next_midnight, next_midnight, work_entry))
                 current_start += timedelta(days=1)
 
-            splitted_work_entries.append(DotDict({
-                'start': current_start,
-                'stop': stop,
-                'work_entry': work_entry,
-            }))
+            splitted_work_entries.append(SplittedWorkEntry(current_start, stop, work_entry))
         return splitted_work_entries
 
     def _get_work_entries_by_day_and_code(self, limit_start=None, limit_stop=None):
@@ -265,14 +301,14 @@ class HrWorkEntryExportEmployeeMixin(models.AbstractModel):
 
         :param limit_start: Optional start date to limit the split
         :param limit_stop: Optional stop date to limit the split
-        :return: A defaultdict {date: defaultdict {code: DotDict {work_entries, duration}}}
+        :return: A defaultdict {date: defaultdict {code: WorkEntryCollection {work_entries, duration}}}
         """
         self.ensure_one()
         work_entry_intervals = self._split_work_entries_on_midnight(limit_start, limit_stop)
-        work_entries_by_day_and_code = defaultdict(lambda: defaultdict(lambda: DotDict({
-            'work_entries': self.env['hr.work.entry'],
-            'duration': 0,  # in seconds in the start day
-        })))
+        work_entries_by_day_and_code = defaultdict(lambda: defaultdict(lambda: WorkEntryCollection(
+            work_entries=self.env['hr.work.entry'],
+            duration=0,
+        )))
         for work_entry_interval in work_entry_intervals:
             date = work_entry_interval.start.date()
             code = work_entry_interval.work_entry.work_entry_type_id.code
@@ -281,7 +317,7 @@ class HrWorkEntryExportEmployeeMixin(models.AbstractModel):
                 work_entry_interval.stop - work_entry_interval.start).total_seconds()
         return work_entries_by_day_and_code
 
-    def check_work_entries(self):
+    def _check_work_entries(self):
         if any(work_entry.state == 'conflict' for work_entry in self.work_entry_ids):
             base_domain = [
                 ('employee_id', 'in', self.employee_id.ids),
@@ -293,16 +329,16 @@ class HrWorkEntryExportEmployeeMixin(models.AbstractModel):
             ] for export in self.export_id])
 
             raise RedirectWarning(
-                message=_('Some work entries are in conflict. Please resolve the conflicts before exporting.'),
+                message=self.env._('Some work entries are in conflict. Please resolve the conflicts before exporting.'),
                 action=self.env.ref('hr_work_entry.hr_work_entry_action_conflict').id,
-                button_text=_('Resolve Conflicts'),
+                button_text=self.env._('Resolve Conflicts'),
                 additional_context={'domain': AND([base_domain, time_domain])}
             )
 
     def action_open_work_entries(self):
         self.ensure_one()
         return {
-            'name': _('Work Entries for %(employee)s', employee=self.employee_id.name),
+            'name': self.env._('Work Entries for %(employee)s', employee=self.employee_id.name),
             'res_model': self.work_entry_ids._name,
             'type': 'ir.actions.act_window',
             'view_mode': 'gantt,calendar,list,pivot,form',

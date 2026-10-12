@@ -241,8 +241,8 @@ class TestTaxReport(TestAccountReportsCommon):
         vals = {
             'name': 'Test tax group',
             'company_id': company.id,
-            'tax_receivable_account_id': cls.company_data['default_account_receivable'].sudo().copy({'company_ids': company.ids}).id,
-            'tax_payable_account_id': cls.company_data['default_account_payable'].sudo().copy({'company_ids': company.ids}).id,
+            'tax_receivable_account_id': cls.company_data['default_tax_account_receivable'].sudo().copy({'company_ids': company.ids}).id,
+            'tax_payable_account_id': cls.company_data['default_tax_account_payable'].sudo().copy({'company_ids': company.ids}).id,
         }
         if country:
             vals['country_id'] = country.id
@@ -494,7 +494,7 @@ class TestTaxReport(TestAccountReportsCommon):
         def assertTaxClosingAvailable(is_enabled, active_companies, export_main_company=None):
             options = tax_report.with_context(allowed_company_ids=active_companies.ids).get_options({})
             closing_button_dict = next(filter(lambda x: x['action'] == 'action_periodic_vat_entries', options['buttons']))
-            self.assertEqual(closing_button_dict.get('disabled', False), not is_enabled)
+            self.assertEqual(closing_button_dict.get('error_action'), None if is_enabled else 'show_error_branch_allowed')
             if is_enabled:
                 self.assertEqual(tax_report._get_sender_company_for_export(options), export_main_company)
 
@@ -2625,6 +2625,9 @@ class TestTaxReport(TestAccountReportsCommon):
             report_options['all'],
         )
 
+        # We need to reset the fiscalyear_lock_date or it will raise an exception
+        company_2.fiscalyear_lock_date = False
+
         # if we change the tax_lock_date, the default values should be created
         lock_date_wizard = self.env['account.change.lock.date']\
             .with_company(company_2).create({
@@ -2973,3 +2976,365 @@ class TestTaxReport(TestAccountReportsCommon):
         self.assert_period(date(2024, 12, 5), expected_start=date(2024, 11, 6), expected_end=date(2024, 12, 5))
         self.assert_period(date(2024, 12, 6), expected_start=date(2024, 12, 6), expected_end=date(2025, 1, 5))
         self.assert_period(date(2025, 1, 5), expected_start=date(2024, 12, 6), expected_end=date(2025, 1, 5))
+
+    def test_multiple_same_tax_lines_with_multiple_analytics(self):
+        """ One Invoice line with analytic_distribution and another with another analytic_distribution, both with the same tax"""
+        analytic_plan = self.env['account.analytic.plan'].create({'name': 'Plan with Tax details'})
+        analytic_account_1 = self.env['account.analytic.account'].create({
+            'name': 'Analytic account with Tax details',
+            'plan_id': analytic_plan.id,
+            'company_id': False,
+        })
+        analytic_account_2 = self.env['account.analytic.account'].create({
+            'name': ' testAnalytic account',
+            'plan_id': analytic_plan.id,
+            'company_id': False,
+        })
+        tax_10 = self.env['account.tax'].create({
+            'name': "tax_10",
+            'amount_type': 'percent',
+            'amount': 10.0,
+        })
+        invoice = self.env['account.move'].create({
+            'move_type': 'out_invoice',
+            'partner_id': self.partner_a.id,
+            'invoice_date': '2019-01-01',
+            'invoice_line_ids': [
+                Command.create({
+                    'name': 'line1',
+                    'account_id': self.company_data['default_account_revenue'].id,
+                    'price_unit': 200.0,
+                    'tax_ids': [Command.set(tax_10.ids)],
+                    'analytic_distribution': {
+                        analytic_account_1.id: 100,
+                    },
+                }),
+                Command.create({
+                    'name': 'line2',
+                    'account_id': self.company_data['default_account_revenue'].id,
+                    'price_unit': 100.0,
+                    'tax_ids': [Command.set(tax_10.ids)],
+                    'analytic_distribution': {
+                        analytic_account_2.id: 100,
+                    },
+                }),
+            ]
+        })
+        invoice.action_post()
+        invoice2 = self.env['account.move'].create({
+            'move_type': 'out_invoice',
+            'partner_id': self.partner_a.id,
+            'invoice_date': '2019-01-01',
+            'invoice_line_ids': [
+                Command.create({
+                    'name': 'line1',
+                    'account_id': self.company_data['default_account_revenue'].id,
+                    'price_unit': 10.0,
+                    'tax_ids': [Command.set(tax_10.ids)],
+                    'analytic_distribution': {
+                        analytic_account_2.id: 100,
+                    },
+                }),
+            ]
+        })
+        invoice2.action_post()
+
+        self.assertRecordValues(invoice.line_ids, [
+            {'name': 'line1', 'debit': 0.00, 'credit': 200.0},
+            {'name': 'line2', 'debit': 0.00, 'credit': 100.0},
+            {'name': tax_10.name, 'debit': 0.00, 'credit': 20.0},
+            {'name': tax_10.name, 'debit': 0.00, 'credit': 10.0},
+            {'name': invoice.name, 'debit': 330.0, 'credit': 0.00}
+        ])
+
+        self.assertRecordValues(invoice2.line_ids, [
+            {'name': 'line1', 'debit': 0.00, 'credit': 10.0},
+            {'name': tax_10.name, 'debit': 0.00, 'credit': 1.0},
+            {'name': invoice2.name, 'debit': 11.0, 'credit': 0.00}
+        ])
+
+        report = self.env.ref('account.generic_tax_report_account_tax')
+        options = self._generate_options(report, invoice.date, invoice.date)
+
+        self.assertLinesValues(
+            report._get_lines(options),
+            #   Name                                                                          Base      Tax
+            [   0,                                                                             1,        2],
+            [
+                ('Sales',                                                                     "",     31.0),
+                (self.company_data['default_account_revenue'].display_name,                   "",     31.0),
+                (f'{tax_10.name} ({tax_10.amount}%)',                                      310.0,     31.0),
+                (f'Total {self.company_data["default_account_revenue"].display_name}',        "",     31.0),
+                ('Total Sales',                                                               "",     31.0),
+            ],
+            options
+        )
+
+        report = self.env.ref("account.generic_tax_report_tax_account")
+        options['report_id'] = report.id
+
+        self.assertLinesValues(
+            report._get_lines(options),
+            #   Name                                                                           Base      Tax
+            [   0,                                                                              1,        2],
+            [
+                ('Sales',                                                                      "",     31.0),
+                (f'{tax_10.name} ({tax_10.amount}%)',                                          "",     31.0),
+                (self.company_data['default_account_revenue'].display_name,                 310.0,     31.0),
+                (f'Total {tax_10.name} ({tax_10.amount}%)',                                    "",     31.0),
+                ('Total Sales',                                                                "",     31.0),
+            ],
+            options
+        )
+
+    def test_caba_negative_lines_with_multiple_accounts(self):
+        """ One invoice with 2 lines on 2 income acccounts, one with a negative total, both with a caba tax."""
+        self.company_data['company'].tax_exigibility = True
+        account_1 = self.company_data['default_account_revenue']
+        account_2 = self.company_data["default_account_assets"]
+        caba_tax_10 = self.env['account.tax'].create({
+            'name': "tax_10",
+            'amount_type': 'percent',
+            'type_tax_use': 'sale',
+            'amount': 10.0,
+            'tax_exigibility': 'on_payment',
+            'cash_basis_transition_account_id': self.company_data['default_account_tax_sale'].id,
+        })
+        invoice = self.env['account.move'].create({
+            'move_type': 'out_invoice',
+            'partner_id': self.partner_a.id,
+            'invoice_date': '2019-01-01',
+            'invoice_line_ids': [
+                Command.create({
+                    'name': 'line1',
+                    'account_id': account_1.id,
+                    'price_unit': -1000.0,
+                    'tax_ids': [Command.set(caba_tax_10.ids)],
+                }),
+                Command.create({
+                    'name': 'line2',
+                    'account_id': account_2.id,
+                    'price_unit': 2000.0,
+                    'tax_ids': [Command.set(caba_tax_10.ids)],
+                }),
+            ]
+        })
+        invoice.action_post()
+
+        payment = self.env['account.payment'].create({
+            'payment_type': 'inbound',
+            'partner_type': 'customer',
+            'partner_id': self.partner_a.id,
+            'amount': 1100,
+            'date': invoice.date,
+            'journal_id': self.company_data['default_journal_bank'].id,
+        })
+        payment.action_post()
+
+        # Reconcile the move with a payment
+        (payment.move_id + invoice).line_ids.filtered(lambda x: x.account_id == self.company_data['default_account_receivable']).reconcile()
+
+        report = self.env.ref('account.generic_tax_report_account_tax')
+        options = self._generate_options(report, invoice.date, invoice.date)
+
+        self.assertLinesValues(
+            report._get_lines(options),
+            #   Name                                                                          Base      Tax
+            [   0,                                                                             1,        2],
+            [
+                ('Sales',                                                                     "",    100.0),
+                (account_2.display_name,                                                      "",    200.0),
+                (f'{caba_tax_10.name} ({caba_tax_10.amount}%)',                           2000.0,    200.0),
+                (f'Total {account_2.display_name}',                                           "",    200.0),
+                (account_1.display_name,                                                      "",   -100.0),
+                (f'{caba_tax_10.name} ({caba_tax_10.amount}%)',                          -1000.0,   -100.0),
+                (f'Total {account_1.display_name}',                                           "",   -100.0),
+                ('Total Sales',                                                               "",    100.0),
+            ],
+            options
+        )
+
+        report = self.env.ref("account.generic_tax_report_tax_account")
+        options['report_id'] = report.id
+
+        self.assertLinesValues(
+            report._get_lines(options),
+            #   Name                                                                           Base      Tax
+            [   0,                                                                              1,        2],
+            [
+                ('Sales',                                                                      "",    100.0),
+                (f'{caba_tax_10.name} ({caba_tax_10.amount}%)',                                "",    100.0),
+                (account_2.display_name,                                                   2000.0,    200.0),
+                (account_1.display_name,                                                  -1000.0,   -100.0),
+                (f'Total {caba_tax_10.name} ({caba_tax_10.amount}%)',                          "",    100.0),
+                ('Total Sales',                                                                "",    100.0),
+            ],
+            options
+        )
+
+    def test_only_one_closing_entry_with_generic_reports(self):
+        """ Test that when multiple generic tax reports are used, only one closing entry is created and used by all reports.
+            This is to prevent multiple identical closing entries to be created when multiple tax reports are used.
+        """
+        generic_tax_report = self.env.ref("account.generic_tax_report")
+        options = self._generate_options(generic_tax_report, '2021-03-01', '2021-03-31')
+        vat_closing_action = generic_tax_report.with_context({'override_tax_closing_warning': True}).dispatch_report_action(options, 'action_periodic_vat_entries')
+        generic_tax_report_closing_moves = self.env['account.move'].browse(vat_closing_action['domain'][0][2])
+
+        generic_tax_report_account_tax = self.env.ref('account.generic_tax_report_account_tax')
+        options = self._generate_options(generic_tax_report_account_tax, '2021-03-01', '2021-03-31')
+        vat_closing_action = generic_tax_report_account_tax.with_context({'override_tax_closing_warning': True}).dispatch_report_action(options, 'action_periodic_vat_entries')
+        generic_tax_report_account_tax_closing_moves = self.env['account.move'].browse(vat_closing_action['domain'][0][2])
+
+        generic_tax_report_tax_account = self.env.ref('account.generic_tax_report_tax_account')
+        options = self._generate_options(generic_tax_report_tax_account, '2021-03-01', '2021-03-31')
+        vat_closing_action = generic_tax_report_tax_account.with_context({'override_tax_closing_warning': True}).dispatch_report_action(options, 'action_periodic_vat_entries')
+        generic_tax_report_tax_account_closing_moves = self.env['account.move'].browse(vat_closing_action['domain'][0][2])
+
+        # We have 2 fiscal positions here, the domestic (no fiscal position) and foreign_vat_fpos.
+        self.assertEqual(len(generic_tax_report_closing_moves), 2, "There should be one closing entry per fiscal position.")
+        self.assertTrue(generic_tax_report_closing_moves.filtered(lambda m: not m.fiscal_position_id), "There should be a closing entry for the domestic fiscal position (no fiscal position).")
+        self.assertTrue(generic_tax_report_closing_moves.filtered(lambda m: m.fiscal_position_id == self.foreign_vat_fpos), "There should be a closing entry for the foreign VAT fiscal position.")
+        self.assertEqual(generic_tax_report_closing_moves, generic_tax_report_account_tax_closing_moves, "The closing entries used for both reports should be the same.")
+        self.assertEqual(generic_tax_report_closing_moves, generic_tax_report_tax_account_closing_moves, "The closing entries used for both reports should be the same.")
+        self.assertEqual(generic_tax_report_closing_moves.mapped('tax_closing_report_id'), self.basic_tax_report, "The closing entries should be linked to the basic tax report.")
+
+    def test_only_one_closing_entry_per_fpos(self):
+        """ Test that when different fiscal positions with foreign VAT numbers are used, only one closing entry per fiscal position is created and used by all reports.
+            This is to prevent multiple identical closing entries to be created when multiple fiscal positions are used.
+            We also test that the closing entry used for a report is the one corresponding to the fiscal position of the report's country.
+        """
+        generic_tax_report = self.env.ref("account.generic_tax_report")
+        other_country = self.env['res.country'].create({'name': 'Other Country', 'code': 'OT'})
+        other_country_vat_fpos = self.env['account.fiscal.position'].create({
+            'name': "Foreign VAT",
+            'country_id': other_country.id,
+            'foreign_vat': 'ZZ0000000',
+        })
+
+        basic_other_country_tax_report = self.env['account.report'].create({
+            'name': "The Unseen Tax Report",
+            'country_id': other_country.id,
+            'root_report_id': generic_tax_report.id,
+            'column_ids': [Command.create({'name': 'balance', 'sequence': 1, 'expression_label': 'balance'})],
+        })
+
+        # Another report to test that when multiple variants are available for the same country, we use the generic tax report.
+        self.env['account.report'].create({
+            'name': "The Other Unseen Tax Report",
+            'country_id': other_country.id,
+            'root_report_id': generic_tax_report.id,
+            'column_ids': [Command.create({'name': 'balance', 'sequence': 1, 'expression_label': 'balance'})],
+        })
+
+        other_country_partner = self.env['res.partner'].create({
+            'name': "Another Country Partner",
+            'country_id': other_country.id,
+        })
+
+        self.init_invoice('out_invoice', partner=other_country_partner, invoice_date='2021-03-15', post=True, amounts=[23000], taxes=self.test_fpos_tax_sale)
+        self.init_invoice('in_invoice', partner=other_country_partner, invoice_date='2021-03-20', post=True, amounts=[300], taxes=self.test_fpos_tax_purchase)
+        self.init_invoice('out_invoice', partner=other_country_partner, invoice_date='2021-03-25', post=True, amounts=[700], taxes=self.test_fpos_tax_sale)
+        self.init_invoice('in_invoice', partner=other_country_partner, invoice_date='2021-03-28', post=True, amounts=[1300], taxes=self.test_fpos_tax_purchase)
+
+        options = self._generate_options(generic_tax_report, '2021-03-01', '2021-03-31')
+        vat_closing_action = generic_tax_report.with_context({'override_tax_closing_warning': True}).dispatch_report_action(options, 'action_periodic_vat_entries')
+        generic_closing_moves = self.env['account.move'].browse(vat_closing_action['domain'][0][2])
+
+        generic_closing_move_domestic = generic_closing_moves.filtered(lambda m: not m.fiscal_position_id)
+        generic_closing_move_foreign = generic_closing_moves.filtered(lambda m: m.fiscal_position_id == other_country_vat_fpos)
+
+        options = self._generate_options(self.basic_tax_report, '2021-03-01', '2021-03-31')
+        vat_closing_action = self.basic_tax_report.with_context({'override_tax_closing_warning': True}).dispatch_report_action(options, 'action_periodic_vat_entries')
+        domestic_closing_move = self.env['account.move'].browse(vat_closing_action['res_id'])
+
+        options = self._generate_options(basic_other_country_tax_report, '2021-03-01', '2021-03-31')
+        vat_closing_action = basic_other_country_tax_report.with_context({'override_tax_closing_warning': True}).dispatch_report_action(options, 'action_periodic_vat_entries')
+        other_country_closing_move = self.env['account.move'].browse(vat_closing_action['res_id'])
+
+        self.assertNotEqual(generic_closing_move_domestic, generic_closing_move_foreign, "Domestic and foreign closing entries should be different.")
+        self.assertEqual(generic_closing_move_domestic, domestic_closing_move, "The domestic closing entry should be the one used for the basic tax report.")
+        self.assertEqual(generic_closing_move_foreign, other_country_closing_move, "The foreign closing entry should be the one used for the other country tax report.")
+        self.assertEqual(generic_closing_move_domestic.tax_closing_report_id, self.basic_tax_report, "The domestic closing entry should be linked to the domestic tax report.")
+        self.assertEqual(generic_closing_move_foreign.tax_closing_report_id, generic_tax_report, "The foreign closing entry should be linked to the generic tax report.")
+
+    def test_previous_tax_period_date_scope(self):
+        self.env.company.account_tax_periodicity = 'trimester'
+
+        self.init_invoice('in_invoice', invoice_date='2024-09-30', post=True, amounts=[60])
+        self.init_invoice('in_invoice', invoice_date='2024-12-31', post=True, amounts=[42])
+        self.init_invoice('in_invoice', invoice_date='2025-01-01', post=True, amounts=[100])
+
+        report = self.env['account.report'].create({
+            'name': 'Test report',
+            'column_ids': [Command.create({'name': 'Balance', 'sequence': 1, 'expression_label': 'balance'})],
+            'line_ids': [
+                Command.create({
+                    'name': "test",
+                    'expression_ids': [
+                        Command.create({
+                            'label': 'balance',
+                            'engine': 'domain',
+                            'formula': [('account_id.account_type', '=', 'expense')],
+                            'subformula': 'sum',
+                            'date_scope': 'previous_tax_period',
+                        })
+                    ],
+                }),
+            ],
+        })
+
+        options = self._generate_options(report, '2025-01-01', '2025-03-31')
+        self.assertLinesValues(
+            report._get_lines(options),
+            #   Name                                    Balance
+            [   0,                                      1],
+            [
+                ("test",                             42.0),
+            ],
+            options,
+        )
+
+        options = self._generate_options(report, '2025-01-01', '2025-01-31')
+        self.assertLinesValues(
+            report._get_lines(options),
+            #   Name                                    Balance
+            [   0,                                      1],
+            [
+                ("test",                             42.0),
+            ],
+            options,
+        )
+
+        options = self._generate_options(report, '2025-02-01', '2025-02-28')
+        self.assertLinesValues(
+            report._get_lines(options),
+            #   Name                                    Balance
+            [   0,                                      1],
+            [
+                ("test",                             42.0),
+            ],
+            options,
+        )
+
+        options = self._generate_options(report, '2025-03-01', '2025-03-31')
+        self.assertLinesValues(
+            report._get_lines(options),
+            #   Name                                    Balance
+            [   0,                                      1],
+            [
+                ("test",                             42.0),
+            ],
+            options,
+        )
+
+        options = self._generate_options(report, '2025-04-01', '2025-04-01')
+        self.assertLinesValues(
+            report._get_lines(options),
+            #   Name                                    Balance
+            [   0,                                      1],
+            [
+                ("test",                            100.0),
+            ],
+            options,
+        )

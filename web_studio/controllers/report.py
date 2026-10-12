@@ -98,7 +98,7 @@ def _recompose_arch_with_t_call_parts(main_tree, origin_call_groups, changed_cal
                 nodes_to_append.extend(origin[group_key]["nodes"])
 
         if nodes_to_append:
-            target = main_tree.xpath(f"//t[@t-call and @ws-call-key='{call_key}']")[0]
+            target = main_tree.xpath(f"//*[@t-call and @ws-call-key='{call_key}']")[0]
             for n in nodes_to_append:
                 target.append(etree.fromstring(etree.tostring(n)))
 
@@ -287,15 +287,27 @@ def _guess_qweb_variables(tree, report, qcontext):
         if "t-set" in node.attrib and "t-value" in node.attrib:
             new_var = node.get("t-set")
             expr = node.get("t-value")
-            try:
-                evalled = qweb_like_eval(expr, qcontext)
-                if new_var not in qcontext or not isinstance(evalled, type(qcontext[new_var])):
-                    keys_info[new_var] = {"type": "python"}
-                qcontext[new_var] = evalled
-            except OperationalError:
-                raise
-            except Exception: # pylint: disable=W0718,W0703
-                pass
+            tif = node.get("t-if")
+
+            should_set = True
+            if tif:
+                try:
+                    should_set = qweb_like_eval(tif, qcontext)
+                except OperationalError:
+                    raise
+                except Exception: # pylint: disable=W0718,W0703
+                    pass
+
+            if should_set:
+                try:
+                    evalled = qweb_like_eval(expr, qcontext)
+                    if new_var not in qcontext or not isinstance(evalled, type(qcontext[new_var])):
+                        keys_info[new_var] = {"type": "python"}
+                    qcontext[new_var] = evalled
+                except OperationalError:
+                    raise
+                except Exception: # pylint: disable=W0718,W0703
+                    pass
             apply_oe_context(node, qcontext, keys_info)
 
         if "t-attf-class" in node.attrib or "t-att-class" in node.attrib:
@@ -373,24 +385,21 @@ def _get_and_write_studio_view(view, values=None, should_create=True, view_key_t
         vals = {"active": True, **values}
         studio_view.write(vals)
     elif should_create:
-        all_inheritance = view._get_inheriting_views()
         vals = {"name": key, "key": key, "inherit_id": view.id, "mode": "extension", "priority": 9999999, **values}
         studio_view = view.create(vals)
-        all_inheritance = all_inheritance.with_prefetch((all_inheritance + studio_view).ids)
-        studio_view = studio_view.with_prefetch(all_inheritance._prefetch_ids)
-        view._copy_field_terms_translations(all_inheritance, "arch_db", studio_view, "arch_db")
-
     return studio_view
 
 
 @contextmanager
 def deactivate_studio_view(main_view):
+    studio_view = None
     try:
         studio_view = _get_and_write_studio_view(main_view, None, should_create=False, active_test=True)
         studio_view.active = False
         yield studio_view
     finally:
-        studio_view.active = True
+        if studio_view:
+            studio_view.active = True
 
 class WebStudioReportController(main.WebStudioController):
 
@@ -676,18 +685,15 @@ class WebStudioReportController(main.WebStudioController):
                 view = IrView.browse(int(view_id))
                 _copy_report_view(view)
                 self._handle_view_changes(view, changes)
-                xml_ids = xml_ids | view.model_data_id
 
         if xml_verbatim:
             for view_id, arch in xml_verbatim.items():
                 view = IrView.browse(int(view_id))
                 _copy_report_view(view)
                 view.write({"arch": arch, "active": True})
-                xml_ids = xml_ids | view.model_data_id
-
-        if report_changes or html_parts or xml_verbatim:
+        
+        if report_changes:
             xml_ids |= request.env['ir.model.data'].sudo().search(["&", ("model", "=", report._name), ("res_id", "=", report.id)])
-
 
         if xml_ids:
             xml_ids.write({"noupdate": True})
@@ -775,7 +781,7 @@ class WebStudioReportController(main.WebStudioController):
     @http.route("/web_studio/reset_report_archs", type="json", auth="user")
     def reset_report_archs(self, report_id, include_web_layout=True):
         report = request.env["ir.actions.report"].browse(report_id)
-        views = request.env["ir.ui.view"].with_context(no_primary_children=True, __views_get_original_hierarchy=[], no_cow=True).get_related_views(report.report_name, bundles=False)
+        views = request.env["ir.ui.view"].with_context(no_primary_children=True, __views_get_original_hierarchy=[], no_cow=True, is_customization_code=False).get_related_views(report.report_name, bundles=False)
         if not include_web_layout:
             views = views.filtered(lambda v: not v.key.startswith("web.") or "layout" not in v.key)
 

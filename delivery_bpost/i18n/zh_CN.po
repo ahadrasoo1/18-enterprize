@@ -1,23 +1,26 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* delivery_bpost
-# 
+# * delivery_bpost
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+#
+# Weblate <noreply-mt-weblate@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Chinese (China) (https://app.transifex.com/odoo/teams/41243/zh_CN/)\n"
+"POT-Creation-Date: 2026-04-17 18:45+0000\n"
+"PO-Revision-Date: 2026-04-18 09:15+0000\n"
+"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"Language-Team: Chinese (Simplified Han script) <https://translate.odoo.com/"
+"projects/odoo-18/delivery_bpost/zh_Hans/>\n"
+"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: zh_CN\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 5.16.2\n"
 
 #. module: delivery_bpost
 #: model:ir.model.fields.selection,name:delivery_bpost.selection__delivery_carrier__bpost_label_stock_type__a4
@@ -127,6 +130,11 @@ msgid "Domestic"
 msgstr "国内的"
 
 #. module: delivery_bpost
+#: model_terms:ir.ui.view,arch_db:delivery_bpost.bpost_shipping_request
+msgid "EUR"
+msgstr "欧元"
+
+#. module: delivery_bpost
 #: model:ir.model.fields.selection,name:delivery_bpost.selection__delivery_carrier__bpost_shipment_type__gift
 msgid "GIFT"
 msgstr "GIFT"
@@ -187,6 +195,22 @@ msgstr "开发者令牌"
 #: code:addons/delivery_bpost/models/bpost_request.py:0
 msgid "Please provide at least one item to ship."
 msgstr "请提供至少一件要运送的物品。"
+
+#. module: delivery_bpost
+#. odoo-python
+#: code:addons/delivery_bpost/models/bpost_request.py:0
+msgid ""
+"Product [%s] is missing a Country of Origin, which is required for "
+"international shipping."
+msgstr ""
+
+#. module: delivery_bpost
+#. odoo-python
+#: code:addons/delivery_bpost/models/bpost_request.py:0
+msgid ""
+"Product [%s] is missing an HS Code, which is required for international "
+"shipping."
+msgstr ""
 
 #. module: delivery_bpost
 #: model:ir.model.fields,field_description:delivery_bpost.field_delivery_carrier__delivery_type
@@ -252,7 +276,8 @@ msgstr "比利时邮政送货服务没有响应，请稍后再试。"
 #. odoo-python
 #: code:addons/delivery_bpost/models/bpost_request.py:0
 msgid ""
-"The address of your company/warehouse is incomplete or wrong (Missing field(s):  \n"
+"The address of your company/warehouse is incomplete or wrong (Missing "
+"field(s):  \n"
 " %s)"
 msgstr "您公司或仓库的地址有误(缺少字段%s)"
 
@@ -268,7 +293,8 @@ msgstr "因为你的所有产品都是服务，所以无法计算出估计的运
 #. odoo-python
 #: code:addons/delivery_bpost/models/bpost_request.py:0
 msgid ""
-"The estimated shipping price cannot be computed because the weight is missing for the following product(s): \n"
+"The estimated shipping price cannot be computed because the weight is "
+"missing for the following product(s): \n"
 " %s"
 msgstr ""
 "因为缺少以下产品的重量，所以无法计算出估计的运输价格。\n"

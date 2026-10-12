@@ -1,19 +1,19 @@
-import { expect, test, describe, beforeEach } from "@odoo/hoot";
-import { click, getActiveElement, queryOne } from "@odoo/hoot-dom";
-import { mockDate, animationFrame, delay } from "@odoo/hoot-mock";
+import { beforeEach, describe, expect, getFixture, test } from "@odoo/hoot";
+import { click, waitFor } from "@odoo/hoot-dom";
+import { animationFrame, mockDate } from "@odoo/hoot-mock";
 
-import { onRpc, mountView, patchWithCleanup } from "@web/../tests/web_test_helpers";
-import { serializeDateTime } from "@web/core/l10n/dates";
-import { session } from "@web/session";
 import {
     defineTimesheetModels,
     timesheetModels,
 } from "@timesheet_grid/../tests/timesheet_mock_models";
+import { TimesheetTimerRendererHook } from "@timesheet_grid/hooks/timesheet_timer_hooks";
+import { mountView, onRpc, patchWithCleanup } from "@web/../tests/web_test_helpers";
+import { serializeDateTime } from "@web/core/l10n/dates";
+import { session } from "@web/session";
 
 describe.current.tags("desktop");
 defineTimesheetModels();
 
-mockDate("2024-09-02");
 const { AnalyticLine } = timesheetModels;
 
 const timesheetgridViewParams = {
@@ -35,6 +35,7 @@ const timesheetgridViewParams = {
 };
 
 beforeEach(() => {
+    mockDate("2024-09-02");
     patchWithCleanup(session, {
         user_companies: {
             current_company: 1,
@@ -71,26 +72,26 @@ beforeEach(() => {
 
 // These methods are not required for this test.
 // These methods can return an empty result and view is still is instantiated without any problems.
-const non_relevant_methods = [
-    "grid_unavailability",
+const irrelevantMethods = [
+    "action_timer_stop",
+    "action_timer_unlink",
+    "get_create_edit_project_ids",
     "get_daily_working_hours",
     "get_last_validated_timesheet_date",
-    "action_timer_unlink",
-    "action_timer_stop",
     "get_planned_and_worked_hours",
+    "grid_unavailability",
 ];
 
-onRpc(({ args, kwargs, method, model }) => {
-    if (model == "timer.timer" && method == "get_server_time") {
-        return serializeDateTime(luxon.DateTime.now().setZone("utc"));
-    }
-    if (non_relevant_methods.includes(method)) {
-        return [];
-    } else if (method == "get_running_timer") {
-        return { step_timer: 15 };
-    } else if (method == "get_create_edit_project_ids") {
+onRpc(({ method }) => {
+    if (irrelevantMethods.includes(method)) {
         return [];
     }
+});
+onRpc("timer.timer", "get_server_time", () => {
+    return serializeDateTime(luxon.DateTime.now().setZone("utc"));
+});
+onRpc("get_running_timer", () => {
+    return { step_timer: 15 };
 });
 
 test("Test to check if start button is always in focus", async () => {
@@ -98,17 +99,22 @@ test("Test to check if start button is always in focus", async () => {
 
     // At each mount and patch Start Button should be in focus
     expect(".btn_start_timer").toHaveCount(1);
-    expect(getActiveElement()).toBe(queryOne(".btn_start_timer"));
+    expect(".btn_start_timer").toBeFocused();
 
     // Click on a clickable button/action should be accessible and should not be disturbed
     // Force focus must not disturb other clicks
     await click(".o_grid_row:not(.o_grid_row_title, .o_grid_row_timer)");
-    await delay(50);
-    expect(getActiveElement()).toBe(queryOne(".o_grid_component div input"));
+    await expect(waitFor(".o_grid_component div input")).resolves.toBeFocused();
 
     // Click on body which doesn't have any fields/actions must make Start button to come in focus
-    await click(document.body);
-    expect(getActiveElement()).toBe(queryOne(".btn_start_timer"));
+    await click(getFixture());
+    expect(".btn_start_timer").toBeFocused();
+
+    // Check click on select in search popover doesn't focus Start button to avoid closing dropdown
+    await click("button.o_searchview_dropdown_toggler");
+    await animationFrame();
+    await click("select.o_add_custom_group_menu");
+    expect(".btn_start_timer").not.toBeFocused();
 });
 
 test("Test to check if stop button is always in focus", async () => {
@@ -118,14 +124,39 @@ test("Test to check if stop button is always in focus", async () => {
     await animationFrame();
     // At each mount and patch Stop Button should be in focus
     expect(".btn_stop_timer").toHaveCount(1);
-    expect(getActiveElement()).toBe(queryOne(".btn_stop_timer"));
+    expect(".btn_stop_timer").toBeFocused();
 
     // Click on a clickable button/input should be accessible and should not be disturbed
     // Force focus must not disturb other clicks/inputs
     await click('.o_field_many2one[name="project_id"] input');
-    expect(getActiveElement()).toBe(queryOne('.o_field_many2one[name="project_id"] input'));
+    expect('.o_field_many2one[name="project_id"] input').toBeFocused();
 
     // Click on body which doesn't have any fields/actions must make Stop button to come in focus
-    await click(document.body);
-    expect(getActiveElement()).toBe(queryOne(".btn_stop_timer"));
+    await click(getFixture());
+    expect(".btn_stop_timer").toBeFocused();
+});
+
+test("_onTimerUnlinked handles undefined timesheet", async () => {
+    TimesheetTimerRendererHook.prototype.setup = function () {};
+    let removeRecordsCalled = false;
+    const propsList = {
+        resModel: "account.analytic.line",
+        _removeRecords: () => {
+            removeRecordsCalled = true;
+        },
+        model: { load: () => {} },
+    };
+    const instance = new TimesheetTimerRendererHook(propsList, {});
+    instance.timerState = { timesheetId: 42 };
+    instance.orm = { call: () => Promise.resolve(true) };
+
+    removeRecordsCalled = false;
+    instance.timesheet = undefined;
+    await instance._onTimerUnlinked();
+    expect(removeRecordsCalled).toBe(false);
+
+    removeRecordsCalled = false;
+    instance.timesheet = { id: 123 };
+    await instance._onTimerUnlinked();
+    expect(removeRecordsCalled).toBe(true);
 });

@@ -1,23 +1,28 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* marketing_automation
-# 
+# * marketing_automation
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Junko Augias, 2025
+#
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
+# "Junko Augias (juau)" <juau@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Japanese (https://app.transifex.com/odoo/teams/41243/ja/)\n"
+"POT-Creation-Date: 2026-06-12 17:46+0000\n"
+"PO-Revision-Date: 2026-06-13 18:26+0000\n"
+"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-18/"
+"marketing_automation/ja/>\n"
+"Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: ja\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 2026.6.1\n"
 
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_activity_summary_template
@@ -27,7 +32,7 @@ msgstr "\" <strong>不達</strong>、"
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_activity_summary_template
 msgid "\" did <strong>not receive a reply</strong>,"
-msgstr "\" <strong>返信を受信しなかった</strong>、"
+msgstr "\" <strong>返信受信なし</strong>、"
 
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_activity_summary_template
@@ -57,12 +62,12 @@ msgstr "メール送信数"
 #. module: marketing_automation
 #: model:ir.model.fields,field_description:marketing_automation.field_marketing_campaign__total_participant_count
 msgid "# of active and completed participants"
-msgstr "アクティブまたは完了済の参加者数"
+msgstr "有効または完了済の参加者数"
 
 #. module: marketing_automation
 #: model:ir.model.fields,field_description:marketing_automation.field_marketing_campaign__running_participant_count
 msgid "# of active participants"
-msgstr "アクティブ参加者数"
+msgstr "有効参加者数"
 
 #. module: marketing_automation
 #: model:ir.model.fields,field_description:marketing_automation.field_marketing_campaign__completed_participant_count
@@ -77,7 +82,7 @@ msgstr "# テスト参加者"
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_activity_summary_template
 msgid "<br/>This activity will be"
-msgstr "<br/>この活動は"
+msgstr "<br/>この活動を"
 
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_participant_view_form
@@ -179,18 +184,28 @@ msgstr "<span class=\"o_form_label\">レコード</span>"
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_campaign_view_form
 msgid ""
-"<span role=\"img\" title=\"Graph\" aria-label=\"Graph\" class=\"o_ma_activity_tab active\" data-tab-type=\"graph\">\n"
-"                                                            <i class=\"fa fa-pie-chart\"/>\n"
+"<span role=\"img\" title=\"Graph\" aria-label=\"Graph\" "
+"class=\"o_ma_activity_tab active\" data-tab-type=\"graph\">\n"
+"                                                            <i class=\"fa fa-"
+"pie-chart\"/>\n"
 "                                                        </span>\n"
-"                                                        <span title=\"Filter\" role=\"img\" aria-label=\"Filter\" class=\"o_ma_activity_tab\" data-tab-type=\"filter\">\n"
-"                                                            <i class=\"fa fa-filter\"/>\n"
+"                                                        <span "
+"title=\"Filter\" role=\"img\" aria-label=\"Filter\" "
+"class=\"o_ma_activity_tab\" data-tab-type=\"filter\">\n"
+"                                                            <i class=\"fa fa-"
+"filter\"/>\n"
 "                                                        </span>"
 msgstr ""
-"<span role=\"img\" title=\"Graph\" aria-label=\"Graph\" class=\"o_ma_activity_tab active\" data-tab-type=\"graph\">\n"
-"                                                            <i class=\"fa fa-pie-chart\"/>\n"
+"<span role=\"img\" title=\"Graph\" aria-label=\"Graph\" "
+"class=\"o_ma_activity_tab active\" data-tab-type=\"graph\">\n"
+"                                                            <i class=\"fa fa-"
+"pie-chart\"/>\n"
 "                                                        </span>\n"
-"                                                        <span title=\"Filter\" role=\"img\" aria-label=\"Filter\" class=\"o_ma_activity_tab\" data-tab-type=\"filter\">\n"
-"                                                            <i class=\"fa fa-filter\"/>\n"
+"                                                        <span "
+"title=\"Filter\" role=\"img\" aria-label=\"Filter\" "
+"class=\"o_ma_activity_tab\" data-tab-type=\"filter\">\n"
+"                                                            <i class=\"fa fa-"
+"filter\"/>\n"
 "                                                        </span>"
 
 #. module: marketing_automation
@@ -245,7 +260,7 @@ msgstr "アクション"
 #. module: marketing_automation
 #: model:ir.model.fields,field_description:marketing_automation.field_marketing_campaign__active
 msgid "Active"
-msgstr "有効化"
+msgstr "有効"
 
 #. module: marketing_automation
 #: model:ir.model.fields,field_description:marketing_automation.field_marketing_campaign__marketing_activity_ids
@@ -287,7 +302,9 @@ msgstr "活動タイプ"
 msgid ""
 "Activity will only be performed if record satisfies this domain, obtained "
 "from the combination of the activity filter and its inherited filter"
-msgstr "活動フィルタとその継承フィルタの組合わせから得られる、レコードがこのドメインを満たす場合にのみ、活動が実行されます。"
+msgstr ""
+"活動フィルタとその継承フィルタの組合わせから得られる、レコードがこのドメイン"
+"を満たす場合にのみ、活動が実行されます。"
 
 #. module: marketing_automation
 #. odoo-python
@@ -355,6 +372,12 @@ msgid "Allows us to filter relevant Campaigns"
 msgstr "関連するキャンペーンをフィルタリングできます。"
 
 #. module: marketing_automation
+#. odoo-python
+#: code:addons/marketing_automation/wizard/marketing_campaign_test.py:0
+msgid "Another test has been launched for this participant"
+msgstr "この参加者に対して別のテストが開始されました"
+
+#. module: marketing_automation
 #: model:ir.model.fields,field_description:marketing_automation.field_marketing_activity__domain
 msgid "Applied Filter"
 msgstr "適用フィルタ"
@@ -370,7 +393,9 @@ msgstr "アーカイブ済"
 msgid ""
 "Are you sure you want to create a new participant for each matching record "
 "that has not been used yet?"
-msgstr "まだ使用されていない一致する記録ごとに、新しい参加者を作成してもよろしいですか？"
+msgstr ""
+"まだ使用されていない一致する記録ごとに、新しい参加者を作成してもよろしいです"
+"か？"
 
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.mailing_mailing_view_form_marketing_activity
@@ -385,9 +410,11 @@ msgstr "自動生成キャンペーン"
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_campaign_view_form
 msgid ""
-"Be aware that participants that had no more activities could be reintroduced"
-" into the campaign and new traces could be created for them."
-msgstr "もう活動をしていない参加者をキャンペーンに再び参加させ、新しいトレースを作成することができることに注意して下さい。"
+"Be aware that participants that had no more activities could be reintroduced "
+"into the campaign and new traces could be created for them."
+msgstr ""
+"もう活動をしていない参加者をキャンペーンに再び参加させ、新しいトレースを作成"
+"することができることに注意して下さい。"
 
 #. module: marketing_automation
 #. odoo-python
@@ -473,7 +500,9 @@ msgid ""
 "amount of time after the scheduled date. (e.g. Time-limited offer, Upcoming "
 "event, …)"
 msgstr ""
-"予定された日付から特定の時間が経過すると、アクションが実行されないようにするには、これをチェックして下さい。(例:期間限定オファー、近日開催予定のイベントなど)"
+"予定された日付から特定の時間が経過すると、アクションが実行されないようにする"
+"には、これをチェックして下さい。(例:期間限定オファー、近日開催予定のイベント"
+"など)"
 
 #. module: marketing_automation
 #: model:ir.model.fields,field_description:marketing_automation.field_marketing_activity__child_ids
@@ -548,13 +577,15 @@ msgstr "キャンペーンを作成"
 #. odoo-javascript
 #: code:addons/marketing_automation/static/src/components/campaign_template_picker_dialog/campaign_template_picker_dialog.xml:0
 msgid "Create a Marketing Automation Campaign"
-msgstr "マーケティング自動化キャンペーンを作成"
+msgstr "マーケティングオートメーションキャンペーンを作成"
 
 #. module: marketing_automation
 #. odoo-javascript
 #: code:addons/marketing_automation/static/src/components/campaign_template_picker_dialog/campaign_template_picker_dialog.xml:0
 msgid "Create one or load a template prepared by our experts."
-msgstr "テンプレートを作成するか、当社エキスパートが用意したテンプレートをロードして下さい。"
+msgstr ""
+"テンプレートを作成するか、当社エキスパートが用意したテンプレートをロードして"
+"下さい。"
 
 #. module: marketing_automation
 #: model_terms:ir.actions.act_window,help:marketing_automation.marketing_campaign_action
@@ -562,7 +593,8 @@ msgid ""
 "Create one or load a template prepared by our experts.<br>\n"
 "                            Then sit down and let Odoo handle the rest!"
 msgstr ""
-"テンプレートを作成するか、当社エキスパートが用意したテンプレートをロードして下さい。<br>\n"
+"テンプレートを作成するか、当社エキスパートが用意したテンプレートをロードして"
+"下さい。<br>\n"
 "                            あとはOdooにお任せ下さい!"
 
 #. module: marketing_automation
@@ -611,8 +643,7 @@ msgstr "削除"
 #. odoo-javascript
 #: code:addons/marketing_automation/static/src/js/marketing_automation_one2many.js:0
 msgid ""
-"Deleting this activity will delete ALL its children activities. Are you "
-"sure?"
+"Deleting this activity will delete ALL its children activities. Are you sure?"
 msgstr "この活動を削除するとその全ての子活動を削除します。本当に実行しますか？"
 
 #. module: marketing_automation
@@ -711,6 +742,12 @@ msgstr "エラー！活動の再帰階層を作成できません。"
 #. module: marketing_automation
 #. odoo-python
 #: code:addons/marketing_automation/models/marketing_activity.py:0
+msgid "Error! You can't modify the hierarchy of an active Activity."
+msgstr "エラー！稼働中の活動の階層を変更することはできません。"
+
+#. module: marketing_automation
+#. odoo-python
+#: code:addons/marketing_automation/models/marketing_activity.py:0
 msgid "Exception in mass mailing: %s"
 msgstr "メール一括送信の例外: %s"
 
@@ -753,8 +790,13 @@ msgstr "フィルター"
 
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_campaign_view_form
+msgid "Generate Participants"
+msgstr "参加者を生成"
+
+#. module: marketing_automation
+#: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_campaign_view_form
 msgid "Generate participants"
-msgstr "対象者を生成"
+msgstr "参加者を生成"
 
 #. module: marketing_automation
 #. odoo-python
@@ -767,7 +809,9 @@ msgstr "10％値引きを受ける"
 msgid ""
 "Here you will be able to check the results of your mailings from all "
 "Marketing Automation Campaigns."
-msgstr "ここでは、すべてのマーケティング自動化キャンペーンからのメール配信の結果を確認することができます。"
+msgstr ""
+"ここでは、すべてのマーケティングオートメーションキャンペーンからのメール配信"
+"の結果を確認することができます。"
 
 #. module: marketing_automation
 #. odoo-python
@@ -832,20 +876,20 @@ msgstr "最新活動の同期"
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_campaign_test_view_form
 msgid "Launch"
-msgstr "起動"
+msgstr "実行"
 
 #. module: marketing_automation
 #. odoo-python
 #: code:addons/marketing_automation/wizard/marketing_campaign_test.py:0
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_campaign_view_form
 msgid "Launch a Test"
-msgstr "テストを開始"
+msgstr "テストを実行"
 
 #. module: marketing_automation
 #: model:ir.actions.act_window,name:marketing_automation.marketing_campaign_test_action
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_campaign_test_view_form
 msgid "Launch a test"
-msgstr "テストを開始"
+msgstr "テストを実行"
 
 #. module: marketing_automation
 #: model:ir.model.fields,field_description:marketing_automation.field_marketing_campaign__crm_lead_count
@@ -867,12 +911,14 @@ msgstr "リンクトラッカー"
 msgid ""
 "Link Trackers are created when mailings with links are sent to track how "
 "many clicks they get."
-msgstr "リンクトラッカーは、リンク付きのメールを送信する際に作成し、そのクリック数を追跡するためのものです。"
+msgstr ""
+"リンクトラッカーは、リンク付きのメールを送信する際に作成し、そのクリック数を"
+"追跡するためのものです。"
 
 #. module: marketing_automation
 #: model:ir.model.fields,field_description:marketing_automation.field_marketing_trace__links_click_datetime
 msgid "Links Click Datetime"
-msgstr ""
+msgstr "リンククリック日時"
 
 #. module: marketing_automation
 #: model:ir.model.fields.selection,name:marketing_automation.selection__marketing_activity__trigger_category__email
@@ -953,6 +999,8 @@ msgid ""
 "Mailings %(mailing_names)s are used in marketing campaigns. You should take "
 "care of this before unlinking the mailings."
 msgstr ""
+"メーリングリスト %(mailing_names)s はマーケティングキャンペーンで使用されてい"
+"ます。 メーリングリストのリンクを解除する前に、この処理を行う必要があります。"
 
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_campaign_view_form
@@ -992,22 +1040,22 @@ msgstr "マーケティング活動"
 #: model:ir.module.category,name:marketing_automation.module_marketing_automation_category
 #: model:ir.ui.menu,name:marketing_automation.marketing_automation_menu
 msgid "Marketing Automation"
-msgstr "マーケティング自動化"
+msgstr "マーケティングオートメーション"
 
 #. module: marketing_automation
 #: model:ir.actions.act_window,name:marketing_automation.mail_mass_mailing_action_marketing_automation
 msgid "Marketing Automation Mailings"
-msgstr "マーケティング自動化メール配信"
+msgstr "マーケティングオートメーションメール配信"
 
 #. module: marketing_automation
 #: model:ir.actions.server,name:marketing_automation.ir_cron_campaign_execute_activities_ir_actions_server
 msgid "Marketing Automation: execute activities"
-msgstr "マーケティング自動化: 活動実行"
+msgstr "マーケティングオートメーション: 活動実行"
 
 #. module: marketing_automation
 #: model:ir.actions.server,name:marketing_automation.ir_cron_campaign_sync_participants_ir_actions_server
 msgid "Marketing Automation: sync participants"
-msgstr "マーケティング自動化: 参加者同期"
+msgstr "マーケティングオートメーション: 参加者同期"
 
 #. module: marketing_automation
 #: model:ir.model,name:marketing_automation.model_marketing_campaign
@@ -1041,7 +1089,9 @@ msgid ""
 "Marketing campaigns use mass mailings with some specific behavior; this "
 "field is used to indicate its statistics may be suspicious."
 msgstr ""
-"マーケティングキャンペーンでは、特定の行動を伴う一括メール配信を使用します。このフィールドは、その統計が疑わしい可能性があることを示すために使用されます。"
+"マーケティングキャンペーンでは、特定の行動を伴う一括メール配信を使用します。"
+"このフィールドは、その統計が疑わしい可能性があることを示すために使用されま"
+"す。"
 
 #. module: marketing_automation
 #: model:ir.model,name:marketing_automation.model_mailing_mailing
@@ -1192,6 +1242,14 @@ msgstr "ソーシャル投稿での交流(いいね、共有、コメントな�
 #: code:addons/marketing_automation/models/marketing_campaign.py:0
 msgid "Offer free catalog"
 msgstr "無料カタログを提供"
+
+#. module: marketing_automation
+#. odoo-python
+#: code:addons/marketing_automation/models/mailing_mailing.py:0
+msgid ""
+"Oops! You can't retry sending emails from inside a Marketing Automation "
+"campaign."
+msgstr ""
 
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_campaign_view_form
@@ -1418,8 +1476,14 @@ msgstr "実行"
 
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_campaign_view_form
+msgid "Run Activities"
+msgstr "活動を実行"
+
+#. module: marketing_automation
+#: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_campaign_view_form
 msgid "Run the next scheduled activity for each participant of this campaign?"
-msgstr "このキャンペーンの参加者それぞれに、次に予定されている活動を実行しますか？"
+msgstr ""
+"このキャンペーンの参加者それぞれに、次に予定されている活動を実行しますか？"
 
 #. module: marketing_automation
 #: model:ir.model.fields.selection,name:marketing_automation.selection__marketing_campaign__state__running
@@ -1443,7 +1507,7 @@ msgstr "通知日"
 #. module: marketing_automation
 #: model:ir.model.fields.selection,name:marketing_automation.selection__marketing_trace__state__scheduled
 msgid "Scheduled"
-msgstr "予定"
+msgstr "スケジュール済"
 
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_campaign_view_search
@@ -1499,7 +1563,8 @@ msgstr "連絡先にウェルカムメールを送り、クリックされたら
 #: code:addons/marketing_automation/models/marketing_campaign.py:0
 msgid ""
 "Send a welcome email to new subscribers, remove the addresses that bounced."
-msgstr "新規購読者にウェルカムメールを送信し、バウンスしたアドレスを削除します。"
+msgstr ""
+"新規購読者にウェルカムメールを送信し、バウンスしたアドレスを削除します。"
 
 #. module: marketing_automation
 #: model:ir.model.fields,field_description:marketing_automation.field_marketing_activity__interval_number
@@ -1536,14 +1601,16 @@ msgstr "ソーシャルメディア投稿"
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_campaign_view_form
 msgid ""
-"Some participants are already running on this campaign. Click on 'Update' to"
-" apply the modifications you've just made."
-msgstr "既にこのキャンペーンを運営中の参加者がいます。'更新'をクリックして、作成したばかりの修正を適用して下さい。"
+"Some participants are already running on this campaign. Click on 'Update' to "
+"apply the modifications you've just made."
+msgstr ""
+"このキャンペーンにはすでに参加者がいます。「更新」をクリックして、変更を適用"
+"してください。"
 
 #. module: marketing_automation
 #: model:ir.model.fields,field_description:marketing_automation.field_marketing_activity__source_id
 msgid "Source"
-msgstr "情報源"
+msgstr "流入元"
 
 #. module: marketing_automation
 #: model:ir.model.fields,field_description:marketing_automation.field_mailing_mailing__use_in_marketing_automation
@@ -1572,7 +1639,7 @@ msgstr "0から始める"
 #: model:ir.model.fields,field_description:marketing_automation.field_marketing_trace__state
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_participant_view_search
 msgid "State"
-msgstr "都道府県・州"
+msgstr "ステータス"
 
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_participant_view_form
@@ -1613,7 +1680,9 @@ msgstr "成功"
 msgid ""
 "Switching Target Model invalidates the existing activities. Either update "
 "your activity actions to match the new Target Model or delete them."
-msgstr "ターゲットモデルを変更すると、既存の活動は無効になります。新しいターゲットモデルに合わせて活動アクションを更新するか、削除して下さい。"
+msgstr ""
+"ターゲットモデルを変更すると、既存の活動は無効になります。新しいターゲットモ"
+"デルに合わせて活動アクションを更新するか、削除して下さい。"
 
 #. module: marketing_automation
 #: model:ir.model.fields,field_description:marketing_automation.field_marketing_campaign__require_sync
@@ -1651,7 +1720,7 @@ msgstr "テンプレート"
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_participant_view_form
 msgid "Test"
-msgstr "インポートテスト"
+msgstr "テスト"
 
 #. module: marketing_automation
 #: model:ir.model.fields,field_description:marketing_automation.field_marketing_participant__is_test
@@ -1674,7 +1743,9 @@ msgstr "テスト"
 msgid ""
 "The saved filter targets different model and is incompatible with this "
 "campaign."
-msgstr "保存されたフィルタは異なるモデルを対象としており、このキャンペーンとは互換性がありません。"
+msgstr ""
+"保存されたフィルタは異なるモデルを対象としており、このキャンペーンとは互換性"
+"がありません。"
 
 #. module: marketing_automation
 #. odoo-javascript
@@ -1689,7 +1760,9 @@ msgstr "残りはOdooにお任せ下さい！"
 msgid ""
 "To use this feature you should be an administrator or belong to the "
 "marketing automation group."
-msgstr "この機能を使用するには、管理者であるか、マーケティング自動化グループに所属している必要があります。"
+msgstr ""
+"この機能を使用するには、管理者であるか、マーケティングオートメーショングルー"
+"プに所属している必要があります。"
 
 #. module: marketing_automation
 #: model:ir.model.fields,field_description:marketing_automation.field_marketing_activity__total_bounce
@@ -1849,47 +1922,56 @@ msgstr "ワークフロー開始"
 #. odoo-python
 #: code:addons/marketing_automation/models/marketing_activity.py:0
 msgid ""
-"You are trying to set the activity \"%(parent_activity)s\" as \"%(parent_type)s\" while its child \"%(activity)s\" has the trigger type \"%(trigger_type)s\"\n"
+"You are trying to set the activity \"%(parent_activity)s\" as \"%"
+"(parent_type)s\" while its child \"%(activity)s\" has the trigger type \"%"
+"(trigger_type)s\"\n"
 "Please modify one of those activities before saving."
 msgstr ""
-"活動 \"%(parent_activity)s\" を \"%(parent_type)s\" として設定しようとしていますが、子 \"%(activity)s\" はトリガタイプ\"%(trigger_type)s\"を持っています。\n"
+"活動 \"%(parent_activity)s\" を \"%(parent_type)s\" として設定しようとしてい"
+"ますが、子 \"%(activity)s\" はトリガタイプ\"%(trigger_type)s\"を持っていま"
+"す。\n"
 "保存するまえにこれらの活動の1つを修正して下さい。"
 
 #. module: marketing_automation
 #. odoo-python
 #: code:addons/marketing_automation/models/utm_campaign.py:0
 msgid ""
-"You cannot delete these UTM Campaigns as they are linked to the following marketing campaigns in Marketing Automation:\n"
+"You cannot delete these UTM Campaigns as they are linked to the following "
+"marketing campaigns in Marketing Automation:\n"
 "%(campaign_names)s"
 msgstr ""
-"これらのUTMキャンペーンは、マーケティング自動化の以下のマーケティングキャンペーンにリンクされているため、削除することはできません :\n"
+"これらのUTMキャンペーンは、マーケティングオートメーションの以下のマーケティン"
+"グキャンペーンにリンクされているため、削除することはできません :\n"
 "%(campaign_names)s"
 
 #. module: marketing_automation
 #. odoo-python
 #: code:addons/marketing_automation/models/utm_source.py:0
 msgid ""
-"You cannot delete these UTM Sources as they are linked to the following marketing activities in Marketing Automation:\n"
+"You cannot delete these UTM Sources as they are linked to the following "
+"marketing activities in Marketing Automation:\n"
 "%(activities_names)s"
 msgstr ""
-"これらのUTMキャンペーンは、マーケティング自動化の以下のマーケティングキャンペーン活動にリンクされているため、削除することはできません :\n"
+"これらのUTMキャンペーンは、マーケティングオートメーションの以下のマーケティン"
+"グキャンペーン活動にリンクされているため、削除することはできません :\n"
 "%(activities_names)s"
 
 #. module: marketing_automation
 #. odoo-python
 #: code:addons/marketing_automation/models/marketing_campaign.py:0
 msgid "You must set up at least one activity to start this campaign."
-msgstr "このキャンペーンを開始するには、少なくとも1つの活動を設定する必要があります。"
+msgstr ""
+"このキャンペーンを開始するには、少なくとも1つの活動を設定する必要があります。"
 
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_activity_summary_template
 msgid "after the <strong>Mailing</strong> sent by the Activity \""
-msgstr "以下の活動により送信された<strong>メーリング</strong>後: \""
+msgstr "<strong>メーリング</strong>送信後 (活動\""
 
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_activity_summary_template
 msgid "after the <strong>beginning of the workflow</strong>,<br/>the"
-msgstr " <strong>ワークフローの始め</strong>の後、<br/>"
+msgstr "<strong>ワークフロー開始</strong>後、<br/>"
 
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_activity_summary_template
@@ -1897,8 +1979,8 @@ msgid ""
 "after the Participant <strong>clicked</strong>,<br/>on any link included in "
 "the <strong>Mailing</strong> sent by the Activity \""
 msgstr ""
-"参加者が <strong>クリックした</strong>後、<br/>以下の活動によって送信された<strong>メーリング</strong> "
-"に含まれるリンク全て: \""
+"参加者が<strong>クリック</strong>後：<br/><strong>メーリング</strong> に含ま"
+"れるいずれかのリンク (送信元の活動 \""
 
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_activity_summary_template
@@ -1906,20 +1988,21 @@ msgid ""
 "after the Participant <strong>opened</strong> the <strong>Mailing</strong> "
 "sent by the Activity \""
 msgstr ""
-"参加者が次を <strong>開封</strong>した後: 以下の活動によって送信された <strong>メーリング</strong>: \""
+"参加者が次を <strong>開封</strong>した後: 以下の活動によって送信された "
+"<strong>メーリング</strong>: \""
 
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_activity_summary_template
 msgid ""
-"after the Participant <strong>replied</strong> to the "
-"<strong>Mailing</strong> sent by the Activity \""
+"after the Participant <strong>replied</strong> to the <strong>Mailing</"
+"strong> sent by the Activity \""
 msgstr ""
-"参加者が次に <strong>回答</strong>した後: 以下の活動によって送信された<strong>メーリング</strong>:  \""
+"参加者が<strong>返信</strong>後: <strong>メーリング</strong> (送信元の活動\""
 
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_activity_summary_template
 msgid "after the execution of the Activity \""
-msgstr "以下の活動の実行後: \""
+msgstr "活動実行後: \""
 
 #. module: marketing_automation
 #: model:ir.model.fields.selection,name:marketing_automation.selection__marketing_activity__trigger_type__activity
@@ -1934,7 +2017,7 @@ msgstr "ワークフローの開始"
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_activity_summary_template
 msgid "cancelled, if"
-msgstr "されます、以下の場合:"
+msgstr "キャンセル。条件:"
 
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_campaign_test_view_form
@@ -1954,13 +2037,13 @@ msgstr "例: Eコマース提案プラン"
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_activity_summary_template
 msgid "have passed since the scheduled date."
-msgstr "予定日を過ぎた"
+msgstr "予定日から経過。"
 
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_activity_summary_template
 msgid ""
 "if no link included in the <strong>Mailing</strong> sent by the Activity \""
-msgstr "以下の活動によって送信された <strong>メーリング</strong> にリンクが含まれない場合:  \""
+msgstr "リンクが<strong>メーリング</strong> に含まれない場合(送信元の活動 \""
 
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_activity_summary_template
@@ -1990,10 +2073,4 @@ msgstr "テスト参加者を作成します"
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_activity_summary_template
 msgid "will be"
-msgstr "は取消"
-
-#. module: marketing_automation
-#. odoo-javascript
-#: code:addons/marketing_automation/static/src/components/campaign_template_picker_dialog/campaign_template_picker_dialog.xml:0
-msgid "{{template_value.title}}"
-msgstr "{{template_value.title}}"
+msgstr "を"

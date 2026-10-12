@@ -52,11 +52,15 @@ class MarketingActivity(models.Model):
         return trigger_types
 
     def _execute_sms(self, traces):
-        res_ids = [r for r in set(traces.mapped('res_id'))]
-
         # we only allow to continue if the user has sufficient rights, as a sudo() follows
         if not self.env.is_superuser() and not self.env.user.has_group('marketing_automation.group_marketing_automation_user'):
             raise AccessError(_('To use this feature you should be an administrator or belong to the marketing automation group.'))
+
+        def _uniquify_list(seq):
+            seen = set()
+            return [x for x in seq if x not in seen and not seen.add(x)]
+        res_ids = _uniquify_list(traces.mapped('res_id'))
+        now = self.env.cr.now()
 
         mailing = self.mass_mailing_id.sudo().with_context(default_marketing_activity_id=self.ids[0])
         try:
@@ -65,7 +69,7 @@ class MarketingActivity(models.Model):
             _logger.warning('Marketing Automation: activity <%s> encountered mass mailing issue %s', self.id, str(e), exc_info=True)
             traces.write({
                 'state': 'error',
-                'schedule_date': Datetime.now(),
+                'schedule_date': now,
                 'state_msg': _('Exception in SMS Marketing: %s', e),
             })
         else:
@@ -83,20 +87,20 @@ class MarketingActivity(models.Model):
             if canceled_traces:
                 canceled_traces.write({
                     'state': 'canceled',
-                    'schedule_date': Datetime.now(),
+                    'schedule_date': now,
                     'state_msg': _('SMS cancelled')
                 })
                 processed_traces = processed_traces - canceled_traces
             if error_traces:
                 error_traces.write({
                     'state': 'error',
-                    'schedule_date': Datetime.now(),
+                    'schedule_date': now,
                     'state_msg': _('SMS failed')
                 })
                 processed_traces = processed_traces - error_traces
             if processed_traces:
                 processed_traces.write({
                     'state': 'processed',
-                    'schedule_date': Datetime.now(),
+                    'schedule_date': now,
                 })
         return True

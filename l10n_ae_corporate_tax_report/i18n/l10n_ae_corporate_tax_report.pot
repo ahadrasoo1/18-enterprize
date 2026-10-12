@@ -4,16 +4,21 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 17.0+e\n"
+"Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-03 12:12+0000\n"
-"PO-Revision-Date: 2024-09-03 12:12+0000\n"
+"POT-Creation-Date: 2025-12-29 19:00+0000\n"
+"PO-Revision-Date: 2025-12-29 19:00+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
+
+#. module: l10n_ae_corporate_tax_report
+#: model:ir.model,name:l10n_ae_corporate_tax_report.model_account_chart_template
+msgid "Account Chart Template"
+msgstr ""
 
 #. module: l10n_ae_corporate_tax_report
 #: model:account.report.column,name:l10n_ae_corporate_tax_report.ae_corporate_tax_report_column_balance
@@ -23,7 +28,6 @@ msgstr ""
 #. module: l10n_ae_corporate_tax_report
 #. odoo-python
 #: code:addons/l10n_ae_corporate_tax_report/models/corporate_tax_report_handler.py:0
-#, python-format
 msgid "CIT Closing for the period %(date_period)s"
 msgstr ""
 
@@ -55,40 +59,29 @@ msgid "Corporate Tax Report"
 msgstr ""
 
 #. module: l10n_ae_corporate_tax_report
+#: model:account.account.tag,name:l10n_ae_corporate_tax_report.uae_account_tag_c_tax_cog
+msgid "Corporate Tax Report COGS Accounts"
+msgstr ""
+
+#. module: l10n_ae_corporate_tax_report
+#: model:account.account.tag,name:l10n_ae_corporate_tax_report.uae_account_tag_c_tax_exempt
+msgid "Corporate Tax Report Exempted Income Accounts"
+msgstr ""
+
+#. module: l10n_ae_corporate_tax_report
+#: model:account.account.tag,name:l10n_ae_corporate_tax_report.uae_account_tag_c_tax_exp
+msgid "Corporate Tax Report Expenses Accounts"
+msgstr ""
+
+#. module: l10n_ae_corporate_tax_report
 #: model_terms:ir.ui.view,arch_db:l10n_ae_corporate_tax_report.res_config_settings_view_form
 msgid "Corporate Taxes"
 msgstr ""
 
 #. module: l10n_ae_corporate_tax_report
-#: model:account.account.tag,name:l10n_ae_corporate_tax_report.uae_account_tag_c_tax_cog
-msgid "Corporate tax of cogs account"
-msgstr ""
-
-#. module: l10n_ae_corporate_tax_report
-#: model:account.account.tag,name:l10n_ae_corporate_tax_report.uae_account_tag_c_tax_exp
-msgid "Corporate tax of expense accounts"
-msgstr ""
-
-#. module: l10n_ae_corporate_tax_report
-#: model:account.account.tag,name:l10n_ae_corporate_tax_report.uae_account_tag_c_tax_exempt
-msgid "Corporate tax-exempt"
-msgstr ""
-
-#. module: l10n_ae_corporate_tax_report
 #. odoo-python
 #: code:addons/l10n_ae_corporate_tax_report/models/corporate_tax_report_handler.py:0
-#, python-format
 msgid "Create Entry"
-msgstr ""
-
-#. module: l10n_ae_corporate_tax_report
-#: model:ir.model.fields,field_description:l10n_ae_corporate_tax_report.field_l10n_ae_corporate_tax_report_handler__create_uid
-msgid "Created by"
-msgstr ""
-
-#. module: l10n_ae_corporate_tax_report
-#: model:ir.model.fields,field_description:l10n_ae_corporate_tax_report.field_l10n_ae_corporate_tax_report_handler__create_date
-msgid "Created on"
 msgstr ""
 
 #. module: l10n_ae_corporate_tax_report
@@ -102,11 +95,6 @@ msgid "Disallowed Portion"
 msgstr ""
 
 #. module: l10n_ae_corporate_tax_report
-#: model:ir.model.fields,field_description:l10n_ae_corporate_tax_report.field_l10n_ae_corporate_tax_report_handler__display_name
-msgid "Display Name"
-msgstr ""
-
-#. module: l10n_ae_corporate_tax_report
 #: model:account.report.line,name:l10n_ae_corporate_tax_report.ae_corporate_tax_report_line_exempt_income
 msgid "Exempt Income"
 msgstr ""
@@ -117,23 +105,8 @@ msgid "Gross Profit"
 msgstr ""
 
 #. module: l10n_ae_corporate_tax_report
-#: model:ir.model.fields,field_description:l10n_ae_corporate_tax_report.field_l10n_ae_corporate_tax_report_handler__id
-msgid "ID"
-msgstr ""
-
-#. module: l10n_ae_corporate_tax_report
 #: model:account.report.line,name:l10n_ae_corporate_tax_report.ae_corporate_tax_report_line_income
 msgid "Income"
-msgstr ""
-
-#. module: l10n_ae_corporate_tax_report
-#: model:ir.model.fields,field_description:l10n_ae_corporate_tax_report.field_l10n_ae_corporate_tax_report_handler__write_uid
-msgid "Last Updated by"
-msgstr ""
-
-#. module: l10n_ae_corporate_tax_report
-#: model:ir.model.fields,field_description:l10n_ae_corporate_tax_report.field_l10n_ae_corporate_tax_report_handler__write_date
-msgid "Last Updated on"
 msgstr ""
 
 #. module: l10n_ae_corporate_tax_report
@@ -147,8 +120,8 @@ msgid "Less(Expenses)"
 msgstr ""
 
 #. module: l10n_ae_corporate_tax_report
-#: model:ir.model.fields,field_description:l10n_ae_corporate_tax_report.field_res_company__tax_report_liabilities_account
-#: model:ir.model.fields,field_description:l10n_ae_corporate_tax_report.field_res_config_settings__tax_report_liabilities_account
+#: model:ir.model.fields,field_description:l10n_ae_corporate_tax_report.field_res_company__l10n_ae_tax_report_liabilities_account
+#: model:ir.model.fields,field_description:l10n_ae_corporate_tax_report.field_res_config_settings__l10n_ae_tax_report_liabilities_account
 msgid "Liabilities Account for Tax Report"
 msgstr ""
 
@@ -168,8 +141,8 @@ msgid "Tax Percentage"
 msgstr ""
 
 #. module: l10n_ae_corporate_tax_report
-#: model:ir.model.fields,field_description:l10n_ae_corporate_tax_report.field_res_company__tax_report_counterpart_account
-#: model:ir.model.fields,field_description:l10n_ae_corporate_tax_report.field_res_config_settings__tax_report_counterpart_account
+#: model:ir.model.fields,field_description:l10n_ae_corporate_tax_report.field_res_company__l10n_ae_tax_report_counterpart_account
+#: model:ir.model.fields,field_description:l10n_ae_corporate_tax_report.field_res_config_settings__l10n_ae_tax_report_counterpart_account
 msgid "Tax Report Counter Part Account"
 msgstr ""
 
@@ -181,15 +154,15 @@ msgstr ""
 #. module: l10n_ae_corporate_tax_report
 #. odoo-javascript
 #: code:addons/l10n_ae_corporate_tax_report/static/src/warnings.xml:0
-#, python-format
 msgid "The"
 msgstr ""
 
 #. module: l10n_ae_corporate_tax_report
 #. odoo-python
 #: code:addons/l10n_ae_corporate_tax_report/models/corporate_tax_report_handler.py:0
-#, python-format
-msgid "The liability accounts for corporate taxes have not been set."
+msgid ""
+"The liability accounts for corporate taxes have not been set in the "
+"settings."
 msgstr ""
 
 #. module: l10n_ae_corporate_tax_report
@@ -200,13 +173,11 @@ msgstr ""
 #. module: l10n_ae_corporate_tax_report
 #. odoo-javascript
 #: code:addons/l10n_ae_corporate_tax_report/static/src/warnings.xml:0
-#, python-format
-msgid "for this report are not correctly configured."
+msgid "for this report have not been configured."
 msgstr ""
 
 #. module: l10n_ae_corporate_tax_report
 #. odoo-javascript
 #: code:addons/l10n_ae_corporate_tax_report/static/src/warnings.xml:0
-#, python-format
 msgid "liability accounts"
 msgstr ""

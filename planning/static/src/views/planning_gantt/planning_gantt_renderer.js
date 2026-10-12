@@ -6,13 +6,16 @@ import { getUnionOfIntersections } from "@web_gantt/gantt_helpers";
 import { PlanningEmployeeAvatar } from "./planning_employee_avatar";
 import { PlanningMaterialRole } from "./planning_material_role";
 import { PlanningGanttRowProgressBar } from "./planning_gantt_row_progress_bar";
-import { useEffect, onWillStart, reactive, onWillUnmount, markup } from "@odoo/owl";
+import { useEffect, onWillStart, reactive, onWillUnmount, markup, useState } from "@odoo/owl";
 import { serializeDateTime } from "@web/core/l10n/dates";
 import { planningAskRecurrenceUpdate } from "../planning_calendar/planning_ask_recurrence_update/planning_ask_recurrence_update_hook";
 import { PlanningGanttRendererControls } from "./planning_gantt_renderer_controls";
 import { escape } from "@web/core/utils/strings";
 import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
+import { usePlanningRecurringDeleteAction } from "../planning_hooks";
+import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
+import { AddressRecurrencyConfirmationDialog } from "@planning/components/address_recurrency_confirmation_dialog/address_recurrency_confirmation_dialog";
 
 const { Duration, DateTime } = luxon;
 
@@ -34,6 +37,10 @@ export class PlanningGanttRenderer extends GanttRenderer {
             this.gridRef.el.classList.add("o_planning_gantt");
         });
 
+        this.state = useState({
+            recurrenceUpdate: "this",
+        });
+        this.planningRecurrenceDeletion = usePlanningRecurringDeleteAction();
         this.isPlanningManager = false;
         this.notificationService = useService("notification");
         onWillStart(this.onWillStart);
@@ -206,21 +213,6 @@ export class PlanningGanttRenderer extends GanttRenderer {
     /**
      * @override
      */
-    getColumnStartStop(startCol, stopCol) {
-        const { scale } = this.model.metaData;
-        if (["week", "month"].includes(scale.unit)) {
-            const { start, stop } = super.getColumnStartStop(startCol, stopCol, false);
-            return {
-                start: start.set({ hours: 8, minutes: 0, seconds: 0, milliseconds: 0 }),
-                stop: stop.set({ hours: 17, minutes: 0, seconds: 0, milliseconds: 0 }),
-            };
-        }
-        return super.getColumnStartStop(...arguments);
-    }
-
-    /**
-     * @override
-     */
     getGroupPillDisplayName(pill) {
         return formatFloatTime(pill.aggregateValue);
     }
@@ -230,13 +222,54 @@ export class PlanningGanttRenderer extends GanttRenderer {
      */
     getPopoverProps(pill) {
         const popoverProps = super.getPopoverProps(pill);
+        const { record } = pill;
         if (popoverProps.bodyTemplate) {
-            const { record } = pill;
             Object.assign(popoverProps.context, {
                 allocatedHoursFormatted:
                     record.allocated_hours && formatFloatTime(record.allocated_hours),
                 allocatedPercentageFormatted:
                     record.allocated_percentage && formatFloat(record.allocated_percentage),
+            });
+        }
+        if (this.isPlanningManager) {
+            const recurrenceProps = { resId: record.id, resModel: this.model.metaData.resModel };
+            popoverProps.buttons.push({
+                text: _t("Delete"),
+                class: "btn btn-sm btn-secondary btn-delete",
+                onClick: async () => {
+                    const canProceed = await new Promise((resolve) => {
+                        if (record.repeat) {
+                            this.dialogService.add(AddressRecurrencyConfirmationDialog, {
+                                cancel: () => resolve(false),
+                                close: () => resolve(false),
+                                confirm: async () => {
+                                    await this.planningRecurrenceDeletion._actionAddressRecurrency(
+                                        recurrenceProps,
+                                        this.state.recurrenceUpdate
+                                    );
+                                    return resolve(true);
+                                },
+                                onChangeRecurrenceUpdate:
+                                    this.planningRecurrenceDeletion._setRecurrenceUpdate.bind(this),
+                                selected: this.state.recurrenceUpdate,
+                            });
+                        } else {
+                            this.dialogService.add(ConfirmationDialog, {
+                                body: _t("Are you sure you want to delete this shift?"),
+                                confirmLabel: _t("Delete"),
+                                cancel: () => resolve(false),
+                                close: () => resolve(false),
+                                confirm: () => resolve(true),
+                            });
+                        }
+                    });
+                    if (canProceed) {
+                        await this.model.orm.unlink(recurrenceProps.resModel, [
+                            recurrenceProps.resId,
+                        ]);
+                        await this.model.fetchData();
+                    }
+                },
             });
         }
         return popoverProps;
@@ -390,7 +423,8 @@ export class PlanningGanttRenderer extends GanttRenderer {
 
     _computeResourceOvertimeColors(pill, workHours) {
         const progressBar = this.row.progressBar;
-        if (!progressBar?.employee_id || ["day", "year"].includes(this.model.metaData.scale.id)) {
+        const isFullyFlexibleHours = this.isFlexibleHours(this.row.resId) && workHours === 24;
+        if (!progressBar?.employee_id || ["day", "year"].includes(this.model.metaData.scale.id) || isFullyFlexibleHours){
             return "bg-primary border-primary";
         }
         return workHours == pill.aggregateValue ? 'bg-success border-success' : workHours > pill.aggregateValue ? 'bg-warning border-warning' : 'bg-danger border-danger';

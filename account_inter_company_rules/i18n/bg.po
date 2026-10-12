@@ -3,17 +3,19 @@
 # 	* account_inter_company_rules
 #
 # Translators:
-# Nikola Iliev, 2023
-# Albena Mincheva <albena_vicheva@abv.bg>, 2023
-# Maria Boyadjieva <marabo2000@gmail.com>, 2023
+# KeyVillage, 2024
+# aleksandar ivanov, 2024
+# Maria Boyadjieva <marabo2000@gmail.com>, 2024
+# Petko Karamotchev, 2024
+# Veselina Slavkova, 2024
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server saas~14.4+e\n"
+"Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-16 16:02+0000\n"
-"PO-Revision-Date: 2022-09-22 05:45+0000\n"
-"Last-Translator: Maria Boyadjieva <marabo2000@gmail.com>, 2023\n"
+"POT-Creation-Date: 2025-12-29 18:46+0000\n"
+"PO-Revision-Date: 2024-09-25 09:44+0000\n"
+"Last-Translator: Veselina Slavkova, 2024\n"
 "Language-Team: Bulgarian (https://app.transifex.com/odoo/teams/41243/bg/)\n"
 "Language: bg\n"
 "MIME-Version: 1.0\n"
@@ -24,13 +26,17 @@ msgstr ""
 #. module: account_inter_company_rules
 #. odoo-python
 #: code:addons/account_inter_company_rules/models/account_move.py:0
-msgid "%s Invoice: %s"
-msgstr ""
+msgid "%(company)s Invoice: %(entry)s"
+msgstr "%(company)s Фактура: %(entry)s"
+
+#. module: account_inter_company_rules
+#: model:ir.model,name:account_inter_company_rules.model_account_move_send
+msgid "Account Move Send"
+msgstr "Преместване на акаунт Изпращане"
 
 #. module: account_inter_company_rules
 #: model:ir.model.fields,field_description:account_inter_company_rules.field_account_bank_statement_line__auto_generated
 #: model:ir.model.fields,field_description:account_inter_company_rules.field_account_move__auto_generated
-#: model:ir.model.fields,field_description:account_inter_company_rules.field_account_payment__auto_generated
 msgid "Auto Generated Document"
 msgstr "Автоматично създаден документ"
 
@@ -38,7 +44,13 @@ msgstr "Автоматично създаден документ"
 #. odoo-python
 #: code:addons/account_inter_company_rules/models/account_move.py:0
 msgid "Automatically generated from %(origin)s of company %(company)s."
-msgstr ""
+msgstr "Автоматично генерирани от %(origin)s на фирмата %(company)s."
+
+#. module: account_inter_company_rules
+#: model:ir.model.fields,field_description:account_inter_company_rules.field_res_company__intercompany_document_state
+#: model:ir.model.fields,field_description:account_inter_company_rules.field_res_config_settings__intercompany_document_state
+msgid "Automation"
+msgstr "Авотматизация"
 
 #. module: account_inter_company_rules
 #: model:ir.model,name:account_inter_company_rules.model_res_company
@@ -48,78 +60,64 @@ msgstr "Фирми"
 #. module: account_inter_company_rules
 #: model:ir.model,name:account_inter_company_rules.model_res_config_settings
 msgid "Config Settings"
-msgstr "Настройки"
+msgstr "Конфигурационни настройки"
+
+#. module: account_inter_company_rules
+#: model:ir.model.fields.selection,name:account_inter_company_rules.selection__res_company__intercompany_document_state__posted
+msgid "Create and validate"
+msgstr "Създайте и валидирайте"
 
 #. module: account_inter_company_rules
 #: model:ir.model.fields,field_description:account_inter_company_rules.field_res_company__intercompany_user_id
 #: model:ir.model.fields,field_description:account_inter_company_rules.field_res_config_settings__intercompany_user_id
 msgid "Create as"
-msgstr ""
+msgstr "Създайте като"
 
 #. module: account_inter_company_rules
-#: model:ir.model.fields.selection,name:account_inter_company_rules.selection__res_company__rule_type__not_synchronize
-msgid "Do not synchronize"
-msgstr ""
+#: model:ir.model.fields.selection,name:account_inter_company_rules.selection__res_company__intercompany_document_state__draft
+msgid "Create in draft"
+msgstr "Създайте в чернова"
 
 #. module: account_inter_company_rules
-#. odoo-python
-#: code:addons/account_inter_company_rules/models/res_company.py:0
-#: code:addons/account_inter_company_rules/models/res_config_settings.py:0
-msgid "Generate a bill/invoice when a company confirms an invoice/bill for %s. The new bill/invoice will be created in the first Purchase/Sales Journal of the Journals list view."
-msgstr ""
+#: model:ir.model.fields,field_description:account_inter_company_rules.field_res_company__intercompany_generate_bills_refund
+#: model:ir.model.fields,field_description:account_inter_company_rules.field_res_config_settings__intercompany_generate_bills_refund
+#: model_terms:ir.ui.view,arch_db:account_inter_company_rules.res_config_settings_view_form
+#: model_terms:ir.ui.view,arch_db:account_inter_company_rules.view_company_inter_change_inherit_form
+msgid "Generate Bills and Refunds"
+msgstr "Генериране на фактури и възстановяване на средства"
 
 #. module: account_inter_company_rules
 #: model_terms:ir.ui.view,arch_db:account_inter_company_rules.view_company_inter_change_inherit_form
 msgid "Inter-Company Transactions"
-msgstr ""
-
-#. module: account_inter_company_rules
-#: model:ir.model.fields,field_description:account_inter_company_rules.field_res_company__intercompany_transaction_message
-#: model:ir.model.fields,field_description:account_inter_company_rules.field_res_config_settings__intercompany_transaction_message
-msgid "Intercompany Transaction Message"
-msgstr ""
+msgstr "Вътрешнофирмени транзакции"
 
 #. module: account_inter_company_rules
 #: model:ir.model,name:account_inter_company_rules.model_account_move
 msgid "Journal Entry"
-msgstr "Записи в Дневника"
+msgstr "Записи в дневника"
 
 #. module: account_inter_company_rules
 #: model:ir.model,name:account_inter_company_rules.model_account_move_line
 msgid "Journal Item"
-msgstr "Счетоводна Операция"
+msgstr "Счетоводна операция"
+
+#. module: account_inter_company_rules
+#: model:ir.model.fields,field_description:account_inter_company_rules.field_res_company__intercompany_purchase_journal_id
+#: model:ir.model.fields,field_description:account_inter_company_rules.field_res_config_settings__intercompany_purchase_journal_id
+msgid "Purchase Journal"
+msgstr "Журнал за покупки"
 
 #. module: account_inter_company_rules
 #: model:ir.model.fields,help:account_inter_company_rules.field_res_company__intercompany_user_id
 #: model:ir.model.fields,help:account_inter_company_rules.field_res_config_settings__intercompany_user_id
-msgid "Responsible user for creation of documents triggered by intercompany rules."
-msgstr "Отговорен потребител за създаването на документи, задействани от правила на интеркомпания."
-
-#. module: account_inter_company_rules
-#: model:ir.model.fields,field_description:account_inter_company_rules.field_res_company__rule_type
-#: model:ir.model.fields,field_description:account_inter_company_rules.field_res_config_settings__rule_type
-msgid "Rule"
-msgstr "Правило"
-
-#. module: account_inter_company_rules
-#: model:ir.model.fields,field_description:account_inter_company_rules.field_res_config_settings__rules_company_id
-msgid "Select Company"
+msgid ""
+"Responsible user for creation of documents triggered by intercompany rules."
 msgstr ""
-
-#. module: account_inter_company_rules
-#: model:ir.model.fields,help:account_inter_company_rules.field_res_company__rule_type
-#: model:ir.model.fields,help:account_inter_company_rules.field_res_config_settings__rule_type
-msgid "Select the type to setup inter company rules in selected company."
-msgstr "Изберете типа, за да настроите правилата за избраната компания."
+"Отговорен потребител за създаването на документи, задействани от правила на "
+"интеркомпания."
 
 #. module: account_inter_company_rules
 #: model:ir.model.fields,field_description:account_inter_company_rules.field_account_bank_statement_line__auto_invoice_id
 #: model:ir.model.fields,field_description:account_inter_company_rules.field_account_move__auto_invoice_id
-#: model:ir.model.fields,field_description:account_inter_company_rules.field_account_payment__auto_invoice_id
 msgid "Source Invoice"
 msgstr "Източник на фактура"
-
-#. module: account_inter_company_rules
-#: model:ir.model.fields.selection,name:account_inter_company_rules.selection__res_company__rule_type__invoice_and_refund
-msgid "Synchronize invoices/bills"
-msgstr ""

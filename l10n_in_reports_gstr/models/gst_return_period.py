@@ -6,14 +6,15 @@ import re
 import markupsafe
 
 from babel.dates import get_quarter_names
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from dateutil import relativedelta
 from itertools import groupby
 from markupsafe import Markup
 
-from odoo import api, fields, models, tools, _
+from odoo import api, fields, models, tools, _, SUPERUSER_ID
 from odoo.exceptions import UserError, AccessError, ValidationError, RedirectWarning
-from odoo.tools import date_utils, get_lang, html_escape, SQL
+from odoo.tools import date_utils, float_is_zero, get_lang, html_escape, SQL
+from odoo.tools import DEFAULT_SERVER_DATE_FORMAT as DF
 from odoo.tools.misc import format_date
 from .irn_exception import IrnException
 
@@ -80,10 +81,10 @@ class L10nInGSTReturnPeriod(models.Model):
         ("12", "December"),
         ], default=_default_month)
     quarter = fields.Selection([
-        ("01", "January"),
-        ("04", "April"),
-        ("07", "July"),
-        ("10", "October"),
+        ("01", "Jan - Mar"),
+        ("04", "Apr - Jun"),
+        ("07", "Jul - Sep"),
+        ("10", "Oct - Dec"),
         ], default=_default_quarterly)
     year = fields.Char(default=_default_year)
 
@@ -123,7 +124,7 @@ class L10nInGSTReturnPeriod(models.Model):
         ('being_processed', 'Being Processed'),
         ('partially_matched', 'Partially Matched'),
         ('fully_matched', 'Matched'),
-    ], default="not_recived", string="Status", readonly=True, tracking=True)
+    ], default="not_recived", string="GSTR-2B Status", readonly=True, tracking=True)
     # if there is big data then it's give in multi-json
     gstr2b_json_from_portal_ids = fields.Many2many('ir.attachment', string='GSTR2B JSON from portal')
     gstr2b_base_value = fields.Monetary("GSTR-2B Base Value")
@@ -212,9 +213,9 @@ class L10nInGSTReturnPeriod(models.Model):
 
     def _compute_name(self):
         for period in self:
-            if period.periodicity == "monthly":
+            if period.periodicity == "monthly" and period.start_date:
                 period.name = format_date(self.env, period.start_date, date_format="MMM-yyyy")
-            elif period.periodicity == "trimester":
+            elif period.periodicity == "trimester" and period.start_date and period.end_date:
                 quarter_names = get_quarter_names("abbreviated", locale=get_lang(self.env).code)
                 period.name = quarter_names[date_utils.get_quarter_number(period.end_date)]
                 period.name += format_date(self.env, period.start_date, date_format="-yyyy")
@@ -232,19 +233,21 @@ class L10nInGSTReturnPeriod(models.Model):
     @api.depends('month', 'quarter', 'year')
     def _compute_period_dates(self):
         for record in self:
-            if record.periodicity == "monthly":
+            if record.periodicity == "monthly" and record.month:
                 period_start = fields.Date.context_today(self).replace(day=1, month=int(record.month), year=int(record.year))
                 time_period = date_utils.get_month(period_start)
-            else:
+            elif record.periodicity == "trimester" and record.quarter:
                 period_start = fields.Date.context_today(self).replace(day=1, month=int(record.quarter), year=int(record.year))
                 time_period = date_utils.get_quarter(period_start)
+            else:
+                time_period = (False, False)
             record.start_date, record.end_date = time_period
 
-    @api.depends("start_date")
+    @api.depends('end_date')
     def _compute_rtn_period_month_year(self):
         for period in self:
-            if period.start_date:
-                period.return_period_month_year = period.start_date.strftime("%m%Y")
+            if period.end_date:
+                period.return_period_month_year = period.end_date.strftime("%m%Y")
             else:
                 period.return_period_month_year = False
 
@@ -340,23 +343,24 @@ class L10nInGSTReturnPeriod(models.Model):
 
     def open_gst_return_period_form_view(self):
         self.ensure_one()
+        context = {'active_id': self.id, 'active_model': 'l10n_in.gst.return.period'}
         return {
             "name": _("GST Return Period"),
             "res_model": "l10n_in.gst.return.period",
             "view_mode": "form",
             "res_id": self.id,
             "type": "ir.actions.act_window",
+            'context': context,
             "views": [[self.env.ref('l10n_in_reports_gstr.l10n_in_gst_return_period_form_view').id, "form"]],
         }
 
     def _get_error_lavel(self, error_codes):
-        blocking_level = "error"
-        if "RTN_24" in error_codes:
-            # File Generation is in progress, please try after sometime.
-            blocking_level = "warning"
-        if "404" in error_codes:
-            blocking_level = "warning"
-        return blocking_level
+        warning_codes = {
+            "RTN_24",  # File Generation is in progress, please try after sometime.
+            "404",  # Resource temporarily unavailable / not found
+            "RET2B1017",  # GSTR-2B data for the selected period is not yet available. Please try after sometime.
+        }
+        return "warning" if warning_codes.intersection(error_codes) else "error"
 
     @api.model
     def _get_gst_return_period(self, company, create_if_not_found=False):
@@ -410,106 +414,55 @@ class L10nInGSTReturnPeriod(models.Model):
                         'cgst': 9.00,
                         'sgst': 9.00,
                         'cess': 3.33,
-                        'line_tax_details': {tax_details}
                     }
                 }
             }
         """
         tax_vals_map = {}
-        tags_id = self._get_l10n_in_taxes_tags_id_by_name(only_gst_tags=True)
-        all_gst_tag = (tags_id['igst'], tags_id['cgst'], tags_id['sgst'])
-        journal_items_ids = set(self.env['account.move.line'].with_context(prefetch_fields=False).search(domain).ids)
-        tax_details_query = self.env['account.move.line']._get_query_tax_details_from_domain(domain=domain)
-        self._cr.execute(SQL(
-            '''
-             WITH RECURSIVE tax_child_tree(id, child_ids) AS (
-                SELECT tax_fil_rel.parent_tax,
-                       ARRAY_AGG(tax_fil_rel.child_tax)
-                  FROM account_tax_filiation_rel tax_fil_rel
-              GROUP BY tax_fil_rel.parent_tax
-             UNION ALL
-                SELECT tax_fil_rel.parent_tax, ARRAY_APPEND(ct.child_ids, tax_fil_rel.parent_tax)
-                  FROM account_tax_filiation_rel tax_fil_rel
-                  JOIN tax_child_tree ct ON ct.id = tax_fil_rel.child_tax
-            ),
-            base_line_with_gst_rate AS (
-                SELECT aml.id, sum(CASE WHEN at.amount_type != 'group' THEN at.amount ELSE 0 END) as gst_rate
-                FROM account_move_line aml
-                JOIN account_move_line_account_tax_rel aml_taxs ON aml_taxs.account_move_line_id = aml.id
-                LEFT JOIN tax_child_tree tax_child ON aml_taxs.account_tax_id = tax_child.id
-                JOIN account_tax at ON at.id = aml_taxs.account_tax_id or at.id = any(tax_child.child_ids)
-                WHERE EXISTS(SELECT 1
-                    FROM account_tax_repartition_line at_rl
-                    JOIN account_account_tag_account_tax_repartition_line_rel tax_tag ON tax_tag.account_tax_repartition_line_id = at_rl.id
-                   where (at_rl.tax_id = at.id OR at_rl.tax_id = aml_taxs.account_tax_id)
-                     and tax_tag.account_account_tag_id in %(all_gst_tag)s
-                )
-                GROUP BY aml.id
-            ),
-            tax_line_with_tags AS (
-                SELECT aml.id, array_agg(aml_tag.account_account_tag_id) as tag_ids
-                FROM account_move_line aml
-                JOIN account_account_tag_account_move_line_rel aml_tag ON aml_tag.account_move_line_id = aml.id
-                GROUP BY aml.id
-            )
-            SELECT
-                COALESCE(aml_gst_rate.gst_rate, 0) as gst_tax_rate,
-                aml_tags.tag_ids,
-                at.l10n_in_reverse_charge,
-                CASE
-                    WHEN %(tags_id_igst)s = any(aml_tags.tag_ids) THEN 'IGST'
-                    WHEN %(tags_id_cgst)s = any(aml_tags.tag_ids) THEN 'CGST'
-                    WHEN %(tags_id_sgst)s = any(aml_tags.tag_ids) THEN 'SGST'
-                    WHEN %(tags_id_cess)s = any(aml_tags.tag_ids) THEN 'CESS'
-                END as tax_type,
-                tax_detail.*
-            FROM (%(tax_details_query)s) AS tax_detail
-       LEFT JOIN account_tax at ON at.id = tax_detail.tax_id
-       LEFT JOIN base_line_with_gst_rate aml_gst_rate ON aml_gst_rate.id = tax_detail.base_line_id
-       LEFT JOIN tax_line_with_tags aml_tags ON aml_tags.id = tax_detail.tax_line_id
-            ''',
-            tax_details_query=tax_details_query,
-            all_gst_tag=all_gst_tag,
-            tags_id_igst=tags_id['igst'],
-            tags_id_cgst=tags_id['cgst'],
-            tags_id_sgst=tags_id['sgst'],
-            tags_id_cess=tags_id['cess'],
-        ))
-        tax_vals_list = self._cr.dictfetchall()
-        base_lines = self.env['account.move.line'].browse(el['base_line_id'] for el in tax_vals_list)
-        base_lines.fetch(['move_id'])
-        for tax_vals in tax_vals_list:
-            journal_items_ids -= {tax_vals.get('base_line_id')}
-            journal_items_ids -= {tax_vals.get('tax_line_id')}
-            base_line = base_lines.browse(tax_vals.get('base_line_id'))
+        gst_tags = {
+            'igst': self.env.ref('l10n_in.tax_tag_igst'),
+            'cgst': self.env.ref('l10n_in.tax_tag_cgst'),
+            'sgst': self.env.ref('l10n_in.tax_tag_sgst'),
+            'cess': self.env.ref('l10n_in.tax_tag_cess'),
+        }
+        journal_items = self.env['account.move.line'].search(domain)
+        tax_details_query, tax_details_params = self.env['account.move.line']._get_query_tax_details_from_domain(domain=domain)
+        self._cr.execute(tax_details_query, tax_details_params)
+        tax_details = self._cr.dictfetchall()
+        # Retrieve base lines and tax lines based on tax_details
+        base_lines = self.env['account.move.line'].browse([tax['base_line_id'] for tax in tax_details])
+        tax_lines = self.env['account.move.line'].browse([tax['tax_line_id'] for tax in tax_details])
+        base_lines_map = {line.id: line for line in base_lines}
+        tax_lines_map = {line.id: line for line in tax_lines}
+        seen_lines = set()
+        for tax_vals in tax_details:
+            base_line = base_lines_map[tax_vals['base_line_id']]
+            tax_line = tax_lines_map[tax_vals['tax_line_id']]
+            seen_lines.add(base_line.id)
+            seen_lines.add(tax_line.id)
             move_id = base_line.move_id
-            tax_vals_map.setdefault(move_id, {})
-            tax_vals_map[move_id].setdefault(base_line, {
+            tax_vals_map.setdefault(move_id, {}).setdefault(base_line, {
                 'base_amount': tax_vals['base_amount'],
-                'l10n_in_reverse_charge': tax_vals['l10n_in_reverse_charge'],
-                'gst_tax_rate': tax_vals['gst_tax_rate'],
+                'l10n_in_reverse_charge': False,
+                'rate_by_tax_tag': {},
+                'gst_tax_rate': 0.00,
                 'igst': 0.00,
                 'cgst': 0.00,
                 'sgst': 0.00,
                 'cess': 0.00,
-                'line_tax_details': [],
             })
-            tax_vals_map[move_id][base_line]['line_tax_details'].append(tax_vals)
-            if tax_vals.get('tax_type') == 'IGST':
-                tax_vals_map[move_id][base_line]['igst'] += (tax_vals['tax_amount'])
-            elif tax_vals.get('tax_type') == 'CGST':
-                tax_vals_map[move_id][base_line]['cgst'] += (tax_vals['tax_amount'])
-            elif tax_vals.get('tax_type') == 'SGST':
-                tax_vals_map[move_id][base_line]['sgst'] += (tax_vals['tax_amount'])
-            elif tax_vals.get('tax_type') == 'CESS':
-                tax_vals_map[move_id][base_line]['cess'] += (tax_vals['tax_amount'])
+            for tax_type, tag_id in gst_tags.items():
+                if tag_id in tax_line.tax_tag_ids:
+                    tax_vals_map[move_id][base_line][tax_type] += tax_vals['tax_amount']
+                    if tax_type in ['igst', 'cgst', 'sgst']:
+                        tax_vals_map[move_id][base_line]['rate_by_tax_tag'][tax_type] = tax_line.tax_line_id.amount
+                    if tax_line.tax_line_id.l10n_in_reverse_charge:
+                        tax_vals_map[move_id][base_line]['l10n_in_reverse_charge'] = True
+            tax_vals_map[move_id][base_line]['gst_tax_rate'] = sum(tax_vals_map[move_id][base_line]['rate_by_tax_tag'].values())
         # IF line have 0% tax or not have tax then we add it manually
-        journal_items = self.env['account.move.line'].browse(list(journal_items_ids))
-        journal_items.fetch(['move_id', 'balance'])
-        for journal_item in journal_items:
+        for journal_item in self.env['account.move.line'].browse(list(set(journal_items.ids) - seen_lines)):
             move_id = journal_item.move_id
-            tax_vals_map.setdefault(move_id, {})
-            tax_vals_map[move_id].setdefault(journal_item, {
+            tax_vals_map.setdefault(move_id, {}).setdefault(journal_item, {
                 'base_amount': journal_item.balance,
                 'l10n_in_reverse_charge': False,
                 'gst_tax_rate': 0.0,
@@ -517,17 +470,24 @@ class L10nInGSTReturnPeriod(models.Model):
                 'cgst': 0.00,
                 'sgst': 0.00,
                 'cess': 0.00,
-                'line_tax_details': [],
             })
         return tax_vals_map
 
+    def _get_hsn_new_schema_apply_date(self):
+        # TODO: Remove this fallback once the government finalizes the official HSN schema date.
+        fallback_value = date(2025, 5, 1)
+        try:
+            param_value = self.env['ir.config_parameter'].sudo().get_param('l10n_in_reports.hsn_new_schema_apply_date')
+            return datetime.strptime(param_value, DF).date() if param_value else fallback_value
+        except (ValueError, TypeError):
+            return fallback_value
 
     def _get_gstr1_hsn_json(self, journal_items, tax_details_by_move):
         # TO OVERRIDE on Point of sale for get details by product
         """
             This method is return hsn json as below
-            Here inovice line is group by product hsn code and product unit code and gst tax rate
-            {'data': [{
+            Here invoice lines are grouped by GST treatment type, product HSN code, product unit code and GST tax rate.
+            {'data/hsn_b2b/hsn_b2c': [{
                 'num': 1,
                 'hsn_sc': '94038900',
                 'uqc': 'UNT',
@@ -544,10 +504,21 @@ class L10nInGSTReturnPeriod(models.Model):
         uoms = self.env['uom.uom'].browse(journal_items.product_uom_id.ids)
         uoms.fetch(['l10n_in_code'])
         hsn_json = {}
+        hsn_new_schema_apply_date = self._get_hsn_new_schema_apply_date()
+        if self.start_date < hsn_new_schema_apply_date:
+            hsn_json = {'data': {}}
+        else:
+            hsn_json = {'hsn_b2b': {}, 'hsn_b2c': {}}
         for move_id in journal_items.mapped('move_id'):
             # We sum value of invoice and credit note
             # so we need positive value for invoice and nagative for credit note
             tax_details = tax_details_by_move.get(move_id, {})
+            if 'data' in hsn_json:
+                hsn_section = 'data'
+            elif move_id.l10n_in_gst_treatment in {'regular', 'composition', 'deemed_export', 'uin_holders', 'special_economic_zone'}:
+                hsn_section = 'hsn_b2b'
+            else:
+                hsn_section = 'hsn_b2c'
             for line, line_tax_details in tax_details.items():
                 tax_rate = line_tax_details['gst_tax_rate']
                 if tax_rate.is_integer():
@@ -558,22 +529,29 @@ class L10nInGSTReturnPeriod(models.Model):
                     uqc = "NA"
                 group_key = "%s-%s-%s" %(
                     tax_rate, line.l10n_in_hsn_code, uqc)
-                hsn_json.setdefault(group_key, {
+                hsn_json[hsn_section].setdefault(group_key, {
                     "hsn_sc": self.env["account.edi.format"]._l10n_in_edi_extract_digits(line.l10n_in_hsn_code),
                     "uqc": uqc,
                     "rt": tax_rate,
                     "qty": 0.00, "txval": 0.00, "iamt": 0.00, "samt": 0.00, "camt": 0.00, "csamt": 0.00})
+                hsn_data = hsn_json[hsn_section][group_key]
                 if line.product_id.type != 'service':
                     if move_id.move_type in ('in_refund', 'out_refund'):
-                        hsn_json[group_key]['qty'] -= line.quantity
+                        hsn_data['qty'] -= line.quantity
                     else:
-                        hsn_json[group_key]['qty'] += line.quantity
-                hsn_json[group_key]['txval'] += line_tax_details.get('base_amount', 0.00) * -1
-                hsn_json[group_key]['iamt'] += line_tax_details.get('igst', 0.00) * -1
-                hsn_json[group_key]['samt'] += line_tax_details.get('cgst', 0.00) * -1
-                hsn_json[group_key]['camt'] += line_tax_details.get('sgst', 0.00) * -1
-                hsn_json[group_key]['csamt'] += line_tax_details.get('cess', 0.00) * -1
+                        hsn_data['qty'] += line.quantity
+                hsn_data['txval'] += line_tax_details.get('base_amount', 0.00) * -1
+                hsn_data['iamt'] += line_tax_details.get('igst', 0.00) * -1
+                hsn_data['samt'] += line_tax_details.get('cgst', 0.00) * -1
+                hsn_data['camt'] += line_tax_details.get('sgst', 0.00) * -1
+                hsn_data['csamt'] += line_tax_details.get('cess', 0.00) * -1
         return hsn_json
+
+    def _get_doc_issue_json(self):
+        # to overwrite in l10n_in_reports_gstr_document_summary
+        return {
+            'doc_det': []
+        }
 
     def _get_gstr1_json(self):
         def _group_aml(group_by_field, journal_items):
@@ -594,6 +572,16 @@ class L10nInGSTReturnPeriod(models.Model):
                     for doc in move_id.edi_document_ids
                 )
             )
+
+        def _process_hsn_data(hsn_data):
+            """Helper function to process HSN data with rounding."""
+            return [
+                {**hsn_dict, 'num': index, **{
+                    key: AccountEdiFormat._l10n_in_round_value(hsn_dict.get(key, 0))
+                    for key in ('txval', 'iamt', 'camt', 'samt', 'csamt', 'qty')
+                }}
+                for index, hsn_dict in enumerate(hsn_data.values(), start=1)
+            ]
 
         def _get_b2b_json(journal_items):
             """
@@ -635,10 +623,8 @@ class L10nInGSTReturnPeriod(models.Model):
                     is_igst_amount = False
                     tax_details = tax_details_by_move.get(move_id)
                     for line_tax_details in tax_details.values():
-                        line_all_tax_type = {line_td['tax_type'] for line_td in line_tax_details['line_tax_details']}
-
                         # Ignore the lines if invoice is not SEZ and GST taxes are not selected
-                        if move_id.l10n_in_gst_treatment != 'special_economic_zone' and not any(tax_type in line_all_tax_type for tax_type in ['IGST', 'CGST', 'SGST']):
+                        if move_id.l10n_in_gst_treatment != 'special_economic_zone' and not line_tax_details['gst_tax_rate']:
                             continue
                         tax_rate = line_tax_details['gst_tax_rate']
                         if line_tax_details['l10n_in_reverse_charge']:
@@ -663,7 +649,7 @@ class L10nInGSTReturnPeriod(models.Model):
                         inv_json = {
                             "inum": move_id.name,
                             "idt": move_id.invoice_date.strftime("%d-%m-%Y"),
-                            "val": AccountEdiFormat._l10n_in_round_value(move_id.amount_total_in_currency_signed),
+                            "val": AccountEdiFormat._l10n_in_round_value(move_id.amount_total_signed),
                             "pos": move_id.l10n_in_state_id.l10n_in_tin,
                             "rchrg": is_reverse_charge and "Y" or "N",
                             "inv_typ": invoice_type,
@@ -679,7 +665,8 @@ class L10nInGSTReturnPeriod(models.Model):
                             ],
                         }
                         inv_json_list.append(inv_json)
-                b2b_json.append({'ctin': partner.vat, 'inv': inv_json_list})
+                if inv_json_list:
+                    b2b_json.append({'ctin': partner.vat, 'inv': inv_json_list})
             return b2b_json
 
         def _get_b2cl_json(journal_items):
@@ -712,8 +699,7 @@ class L10nInGSTReturnPeriod(models.Model):
                     lines_json = {}
                     tax_details = tax_details_by_move.get(move_id)
                     for line_tax_details in tax_details.values():
-                        line_all_tax_type = {line_td['tax_type'] for line_td in line_tax_details['line_tax_details']}
-                        if move_id.l10n_in_gst_treatment != 'special_economic_zone' and not any(tax_type in line_all_tax_type for tax_type in ['IGST', 'CGST', 'SGST']):
+                        if move_id.l10n_in_gst_treatment != 'special_economic_zone' and not line_tax_details['gst_tax_rate']:
                             continue
                         tax_rate = line_tax_details.get('gst_tax_rate')
                         lines_json.setdefault(tax_rate, {
@@ -725,7 +711,7 @@ class L10nInGSTReturnPeriod(models.Model):
                         inv_json = {
                             "inum": move_id.name,
                             "idt": move_id.invoice_date.strftime("%d-%m-%Y"),
-                            "val": AccountEdiFormat._l10n_in_round_value(move_id.amount_total_in_currency_signed),
+                            "val": AccountEdiFormat._l10n_in_round_value(move_id.amount_total_signed),
                             #"etin": move_id.l10n_in_reseller_partner_id.vat or "",
                             "itms": [
                                 {"num": index, "itm_det": {
@@ -761,8 +747,7 @@ class L10nInGSTReturnPeriod(models.Model):
                 # so we need positive value for invoice and nagative for credit note
                 tax_details = tax_details_by_move.get(move_id)
                 for line_tax_details in tax_details.values():
-                    line_all_tax_type = {line_td['tax_type'] for line_td in line_tax_details['line_tax_details']}
-                    if move_id.l10n_in_gst_treatment != 'special_economic_zone' and not any(tax_type in line_all_tax_type for tax_type in ['IGST', 'CGST', 'SGST']):
+                    if move_id.l10n_in_gst_treatment != 'special_economic_zone' and not line_tax_details['gst_tax_rate']:
                         continue
                     tax_rate = line_tax_details.get('gst_tax_rate')
                     group_key = "%s-%s"%(tax_rate, move_id.l10n_in_state_id.l10n_in_tin)
@@ -826,8 +811,7 @@ class L10nInGSTReturnPeriod(models.Model):
                     is_reverse_charge = False
                     tax_details = tax_details_by_move[move_id]
                     for line_tax_details in tax_details.values():
-                        line_all_tax_type = {line_td['tax_type'] for line_td in line_tax_details['line_tax_details']}
-                        if move_id.l10n_in_gst_treatment != 'special_economic_zone' and not any(tax_type in line_all_tax_type for tax_type in ['IGST', 'CGST', 'SGST']):
+                        if move_id.l10n_in_gst_treatment != 'special_economic_zone' and not line_tax_details['gst_tax_rate']:
                             continue
                         tax_rate = line_tax_details['gst_tax_rate']
                         if line_tax_details['l10n_in_reverse_charge']:
@@ -855,7 +839,7 @@ class L10nInGSTReturnPeriod(models.Model):
                             "ntty": is_out_refund and "C" or "D",
                             "nt_num": move_id.name,
                             "nt_dt": move_id.invoice_date.strftime("%d-%m-%Y"),
-                            "val": AccountEdiFormat._l10n_in_round_value(move_id.amount_total_in_currency_signed * -sign),
+                            "val": AccountEdiFormat._l10n_in_round_value(move_id.amount_total_signed * -sign),
                             "pos": move_id.l10n_in_state_id.l10n_in_tin,
                             "rchrg": is_reverse_charge and "Y" or "N",
                             "inv_typ": invoice_type,
@@ -871,7 +855,8 @@ class L10nInGSTReturnPeriod(models.Model):
                             ],
                         }
                         inv_json_list.append(inv_json)
-                cdnr_json.append({'ctin': partner.vat, 'nt': inv_json_list})
+                if inv_json_list:
+                    cdnr_json.append({'ctin': partner.vat, 'nt': inv_json_list})
             return cdnr_json
 
         def _get_cdnur_json(journal_items):
@@ -902,31 +887,34 @@ class L10nInGSTReturnPeriod(models.Model):
                 tax_details = tax_details_by_move.get(move_id)
                 lines_json = {}
                 is_igst_amount = False
-                for line_tax_detail in tax_details.values():
-                    line_all_tax_type = {line_td['tax_type'] for line_td in line_tax_detail['line_tax_details']}
-                    if move_id.l10n_in_gst_treatment != 'special_economic_zone' and not any(tax_type in line_all_tax_type for tax_type in ['IGST', 'CGST', 'SGST']):
+                for line_tax_details in tax_details.values():
+                    if move_id.l10n_in_gst_treatment != 'special_economic_zone' and not line_tax_details['gst_tax_rate']:
                         continue
-                    if line_tax_detail['igst']:
+                    if line_tax_details['igst']:
                         is_igst_amount = True
-                    tax_rate = line_tax_detail['gst_tax_rate']
+                    tax_rate = line_tax_details['gst_tax_rate']
                     lines_json.setdefault(tax_rate, {
                         "rt": tax_rate, "txval": 0.00, "iamt": 0.00, "csamt": 0.00})
-                    lines_json[tax_rate]['txval'] += line_tax_detail['base_amount']
-                    lines_json[tax_rate]['iamt'] += line_tax_detail['igst']
-                    lines_json[tax_rate]['csamt'] += line_tax_detail['cess']
+                    lines_json[tax_rate]['txval'] += line_tax_details['base_amount']
+                    lines_json[tax_rate]['iamt'] += line_tax_details['igst']
+                    lines_json[tax_rate]['csamt'] += line_tax_details['cess']
                 if lines_json:
                     invoice_type = 'B2CL'
-                    if move_id.l10n_in_gst_treatment == "overseas" and is_igst_amount:
-                        invoice_type = 'EXPWP'
-                    elif move_id.l10n_in_gst_treatment == "overseas":
-                        invoice_type = 'EXPWOP'
                     is_out_refund = move_id.move_type == "out_refund"
                     sign = is_out_refund and 1 or -1
+                    invoice_total = move_id.amount_total_signed * -sign
+                    if move_id.l10n_in_gst_treatment == "overseas" and is_igst_amount:
+                        invoice_type = 'EXPWP'
+                        # If Base amount and Invoice total is same then add tax values in total for Export with payment only
+                        if float_is_zero(invoice_total - sum(line['txval'] for line in lines_json.values()), precision_digits=2):
+                            invoice_total += sum(line['iamt'] + line['csamt'] for line in lines_json.values())
+                    elif move_id.l10n_in_gst_treatment == "overseas":
+                        invoice_type = 'EXPWOP'
                     inv_json = {
                         "ntty": is_out_refund and "C" or "D",
                         "nt_num": move_id.name,
                         "nt_dt": move_id.invoice_date.strftime("%d-%m-%Y"),
-                        "val": AccountEdiFormat._l10n_in_round_value(move_id.amount_total_signed * -sign),
+                        "val": AccountEdiFormat._l10n_in_round_value(invoice_total),
                         "typ": invoice_type,
                         "itms": [
                             {"num": index, "itm_det": {
@@ -975,20 +963,26 @@ class L10nInGSTReturnPeriod(models.Model):
                 for line_tax_details in tax_details.values():
                     if line_tax_details['igst']:
                         is_igst_amount = True
+                    elif line_tax_details['sgst'] or line_tax_details['cgst']:
+                        continue
                     tax_rate = line_tax_details['gst_tax_rate']
                     lines_json.setdefault(tax_rate, {"rt": tax_rate, "txval": 0.00, "iamt": 0.00, "csamt": 0.00})
                     lines_json[tax_rate]['txval'] += line_tax_details['base_amount'] * -1
                     lines_json[tax_rate]['iamt'] += line_tax_details['igst'] * -1
                     lines_json[tax_rate]['csamt'] += line_tax_details['cess'] * -1
                 if lines_json:
+                    invoice_total = move_id.amount_total_signed
                     invoice_type = 'WOPAY'
                     if is_igst_amount:
                         invoice_type = 'WPAY'
+                        # If Base amount and Invoice total is same then add tax values in total for Export with payment only
+                        if float_is_zero(invoice_total - sum(line['txval'] for line in lines_json.values()), precision_digits=2):
+                            invoice_total += sum(line['iamt'] + line['csamt'] for line in lines_json.values())
                     export_json.setdefault(invoice_type, [])
                     export_inv = {
                         "inum": move_id.name,
                         "idt": move_id.invoice_date.strftime("%d-%m-%Y"),
-                        "val": AccountEdiFormat._l10n_in_round_value(move_id.amount_total_signed),
+                        "val": AccountEdiFormat._l10n_in_round_value(invoice_total),
                         "itms": list({
                             **d,
                             "txval": AccountEdiFormat._l10n_in_round_value(d['txval']),
@@ -1143,7 +1137,7 @@ class L10nInGSTReturnPeriod(models.Model):
                 "cess": AccountEdiFormat._l10n_in_round_value(d['cess']),
             } for d in paytx_json.values()]
 
-        AccountMoveLine = self.env['account.move.line']
+        AccountMoveLine = self.env['account.move.line'].sudo()
         AccountEdiFormat = self.env["account.edi.format"]
         tax_details_by_move = self._get_tax_details(self._get_section_domain('hsn'))
         hsn_json = self._get_gstr1_hsn_json(AccountMoveLine.search(self._get_section_domain('hsn')), tax_details_by_move)
@@ -1157,6 +1151,7 @@ class L10nInGSTReturnPeriod(models.Model):
             'cdnr': _get_cdnr_json(AccountMoveLine.search(self._get_section_domain('cdnr'))),
             'cdnur': _get_cdnur_json(AccountMoveLine.search(self._get_section_domain('cdnur'))),
             'exp': _get_exp_json(AccountMoveLine.search(self._get_section_domain('exp'))),
+            'doc_issue': self._get_doc_issue_json()
             # Indian Government is not supporting supeco in the production
             # 'supeco': {
             #     'clttx': _get_supeco_clttx_json(AccountMoveLine.search(self._get_section_domain('supeco_clttx'))), # details for section 52 (TCS)
@@ -1166,28 +1161,62 @@ class L10nInGSTReturnPeriod(models.Model):
         if nil_json:
             return_json.update({'nil': nil_json})
         if hsn_json:
-            return_json.update({'hsn':
-                {'data': [{**hsn_dict, 'num': index,
-                    'txval': AccountEdiFormat._l10n_in_round_value(hsn_dict.get('txval')),
-                    'iamt': AccountEdiFormat._l10n_in_round_value(hsn_dict.get('iamt')),
-                    'camt': AccountEdiFormat._l10n_in_round_value(hsn_dict.get('camt')),
-                    'samt': AccountEdiFormat._l10n_in_round_value(hsn_dict.get('samt')),
-                    'csamt': AccountEdiFormat._l10n_in_round_value(hsn_dict.get('csamt')),
-                    'qty': AccountEdiFormat._l10n_in_round_value(hsn_dict.get('qty')),
-                    } for index, hsn_dict in enumerate(hsn_json.values(), start=1)]}})
+            return_json['hsn'] = {
+                hsn_section: _process_hsn_data(hsn_json[hsn_section])
+                for hsn_section in hsn_json
+            }
         return return_json
 
     def button_send_gstr1(self):
+        cron = self.env.ref('l10n_in_reports_gstr.ir_cron_to_send_gstr1_data')
+        cron_sudo = cron.sudo()
+        if not cron_sudo.active:
+            if self.env.user.has_group('base.group_system'):
+                message = _("Can not send GSTR-1 data because the required scheduled action '%s' is not active.", cron_sudo.cron_name)
+                action = {
+                    'name': _("Scheduled Action"),
+                    'type': 'ir.actions.act_window',
+                    'res_model': 'ir.cron',
+                    'res_id': cron.id,
+                    'views': [[False, 'form']],
+                }
+                raise RedirectWarning(message, action, _("Go to Scheduled Action"))
+            else:
+                raise ValidationError(_("Can not send GSTR-1 data because the required scheduled action '%s' is not active.\nPlease contact your system administrator.", cron_sudo.cron_name))
+
         self._check_config(next_gst_action='send_gstr1')
+        if not self.env['account.move.line'].sudo().search_count(self._get_section_domain('hsn'), limit=1):
+            raise ValidationError(_("There are no transactions available for the current period to send for GSTR-1 filing."))
+
+        # TODO remove in master
+        # If the periodicity is `trimester`, the return_period_month_year is computed based on the start month of the period.
+        # But it should be `end month of the period + year`. ex. 032025, 062025, etc.
+        # Therefore, the compute needs to be triggered manually for existing records.
+        if self.periodicity == 'trimester':
+            self._compute_rtn_period_month_year()
+
         self.sudo().write({
             "gstr1_error": False,
             "gstr1_blocking_level": False,
             "gstr1_status": "sending",
         })
-        self.env.ref("l10n_in_reports_gstr.ir_cron_to_send_gstr1_data")._trigger()
+        cron._trigger()
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'type': 'info',
+                'message': _("Action triggered — now waiting in queue to prepare and send data."),
+                'sticky': True,
+                'next': {
+                    'type': 'ir.actions.client',
+                    'tag': 'soft_reload',
+                },
+            }
+        }
 
     def _cron_send_gstr1_data(self, job_count=None):
-        gstr1_sending = self.search([("gstr1_status", "=", "sending")])
+        gstr1_sending = self.search([("gstr1_status", "=", "sending"), ("gstr1_blocking_level", "!=", "error")])
         process_gstr1 = gstr1_sending[:job_count] if job_count else gstr1_sending
         for return_period in process_gstr1:
             return_period.send_gstr1()
@@ -1199,6 +1228,12 @@ class L10nInGSTReturnPeriod(models.Model):
             self.env.ref("l10n_in_reports_gstr.ir_cron_to_send_gstr1_data")._trigger()
 
     def send_gstr1(self):
+        if not self.company_id._is_l10n_in_gstr_token_valid():
+            self.sudo().write({
+                "gstr1_blocking_level": "error",
+                "gstr1_error": _("GSTR-1 submission failed:  GST token expired or missing, Please regenerate it by verifying GST OTP."),
+            })
+            return
         json_payload = self._get_gstr1_json()
         self.sudo().message_post(
             subject=_("GSTR-1 Send data"),
@@ -1240,13 +1275,62 @@ class L10nInGSTReturnPeriod(models.Model):
         self._check_config(next_gst_action='gstr1_status')
         self.check_gstr1_status()
 
+    def _get_gstr_responsible_activity_and_user(self):
+        """
+        Retrieve the mail activity type for GSTR-1 exceptions and identify the responsible user.
+        """
+        act_type_xmlid = 'l10n_in_reports_gstr.mail_activity_type_gstr1_exception_to_be_sent'
+        act_type = self.env.ref(act_type_xmlid, raise_if_not_found=False)
+        # Ensure the activity type exists; create if missing
+        if not act_type:
+            act_type = self.env['mail.activity.type'].sudo()._load_records([{
+                'xml_id': act_type_xmlid,
+                'noupdate': False,
+                'values': {
+                    'name': 'GSTR-1 Exception',
+                    'summary': 'GSTR-1 exception sent to the responsible user of the journal entry',
+                    'category': 'default',
+                    'delay_count': 0,
+                    'delay_unit': 'days',
+                    'delay_from': 'current_date',
+                    'res_model': 'account.move',
+                    'chaining_type': 'suggest',
+                }
+            }])
+
+        # Determine the responsible user
+        advisor_user = self.env['res.users']
+        company_ids = self.company_ids or self.company_id
+        if (
+            act_type.default_user_id and
+            act_type.default_user_id.has_group(self.env.ref('account.group_account_manager').id) and
+            any(company in act_type.default_user_id.company_ids for company in company_ids)
+        ):
+            advisor_user = act_type.default_user_id
+        else:
+            field_id = self.env['ir.model.fields']._get('l10n_in.gst.return.period', 'gstr1_status')
+            # Search for the last relevant mail message to find a responsible user
+            last_message = self.env['mail.message'].search([
+                ('model', '=', self._name),
+                ('res_id', '=', self.id),
+                ('create_uid', '!=', SUPERUSER_ID),
+                ('create_uid.groups_id', 'in', self.env.ref('account.group_account_manager').ids),
+                ('tracking_value_ids.field_id', '=', field_id.id),
+            ], limit=1)
+            advisor_user = last_message and last_message.create_uid or self.env.user
+
+        return act_type_xmlid, advisor_user
+
     def check_gstr1_status(self):
+        if not self.company_id._is_l10n_in_gstr_token_valid():
+            self.sudo().write({
+                "gstr1_blocking_level": "error",
+                "gstr1_error": _("GSTR-1 check status failed: GST token expired or missing, Please regenerate it by verifying GST OTP."),
+            })
+            return
         response = self._get_gstr_status(
             company=self.company_id, month_year=self.return_period_month_year, reference_id=self.gstr_reference)
         if response.get('data'):
-            advisor_user = self.env['res.users'].search([
-                ('company_ids', 'in', self.company_ids.ids or self.company_id.ids),
-                ('groups_id', 'in', self.env.ref('account.group_account_manager').ids)], limit=1, order="id ASC")
             data = response["data"]
             if data.get("status_cd") == "P":
                 self.sudo().write({
@@ -1271,37 +1355,55 @@ class L10nInGSTReturnPeriod(models.Model):
                 AccountMove = self.env['account.move'].with_context(allowed_company_ids=self.company_ids.ids)
                 if data.get("status_cd") == "ER":
                     error_report = data.get('error_report', {})
-                    message = "[%s] %s"%(error_report.get('error_cd'), error_report.get('error_msg'))
+                    message = "[%s] %s" % (error_report.get('error_cd'), error_report.get('error_msg'))
                 else:
-                    for section_code, inv_by_section in data.get('error_report').items():
-                        message += "<li><b>%s :- </b></li>"%(section_code.upper())
-                        for invoice in inv_by_section:
-                            error_cd = invoice.get('error_cd', False)
-                            error_msg = invoice.get('error_msg', False)
-                            invoice_number = ""
-                            if error_cd or error_msg:
+                    act_type_xmlid, advisor_user = self._get_gstr_responsible_activity_and_user()
+                    error_report_summary = {}
+                    for section_code, invoices in data.get('error_report', {}).items():
+                        error_report_summary[section_code] = {}
+                        for invoice in invoices:
+                            error_code = invoice.get('error_cd', False)
+                            error_message = invoice.get('error_msg', False)
+                            invoice_number = None
+                            if error_code or error_message:
+                                # Extract invoice number based on section_code type
                                 if section_code in ('b2b', 'b2cl', 'exp'):
                                     invoice_number = invoice.get('inv')[0].get('inum')
                                 if section_code == "cdnr":
                                     invoice_number = invoice.get('nt')[0].get('nt_num')
                                 if section_code == 'cdnur':
                                     invoice_number = invoice.get('nt_num')
-                                msg = " - ".join([error_cd, error_msg])
-                                moves = AccountMove.search([('name', '=', invoice_number),
-                                    ('company_id', 'in', self.company_ids.ids or self.company_id.ids)])
-                                for move in moves:
-                                    invoice_link_msg = "".join(
-                                        "<a href='#' data-oe-model='account.move' data-oe-id='%s'>%s</a>"
-                                        %(move.id, move.name))
-                                    message += "<ul><li>Invoice :- %s</li>" %(invoice_link_msg)
-                                    message += "<ul><li> %s </li></ul></ul>" %(msg)
-                                    # Create activity in Invoice
-                                    move.activity_schedule(
-                                        act_type_xmlid='mail.mail_activity_data_warning',
-                                        user_id=advisor_user.id or self.env.user.id,
-                                        note=_('GSTR-1 Processed with Error:<b>%s</b>', msg))
-                                message += "<ul><li>%s</li></ul>" %(msg) if not moves else ""
-
+                            # Search for the corresponding account move
+                            move = (
+                                AccountMove.search([
+                                    ('name', '=', invoice_number),
+                                    ('company_id', 'in', self.company_ids.ids or self.company_id.ids)
+                                ], limit=1) if invoice_number else AccountMove
+                            )
+                            # Initialize section_code and move in the error report summary
+                            error_report_summary[section_code].setdefault(move, {
+                                "move_name": invoice_number,
+                                "errors": {}
+                            })
+                            # Add error details to the corresponding move
+                            error_report_summary[section_code][move]["errors"].update({error_code: error_message})
+                    # Generate error messages and schedule activities
+                    for section_code, moves in error_report_summary.items():
+                        message += Markup("<li><b>%s :- </b></li>") % section_code.upper()
+                        for move, move_details in moves.items():
+                            error_note = Markup().join(Markup("<ul><li>%s - %s</li></ul>") % (error_code, error_message) for error_code, error_message in move_details["errors"].items())
+                            if move:
+                                # Generate a clickable link for the invoice
+                                message += Markup(
+                                    "<ul><li>Invoice : <a href='#' data-oe-model='account.move' data-oe-id='%s'>%s</a></li>%s</ul>"
+                                ) % (move.id, move.name, error_note)
+                                move.activity_schedule(
+                                    act_type_xmlid=act_type_xmlid,
+                                    user_id=advisor_user.id,
+                                    note=_('GSTR-1 Processed with Error: %s', error_note)
+                                )
+                            else:
+                                message += error_note
                 # Create message in Return period
                 self.sudo().message_post(
                     subject=_("GSTR-1 Errors"),
@@ -1384,7 +1486,12 @@ class L10nInGSTReturnPeriod(models.Model):
                         ("move_id.debit_origin_id", "=", False),
                         ("move_id.l10n_in_gst_treatment", "in", ("unregistered", "consumer")),
                         ("move_id.l10n_in_state_id", "!=", self.company_id.state_id.id),
+                        "|", "&",
+                        ("date", "<", date(2024, 11, 1)),
                         ("move_id.amount_total", ">", 250000),
+                        "&",
+                        ("date", ">=", date(2024, 11, 1)),
+                        ("move_id.amount_total", ">", 100000),
                         ("tax_tag_ids", "in", gst_tags),
                     ]
                 )
@@ -1399,7 +1506,12 @@ class L10nInGSTReturnPeriod(models.Model):
                         ("move_id.l10n_in_transaction_type", "=", "intra_state"),
                         "&",
                         ("move_id.l10n_in_transaction_type", "=", "inter_state"),
+                        "|", "&",
+                        ("date", "<", date(2024, 11, 1)),
                         ("move_id.amount_total", "<=", 250000),
+                        "&",
+                        ("date", ">=", date(2024, 11, 1)),
+                        ("move_id.amount_total", "<=", 100000),
                     ]
                 )
             case "cdnr":
@@ -1435,7 +1547,12 @@ class L10nInGSTReturnPeriod(models.Model):
                         ("tax_tag_ids", "in", gst_tags),
                         ("move_id.l10n_in_gst_treatment", "in", ["unregistered", "consumer"]),
                         ("move_id.l10n_in_transaction_type", "=", "inter_state"),
+                        "|", "&",
+                        ("date", "<", date(2024, 11, 1)),
                         ("move_id.amount_total", ">", 250000),
+                        "&",
+                        ("date", ">=", date(2024, 11, 1)),
+                        ("move_id.amount_total", ">", 100000),
                     ]
                 )
             case "exp":
@@ -1530,6 +1647,14 @@ class L10nInGSTReturnPeriod(models.Model):
 
     def action_get_gstr2b_data(self):
         self._check_config(next_gst_action='fetch_gstr2b')
+
+        # TODO remove in master
+        # If the periodicity is `trimester`, the return_period_month_year is computed based on the start month of the period.
+        # But it should be `end month of the period + year`. ex. 032025, 062025, etc.
+        # Therefore, the compute needs to be triggered manually for existing records.
+        if self.periodicity == 'trimester':
+            self._compute_rtn_period_month_year()
+
         self.sudo().write({
             "gstr2b_status": "waiting_reception",
             "gstr2b_error": False,
@@ -1538,6 +1663,12 @@ class L10nInGSTReturnPeriod(models.Model):
         self.env.ref('l10n_in_reports_gstr.ir_cron_auto_sync_gstr2b_data')._trigger()
 
     def get_gstr2b_data(self):
+        if not self.company_id._is_l10n_in_gstr_token_valid():
+            self.sudo().write({
+                "gstr2b_blocking_level": "error",
+                "gstr2b_error": _("GSTR-2B data fetching failed: GST token expired or missing, Please regenerate it by verifying GST OTP."),
+            })
+            return
         response = self._get_gstr2b_data(company=self.company_id, month_year=self.return_period_month_year)
         if response.get("data"):
             gstr2b_data = response["data"]
@@ -1574,7 +1705,7 @@ class L10nInGSTReturnPeriod(models.Model):
             self.sudo().gstr2b_status = "being_processed"
 
     def _cron_get_gstr2b_data(self):
-        for return_period in self.search([('gstr2b_status', '=', 'waiting_reception')]):
+        for return_period in self.search([('gstr2b_status', '=', 'waiting_reception'), ('gstr2b_blocking_level', '!=', 'error')]):
             return_period.get_gstr2b_data()
 
     def convert_to_date(self, date):
@@ -1582,7 +1713,7 @@ class L10nInGSTReturnPeriod(models.Model):
         return datetime.strptime(date, "%d-%m-%Y").date()
 
     def _cron_gstr2b_match_data(self):
-        return_periods = self.search([('gstr2b_status', '=', 'being_processed')])
+        return_periods = self.search([('gstr2b_status', '=', 'being_processed'), ('gstr2b_blocking_level', '!=', 'error')])
         for return_period in return_periods:
             return_period.gstr2b_match_data()
 
@@ -1615,6 +1746,15 @@ class L10nInGSTReturnPeriod(models.Model):
             tolerance_value = self.env['ir.config_parameter'].sudo().get_param('l10n_in_reports_gstr.gstr2b_matching_tolerance_amount', TOLERANCE_AMOUNT)
             return float(tolerance_value)
 
+        def remove_matched_bill_value(matching_dict, matching_keys_to_remove, matched_bill):
+            for key in matching_keys_to_remove:
+                # only remove matched bill
+                if key in matching_dict:
+                    matching_dict[key] -= matched_bill
+                    # no value then delete key
+                    if not matching_dict[key]:
+                        del matching_dict[key]
+
         def match_bills(gstr2b_streamline_bills, matching_dict):
             create_vals = []
             checked_bills = self.env['account.move']
@@ -1644,12 +1784,14 @@ class L10nInGSTReturnPeriod(models.Model):
                     else:
                         invoice_type = 'Bill'
                     if len(matched_bills) == 1:
+                        remove_matched_bill_value(matching_dict, matching_keys, matched_bills)
                         exception = []
+                        sign = 1 if matched_bills.is_inbound(include_receipts=True) else -1
+                        amount_total = matched_bills.amount_total_signed * sign
+                        amount_untaxed = matched_bills.amount_untaxed_signed * sign
                         if matched_bills.ref == gstr2b_bill.get('bill_number'):
-                            if 'bill_taxable_value' in gstr2b_bill and gstr2b_bill['bill_taxable_value'] != matched_bills.amount_untaxed:
+                            if 'bill_taxable_value' in gstr2b_bill and gstr2b_bill['bill_taxable_value'] != amount_untaxed:
                                 exception.append(_("Total Taxable amount as per GSTR-2B is %s", gstr2b_bill['bill_taxable_value']))
-                            amount_total = matched_bills.amount_total
-                            sign = 1 if matched_bills.is_inbound(include_receipts=True) else -1
                             for line in matched_bills.line_ids:
                                 if line.tax_line_id.amount < 0:
                                     amount_total += line.balance * sign
@@ -1661,14 +1803,17 @@ class L10nInGSTReturnPeriod(models.Model):
                                 exception.append(_("The bill date as per GSTR-2B is %s", gstr2b_bill['bill_date']))
                             if 'bill_type' in gstr2b_bill and (matched_bills.move_type == 'in_refund' and gstr2b_bill['bill_type'] == 'bill') or \
                                 (matched_bills.move_type != 'in_refund' and gstr2b_bill['bill_type'] == 'credit_note'):
-                                exception.append(_("The bill type as per GSTR-2B is %s", invoice_type))
-                        elif (gstr2b_bill.get('bill_total') == matched_bills.amount_total or \
-                            gstr2b_bill.get('bill_taxable_value') == matched_bills.amount_untaxed) and \
-                            gstr2b_bill.get('vat') == matched_bills.partner_id.vat and \
-                            gstr2b_bill.get('bill_date') == matched_bills.invoice_date and \
-                            (matched_bills.move_type == 'in_refund' and gstr2b_bill.get('bill_type') == 'credit_note') or \
-                            (matched_bills.move_type != 'in_refund' and gstr2b_bill.get('bill_type') == 'bill'):
-                            exception.append(_("The reference number as per GSTR-2B is %s", gstr2b_bill['bill_number']))
+                                exception.append(_("Bill type as per GSTR-2B is %s", invoice_type))
+                        elif (
+                            (
+                                gstr2b_bill.get('bill_total') == amount_total
+                                or gstr2b_bill.get('bill_taxable_value') == amount_untaxed
+                            )
+                            and gstr2b_bill.get('vat') == matched_bills.partner_id.vat
+                            and gstr2b_bill.get('bill_date') == matched_bills.invoice_date
+                            and gstr2b_bill.get('bill_type') == ('credit_note' if matched_bills.move_type == 'in_refund' else 'bill')
+                        ):
+                            exception.append(_("The Reference number as per GSTR-2B is %s", gstr2b_bill['bill_number']))
                         matched_bills.write({
                             "l10n_in_exception": '<br/>'.join(exception),
                             "l10n_in_gstr2b_reconciliation_status": exception and "partially_matched" or "matched",
@@ -1700,9 +1845,9 @@ class L10nInGSTReturnPeriod(models.Model):
                         ('vat', '=', gstr2b_bill['vat']),
                     ], limit=1)
                     journal = self.env['account.journal'].search([
-                        *self.env['account.journal']._check_company_domain(self.company_id),
+                        *self.env['account.journal']._check_company_domain(self.company_ids or self.company_id),
                         ('type', '=', 'purchase')
-                    ], limit=1)
+                    ], order="sequence, id", limit=1)
                     default_l10n_in_gst_treatment = (gstr2b_bill.get('section_code') == 'impg' and 'overseas') or (gstr2b_bill.get('section_code') == 'impgsez' and 'special_economic_zone') or 'regular'
                     create_vals.append({
                         "move_type": gstr2b_bill.get('bill_type') == 'credit_note' and "in_refund" or "in_invoice",
@@ -1730,6 +1875,19 @@ class L10nInGSTReturnPeriod(models.Model):
             if create_vals:
                 created_move = self.env['account.move'].create(create_vals)
                 checked_bills += created_move
+                self._cr.execute(SQL("""
+                    UPDATE ir_attachment
+                    SET res_id = msg.res_id,
+                        res_model = 'account.move'
+                    FROM ir_attachment att
+                    JOIN message_attachment_rel rel ON rel.attachment_id = att.id
+                    JOIN mail_message msg ON msg.id = rel.message_id
+                    WHERE att.id = ir_attachment.id
+                        AND att.res_model IS NULL
+                        AND att.res_id = 0
+                        AND msg.model = 'account.move'
+                        AND msg.res_id IN %(ids)s
+                """, ids=tuple(created_move.ids)))
             return checked_bills
 
         def _get_matching_keys(ref, vat, invoice_date, invoice_type, amount):
@@ -1772,16 +1930,24 @@ class L10nInGSTReturnPeriod(models.Model):
             ]
             to_match_bills = AccountMove.search(domain)
             for late_bill in gstr2b_late_streamline_bills:
+                bill_month_start, bill_month_end = date_utils.get_month(late_bill.get('bill_date'))
                 to_match_bills += AccountMove.search([
                     ('l10n_in_gst_return_period_id', '!=', self.id),
-                    ("invoice_date", "<", self.start_date),
+                    ("invoice_date", ">=", bill_month_start),
+                    ("invoice_date", "<=", bill_month_end),
                     ("company_id", "in", self.company_ids.ids or self.company_id.ids),
                     ("move_type", "in", AccountMove.get_purchase_types()),
                     ('ref', '=', late_bill.get('bill_number')),
                     ("state", "=", "posted"),
-                    ("l10n_in_gst_treatment", "not in", ('composition', 'unregistered', 'consumer'))
+                    ("l10n_in_gst_treatment", "not in", ('composition', 'unregistered', 'consumer')),
+                    ("l10n_in_gstr2b_reconciliation_status", "not in", ('matched', 'partially_matched')),
                 ])
+            filtered_to_match_bills = AccountMove
             for bill in to_match_bills:
+                # There is no tax mins bill from unregistered and consumer so no need to match
+                # If set this in domain then it will impact the performance because of tax_ids is m2m field, so put this condition here
+                if bill.state == 'posted' and not bill.line_ids.tax_ids:
+                    continue
                 bill_type = 'bill'
                 amount = bill.amount_total
                 # For SEZ and overseas amount get from Goverment is amount_untaxed
@@ -1796,29 +1962,30 @@ class L10nInGSTReturnPeriod(models.Model):
                 for matching_key in matching_keys:
                     matching_dict.setdefault(matching_key, AccountMove)
                     matching_dict[matching_key] += bill
-            return to_match_bills, matching_dict
+                filtered_to_match_bills += bill
+            return filtered_to_match_bills, matching_dict
 
         def get_streamline_bills_from_json(json_payload):
             vals_list = []
             late_vals_list = []
             gstr2b_bills = json_payload.get("data", {}).get('data', {}).get("docdata", {})
-            return_period = json_payload.get("data", {}).get('data', {}).get("rtnprd", {})
             for section_code, bill_datas in gstr2b_bills.items():
                 if section_code in ('b2b', 'cdnr'):
                     for bill_by_vat in bill_datas:
                         key = section_code == 'cdnr' and 'nt' or 'inv'
                         for doc_data in bill_by_vat.get(key):
+                            bill_date = self.convert_to_date(doc_data.get('dt'))
                             vals = {
                                 'vat': bill_by_vat.get('ctin'),
                                 'bill_number': section_code == 'cdnr' and doc_data.get('ntnum') or doc_data.get('inum'),
-                                'bill_date': self.convert_to_date(doc_data.get('dt')),
+                                'bill_date': bill_date,
                                 'bill_total': doc_data.get('val'),
                                 'bill_value_json': doc_data,
-                                'bill_type': section_code == 'cdnr' and 'credit_note' or 'bill',
+                                'bill_type': section_code == 'cdnr' and doc_data.get('typ') == 'C' and 'credit_note' or 'bill',
                                 'section_code': section_code,
                             }
                             vals_list.append(vals)
-                            if return_period != doc_data.get('supprd'):
+                            if bill_date < self.start_date:
                                 late_vals_list.append(vals)
                 if section_code == 'impg':
                     for bill_data in bill_datas:
@@ -1912,7 +2079,7 @@ class L10nInGSTReturnPeriod(models.Model):
 
         :returns: a notification action informing the user that the fetch is in progress.
         """
-        if self.company_id.l10n_in_edi_production_env:
+        if self.company_id.sudo().l10n_in_edi_production_env:
             edi_credits = self.env["iap.account"].get_credits(service_name="l10n_in_edi")
             if edi_credits < 3:
                 url = self.env["iap.account"].get_credits_url(service_name="l10n_in_edi")
@@ -1925,11 +2092,7 @@ class L10nInGSTReturnPeriod(models.Model):
                     _("Buy Credits")
                 ))
                 return True
-        context = {
-            'active_id': self.id,
-            'active_model': 'l10n_in.gst.return.period'
-        }
-        self.with_context(context)._check_config(next_gst_action='fetch_irn')
+        self._check_config(next_gst_action='fetch_irn')
         self.irn_status = 'to_download'
         self.message_post(body=_("IRN Processing is running in the background."))
         self.env.ref('l10n_in_reports_gstr.ir_cron_auto_sync_einvoice_irn')._trigger()
@@ -1957,18 +2120,32 @@ class L10nInGSTReturnPeriod(models.Model):
         """
         def extract_token_from_error(response):
             """
-            Extracts a token from a specific error message if present.
-            :returns: The extracted token or `False` if not found.
+            Extracts a file token from a specific error message if the error code matches.
+            Handles specific errors and performs appropriate actions.
+            :param response: The JSON response containing error details.
+            :returns:
+                - The extracted token as a string if `EINV30130` is found.
+                - A dictionary with `error_code` if `EINV30109` is found (indicates retry).
+                - `False` if no relevant error is found.
             """
-            handle_error_code = 'EINV30130'  # Specific error code to handle
             errors = response.get('error', [])
             if isinstance(errors, dict):
                 errors['code'] = errors.pop('error_cd', None)
             for error in list(errors):
-                if error.get('code', '') == handle_error_code:
+                error_code = error.get('code', '')
+                # Handle `EINV30130`: Extract file token from the error message
+                if error_code == 'EINV30130':
                     token_match = re.search(r'token\s([a-f0-9]+)(?=.*The link is valid till 1 day)', error.get('message', ''))
                     if token_match:
                         return token_match.group(1)
+                # Handle `EINV30109`: File generation in progress, schedule a retry
+                elif error_code == 'EINV30109':
+                    # Dynamically activate and schedule a retry for the cron job after 10 minutes
+                    self.env.ref("l10n_in_reports_gstr.ir_cron_auto_sync_einvoice_irn")._trigger(
+                        fields.Datetime.now() + timedelta(minutes=10)
+                    )
+                    self.message_post(body=_("File generation is in progress on the GST portal. Auto retry in 10 minutes."))
+                    return 'EINV30109_file_under_process'
             return False
 
         # Retrieve file token
@@ -1979,6 +2156,8 @@ class L10nInGSTReturnPeriod(models.Model):
         )
         if (file_token := file_token_response.get('data', {}).get('token')) is None:
             file_token = extract_token_from_error(file_token_response)
+        if file_token == 'EINV30109_file_under_process':
+            return False
         if not file_token:
             raise IrnException(file_token_response.get('error', {}))
         # Retrieve encryption keys and URLs for the e-invoice files
@@ -2102,9 +2281,9 @@ class L10nInGSTReturnPeriod(models.Model):
             if not bill_already_exists:
                 # Create a new bill if no match is found
                 journal = self.env['account.journal'].search([
-                    *self.env['account.journal']._check_company_domain(self.company_id),
+                    *self.env['account.journal']._check_company_domain(self.company_ids or self.company_id),
                     ('type', '=', 'purchase')
-                ], limit=1)
+                ], order="sequence, id", limit=1)
                 move_type = "in_invoice" if bill.get('bill_type') != "CRN" else "in_refund"
                 created_move = self.env['account.move'].with_context(skip_is_manually_modified=True).create({
                     'journal_id': journal.id,
@@ -2116,13 +2295,18 @@ class L10nInGSTReturnPeriod(models.Model):
                     try:
                         gov_json_data = created_move._l10n_in_retrieve_details_from_irn(irn_number, self.company_id)
                     except IrnException as e:
-                        created_move.message_post(body=Markup("%s<br/> %s") % (_("Fetching IRN details failed with error(s):"), str(e)))
+                        if str(e) == 'no-credit':
+                            message = self.env['account.edi.format']._l10n_in_edi_get_iap_buy_credits_message()
+                        else:
+                            message = str(e)
+                        created_move.message_post(body=Markup("%s<br/> %s") % (_("Fetching IRN details failed with error(s):"), message))
                         checked_moves |= created_move
                         continue
                     if gov_json_data:
                         # Create an attachment for the fetched data and update the bill
                         attachment = self.env['ir.attachment'].create({
-                            'name': '%s.json' % irn_number,
+                            # Limit the name to 45 characters to avoid exceeding the limit on e-invoice portal
+                            'name': f'{irn_number[:45]}.json',
                             'mimetype': 'application/json',
                             'raw': json.dumps(gov_json_data),
                             'res_model': 'account.move',
@@ -2164,8 +2348,12 @@ class L10nInGSTReturnPeriod(models.Model):
             try:
                 return_period._get_irn_data()
             except IrnException as e:
+                if str(e) == 'no-credit':
+                    message = self.env['account.edi.format']._l10n_in_edi_get_iap_buy_credits_message()
+                else:
+                    message = str(e)
                 return_period.irn_status = 'process_with_error'
-                return_period.message_post(body=Markup("%s<br/> %s") % (_("Fetching List of e-invoice..."), str(e)))
+                return_period.message_post(body=Markup("%s<br/> %s") % (_("Fetching List of e-invoice..."), message))
 
     def _cron_irn_match_data(self):
         """

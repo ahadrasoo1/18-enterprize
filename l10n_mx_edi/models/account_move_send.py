@@ -35,7 +35,24 @@ class AccountMoveSend(models.AbstractModel):
                     name=_("Check Country on Partner(s)")
                 ),
             }
+        if invalid_mx_partners := moves.filtered(
+            lambda m: m.company_id.country_id.code == 'MX' and not m.l10n_mx_edi_cfdi_to_public and (not m.partner_id.country_id or not m.partner_id.zip)
+        ).partner_id:
+            alerts['partner_country_or_zip_missing'] = {
+                "message": _("CFDI is not set to Public but the following partner(s) do not have country and/or ZIP configured."),
+                "action_text": _("View Partner(s)"),
+                "action": invalid_mx_partners._get_records_action(
+                    name=_("Check Country/ZIP on Partner(s)")
+                ),
+            }
         return alerts
+
+    @api.model
+    def _get_move_constraints(self, moves):
+        constraints = super()._get_move_constraints(moves)
+        if any(move.company_id.country_id.code == 'MX' and not move.l10n_mx_edi_cfdi_to_public and (not move.commercial_partner_id.country_id or not move.commercial_partner_id.zip) for move in moves):
+            constraints['cfdi_not_set_to_public'] = _("CFDI not set to Public: The partner specified does not have recognized country and/or ZIP code set.")
+        return constraints
 
     # -------------------------------------------------------------------------
     # ATTACHMENTS
@@ -48,9 +65,9 @@ class AccountMoveSend(models.AbstractModel):
             attachments += move.l10n_mx_edi_cfdi_attachment_id
         return attachments
 
-    def _get_placeholder_mail_attachments_data(self, move, extra_edis=None):
+    def _get_placeholder_mail_attachments_data(self, move, invoice_edi_format=None, extra_edis=None):
         # EXTENDS 'account'
-        results = super()._get_placeholder_mail_attachments_data(move, extra_edis=extra_edis)
+        results = super()._get_placeholder_mail_attachments_data(move, invoice_edi_format=invoice_edi_format, extra_edis=extra_edis)
 
         if not move.l10n_mx_edi_cfdi_attachment_id and 'mx_cfdi' in extra_edis:
             filename = move._l10n_mx_edi_get_invoice_cfdi_filename()

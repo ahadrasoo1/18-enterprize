@@ -2,11 +2,16 @@ import json
 from contextlib import contextmanager
 from unittest.mock import patch
 import requests
+
 from odoo.tests.common import TransactionCase, tagged
+from odoo.tools import mute_logger
+from odoo import Command
+
+from ..models.ups_request import UPSRequest
 
 
 @contextmanager
-def _mock_request_call():
+def _mock_request_call(specific_ups_check=None):
     def _mock_request(*args, **kwargs):
         url = kwargs.get('url')
         if 'shipments' in url:
@@ -28,6 +33,8 @@ def _mock_request_call():
 
         for endpoint, content in responses.items():
             if endpoint in url:
+                if specific_ups_check:
+                    specific_ups_check(endpoint, kwargs['json'])
                 response = requests.Response()
                 response._content = json.dumps(content).encode()
                 response.status_code = 200
@@ -87,6 +94,16 @@ class TestDeliveryUPS(TransactionCase):
             'zip': '1234',
         })
 
+        self.hong_kong_partner = self.env['res.partner'].create({
+            'name': 'Hong Kong Customer',
+            'country_id': self.env.ref('base.hk').id,
+            'state_id': self.env.ref('base.state_hk_hk').id,
+            'street': "1 H-K Road",
+            'city': "Hong Kong",
+            'phone': '1234567890',
+            'zip': '999077',
+        })
+
     def test_ups_basic_flow(self):
         sale_order = self.env['sale.order'].create({
             'partner_id': self.partner.id,
@@ -120,3 +137,180 @@ class TestDeliveryUPS(TransactionCase):
             self.assertEqual(picking.carrier_price, 5.5, 'Price should be set from mock response')
             picking.cancel_shipment()
             self.assertEqual(picking.carrier_tracking_ref, False, 'Shipment cancel failed')
+
+    def test_ups_rest_sends_correct_delivery_type_for_amazon(self):
+        amazon_expected_delivery_type = self.ups_delivery._get_delivery_type()
+        self.assertEqual(amazon_expected_delivery_type, 'ups')
+
+    def test_ups_invoice_uses_correct_currency(self):
+        usd = self.env.ref('base.USD')
+        eur = self.env.ref('base.EUR')
+        pricelists = self.env['product.pricelist'].create([
+            {
+                'name': 'USD Pricelist',
+                'currency_id': usd.id,
+            },
+            {
+                'name': 'EUR Pricelist',
+                'currency_id': eur.id,
+            },
+        ])
+        for pricelist in pricelists:
+            sale_order = self.env['sale.order'].create({
+                'partner_id': self.partner.id,
+                'pricelist_id': pricelist.id,
+                'order_line': [Command.create({
+                    'product_id': self.product.id,
+                    'name': "Fancy box",
+                    'product_uom_qty': 1.0,
+                    'price_unit': 20,
+                })]
+            })
+            wiz_action = sale_order.action_open_delivery_wizard()
+            choose_delivery_carrier = self.env[wiz_action['res_model']].with_context(wiz_action['context']).create({
+                'carrier_id': self.ups_delivery.id,
+                'order_id': sale_order.id
+            })
+            with _mock_request_call():
+                choose_delivery_carrier.update_price()
+                choose_delivery_carrier.button_confirm()
+                sale_order.action_confirm()
+                picking = sale_order.picking_ids[0]
+                picking.action_assign()
+                picking._action_done()
+                _, shipment_info, _, _, _ = self.ups_delivery._prepare_shipping_data(picking)
+                self.assertEqual(shipment_info['itl_currency_code'], pricelist.currency_id.name)
+
+    def test_ups_commercial_invoice_freight_charge(self):
+        '''
+        Ensure freight charge is correctly transmitted for internatonal UPS deliveries.
+        '''
+        original_send_request = UPSRequest._send_request
+
+        def patched_send_request(self, url, method='GET', data=None, json=None, headers=None, auth=None):
+            if '/ship' in url:
+                assert json['ShipmentRequest']['Shipment']['ShipmentServiceOptions']['InternationalForms']['FreightCharges']['MonetaryValue'] == str(freight_charge)
+            return original_send_request(self, url, method, data, json, headers, auth)
+
+        sale_order = self.env['sale.order'].create({
+            'partner_id': self.hong_kong_partner.id,
+            'order_line': [(0, 0, {
+                'product_id': self.product.id,
+                'name': "Fancy box",
+                'product_uom_qty': 1.0,
+                'price_unit': 20,
+            })]
+        })
+        wiz_action = sale_order.action_open_delivery_wizard()
+        choose_delivery_carrier = self.env[wiz_action['res_model']].with_context(wiz_action['context']).create({
+            'carrier_id': self.ups_delivery.id,
+            'order_id': sale_order.id
+        })
+        with patch.object(UPSRequest, '_send_request', side_effect=patched_send_request, autospec=True):
+            with _mock_request_call():
+                choose_delivery_carrier.update_price()
+                choose_delivery_carrier.button_confirm()
+                sale_order.action_confirm()
+                freight_charge = sale_order.order_line.filtered(lambda sol: sol.is_delivery).price_total
+                picking = sale_order.picking_ids[0]
+                picking._action_done()
+
+    @mute_logger('odoo.tools.translate')
+    def test_ups_commercial_invoice_with_different_delivery_and_invoice_address(self):
+        '''
+        Ensure the commercial invoice uses the partner's delivery address and invoicing address when
+        specified. If the 2 address' country are different, ensure 'SoldTo' defaults to the delivery
+        address (because UPS does not accept for them to be in different countries).
+        '''
+        def same_country_commercial_invoice_address_check(endpoint, payload):
+            if endpoint == 'ship':
+                ship_to = payload['ShipmentRequest']['Shipment']['ShipTo']
+                sold_to = payload['ShipmentRequest']['Shipment']['ShipmentServiceOptions']['InternationalForms']['Contacts']['SoldTo']
+                self.assertEqual(ship_to['Address']['AddressLine'][0], delivery_address.street)
+                self.assertEqual(sold_to['Address']['AddressLine'][0], invoicing_address.street)
+
+        def different_country_commercial_invoice_address_check(endpoint, payload):
+            if endpoint == 'ship':
+                ship_to = payload['ShipmentRequest']['Shipment']['ShipTo']
+                sold_to = payload['ShipmentRequest']['Shipment']['ShipmentServiceOptions']['InternationalForms']['Contacts']['SoldTo']
+                self.assertEqual(ship_to['Address']['AddressLine'][0], sold_to['Address']['AddressLine'][0])
+                self.assertEqual(sold_to['Address']['AddressLine'][0], delivery_address.street)
+
+        delivery_address, invoicing_address = self.env['res.partner'].create([
+            {
+                'name': 'Hong Kong Delivery Address',
+                'type': 'delivery',
+                'country_id': self.env.ref('base.hk').id,
+                'street': 'Delivery Street 1',
+                'state_id': self.env.ref('base.state_hk_hk').id,
+                'city': "Hong Kong",
+                'phone': '1234567890',
+                'zip': '999077',
+                'parent_id': self.hong_kong_partner.id,
+            },
+            {
+                'name': 'Hong Kong Invoicing Address',
+                'type': 'invoice',
+                'country_id': self.env.ref('base.hk').id,
+                'street': 'Invoicing Street 1',
+                'state_id': self.env.ref('base.state_hk_hk').id,
+                'city': "Hong Kong",
+                'phone': '1234567890',
+                'zip': '999077',
+                'parent_id': self.hong_kong_partner.id,
+            },
+        ])
+
+        sale_order_1, sale_order_2 = self.env['sale.order'].create([
+            {
+                'partner_id': self.hong_kong_partner.id,
+                'order_line': [Command.create({
+                    'product_id': self.product.id,
+                    'name': "Fancy box",
+                    'product_uom_qty': 1.0,
+                    'price_unit': 20,
+                })]
+            },
+            {
+                'partner_id': self.hong_kong_partner.id,
+                'order_line': [Command.create({
+                    'product_id': self.product.id,
+                    'name': "Fancy box",
+                    'product_uom_qty': 3.0,
+                    'price_unit': 30,
+                })]
+            },
+        ])
+
+        wiz_action = sale_order_1.action_open_delivery_wizard()
+        choose_delivery_carrier = self.env[wiz_action['res_model']].with_context(wiz_action['context']).create({
+            'carrier_id': self.ups_delivery.id,
+            'order_id': sale_order_1.id
+        })
+        with _mock_request_call(same_country_commercial_invoice_address_check):
+            choose_delivery_carrier.update_price()
+            choose_delivery_carrier.button_confirm()
+            sale_order_1.action_confirm()
+            self.assertGreater(len(sale_order_1.picking_ids), 0)
+
+            picking = sale_order_1.picking_ids[0]
+            picking.action_assign()
+            picking.move_line_ids[0].quantity = 1.0
+            picking._action_done()
+
+        delivery_address.country_id = self.env.ref('base.uk')
+        wiz_action = sale_order_2.action_open_delivery_wizard()
+        choose_delivery_carrier = self.env[wiz_action['res_model']].with_context(wiz_action['context']).create({
+            'carrier_id': self.ups_delivery.id,
+            'order_id': sale_order_2.id
+        })
+        with _mock_request_call(different_country_commercial_invoice_address_check):
+            choose_delivery_carrier.update_price()
+            choose_delivery_carrier.button_confirm()
+            sale_order_2.action_confirm()
+            self.assertGreater(len(sale_order_2.picking_ids), 0)
+
+            picking = sale_order_2.picking_ids[0]
+            picking.action_assign()
+            picking.move_line_ids[0].quantity = 1.0
+            picking._action_done()

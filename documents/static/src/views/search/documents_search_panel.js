@@ -35,7 +35,7 @@ export class DocumentsSearchPanelItemSettingsPopover extends Component {
 
 export class DocumentsSearchPanel extends SearchPanel {
     static modelExtension = "DocumentsSearchPanel";
-    static template = !uiUtils.isSmall() ? "documents.SearchPanel" : "web.SearchPanel";
+    static template = !uiUtils.isSmall() ? "documents.SearchPanel" : "documents.SearchPanel.Small";
     static subTemplates = !uiUtils.isSmall()
         ? {
               section: "web.SearchPanel.Section",
@@ -47,6 +47,14 @@ export class DocumentsSearchPanel extends SearchPanel {
               category: "documents.SearchPanel.Category.Small",
               filtersGroup: "documents.SearchPanel.FiltersGroup.Small",
           };
+    static rootIcons = {
+        false: "fa-folder-o",
+        COMPANY: "fa-building",
+        MY: "fa-hdd-o",
+        RECENT: "fa-clock-o",
+        SHARED: "fa-users",
+        TRASH: "fa-trash",
+    };
     setup() {
         super.setup(...arguments);
         const { uploads } = useService("file_upload");
@@ -63,16 +71,33 @@ export class DocumentsSearchPanel extends SearchPanel {
         this.dialog = useService("dialog");
 
         onWillStart(async () => {
+            await this.env.searchModel.sectionsPromise;
             this.isDocumentManager = await user.hasGroup("documents.group_documents_manager");
-            const selectedFolderId = this.env.searchModel.getSelectedFolderId();
-            if (selectedFolderId) {
-                this._expandFolder({ folderId: selectedFolderId });
+            if (this.env.model.config.context.active_model) {
+                // Ensure folders in search panel are folded when users come from another app
+                const categories = this.env.searchModel.getSections((s) => s.type === "category");
+                for (const category of categories) {
+                    this.state.expanded[category.id] = {};
+                }
+            } else {
+                const selectedFolderId = this.env.searchModel.getSelectedFolderId();
+                if (selectedFolderId) {
+                    this.state.expanded[this.sections[0].id]["COMPANY"] = true;
+                    this._expandFolder({ folderId: selectedFolderId });
+                }
             }
         });
 
         useBus(this.env.documentsView.bus, "documents-expand-folder", (ev) => {
             this._expandFolder(ev.detail);
         });
+
+        useBus(this.env.searchModel, "update-search-panel", async () => {
+            this.updateActiveValues();
+            this.render();
+        });
+
+        // todo: remove in master
         useBus(this.env.documentsView.bus, "documents-open-edit-selected-folder", () => {
             const selectedFolderId = this.env.searchModel.getSelectedFolderId();
             if (selectedFolderId) {
@@ -109,18 +134,30 @@ export class DocumentsSearchPanel extends SearchPanel {
                     prevPos.parent.classList.remove("o_has_treeEntry");
                 }
             },
-            onDrop: async ({ element, parent, next }) => {
+            onDrop: async ({ element, parent }) => {
                 const draggingFolderId = parseInt(element.dataset.valueId);
+                const draggingFolderRootId = this.env.searchModel.getFolderById(draggingFolderId).rootId;
                 let parentFolderId = parent ? parent.dataset.valueId : false;
+                if (draggingFolderId === parentFolderId) {
+                    return;
+                }
                 if (!parentFolderId || this._notify_wrong_drop_destination(parentFolderId)) {
                     return;
                 }
-                if (parentFolderId === "MY") {
+                const parentFolderRootId =this.env.searchModel.getFolderById(parentFolderId).rootId;
+                if (parentFolderRootId === "MY" && draggingFolderRootId !== "MY") {
                     await this.orm.call(
                         "documents.document",
                         "action_create_shortcut",
                         [draggingFolderId],
-                        { location_folder_id : false },
+                        { location_folder_id: parentFolderId === "MY" ? false : parentFolderId },
+                    );
+                    return this.env.searchModel._reloadSearchModel(true);
+                } else if (parentFolderId === "COMPANY") {
+                    await this.orm.call(
+                        "documents.document",
+                        "action_set_as_company_root",
+                        [draggingFolderId],
                     );
                     return this.env.searchModel._reloadSearchModel(true);
                 } else if (parentFolderId) {
@@ -140,6 +177,39 @@ export class DocumentsSearchPanel extends SearchPanel {
         return Object.values(this.documentUploads).find(
             (upload) => upload.data.get("folder_id") === folderId
         );
+    }
+
+    //---------------------------------------------------------------------
+    // Selection
+    //---------------------------------------------------------------------
+
+    /**
+     * @param {Object} category
+     * @param {Object} value
+     */
+    async toggleCategory(category, value) {
+        if (category.activeValueId !== value.id) {
+            const folder = this.env.searchModel.getFolderById(value.id);
+            const isShortcut = !!folder.shortcut_document_id?.length;
+            if (isShortcut && !this.env.searchModel.getFolderById(folder.shortcut_document_id[0])) {
+                // Unknown folders are in the Trash.
+                return this.env.searchModel.toggleCategoryValue(category.id, "TRASH");
+            }
+            this.env.searchModel.toggleCategoryValue(category.id, value.id);
+        }
+    }
+
+    /**
+     * @param {*} category
+     * @param {*} value
+     */
+    async toggleFold(category, value) {
+        if (value.childrenIds.length) {
+            const categoryState = this.state.expanded[category.id];
+            categoryState[value.id] = !categoryState[value.id];
+        } else {
+            this.getDropdownState(category.id).close();
+        }
     }
 
     //---------------------------------------------------------------------
@@ -181,12 +251,15 @@ export class DocumentsSearchPanel extends SearchPanel {
     _expandFolder({ folderId }) {
         let needRefresh = false;
         const sectionId = this.sections[0].id;
-        for (const folder of this.env.searchModel.getFolderAndParents(
+        const folders = this.env.searchModel.getFolderAndParents(
             this.env.searchModel.getFolderById(folderId)
-        )) {
-            if (!this.state.expanded[sectionId][folder.id]) {
-                this.state.expanded[sectionId][folder.id] = true;
-                needRefresh = true;
+        );
+        if (this.state.expanded[sectionId][folders[0].rootId]) {
+            for (const folder of folders) {
+                if (!this.state.expanded[sectionId][folder.id]) {
+                    this.state.expanded[sectionId][folder.id] = true;
+                    needRefresh = true;
+                }
             }
         }
         if (needRefresh) {
@@ -306,43 +379,64 @@ export class DocumentsSearchPanel extends SearchPanel {
         ) {
             return;
         }
-        let target_folder_id = value.id === "MY" ? false : value.id;
+        let targetFolderId = value.id === "MY" ? false : value.id;
         const data = JSON.parse(dataTransfer.getData("o_documents_data"));
         const currentFolder = this.env.searchModel.getSelectedFolder();
+
+        const movedRecords = this.env.model.root.records
+            .map((r) => r.data)
+            .filter((r) => data.recordIds.includes(r.id));
+
+        const isEditable = (folder) => {
+            return (
+                !folder.id ||
+                folder.user_permission === "edit" ||
+                (folder.id === "COMPANY" && this.isDocumentManager)
+            );
+        };
 
         if (this._notify_wrong_drop_destination(value.id)) {
             return;
         }
-        if ((currentFolder.id && currentFolder.user_permission !== "edit")
-            || value.user_permission !== "edit") {
+        if (!isEditable(value)) {
             return this.notification.add(
-                _t("You don't have the rights to move documents to that folder."),
+                _t("You don't have the rights to move documents nor create shortcut to that folder."),
                 {
                     title: _t("Access Error"),
                     type: "warning",
                 }
             );
         }
-        if (currentFolder.id === "TRASH") {
-            const model = this.env.model;
-            await this.orm.write("documents.document", data.recordIds, { folder_id: value.id });
-            await toggleArchive(model, model.root.resModel, data.recordIds, false);
-            return;
-        }
         // Dropping in 'My Drive'
         if (value.rootId === "MY" && currentFolder.rootId !== "MY") {  // Not from my drive => shortcut
-            await this.orm.call("documents.document", "action_create_shortcut", data.recordIds, {
-                location_folder_id: false,
-            });
+            await this.orm.call("documents.document", "action_create_shortcut", [data.recordIds, targetFolderId]);
             await this.env.searchModel._reloadSearchModel(true);
             return this.notification.add(
                 _t("Shortcut created"),
                 { title: _t("Done!"), type: "success" }
             );
         }
-        if (target_folder_id === "TRASH") {
+        if (targetFolderId === "COMPANY") {
+            if (
+                movedRecords.some(
+                    (r) => r.type === "binary" && !r.checksum?.length && !r.shortcut_document_id
+                )
+            ) {
+                return this.notification.add(_t("You cannot move request in the company folder"), {
+                    title: _t("Access Error"),
+                    type: "warning",
+                });
+            }
+            await this.orm.call("documents.document", "action_set_as_company_root", [data.recordIds]);
+            await this.env.searchModel._reloadSearchModel(true);
+            return;
+        }
+        if (targetFolderId === "TRASH") {
             const model = this.env.model;
             await toggleArchive(model, model.root.resModel, data.recordIds, true);
+            await model.load();
+            await model.notify();
+            await model.env.searchModel._reloadSearchModel(true);
             return;
         }
         if (data.lockedCount) {
@@ -354,18 +448,15 @@ export class DocumentsSearchPanel extends SearchPanel {
                 { title: _t("Partial transfer"), type: "warning" }
             );
         }
-        const action_name = ev.ctrlKey ? "action_create_shortcut" : "action_move_documents";
-        await this.orm.call("documents.document", action_name, [data.recordIds, target_folder_id]);
+
+        await this.documentService.moveOrCreateShortcut(data, targetFolderId, ev.ctrlKey);
         await this.env.searchModel._reloadSearchModel(true);
     }
 
     _notify_wrong_drop_destination(folderId) {
-        if (["RECENT", "SHARED", "COMPANY"].includes(folderId)) {
+        if (["RECENT", "SHARED"].includes(folderId)) {
             this.notification.add(
-                _t("You can't create shortcuts in or move documents to this special folder.") +
-                    (folderId === "COMPANY" && this.isDocumentManager
-                        ? _t(" Perhaps you mean to use the pin action.")
-                        : ""),
+                _t("You can't create shortcuts in or move documents to this special folder."),
                 {
                     title: _t("Invalid operation"),
                     type: "warning",

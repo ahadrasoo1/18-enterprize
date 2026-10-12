@@ -5,7 +5,7 @@ from dateutil.relativedelta import relativedelta
 import logging
 import pytz
 import uuid
-from math import modf
+from math import modf, ceil
 from random import randint, shuffle
 from werkzeug.urls import url_encode
 
@@ -169,16 +169,13 @@ class Planning(models.Model):
         for slot in self:
             slot.company_id = slot.resource_id.company_id or slot.company_id or slot.env.company
 
-    @api.depends('start_datetime')
+    @api.depends('end_datetime')
     def _compute_past_shift(self):
         now = fields.Datetime.now()
         for slot in self:
             if slot.end_datetime:
                 if slot.end_datetime < now:
                     slot.is_past = True
-                    # We have to do this (below), for the field to be set automatically to False when the shift is in the past
-                    if slot.request_to_switch:
-                        slot.sudo().request_to_switch = False
                 else:
                     slot.is_past = False
             else:
@@ -257,7 +254,8 @@ class Planning(models.Model):
             ._get_valid_work_intervals(start_utc, end_utc, calendars=slots.company_id.resource_calendar_id)
         for slot in slots:
             if (not slot.resource_id and slot.allocation_type == 'planning') or (slot.resource_id and slot.resource_id._is_flexible()):
-                slot.allocated_percentage = 100 * slot.allocated_hours / slot._calculate_slot_duration()
+                duration = slot._calculate_slot_duration()
+                slot.allocated_percentage = 100 * slot.allocated_hours / duration if duration else 100
             else:
                 work_hours = slot._get_working_hours_over_period(start_utc, end_utc, resource_work_intervals, calendar_work_intervals)
                 slot.allocated_percentage = 100 * slot.allocated_hours / work_hours if work_hours else 100
@@ -295,11 +293,15 @@ class Planning(models.Model):
             resource_work_intervals, calendar_work_intervals = assigned_slots.resource_id._get_valid_work_intervals(
                 start_utc, end_utc, calendars=assigned_slots.company_id.resource_calendar_id
             )
+            slots_by_allocated_hours = defaultdict(lambda: self.env['planning.slot'])
             for slot in planned_assigned_slots:
-                slot.allocated_hours = slot._get_duration_over_period(
+                allocated_hour = slot._get_duration_over_period(
                     pytz.utc.localize(slot.start_datetime), pytz.utc.localize(slot.end_datetime),
                     resource_work_intervals, calendar_work_intervals, has_allocated_hours=False
                 )
+                slots_by_allocated_hours[allocated_hour] |= slot
+            for allocated_hours, slots in slots_by_allocated_hours.items():
+                slots.allocated_hours = allocated_hours
 
     @api.depends('start_datetime', 'end_datetime', 'resource_id')
     def _compute_overlap_slot_count(self):
@@ -381,8 +383,20 @@ class Planning(models.Model):
         """Return the slot (effective) duration expressed in hours.
         """
         self.ensure_one()
+        resource = self.resource_id or self.env.user.employee_id.resource_id
         if not self.start_datetime or not self.end_datetime:
             return False
+
+        if resource and not resource._is_flexible():
+            work_intervals, calendar_intervals = resource._get_valid_work_intervals(
+                pytz.utc.localize(self.start_datetime).astimezone(pytz.timezone(resource.tz)),
+                pytz.utc.localize(self.end_datetime).astimezone(pytz.timezone(resource.tz))
+            )
+            working_intervals = work_intervals[resource.id] \
+                if resource \
+                else calendar_intervals.get(self.company_id.resource_calendar_id.id,
+                                            calendar_intervals[self.company_id.id])
+            return sum_intervals(working_intervals)
         return (self.end_datetime - self.start_datetime).total_seconds() / 3600.0
 
     def _get_domain_template_slots(self):
@@ -396,9 +410,10 @@ class Planning(models.Model):
 
     @api.depends('role_id', 'employee_id')
     def _compute_template_autocomplete_ids(self):
-        domain = self._get_domain_template_slots()
-        templates = self.env['planning.slot.template'].search(domain, order='start_time', limit=10)
-        self.template_autocomplete_ids = templates + self.template_id
+        for slot in self:
+            domain = slot._get_domain_template_slots()
+            templates = self.env['planning.slot.template'].search(domain, order='start_time', limit=10)
+            slot.template_autocomplete_ids = templates + slot.template_id
 
     @api.depends('employee_id', 'role_id', 'start_datetime', 'end_datetime')
     def _compute_template_id(self):
@@ -412,7 +427,7 @@ class Planning(models.Model):
 
     def _different_than_template(self, check_empty=True):
         self.ensure_one()
-        if not self.start_datetime:
+        if not (self.start_datetime and self.end_datetime):
             return True
         template_fields = self._get_template_fields().items()
         for template_field, slot_field in template_fields:
@@ -439,7 +454,7 @@ class Planning(models.Model):
                 slot.allow_template_creation = False
                 continue
 
-            values = self._prepare_template_values()
+            values = slot._prepare_template_values()
             domain = [(x, '=', values[x]) for x in values.keys()]
             existing_templates = self.env['planning.slot.template'].search(domain, limit=1)
             slot.allow_template_creation = not existing_templates and slot._different_than_template(check_empty=False)
@@ -535,6 +550,22 @@ class Planning(models.Model):
             else:
                 slot.write({'template_id': existing_templates.id})
 
+    def _get_non_working_days_bounds(self, start_datetime, end_datetime, resource=False):
+        resource = resource or self.env.user.employee_id.resource_id
+        user_tz = pytz.timezone(self.env.user.tz
+            or resource.employee_id and resource.employee_id.tz
+            or resource.tz
+            or self._context.get('tz')
+            or self.env.user.company_id.resource_calendar_id.tz
+            or 'UTC'
+        )
+        start_date_in_user_tz = start_datetime.astimezone(user_tz)
+        offset = start_date_in_user_tz.utcoffset().total_seconds() / 3600
+        return (
+            (start_datetime.replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=None) + timedelta(hours=8 - offset)),
+            (end_datetime.replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=None) + timedelta(hours=17 - offset))
+        )
+
     @api.model
     def _calculate_start_end_dates(self,
                                  start_datetime,
@@ -561,19 +592,23 @@ class Planning(models.Model):
                                 or self.env.user.company_id.resource_calendar_id.tz
                                 or 'UTC')
 
-        if start_datetime and end_datetime and not template_id:
+        # start_datetime and end_datetime are from 00:00 to 23:59 in user timezone
+        # Converted in UTC, it gives an offset for any other timezone, _convert_datetime_timezone removes the offset
+        # If start_datetime and end_datetime are None, the resource should follow the company's working calendar and return the work intervals based on the time zone and the company's working calendar.
+        intervals = []
+        start = convert_datetime_timezone(start_datetime, user_tz) if start_datetime else user_tz.localize(self._default_start_datetime())
+        end = convert_datetime_timezone(end_datetime, user_tz) if end_datetime else user_tz.localize(self._default_end_datetime())
+
+        if not template_id:
             # Transform the current column's start/end_datetime to the user's timezone from UTC
-            current_start = convert_datetime_timezone(start_datetime, user_tz)
-            current_end = convert_datetime_timezone(end_datetime, user_tz)
             # Look at the work intervals to examine whether the current start/end_datetimes are inside working hours
             calendar_id = resource.calendar_id or company.resource_calendar_id
-            work_interval = calendar_id._work_intervals_batch(current_start, current_end)[False]
+            work_interval = calendar_id._work_intervals_batch(start, end)[False]
             intervals = [(date_start, date_stop) for date_start, date_stop, attendance in work_interval]
-            if not intervals:
+            if not intervals and not self._context.get('planning_keep_default_datetime', False):
                 # If we are outside working hours, we do not edit the start/end_datetime
                 # Return the start/end times back at UTC and remove the tzinfo from the object
-                return (current_start.astimezone(pytz.utc).replace(tzinfo=None),
-                        current_end.astimezone(pytz.utc).replace(tzinfo=None))
+                return self._get_non_working_days_bounds(start, end, resource)
 
         # start_datetime and end_datetime are from 00:00 to 23:59 in user timezone
         # Converted in UTC, it gives an offset for any other timezone, _convert_datetime_timezone removes the offset
@@ -595,9 +630,10 @@ class Planning(models.Model):
         # The datetime given to _get_closest_work_time will be 6 AM once shifted in the resource's timezone. This will properly find the start of the morning shift at 8AM
         # For the afternoon shift, _get_closest_work_time will search the end of the shift that is close to 6AM the day after.
         # The closest shift found based on the end datetime will be the morning shift meaning that the work_interval_end will be the end of the morning shift the following day.
-        if resource:
-            work_interval_start, work_interval_end = resource._adjust_to_calendar(start.replace(tzinfo=pytz.timezone(resource.tz)), end.replace(tzinfo=pytz.timezone(resource.tz)), compute_leaves=False)[resource]
-            start, end = (work_interval_start or start, work_interval_end or end)
+        # Determine the start and end dates from _work_intervals_batch and convert them to the resource's time zone.
+        if resource and intervals:
+            start = pytz.timezone(resource.tz).localize(intervals[0][0].replace(tzinfo=None))
+            end = pytz.timezone(resource.tz).localize(intervals[-1][-1].replace(tzinfo=None))
 
         if not previous_template_id and not template_reset:
             start = start.astimezone(pytz.utc).replace(tzinfo=None)
@@ -612,13 +648,10 @@ class Planning(models.Model):
 
             h = int(template_id.end_time)
             m = round(modf(template_id.end_time)[0] * 60.0)
-            end = (start + relativedelta(days=(template_id.duration_days - 1), hour=0, minute=0, second=0)).astimezone(pytz.timezone(resource.tz) if resource else user_tz)
+            end = (start + relativedelta(days=(template_id.duration_days - 1), hour=0, minute=0, second=0))
             if template_id.duration_days > 1 and resource_id.calendar_id:
-                end = resource.calendar_id.plan_days(template_id.duration_days, start, compute_leaves=True)
+                end = resource.calendar_id.plan_days(template_id.duration_days, start, compute_leaves=True) or end
             end = end.replace(hour=int(h), minute=int(m))
-
-            start = start.astimezone(pytz.utc).replace(tzinfo=None)
-            end = end.astimezone(pytz.utc).replace(tzinfo=None)
 
         # Need to remove the tzinfo in start and end as without these it leads to a traceback
         # when the start time is empty
@@ -646,14 +679,19 @@ class Planning(models.Model):
         work_interval = company.resource_calendar_id._work_intervals_batch(start, end)[False]
         intervals = [(date_start, date_stop) for date_start, date_stop, attendance in work_interval]
         start_datetime, end_datetime = (start, end)
-        if intervals and (end_datetime-start_datetime).days == 0: # Then we want the first working day and keep the end hours of this day
+        if intervals and (end_datetime - start_datetime).days == 0:  # Then we want the first working day and keep the end hours of this day
             start_datetime = intervals[0][0]
             end_datetime = [stop for start, stop in intervals if stop.date() == start_datetime.date()][-1]
-        elif intervals and (end_datetime-start_datetime).days >= 0:
+        elif intervals and (end_datetime - start_datetime).days > 0:
             start_datetime = intervals[0][0]
             end_datetime = intervals[-1][1]
 
         return (start_datetime, end_datetime)
+
+    def _has_company_working_hours(self, start, end):
+        # TODO: remove this method in master
+        calendar = (self.company_id or self.env.company).resource_calendar_id
+        return bool(calendar._work_intervals_batch(start, end)[False])
 
     def _compute_allow_self_unassign(self):
         allow_self_unassign_planning = self.filtered(lambda p: p.company_id.planning_employee_unavailabilities == 'unassign')
@@ -699,7 +737,7 @@ class Planning(models.Model):
         if null_fields:
             for r in res:
                 for f in null_fields:
-                    if r[f] == 0:
+                    if r.get(f) == 0:
                         r[f] = False
         return res
 
@@ -725,10 +763,14 @@ class Planning(models.Model):
                 start = pytz.utc.localize(start_datetime)
                 end = pytz.utc.localize(end_datetime) if end_datetime else self._default_end_datetime()
                 opening_hours = self._company_working_hours(start, end)
-                res['start_datetime'] = opening_hours[0].astimezone(pytz.utc).replace(tzinfo=None)
-
-                if 'end_datetime' in fields_list:
-                    res['end_datetime'] = opening_hours[1].astimezone(pytz.utc).replace(tzinfo=None)
+                if opening_hours and self._has_company_working_hours(start, end):
+                    res['start_datetime'] = opening_hours[0].astimezone(pytz.utc).replace(tzinfo=None)
+                    if 'end_datetime' in fields_list:
+                        res['end_datetime'] = opening_hours[1].astimezone(pytz.utc).replace(tzinfo=None)
+                else:
+                    res['start_datetime'], end_datetime = self._get_non_working_days_bounds(start_datetime, end_datetime)
+                    if 'end_datetime' in fields_list:
+                        res['end_datetime'] = end_datetime
 
         return res
 
@@ -796,8 +838,8 @@ class Planning(models.Model):
         for slot in self:
             if slot.request_to_switch and (
                 (new_resource and slot.resource_id != new_resource)
-                or ('start_datetime' in values and slot.start_datetime != datetime.strptime(values['start_datetime'], '%Y-%m-%d %H:%M:%S'))
-                or ('end_datetime' in values and slot.end_datetime != datetime.strptime(values['end_datetime'], '%Y-%m-%d %H:%M:%S'))
+                or ('start_datetime' in values and slot.start_datetime != values['start_datetime'])
+                or ('end_datetime' in values and slot.end_datetime != values['end_datetime'])
             ):
                 values['request_to_switch'] = False
 
@@ -823,7 +865,7 @@ class Planning(models.Model):
             else:
                 recurrence_slots = self.search([('recurrency_id', 'in', self.recurrency_id.ids)])
                 datetime_keys = values.keys() & {'start_datetime', 'end_datetime'}
-                if datetime_keys:
+                if datetime_keys and recurrence_slots:
                     slot = recurrence_slots[-1]
                     values["repeat_type"] = slot.repeat_type    # this is to ensure that the subsequent slots are recreated
                     values.update({
@@ -878,8 +920,8 @@ class Planning(models.Model):
 
     def copy(self, default=None):
         result = super().copy(default=default)
-        # force recompute of stored computed fields depending on start_datetime
-        if default and "start_datetime" in default:
+        # force recompute of stored computed fields depending on start_datetime and resource_id
+        if default and {'start_datetime', 'resource_id'} & default.keys():
             result._compute_allocated_hours()
         return result
 
@@ -936,6 +978,10 @@ class Planning(models.Model):
             raise AccessError(_("You don't have the right to assign yourself to shifts."))
         if self.resource_id and not self.request_to_switch:
             raise UserError(_("You can not assign yourself to an already assigned shift."))
+        if self.is_past:
+            if self.request_to_switch:
+                self.sudo().write({'request_to_switch': False})
+            raise UserError(_("You cannot assign yourself to a shift in the past."))
         return self.sudo().write({'resource_id': self.env.user.employee_id.resource_id.id if self.env.user.employee_id else False})
 
     def action_self_unassign(self):
@@ -949,6 +995,8 @@ class Planning(models.Model):
             raise UserError(_("The deadline for unassignment has passed."))
         if self.employee_id != self.env.user.employee_id:
             raise UserError(_("You can not unassign another employee than yourself."))
+        if self.is_past:
+            raise UserError(_("You cannot unassign yourself from a shift in the past."))
         return self.sudo().write({'resource_id': False})
 
     def action_switch_shift(self):
@@ -977,9 +1025,8 @@ class Planning(models.Model):
 
     def _get_ics_file(self, calendar, employee_tz):
         def ics_datetime(idate):
-            return idate and idate.astimezone(
-                pytz.timezone(slot._get_tz())
-            ).replace(tzinfo=pytz.timezone(employee_tz))
+            tz_info = employee_tz or self.env.user.tz or 'UTC'
+            return idate and idate.astimezone(pytz.timezone(tz_info))
 
         for slot in self:
             event = calendar.add('vevent')
@@ -1273,7 +1320,9 @@ class Planning(models.Model):
     @api.model
     def action_rollback_auto_plan_ids(self, shifts_data):
         open_shift_assigned = shifts_data["open_shift_assigned"]
-        self.browse(open_shift_assigned).resource_id = False
+        shifts = self.browse(open_shift_assigned)
+        with self.env.protecting([self._fields['allocated_hours']], shifts):
+            shifts.write({'resource_id': False})
 
     # ----------------------------------------------------
     # Gantt - Calendar view
@@ -1344,8 +1393,10 @@ class Planning(models.Model):
 
         result = {}
         for resource in resources:
-            # return no unavailability if the resource has flexible hours or no calendar for material.
-            if (resource.id not in res_ids) or (resource and (not resource.calendar_id or resource._is_flexible())):
+            # return no unavailability if the resource is fully flexible hours (both material and employee).
+            if ((resource.id not in res_ids)
+                or (resource and resource._is_fully_flexible())
+                or (resource.id not in leaves_mapping and resource and resource._is_flexible())):
                 continue
             calendar = leaves_mapping.get(resource.id, company_leaves)
             # remove intervals smaller than a cell, as they will cause half a cell to turn grey
@@ -1396,7 +1447,7 @@ class Planning(models.Model):
 
     def action_rollback_copy_previous_week(self, copied_slot_ids):
         self.browse(copied_slot_ids).was_copied = False
-        self.unlink()
+        self.exists().unlink()
 
     # ----------------------------------------------------
     # Sending Shifts
@@ -1501,9 +1552,20 @@ class Planning(models.Model):
             return 0.0
         period = self.end_datetime - self.start_datetime
         slot_duration = period.total_seconds() / 3600
+        resource = self.resource_id or self.env.user.employee_id.resource_id
         # If resource is fully flexible, return the length of the slot.
         if (self.resource_id and self.resource_id._is_fully_flexible()):
             return slot_duration
+        if resource and not resource._is_flexible():
+            work_intervals, calendar_intervals = resource._get_valid_work_intervals(
+                pytz.utc.localize(self.start_datetime).astimezone(pytz.timezone(resource.tz)),
+                pytz.utc.localize(self.end_datetime).astimezone(pytz.timezone(resource.tz))
+            )
+            working_intervals = work_intervals[resource.id] \
+                if resource \
+                else calendar_intervals.get(self.company_id.resource_calendar_id.id,
+                                            calendar_intervals[self.company_id.id])
+            slot_duration = sum_intervals(working_intervals)
         # if the resource is an employee, the hours_per_day of its calendar is used as max_hours_per_day.
         if self.employee_id:
             max_hours_per_day = self.employee_id.resource_calendar_id.hours_per_day
@@ -1698,11 +1760,14 @@ class Planning(models.Model):
             if not calendar:
                 continue
             # For each calendar, retrieves the work intervals of every resource
-            attendances = calendar._attendance_intervals_batch(
-                start_dt_delta_utc,
-                end_dt_delta_utc,
-                resources=resources
-            )
+            attendances = {
+                resource_id: Intervals(work_interval._items)
+                for resource_id, work_interval in calendar._attendance_intervals_batch(
+                    start_dt_delta_utc,
+                    end_dt_delta_utc,
+                    resources=resources
+                ).items()
+            }
             leaves = calendar._leave_intervals_batch(
                 start_dt_delta_utc,
                 end_dt_delta_utc,
@@ -1776,7 +1841,7 @@ class Planning(models.Model):
                         # 2) The unassigned intervals represents the slots where the employee should be unassigned
                         #    (when the company is not unavailable and the employee is unavailable)
                         work_interval_employee = (attendance_interval_resource - unavailable_interval_resource)
-                        unassigned_interval = unavailable_interval_resource - unavailable_interval_company
+                        unassigned_interval = (unavailable_interval_resource - unavailable_interval_company) & (attendance_interval_company - unavailable_interval_company)
                         split_slot_values = slot._get_split_slot_values(values, work_interval_employee, remaining_hours_to_plan)
                         if slot.resource_type == 'user':
                             split_slot_values += slot._get_split_slot_values(values, unassigned_interval, remaining_hours_to_plan, unassign=True)
@@ -1978,6 +2043,7 @@ class Planning(models.Model):
             allocated_hours = timedelta(hours=self.allocated_hours).total_seconds()
             formatted_allocated_hours = "%d:%02d" % (allocated_hours // 3600, round(allocated_hours % 3600 / 60))
             allocated_percentage = float_utils.float_repr(self.allocated_percentage, precision_digits=0)
+            lang = employee.user_partner_id.lang or employee.work_contact_id.lang or self.env.context.get('lang')
             # update context to build a link for view in the slot
             view_context.update({
                 'link': employee_url_map[employee.id],
@@ -1987,7 +2053,8 @@ class Planning(models.Model):
                 'work_email': employee.work_email,
                 'allocated_hours': formatted_allocated_hours,
                 'allocated_percentage': allocated_percentage,
-                'unassign_deadline': unassign_deadline
+                'unassign_deadline': unassign_deadline,
+                'lang': lang,
             })
             mail_id = template.with_context(view_context).send_mail(self.id, email_layout_xmlid='mail.mail_notification_light')
             mails_to_send_ids.append(mail_id)
@@ -2098,7 +2165,7 @@ class Planning(models.Model):
         new_slots_vals_list = []
         # accumulator for mergeable slots
         sum_allocated_hours = 0
-        to_merge = []
+        to_merge = None
         # invariants for mergeable slots
         common_allocated_percentage = slots_to_merge[0]['allocated_percentage']
         resource_id = slots_to_merge[0].get('resource_id')
@@ -2123,28 +2190,24 @@ class Planning(models.Model):
                 )])
                 if not (interval & unforecastable_intervals):
                     sum_allocated_hours += slot['allocated_hours']
-                    if (end_datetime - start_datetime).total_seconds() < 3600 * 24:
-                        # If the elapsed time between the first start_datetime and the
-                        # current end_datetime is not higher than 24hours,
-                        # slots cannot be merged as it won't be a forecast
-                        to_merge.append(slot)
-                    else:
-                        to_merge = [{
-                            **slot,
-                            'start_datetime': start_datetime,
-                            'allocated_hours': sum_allocated_hours,
-                        }]
+                    to_merge = {
+                        **slot,
+                        'start_datetime': start_datetime,
+                        'allocated_hours': sum_allocated_hours,
+                    }
                 else:
                     mergeable = False
             if not mergeable:
-                new_slots_vals_list += to_merge
-                to_merge = [slot]
+                if to_merge:
+                    new_slots_vals_list.append(to_merge)
+                to_merge = slot
                 start_datetime = slot['start_datetime']
                 common_allocated_percentage = slot['allocated_percentage']
                 resource_id = slot.get('resource_id')
                 sum_allocated_hours = slot['allocated_hours']
             previous_end_datetime = slot['end_datetime']
-        new_slots_vals_list += to_merge
+        if to_merge:
+            new_slots_vals_list.append(to_merge)
         return new_slots_vals_list
 
     def _get_working_hours_over_period(self, start_utc, end_utc, work_intervals, calendar_intervals):
@@ -2172,9 +2235,11 @@ class Planning(models.Model):
                 # If the resource is fully flexible hours, we return the whole slot interval
                 return round(sum_intervals(slot_interval), 2)
             elif self.resource_id._is_flexible() and self.resource_id.calendar_id.id in calendar_intervals:
+                interval_period = end - start
                 # Otherwise we take into account the `hours_per_day` of the flexible calendar
                 max_hours_per_day = self.resource_id.calendar_id.hours_per_day
-                max_duration = (period.days + (1 if period.seconds else 0)) * max_hours_per_day
+                # Converting the interval period total seconds to days
+                max_duration = ceil(interval_period.total_seconds() / 86400) * max_hours_per_day
                 return round(min(slot_duration, max_duration), 2)
 
         # For open shift, take the `hours_per_day` of the company's default calendar
@@ -2240,8 +2305,8 @@ class Planning(models.Model):
             return sum_intervals(work_intervals)
         if num_days == 1:
             return resource.calendar_id.hours_per_day
-        # final result is rounded to the hour (e.g. 177.5 hours -> 178 hours)
-        return round(resource.calendar_id.full_time_required_hours * (num_days / 7))
+        # final result is rounded to the minute (e.g. 8h15 * 5 days schedule will display '41h15')
+        return round(resource.calendar_id.full_time_required_hours * (num_days / 7), 2)
 
     def _gantt_progress_bar_resource_id(self, res_ids, start, stop):
         start_naive, stop_naive = start.replace(tzinfo=None), stop.replace(tzinfo=None)
@@ -2416,12 +2481,13 @@ class PlanningPlanning(models.Model):
             # /!\ For security reason, we only given the public employee to render mail template
             for employee in self.env['hr.employee.public'].browse(employees.ids):
                 if employee.work_email:
+                    assigned_new_shift = bool(slots.filtered(lambda slot: slot.employee_id.id == employee.id))
                     template_context['employee'] = employee
                     template_context['start_datetime'] = self.date_start
                     template_context['end_datetime'] = self.date_end
                     template_context['planning_url'] = employee_url_map[employee.id]
-                    template_context['planning_url_ics'] = ics_url_per_employee_id[employee.id]
-                    template_context['assigned_new_shift'] = bool(slots.filtered(lambda slot: slot.employee_id.id == employee.id))
+                    template_context['planning_url_ics'] = ics_url_per_employee_id[employee.id] if assigned_new_shift else False
+                    template_context['assigned_new_shift'] = assigned_new_shift
                     template.with_context(**template_context).send_mail(self.id, email_values={'email_to': employee.work_email, 'email_from': email_from}, email_layout_xmlid='mail.mail_notification_light')
         # mark as sent
         slots.write({

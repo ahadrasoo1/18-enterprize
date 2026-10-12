@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
+import binascii
 import io
 import zipfile
 from collections import OrderedDict
@@ -110,9 +111,12 @@ def generate_module(module, export_info):
         root = E.odoo(*nodes)
         xml = etree.tostring(root, pretty_print=True, encoding='UTF-8', xml_declaration=True)
         yield (filepath, xml)
-        # this demo file should be before demo/ir_ui_view.xml
-        index = filenames.index('demo/ir_ui_view.xml')
-        filenames.insert(index, filepath)
+        try:
+            # this demo file should be before 'demo/ir_ui_view.xml' if it exists.
+            index = filenames.index('demo/ir_ui_view.xml')
+            filenames.insert(index, filepath)
+        except ValueError:
+            filenames.append(filepath)
 
     # yield a warning file to notify circular dependencies and that some data haven't been exported
     warnings = []
@@ -386,6 +390,12 @@ def _get_relations(record, field):
     if field.type in ('many2one', 'one2many', 'many2many', 'reference'):
         return record[field.name]
 
+    if field.type == 'many2one_reference':
+        related_model = record[field.model_field]
+        if not related_model:
+            return
+        return record.env[related_model].browse(record[field.name])
+
     if field.model_name == 'ir.model.fields':
         # Some fields (depends, related, relation_field) are of type char, but
         # refer to other fields that must be defined beforehand
@@ -454,7 +464,10 @@ def _prepare_records_to_export(module, model, records, fields_to_export, get_mod
             # create files for binary fields
             if field.type == 'binary' and record[field.name]:
                 value = record[field.name]
-                binary_data = b64decode(value)
+                try:
+                    binary_data = b64decode(value)
+                except (binascii.Error, TypeError):
+                    binary_data = value.decode('utf-8') if isinstance(value, bytes) else str(value)
                 binary_files.append((_get_binary_field_file_name(field, record), binary_data))
 
             # handle relational fields

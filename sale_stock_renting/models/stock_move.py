@@ -25,10 +25,16 @@ class StockMove(models.Model):
             domain.insert(index_to_insert, '|')
         return domain
 
+    def _prepare_procurement_values(self):
+        res = super()._prepare_procurement_values()
+        if self.sale_line_id._are_rental_pickings_enabled() and self.sale_line_id.is_rental and self.sale_line_id.is_mto:
+            res['route_ids'] = self.rule_id.route_id
+        return res
+
     @api.model
     def _prepare_merge_moves_distinct_fields(self):
         distinct_fields = super()._prepare_merge_moves_distinct_fields()
-        if any(sale_order.is_rental_order for sale_order in self.group_id.sale_id):
+        if any(sale_order.is_rental_order for sale_order in self.group_id.sale_id.sudo()):
             distinct_fields.remove('origin_returned_move_id')
             distinct_fields.remove('procure_method')
         return distinct_fields
@@ -56,7 +62,7 @@ class StockMove(models.Model):
         """ Correctly set the qty_delivered and qty_returned of rental order lines when using pickings."""
         res = super()._action_done(cancel_backorder=cancel_backorder)
         if self.env.user.has_group('sale_stock_renting.group_rental_stock_picking'):
-            for move in self:
+            for move in res:
                 if move.state != "done":
                     continue
                 if not move.sale_line_id.is_rental or move.product_id != move.sale_line_id.product_id:
@@ -67,3 +73,35 @@ class StockMove(models.Model):
                         move.sale_line_id._generate_delay_line(current_qty_returned)
                     move.sale_line_id.qty_returned += current_qty_returned
         return res
+
+    def _compute_location_dest_id(self):
+        moves_to_super = self.env['stock.move']
+        for move in self:
+            if (
+                move.location_dest_id
+                and move.location_final_id
+                and move.sale_line_id
+                and not move.sale_line_id.is_rental
+                and move.sale_line_id.order_id.is_rental_order
+                and move.picking_type_id.code == 'outgoing'
+                and move.location_final_id._child_of(move.location_dest_id)
+            ):
+                move.location_dest_id = move.location_final_id
+            else:
+                moves_to_super |= move
+
+        if moves_to_super:
+            super(StockMove, moves_to_super)._compute_location_dest_id()
+
+    def _set_rental_sm_qty(self):
+        self.ensure_one()
+        return self
+
+    def _is_incoming(self):
+        if (
+            self.company_id.rental_loc_id == self.location_id
+            and self.location_dest_id.usage == 'internal'
+        ):
+            return True
+
+        return super()._is_incoming()

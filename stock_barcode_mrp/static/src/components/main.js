@@ -106,6 +106,14 @@ patch(MainComponent.prototype, {
         return super.onOpenProductPage(...arguments);
     },
 
+    async onWillStart() {
+        await super.onWillStart();
+        if (this.resModel == "mrp.production") {
+            const { default_picking_type_id } = this.props.action.context;
+            this.env.model.picking_type_id = default_picking_type_id;
+        }
+    },
+
     async saveFormView(lineRecord) {
         if (lineRecord.resModel === 'mrp.production') {
             const recordId = lineRecord.resId;
@@ -115,7 +123,12 @@ patch(MainComponent.prototype, {
                 await this.env.model.confirmAndSetData(recordId);
                 this.toggleBarcodeLines();
             }
-            if (lineRecord.context.set_qty_producing === true && lineRecord.data.lot_producing_id[0] != this.env.model.record.lot_producing_id?.id){
+            const lotProducing = lineRecord.data.lot_producing_id;
+            if (
+                lineRecord.context.set_qty_producing === true &&
+                lotProducing &&
+                lotProducing[0] != this.env.model.record.lot_producing_id?.id
+            ) {
                 await this.orm.call('mrp.production', 'set_qty_producing', [[recordId]]);
                 update = true;
             }

@@ -1,4 +1,5 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
+import ast
 
 from odoo import models, fields, api, osv
 from odoo.addons.web.controllers.utils import clean_action
@@ -10,7 +11,7 @@ class AccountReport(models.AbstractModel):
 
     filter_analytic_groupby = fields.Boolean(
         string="Analytic Group By",
-        compute=lambda x: x._compute_report_option_filter('filter_analytic_groupby'), readonly=False, store=True, depends=['root_report_id'],
+        compute=lambda x: x._compute_report_option_filter('filter_analytic_groupby'), readonly=False, store=True, depends=['root_report_id', 'section_main_report_ids'],
     )
 
     def _get_options_initializers_forced_sequence_map(self):
@@ -46,6 +47,10 @@ class AccountReport(models.AbstractModel):
 
         self._create_column_analytic(options)
 
+    def _init_options_readonly_query(self, options, previous_options):
+        super()._init_options_readonly_query(options, previous_options)
+        options['readonly_query'] = options['readonly_query'] and not options.get('analytic_groupby_option')
+
     def _create_column_analytic(self, options):
         """ Creates the analytic columns for each plan or account in the filters.
         This will duplicate all previous columns and adding the analytic accounts in the domain of the added columns.
@@ -66,6 +71,7 @@ class AccountReport(models.AbstractModel):
                 'forced_options': {
                     'analytic_groupby_option': True,
                     'analytic_accounts_list': tuple(account_list),  # Analytic accounts used in the domain to filter the lines.
+                    'analytic_plan_id': plan.id,
                 }
             })
 
@@ -79,12 +85,18 @@ class AccountReport(models.AbstractModel):
                 }
             })
         if analytic_headers:
-            analytic_headers.append({'name': ''})
-            # We add the analytic layer to the column_headers before creating the columns
-            options['column_headers'] = [
-                *options['column_headers'],
-                analytic_headers,
-            ]
+            has_selected_budgets = any([budget for budget in options.get('budgets', []) if budget['selected']])
+            if has_selected_budgets:
+                # if budget is selected, then analytic headers are placed on the same header level
+                options['column_headers'][-1] = analytic_headers + options['column_headers'][-1]
+            else:
+                # We add the analytic layer to the column_headers before creating the columns
+                analytic_headers.append({'name': ''})
+
+                options['column_headers'] = [
+                    *options['column_headers'],
+                    analytic_headers,
+                ]
 
     @api.model
     def _prepare_lines_for_analytic_groupby(self):
@@ -105,11 +117,10 @@ class AccountReport(models.AbstractModel):
             return
 
         project_plan, other_plans = self.env['account.analytic.plan']._get_all_plans()
-        analytic_cols = ", ".join(n._column_name() for n in (project_plan + other_plans))
-        analytic_distribution_equivalent = SQL(f'to_jsonb(UNNEST(ARRAY[account_analytic_line.{analytic_cols}]))')
+        analytic_cols = SQL(", ").join(SQL('"account_analytic_line".%s', SQL.identifier(n._column_name())) for n in (project_plan + other_plans))
+        analytic_distribution_equivalent = SQL('to_jsonb(UNNEST(ARRAY_REMOVE(ARRAY[%s], NULL)))', analytic_cols)
 
         change_equivalence_dict = {
-            'id': SQL("account_analytic_line.id"),
             'balance': SQL("-amount"),
             'display_type': 'product',
             'parent_state': 'posted',
@@ -117,40 +128,30 @@ class AccountReport(models.AbstractModel):
             'debit': SQL("CASE WHEN (amount < 0) THEN -amount else 0 END"),
             'credit': SQL("CASE WHEN (amount > 0) THEN amount else 0 END"),
             'analytic_distribution': analytic_distribution_equivalent,
+            'date': SQL("account_analytic_line.date"),
+            'company_id': SQL("account_analytic_line.company_id"),
         }
 
         all_stored_aml_fields = {
             field
-            for field, attrs in self.env['account.move.line'].fields_get().items()
+            for field, attrs in self.env['account.move.line'].fields_get(attributes=["type", "store"]).items()
             if attrs['type'] not in ['many2many', 'one2many'] and attrs.get('store')
         }
 
         for aml_field in all_stored_aml_fields:
             if aml_field not in change_equivalence_dict:
-                change_equivalence_dict[aml_field] = SQL(f"account_move_line.{aml_field}")
+                change_equivalence_dict[aml_field] = SQL('"account_move_line".%s', SQL.identifier(aml_field))
 
         stored_aml_fields, fields_to_insert = self.env['account.move.line']._prepare_aml_shadowing_for_report(change_equivalence_dict)
 
         query = SQL("""
-            -- Create a temporary table, dropping not null constraints because we're not filling those columns
-            CREATE TEMPORARY TABLE IF NOT EXISTS analytic_temp_account_move_line () inherits (account_move_line) ON COMMIT DROP;
-            ALTER TABLE analytic_temp_account_move_line NO INHERIT account_move_line;
-            ALTER TABLE analytic_temp_account_move_line DROP CONSTRAINT IF EXISTS account_move_line_check_amount_currency_balance_sign;
-            ALTER TABLE analytic_temp_account_move_line ALTER COLUMN move_id DROP NOT NULL;
-            ALTER TABLE analytic_temp_account_move_line ALTER COLUMN currency_id DROP NOT NULL;
-
-            INSERT INTO analytic_temp_account_move_line (%(stored_aml_fields)s)
+            CREATE OR REPLACE TEMPORARY VIEW analytic_temp_account_move_line (%(stored_aml_fields)s) AS
             SELECT %(fields_to_insert)s
             FROM account_analytic_line
             LEFT JOIN account_move_line
                 ON account_analytic_line.move_line_id = account_move_line.id
             WHERE
                 account_analytic_line.general_account_id IS NOT NULL;
-
-            -- Create a supporting index to avoid seq.scans
-            CREATE INDEX IF NOT EXISTS analytic_temp_account_move_line__composite_idx ON analytic_temp_account_move_line (analytic_distribution, journal_id, date, company_id);
-            -- Update statistics for correct planning
-            ANALYZE analytic_temp_account_move_line
         """, stored_aml_fields=stored_aml_fields, fields_to_insert=fields_to_insert)
 
         self.env.cr.execute(query)
@@ -177,7 +178,17 @@ class AccountReport(models.AbstractModel):
         column_group_options = self._get_column_group_options(options, params['column_group_key'])
 
         if not column_group_options.get('analytic_groupby_option'):
-            return super(AccountReport, self).action_audit_cell(options, params)
+            action = super().action_audit_cell(options, params)
+            if options.get('column_percent_comparison') == 'analytic_coverage':
+                context = ast.literal_eval(action.get('context', "{}"))
+                context.update({
+                    'selected_analytic_plan': options['analytic_plans_groupby'][0],
+                })
+                action['context'] = context
+                view_id = self.env.ref('account_reports.view_analytic_move_line_tree', raise_if_not_found=False) or False
+                if view_id:
+                    action['views'] = [(view_id.id, 'list')]
+            return action
         else:
             # Start by getting the domain from the options. Note that this domain is targeting account.move.line
             report_line = self.env['account.report.line'].browse(params['report_line_id'])
@@ -196,9 +207,11 @@ class AccountReport(models.AbstractModel):
                 if field.split('.')[0] == 'account_id':
                     field = field.replace('account_id', 'general_account_id')
                     expression = [(field, operator, right_term)]
-                # Replace the 'analytic_distribution' by the account_id domain as we expect for analytic lines.
                 elif field == 'analytic_distribution':
-                    expression = [('auto_account_id', 'in', right_term)]
+                    if options.get('column_percent_comparison') == 'analytic_coverage':
+                        expression = [(1, '=', 1)]
+                    else:
+                        expression = [('auto_account_id', 'in', right_term)]
                 # For other fields not present in on the analytic line model, map them to get the info from the move_line.
                 # Or ignore these conditions if there is no move lines.
                 elif field.split('.')[0] not in AccountAnalyticLine._fields:
@@ -214,6 +227,18 @@ class AccountReport(models.AbstractModel):
 
             action = clean_action(self.env.ref('analytic.account_analytic_line_action_entries')._get_action_dict(), env=self.env)
             action['domain'] = domain
+            if options.get('column_percent_comparison') == 'analytic_coverage':
+                context = ast.literal_eval(action.get('context', "{}"))
+                context.update({
+                    'selected_analytic_plan': options['analytic_plans_groupby'][0],
+                    'group_by': 'move_line_id',
+                })
+                action['context'] = context
+                action['display_name'] += ' - ' + options['selected_analytic_plan_groupby_names'][0]
+                view_id = self.env.ref('account_reports.view_analytic_line_tree', raise_if_not_found=False) or False
+                if view_id:
+                    action['views'] = [(view_id.id, 'list')]
+
             return action
 
     @api.model

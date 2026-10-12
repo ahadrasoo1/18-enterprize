@@ -24,6 +24,7 @@ class TestDKReportCommon(TestAccountReportsCommon):
             'acc_type': 'iban',
             'partner_id': cls.company_data['company'].partner_id.id,
             'acc_number': 'DK5000400440116243',
+            'allow_out_payment': True,
         })
         cls.env['res.partner'].create({
             'name': 'Mr Big CEO',
@@ -114,6 +115,28 @@ class TestDKReportCommon(TestAccountReportsCommon):
 class TestDKReport(TestDKReportCommon):
 
     def test_validate_dk_saft_report_values(self):
+        payable_account = self.env['account.chart.template'].ref("dk_coa_7440")
+        liability_account = self.env['account.chart.template'].ref("dk_coa_7350")
+        # Create a move without a partner but with a receivable line
+        move = self.env['account.move'].create({
+                'move_type': 'entry',
+                'invoice_date': '2021-03-01',
+                'date': '2021-03-01',
+                'partner_id': None,
+                'invoice_line_ids': [
+                    Command.create({
+                        'credit': 67.0,
+                        'account_id': payable_account.id,
+                    }),
+                    Command.create({
+                        'debit': 67.0,
+                        'account_id': liability_account.id,
+                    })
+                ],
+            })
+        move._post()
+        self.env.flush_all()
+
         with tools.file_open("l10n_dk_reports/tests/xml/expected_test_saft_report.xml", "rb") as expected_xml:
             stringified_xml = self._generate_xml()
             self.assertXmlTreeEqual(
@@ -136,11 +159,11 @@ class TestDKReport(TestDKReportCommon):
         expected_values = (
             # _20230131 is not the export date, but rather the date at which the norm of this csv export was enforced
             ('KONTONUMMER_20230131', 'KONTONAVN_20230131', 'VAERDI_20230131'),
-            ('6190', 'Trade and other receivables', '6250'),
-            ('7191', 'Other payables - long-term (copy)', '-10000'),
-            ('7680', 'Sales tax', '-1250'),
-            ('7740', 'VAT on purchases', '2000'),
-            ('999999', 'Undistributed Profits/Losses', '3000'),
+            ('619000', 'Trade receivables', '6250'),
+            ('694000', 'Retained earnings, cf. distribution of profit', '3000'),
+            ('744001', 'Trade payables (short-term) (copy)', '-10000'),
+            ('768000', 'Output VAT', '-1250'),
+            ('774000', 'Input VAT', '2000'),
         )
         for idx, content in enumerate(reader):
             self.assertSequenceEqual(expected_values[idx], content)

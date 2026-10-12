@@ -18,7 +18,7 @@ class CalendarEvent(models.Model):
         """
         events_w_google_url = self.filtered(lambda event: event.videocall_source == 'google_meet')
         for event in events_w_google_url:
-            if event.user_id.is_google_calendar_synced():
+            if event.user_id and event.user_id.is_google_calendar_synced():
                 if not event.access_token:
                     event.access_token = uuid.uuid4().hex
                 event.videocall_redirection = f"{event.get_base_url()}/calendar/videocall/{event.access_token}"
@@ -49,7 +49,7 @@ class CalendarEvent(models.Model):
         """
         self.ensure_one()
         post_values = super()._get_post_sync_values(request_values, google_values)
-        if self.appointment_type_id.event_videocall_source == 'google_meet':
+        if self.appointment_type_id.sudo().event_videocall_source == 'google_meet':
             gevent = GoogleEvent([google_values])
             if gevent.id and gevent.hangoutLink:
                 post_values.update({'videocall_location': gevent.hangoutLink})

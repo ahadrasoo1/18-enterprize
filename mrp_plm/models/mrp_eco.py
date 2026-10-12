@@ -8,7 +8,7 @@ import ast
 
 from odoo import api, fields, models, tools, Command, _
 from odoo.osv import expression
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 
 
 class MrpEcoType(models.Model):
@@ -43,11 +43,14 @@ class MrpEcoType(models.Model):
                 ('type_id', '=', eco_type.id),
                 ('approval_ids.status', '=', 'none')
             ])
-            eco_type.nb_approvals_my = MrpEco.search_count([
-                ('type_id', '=', eco_type.id),
-                ('approval_ids.status', '=', 'none'),
-                ('approval_ids.required_user_ids', '=', self.env.user.id)
-            ])
+            approvals_waiting_for_me = self.env['mrp.eco.approval'].search_read([
+                ('eco_id.type_id', '=', eco_type.id),
+                ('eco_id.active', '=', True),
+                ('status', '=', 'none'),
+                ('required_user_ids', '=', self.env.user.id)
+            ], fields=['eco_id'])
+            num_eco = len({app_data['eco_id'] for app_data in approvals_waiting_for_me})
+            eco_type.nb_approvals_my = num_eco
 
     def _alias_get_creation_values(self):
         values = super(MrpEcoType, self)._alias_get_creation_values()
@@ -72,6 +75,18 @@ class MrpEcoApprovalTemplate(models.Model):
         default='mandatory', required=True, index=True)
     user_ids = fields.Many2many('res.users', string='Users', domain=lambda self: [('groups_id', 'in', self.env.ref('mrp_plm.group_plm_user').id)], required=True)
     stage_id = fields.Many2one('mrp.eco.stage', 'Stage', required=True)
+
+    @api.constrains('user_ids', 'stage_id')
+    def _check_unique_user_stage(self):
+        domain = expression.OR([
+            [('id', '!=', record.id),
+            ('stage_id', '=', record.stage_id.id),
+            ('user_ids', 'in', record.user_ids.ids)]
+            for record in self.filtered('user_ids')
+        ])
+        duplicate = self.env['mrp.eco.approval.template'].search_count(domain, limit=1)
+        if duplicate:
+            raise ValidationError(_('A user cannot be assigned more than once to the same stage'))
 
 
 class MrpEcoApproval(models.Model):
@@ -622,6 +637,8 @@ class MrpEco(models.Model):
             for eco in self:
                 if eco.new_bom_id and eco.state != 'done' and eco.will_update_version != vals['will_update_version']:
                     eco.new_bom_id.version += 1 if vals['will_update_version'] else -1
+        if vals.get('type') == 'product':
+            vals['bom_id'] = False
         res = super(MrpEco, self).write(vals)
         if vals.get('stage_id'):
             self._create_approvals()
@@ -655,6 +672,10 @@ class MrpEco(models.Model):
     def _create_approvals(self):
         approval_vals = []
         activity_vals = []
+        # TDE TODO: default type in master
+        activity_type = self.env.ref(
+            'mrp_plm.mail_activity_eco_approval', raise_if_not_found=False
+        ) or self.env["mail.activity.type"]
         for eco in self:
             for approval_template in eco.stage_id.approval_template_ids:
                 approval = eco.approval_ids.filtered(lambda app: app.approval_template_id == approval_template and not app.is_closed)
@@ -665,7 +686,7 @@ class MrpEco(models.Model):
                     })
                     for user in approval_template.user_ids:
                         activity_vals.append({
-                            'activity_type_id': self.env.ref('mrp_plm.mail_activity_eco_approval').id,
+                            'activity_type_id': activity_type.id,
                             'user_id': user.id,
                             'res_id': eco.id,
                             'res_model_id': self.env.ref('mrp_plm.model_mrp_eco').id,
@@ -776,7 +797,7 @@ class MrpEco(models.Model):
                         'res_model': 'product.template',
                         'res_id': eco.product_tmpl_id.id,
                     })
-                    attach.origin_attachment_id = new_doc.id
+                    attach.origin_attachment_id = new_doc.ir_attachment_id.id
 
                 vals = {'state': 'done'}
                 stage_id = eco.env['mrp.eco.stage'].search([
@@ -873,7 +894,7 @@ class MrpEcoBomChange(models.Model):
     new_product_qty = fields.Float('New revision quantity', default=0)
     old_operation_id = fields.Many2one('mrp.routing.workcenter', 'Previous Consumed in Operation')
     new_operation_id = fields.Many2one('mrp.routing.workcenter', 'New Consumed in Operation')
-    upd_product_qty = fields.Float('Quantity', compute='_compute_upd_product_qty', store=True)
+    upd_product_qty = fields.Float('Quantity', compute='_compute_upd_product_qty', store=True, digits='Product Unit of Measure')
     uom_change = fields.Char('Unit of Measure', compute='_compute_change', compute_sudo=True)
     operation_change = fields.Char(compute='_compute_change', string='Consumed in Operation', compute_sudo=True)
     conflict = fields.Boolean()

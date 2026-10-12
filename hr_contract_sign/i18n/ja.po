@@ -1,23 +1,27 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* hr_contract_sign
-# 
+# * hr_contract_sign
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Junko Augias, 2025
+#
+# "Junko Augias (juau)" <juau@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:27+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Japanese (https://app.transifex.com/odoo/teams/41243/ja/)\n"
+"POT-Creation-Date: 2025-12-29 18:47+0000\n"
+"PO-Revision-Date: 2026-06-06 11:19+0000\n"
+"Last-Translator: \"Junko Augias (juau)\" <juau@odoo.com>\n"
+"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-18/"
+"hr_contract_sign/ja/>\n"
+"Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: ja\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 2026.6.1\n"
 
 #. module: hr_contract_sign
 #. odoo-python
@@ -71,6 +75,11 @@ msgid "Attachment"
 msgstr "添付ファイル"
 
 #. module: hr_contract_sign
+#: model:sign.template,redirect_url_text:hr_contract_sign.template_sign_termination
+msgid "Close"
+msgstr "クローズ"
+
+#. module: hr_contract_sign
 #: model:ir.model.fields,field_description:hr_contract_sign.field_hr_contract_sign_document_wizard__contract_id
 msgid "Contract"
 msgstr "契約"
@@ -113,7 +122,7 @@ msgstr "ドキュメント署名"
 #. module: hr_contract_sign
 #: model:ir.model.fields,field_description:hr_contract_sign.field_mail_activity_plan_template__sign_template_id
 msgid "Document to sign"
-msgstr "未署名ドキュメント"
+msgstr "署名対象ドキュメント"
 
 #. module: hr_contract_sign
 #: model:ir.model.fields,field_description:hr_contract_sign.field_hr_contract_sign_document_wizard__sign_template_ids
@@ -123,12 +132,17 @@ msgstr "未署名ドキュメント"
 #. module: hr_contract_sign
 #: model:ir.model.fields,help:hr_contract_sign.field_hr_contract_sign_document_wizard__sign_template_ids
 msgid ""
-"Documents to sign. Only documents with 1 or 2 different responsible are selectable.\n"
-"        Documents with 1 responsible will only have to be signed by the employee while documents with 2 different responsible will have to be signed by both the employee and the responsible.\n"
+"Documents to sign. Only documents with 1 or 2 different responsible are "
+"selectable.\n"
+"        Documents with 1 responsible will only have to be signed by the "
+"employee while documents with 2 different responsible will have to be signed "
+"by both the employee and the responsible.\n"
 "        "
 msgstr ""
-"未署名ドキュメント。選択できるのは、1つまたは2つの異なる責任者を持つドキュメントのみです。\n"
-"        責任者が1名のドキュメントには従業員のみが署名する必要がありますが、責任者が2名のドキュメントには従業員と責任者の両方が署名する必要があります。\n"
+"未署名ドキュメント。選択できるのは、1つまたは2つの異なる責任者を持つドキュメ"
+"ントのみです。\n"
+"        責任者が1名のドキュメントには従業員のみが署名する必要がありますが、責"
+"任者が2名のドキュメントには従業員と責任者の両方が署名する必要があります。\n"
 "        "
 
 #. module: hr_contract_sign
@@ -142,12 +156,14 @@ msgid ""
 "Email used to send the signature request.\n"
 "                - Work takes the email defined in \"work email\"\n"
 "                - Private takes the email defined in Private Information\n"
-"                - If the selected email is not defined, the available one will be used."
+"                - If the selected email is not defined, the available one "
+"will be used."
 msgstr ""
 "署名依頼の送信に使用されるEメール。\n"
 "                - 社用は、\"社用メール\"で定義されたEメールを使用します。\n"
 "                - 非公開は、私用メールで定義されたEメールを使用します。\n"
-"                - 選択したEメールが定義されていない場合、利用可能なものが使用されます。"
+"                - 選択したEメールが定義されていない場合、利用可能なものが使用"
+"されます。"
 
 #. module: hr_contract_sign
 #: model:ir.model,name:hr_contract_sign.model_hr_employee
@@ -163,7 +179,7 @@ msgstr "従業員契約"
 #: model:ir.model.fields,field_description:hr_contract_sign.field_hr_contract_sign_document_wizard__employee_role_id
 #: model:ir.model.fields,field_description:hr_contract_sign.field_mail_activity_plan_template__employee_role_id
 msgid "Employee Role"
-msgstr "従業員役割"
+msgstr "従業員役職"
 
 #. module: hr_contract_sign
 #: model:ir.model.fields,help:hr_contract_sign.field_hr_contract_sign_document_wizard__employee_role_id
@@ -171,7 +187,9 @@ msgstr "従業員役割"
 msgid ""
 "Employee's role on the templates to sign. The same role must be present in "
 "all the templates"
-msgstr "署名するテンプレート上の従業員の役割。全てのテンプレートに同じ役割が存在する必要があります。"
+msgstr ""
+"署名するテンプレート上の従業員の役割。全てのテンプレートに同じ役割が存在する"
+"必要があります。"
 
 #. module: hr_contract_sign
 #: model:ir.model.fields,field_description:hr_contract_sign.field_hr_contract_sign_document_wizard__employee_ids
@@ -227,8 +245,8 @@ msgstr "メッセージ"
 #. odoo-python
 #: code:addons/hr_contract_sign/wizard/hr_contract_sign_document_wizard.py:0
 msgid ""
-"No appropriate template could be found, please make sure you configured them"
-" properly."
+"No appropriate template could be found, please make sure you configured them "
+"properly."
 msgstr "適切なテンプレートが見つかりません。正確に設定したか確認して下さい。"
 
 #. module: hr_contract_sign
@@ -241,11 +259,6 @@ msgstr "利用可能なテンプレートなし"
 #: code:addons/hr_contract_sign/wizard/hr_contract_sign_document_wizard.py:0
 msgid "Only %s has to sign."
 msgstr " %s のみ署名が必要です。"
-
-#. module: hr_contract_sign
-#: model:sign.template,redirect_url_text:hr_contract_sign.template_sign_termination
-msgid "Open Link"
-msgstr "リンクを開く"
 
 #. module: hr_contract_sign
 #: model_terms:ir.ui.view,arch_db:hr_contract_sign.view_hr_contract_sign

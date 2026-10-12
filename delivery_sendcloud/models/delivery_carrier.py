@@ -30,7 +30,7 @@ class DeliveryCarrier(models.Model):
     sendcloud_can_batch_shipping = fields.Boolean(
         related="sendcloud_shipping_id.has_multicollo")
     sendcloud_use_batch_shipping = fields.Boolean(
-        string="Use Batch Shipping",
+        string="Use Multicollo",
         help="When sending multiple parcels, combine them in one shipment. Not supported for international shipping requiring customs' documentation",)
 
     @api.constrains('delivery_type', 'sendcloud_public_key', 'sendcloud_secret_key')
@@ -192,6 +192,8 @@ class DeliveryCarrier(models.Model):
 
     def sendcloud_get_tracking_link(self, picking):
         sendcloud = self._get_sendcloud()
+        if not picking.sendcloud_parcel_ref:
+            return
         # since there can be more than one id stored, comma seperated, only the first will be tracked
         parcel_id = picking.sendcloud_parcel_ref[0]
         if isinstance(parcel_id, list):  # Multicollo
@@ -370,3 +372,10 @@ class DeliveryCarrier(models.Model):
         doc_ids = self.env['ir.attachment'].create(docs)
 
         return list(parcel_ids.values()), parcel_tracking_numbers, doc_ids
+
+    def _get_delivery_type(self):
+        """ Override of delivery to return the sendcloud delivery type."""
+        res = super()._get_delivery_type()
+        if self.delivery_type != 'sendcloud':
+            return res
+        return self.sendcloud_shipping_id.carrier

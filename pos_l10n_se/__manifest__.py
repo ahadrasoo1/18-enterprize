@@ -12,7 +12,6 @@
     """,
     'depends': ['pos_restaurant', 'pos_iot', 'l10n_se'],
     'data': [
-        'views/pos_daily_reports.xml',
         'views/pos_config.xml',
         'views/res_config_settings_views.xml',
         'views/pos_order.xml',
@@ -20,6 +19,9 @@
     'assets': {
         'point_of_sale._assets_pos': [
             'pos_l10n_se/static/src/**/*',
+        ],
+        'web.assets_tests': [
+            'pos_l10n_se/static/tests/**/*'
         ],
     },
     'installable': True,

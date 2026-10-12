@@ -2,27 +2,37 @@
 
 import { ListController } from "@web/views/list/list_controller";
 import { _t } from "@web/core/l10n/translation";
+import { useBus, useService } from "@web/core/utils/hooks";
+import { DocumentsControllerMixin } from "@documents/views/documents_controller_mixin";
 import { openDeleteConfirmationDialog, preSuperSetup, useDocumentView } from "@documents/views/hooks";
 import { useRef, useState } from "@odoo/owl";
 
-export class DocumentsListController extends ListController {
+export class DocumentsListController extends DocumentsControllerMixin(ListController) {
     static template = "documents.DocumentsListController";
     setup() {
         preSuperSetup();
         super.setup(...arguments);
         this.uploadFileInputRef = useRef("uploadFileInput");
+        this.documentService = useService("document.document");
         const properties = useDocumentView(this.documentsViewHelpers());
         Object.assign(this, properties);
+
+        useBus(this.model.env.documentsView.bus, "documents-export-selection", (ev) => {
+            this.onExportData();
+        });
 
         this.documentStates = useState({
             previewStore: {},
         });
+        if (!this.documentService.userIsInternal) {
+            this.archInfo.columns = this.archInfo.columns.filter(
+                (col) => !this.internalOnlyColumns.includes(col.name)
+            );
+        }
     }
 
-    get modelParams() {
-        const modelParams = super.modelParams;
-        modelParams.multiEdit = true;
-        return modelParams;
+    get internalOnlyColumns() {
+        return ["company_id"];
     }
 
     /**
@@ -31,9 +41,9 @@ export class DocumentsListController extends ListController {
     documentsViewHelpers() {
         return {
             getSelectedDocumentsElements: () =>
-                this.root.el.querySelectorAll(
+                this.root?.el?.querySelectorAll(
                     ".o_data_row.o_data_row_selected .o_list_record_selector"
-                ),
+                ) || [],
             setPreviewStore: (previewStore) => {
                 this.documentStates.previewStore = previewStore;
             },

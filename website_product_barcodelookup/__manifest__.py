@@ -7,6 +7,11 @@
     'data': [
         'data/product_data.xml',
     ],
+    'assets': {
+        'web.assets_tests': [
+            'website_product_barcodelookup/static/tests/**/*',
+        ],
+    },
     'auto_install': True,
     'license': 'OEEL-1',
 }

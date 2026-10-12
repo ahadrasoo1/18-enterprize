@@ -4,6 +4,7 @@ import json
 
 from odoo.exceptions import UserError
 from odoo.addons.hr_referral.tests.common import TestHrReferralBase
+from odoo.tests import Form
 
 
 class TestHrReferral(TestHrReferralBase):
@@ -22,7 +23,7 @@ class TestHrReferral(TestHrReferralBase):
     def test_referral_change_referrer(self):
         # Create an applicant
         job_applicant = self.env['hr.applicant'].create({
-            'candidate_id': self.env['hr.candidate'].create({'partner_name': 'Technical worker'}).id,
+            'candidate_id': self.env['hr.candidate'].create({'partner_name': 'Technical worker', 'company_id': self.company_1.id}).id,
             'job_id': self.job_dev.id,
             'ref_user_id': self.richard_user.id
         })
@@ -41,7 +42,7 @@ class TestHrReferral(TestHrReferralBase):
         with self.assertRaises(UserError):
             self.mug_shop.sudo().buy()
         job_applicant = self.env['hr.applicant'].create({
-            'candidate_id': self.env['hr.candidate'].create({'partner_name': 'Technical worker'}).id,
+            'candidate_id': self.env['hr.candidate'].create({'partner_name': 'Technical worker', 'company_id': self.company_1.id}).id,
             'job_id': self.job_dev.id,
             'ref_user_id': self.richard_user.id,
             'company_id': self.company_1.id
@@ -64,7 +65,7 @@ class TestHrReferral(TestHrReferralBase):
         self.env['hr.referral.link.to.share'].with_user(self.richard_user.id).create({'job_id': self.job_dev.id}).url
 
         job_applicant = self.env['hr.applicant'].create({
-            'candidate_id': self.env['hr.candidate'].create({'partner_name': 'Technical worker'}).id,
+            'candidate_id': self.env['hr.candidate'].create({'partner_name': 'Technical worker', 'company_id': self.company_1.id}).id,
             'job_id': self.job_dev.id,
             'source_id': self.richard_user.utm_source_id.id
         })
@@ -98,7 +99,7 @@ class TestHrReferral(TestHrReferralBase):
             'points': 1000,  # points must be ignored for 'not hired stage'
         })
         job_applicant = self.env['hr.applicant'].create({
-            'candidate_id': self.env['hr.candidate'].create({'partner_name': 'Technical worker'}).id,
+            'candidate_id': self.env['hr.candidate'].create({'partner_name': 'Technical worker', 'company_id': self.company_1.id}).id,
             'job_id': self.job_dev.id,
             'ref_user_id': self.richard_user.id,
             'company_id': self.company_1.id,
@@ -165,7 +166,7 @@ class TestHrReferral(TestHrReferralBase):
             'points': 0,
         })
         job_applicant = self.env['hr.applicant'].create({
-            'candidate_id': self.env['hr.candidate'].create({'partner_name': 'Technical worker'}).id,
+            'candidate_id': self.env['hr.candidate'].create({'partner_name': 'Technical worker', 'company_id': self.company_1.id}).id,
             'job_id': self.job_dev.id,
             'ref_user_id': self.richard_user.id,
             'company_id': self.company_1.id,
@@ -180,3 +181,86 @@ class TestHrReferral(TestHrReferralBase):
         job_applicant.stage_id = stage_parking_1
         info_dashboard = json.loads(job_applicant.shared_item_infos)
         self.assertEqual([x['done'] for x in info_dashboard], [True, True, True, True, True, True, False, False], 'parking2 should not be marked as done anymore')
+
+    def test_referral_reset_applicant(self):
+        """Test that reset_applicant correctly resets the referral state to 'progress'"""
+        # Create an applicant in 'progress' state
+        applicant = self.env['hr.applicant'].create({
+            'partner_name': 'Test Applicant',
+            'candidate_id': self.env['hr.candidate'].create({'partner_name': 'Test Applicant', 'company_id': self.company_1.id}).id,
+            'job_id': self.job_dev.id,
+            'ref_user_id': self.richard_user.id,
+            'referral_state': 'progress'
+        })
+        # Change state to 'hired'
+        applicant.write({'referral_state': 'hired'})
+        self.assertEqual(applicant.referral_state, 'hired', "Applicant referral state should be 'hired'")
+        # Reset the applicant
+        applicant.reset_applicant()
+        # Check if the referral state is reset to 'progress'
+        self.assertEqual(applicant.referral_state, 'progress', "After reset_applicant, referral state should be 'progress'")
+        # Test resetting from 'closed' state
+        applicant.write({'referral_state': 'closed'})
+        self.assertEqual(applicant.referral_state, 'closed', "Applicant referral state should be 'closed'")
+        # Reset the applicant again
+        applicant.reset_applicant()
+        # Check if the referral state is reset to 'progress'
+        self.assertEqual(applicant.referral_state, 'progress', "After reset_applicant, referral state should be 'progress'")
+
+    def test_referral_reset_applicant_batch(self):
+        """Test that reset_applicant correctly works when called on multiple records"""
+        # Create applicants with different referral states
+        applicants = self.env['hr.applicant'].create([
+            {
+                'partner_name': 'Applicant 1',
+                'candidate_id': self.env['hr.candidate'].create({'partner_name': 'Applicant 1', 'company_id': self.company_1.id}).id,
+                'job_id': self.job_dev.id,
+                'ref_user_id': self.richard_user.id,
+                'referral_state': 'hired'
+            },
+            {
+                'partner_name': 'Applicant 2',
+                'candidate_id': self.env['hr.candidate'].create({'partner_name': 'Applicant 2', 'company_id': self.company_1.id}).id,
+                'job_id': self.job_dev.id,
+                'ref_user_id': self.steve_user.id,
+                'referral_state': 'closed'
+            },
+            {
+                'partner_name': 'Applicant 3',
+                'candidate_id': self.env['hr.candidate'].create({'partner_name': 'Applicant 3', 'company_id': self.company_1.id}).id,
+                'job_id': self.job_dev.id,
+                'ref_user_id': self.richard_user.id,
+                'referral_state': 'progress'
+            }
+        ])
+        # Test initial states
+        self.assertEqual(applicants[0].referral_state, 'hired')
+        self.assertEqual(applicants[1].referral_state, 'closed')
+        self.assertEqual(applicants[2].referral_state, 'progress')
+        # Reset all applicants at once
+        applicants.reset_applicant()
+        # Verify all records have been reset to 'progress'
+        for applicant in applicants:
+            self.assertEqual(applicant.referral_state, 'progress', f"Applicant {applicant.partner_name} should have referral_state 'progress' after reset")
+
+    def test_source_field_gets_saved(self):
+        """
+        Make sure source field is not removed when
+        saving the applicant record
+        """
+        source = self.env['utm.source'].create({
+            'name': 'Linkedin',
+        })
+
+        candidate = self.env['hr.candidate'].create({
+            'partner_name': 'Master Splinter',
+            'company_id': self.company_1.id,
+        })
+
+        with Form(self.env['hr.applicant']) as app:
+            app.candidate_id = candidate
+            app.job_id = self.job_dev
+            app.source_id = source
+
+        app.save()
+        self.assertEqual(app.record.source_id.id, source.id)

@@ -1,22 +1,23 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* project_forecast
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Abe Manyo, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:28+0000\n"
+"POT-Creation-Date: 2025-12-29 18:48+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
+"Last-Translator: Abe Manyo, 2025\n"
 "Language-Team: Indonesian (https://app.transifex.com/odoo/teams/41243/id/)\n"
+"Language: id\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: id\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. module: project_forecast
@@ -27,7 +28,7 @@ msgstr "<b>Project:</b>"
 #. module: project_forecast
 #: model:ir.ui.menu,name:project_forecast.planning_menu_schedule_by_project
 msgid "By Project"
-msgstr "Oleh Proyek"
+msgstr "Oleh Project"
 
 #. module: project_forecast
 #: model:ir.model.fields,field_description:project_forecast.field_planning_slot_template__company_id
@@ -43,7 +44,7 @@ msgstr "Mari memulai perencanaan Anda dengan menambahkan shift baru."
 #: model_terms:ir.ui.view,arch_db:project_forecast.planning_slot_template_inherit_view_search
 #: model_terms:ir.ui.view,arch_db:project_forecast.planning_slot_view_search
 msgid "My Projects"
-msgstr "Proyek"
+msgstr "Project"
 
 #. module: project_forecast
 #: model_terms:ir.actions.act_window,help:project_forecast.planning_action_schedule_by_project
@@ -87,7 +88,7 @@ msgstr "Merencanakan Shift"
 #: model_terms:ir.ui.view,arch_db:project_forecast.planning_slot_view_search
 #: model_terms:ir.ui.view,arch_db:project_forecast.resource_planning_project_forecast
 msgid "Project"
-msgstr "Proyek"
+msgstr "Project"
 
 #. module: project_forecast
 #: model_terms:ir.ui.view,arch_db:project_forecast.planning_shift_ics_description_inherit
@@ -129,6 +130,12 @@ msgstr "Tester"
 #. odoo-python
 #: code:addons/project_forecast/models/project.py:0
 msgid ""
-"You cannot update the company for project %(project_name)s as it's linked to shifts in another company.\n"
-"If you want to change the company for another, leave the project's company blank, transfer shifts %(slots_names)s to the destination company and then change the project's company."
+"You cannot update the company for the %(project_name)s project because it’s "
+"tied to shifts in another company.\n"
+"To change it, first clear the company field for the project. Then move the "
+"shifts to the new company, and update the project's company."
 msgstr ""
+"Anda tidak dapat mengupdate perusahaan untuk project %(project_name)s karena "
+"terhubung ke shift di perusahaan lain.\n"
+"Untuk mengubahnya, hapus field perusahaan pada project. Lalu pindahkan shift "
+"ke perusahaan yang baru, dan update perusahaan project."

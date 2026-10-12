@@ -24,6 +24,7 @@ patch(PosStore.prototype, {
     },
     async addLineToCurrentOrder(vals, opt = {}, configure = true) {
         const product = vals.product_id;
+        const productTaxesIds = product.taxes_id.map((tax) => tax.id);
         if (this.useBlackBoxSweden() && product.taxes_id.length === 0) {
             this.dialog.add(AlertDialog, {
                 title: _t("POS error"),
@@ -33,7 +34,7 @@ patch(PosStore.prototype, {
         } else if (
             this.useBlackBoxSweden() &&
             !this.models["account.tax"]
-                .get(product.taxes_id)
+                .filter((tax) => productTaxesIds.includes(tax.id))
                 ?.every((tax) => tax.tax_group_id.pos_receipt_label)
         ) {
             this.dialog.add(AlertDialog, {
@@ -59,29 +60,23 @@ patch(PosStore.prototype, {
             return await super.addLineToCurrentOrder(vals, opt, configure);
         }
     },
-    async printReceipt() {
+    async printReceipt({ order = this.get_order() } = {}) {
         if (this.useBlackBoxSweden()) {
-            const order = this.props.order;
-
             if (order) {
-                const isReprint = await this.data.call("pos.order", "is_already_reprint", [
-                    [this.validated_orders_name_server_id_map[order.name]],
-                ]);
-                if (isReprint) {
+                if (order.nb_print > 1) {
                     this.dialog.add(AlertDialog, {
                         title: _t("POS error"),
                         body: _t("A duplicate has already been printed once."),
                     });
-                } else {
+                    return;
+                }
+                if (order.nb_print === 1) {
                     order.receipt_type = "kopia";
-                    await this.push_single_order(order);
+                    await this.pushSingleOrder(order);
                     order.receipt_type = false;
                     order.isReprint = true;
-                    await this.data.call("pos.order", "set_is_reprint", [
-                        [this.validated_orders_name_server_id_map[order.name]],
-                    ]);
-                    return super.printReceipt(...arguments);
                 }
+                return super.printReceipt(...arguments);
             }
         } else {
             return super.printReceipt(...arguments);

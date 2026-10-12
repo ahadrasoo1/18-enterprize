@@ -1,23 +1,30 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* account_sepa_direct_debit
-# 
+# * account_sepa_direct_debit
+#
 # Translators:
-# Wil Odoo, 2024
-# 
+# Aleš Fiala <f.ales1@seznam.cz>, 2024
+# Wil Odoo, 2025
+# Stanislav Kurinec, 2025
+# Vojtěch Olšan, 2025
+# Marta Wacławek, 2025
+# "Marta (wacm)" <wacm@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:26+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Czech (https://app.transifex.com/odoo/teams/41243/cs/)\n"
+"POT-Creation-Date: 2026-06-19 17:47+0000\n"
+"PO-Revision-Date: 2026-02-27 05:16+0000\n"
+"Last-Translator: \"Marta (wacm)\" <wacm@odoo.com>\n"
+"Language-Team: Czech <https://translate.odoo.com/projects/odoo-18/"
+"account_sepa_direct_debit/cs/>\n"
+"Language: cs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: cs\n"
-"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
+"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n "
+"<= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
+"X-Generator: Weblate 5.14.3\n"
 
 #. module: account_sepa_direct_debit
 #: model_terms:ir.ui.view,arch_db:account_sepa_direct_debit.sdd_mandate_form
@@ -30,58 +37,85 @@ msgid "(optional)"
 msgstr "(volitelný)"
 
 #. module: account_sepa_direct_debit
-#: model_terms:ir.ui.view,arch_db:account_sepa_direct_debit.sdd_mandate_form
-msgid "123456789"
-msgstr "123456789"
+#: model_terms:ir.ui.view,arch_db:account_sepa_direct_debit.account_sepa_direct_debit_mandate_form
+msgid ""
+".\n"
+"                                Make sure the mandate isn't meant for the "
+"parent contact."
+msgstr ""
+".\n"
+"Ujistěte se, že mandát není určen pro nadřízený kontakt."
 
 #. module: account_sepa_direct_debit
-#: model_terms:ir.ui.view,arch_db:account_sepa_direct_debit.sdd_mandate_form
-msgid "2023-08-10"
-msgstr "10. 8. 2023"
-
-#. module: account_sepa_direct_debit
-#: model_terms:ir.ui.view,arch_db:account_sepa_direct_debit.sdd_mandate_form
-msgid "2023-09-10"
-msgstr "10. 9. 2023"
-
-#. module: account_sepa_direct_debit
-#: model_terms:ir.ui.view,arch_db:account_sepa_direct_debit.sdd_mandate_form
-msgid "380055"
-msgstr "380055"
-
-#. module: account_sepa_direct_debit
-#: model_terms:ir.ui.view,arch_db:account_sepa_direct_debit.sdd_mandate_form
-msgid "3956012345678"
-msgstr "3956012345678"
+#: model_terms:ir.ui.view,arch_db:account_sepa_direct_debit.view_batch_payment_form_inherit
+msgid ""
+".\n"
+"                        SEPA requires a 5 days notice."
+msgstr ""
+".\n"
+"SEPA vyžaduje 5denní oznámení."
 
 #. module: account_sepa_direct_debit
 #: model:mail.template,body_html:account_sepa_direct_debit.email_template_sdd_new_mandate
 msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
-"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
-"                        Dear <t t-out=\"object.partner_id.display_name or ''\">Azure Interior</t>\n"
-"                        <br>\n"
-"                        <br>\n"
-"                        Here is your SEPA Direct Debit Mandate to sign to authorize\n"
-"                        <t t-out=\"object.company_id.display_name or ''\">YourCompany</t>\n"
-"                        to send instructions to your bank to debit your account in accordance with the instructions from\n"
-"                        <t t-out=\"object.company_id.display_name or ''\">YourCompany</t>\n"
-"                        Do not hesitate to contact us if you have any questions.\n"
-"                        <br>\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
+"\">\n"
+"                        Dear <t t-out=\"object.partner_id.display_name or "
+"''\">Azure Interior</t>\n"
+"                        <br/>\n"
+"                        <br/>\n"
+"                        Here is your SEPA Direct Debit Mandate to sign to "
+"authorize\n"
+"                        <t t-out=\"object.company_id.display_name or "
+"''\">YourCompany</t>\n"
+"                        to send instructions to your bank to debit your "
+"account in accordance with the instructions from\n"
+"                        <t t-out=\"object.company_id.display_name or "
+"''\">YourCompany</t>\n"
+"                        Do not hesitate to contact us if you have any "
+"questions.\n"
+"                        <br/>\n"
 "                        Best regards,\n"
-"                        <t t-if=\"not is_html_empty(user.signature)\">\n"
-"                            <br><br>\n"
-"                            <t t-out=\"user.signature\">--<br>Mitchell Admin</t>\n"
+"                        <t t-if=\"not is_html_empty(user.signature)\" data-o-"
+"mail-quote-container=\"1\">\n"
+"                            <br/><br/>\n"
+"                            <t t-out=\"user.signature\" data-o-mail-"
+"quote=\"1\">--<br data-o-mail-quote=\"1\"/>Mitchell Admin</t>\n"
 "                        </t>\n"
 "                    </p>\n"
 "                </div>\n"
 "            "
 msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
+"\">\n"
+"                        Dobrý den<t t-out=\"object.partner_id.display_name "
+"or ''\">Azure Interior</t>\n"
+"                        <br/>\n"
+" <br/> \n"
+"V příloze zasíláme mandát k inkasu SEPA. Jeho podpisem udělíte společnosti \n"
+"<t t-out=\"object.company_id.display_name or ''\">YourCompany</t>\n"
+"souhlas k inkasování plateb z vašeho účtu v souladu s dohodnutými podmínkami "
+"od\n"
+" <t t-out=\"object.company_id.display_name or ''\">YourCompany</t>\n"
+"V případě jakýchkoli dotazů nás neváhejte kontaktovat.\n"
+" <br/>\n"
+"S pozdravem,\n"
+"<t t-if=\"not is_html_empty(user.signature)\" data-o-mail-quote-"
+"container=\"1\">\n"
+"                            <br/><br/>\n"
+"                            <t t-out=\"user.signature\" data-o-mail-"
+"quote=\"1\"> --<br data-o-mail-quote=\"1\"/>>Mitchell Admin</t>\n"
+"                       </t>\n"
+"                    </p> \n"
+"               </div>\n"
+"            "
 
 #. module: account_sepa_direct_debit
 #: model_terms:ir.ui.view,arch_db:account_sepa_direct_debit.account_sepa_direct_debit_mandate_form
 msgid "<span> day(s)</span>"
-msgstr ""
+msgstr "<span> den(dny)</span>"
 
 #. module: account_sepa_direct_debit
 #: model_terms:ir.ui.view,arch_db:account_sepa_direct_debit.sdd_mandate_form
@@ -106,11 +140,11 @@ msgstr "<strong>Identifikátor věřitele:</strong>"
 #. module: account_sepa_direct_debit
 #: model_terms:ir.ui.view,arch_db:account_sepa_direct_debit.sdd_mandate_form
 msgid ""
-"<strong>Date and place of signature:</strong> "
-"......................................"
+"<strong>Date and place of signature:</"
+"strong> ......................................"
 msgstr ""
-"<strong>Datum a místo podpisu:</strong> "
-"......................................"
+"<strong>Datum a místo podpisu:</"
+"strong> ......................................"
 
 #. module: account_sepa_direct_debit
 #: model_terms:ir.ui.view,arch_db:account_sepa_direct_debit.sdd_mandate_form
@@ -130,11 +164,11 @@ msgstr "<strong>Identifikátor mandátu:</strong>"
 #. module: account_sepa_direct_debit
 #: model_terms:ir.ui.view,arch_db:account_sepa_direct_debit.sdd_mandate_form
 msgid ""
-"<strong>Name of the reference party:</strong> "
-"......................................"
+"<strong>Name of the reference party:</"
+"strong> ......................................"
 msgstr ""
-"<strong>Název referenční strany:</strong> "
-"......................................"
+"<strong>Název referenční strany:</"
+"strong> ......................................"
 
 #. module: account_sepa_direct_debit
 #: model_terms:ir.ui.view,arch_db:account_sepa_direct_debit.sdd_mandate_form
@@ -164,22 +198,35 @@ msgstr "<strong>PSČ: </strong>"
 #. module: account_sepa_direct_debit
 #: model:mail.template,body_html:account_sepa_direct_debit.email_template_sdd_pre_notification
 msgid ""
-"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-top: 16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; color: #454748; width: 100%; border-collapse:separate;\"><tr><td align=\"center\">\n"
-"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" style=\"padding: 16px; background-color: white; color: #454748; border-collapse:separate;\">\n"
+"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-top: "
+"16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; "
+"color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
+"align=\"center\">\n"
+"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" "
+"style=\"padding: 16px; background-color: white; color: #454748; border-"
+"collapse:separate;\">\n"
 "<tbody>\n"
 "    <!-- HEADER -->\n"
 "    <tr>\n"
 "        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
+"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
+"0px 8px 0px 8px; border-collapse:separate;\">\n"
 "                <tr><td valign=\"middle\">\n"
-"                    <t t-set=\"company\" t-value=\"object.company_id\"></t>\n"
-"                    <span style=\"font-size: 10px;\">Your Direct Debit Payment Notification</span><br>\n"
+"                    <t t-set=\"company\" t-value=\"object.company_id\"/>\n"
+"                    <span style=\"font-size: 10px;\">Your Direct Debit "
+"Payment Notification</span><br/>\n"
 "                </td></tr>\n"
-"                <tr><td valign=\"middle\" align=\"right\" t-if=\"not company.uses_default_logo\">\n"
-"                    <img t-attf-src=\"/logo.png?company={{ company.id }}\" style=\"padding: 0px; margin: 0px; height: auto; width: 80px;\" t-att-alt=\"company.name\">\n"
+"                <tr><td valign=\"middle\" align=\"right\" t-if=\"not "
+"company.uses_default_logo\">\n"
+"                    <img t-attf-src=\"/logo.png?company={{ company.id }}\" "
+"style=\"padding: 0px; margin: 0px; height: auto; width: 80px;\" t-att-"
+"alt=\"company.name\"/>\n"
 "                </td></tr>\n"
 "                <tr><td colspan=\"2\" style=\"text-align:center;\">\n"
-"                    <hr width=\"100%\" style=\"background-color:rgb(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin:16px 0px 16px 0px;\">\n"
+"                    <hr width=\"100%\" style=\"background-"
+"color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
+"size:0px;min-height:1px;line-height:0; margin:16px 0px 16px 0px;\"/>\n"
 "                </td></tr>\n"
 "            </table>\n"
 "        </td>\n"
@@ -188,34 +235,47 @@ msgid ""
 "    <!-- CONTENT -->\n"
 "    <tr>\n"
 "        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
+"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
+"0px 8px 0px 8px; border-collapse:separate;\">\n"
 "                <tr><td valign=\"top\" style=\"font-size: 13px;\">\n"
-"                    Dear <t t-out=\"object.partner_id.name or ''\">Azure Interior</t><br>\n"
-"                    <br>\n"
+"                    Dear <t t-out=\"object.partner_id.name or ''\">Azure "
+"Interior</t><br/>\n"
+"                    <br/>\n"
 "                    A Direct Debit payment request amounting to\n"
-"                    <span style=\"font-weight:bold;\" t-out=\"format_amount(object.amount, object.currency_id) or ''\">$ 0.00</span>\n"
-"                    will be sent to your bank.<br>\n"
-"                    Your account ending with <t t-out=\"ctx.get('iban_last_4') or ''\">1234</t> will be automatically debited on the\n"
-"                    <span style=\"font-weight:bold;\" t-out=\"format_date(ctx.get('collection_date'))\">2020-04-18</span>,\n"
-"                    or shortly thereafter.<br>\n"
-"                    please make sure you have the requested funds.<br>\n"
-"                    <br>\n"
-"                    <t t-if=\"ctx.get('creditor_iban') or ctx.get('mandate_ref')\">\n"
-"                        Merchant data:<br>\n"
+"                    <span style=\"font-weight:bold;\" t-"
+"out=\"format_amount(object.amount, object.currency_id) or ''\">$ 0.00</"
+"span>\n"
+"                    will be sent to your bank.<br/>\n"
+"                    Your account ending with <t t-"
+"out=\"ctx.get('iban_last_4') or ''\">1234</t> will be automatically debited "
+"on the\n"
+"                    <span style=\"font-weight:bold;\" t-"
+"out=\"format_date(ctx.get('collection_date'))\">2020-04-18</span>,\n"
+"                    or shortly thereafter.<br/>\n"
+"                    please make sure you have the requested funds.<br/>\n"
+"                    <br/>\n"
+"                    <t t-if=\"ctx.get('creditor_iban') or "
+"ctx.get('mandate_ref')\">\n"
+"                        Merchant data:<br/>\n"
 "                        <ul>\n"
 "                            <t t-if=\"ctx.get('creditor_iban')\">\n"
-"                                <li>IBAN: <t t-out=\"ctx['creditor_iban'] or ''\">NO 93 8601 1117947</t></li>\n"
+"                                <li>IBAN: <t t-out=\"ctx['creditor_iban'] or "
+"''\">NO 93 8601 1117947</t></li>\n"
 "                            </t>\n"
 "                            <t t-if=\"ctx.get('mandate_ref')\">\n"
-"                                <li>SEPA DIRECT DEBIT MANDATE REFERENCE: <t t-out=\"ctx['mandate_ref'] or ''\"></t></li>\n"
+"                                <li>SEPA DIRECT DEBIT MANDATE REFERENCE: <t "
+"t-out=\"ctx['mandate_ref'] or ''\"/></li>\n"
 "                            </t>\n"
 "                        </ul>\n"
 "                    </t>\n"
-"                    <br>\n"
+"                    <br/>\n"
 "                    Do not hesitate to contact us if you have any question.\n"
 "                </td></tr>\n"
 "                <tr><td style=\"text-align:center;\">\n"
-"                    <hr width=\"100%\" style=\"background-color:rgb(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;\">\n"
+"                    <hr width=\"100%\" style=\"background-"
+"color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
+"size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;\"/>\n"
 "                </td></tr>\n"
 "            </table>\n"
 "        </td>\n"
@@ -223,19 +283,27 @@ msgid ""
 "    <!-- FOOTER -->\n"
 "    <tr>\n"
 "        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-color: white; font-size: 11px; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
+"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; font-size: "
+"11px; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
 "                <tr><td valign=\"middle\" align=\"left\">\n"
 "                    <t t-out=\"company.name or ''\">YourCompany</t>\n"
 "                </td></tr>\n"
-"                <tr><td valign=\"middle\" align=\"left\" style=\"opacity: 0.7;\">\n"
+"                <tr><td valign=\"middle\" align=\"left\" style=\"opacity: "
+"0.7;\">\n"
 "                    <t t-if=\"company.phone\">\n"
-"                        <t t-out=\"company.phone or ''\">+1 650-123-4567</t> |\n"
+"                        <t t-out=\"company.phone or ''\">+1 650-123-4567</t> "
+"|\n"
 "                    </t>\n"
 "                    <t t-if=\"company.email\">\n"
-"                        <a t-attf-href=\"'mailto:%s' % {{ company.email }}\" style=\"text-decoration:none; color: #454748;\" t-out=\"company.email or ''\">info@yourcompany.com</a> |\n"
+"                        <a t-attf-href=\"'mailto:%s' % {{ company.email }}\" "
+"style=\"text-decoration:none; color: #454748;\" t-out=\"company.email or "
+"''\">info@yourcompany.com</a> |\n"
 "                    </t>\n"
 "                    <t t-if=\"company.website\">\n"
-"                        <a t-attf-href=\"'%s' % {{ company.website }}\" style=\"text-decoration:none; color: #454748;\" t-out=\"company.website or ''\">http://www.example.com</a>\n"
+"                        <a t-attf-href=\"'%s' % {{ company.website }}\" "
+"style=\"text-decoration:none; color: #454748;\" t-out=\"company.website or "
+"''\">http://www.example.com</a>\n"
 "                    </t>\n"
 "                </td></tr>\n"
 "            </table>\n"
@@ -246,55 +314,214 @@ msgid ""
 "</td></tr>\n"
 "<!-- POWERED BY -->\n"
 "<tr><td align=\"center\" style=\"min-width: 590px;\">\n"
-"    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-color: #F1F1F1; color: #454748; padding: 8px; border-collapse:separate;\">\n"
+"    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" "
+"style=\"min-width: 590px; background-color: #F1F1F1; color: #454748; "
+"padding: 8px; border-collapse:separate;\">\n"
 "      <tr><td style=\"text-align: center; font-size: 13px;\">\n"
-"        Powered by <a target=\"_blank\" href=\"https://www.odoo.com?utm_source=db&amp;utm_medium=mail\" style=\"color: #875A7B;\">Odoo</a>\n"
+"        Powered by <a target=\"_blank\" href=\"https://www.odoo.com?"
+"utm_source=db&amp;utm_medium=mail\" style=\"color: #875A7B;\">Odoo</a>\n"
 "      </td></tr>\n"
 "    </table>\n"
 "</td></tr>\n"
 "</table>\n"
 "            "
 msgstr ""
+"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-top: "
+"16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; "
+"color: #454748; width: 100%; border-collapse:separate;\"><tr><td "
+"align=\"center\">\n"
+"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" "
+"style=\"padding: 16px; background-color: white; color: #454748; border-"
+"collapse:separate;\">\n"
+"<tbody>\n"
+"    <!-- HEADER -->\n"
+"    <tr>\n"
+"        <td align=\"center\" style=\"min-width: 590px;\">\n"
+"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
+"0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                <tr><td valign=\"middle\">\n"
+"                    <t t-set=\"company\" t-value=\"object.company_id\"/>\n"
+"                    <span style=\"font-size: 10px;\">Vaše oznámení o platbě "
+"inkasem</span><br/>\n"
+"                </td></tr>\n"
+"                <tr><td valign=\"middle\" align=\"right\" t-if=\"not "
+"company.uses_default_logo\">\n"
+"                    <img t-attf-src=\"/logo.png?company={{ company.id }}\" "
+"style=\"padding: 0px; margin: 0px; height: auto; width: 80px;\" t-att-"
+"alt=\"company.name\"/>\n"
+"                </td></tr>\n"
+"                <tr><td colspan=\"2\" style=\"text-align:center;\">\n"
+"                    <hr width=\"100%\" style=\"background-"
+"color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
+"size:0px;min-height:1px;line-height:0; margin:16px 0px 16px 0px;\"/>\n"
+"                </td></tr>\n"
+"            </table>\n"
+"        </td>\n"
+"    </tr>\n"
+"\n"
+"    <!-- CONTENT -->\n"
+"    <tr>\n"
+"        <td align=\"center\" style=\"min-width: 590px;\">\n"
+"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; padding: "
+"0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                <tr><td valign=\"top\" style=\"font-size: 13px;\">\n"
+"                    Dobrý den, <t t-out=\"object.partner_id.name or "
+"''\">Azure Interior</t><br/>\n"
+"                    <br/>\n"
+"                    Oznamujeme vám, že žádost o inkasní platbu ve výši\n"
+"                    <span style=\"font-weight:bold;\" t-"
+"out=\"format_amount(object.amount, object.currency_id) or ''\">$ 0.00</"
+"span>\n"
+"                    bude odeslána vaši bance.<br/>\n"
+"                    Z vašeho účtu končícího číslem <t t-"
+"out=\"ctx.get('iban_last_4') or ''\">1234</t> bude částka automatický "
+"stržena dne\n"
+"                    <span style=\"font-weight:bold;\" t-"
+"out=\"format_date(ctx.get('collection_date'))\">2020-04-18</span>,\n"
+"                    případně krátce poté.<br/>\n"
+"                    Prosíme, ujistěte se, že máte na účtu dostatek "
+"prostředků.<br/>\n"
+"                    <br/>\n"
+"                    <t t-if=\"ctx.get('creditor_iban') or "
+"ctx.get('mandate_ref')\">\n"
+"                        Údaje o obchodníkovi:<br/>\n"
+"                        <ul>\n"
+"                            <t t-if=\"ctx.get('creditor_iban')\">\n"
+"                                <li>IBAN: <t t-out=\"ctx['creditor_iban'] or "
+"''\">NO 93 8601 1117947</t></li>\n"
+"                            </t>\n"
+"                            <t t-if=\"ctx.get('mandate_ref')\">\n"
+"                                <li>REFERENČNÍ MANDÁT K PŘÍMÉMU INKASU SEPA: "
+"<t t-out=\"ctx['mandate_ref'] or ''\"/></li>\n"
+"                            </t>\n"
+"                        </ul>\n"
+"                    </t>\n"
+"                    <br/>\n"
+"                    V případě jakýchkoliv dotazů nás neváhejte kontaktovat.\n"
+"                </td></tr>\n"
+"                <tr><td style=\"text-align:center;\">\n"
+"                    <hr width=\"100%\" style=\"background-"
+"color:rgb(204,204,204);border:medium none;clear:both;display:block;font-"
+"size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;\"/>\n"
+"                </td></tr>\n"
+"            </table>\n"
+"        </td>\n"
+"    </tr>\n"
+"    <!-- FOOTER -->\n"
+"    <tr>\n"
+"        <td align=\"center\" style=\"min-width: 590px;\">\n"
+"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"width=\"590\" style=\"min-width: 590px; background-color: white; font-size: "
+"11px; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                <tr><td valign=\"middle\" align=\"left\">\n"
+"                    <t t-out=\"company.name or ''\">YourCompany</t>\n"
+"                </td></tr>\n"
+"                <tr><td valign=\"middle\" align=\"left\" style=\"opacity: "
+"0.7;\">\n"
+"                    <t t-if=\"company.phone\">\n"
+"                        <t t-out=\"company.phone or ''\">+1 650-123-4567</t> "
+"|\n"
+"                    </t>\n"
+"                    <t t-if=\"company.email\">\n"
+"                        <a t-attf-href=\"'mailto:%s' % {{ company.email }}\" "
+"style=\"text-decoration:none; color: #454748;\" t-out=\"company.email or "
+"''\">info@yourcompany.com</a> |\n"
+"                    </t>\n"
+"                    <t t-if=\"company.website\">\n"
+"                        <a t-attf-href=\"'%s' % {{ company.website }}\" "
+"style=\"text-decoration:none; color: #454748;\" t-out=\"company.website or "
+"''\">http://www.example.com</a>\n"
+"                    </t>\n"
+"                </td></tr>\n"
+"            </table>\n"
+"        </td>\n"
+"    </tr>\n"
+"</tbody>\n"
+"</table>\n"
+"</td></tr>\n"
+"<!-- POWERED BY -->\n"
+"<tr><td align=\"center\" style=\"min-width: 590px;\">\n"
+"    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" "
+"style=\"min-width: 590px; background-color: #F1F1F1; color: #454748; "
+"padding: 8px; border-collapse:separate;\">\n"
+"      <tr><td style=\"text-align: center; font-size: 13px;\">\n"
+"        Powered by <a target=\"_blank\" href=\"https://www.odoo.com?"
+"utm_source=db&amp;utm_medium=mail\" style=\"color: #875A7B;\">Odoo</a>\n"
+"      </td></tr>\n"
+"    </table>\n"
+"</td></tr>\n"
+"</table>\n"
+"            "
 
 #. module: account_sepa_direct_debit
 #: model:mail.template,body_html:account_sepa_direct_debit.email_template_sdd_mandate_expiring
 msgid ""
-"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-top: 16px; background-color: #FFFFFF; font-family:Verdana, Arial,sans-serif; color: #454748; width: 100%; border-collapse:separate;\">\n"
+"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-top: "
+"16px; background-color: #FFFFFF; font-family:Verdana, Arial,sans-serif; "
+"color: #454748; width: 100%; border-collapse:separate;\">\n"
 "                    <tr>\n"
 "                        <td align=\"center\">\n"
-"                            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" style=\"padding: 16px; background-color: #FFFFFF; color: #454748; border-collapse:separate;\">\n"
+"                            <table border=\"0\" cellpadding=\"0\" "
+"cellspacing=\"0\" width=\"590\" style=\"padding: 16px; background-color: "
+"#FFFFFF; color: #454748; border-collapse:separate;\">\n"
 "                                <tbody>\n"
 "                                    <!-- CONTENT -->\n"
 "                                    <tr>\n"
-"                                        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"                                            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                                        <td align=\"center\" style=\"min-"
+"width: 590px;\">\n"
+"                                            <table border=\"0\" "
+"cellpadding=\"0\" cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; "
+"background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;"
+"\">\n"
 "                                                <tr>\n"
-"                                                    <td valign=\"top\" style=\"font-size: 13px;\">\n"
+"                                                    <td valign=\"top\" "
+"style=\"font-size: 13px;\">\n"
 "                                                        <div>\n"
-"                                                            Hello,<br><br>\n"
-"                                                            A SEPA Direct Debit mandate will reach its automatic expiration date on <span t-out=\"format_date(object._get_expiry_date_per_mandate()[object])\">2020-04-18</span><br>\n"
-"                                                            This can be caused by one of the following reason:\n"
+"                                                            Hello,<br/><br/"
+">\n"
+"                                                            A SEPA Direct "
+"Debit mandate will reach its automatic expiration date on <span t-"
+"out=\"format_date(object._get_expiry_date_per_mandate()[object])"
+"\">2020-04-18</span><br/>\n"
+"                                                            This can be "
+"caused by one of the following reason:\n"
 "                                                            <ul>\n"
 "                                                                <li>\n"
-"                                                                    That date is the mandate end date agreed upon signature.\n"
+"                                                                    That "
+"date is the mandate end date agreed upon signature.\n"
 "                                                                </li>\n"
 "                                                                <li>\n"
-"                                                                    It would then be more than 36 months since the last time this mandate was used.\n"
+"                                                                    It would "
+"then be more than 36 months since the last time this mandate was used.\n"
 "                                                                </li>\n"
 "                                                            </ul>\n"
-"                                                            <div style=\"margin: 16px 0px 16px 0px;\">\n"
-"                                                                <a t-attf-href=\"{{ website_url }}/odoo/sdd-mandates/{{ object.id }}\" style=\"background-color: #4caf50; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;\">\n"
-"                                                                    Go to Mandate\n"
+"                                                            <div "
+"style=\"margin: 16px 0px 16px 0px;\">\n"
+"                                                                <a t-attf-"
+"href=\"{{ website_url }}/odoo/sdd-mandates/{{ object.id }}\" "
+"style=\"background-color: #4caf50; padding: 8px 16px 8px 16px; text-"
+"decoration: none; color: #fff; border-radius: 5px; font-size:13px;\">\n"
+"                                                                    Go to "
+"Mandate\n"
 "                                                                </a>\n"
 "                                                            </div>\n"
-"                                                            Security Tip: Check that the domain name you are redirected to is: <b><a t-att-href=\"object.get_base_url()\" t-out=\"object.get_base_url() or ''\">\n"
-"                                                            https://yourcompany.odoo.com</a></b>\n"
+"                                                            Security Tip: "
+"Check that the domain name you are redirected to is: <b><a t-att-"
+"href=\"object.get_base_url()\" t-out=\"object.get_base_url() or ''\">\n"
+"                                                            https://"
+"yourcompany.odoo.com</a></b>\n"
 "                                                        </div>\n"
 "                                                    </td>\n"
 "                                                </tr>\n"
 "                                                <tr>\n"
-"                                                    <td style=\"text-align:center;\">\n"
-"                                                        <hr width=\"100%\" style=\"background-color:rgb(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;\">\n"
+"                                                    <td style=\"text-"
+"align:center;\">\n"
+"                                                        <hr width=\"100%\" "
+"style=\"background-color:rgb(204,204,204);border:medium "
+"none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; "
+"margin: 16px 0px 16px 0px;\"/>\n"
 "                                                    </td>\n"
 "                                                </tr>\n"
 "                                            </table>\n"
@@ -307,17 +534,27 @@ msgid ""
 "                    <!-- POWERED BY -->\n"
 "                    <tr>\n"
 "                        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"                            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-color: #F1F1F1; color: #454748; padding: 8px; border-collapse:separate;\">\n"
+"                            <table border=\"0\" cellpadding=\"0\" "
+"cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-color: "
+"#F1F1F1; color: #454748; padding: 8px; border-collapse:separate;\">\n"
 "                                <tr>\n"
-"                                    <td style=\"text-align: center; font-size: 13px;\">\n"
-"                                        Powered by <a target=\"_blank\" href=\"https://www.odoo.com?utm_source=db&amp;utm_medium=auth\" style=\"color: #875A7B;\">Odoo</a>\n"
+"                                    <td style=\"text-align: center; font-"
+"size: 13px;\">\n"
+"                                        Powered by <a target=\"_blank\" "
+"href=\"https://www.odoo.com?utm_source=db&amp;utm_medium=auth\" "
+"style=\"color: #875A7B;\">Odoo</a>\n"
 "                                    </td>\n"
 "                                </tr>\n"
 "                            </table>\n"
-"                            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; color: #454748; padding: 8px; border-collapse:separate;\">\n"
+"                            <table border=\"0\" cellpadding=\"0\" "
+"cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; color: #454748; "
+"padding: 8px; border-collapse:separate;\">\n"
 "                                <tr>\n"
-"                                    <td style=\"text-align: center; font-size: 11px;\">\n"
-"                                        PS: This is an automated email sent by Odoo Accounting to notify you a SEPA Direct Debit mandate is going to get automatically closed.\n"
+"                                    <td style=\"text-align: center; font-"
+"size: 11px;\">\n"
+"                                        PS: This is an automated email sent "
+"by Odoo Accounting to notify you a SEPA Direct Debit mandate is going to get "
+"automatically closed.\n"
 "                                    </td>\n"
 "                                </tr>\n"
 "                            </table>\n"
@@ -326,6 +563,103 @@ msgid ""
 "                </table>\n"
 "            "
 msgstr ""
+"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-top: "
+"16px; background-color: #FFFFFF; font-family:Verdana, Arial,sans-serif; "
+"color: #454748; width: 100%; border-collapse:separate;\">\n"
+"                    <tr>\n"
+"                       <td align=\"center\">\n"
+"                            <table border=\"0\" cellpadding=\"0\" "
+"cellspacing=\"0\" width=\"590\" style=\"padding: 16px; background-color: "
+"#FFFFFF; color: #454748; border-collapse:separate;\"> \n"
+"                               <tbody>\n"
+"                                    <!-- CONTENT --> \n"
+"                                   <tr>\n"
+"                                        <td align=\"center\" style=\"min-"
+"width: 590px;\"> \n"
+"                                           <table border=\"0\" "
+"cellpadding=\"0\" cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; "
+"background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;"
+"\">\n"
+"                                                <tr> \n"
+"                                                   <td valign=\"top\" "
+"style=\"font-size: 13px;\">\n"
+"                                                        <div> \n"
+"                                                            Dobrý den,<br/"
+"><br/>\n"
+"                                                            Mandát k inkasu "
+"SEPA Direct Debit dosáhne automatického data vypršení platnosti dne <span t-"
+"out=\"format_date(object._get_expiry_date_per_mandate()[object])"
+"\">2020-04-18</span><br/>\n"
+"                                                            To může být "
+"způsobeno jedním z následujících:\n"
+"                                                           <ul>\n"
+"                                                                <li> \n"
+"                                                                    Toto "
+"datum je datem ukončení mandátu dohodnutým při podpisu.\n"
+"                                                               </li>\n"
+"                                                                <li> \n"
+"                                                                    Od "
+"posledního použití tohoto mandátu by tehdy uplynulo více než 36 měsíců.\n"
+"                                                               </li>\n"
+"                                                            </ul> \n"
+"                                                           <div "
+"style=\"margin: 16px 0px 16px 0px;\">\n"
+"                                                                <a t-attf-"
+"href=\"{{ website_url }}/odoo/sdd-mandates/{{ object.id }}\" "
+"style=\"background-color: #4caf50; padding: 8px 16px 8px 16px; text-"
+"decoration: none; color: #fff; border-radius: 5px; font-size:13px;\"> \n"
+"                                                                    Přejděte "
+"na Mandát </a>\n"
+"                                                            </div>Tip pro "
+"zabezpečení: Zkontrolujte, zda je doména, na kterou jste přesměrováni, "
+"následující: <b><a t-att-href=\"object.get_base_url()\" t-"
+"out=\"object.get_base_url() or ''\">https://yourcompany.odoo.com</a></b>\n"
+"                                                       </div>\n"
+"                                                    </td> \n"
+"                                               </tr>\n"
+"                                                <tr> \n"
+"                                                   <td style=\"text-"
+"align:center;\">\n"
+"                                                        <hr width=\"100%\" "
+"style=\"background-color:rgb(204,204,204);border:medium "
+"none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; "
+"margin: 16px 0px 16px 0px;\"/> \n"
+"                                                   </td>\n"
+"                                                </tr> \n"
+"                                           </table>\n"
+"                                        </td> \n"
+"                                   </tr>\n"
+"                                </tbody> \n"
+"                           </table>\n"
+"                        </td> \n"
+"                   </tr>\n"
+"                    <!-- POWERED BY --> \n"
+"                   <tr>\n"
+"                        <td align=\"center\" style=\"min-width: 590px;\"> \n"
+"                           <table border=\"0\" cellpadding=\"0\" "
+"cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-color: "
+"#F1F1F1; color: #454748; padding: 8px; border-collapse:separate;\">\n"
+"                                <tr> \n"
+"                                   <td style=\"text-align: center; font-"
+"size: 13px;\"> \n"
+"                                        Powered by <a target=\"_blank\" "
+"href=\"https://www.odoo.com?utm_source=db&amp;utm_medium=auth\" "
+"style=\"color: #875A7B;\">Odoo</a>\n"
+"                                    </td> </tr>\n"
+"                            </table> <table border=\"0\" cellpadding=\"0\" "
+"cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; color: #454748; "
+"padding: 8px; border-collapse:separate;\">\n"
+"                                <tr> <td style=\"text-align: center; font-"
+"size: 11px;\"> \n"
+"PS: Toto je automatický e-mail odeslaný Odoo Účetnictví, který vás "
+"informuje, že mandát SEPA Direct Debit bude automaticky uzavřen.\n"
+"                                   </td>\n"
+"                                </tr> \n"
+"                           </table>\n"
+"                        </td> \n"
+"                   </tr>\n"
+"                </table>\n"
+"            "
 
 #. module: account_sepa_direct_debit
 #. odoo-python
@@ -334,23 +668,20 @@ msgid ""
 "A SEPA direct debit version should be selected to generate the addresses in "
 "the export file."
 msgstr ""
-"Pro generování adres v exportním souboru byste měli zvolit verzi SEPA "
-"inkasa."
+"Pro generování adres v exportním souboru byste měli zvolit verzi SEPA inkasa."
 
 #. module: account_sepa_direct_debit
 #. odoo-python
 #: code:addons/account_sepa_direct_debit/models/account_payment.py:0
 msgid ""
 "A SEPA direct debit version should be selected to generate the export file."
-msgstr ""
-"Pro generování exportního souboru byste měli zvolit verzi SEPA inkasa."
+msgstr "Pro generování exportního souboru byste měli zvolit verzi SEPA inkasa."
 
 #. module: account_sepa_direct_debit
 #. odoo-python
 #: code:addons/account_sepa_direct_debit/models/sdd_mandate.py:0
-msgid ""
-"A customer account is required to validate a SEPA Direct Debit mandate."
-msgstr ""
+msgid "A customer account is required to validate a SEPA Direct Debit mandate."
+msgstr "K ověření mandátu SEPA Direct Debit je vyžadován zákaznický účet."
 
 #. module: account_sepa_direct_debit
 #: model_terms:ir.actions.act_window,help:account_sepa_direct_debit.account_sepa_direct_debit_mandate_tree_act
@@ -396,14 +727,6 @@ msgstr "Stav aktivity"
 #: model:ir.model.fields,field_description:account_sepa_direct_debit.field_sdd_mandate__activity_type_icon
 msgid "Activity Type Icon"
 msgstr "Ikona typu aktivity"
-
-#. module: account_sepa_direct_debit
-#. odoo-python
-#: code:addons/account_sepa_direct_debit/models/account_batch_payment.py:0
-msgid ""
-"All the payments in the batch must have an active SEPA mandate.\n"
-"Please check the following mandates: %(mandate_list)s."
-msgstr ""
 
 #. module: account_sepa_direct_debit
 #. odoo-python
@@ -512,7 +835,7 @@ msgstr "Zrušeno"
 #. odoo-python
 #: code:addons/account_sepa_direct_debit/wizard/sdd_mandate_send.py:0
 msgid "Check Partner(s) Email(s)"
-msgstr ""
+msgstr "Zkontrolujte e-maily partnerů"
 
 #. module: account_sepa_direct_debit
 #: model_terms:ir.ui.view,arch_db:account_sepa_direct_debit.account_sepa_direct_debit_mandate_form
@@ -573,7 +896,6 @@ msgid "Create a new direct debit customer mandate"
 msgstr "Vytvořte nový mandát pro inkaso"
 
 #. module: account_sepa_direct_debit
-#: model_terms:ir.ui.view,arch_db:account_sepa_direct_debit.account_payment_register_form_inherit_account_sepa_direct_debit
 #: model_terms:ir.ui.view,arch_db:account_sepa_direct_debit.sdd_account_payment_form
 msgid "Create it."
 msgstr "Vytvořit."
@@ -644,9 +966,10 @@ msgstr ""
 #: model:ir.model.fields,help:account_sepa_direct_debit.field_account_batch_payment__sdd_required_collection_date
 msgid ""
 "Date when the company expects to receive the payments of this batch. It "
-"can't be inferior to the sending day + the longest pre-notification period "
-"defined in the mandates linked to this batch."
+"can't be inferior to the sending day + the minimum pre-notification period."
 msgstr ""
+"Datum, kdy společnost očekává přijetí plateb této dávky. Nesmí být kratší "
+"než den odeslání + minimální lhůta pro předběžné oznámení."
 
 #. module: account_sepa_direct_debit
 #: model_terms:ir.ui.view,arch_db:account_sepa_direct_debit.sdd_mandate_form
@@ -696,7 +1019,7 @@ msgstr "Inkaso inkasních plateb"
 #: model:ir.model.fields,field_description:account_sepa_direct_debit.field_sdd_mandate__display_name
 #: model:ir.model.fields,field_description:account_sepa_direct_debit.field_sdd_mandate_send__display_name
 msgid "Display Name"
-msgstr "Zobrazovací název"
+msgstr "Zobrazovaný název"
 
 #. module: account_sepa_direct_debit
 #: model:ir.model.fields,field_description:account_sepa_direct_debit.field_sdd_mandate_send__checkbox_download
@@ -715,19 +1038,26 @@ msgid ""
 "Draft: Validate before use.\n"
 "Active: Valid mandates to collect payments.\n"
 "Cancelled: Mandates never validated.\n"
-"Closed: Expired or manually closed mandates. Previous transactions remain valid.\n"
+"Closed: Expired or manually closed mandates. Previous transactions remain "
+"valid.\n"
 "Revoked: Fraudulent mandates. Previous invoices might need reimbursement.\n"
 msgstr ""
+"Návrh: Před použitím ověřte.\n"
+"Aktivní: Platné příkazy k inkasu plateb.\n"
+"Zrušené: Příkazy, které nebyly nikdy ověřeny.\n"
+"Uzavřené: Vypršené nebo ručně uzavřené příkazy. Předchozí transakce "
+"zůstávají platné.\n"
+"Zrušené: Podvodné příkazy. Předchozí faktury mohou vyžadovat vrácení peněz.\n"
 
 #. module: account_sepa_direct_debit
 #: model:ir.model.fields,field_description:account_sepa_direct_debit.field_sdd_mandate_send__checkbox_send_mail
 msgid "Email"
-msgstr "Email "
+msgstr "Email"
 
 #. module: account_sepa_direct_debit
 #: model:mail.template,description:account_sepa_direct_debit.email_template_sdd_new_mandate
 msgid "Email requesting the customer to sign the mandate attached"
-msgstr ""
+msgstr "E-mail s žádostí zákazníka o podepsání přiloženého zmocnění"
 
 #. module: account_sepa_direct_debit
 #: model:ir.model.fields,field_description:account_sepa_direct_debit.field_sdd_mandate_send__template_id
@@ -753,7 +1083,12 @@ msgstr "Každý příkaz tohoto partnera."
 #. module: account_sepa_direct_debit
 #: model:ir.model.fields,field_description:account_sepa_direct_debit.field_sdd_mandate__expiration_warning_already_sent
 msgid "Expiration warning sent"
-msgstr ""
+msgstr "Odesláno upozornění na vypršení platnosti"
+
+#. module: account_sepa_direct_debit
+#: model_terms:ir.ui.view,arch_db:account_sepa_direct_debit.view_batch_payment_form_inherit
+msgid "First-Time Payments"
+msgstr "První platby"
 
 #. module: account_sepa_direct_debit
 #: model:ir.model.fields,field_description:account_sepa_direct_debit.field_sdd_mandate__message_follower_ids
@@ -779,25 +1114,31 @@ msgstr "Bezplatná reference k identifikaci dlužníka ve vaší společnosti."
 #. odoo-python
 #: code:addons/account_sepa_direct_debit/models/account_batch_payment.py:0
 msgid "Go to journal"
-msgstr ""
+msgstr "Přejít na deník"
 
 #. module: account_sepa_direct_debit
 #. odoo-python
 #: code:addons/account_sepa_direct_debit/models/account_batch_payment.py:0
 msgid "Go to mandates"
-msgstr ""
+msgstr "Přejít na mandáty"
+
+#. module: account_sepa_direct_debit
+#. odoo-python
+#: code:addons/account_sepa_direct_debit/models/account_batch_payment.py:0
+msgid "Go to payments"
+msgstr "Přejít na platby"
 
 #. module: account_sepa_direct_debit
 #. odoo-python
 #: code:addons/account_sepa_direct_debit/models/account_batch_payment.py:0
 msgid "Go to settings"
-msgstr ""
+msgstr "Přejít do nastavení"
 
 #. module: account_sepa_direct_debit
 #: model_terms:ir.ui.view,arch_db:account_sepa_direct_debit.account_payment_register_form_inherit_account_sepa_direct_debit
 #: model_terms:ir.ui.view,arch_db:account_sepa_direct_debit.sdd_account_payment_form
 msgid "Good news! A valid SEPA Mandate is available."
-msgstr ""
+msgstr "Dobrá zpráva! Platný mandát SEPA je k dispozici."
 
 #. module: account_sepa_direct_debit
 #: model:ir.model.fields,field_description:account_sepa_direct_debit.field_sdd_mandate__has_message
@@ -847,12 +1188,17 @@ msgid "If checked, some messages have a delivery error."
 msgstr "Pokud zaškrtnuto, některé zprávy mají chybu při doručení."
 
 #. module: account_sepa_direct_debit
+#: model:ir.model.fields,help:account_sepa_direct_debit.field_sdd_mandate__payment_ids
+#: model_terms:ir.ui.view,arch_db:account_sepa_direct_debit.account_sepa_direct_debit_mandate_form
+msgid "In-process and completed payments generated under this mandate."
+msgstr "Probíhající a dokončené platby generované na základě tohoto mandátu."
+
+#. module: account_sepa_direct_debit
 #. odoo-python
 #: code:addons/account_sepa_direct_debit/models/res_company.py:0
 msgid "Invalid creditor identifier. Make sure you made no typo."
 msgstr ""
-"Neplatný identifikátor věřitele. Ujistěte se, že jste neudělali žádnou "
-"chybu."
+"Neplatný identifikátor věřitele. Ujistěte se, že jste neudělali žádnou chybu."
 
 #. module: account_sepa_direct_debit
 #. odoo-python
@@ -931,11 +1277,17 @@ msgstr "Hlavní příloha"
 #. module: account_sepa_direct_debit
 #: model:ir.model.fields,field_description:account_sepa_direct_debit.field_sdd_mandate_send__mandate_id
 msgid "Mandate"
-msgstr ""
+msgstr "Mandát"
 
 #. module: account_sepa_direct_debit
 #: model:ir.model.fields,field_description:account_sepa_direct_debit.field_sdd_mandate__mandate_pdf_file
 msgid "Mandate Form PDF"
+msgstr "Formulář mandátu PDF"
+
+#. module: account_sepa_direct_debit
+#. odoo-python
+#: code:addons/account_sepa_direct_debit/models/sdd_mandate.py:0
+msgid "Mandate customer and bank account need to match."
 msgstr ""
 
 #. module: account_sepa_direct_debit
@@ -994,6 +1346,11 @@ msgid "Next Activity Type"
 msgstr "Typ další aktivity"
 
 #. module: account_sepa_direct_debit
+#: model:ir.model.fields,field_description:account_sepa_direct_debit.field_account_payment_register__no_sdd_mandate_partner_ids
+msgid "No Sdd Mandate Partner"
+msgstr "Žádný partner s mandátem Sdd"
+
+#. module: account_sepa_direct_debit
 #: model_terms:ir.actions.act_window,help:account_sepa_direct_debit.action_sdd_payments_to_collect
 msgid "No direct debit payment to collect"
 msgstr "Žádná inkasní platba k inkasu"
@@ -1004,22 +1361,17 @@ msgid "Number of Actions"
 msgstr "Počet akcí"
 
 #. module: account_sepa_direct_debit
-#: model:ir.model.fields,help:account_sepa_direct_debit.field_sdd_mandate__payments_to_collect_nber
-msgid ""
-"Number of Direct Debit payments to be collected for this mandate, that is, "
-"the number of payments that have been generated and posted thanks to this "
-"mandate and still needs their XML file to be generated and sent to the bank "
-"to debit the customer's account."
-msgstr ""
-"Počet plateb přímým debetem, které mají být shromážděny pro tento mandát, "
-"tj. Počet plateb, které byly vygenerovány a zaúčtovány díky tomuto mandátu a"
-" stále je třeba vygenerovat a odeslat jejich soubor XML a odeslat do banky k"
-" odepsání z účtu zákazníka."
-
-#. module: account_sepa_direct_debit
 #: model:ir.model.fields,field_description:account_sepa_direct_debit.field_sdd_mandate__message_has_error_counter
 msgid "Number of errors"
 msgstr "Počet chyb"
+
+#. module: account_sepa_direct_debit
+#: model:ir.model.fields,help:account_sepa_direct_debit.field_sdd_mandate__payments_to_collect_nber
+msgid ""
+"Number of in-process and completed payments generated under this mandate."
+msgstr ""
+"Počet plateb v procesu a dokončených plateb generovaných na základě tohoto "
+"mandátu."
 
 #. module: account_sepa_direct_debit
 #: model:ir.model.fields,help:account_sepa_direct_debit.field_sdd_mandate__paid_invoices_nber
@@ -1029,7 +1381,7 @@ msgstr "Počet faktur uhrazených tímto svolením."
 #. module: account_sepa_direct_debit
 #: model:ir.model.fields,help:account_sepa_direct_debit.field_sdd_mandate__message_needaction_counter
 msgid "Number of messages requiring action"
-msgstr "Počet zpráv vyžadujících akci"
+msgstr "Počet zpráv, které vyžadují vaši pozornost"
 
 #. module: account_sepa_direct_debit
 #: model:ir.model.fields,help:account_sepa_direct_debit.field_sdd_mandate__message_has_error_counter
@@ -1045,15 +1397,20 @@ msgstr "Odoo PVT LTD"
 #: model_terms:ir.actions.act_window,help:account_sepa_direct_debit.account_sepa_direct_debit_mandate_tree_act
 msgid ""
 "Once an invoice is made\n"
-"                    in Odoo for a customer having a mandate active on the invoice date,\n"
-"                    its validation will trigger its automatic payment, and you will\n"
-"                    then only have to generate a SEPA Direct Debit (SDD) XML file containing this operation\n"
+"                    in Odoo for a customer having a mandate active on the "
+"invoice date,\n"
+"                    its validation will trigger its automatic payment, and "
+"you will\n"
+"                    then only have to generate a SEPA Direct Debit (SDD) XML "
+"file containing this operation\n"
 "                    and send it to your bank to effectively get paid."
 msgstr ""
 "Jakmile je v Odoo pro zákazníka vytvořena faktura,\n"
 "                    který má aktivní pověření k inkasu ke dni faktury,\n"
-"                    její zaúčtování spustí automatickou úhradu, a vy následně\n"
-"                    musíte vytvořit SEPA Příkaz k inkasu (SDD) XML soubor, obsahující příslušnou operaci,\n"
+"                    její zaúčtování spustí automatickou úhradu, a vy "
+"následně\n"
+"                    musíte vytvořit SEPA Příkaz k inkasu (SDD) XML soubor, "
+"obsahující příslušnou operaci,\n"
 "                    a poslat jej do banky, abyste skutečně dostali zaplaceno."
 
 #. module: account_sepa_direct_debit
@@ -1061,8 +1418,8 @@ msgstr ""
 #: model:ir.model.fields,help:account_sepa_direct_debit.field_account_move__sdd_mandate_id
 #: model:ir.model.fields,help:account_sepa_direct_debit.field_account_payment__sdd_mandate_id
 msgid ""
-"Once this invoice has been paid with Direct Debit, contains the mandate that"
-" allowed the payment."
+"Once this invoice has been paid with Direct Debit, contains the mandate that "
+"allowed the payment."
 msgstr ""
 "Jakmile byla tato faktura zaplacena inkasem, obsahuje mandát umožňující "
 "platbu."
@@ -1080,31 +1437,37 @@ msgid ""
 "select a journal associated to one or add an IBAN bank account to the "
 "current journal"
 msgstr ""
+"Platby SEPA Direct Debit lze přijímat pouze na účty s číslem IBAN. Vyberte "
+"deník spojený s jedním z nich nebo přidejte bankovní účet IBAN do aktuálního "
+"deníku."
 
 #. module: account_sepa_direct_debit
 #. odoo-python
 #: code:addons/account_sepa_direct_debit/models/sdd_mandate.py:0
 msgid "Only mandates in draft state can be deleted."
-msgstr ""
+msgstr "Lze smazat pouze mandáty ve stavu návrhu."
 
 #. module: account_sepa_direct_debit
 #: model_terms:ir.ui.view,arch_db:account_sepa_direct_debit.account_payment_register_form_inherit_account_sepa_direct_debit
+msgid "Oops! No valid SEPA mandate for the following partner(s):"
+msgstr "Ups! Neplatný SEPA příkaz pro následující partnery:"
+
+#. module: account_sepa_direct_debit
 #: model_terms:ir.ui.view,arch_db:account_sepa_direct_debit.sdd_account_payment_form
 msgid "Oops! No valid SEPA mandate for this customer."
-msgstr ""
-"Jejda! Pro tohoto zákazníka neexistuje ověřené pověření k SEPA inkasu."
+msgstr "Jejda! Pro tohoto zákazníka neexistuje ověřené pověření k SEPA inkasu."
 
 #. module: account_sepa_direct_debit
 #. odoo-python
 #: code:addons/account_sepa_direct_debit/models/sdd_mandate.py:0
 msgid "Open customer"
-msgstr ""
+msgstr "Otevřít zákazníka"
 
 #. module: account_sepa_direct_debit
 #. odoo-python
 #: code:addons/account_sepa_direct_debit/models/sdd_mandate.py:0
 msgid "Open customers"
-msgstr ""
+msgstr "Otevřít zákazníky"
 
 #. module: account_sepa_direct_debit
 #: model_terms:ir.ui.view,arch_db:account_sepa_direct_debit.account_sdd_res_partner_view
@@ -1116,11 +1479,11 @@ msgstr "Otevřít mandáty tohoto partnera"
 msgid ""
 "Optional translation language (ISO code) to select when sending out an "
 "email. If not set, the english version will be used. This should usually be "
-"a placeholder expression that provides the appropriate language, e.g. {{ "
-"object.partner_id.lang }}."
+"a placeholder expression that provides the appropriate language, e.g. "
+"{{ object.partner_id.lang }}."
 msgstr ""
-"Volitelný překladový jazyk (kód ISO), který lze vybrat při odesílání "
-"e-mailu. Pokud není nastavena, bude použita anglická verze. To by měl být "
+"Volitelný překladový jazyk (kód ISO), který lze vybrat při odesílání e-"
+"mailu. Pokud není nastavena, bude použita anglická verze. To by měl být "
 "obvykle zástupný výraz, který poskytuje vhodný jazyk, např. "
 "{{object.partner_id.lang}}."
 
@@ -1147,10 +1510,26 @@ msgid "Paid via direct debit"
 msgstr "Placené prostřednictvím inkasa"
 
 #. module: account_sepa_direct_debit
+#: model:ir.model.fields,field_description:account_sepa_direct_debit.field_sdd_mandate__partner_parent_id
+msgid "Parent Partner"
+msgstr "Nadřazený partner"
+
+#. module: account_sepa_direct_debit
+#: model:ir.model,name:account_sepa_direct_debit.model_account_partial_reconcile
+msgid "Partial Reconcile"
+msgstr "Částečné spárování"
+
+#. module: account_sepa_direct_debit
 #. odoo-python
 #: code:addons/account_sepa_direct_debit/wizard/sdd_mandate_send.py:0
 msgid "Partner should have an email address."
-msgstr ""
+msgstr "Partner by měl mít e-mailovou adresu."
+
+#. module: account_sepa_direct_debit
+#. odoo-python
+#: code:addons/account_sepa_direct_debit/models/sdd_mandate.py:0
+msgid "Partner's Parent"
+msgstr "Nadřazený partnera"
 
 #. module: account_sepa_direct_debit
 #: model:ir.model,name:account_sepa_direct_debit.model_account_payment_register
@@ -1165,7 +1544,7 @@ msgstr "Platební metody"
 #. module: account_sepa_direct_debit
 #: model:mail.template,subject:account_sepa_direct_debit.email_template_sdd_pre_notification
 msgid "Payment notification {{ object.memo }}"
-msgstr ""
+msgstr "Notifikace o platbě {{ object.memo }}"
 
 #. module: account_sepa_direct_debit
 #: model:ir.model,name:account_sepa_direct_debit.model_account_payment
@@ -1174,19 +1553,9 @@ msgid "Payments"
 msgstr "Platby"
 
 #. module: account_sepa_direct_debit
-#: model_terms:ir.ui.view,arch_db:account_sepa_direct_debit.account_sepa_direct_debit_mandate_form
-msgid "Payments generated for this mandate that have not yet been collected."
-msgstr "Platby generované za tento mandát, které dosud nebyly vybrány."
-
-#. module: account_sepa_direct_debit
-#: model:ir.model.fields,help:account_sepa_direct_debit.field_sdd_mandate__payment_ids
-msgid "Payments generated thanks to this mandate."
-msgstr "Platby generované díky tomuto mandátu."
-
-#. module: account_sepa_direct_debit
 #: model_terms:ir.ui.view,arch_db:account_sepa_direct_debit.view_account_move_line_payment_filter
 msgid "Payments matching a valid SEPA Direct Debit Mandate"
-msgstr ""
+msgstr "Platby odpovídající platnému příkazu k inkasu SEPA"
 
 #. module: account_sepa_direct_debit
 #. odoo-python
@@ -1195,9 +1564,16 @@ msgid "Payments to Collect"
 msgstr "Platby k inkasu"
 
 #. module: account_sepa_direct_debit
+#. odoo-python
+#: code:addons/account_sepa_direct_debit/models/account_batch_payment.py:0
+msgid "Payments without mandate"
+msgstr "Platby bez mandátu"
+
+#. module: account_sepa_direct_debit
 #: model_terms:ir.ui.view,arch_db:account_sepa_direct_debit.sdd_report_invoice_document
 msgid ""
-"Please do not pay it manually, the payment will be asked to your bank to be processed\n"
+"Please do not pay it manually, the payment will be asked to your bank to be "
+"processed\n"
 "                        automatically."
 msgstr ""
 "Neplaťte to prosím ručně, platba bude odeslána ke zpracování vaší bance\n"
@@ -1206,13 +1582,13 @@ msgstr ""
 #. module: account_sepa_direct_debit
 #: model:ir.model.fields,field_description:account_sepa_direct_debit.field_sdd_mandate__pre_notification_period
 msgid "Pre-notification"
-msgstr ""
+msgstr "Předběžné oznámení"
 
 #. module: account_sepa_direct_debit
 #. odoo-python
 #: code:addons/account_sepa_direct_debit/models/account_batch_payment.py:0
 msgid "Problematic mandates"
-msgstr ""
+msgstr "Problémové mandáty"
 
 #. module: account_sepa_direct_debit
 #: model:ir.model.fields,field_description:account_sepa_direct_debit.field_sdd_mandate__rating_ids
@@ -1237,7 +1613,7 @@ msgstr ""
 
 #. module: account_sepa_direct_debit
 #: model:ir.model.fields,field_description:account_sepa_direct_debit.field_account_batch_payment__sdd_required_collection_date
-msgid "Required collection date"
+msgid "Required Collection Date"
 msgstr "Požadované datum vyzvednutí"
 
 #. module: account_sepa_direct_debit
@@ -1290,7 +1666,7 @@ msgstr "SDD Mandát"
 #. module: account_sepa_direct_debit
 #: model:ir.model,name:account_sepa_direct_debit.model_sdd_mandate_send
 msgid "SDD Mandate Send"
-msgstr ""
+msgstr "Odesláno SDD Mandát"
 
 #. module: account_sepa_direct_debit
 #: model:ir.model.fields,field_description:account_sepa_direct_debit.field_account_batch_payment__sdd_scheme
@@ -1329,7 +1705,7 @@ msgstr "Inkaso SEPA"
 #. module: account_sepa_direct_debit
 #: model:mail.template,name:account_sepa_direct_debit.email_template_sdd_pre_notification
 msgid "SEPA Direct Debit Customer Pre-Notification mail"
-msgstr ""
+msgstr "Předběžné oznámení zákazníkovi o inkazu SEPA"
 
 #. module: account_sepa_direct_debit
 #: model_terms:ir.ui.view,arch_db:account_sepa_direct_debit.sdd_mandate_form
@@ -1344,7 +1720,7 @@ msgstr "SEPA Direct Debit Pain verze"
 #. module: account_sepa_direct_debit
 #: model:mail.template,name:account_sepa_direct_debit.email_template_sdd_new_mandate
 msgid "SEPA Direct Debit Sending"
-msgstr ""
+msgstr "Odesílání přímých inkasa SEPA"
 
 #. module: account_sepa_direct_debit
 #: model:ir.model.fields,help:account_sepa_direct_debit.field_res_company__sdd_creditor_identifier
@@ -1356,14 +1732,14 @@ msgstr "Identifikátor věřitele SEPA Direct Debit poskytnutý bankou."
 #: model:mail.template,name:account_sepa_direct_debit.email_template_sdd_mandate_expiring
 #: model:mail.template,subject:account_sepa_direct_debit.email_template_sdd_mandate_expiring
 msgid "SEPA Direct Debit mandate expiration warning"
-msgstr ""
+msgstr "Upozornění na vypršení platnosti mandátu k inkasu SEPA"
 
 #. module: account_sepa_direct_debit
 #. odoo-python
 #: code:addons/account_sepa_direct_debit/models/sdd_mandate.py:0
 msgid ""
-"SEPA Direct Debit scheme only accepts IBAN account numbers. Please select an"
-" IBAN-compliant debtor account for this mandate."
+"SEPA Direct Debit scheme only accepts IBAN account numbers. Please select an "
+"IBAN-compliant debtor account for this mandate."
 msgstr ""
 "Schéma SEPA inkasa přijímá pouze čísla účtů IBAN. Pro tento mandát vyberte "
 "prosím účet dlužníka, který vyhovuje IBAN."
@@ -1382,22 +1758,25 @@ msgstr "SEPA Pain verze"
 #: model_terms:ir.ui.view,arch_db:account_sepa_direct_debit.account_payment_register_form_inherit_account_sepa_direct_debit
 #: model_terms:ir.ui.view,arch_db:account_sepa_direct_debit.sdd_account_payment_form
 msgid "SEPA Scheme operates in Euro."
-msgstr ""
+msgstr "Systém SEPA funguje v eurech."
 
 #. module: account_sepa_direct_debit
 #. odoo-python
 #: code:addons/account_sepa_direct_debit/models/sdd_mandate.py:0
 msgid "SEPA direct debit stateless customer"
-msgstr ""
+msgstr "Zákazník bez státního občanství využívající přímé inkaso SEPA"
 
 #. module: account_sepa_direct_debit
 #. odoo-python
 #: code:addons/account_sepa_direct_debit/models/sdd_mandate.py:0
 msgid ""
-"SEPA regulations set the minimum pre-notification period to a minimum of 2 "
+"SEPA regulations set the minimum pre-notification period to a minimum of %s "
 "days to allow enough time for the customer to check that their account is "
 "adequately funded."
 msgstr ""
+"Předpisy SEPA stanovují minimální lhůtu pro předběžné oznámení na %s dní, "
+"aby měl zákazník dostatek času zkontrolovat, zda má na svém účtu dostatečné "
+"finanční prostředky."
 
 #. module: account_sepa_direct_debit
 #: model_terms:ir.ui.view,arch_db:account_sepa_direct_debit.sdd_mandate_form
@@ -1439,7 +1818,7 @@ msgstr "Před generováním XML zvolte verzi SEPA inkasa."
 #. odoo-python
 #: code:addons/account_sepa_direct_debit/models/sdd_mandate.py:0
 msgid "Send"
-msgstr "Odchozí"
+msgstr "Odeslat"
 
 #. module: account_sepa_direct_debit
 #: model_terms:ir.ui.view,arch_db:account_sepa_direct_debit.account_sepa_direct_debit_mandate_form
@@ -1450,12 +1829,12 @@ msgstr "Odeslat a vytisknout"
 #. module: account_sepa_direct_debit
 #: model:ir.model.fields,field_description:account_sepa_direct_debit.field_sdd_mandate__is_sent
 msgid "Sent to the customer"
-msgstr ""
+msgstr "Odesláno zákazníkovi"
 
 #. module: account_sepa_direct_debit
 #: model:mail.template,description:account_sepa_direct_debit.email_template_sdd_pre_notification
 msgid "Sent to the customer to indicate their account will be charged"
-msgstr ""
+msgstr "Odesláno zákazníkovi, aby uvedl, že jeho účet bude účtován"
 
 #. module: account_sepa_direct_debit
 #: model_terms:ir.ui.view,arch_db:account_sepa_direct_debit.sdd_mandate_form
@@ -1473,6 +1852,18 @@ msgstr ""
 "mandátu."
 
 #. module: account_sepa_direct_debit
+#. odoo-python
+#: code:addons/account_sepa_direct_debit/models/account_batch_payment.py:0
+msgid "Some payments are linked to an inactive mandate."
+msgstr "Některé platby jsou spojeny s neaktivním mandátem."
+
+#. module: account_sepa_direct_debit
+#. odoo-python
+#: code:addons/account_sepa_direct_debit/models/account_batch_payment.py:0
+msgid "Some payments are not linked to any mandate."
+msgstr "Některé platby nejsou spojeny s žádným mandátem."
+
+#. module: account_sepa_direct_debit
 #: model:ir.model.fields,field_description:account_sepa_direct_debit.field_sdd_mandate__start_date
 msgid "Start Date"
 msgstr "Počáteční datum"
@@ -1480,7 +1871,7 @@ msgstr "Počáteční datum"
 #. module: account_sepa_direct_debit
 #: model:ir.model.fields,field_description:account_sepa_direct_debit.field_sdd_mandate__state
 msgid "State"
-msgstr "Stát"
+msgstr "Stav"
 
 #. module: account_sepa_direct_debit
 #: model:ir.model.fields,help:account_sepa_direct_debit.field_sdd_mandate__activity_state
@@ -1518,8 +1909,8 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_sepa_direct_debit/models/account_payment.py:0
 msgid ""
-"The SEPA Direct Debit mandate associated to the payment has been revoked and"
-" cannot be used anymore."
+"The SEPA Direct Debit mandate associated to the payment has been revoked and "
+"cannot be used anymore."
 msgstr ""
 "Mandát SEPA inkasa spojený s platbou byl zrušen a již jej nelze použít."
 
@@ -1527,11 +1918,15 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_sepa_direct_debit/models/account_batch_payment.py:0
 msgid ""
-"The bank needs to be informed at least 5 days in advance for collections "
-"related to a new mandate and 2 days in advance when the mandate is already "
-"known by them. In this case, the minimum collection date must be the "
-"%(date)s"
+"The bank needs to be informed at least %(min_days_new)s days in advance for "
+"collections related to a new mandate and %(min_days)s days in advance when "
+"the mandate is already known by them.\n"
+"The minimum collection date must be %(date)s."
 msgstr ""
+"Banka musí být informována nejméně %(min_days_new)s dní předem v případě "
+"inkasních příkazů souvisejících s novým mandátem a %(min_days)s dní předem v "
+"případě, že je mandát bance již znám.\n"
+"Minimální datum inkasa musí být %(date)s."
 
 #. module: account_sepa_direct_debit
 #. odoo-python
@@ -1543,7 +1938,7 @@ msgstr "Identifikátor věřitele překračuje maximální délku 35 znaků."
 #. odoo-python
 #: code:addons/account_sepa_direct_debit/models/sdd_mandate.py:0
 msgid "The customer must have a country"
-msgstr ""
+msgstr "Zákazník musí mít zemi"
 
 #. module: account_sepa_direct_debit
 #. odoo-python
@@ -1584,10 +1979,17 @@ msgstr "Konec mandátu musí být po datu, nebo roven počátečnímu datu."
 #. module: account_sepa_direct_debit
 #: model_terms:ir.ui.view,arch_db:account_sepa_direct_debit.sdd_mandate_form
 msgid ""
-"The mandate will only be used to pay invoices into the specified time range. If no end date is specified,\n"
-"                    you will have to contact us to stop its use. The minimum notification period for creditors\n"
+"The mandate will only be used to pay invoices into the specified time range. "
+"If no end date is specified,\n"
+"                    you will have to contact us to stop its use. The minimum "
+"notification period for creditors\n"
 "                    to inform debtors about an upcoming collection is"
 msgstr ""
+"Mandát bude použit pouze k úhradě faktur v určeném časovém rozmezí. Pokud "
+"není stanoveno datum ukončení,\n"
+"                    budete nás muset kontaktovat, abychom jeho použití "
+"zastavili. Minimální lhůta, ve které musí věřitelé\n"
+"                    informovat dlužníky o blížícím se inkasu, je"
 
 #. module: account_sepa_direct_debit
 #: model:ir.model.fields,help:account_sepa_direct_debit.field_sdd_mandate__pre_notification_period
@@ -1595,6 +1997,8 @@ msgid ""
 "The minimum notice period in days, used to inform the customer prior to "
 "collection."
 msgstr ""
+"Minimální lhůta ve dnech, která se používá k informování zákazníka před "
+"inkasem."
 
 #. module: account_sepa_direct_debit
 #. odoo-python
@@ -1607,9 +2011,19 @@ msgstr ""
 "XML inkaso."
 
 #. module: account_sepa_direct_debit
+#: model_terms:ir.ui.view,arch_db:account_sepa_direct_debit.account_sepa_direct_debit_mandate_form
+msgid "The selected customer is a child of"
+msgstr "Vybraný zákazník je pořízený"
+
+#. module: account_sepa_direct_debit
 #: model:ir.model.fields,help:account_sepa_direct_debit.field_sdd_mandate__name
 msgid "The unique identifier of this mandate."
 msgstr "Jedinečný identifikátor tohoto pověření."
+
+#. module: account_sepa_direct_debit
+#: model_terms:ir.ui.view,arch_db:account_sepa_direct_debit.view_batch_payment_form_inherit
+msgid "This batch includes payments from mandates with no prior collections:"
+msgstr "Tato dávka zahrnuje platby z mandátů bez předchozích inkas:"
 
 #. module: account_sepa_direct_debit
 #: model_terms:ir.ui.view,arch_db:account_sepa_direct_debit.sdd_report_invoice_document
@@ -1623,10 +2037,10 @@ msgstr ""
 #. module: account_sepa_direct_debit
 #: model_terms:ir.ui.view,arch_db:account_sepa_direct_debit.sdd_mandate_form
 msgid ""
-"This mandate is only intended for business-to-business transactions. You are"
-" not entitled to a refund from your bank after your account has been "
-"debited, but you are entitled to request your bank not to debit your account"
-" up until the day on which the payment is due."
+"This mandate is only intended for business-to-business transactions. You are "
+"not entitled to a refund from your bank after your account has been debited, "
+"but you are entitled to request your bank not to debit your account up until "
+"the day on which the payment is due."
 msgstr ""
 "Toto pověření je určeno pouze pro transakce mezi podniky. Po odepsání peněz "
 "z vašeho účtu nemáte nárok na vrácení peněz, ale máte právo požádat banku, "
@@ -1639,8 +2053,8 @@ msgid ""
 "To solve that, you should create a mandate for each of the involved "
 "customers, valid at the moment of the payment date."
 msgstr ""
-"Chcete-li to vyřešit, měli byste vytvořit mandát pro každého ze zúčastněných"
-" zákazníků, platný v okamžiku data platby."
+"Chcete-li to vyřešit, měli byste vytvořit mandát pro každého ze zúčastněných "
+"zákazníků, platný v okamžiku data platby."
 
 #. module: account_sepa_direct_debit
 #: model:ir.model.fields,help:account_sepa_direct_debit.field_sdd_mandate__one_off
@@ -1649,8 +2063,8 @@ msgid ""
 "will automatically go from 'active' to 'closed' after its first use in "
 "payment if this option is set.\n"
 msgstr ""
-"Pravda pouze tehdy, pokud lze tento mandát použít pouze pro jednu transakci."
-" Je-li tato možnost nastavena, automaticky přejde z prvního na placené z "
+"Pravda pouze tehdy, pokud lze tento mandát použít pouze pro jednu transakci. "
+"Je-li tato možnost nastavena, automaticky přejde z prvního na placené z "
 "aktivního na uzavřené.\n"
 
 #. module: account_sepa_direct_debit
@@ -1689,7 +2103,7 @@ msgstr "Typ výjimečné aktivity na záznamu."
 #. odoo-python
 #: code:addons/account_sepa_direct_debit/models/sdd_mandate.py:0
 msgid "Under B2B SDD Scheme, the customer must be a company."
-msgstr ""
+msgstr "V rámci programu B2B SDD musí být zákazníkem společnost."
 
 #. module: account_sepa_direct_debit
 #: model:ir.model.fields.selection,name:account_sepa_direct_debit.selection__account_journal__debit_sepa_pain_version__pain_008_001_08
@@ -1729,6 +2143,16 @@ msgstr "Webová historie komunikace"
 
 #. module: account_sepa_direct_debit
 #. odoo-python
+#: code:addons/account_sepa_direct_debit/wizard/account_payment_register.py:0
+msgid ""
+"You can't pay any of the selected invoices using the SEPA Direct Debit "
+"method, as no valid mandate is available"
+msgstr ""
+"Vybrané faktury nelze uhradit metodou SEPA Direct Debit, protože není k "
+"dispozici žádný platný mandát."
+
+#. module: account_sepa_direct_debit
+#. odoo-python
 #: code:addons/account_sepa_direct_debit/models/res_partner_bank.py:0
 msgid ""
 "You cannot delete a bank account linked to an active SEPA Direct Debit "
@@ -1740,9 +2164,15 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_sepa_direct_debit/models/account_batch_payment.py:0
 msgid ""
-"You cannot generate a SEPA Direct Debit file with a required collection date inferior to the sending day + the longest pre-notification period defined in the mandates linked to this batch.\n"
-"According to these payments mandates, the minimum required date should be the %(minimum_date)s"
+"You cannot generate a SEPA Direct Debit file with a required collection date "
+"inferior to the sending day + the minimum pre-notification period of %"
+"(prenot_days)s days.\n"
+"The minimum required date should be %(minimum_date)s."
 msgstr ""
+"Nelze vygenerovat soubor SEPA Direct Debit s požadovaným datem inkasa, které "
+"je kratší než den odeslání + minimální lhůta pro předběžné oznámení %"
+"(prenot_days)s dní.\n"
+"Minimální požadované datum by mělo být %(minimum_date)s."
 
 #. module: account_sepa_direct_debit
 #. odoo-python
@@ -1751,8 +2181,8 @@ msgid ""
 "Your company must have a creditor identifier in order to issue SEPA Direct "
 "Debit payments requests. It can be defined in accounting module's settings."
 msgstr ""
-"Vaše společnost musí mít k vydání žádostí o platby SEPA inkasa identifikátor"
-" věřitele. Může být definován v nastavení účetního modulu."
+"Vaše společnost musí mít k vydání žádostí o platby SEPA inkasa identifikátor "
+"věřitele. Může být definován v nastavení účetního modulu."
 
 #. module: account_sepa_direct_debit
 #: model_terms:ir.ui.view,arch_db:account_sepa_direct_debit.sdd_mandate_form
@@ -1760,12 +2190,14 @@ msgid ""
 "day(s).\n"
 "                    It will be sent to the debtor's email."
 msgstr ""
+"den (dny).\n"
+"                    Bude zaslána na e-mail dlužníka."
 
 #. module: account_sepa_direct_debit
 #: model_terms:ir.ui.view,arch_db:account_sepa_direct_debit.sdd_mandate_form
 msgid ""
-"to send instructions to your bank to debit your account and (B) your bank to"
-" debit your account in accordance with the instructions from"
+"to send instructions to your bank to debit your account and (B) your bank to "
+"debit your account in accordance with the instructions from"
 msgstr ""
 "zaslat pokyny vaší bance k odepsání částky z vašeho účtu a (B) vaší bance k "
 "odepsání částky z vašeho účtu v souladu s pokyny od"
@@ -1773,4 +2205,19 @@ msgstr ""
 #. module: account_sepa_direct_debit
 #: model:mail.template,subject:account_sepa_direct_debit.email_template_sdd_new_mandate
 msgid "{{ object.partner_id.display_name }} SEPA Direct Debit Mandate"
-msgstr ""
+msgstr "{{ object.partner_id.display_name }} Mandát k přímému inkasu SEPA"
+
+#~ msgid "123456789"
+#~ msgstr "123456789"
+
+#~ msgid "2023-08-10"
+#~ msgstr "10. 8. 2023"
+
+#~ msgid "2023-09-10"
+#~ msgstr "10. 9. 2023"
+
+#~ msgid "380055"
+#~ msgstr "380055"
+
+#~ msgid "3956012345678"
+#~ msgstr "3956012345678"

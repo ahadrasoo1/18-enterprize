@@ -78,7 +78,6 @@ class WinbooksImportWizard(models.TransientModel):
         ResPartner = self.env['res.partner']
         ResPartnerBank = self.env['res.partner.bank']
         partner_data_dict = {}
-        partners_by_iban = collections.defaultdict(set)
         for rec in dbf_records:
             if not rec.get('NUMBER'):
                 continue
@@ -113,8 +112,7 @@ class WinbooksImportWizard(models.TransientModel):
                         'child_ids': [(0, 0, {'name': rec.get('NAME2'), 'title': civility_data.get(rec.get('CIVNAME2'), False)})]
                     })
                 # manage the bank account of the partner
-                partners_by_iban[rec.get('IBANAUTO')].add((rec.get('NUMBER'), rec.get('NAME1')))
-                if rec.get('IBANAUTO') and len(partners_by_iban[rec.get('IBANAUTO')]) == 1:
+                if rec.get('IBANAUTO'):
                     partner_bank = ResPartnerBank.search([('acc_number', '=', rec.get('IBANAUTO'))], limit=1)
                     if partner_bank:
                         data['bank_ids'] = [(4, partner_bank.id)]
@@ -139,27 +137,6 @@ class WinbooksImportWizard(models.TransientModel):
                 if len(partner_data_dict) % 100 == 0:
                     _logger.info("Advancement: %s", len(partner_data_dict))
 
-        shared_iban = {
-            iban: partners
-            for iban, partners in partners_by_iban.items()
-            if len(partners) > 1 and iban
-        }
-        if shared_iban:
-            message = _(
-                "The following banks were used for multiple partners in Winbooks, which is "
-                "not allowed in Odoo. The bank number has been only set on one of each group:\n%s",
-                "\n".join(
-                    "%(bank)s : %(partners)s" % {
-                        'bank': iban,
-                        'partners': ', '.join("[%s] %s" % p for p in partners),
-                    }
-                    for iban, partners in shared_iban.items()
-                )
-            )
-            if self.env.context.get('winbooks_import_hard_fail', True):
-                raise UserError(message)
-            else:
-                _logger.info(message)
         partner_ids = ResPartner.create(partner_data_dict.values())
         for partner in partner_ids:
             partner_data[partner.ref] = partner.id
@@ -180,7 +157,7 @@ class WinbooksImportWizard(models.TransientModel):
             account_tax is a dictionary whose keys are the Winbooks account
                 references and the values are the Winbooks tax references.
         """
-        def manage_centralid(account, centralid):
+        def manage_centralid(account, centralid, skip_constraints_check=False):
             "Set account to being a central account"
             property_name = None
             account_central[centralid] = account.id
@@ -198,7 +175,7 @@ class WinbooksImportWizard(models.TransientModel):
             if property_name:
                 self.env['ir.default'].set(model_name, property_name, account.id, company_id=self.env.company.id)
             if tax_group_name:
-                self.env['account.tax.group'].search(self.env['account.tax.group']._check_company_domain(self.env.company))[tax_group_name] = account
+                self.env['account.tax.group'].search(self.env['account.tax.group']._check_company_domain(self.env.company)).with_context(skip_constraints_check=skip_constraints_check)[tax_group_name] = account
 
         _logger.info("Import Accounts")
         account_data = {}
@@ -213,12 +190,8 @@ class WinbooksImportWizard(models.TransientModel):
             {'min': 160, 'max': 200, 'id': 'liability_non_current'},
             {'min': 200, 'max': 280, 'id': 'asset_non_current'},
             {'min': 280, 'max': 290, 'id': 'asset_fixed'},
-            {'min': 290, 'max': 400, 'id': 'asset_current'},
-            {'min': 400, 'max': 401, 'id': 'asset_receivable', 'reconcile': True},
-            {'min': 401, 'max': 420, 'id': 'asset_current'},
-            {'min': 420, 'max': 440, 'id': 'liability_current'},
-            {'min': 440, 'max': 441, 'id': 'liability_payable', 'reconcile': True},
-            {'min': 441, 'max': 490, 'id': 'liability_current'},
+            {'min': 290, 'max': 420, 'id': 'asset_current'},
+            {'min': 420, 'max': 490, 'id': 'liability_current'},
             {'min': 490, 'max': 492, 'id': 'asset_current'},
             {'min': 492, 'max': 500, 'id': 'liability_current'},
             {'min': 500, 'max': 600, 'id': 'asset_cash'},
@@ -242,7 +215,7 @@ class WinbooksImportWizard(models.TransientModel):
                     ], limit=1)
                     if account:
                         account_data[rec.get('NUMBER')] = account.id
-                        rec['CENTRALID'] and manage_centralid(account, rec['CENTRALID'])
+                        rec['CENTRALID'] and manage_centralid(account, rec['CENTRALID'], skip_constraints_check=True)
                     if not account and rec.get('NUMBER') not in rec_number_list:
                         data = {
                             'code': rec.get('NUMBER'),
@@ -259,10 +232,17 @@ class WinbooksImportWizard(models.TransientModel):
                             account_code = 300  # set Current Asset by default for deprecated accounts
                         for account_type in account_types:
                             if account_code in range(account_type['min'], account_type['max']):
-                                data.update({
-                                    'account_type': account_type['id'],
-                                    'reconcile': account_type.get('reconcile', False)
-                                })
+                                if rec.get('CENTRALID', '').startswith('C') or rec.get('CENTRALID', '').startswith('V01'):
+                                    data['account_type'] = 'asset_receivable'
+                                    data['reconcile'] = True
+                                    data['non_trade'] = True
+                                elif rec.get('CENTRALID', '').startswith('S') or rec.get('CENTRALID', '').startswith('V03'):
+                                    data['account_type'] = 'liability_payable'
+                                    data['reconcile'] = True
+                                    data['non_trade'] = True
+                                else:
+                                    data['account_type'] = account_type['id']
+                                    data['reconcile'] = False
                                 break
                         # fallback for accounts not in range(100000,860000)
                         if not data.get('account_type'):
@@ -292,6 +272,13 @@ class WinbooksImportWizard(models.TransientModel):
             if vat in vatcode_data:
                 self.env['account.account'].browse(account_data[account]).write({'tax_ids': [(4, vatcode_data[vat])]})
 
+    def _post_process_tax(self, tax_ids, account_deprecated_ids):
+        """Post process the tax data in order to avoid deprecating accounts
+           used in repartition lines
+        """
+        account_deprecated_ids -= tax_ids.repartition_line_ids.filtered(lambda l: l.repartition_type == 'tax').account_id
+        return account_deprecated_ids
+
     def _import_journal(self, dbf_records):
         """Import journals from *_dbk*.dbf files.
         The data in those files are the name, code and type of the journal.
@@ -309,21 +296,39 @@ class WinbooksImportWizard(models.TransientModel):
         journal_data = {}
         journals = self.env['account.journal']
         AccountJournal = self.env['account.journal']
+        existing_journals = AccountJournal.search(AccountJournal._check_company_domain(self.env.company))
+        used_codes = set(existing_journals.mapped('code'))
+        processed_records = set()   # used to filter out duplicate records
+        code_inc = 0
         for rec in dbf_records:
-            if not rec.get('DBKID'):
+            if not rec.get('DBKID') or rec.get('DBKID') in processed_records:
                 continue
-            journal = AccountJournal.search([
-                *AccountJournal._check_company_domain(self.env.company),
-                ('code', '=', rec.get('DBKID')),
-            ], limit=1)
+            journal = existing_journals.filtered(lambda j: j.code == rec.get('DBKID'))
             if not journal:
                 if rec.get('DBKTYPE') == '4':
                     journal_type = 'bank' if 'IBAN' in rec.get('DBKOPT') else 'cash'
                 else:
                     journal_type = journal_types.get(rec.get('DBKTYPE'), 'general')
+                # The code of a journal is limited to a size of 5 characters.
+                # The following process is applied to the received code:
+                # 1) Check if the 5 first characters is used.
+                # 2) Check if the 5 last characters is used.
+                # 3) Fall back on a generic code.
+                # The format of this code will be the "*" character followed by an incremented number.
+                # The possible values will range from "*1" to "*9999".
+                # There are only 9999 possibilities, but it should be more than enough to handle the duplicate codes.
+                # The purpose of this generic code is to not prevent the jounal creation and to be able
+                # to quickly find it once created if we want to change it manually.
+                code = rec.get('DBKID')[:5]
+                if code in used_codes:
+                    code = rec.get('DBKID')[-5:]
+                while code in used_codes and code_inc < 10000:
+                    code_inc += 1
+                    code = '*%s' % code_inc
+                used_codes.add(code)
                 data = {
                     'name': rec.get('DBKDESC'),
-                    'code': rec.get('DBKID'),
+                    'code': code,
                     'type': journal_type,
                 }
                 if data['type'] == 'sale':
@@ -333,6 +338,7 @@ class WinbooksImportWizard(models.TransientModel):
                 journal = AccountJournal.create(data)
             journal_data[rec.get('DBKID')] = journal.id
             journals += journal
+            processed_records.add(rec.get('DBKID'))
         return journal_data, journals
 
     def _import_move(self, dbf_records, pdffiles, account_data, account_central, journal_data, partner_data, vatcode_data, param_data):
@@ -372,6 +378,8 @@ class WinbooksImportWizard(models.TransientModel):
         pdf_file_list = []
         for key, val in grouped.items():
             journal_id = self.env['account.journal'].browse(journal_data.get(key[1]))
+            if not journal_id:
+                continue
             bookyear = int(key[3], 36)
             if not bookyear or (self.only_open and bookyear not in param_data['openyears']):
                 continue
@@ -391,6 +399,7 @@ class WinbooksImportWizard(models.TransientModel):
                 'ref': '%s_%s' % (key[1], key[0]),
                 'company_id': self.env.company.id,
                 'date': min(max(start_period_date, move_date), end_period_date),
+                'payment_state': 'not_paid',
             }
             if not move_data_dict.get('journal_id') and key[1] == 'MATCHG':
                 continue
@@ -401,7 +410,7 @@ class WinbooksImportWizard(models.TransientModel):
             # Split lines having a different sign on the balance in company currency and foreign currency
             tmp_val = []
             for rec in val:
-                tmp_val += [rec]
+                tmp_val += [rec.copy()]
                 if (rec['AMOUNTEUR'] or 0) * (rec['CURRAMOUNT'] or 0) < 0:
                     tmp_val[-1]['CURRAMOUNT'] = 0
                     tmp_val += [rec.copy()]
@@ -416,6 +425,8 @@ class WinbooksImportWizard(models.TransientModel):
                 matching_number = rec.get('MATCHNO') and '%s-%s' % (rec.get('ACCOUNTGL'), rec.get('MATCHNO')) or False
                 balance = rec.get('AMOUNTEUR', 0.0)
                 amount_currency = rec.get('CURRAMOUNT') if currency and rec.get('CURRAMOUNT') else balance
+                if balance and not account_id:
+                    account_id = suspense_account
                 line_data = {
                     'date': rec.get('DATE', False),
                     'account_id': account_id.id,
@@ -486,7 +497,7 @@ class WinbooksImportWizard(models.TransientModel):
                     'tax_tag_ids': [(6, 0, tax_line.get_tax_tags(is_refund, repartition_type).ids)],
                     'tax_repartition_line_id': is_vat and repartition_line.filtered(lambda x: x.repartition_type == repartition_type and x.account_id.id == line_data[2]['account_id']).id or False,
                 })
-            move_line_data_list = [line for line in move_line_data_list if line[2]['account_id'] or line[2]['balance']]  # Remove empty lines
+            move_line_data_list = [line for line in move_line_data_list if line[2]['account_id']]  # Remove empty lines
 
             # Adapt invoice specific informations
             if move_data_dict['move_type'] != 'entry':
@@ -559,7 +570,7 @@ class WinbooksImportWizard(models.TransientModel):
         self.env['ir.attachment'].create(attachment_data_list)
         return {f"{m.date.year}_{m.ref}" : m for m in move_ids}, move_ids
 
-    def _import_analytic_account(self, dbf_records):
+    def _import_analytic_account(self, dbf_records, param_data):
         """Import the analytic accounts from *_anf*.dbf files.
         :return: a dictionary whose keys are the Winbooks analytic account
         references and the values the analytic account ids in Odoo.
@@ -567,7 +578,7 @@ class WinbooksImportWizard(models.TransientModel):
         _logger.info("Import Analytic Accounts")
         analytic_account_data = {}
         analytic_plan_dict = {}
-        analytic_account = self.env['account.analytic.account']
+        analytic_accounts = self.env['account.analytic.account']
         AccountAnalyticAccount = self.env['account.analytic.account']
         AccountAnalyticPlan = self.env['account.analytic.plan']
         for rec in dbf_records:
@@ -575,9 +586,12 @@ class WinbooksImportWizard(models.TransientModel):
                 continue
             analytic_account = AccountAnalyticAccount.search(
                 [('code', '=', rec.get('NUMBER')), ('company_id', '=', self.env.company.id)], limit=1)
-            plan_name = 'Imported Plan ' + rec.get('TYPE', '0')
+            plan_name = param_data['ZONANA' + rec['TYPE']]
             if not analytic_plan_dict.get(plan_name):
-                analytic_plan_dict[plan_name] = AccountAnalyticPlan.create({'name': plan_name})
+                analytic_plan_dict[plan_name] = (
+                    AccountAnalyticPlan.search([('name', '=', plan_name)], limit=1)
+                    or AccountAnalyticPlan.create({'name': plan_name})
+                )
             if not analytic_account:
                 data = {
                     'code': rec.get('NUMBER'),
@@ -586,8 +600,9 @@ class WinbooksImportWizard(models.TransientModel):
                     'plan_id': analytic_plan_dict[plan_name].id,
                 }
                 analytic_account = AccountAnalyticAccount.create(data)
-            analytic_account_data[rec.get('NUMBER')] = analytic_account.id
-        return analytic_account_data, analytic_account
+            analytic_accounts += analytic_account
+            analytic_account_data[rec['NUMBER']] = analytic_account
+        return analytic_account_data, analytic_accounts
 
     def _import_analytic_account_line(self, dbf_records, analytic_account_data, account_data, move_data, param_data):
         """Import the analytic lines from the *_ant*.dbf files.
@@ -595,7 +610,11 @@ class WinbooksImportWizard(models.TransientModel):
         _logger.info("Import Analytic Account Lines")
         analytic_line_data_list = []
         analytic_list = None
+        line2analytics2amount = collections.defaultdict(lambda: collections.defaultdict(float))  # {account.move.line: {analytic_ids: amount}}
         for rec in dbf_records:
+            bookyear = int(rec['BOOKYEAR'] or '0', 36)
+            if not bookyear or (self.only_open and bookyear not in param_data['openyears']):
+                continue
             if not analytic_list:
                 # In this winbooks file, there is one column for each analytic plan, named 'ZONANA' + [number of the plan].
                 # These columns contain the analytic account number associated to that plan.
@@ -604,31 +623,46 @@ class WinbooksImportWizard(models.TransientModel):
             bookyear_first_year = param_data['period_date'][int(rec['BOOKYEAR'], 36)][0].year
             bookyear_last_year = param_data['period_date'][int(rec['BOOKYEAR'], 36)][-1].year
             journal_code, move_number = rec['DBKCODE'], rec['DOCNUMBER']
-            move_line_id = False
+            account_id = account_data.get(rec.get('ACCOUNTGL'))
+            analytic_accounts = [
+                analytic_account_data.get(rec[analytic])
+                for analytic in analytic_list
+                if analytic_account_data.get(rec.get(analytic))
+            ]
             move = move_data.get(f"{bookyear_first_year}_{journal_code}_{move_number}") or move_data.get(f"{bookyear_last_year}_{journal_code}_{move_number}")
             if move:
-                if rec['DOCORDER'] == 'VAT':
-                    # A move can have multiple VAT lines. If that's the case, we will just take any tax with a corresponding account and amount,
-                    # as the docorder just says "VAT".
-                    tax_lines = move.line_ids.filtered(lambda l:
-                        l.display_type == 'tax'
-                        and l.account_id.id == account_data.get(rec.get('ACCOUNTGL'))
-                        and round(l.balance, 1) == round(rec.get('AMOUNTGL'), 1))
-                    move_line_id = tax_lines[0].id if tax_lines else False
-                else:
-                    move_line_id = move.line_ids.filtered(lambda l: l.winbooks_line_id == rec['DOCORDER']).id
-            data = {
-                'date': rec.get('DATE', False),
-                'name': rec.get('COMMENT'),
-                'amount': -rec.get('AMOUNTEUR'),
-                'general_account_id': account_data.get(rec.get('ACCOUNTGL')),
-                'move_line_id': move_line_id,
-            }
-            for analytic in analytic_list:
-                if rec.get(analytic):
-                    new_analytic_line = data.copy()
-                    new_analytic_line['account_id'] = analytic_account_data.get(rec.get(analytic))
-                    analytic_line_data_list.append(new_analytic_line)
+                # Since the moves are in draft, the analytic lines can't exist yet
+                move_line = move.line_ids.filtered(lambda l:
+                    l.winbooks_line_id == rec['DOCORDER']
+                    and l.account_id.id == account_id
+                    and round(l.balance, 1) == round(rec.get('AMOUNTGL'), 1)
+                )[:1]
+                line2analytics2amount[move_line][','.join(str(a.id) for a in analytic_accounts)] += rec.get('AMOUNTEUR')
+            else:
+                analytic_line_data_list.append({
+                    'date': rec.get('DATE', False),
+                    'name': rec.get('COMMENT'),
+                    'amount': -rec.get('AMOUNTEUR'),
+                    'general_account_id': account_id,
+                    **{account.plan_id._column_name(): account.id for account in analytic_accounts},
+                })
+                if len(analytic_line_data_list) % 100 == 0:
+                    _logger.info("Advancement: %s", len(analytic_line_data_list))
+        if line2analytics2amount or analytic_line_data_list:
+            group_user = self.env.ref('base.group_user', raise_if_not_found=False)
+            group_analytic = self.env.ref('analytic.group_analytic_accounting', raise_if_not_found=False)
+            if group_user and group_analytic:
+                group_user.sudo()._apply_group(group_analytic)
+        if line2analytics2amount:
+            _logger.info("Updating Analytic Distributions on %s lines", len(line2analytics2amount))
+            self.env['decimal.precision'].search([('name', '=', 'Percentage Analytic')]).digits = 6
+            for line, analytics2amount in line2analytics2amount.items():
+                line.analytic_distribution = {
+                    analytics: 100 * (amount / line.balance if amount and line.balance else 1)
+                    for analytics, amount in analytics2amount.items()
+                }
+        if analytic_line_data_list:
+            _logger.info("Creating Analytic Lines")
         return self.env['account.analytic.line'].create(analytic_line_data_list)
 
     def _import_vat(self, dbf_records, account_central):
@@ -711,6 +745,9 @@ class WinbooksImportWizard(models.TransientModel):
         in Winbooks.
         :return: a dictionary with the parameters extracted.
         """
+        def parse_csv_value(csv_values):
+            return dict(pair.split('=') for pair in csv_values.split(','))
+
         param_data = {}
         param_data['openyears'] = []
         param_data['period_date'] = {}
@@ -728,6 +765,12 @@ class WinbooksImportWizard(models.TransientModel):
             search = re.search(r'BOOKYEAR(\d+).PERDATE', rec_id)
             if search and search.group(1):
                 param_data['period_date'][int(search.group(1))] = [datetime.strptime(value[i*8:(i+1)*8], '%d%m%Y').date() for i in range(int(len(value)/8))]
+            try:
+                csv_values = parse_csv_value(value + rec.get('VALUEEXT'))
+            except ValueError:
+                csv_values = {}
+            if csv_values.get('NAME', '').startswith('ZONANA'):  # get the names of analytic plans
+                param_data[csv_values['NAME']] = csv_values['TIT1']
         return param_data
 
     def _post_import(self, account_deprecated_ids):
@@ -802,6 +845,7 @@ class WinbooksImportWizard(models.TransientModel):
                 vat_recs = get_dbfrecords(lambda file: file.lower().endswith("_codevat.dbf"))
                 vatcode_data, tax_ids = self._import_vat(vat_recs, account_central)
 
+                account_deprecated_ids = self._post_process_tax(tax_ids, account_deprecated_ids)
                 self._post_process_account(account_data, vatcode_data, account_tax)
 
                 table_recs = get_dbfrecords(lambda file: file.lower().endswith("_table.dbf"))
@@ -814,7 +858,7 @@ class WinbooksImportWizard(models.TransientModel):
                 move_data, move_ids = self._import_move(act_recs, pdffiles, account_data, account_central, journal_data, partner_data, vatcode_data, param_data)
 
                 anf_recs = get_dbfrecords(lambda file: file.lower().endswith("_anf.dbf"))
-                analytic_account_data, analytic_account_ids = self._import_analytic_account(anf_recs)
+                analytic_account_data, analytic_account_ids = self._import_analytic_account(anf_recs, param_data)
 
                 ant_recs = get_dbfrecords(lambda file: file.lower().endswith("_ant.dbf"))
                 analytic_account_line_ids = self._import_analytic_account_line(ant_recs, analytic_account_data, account_data, move_data, param_data)

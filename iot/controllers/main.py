@@ -6,13 +6,18 @@ import itertools
 import json
 import logging
 import pathlib
+import pprint
+import re
 import textwrap
+import werkzeug
 import zipfile
 
 from odoo import http
 from odoo.http import request, Response
 from odoo.modules import get_module_path
 from odoo.tools.misc import str2bool
+
+_logger = logging.getLogger(__name__)
 
 _iot_logger = logging.getLogger(__name__ + '.iot_log')
 # We want to catch any log level that the IoT send
@@ -25,16 +30,32 @@ class IoTController(http.Controller):
         return request.env['iot.box'].sudo().search([('identifier', '=', mac_address)], limit=1)
 
     @http.route('/iot/get_handlers', type='http', auth='public', csrf=False)
-    def download_iot_handlers(self, mac, auto):
+    def download_iot_handlers(self, auto, **kwargs):
+        mac = kwargs.get('mac')
+        identifier = kwargs.get('identifier')
+
         # Check mac is of one of the IoT Boxes
-        box = self._search_box(mac)
+        box = self._search_box(mac) if mac else self._search_box(identifier)
         if not box or (auto == 'True' and not box.drivers_auto_update):
-            return ''
+            raise werkzeug.exceptions.Unauthorized(
+                description="No IoT box found with mac/identifier '%s' or auto update disabled on the box." % mac
+            )
 
         module_ids = request.env['ir.module.module'].sudo().search([('state', '=', 'installed')])
+        modules = module_ids.mapped('name') + ["hw_drivers"]
+
+        if re.search(r"\d{4}\.\d{2}\.\d{2}", box.version):
+            # New IoT Boxes get drivers from git repository, not from installed modules
+            # for partners/clients that want to download custom drivers from the db, we only download
+            # custom drivers, to avoid overwriting the git ones
+            modules = [
+                m for m in modules
+                if m not in {"iot", "hw_drivers", "pos_blackbox_be", "pos_l10n_se", "pos_iot_six", "quality_iot"}
+            ]
+
         fobj = io.BytesIO()
         with zipfile.ZipFile(fobj, 'w', zipfile.ZIP_DEFLATED) as zf:
-            for module in module_ids.mapped('name') + ['hw_drivers']:
+            for module in modules:
                 module_path = get_module_path(module)
                 if module_path:
                     iot_handlers = pathlib.Path(module_path) / 'iot_handlers'
@@ -43,7 +64,7 @@ class IoTController(http.Controller):
                             # In order to remove the absolute path
                             zf.write(handler, handler.relative_to(iot_handlers))
 
-        return fobj.getvalue()
+        return request.make_response(fobj.getvalue(), headers=[('Content-Type', 'application/zip')])
 
     @http.route('/iot/keyboard_layouts', type='http', auth='public', csrf=False)
     def load_keyboard_layouts(self, available_layouts):
@@ -61,13 +82,22 @@ class IoTController(http.Controller):
                 urls[device.identifier] = device.display_url
         return json.dumps(urls)
 
-    @http.route('/iot/printer/status', type='json', auth='public')
-    def listen_iot_printer_status(self, print_id, device_identifier, iot_mac):
+    @http.route(['/iot/printer/status', '/iot/box/send_websocket'], type='json', auth='public')
+    def listen_iot_printer_status(self, **kwargs):
         """
         Called by the IoT once the printing operation is over. We then forward
         the acknowledgment to the user who made the print request to inform him
-        of the sucess of the operation.
+        of the success of the operation.
         """
+        print_id = kwargs.get('print_id') or kwargs.get('session_id')  # compatibility w/ newer IoT boxes
+        iot_mac = kwargs.get('iot_mac') or kwargs.get("iot_box_identifier")  # compatibility w/ newer IoT boxes
+        device_identifier = kwargs.get('device_identifier')
+
+        if not print_id or not iot_mac or not device_identifier:
+            # in V17.0 we don't handle websocket callbacks for all actions,
+            # this is meant to avoid traceback when using an IoT Box in V18.4+
+            return
+
         if isinstance(device_identifier, str) and isinstance(print_id, str):
             box = self._search_box(iot_mac)
             if not box:
@@ -108,22 +138,35 @@ class IoTController(http.Controller):
             iot_box = data
             devices = data['devices']
 
-         # Update or create box
-        box = self._search_box(iot_box['identifier'])
+        # Update or create box
+        iot_identifier = iot_box['identifier']  # IoT Mac Address
+        iot_serial_number = iot_box.get('serial_number')
+        new_iot_name = iot_box['name']
+        new_iot_ip = iot_box['ip']
+        new_iot_version = iot_box['version']
+        box = request.env['iot.box'].sudo().search([('identifier', 'in', [iot_identifier, iot_serial_number])], limit=1)
+        create_update_value = {
+            'name': new_iot_name,
+            'ip': new_iot_ip,
+            'version': new_iot_version,
+        }
         if box:
-            box = box[0]
-            box.ip = iot_box['ip']
-            box.name = iot_box['name']
+            if box.identifier != iot_identifier and box.identifier == iot_serial_number:
+                create_update_value['identifier'] = iot_identifier
+            if (box.name, box.ip, box.version, box.identifier) != (new_iot_name, new_iot_ip, new_iot_version, create_update_value.get('identifier')):
+                _logger.info('Updating IoT %s with data: %s', box, create_update_value)
+                box.write(create_update_value)
         else:
-            iot_token = request.env['ir.config_parameter'].sudo().search([('key', '=', 'iot_token')], limit=1)
-            if iot_token.value.strip('\n') == iot_box['token']:
-                box = request.env['iot.box'].sudo().create({
-                    'name': iot_box['name'],
-                    'identifier': iot_box['identifier'],
-                    'ip': iot_box['ip'],
-                    'version': iot_box['version'],
-                })
+            iot_token = request.env['ir.config_parameter'].sudo().get_param('iot_token', '').strip('\n')
+            if iot_token and iot_token == iot_box['token']:
+                create_update_value['identifier'] = iot_identifier
+                _logger.info('Creating IoT with data: %s', create_update_value)
+                box = request.env['iot.box'].sudo().create(create_update_value)
+            else:
+                _logger.warning('Token mismatch for IoT %s expected %s got %s', iot_identifier, iot_token, iot_box['token'])
+                return
 
+        _logger.info('IoT %s devices:\n%s', box, pprint.pformat(devices))
         # Update or create devices
         if box:
             previously_connected_iot_devices = request.env['iot.device'].sudo().search([
@@ -137,11 +180,18 @@ class IoTController(http.Controller):
 
                 data_device = devices[device_identifier]
                 if data_device['type'] in available_types and data_device['connection'] in available_connections:
-                    if data_device['connection'] == 'network':
-                        device = request.env['iot.device'].sudo().search([('identifier', '=', device_identifier)])
-                    else:
-                        device = request.env['iot.device'].sudo().search([('iot_id', '=', box.id), ('identifier', '=', device_identifier)])
-                
+                    # Special case to handle serial port change for blackbox
+                    if data_device['type'] == 'fiscal_data_module' and 'BODO001' in data_device['name']:
+                        existing_blackbox = connected_iot_devices.search([
+                            ('iot_id', '=', box.id), ('name', 'like', 'BODO001'), ('type', '=', 'fiscal_data_module')
+                        ], limit=1)
+                        if existing_blackbox:
+                            existing_blackbox.write({'identifier': device_identifier})
+                            connected_iot_devices |= existing_blackbox
+                            continue
+
+                    device = request.env['iot.device'].sudo().search([('iot_id', '=', box.id), ('identifier', '=', device_identifier)])
+
                     # If an `iot.device` record isn't found for this `device`, create a new one.
                     if not device:
                         device = request.env['iot.device'].sudo().create({
@@ -149,7 +199,7 @@ class IoTController(http.Controller):
                             'name': data_device['name'],
                             'identifier': device_identifier,
                             'type': data_device['type'],
-                            'manufacturer': data_device['manufacturer'],
+                            'manufacturer': data_device.get('manufacturer'),
                             'connection': data_device['connection'],
                             'subtype': data_device.get('subtype', ''),
                         })
@@ -165,8 +215,7 @@ class IoTController(http.Controller):
             # Mark the received devices as connected, disconnect the others.
             connected_iot_devices.write({'connected': True})
             (previously_connected_iot_devices - connected_iot_devices).write({'connected': False})
-            iot_channel = request.env['iot.channel'].sudo().get_iot_channel(check=True)
-            return iot_channel
+            return request.env['iot.channel'].sudo().get_iot_channel()
 
     def _is_iot_log_enabled(self):
         return str2bool(request.env['ir.config_parameter'].sudo().get_param('iot.should_log_iot_logs', True))

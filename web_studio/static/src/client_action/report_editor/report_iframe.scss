@@ -76,6 +76,14 @@ div.page {
     &:empty::before {
         content: attr(oe-expression-readable);
     }
+}
+
+/**
+  * When a `[t-field]` or `[t-out]` element has the `data-oe-demo` attribute, it will render that value
+  * as placeholder text inside the report editor.
+  */
+[t-field],
+[t-out] {
     &[data-oe-demo]:empty::before {
         content: attr(data-oe-demo);
     }
@@ -266,5 +274,17 @@ table.table-borderless {
                 background-color: rgba(73, 80, 87, 0.2) !important;
             }
         }
+    }
+}
+svg {
+    pointer-events: none;
+}
+
+main:has(> .footer), t[t-name^='web.external_layout_']:has(> .footer) {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    & > .footer {
+        margin-top: auto;
     }
 }

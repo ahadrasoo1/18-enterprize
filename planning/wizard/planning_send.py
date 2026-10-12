@@ -2,6 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, models, fields, Command, _
+from odoo.addons.resource.models.utils import filter_domain_leaf
 from odoo.osv import expression
 
 
@@ -29,7 +30,23 @@ class PlanningSend(models.TransientModel):
 
     def _get_slot_domain(self):
         self.ensure_one()
-        return [('start_datetime', '>=', self.start_datetime), ('end_datetime', '<=', self.end_datetime)]
+
+        # Our datetime conditions (these will override any from active_domain)
+        datetime_domain = [
+            ('start_datetime', '>=', self.start_datetime),
+            ('end_datetime', '<=', self.end_datetime)
+        ]
+
+        active_domain = self.env.context.get('active_domain', [])
+
+        if not active_domain:
+            return datetime_domain
+
+        # Remove conditions with 'start_datetime' or 'end_datetime' where the value is not False,
+        cleaned_active_domain = filter_domain_leaf(active_domain, lambda field: field not in ['start_datetime', 'end_datetime'])
+
+        # Combine domains: cleaned active_domain + our datetime
+        return expression.AND([cleaned_active_domain, datetime_domain])
 
     @api.depends('start_datetime', 'end_datetime')
     def _compute_slots_data(self):
@@ -65,7 +82,7 @@ class PlanningSend(models.TransientModel):
         }
 
     def action_check_emails(self):
-        if self.employees_no_email:
+        if self.employees_no_email and self.employee_ids.has_access('write'):
             return {
                 'name': _('No Email Address for Some Employees'),
                 'view_mode': 'form',
@@ -75,24 +92,14 @@ class PlanningSend(models.TransientModel):
                 'res_id': self.id,
                 'target': 'new',
             }
-        else:
-            return self.action_send()
+        return self.action_send()
 
     def action_send(self):
-        if not all(employee.work_email for employee in self.employee_ids):
-            return {
-                'type': 'ir.actions.client',
-                'tag': 'display_notification',
-                'params': {
-                    'type': 'danger',
-                    'message': _("The work email is missing for the following employees:"),
-                }
-            }
-
+        employees = self.employee_ids - self.employees_no_email
         if self.include_unassigned:
-            slot_to_send = self.slot_ids.filtered(lambda s: not s.employee_id or s.employee_id in self.employee_ids)
+            slot_to_send = self.slot_ids.filtered(lambda s: not s.employee_id or s.employee_id in employees)
         else:
-            slot_to_send = self.slot_ids.filtered(lambda s: s.employee_id in self.employee_ids)
+            slot_to_send = self.slot_ids.filtered(lambda s: s.employee_id in employees)
         if not slot_to_send:
             return {
                 'type': 'ir.actions.client',
@@ -111,7 +118,7 @@ class PlanningSend(models.TransientModel):
         slot_employees = slot_to_send.mapped('employee_id')
         open_slots = slot_to_send.filtered(lambda s: not s.employee_id and not s.is_past)
         employees_to_send = self.env['hr.employee']
-        for employee in self.employee_ids:
+        for employee in employees:
             if employee in slot_employees:
                 employees_to_send |= employee
             else:
@@ -120,12 +127,18 @@ class PlanningSend(models.TransientModel):
                         employees_to_send |= employee
         res = planning._send_planning(slots=slot_to_send, message=self.note, employees=employees_to_send)
         if res:
+            if self.employees_no_email:
+                message = _("Shifts published — employees without a work email were skipped")
+                notification_type = "info"
+            else:
+                message = _("Schedule sent to your employees")
+                notification_type = "success"
             return {
                 'type': 'ir.actions.client',
                 'tag': 'display_notification',
                 'params': {
-                    'type': 'success',
-                    'message': _("Schedule sent to your employees"),
+                    'type': notification_type,
+                    'message': message,
                     'next': {'type': 'ir.actions.act_window_close'},
                 }
             }

@@ -8,6 +8,10 @@ import { IoTPrinter } from "@pos_iot/app/iot_printer";
 import { PaymentIngenico, PaymentWorldline } from "@pos_iot/app/payment";
 
 patch(PosStore.prototype, {
+    async setup() {
+        await super.setup(...arguments);
+        this.env.services.iot_longpolling.setLna(odoo.use_lna);
+    },
     async processServerData(loadedData) {
         await super.processServerData(...arguments);
 
@@ -51,7 +55,7 @@ patch(PosStore.prototype, {
         }
     },
 
-    showScreen() {
+    showScreen(name, props) {
         if (
             this.mainScreen.component === PaymentScreen &&
             this.get_order().payment_ids.some(

@@ -3,6 +3,7 @@
 
 from odoo.tests import tagged
 from odoo.addons.stock_barcode.tests.test_barcode_client_action import TestBarcodeClientAction
+from odoo import Command
 
 
 @tagged('post_install', '-at_install')
@@ -142,3 +143,111 @@ class TestPickingBarcodeClientAction(TestBarcodeClientAction):
         url = self._get_client_action_url(picking.id)
         self.start_tour(url, 'test_picking_product_with_kit_and_packaging', login='admin', timeout=180)
         self.assertEqual(picking.state, 'done')
+
+    def test_picking_product_with_kit_and_component(self):
+        """ A picking with a kit (comp A + comp B) and a separate move for a component(comp B) should not group the
+        two lines (the comp B line linked to the kit and the comp B line from the comp B move) in Barcode
+        """
+        self.clean_access_rights()
+        grp_lot = self.env.ref('stock.group_production_lot')
+        self.env.user.write({'groups_id': [(4, grp_lot.id, 0)]})
+        picking = self.env['stock.picking'].create({
+            'picking_type_id': self.picking_type_internal.id,
+            'location_id': self.stock_location.id,
+            'location_dest_id': self.stock_location.id,
+            'move_ids': [Command.create({
+                'name': 'test_picking_product_with_packaging stock move',
+                'product_id': product.id,
+                'product_uom_qty': 1.0,
+                'product_uom': self.simple_kit.uom_id.id,
+                'location_id': self.stock_location.id,
+                'location_dest_id': self.stock_location.id,
+            }) for product in [self.kit_lot, self.component_lot]],
+        })
+        picking.action_confirm()
+        picking.move_ids.write({'quantity': 1})
+        url = self._get_client_action_url(picking.id)
+        self.start_tour(url, 'test_picking_product_with_kit_and_component', login='admin', timeout=180)
+
+    def test_picking_kit_variant_packaging(self):
+        """ Test packaging related to a specific variant.
+        """
+        self.clean_access_rights()
+        self.env.user.groups_id = [Command.link(self.ref('product.group_stock_packaging'))]
+        att_color = self.env['product.attribute'].create({'name': 'Color', 'sequence': 1})
+        att_color_values = self.env['product.attribute.value'].create([
+            {'name': 'red', 'attribute_id': att_color.id},
+            {'name': 'blue', 'attribute_id': att_color.id},
+        ])
+        product_template = self.bom_simple_kit.product_tmpl_id
+        product_template.attribute_line_ids = self.env['product.template.attribute.line'].create([{
+            'product_tmpl_id': product_template.id,
+            'attribute_id': att_color.id,
+            'value_ids': [
+                Command.set(att_color_values.ids),
+            ],
+        }])
+        blue_sofa = product_template.product_variant_ids[1]
+        self.env['product.packaging'].create({
+            'name': 'pack of 2',
+            'qty': 2,
+            'product_id': blue_sofa.id,
+            'barcode': 'PACKOF2',
+        })
+
+        picking = self.env['stock.picking'].create({
+            'name': 'WH/IN/BLUESIMPLEKIT',
+            'picking_type_id': self.picking_type_in.id,
+            'location_id': self.supplier_location.id,
+            'location_dest_id': self.stock_location.id,
+            'move_ids': [
+                Command.create({
+                    'name': "test_picking_kit_variant_packaging stock move",
+                    'product_id': blue_sofa.id,
+                    'product_uom_qty': 2,
+                    'product_uom': blue_sofa.uom_id.id,
+                    'location_id': self.supplier_location.id,
+                    'location_dest_id': self.stock_location.id,
+                    'product_packaging_id': blue_sofa.packaging_ids.id,
+                }),
+            ],
+        })
+        picking.action_confirm()
+        self.start_tour('/odoo/barcode', 'test_picking_kit_variant_packaging', login='admin')
+
+    def test_delivery_kit_with_tracked_compo(self):
+        """
+        Test that unreserved scanned component lots overrides the initial reservation.
+        """
+        self.clean_access_rights()
+        grp_lot = self.env.ref('stock.group_production_lot')
+        self.env.user.groups_id |= grp_lot
+        self.picking_type_out.show_reserved_sns = True
+        self.bom_kit_lot.bom_line_ids = self.bom_kit_lot.bom_line_ids[-1]
+        lots = self.env['stock.lot'].create([
+            {
+                'name': f"LOT00{i + 1}",
+                'product_id': self.component_lot.id,
+                'company_id': self.env.company.id
+            } for i in range(4)
+        ])
+        for lot in lots:
+            self.env['stock.quant']._update_available_quantity(product_id=self.component_lot, location_id=self.stock_location, quantity=1, lot_id=lot)
+        delivery = self.env['stock.picking'].create({
+            'name': 'WH/OUT/DKWTC',
+            'picking_type_id': self.picking_type_out.id,
+            'location_id': self.stock_location.id,
+            'location_dest_id': self.customer_location.id,
+            'move_ids': [
+                Command.create({
+                    'name': 'lovely move',
+                    'product_id': product.id,
+                    'product_uom_qty': 1.0,
+                    'product_uom': product.uom_id.id,
+                    'location_id': self.stock_location.id,
+                    'location_dest_id': self.customer_location.id,
+                }) for product in [self.kit_lot, self.component_lot]
+            ],
+        })
+        delivery.action_confirm()
+        self.start_tour('/odoo/barcode', 'test_delivery_kit_with_tracked_compo', login='admin')

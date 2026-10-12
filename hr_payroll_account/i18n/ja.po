@@ -1,22 +1,23 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* hr_payroll_account
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Junko Augias, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:27+0000\n"
+"POT-Creation-Date: 2025-12-29 18:47+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
+"Last-Translator: Junko Augias, 2025\n"
 "Language-Team: Japanese (https://app.transifex.com/odoo/teams/41243/ja/)\n"
+"Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: ja\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. module: hr_payroll_account
@@ -29,13 +30,19 @@ msgstr "給与明細数"
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_payslip_run_view_form
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_payslip_view_form
 msgid ""
-"<span class=\"o_stat_text\" invisible=\"move_state != 'draft'\">Journal Entry <br/>(Draft)</span>\n"
-"                        <span class=\"o_stat_text\" invisible=\"move_state != 'posted'\">Journal Entry <br/>(Posted)</span>\n"
-"                        <span class=\"o_stat_text\" invisible=\"move_state != 'cancel'\">Journal Entry <br/>(Canceled)</span>"
+"<span class=\"o_stat_text\" invisible=\"move_state != 'draft'\">Journal "
+"Entry <br/>(Draft)</span>\n"
+"                        <span class=\"o_stat_text\" invisible=\"move_state !"
+"= 'posted'\">Journal Entry <br/>(Posted)</span>\n"
+"                        <span class=\"o_stat_text\" invisible=\"move_state !"
+"= 'cancel'\">Journal Entry <br/>(Canceled)</span>"
 msgstr ""
-"<span class=\"o_stat_text\" invisible=\"move_state != 'draft'\">記帳<br/>(ドラフト)</span>\n"
-"                        <span class=\"o_stat_text\" invisible=\"move_state != 'posted'\">記帳 <br/>(投稿済)</span>\n"
-"                        <span class=\"o_stat_text\" invisible=\"move_state != 'cancel'\">記帳 <br/>(取消済)</span>"
+"<span class=\"o_stat_text\" invisible=\"move_state != 'draft'\">仕訳<br/>(ド"
+"ラフト)</span>\n"
+"                        <span class=\"o_stat_text\" invisible=\"move_state !"
+"= 'posted'\">仕訳 <br/>(記帳済)</span>\n"
+"                        <span class=\"o_stat_text\" invisible=\"move_state !"
+"= 'cancel'\">仕訳 <br/>(キャンセル済)</span>"
 
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.view_move_form_inherit
@@ -173,21 +180,27 @@ msgid ""
 "into a single account move line. This will anonymize the accounting entries "
 "but also disable single payment generations."
 msgstr ""
-"このオプションを有効にすると、同じ期間の全ての会計項目が1つの会計仕訳明細にマージされます。これにより、会計項目は匿名化されますが、単一支払生成も無効になります。"
+"このオプションを有効にすると、同じ期間の全ての会計項目が1つの会計仕訳明細に"
+"マージされます。これにより、会計項目は匿名化されますが、単一支払生成も無効に"
+"なります。"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,help:hr_payroll_account.field_hr_salary_rule__split_move_lines
 msgid ""
-"Enable this option to split the accountig entries for this rule according to"
-" the payslip line name. It could be useful for deduction/reimbursement or "
+"Enable this option to split the accountig entries for this rule according to "
+"the payslip line name. It could be useful for deduction/reimbursement or "
 "salary attachments for instance."
-msgstr "このオプションを有効にすると、この規則の勘定科目が給与明細の明細名に従って分割されます。たとえば、控除/払戻や給与の添付に便利です。"
+msgstr ""
+"このオプションを有効にすると、この規則の勘定科目が給与明細の明細名に従って分"
+"割されます。たとえば、控除/払戻や給与の添付に便利です。"
 
 #. module: hr_payroll_account
 #: model_terms:ir.actions.act_window,help:hr_payroll_account.action_res_partner_bank_account_form
 msgid ""
 "From here you can manage all bank accounts linked to you and your contacts."
-msgstr "ここから、あなたと連絡先にリンクされている全ての銀行口座を管理することができます。"
+msgstr ""
+"ここから、あなたと連絡先にリンクされている全ての銀行口座を管理することができ"
+"ます。"
 
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_hr_payroll_payment_report_wizard
@@ -198,7 +211,7 @@ msgstr "人事給与明細支払レポートウィザード"
 #: model:ir.model.fields,field_description:hr_payroll_account.field_account_setup_bank_manual_config__has_alt_bank_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_res_partner_bank__has_alt_bank_account
 msgid "Has Alt Bank Account"
-msgstr ""
+msgstr "Alt銀行口座あり"
 
 #. module: hr_payroll_account
 #. odoo-python
@@ -243,7 +256,7 @@ msgstr "仕訳"
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_payslip_run__move_state
 msgid "Move State"
-msgstr ""
+msgstr "仕訳ステータス"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_salary_rule__not_computed_in_net
@@ -257,16 +270,10 @@ msgid "One of the contract for these payslips has no structure type."
 msgstr "これらの給与明細の契約書の1つには、構造タイプがありません。"
 
 #. module: hr_payroll_account
-#. odoo-python
-#: code:addons/hr_payroll_account/models/hr_payslip.py:0
-msgid "One of the payroll structures has no account journal defined on it."
-msgstr "仕訳帳が定義されていない給与体系があります。"
-
-#. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_account_payment_register
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_payslip_view_form
 msgid "Pay"
-msgstr "お支払い"
+msgstr "支払"
 
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_hr_payslip
@@ -340,7 +347,9 @@ msgid ""
 "Tags assigned to this line will impact financial reports when translated "
 "into an accounting journal entry.They will be applied on the credit account "
 "line in the journal entry."
-msgstr "この行に割当てられたタグは、会計仕訳に変換されたときに会計レポートに影響を与えます。これらは、仕訳の中で貸方勘定明細に適用されます。"
+msgstr ""
+"この行に割当てられたタグは、会計仕訳に変換されたときに会計レポートに影響を与"
+"えます。これらは、仕訳の中で貸方勘定明細に適用されます。"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,help:hr_payroll_account.field_hr_payslip_line__debit_tag_ids
@@ -349,7 +358,9 @@ msgid ""
 "Tags assigned to this line will impact financial reports when translated "
 "into an accounting journal entry.They will be applied on the debit account "
 "line in the journal entry."
-msgstr "この行に割当てられたタグは、会計仕訳に変換されたときに会計レポートに影響を与えます。これらは、仕訳の中で借方勘定明細に適用されます。"
+msgstr ""
+"この行に割当てられたタグは、会計仕訳に変換されたときに会計レポートに影響を与"
+"えます。これらは、仕訳の中で借方勘定明細に適用されます。"
 
 #. module: hr_payroll_account
 #. odoo-python
@@ -373,17 +384,19 @@ msgstr "従業員の銀行口座が信頼されていません"
 #. module: hr_payroll_account
 #: model:ir.model.fields,help:hr_payroll_account.field_hr_salary_rule__not_computed_in_net
 msgid ""
-"This field allows you to delete the value of this rule in the \"Net Salary\""
-" rule at the accounting level to explicitly display the value of this rule "
-"in the accounting. For example, if you want to display the value of your "
+"This field allows you to delete the value of this rule in the \"Net Salary\" "
+"rule at the accounting level to explicitly display the value of this rule in "
+"the accounting. For example, if you want to display the value of your "
 "representation fees, you can check this field."
 msgstr ""
-"このフィールドを使用すると、会計レベルの'正味給与'規則でこの規則の値を削除して、会計でこの規則の値を明示的に表示することができます。例えば、代理人報酬の値を表示したい場合は、このフィールドをチェックします。"
+"このフィールドを使用すると、会計レベルの'正味給与'規則でこの規則の値を削除し"
+"て、会計でこの規則の値を明示的に表示することができます。例えば、代理人報酬の"
+"値を表示したい場合は、このフィールドをチェックします。"
 
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.view_partner_bank_form_inherit_hr_payroll_account
 msgid "This will replace the employee existing bank account."
-msgstr ""
+msgstr "これは従業員の既存の銀行口座に代わるものです。"
 
 #. module: hr_payroll_account
 #. odoo-python
@@ -395,10 +408,19 @@ msgstr "記帳済の仕訳に対してのみ支払登録することができま
 #. odoo-python
 #: code:addons/hr_payroll_account/models/hr_payslip.py:0
 msgid "You can only register payments for unpaid documents."
-msgstr ""
+msgstr "支払は未払ドキュメントに対してのみ登録できます。"
+
+#. module: hr_payroll_account
+#. odoo-python
+#: code:addons/hr_payroll_account/models/hr_payslip.py:0
+msgid "You can't create a journal entry for a paid payslip."
+msgstr "支払われた給与明細に対して仕訳を作成することはできません。"
 
 #. module: hr_payroll_account
 #. odoo-python
 #: code:addons/hr_payroll_account/models/account_journal.py:0
 msgid "You cannot delete the journal linked to a Salary Structure"
 msgstr "給与構造にリンクされた仕訳帳は削除できません。"
+
+#~ msgid "One of the payroll structures has no account journal defined on it."
+#~ msgstr "仕訳帳が定義されていない給与体系があります。"

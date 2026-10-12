@@ -21,14 +21,15 @@
     }
 }
 
+.o_documents_kanban_view .o_control_panel {
+    @include media-breakpoint-down(md) {
+        padding-bottom: 0 !important;
+    }
+}
+
 .o_documents_kanban_view .o_control_panel_actions,
 .o_documents_list_view .o_control_panel_actions {
     justify-content: center !important;
-
-    .o_list_selection_box span {
-        padding-top: 4px !important;
-        padding-bottom: 4px !important;
-    }
 }
 
 .o_documents_action_dropdown button {
@@ -177,5 +178,18 @@
     border-left: 1px solid var(--border-color);
     .o-mail-Chatter-topbar {
         padding-top: 0.25rem;
+        @include media-breakpoint-up(lg) {
+            &:not(:hover) {
+                overflow-x: hidden !important;
+            }
+        }
+
+    }
+    &.o-mail-ChatterContainer {
+        overflow: auto;
+        height: 100%;
+    }
+    &.o-mail-ChatterContainer.o-aside {
+        width: calc(#{$o-mail-Chatter-minWidth} + 20px + var(--Chatter-asideExtraWidth));
     }
 }

@@ -21,6 +21,7 @@ class IotBox(models.Model):
     ip_url = fields.Char('IoT Box Home Page', readonly=True, compute='_compute_ip_url')
     drivers_auto_update = fields.Boolean('Automatic drivers update', help='Automatically update drivers when the IoT Box boots', default=True)
     version = fields.Char('Image Version', readonly=True)
+    version_commit_url = fields.Html(readonly=True, compute='_compute_commit_url')
     is_websocket_active = fields.Boolean("Is Websocket active?", readonly=True, default=False)
     company_id = fields.Many2one('res.company', 'Company')
 
@@ -35,6 +36,18 @@ class IotBox(models.Model):
     def _compute_device_count(self):
         for box in self:
             box.device_count = len(box.device_ids)
+
+    @api.depends('version')
+    def _compute_commit_url(self):
+        base_url = "https://www.github.com/odoo/odoo/commit/"
+        for box in self:
+            if box.version and "#" in box.version:
+                image_version, commit_hash = box.version.split("#", 1)
+                box.version_commit_url = (
+                    f'<span>{image_version}#<a href="{base_url}{commit_hash}" target="_blank">{commit_hash}</a></span>'
+                )
+            else:
+                box.version_commit_url = f'<span>{box.version}</span>' if box.version else False
 
 
 class IotDevice(models.Model):
@@ -100,12 +113,6 @@ class IotDevice(models.Model):
         for device in self:
             device.manual_measurement = device.manufacturer == 'Adam'
 
-    def write(self, vals):
-        return_value = super().write(vals)
-        if 'report_ids' in vals:
-            self.env['iot.channel'].update_is_open()
-        return return_value
-
 
 class KeyboardLayout(models.Model):
     _name = 'iot.keyboard.layout'
@@ -132,21 +139,13 @@ class IotChannel(models.AbstractModel):
         Get the IoT channel name.
         To facilitate multi-company, the channel is unique for every company and IoT
 
-        :param check: If False, it will force to return the channel name even if it is unused.
+        :param check: kept only to not break the API, has no effect
         """
-        if (self.env.is_system() or self.env.user._is_internal()) and (not check or self.update_is_open()):
+        if self.env.is_system() or self.env.user._is_internal():
             iot_channel_key_value = self.env['ir.config_parameter'].sudo().get_param(self.SYSTEM_PARAMETER_KEY)
             return iot_channel_key_value or self._create_channel_if_not_exist()
         return ''
 
     def update_is_open(self):
-        """
-        Wherever the IoT Channel should be open or not.
-        For performance reasons, we only open the channel if there is at least one IoT device with a report set.
-
-        :return: True if the channel should be open, False otherwise
-        """
-        is_open = bool(self.env['iot.device'].search_count([('report_ids', '!=', False)], limit=1))
-        if not is_open:
-            self.env["iot.box"].search([]).write({"is_websocket_active": False})
-        return is_open
+        """Always return True, this method is kept to not break the API"""
+        return True

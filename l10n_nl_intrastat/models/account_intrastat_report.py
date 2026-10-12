@@ -43,22 +43,21 @@ class IntrastatReportCustomHandler(models.AbstractModel):
             account_move.name AS name,
             account_move_line.price_subtotal AS price_subtotal,
             prodt.list_price AS lst_price,
-            country.code AS country_dest_code,
         """))
 
     def _get_exporting_dict_data(self, result_dict, query_res):
         super()._get_exporting_dict_data(result_dict, query_res)
-        result_dict.update({
-            'system': result_dict['system'][0:2],
-            'product_id': query_res['product_id'],
-            'quantity': query_res['quantity'],
-            'price_subtotal': query_res['price_subtotal'],
-            'lst_price': query_res['lst_price'],
-            'country_dest_code': query_res['country_dest_code'],
-            'name': query_res['name'],
-            'invoice_date': query_res['invoice_date'],
-            'move_type': query_res['move_type'],
-        })
+        if self.env.company.account_fiscal_country_id.code == 'NL':
+            result_dict.update({
+                'system': result_dict['system'][0],
+                'product_id': query_res['product_id'],
+                'quantity': query_res['quantity'],
+                'price_subtotal': query_res['price_subtotal'],
+                'lst_price': query_res['lst_price'],
+                'name': query_res['name'],
+                'invoice_date': query_res['invoice_date'],
+                'move_type': query_res['move_type'],
+            })
         return result_dict
 
     @api.model
@@ -84,6 +83,7 @@ class IntrastatReportCustomHandler(models.AbstractModel):
         date_from = options['date']['date_from']
         date_to = options['date']['date_to']
 
+        self.env.flush_all()
         report._init_currency_table(options)
         expressions = report.line_ids.expression_ids
         results = self._report_custom_engine_intrastat(expressions, options, expressions[0].date_scope, 'id', None)
@@ -142,9 +142,9 @@ class IntrastatReportCustomHandler(models.AbstractModel):
         # CONTENT LINES
         i = 1
         for res in results:
-            country_dest_code = res['country_dest_code'] or ''
-            country_origin_code = res['country_code'] if res['system'] == 6 and date_to > '2022-1-1' else ''
-            country = res['country_code'] if res['system'] == 6 else country_dest_code
+            country_dest_code = res['country_code'] or ''
+            country_origin_code = res['intrastat_product_origin_country_code'] if res['intrastat_type'] == 'Dispatch' and date_to > '2022-1-1' else ''
+            country = res['country_code'] if res['intrastat_type'] == 'Arrival' else country_dest_code
 
             # From the Manual for Statistical Declarations International Trade in Goods:
             #
@@ -171,7 +171,7 @@ class IntrastatReportCustomHandler(models.AbstractModel):
             transaction_period = str(res['invoice_date'].year) + str(res['invoice_date'].month).rjust(2, '0')
             file_content += ''.join([
                 transaction_period,                                             # Transaction period    length=6
-                str(res['system']),                                             # Commodity flow        length=1
+                res['system'],                                                  # Commodity flow        length=1
                 vat and vat[2:].replace(' ', '').ljust(12) or ''.ljust(12),     # VAT number            length=12
                 str(i).zfill(5),                                                # Line number           length=5
                 country_origin_code.ljust(3),                                   # Country of origin     length=3

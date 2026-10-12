@@ -1,32 +1,37 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* account_accountant_batch_payment
-# 
+#
 # Translators:
-# Wil Odoo, 2024
-# 
+# Wil Odoo, 2025
+# Thi Huong Nguyen, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:26+0000\n"
+"POT-Creation-Date: 2025-12-29 18:46+0000\n"
 "PO-Revision-Date: 2024-09-25 09:43+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
+"Last-Translator: Thi Huong Nguyen, 2025\n"
 "Language-Team: Vietnamese (https://app.transifex.com/odoo/teams/41243/vi/)\n"
+"Language: vi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: vi\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. module: account_accountant_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_accountant_batch_payment.view_account_batch_payment_rejection_form
 msgid ""
 "<br/>\n"
-"                        <span>Do you want to cancel payments to retry them later or keep the batch open with unprocess payments, if you expect them later.</span>"
+"                        <span>Do you want to cancel payments to retry them "
+"later or keep the batch open with unprocess payments, if you expect them "
+"later.</span>"
 msgstr ""
 "<br/>\n"
-"                        <span>Bạn có muốn hủy các khoản thanh toán để thử lại sau hay tiếp tục để mở loạt thanh toán chưa được xử lý, nếu bạn dự kiến thanh toán sau?</span>"
+"                        <span>Bạn có muốn hủy các khoản thanh toán để thử "
+"lại sau hay tiếp tục để mở lô thanh toán chưa được xử lý, nếu bạn dự kiến "
+"thanh toán sau?</span>"
 
 #. module: account_accountant_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_accountant_batch_payment.view_account_batch_payment_list_bank_rec_widget
@@ -44,25 +49,19 @@ msgid "Bank reconciliation widget for a single statement line"
 msgstr "Tiện ích đối chiếu ngân hàng cho một dòng sao kê"
 
 #. module: account_accountant_batch_payment
-#: model:ir.model.fields,field_description:account_accountant_batch_payment.field_bank_rec_widget_line__batch_pay_content
-msgid "Batch Pay Content"
-msgstr ""
-
-#. module: account_accountant_batch_payment
 #. odoo-python
 #: code:addons/account_accountant_batch_payment/models/account_batch_payment.py:0
-#: code:addons/account_accountant_batch_payment/models/bank_rec_widget.py:0
 #: model:ir.model,name:account_accountant_batch_payment.model_account_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_accountant_batch_payment.view_account_batch_payment_rejection_form
 #: model_terms:ir.ui.view,arch_db:account_accountant_batch_payment.view_account_batch_payment_search_bank_rec_widget
 msgid "Batch Payment"
-msgstr "Thanh toán hàng loạt"
+msgstr "Thanh toán theo lô"
 
 #. module: account_accountant_batch_payment
 #. odoo-javascript
 #: code:addons/account_accountant_batch_payment/static/src/components/bank_reconciliation/bank_rec_form.xml:0
 msgid "Batch Payments"
-msgstr "Thanh toán hàng loạt"
+msgstr "Thanh toán theo lô"
 
 #. module: account_accountant_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_accountant_batch_payment.view_account_batch_payment_rejection_form
@@ -98,7 +97,7 @@ msgstr "Tên hiển thị"
 #. odoo-python
 #: code:addons/account_accountant_batch_payment/models/bank_rec_widget.py:0
 msgid "Exchange Difference: %(batch_name)s - %(currency)s"
-msgstr ""
+msgstr "Chênh lệch tỷ giá: %(batch_name)s - %(currency)s"
 
 #. module: account_accountant_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_accountant_batch_payment.view_account_batch_payment_rejection_form
@@ -124,7 +123,7 @@ msgstr "Thanh toán đang đối chiếu"
 #. odoo-python
 #: code:addons/account_accountant_batch_payment/models/bank_rec_widget.py:0
 msgid "Includes %(count)s payment(s)"
-msgstr ""
+msgstr "Bao gồm %(count)s khoản thanh toán"
 
 #. module: account_accountant_batch_payment
 #: model:ir.model.fields,field_description:account_accountant_batch_payment.field_account_batch_payment_rejection__write_uid
@@ -144,12 +143,12 @@ msgstr "Dòng tiện ích đối chiếu ngân hàng"
 #. module: account_accountant_batch_payment
 #: model:ir.model,name:account_accountant_batch_payment.model_account_batch_payment_rejection
 msgid "Manage the payment rejection from batch payments"
-msgstr "Quản lý lệnh từ chối thanh toán từ thanh toán hàng loạt"
+msgstr "Quản lý lệnh từ chối thanh toán từ thanh toán theo lô"
 
 #. module: account_accountant_batch_payment
 #: model:ir.model.fields,field_description:account_accountant_batch_payment.field_account_batch_payment_rejection__nb_batch_payment_ids
 msgid "Nb Batch Payment"
-msgstr "Nb thanh toán hàng loạt"
+msgstr "Nb thanh toán theo lô"
 
 #. module: account_accountant_batch_payment
 #: model:ir.model.fields,field_description:account_accountant_batch_payment.field_account_batch_payment_rejection__nb_rejected_payment_ids
@@ -182,22 +181,27 @@ msgstr "Nb thanh toán bị từ chối"
 #. module: account_accountant_batch_payment
 #: model:ir.model.fields,field_description:account_accountant_batch_payment.field_bank_rec_widget__selected_batch_payment_ids
 msgid "Selected Batch Payment"
-msgstr "Thanh toán hàng loạt đã chọn"
+msgstr "Thanh toán theo lô đã chọn"
 
 #. module: account_accountant_batch_payment
 #: model:ir.model.fields,field_description:account_accountant_batch_payment.field_bank_rec_widget_line__source_batch_payment_id
 msgid "Source Batch Payment"
-msgstr "Thanh toán hàng loạt nguồn"
+msgstr "Thanh toán theo lô nguồn"
 
 #. module: account_accountant_batch_payment
 #: model:ir.model.fields,field_description:account_accountant_batch_payment.field_bank_rec_widget_line__source_batch_payment_name
 msgid "Source Batch Payment Name"
-msgstr ""
+msgstr "Tên thanh toán theo lô nguồn"
 
 #. module: account_accountant_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_accountant_batch_payment.view_account_batch_payment_list_bank_rec_widget
 msgid "Suggestions"
 msgstr "Gợi ý"
+
+#. module: account_accountant_batch_payment
+#: model_terms:ir.ui.view,arch_db:account_accountant_batch_payment.view_account_batch_payment_search_bank_rec_widget
+msgid "Unreconciled"
+msgstr "Chưa được đối soát"
 
 #. module: account_accountant_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_accountant_batch_payment.view_account_batch_payment_list_bank_rec_widget
@@ -207,12 +211,12 @@ msgstr "Chế độ xem"
 #. module: account_accountant_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_accountant_batch_payment.view_account_batch_payment_rejection_form
 msgid "batches have been removed."
-msgstr "loạt thanh toán đã bị loại bỏ."
+msgstr "lô thanh toán đã bị loại bỏ."
 
 #. module: account_accountant_batch_payment
 #: model:ir.model.fields.selection,name:account_accountant_batch_payment.selection__bank_rec_widget_line__flag__new_batch
 msgid "new_batch"
-msgstr ""
+msgstr "new_batch"
 
 #. module: account_accountant_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_accountant_batch_payment.view_account_batch_payment_rejection_form
@@ -222,4 +226,4 @@ msgstr "thanh toán từ"
 #. module: account_accountant_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_accountant_batch_payment.view_account_batch_payment_rejection_form
 msgid "payments from the batch have been removed."
-msgstr "thanh toán từ loạt thanh toán đã bị loại bỏ."
+msgstr "thanh toán từ lô thanh toán đã bị loại bỏ."

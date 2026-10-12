@@ -19,6 +19,9 @@ class TestUi(odoo.tests.HttpCase, SignRequestCommon):
             self.env.ref('base.group_user').write({"implied_ids": [(4, group_order_template.id)]})
         self.start_tour("/odoo", 'sign_widgets_tour', login='admin')
 
+        # make sure that we only have the required template.
+        self.env['sign.template'].search([('name', '!=', 'template_1_role')]).write({'active': False})
+
         self.start_tour("/odoo", 'shared_sign_request_tour', login='admin')
         shared_sign_request = self.env['sign.request'].search([('reference', '=', 'template_1_role-Shared'), ('state', '=', 'shared')])
         self.assertTrue(shared_sign_request.exists(), 'A shared sign request should be created')
@@ -80,3 +83,17 @@ class TestUi(odoo.tests.HttpCase, SignRequestCommon):
 
     def test_report_modal(self):
         self.start_tour("/odoo", "sign_report_modal_tour", login="admin")
+
+    def test_sign_tour(self):
+        sign_requests = self.env['sign.request'].search([])
+        # Step 2 of the `sign_tour` onboarding tour assumes that there's no sign.request record in the database.
+        sign_requests.active = False
+        self.start_tour("/odoo", "sign_tour", login="admin")
+
+    def test_sign_tour_without_sign(self):
+        # The tour has a step for the Signature dialoge, which is relevant only if the user has no saved signature.
+        self.env.ref('base.user_admin').sign_signature = False
+        sign_requests = self.env['sign.request'].search([])
+        # Step 2 of the `sign_tour` onboarding tour assumes that there's no sign.request record in the database.
+        sign_requests.active = False
+        self.start_tour("/odoo", "sign_tour", login="admin")

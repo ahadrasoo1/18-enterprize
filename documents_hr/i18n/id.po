@@ -1,48 +1,80 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* documents_hr
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Abe Manyo, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-26 09:15+0000\n"
+"POT-Creation-Date: 2026-02-27 18:47+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
+"Last-Translator: Abe Manyo, 2025\n"
 "Language-Team: Indonesian (https://app.transifex.com/odoo/teams/41243/id/)\n"
+"Language: id\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: id\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. module: documents_hr
 #: model_terms:ir.ui.view,arch_db:documents_hr.documents_hr_portal_view
 msgid "<i class=\"fa fa-download fa-fw\"/> Download file"
-msgstr ""
+msgstr "<i class=\"fa fa-download fa-fw\"/> Unduh file"
 
 #. module: documents_hr
 #: model:mail.template,body_html:documents_hr.mail_template_document_folder_link
 msgid ""
-"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"width:100%; margin:0px auto;\"><tbody>\n"
-"        <tr><td valign=\"top\" style=\"text-align: left; font-size: 14px;\">\n"
-"            Dear <t t-esc=\"object.name\"></t>, your personal documents access link is available for you.<br><br>\n"
-"            You'll find all your personal HR documents in this folder.<br><br>\n"
-"            Please keep this link secure.<br><br>\n"
-"            <div style=\"text-align: center; padding: 16px 0px 16px 0px; font-size: 14px;\">\n"
-"                <a t-attf-href=\"{{ object.sudo().documents_link_url }}\" target=\"_blank\" style=\"background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;\">\n"
+"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"width:100%; "
+"margin:0px auto;\"><tbody>\n"
+"        <tr><td valign=\"top\" style=\"text-align: left; font-size: 14px;"
+"\">\n"
+"            Dear <t t-esc=\"object.name\"/>, your personal documents access "
+"link is available for you.<br/><br/>\n"
+"            You'll find all your personal HR documents in this folder.<br/"
+"><br/>\n"
+"            Please keep this link secure.<br/><br/>\n"
+"            <div style=\"text-align: center; padding: 16px 0px 16px 0px; "
+"font-size: 14px;\">\n"
+"                <a t-attf-href=\"{{ object._get_documents_link_url() }}\" "
+"target=\"_blank\" style=\"background-color: #875A7B; padding: 8px 16px 8px "
+"16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;"
+"\">\n"
 "                    Your Documents\n"
 "                </a>\n"
 "            </div>\n"
-"            Have a nice day,<br>\n"
+"            Have a nice day,<br/>\n"
 "            The HR Team\n"
 "        </td></tr>\n"
 "    </tbody></table>\n"
 "                "
 msgstr ""
+"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"width:100%; "
+"margin:0px auto;\"><tbody>\n"
+"        <tr><td valign=\"top\" style=\"text-align: left; font-size: 14px;"
+"\">\n"
+"            Kepada <t t-esc=\"object.name\"/>, link akses dokumen pribadi "
+"Anda sekarang tersedia untuk Anda.<br/><br/>\n"
+"            Anda akan menemukan semua dokumen pribadi HR Anda di folder ini."
+"<br/><br/>\n"
+"            Pastikan link ini aman.<br/><br/>\n"
+"            <div style=\"text-align: center; padding: 16px 0px 16px 0px; "
+"font-size: 14px;\">\n"
+"                <a t-attf-href=\"{{ object._get_documents_link_url() }}\" "
+"target=\"_blank\" style=\"background-color: #875A7B; padding: 8px 16px 8px "
+"16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;"
+"\">\n"
+"                    Dokumen-Dokumen Anda\n"
+"                </a>\n"
+"            </div>\n"
+"            Have a nice day,<br/>\n"
+"            Tim HRD\n"
+"        </td></tr>\n"
+"    </tbody></table>\n"
+"                "
 
 #. module: documents_hr
 #: model:documents.tag,name:documents_hr.documents_tag_absences
@@ -87,11 +119,9 @@ msgstr "Jumlah Dokumen"
 #. module: documents_hr
 #: model:ir.model,name:documents_hr.model_documents_redirect
 msgid "Document Redirect"
-msgstr ""
+msgstr "Pengalihan Dokumen"
 
 #. module: documents_hr
-#. odoo-python
-#: code:addons/documents_hr/models/res_users.py:0
 #: model:ir.model.fields,field_description:documents_hr.field_res_users__document_count
 #: model_terms:ir.ui.view,arch_db:documents_hr.hr_employee_view_form
 #: model_terms:ir.ui.view,arch_db:documents_hr.res_users_view_form
@@ -118,11 +148,9 @@ msgstr "Karyawan"
 #. odoo-python
 #: code:addons/documents_hr/models/hr_employee.py:0
 msgid ""
-"Employee's related user and private email must be set to use \"Send Access Link\" function:\n"
+"Employee's private email must be set to use \"Send Access Link\" function:\n"
 "%s"
 msgstr ""
-"Email user dan pribadi karyawan yang terkait harus ditetapkan untuk menggunakan fungsi \"Kirim Link Akses\":\n"
-"%s"
 
 #. module: documents_hr
 #: model:documents.tag,name:documents_hr.documents_tag_employees
@@ -142,7 +170,7 @@ msgstr "Sumber Daya Manusia"
 #. module: documents_hr
 #: model_terms:ir.ui.view,arch_db:documents_hr.documents_hr_portal_view
 msgid "My documents"
-msgstr ""
+msgstr "Dokumen-dokumen saya"
 
 #. module: documents_hr
 #: model:ir.model.fields,field_description:documents_hr.field_hr_departure_wizard__private_email
@@ -162,8 +190,8 @@ msgstr "Kirim Link Akses Dokumen HR"
 #. module: documents_hr
 #: model:ir.model.fields,help:documents_hr.field_hr_departure_wizard__send_hr_documents_access_link
 msgid ""
-"Send a share link to the private email of the employee with all the HR files"
-" he owns in Documents app"
+"Send a share link to the private email of the employee with all the HR files "
+"he owns in Documents app"
 msgstr ""
 "Kirim link sharing ke email pribadi karyawan dengan semua file HR yang dia "
 "miliki di aplikasi Dokumen"
@@ -198,7 +226,7 @@ msgstr "Ruang Kerja"
 #. odoo-python
 #: code:addons/documents_hr/models/hr_employee.py:0
 msgid "You can not send the documents link to the employee."
-msgstr ""
+msgstr "Anda tidak dapat mengirimkan link dokumen ke karyawan."
 
 #. module: documents_hr
 #. odoo-python
@@ -224,3 +252,12 @@ msgstr "ruang kerja default hr"
 #: model:mail.template,subject:documents_hr.mail_template_document_folder_link
 msgid "{{ object.name }}, your personal documents access link is available"
 msgstr "{{ object.name }}, link akses dokumen pribadi Anda masih tersedia"
+
+#~ msgid ""
+#~ "Employee's related user and private email must be set to use \"Send "
+#~ "Access Link\" function:\n"
+#~ "%s"
+#~ msgstr ""
+#~ "Email user dan pribadi karyawan yang terkait harus ditetapkan untuk "
+#~ "menggunakan fungsi \"Kirim Link Akses\":\n"
+#~ "%s"

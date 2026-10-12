@@ -21,6 +21,19 @@ class DeferredReportCustomHandler(models.AbstractModel):
     # DEFERRED COMMON (DISPLAY AND GENERATION) #
     ############################################
 
+    def _get_domain_fully_inside_period(self, options):
+        return [  # Exclude if entirely inside the period
+            '!', '&', '&', '&', '&', '&', '&', '&',
+                ('deferred_start_date', '!=', False),
+                ('deferred_end_date', '!=', False),
+                ('deferred_start_date', '>=', options['date']['date_from']),
+                ('deferred_start_date', '<=', options['date']['date_to']),
+                ('deferred_end_date', '>=', options['date']['date_from']),
+                ('deferred_end_date', '<=', options['date']['date_to']),
+                ('move_id.date', '>=', options['date']['date_from']),
+                ('move_id.date', '<=', options['date']['date_to']),
+        ]
+
     def _get_domain(self, report, options, filter_already_generated=False, filter_not_started=False):
         domain = report._get_options_domain(options, "from_beginning")
         account_types = ('expense', 'expense_depreciation', 'expense_direct_cost') if self._get_deferred_report_type() == 'expense' else ('income', 'income_other')
@@ -31,29 +44,27 @@ class DeferredReportCustomHandler(models.AbstractModel):
             ('deferred_end_date', '>=', options['date']['date_from']),
             ('move_id.date', '<=', options['date']['date_to']),
         ]
-        domain += [  # Exclude if entirely inside the period
-            '!', '&', '&', '&', '&', '&',
-            ('deferred_start_date', '>=', options['date']['date_from']),
-            ('deferred_start_date', '<=', options['date']['date_to']),
-            ('deferred_end_date', '>=', options['date']['date_from']),
-            ('deferred_end_date', '<=', options['date']['date_to']),
-            ('move_id.date', '>=', options['date']['date_from']),
-            ('move_id.date', '<=', options['date']['date_to']),
-        ]
+        domain += self._get_domain_fully_inside_period(options)
         if filter_already_generated:
+            # Avoid regenerating already generated deferrals
             domain += [
-                ('deferred_end_date', '>=', options['date']['date_from']),
-                '!',
-                    '&',
-                    ('move_id.deferred_move_ids.date', '=', options['date']['date_to']),
-                    ('move_id.deferred_move_ids.state', '=', 'posted'),
-            ]
+            ('deferred_end_date', '>=', options['date']['date_from']),
+            '!',
+                ('move_id.deferred_move_ids', 'any', [
+                    ('date', '=', options['date']['date_to']),
+                    '|',
+                        ('state', '=', 'posted'),  # Either posted
+                        '&',  # Or autoposted in the future
+                            ('auto_post', '=', 'at_date'),
+                            ('date', '>=', fields.Date.context_today(self)),
+                ])
+        ]
         if filter_not_started:
             domain += [('deferred_start_date', '>', options['date']['date_to'])]
         return domain
 
     @api.model
-    def _get_select(self):
+    def _get_select(self, options):
         account_name = self.env['account.account']._field_to_sql('account_move_line__account_id', 'name')
         return [
             SQL("account_move_line.id AS line_id"),
@@ -69,13 +80,47 @@ class DeferredReportCustomHandler(models.AbstractModel):
             SQL("account_move_line.analytic_distribution AS analytic_distribution"),
             SQL("account_move_line__move_id.id as move_id"),
             SQL("account_move_line__move_id.name AS move_name"),
+            SQL("""
+                NOT (
+                    account_move_line.deferred_end_date >= %(report_date_from)s
+                    AND
+                    NOT EXISTS (
+                         SELECT 1 
+                           FROM account_move_deferred_rel AS amdr
+                      LEFT JOIN account_move AS am ON amdr.deferred_move_id = am.id
+                          WHERE amdr.original_move_id = account_move_line.move_id
+                            AND am.date = %(report_date_to)s
+                            AND (
+                                 am.state = 'posted' 
+                                 OR (am.auto_post = 'at_date' AND am.date >= %(today)s)
+                                )
+                    )
+                ) AS is_already_generated
+            """,
+                report_date_from=options['date']['date_from'],
+                report_date_to=options['date']['date_to'],
+                today=fields.Date.context_today(self),
+            ),
             SQL("%s AS account_name", account_name),
         ]
 
     def _get_lines(self, report, options, filter_already_generated=False):
+        if 'report_deferred_lines' not in self.env.cr.cache:
+            self._fetch_lines(report, options, filter_already_generated)
+
+        if not filter_already_generated:
+            # No more filtering needed, we can reuse the cached result
+            return self.env.cr.cache['report_deferred_lines'].values()
+        else:
+            # Filter the cached result to only keep the lines that are not already generated
+            cached_lines = self.env.cr.cache['report_deferred_lines'].values()
+            return [cached_line for cached_line in cached_lines if not cached_line['is_already_generated']]
+
+    def _fetch_lines(self, report, options, filter_already_generated):
+        """Fetch the lines that need to be deferred from the DB and store them in the cache for later reuse"""
         domain = self._get_domain(report, options, filter_already_generated)
         query = report._get_report_query(options, domain=domain, date_scope='from_beginning')
-        select_clause = SQL(', ').join(self._get_select())
+        select_clause = SQL(', ').join(self._get_select(options))
 
         query = SQL(
             """
@@ -92,8 +137,11 @@ class DeferredReportCustomHandler(models.AbstractModel):
         )
 
         self.env.cr.execute(query)
-        res = self.env.cr.dictfetchall()
-        return res
+        # Cache the result so that it can be reused to check whether a warning banner should be shown
+        # only if it's the generic query (so without filtering already generated deferrals)
+        self.env.cr.cache['report_deferred_lines'] = {
+            r['line_id']: r for r in self.env.cr.dictfetchall()
+        }
 
     @api.model
     def _get_grouping_fields_deferred_lines(self, filter_already_generated=False, grouping_field='account_id'):
@@ -181,13 +229,13 @@ class DeferredReportCustomHandler(models.AbstractModel):
             'name': _('Before'),
             'expression_label': 'before',
             'date_from': DEFERRED_DATE_MIN,
-            'date_to': options['columns'][0]['date_from'],
+            'date_to': fields.Date.to_string(fields.Date.to_date(options['columns'][0]['date_from']) - relativedelta(days=1)),
         }]
         later_column = [{
             **options['columns'][0],
             'name': _('Later'),
             'expression_label': 'later',
-            'date_from': options['columns'][-1]['date_to'],
+            'date_from': fields.Date.to_string(fields.Date.to_date(options['columns'][-1]['date_to']) + relativedelta(days=1)),
             'date_to': DEFERRED_DATE_MAX,
         }]
         options['columns'] = total_column + not_started_column + before_column + options['columns'] + later_column
@@ -256,30 +304,50 @@ class DeferredReportCustomHandler(models.AbstractModel):
             # We're auditing a specific account, so we only want moves containing this account
             original_move_lines_domain.append((options['deferred_grouping_field'], '=', grouping_record_id))
         # We're getting all lines from the concerned moves. They are filtered later for flexibility.
-        original_move = self.env['account.move.line'].search(original_move_lines_domain).move_id
+        original_moves = self.env['account.move.line'].search(original_move_lines_domain).move_id
 
-        # For the Total period only show the original move lines
-        line_ids = original_move.line_ids.ids
+        domain = [
+            # For the Total period only show the original move lines
+            '&',
+                ('move_id', 'in', original_moves.ids),
+                ('deferred_end_date', '>=', report_date_from),
+        ]
 
         # Show both the original move lines and deferral move lines for all other periods
-        if not column_values['expression_label'] == 'total':
-            line_ids += original_move.deferred_move_ids.line_ids.ids
+        if column_values['expression_label'] != 'total' and original_moves.deferred_move_ids:
+            domain = ['|'] + [('move_id', 'in', original_moves.deferred_move_ids.ids)] + domain
+
+        if column_values['expression_label'] == 'not_started':
+            domain += [('deferred_start_date', '>=', column_date_from)]
+        else:
+            # If in manually & grouped mode, and deferrals have not yet been generated
+            # so no move with `date` set => instead show the candidates original deferred moves that
+            # will be deferred upon clicking the button. If totally/partially generated, we'll just
+            # use the `date` filter which will include both the originals and deferrals.
+            if not original_moves.deferred_move_ids:
+                domain += [
+                    ('deferred_start_date', '<=', column_date_to),
+                    ('deferred_end_date', '>=', column_date_from),
+                ]
+            else:
+                domain += [
+                    ('date', '>=', column_date_from),
+                    ('date', '<=', column_date_to),
+                ]
+        domain += self._get_domain_fully_inside_period(options)
 
         return {
             'type': 'ir.actions.act_window',
             'name': _('Deferred Entries'),
             'res_model': 'account.move.line',
-            'domain': [('id', 'in', line_ids)],
-            'views': [(self.env.ref('account_accountant.view_deferred_entries_tree').id, 'list')],
+            'domain': domain,
+            'views': [(self.env.ref('account_accountant.view_deferred_entries_tree').id, 'list'), (False, 'pivot'), (False, 'graph'), (False, 'kanban')],
             # Most filters are set here to allow auditing flexibility to the user
             'context': {
                 'search_default_pl_accounts': True,
                 f'search_default_{options["deferred_grouping_field"]}': grouping_record_id,
-                'date_from': column_date_from,
-                'date_to': column_date_to,
-                'search_default_date_between': True,
                 'expand': True,
-            }
+            },
         }
 
     def _caret_options_initializer(self):
@@ -290,17 +358,22 @@ class DeferredReportCustomHandler(models.AbstractModel):
         }
 
     def _customize_warnings(self, report, options, all_column_groups_expression_totals, warnings):
-        already_generated = (
-            (
-                self._get_deferred_report_type() == 'expense' and self.env.company.generate_deferred_expense_entries_method == 'manual'
-                or self._get_deferred_report_type() == 'revenue' and self.env.company.generate_deferred_revenue_entries_method == 'manual'
-            )
-            and self.env['account.move'].search_count(
+        if (
+            self._get_deferred_report_type() == 'expense' and self.env.company.generate_deferred_expense_entries_method == 'manual'
+            or self._get_deferred_report_type() == 'revenue' and self.env.company.generate_deferred_revenue_entries_method == 'manual'
+        ):
+            already_generated = self.env['account.move'].search_count(
                 report._get_generated_deferral_entries_domain(options)
             )
-        )
-        if already_generated:
-            warnings['account_reports.deferred_report_warning_already_posted'] = {'alert_type': 'warning'}
+            # This will trigger a second _get_lines call, however the first one was cached, so we just need to filter again on the cache (see _get_lines)
+            moves_lines_to_generate, __, __, __, __ = self._get_moves_to_defer(options)
+            if moves_lines_to_generate and already_generated:
+                warnings['account_reports.deferred_report_warning_partially_generated'] = {'alert_type': 'warning'}
+            elif moves_lines_to_generate:
+                warnings['account_reports.deferred_report_warning_never_generated'] = {'alert_type': 'warning'}
+            elif already_generated:
+                warnings['account_reports.deferred_report_info_fully_generated'] = {'alert_type': 'info'}
+
 
     def open_journal_items(self, options, params):
         report = self.env['account.report'].browse(options['report_id'])
@@ -405,16 +478,11 @@ class DeferredReportCustomHandler(models.AbstractModel):
             'target': 'current',
         }
 
-    def _generate_deferral_entry(self, options):
-        journal = self.env.company.deferred_expense_journal_id if self._get_deferred_report_type() == "expense" else self.env.company.deferred_revenue_journal_id
-        if not journal:
-            raise UserError(_("Please set the deferred journal in the accounting settings."))
+    def _get_moves_to_defer(self, options):
         date_from = fields.Date.to_date(DEFERRED_DATE_MIN)
         date_to = fields.Date.from_string(options['date']['date_to'])
         if date_to.day != calendar.monthrange(date_to.year, date_to.month)[1]:
             raise UserError(_("You cannot generate entries for a period that does not end at the end of the month."))
-        if self.env.company._get_violated_lock_dates(date_to, False, journal):
-            raise UserError(_("You cannot generate entries for a period that is locked."))
         options['all_entries'] = False  # We only want to create deferrals for posted moves
         report = self.env["account.report"].browse(options["report_id"])
         self.env['account.move.line'].flush_model()
@@ -424,6 +492,15 @@ class DeferredReportCustomHandler(models.AbstractModel):
         ref_rev = _("Reversal of Grouped Deferral Entry of %s", deferral_entry_period['string'])
         deferred_account = self.env.company.deferred_expense_account_id if self._get_deferred_report_type() == 'expense' else self.env.company.deferred_revenue_account_id
         move_lines, original_move_ids = self._get_deferred_lines(lines, deferred_account, (date_from, date_to, 'current'), self._get_deferred_report_type() == 'expense', ref)
+        return move_lines, original_move_ids, ref, ref_rev, date_to
+
+    def _generate_deferral_entry(self, options):
+        journal = self.env.company.deferred_expense_journal_id if self._get_deferred_report_type() == "expense" else self.env.company.deferred_revenue_journal_id
+        if not journal:
+            raise UserError(_("Please set the deferred journal in the accounting settings."))
+        move_lines, original_move_ids, ref, ref_rev, date_to = self._get_moves_to_defer(options)
+        if self.env.company._get_violated_lock_dates(date_to, False, journal):
+            raise UserError(_("You cannot generate entries for a period that is locked."))
         if not move_lines:
             raise UserError(_("No entry to generate."))
 
@@ -457,7 +534,8 @@ class DeferredReportCustomHandler(models.AbstractModel):
             for original_move_id in original_move_ids
             for deferral_move in new_deferred_moves
         ])
-        (deferred_move + reverse_move)._post(soft=True)
+        new_deferred_moves.invalidate_recordset()
+        new_deferred_moves._post(soft=True)
         return new_deferred_moves
 
     @api.model
@@ -479,9 +557,11 @@ class DeferredReportCustomHandler(models.AbstractModel):
         """
         if not deferred_account:
             raise UserError(_("Please set the deferred accounts in the accounting settings."))
+
         deferred_amounts_by_line = self.env['account.move']._get_deferred_amounts_by_line(lines, [period], is_reverse)
         deferred_amounts_by_key, deferred_amounts_totals = self._group_deferred_amounts_by_grouping_field(deferred_amounts_by_line, [period], is_reverse, filter_already_generated=True)
-        if deferred_amounts_totals['totals_aggregated'] == deferred_amounts_totals[period]:
+        totals_aggregated = deferred_amounts_totals['totals_aggregated']
+        if totals_aggregated == deferred_amounts_totals[period]:
             return [], set()
 
         # compute analytic distribution to populate on deferred lines
@@ -497,9 +577,11 @@ class DeferredReportCustomHandler(models.AbstractModel):
                 continue
             # Analytic distribution should be computed from the lines with the same _get_grouping_keys_deferred_lines(), except for
             # the deferred line with the deferral account which will use _get_grouping_fields_deferral_lines()
-            full_ratio = (line['balance'] / deferred_amounts_totals['totals_aggregated']) if deferred_amounts_totals['totals_aggregated'] else 0
+            sign = 1 if is_reverse else -1
             key_amount = deferred_amounts_by_key.get(self._group_by_deferred_fields(line, True))
-            key_ratio = (line['balance'] / key_amount['amount_total']) if key_amount and key_amount['amount_total'] else 0
+            total_amount = key_amount.get('amount_total')
+            key_ratio = sign * line['balance'] / total_amount if total_amount else 0
+            full_ratio = sign * line['balance'] / totals_aggregated if totals_aggregated else 0
 
             for account_id, distribution in line['analytic_distribution'].items():
                 anal_dist_by_key[self._group_by_deferred_fields(line, True)][account_id] += distribution * key_ratio

@@ -12,6 +12,16 @@ class IrAttachment(models.Model):
             if vals.get('res_model') != 'account.move':
                 continue
             move = self.env['account.move'].browse(vals.get('res_id', False))
-            if move.move_type == 'entry' or (len(move.attachment_ids) == 1 and move.attachment_ids[0] == attachment):
+            # In order to avoid creation of extra documents we retrict creation of a document to:
+            # - attachments of a misc operation
+            # - xml file after it has been succesfully registered as move attachment
+            # Only in the case where the 'no_document' flag is set to False
+            if (
+                not self._context.get('no_document')
+                and (
+                    move.move_type == 'entry'
+                    or attachment.mimetype == 'application/xml'
+                )
+            ):
                 move._update_or_create_document(attachment.id)
         return attachments

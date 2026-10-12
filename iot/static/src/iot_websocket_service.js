@@ -78,6 +78,10 @@ export class IotWebsocket {
         const jobIndex = this.jobs[printId].findIndex((element) => element && element["identifier"] === deviceId);
         const device = this.jobs[printId][jobIndex];
 
+        if (!device) {
+            return; // avoid traceback if multiple jobs confirmations with same `print_id`
+        }
+
         device._removeSendingNotification?.();
         this.notification.add(_t('Printing operation completed on printer %s', device["display_name"]), {
             type: "success",
@@ -95,9 +99,9 @@ export const IotWebsocketService = {
 
         if (iot_channel) {
             bus_service.addChannel(iot_channel);
-            bus_service.subscribe("print_confirmation", (payload) => {
-                if (ws.jobs[payload["print_id"]]) {
-                    ws.onPrintConfirmation(payload["device_identifier"], payload["print_id"]);
+            bus_service.subscribe("print_confirmation", ({ print_id, device_identifier }) => {
+                if (ws.jobs[print_id]) {
+                    ws.onPrintConfirmation(device_identifier, print_id);
                 }
             });
         }

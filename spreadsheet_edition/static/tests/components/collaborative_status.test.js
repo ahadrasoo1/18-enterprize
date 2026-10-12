@@ -1,19 +1,18 @@
-import { makeMockEnv } from "@web/../tests/web_test_helpers";
+import { describe, expect, test } from "@odoo/hoot";
 import { defineSpreadsheetModels } from "@spreadsheet/../tests/helpers/data";
-import { describe, expect, test, getFixture, mountOnFixture } from "@odoo/hoot";
-import { getTemplate } from "@web/core/templates";
+import { makeMockEnv, mountWithCleanup } from "@web/../tests/web_test_helpers";
 
 import { CollaborativeStatus } from "@spreadsheet_edition/bundle/components/collaborative_status/collaborative_status";
 
 describe.current.tags("headless");
 defineSpreadsheetModels();
 
-async function mountCollaborativeStatusComponent(env) {
-    await mountOnFixture(CollaborativeStatus, { props: {}, env, getTemplate });
+async function mountCollaborativeStatusComponent() {
+    await mountWithCleanup(CollaborativeStatus);
 }
 
 test("not synchronized", async function () {
-    const env = await makeMockEnv({
+    await makeMockEnv({
         model: {
             getters: {
                 isFullySynchronized: () => false,
@@ -21,17 +20,15 @@ test("not synchronized", async function () {
             },
         },
     });
-    await mountCollaborativeStatusComponent(env);
+    await mountCollaborativeStatusComponent();
 
-    const fixture = getFixture();
-
-    expect(fixture.querySelector(".o_spreadsheet_sync_status")).toHaveText("Saving");
-    expect(fixture.querySelector(".o_spreadsheet_number_users")).toHaveText("1");
-    expect(fixture.querySelector(".o_spreadsheet_number_users i.fa")).toHaveClass("fa-user");
+    expect(".o_spreadsheet_sync_status").toHaveText("Saving");
+    expect(".o_spreadsheet_number_users").toHaveText("1");
+    expect(".o_spreadsheet_number_users i.fa").toHaveClass("fa-user");
 });
 
 test("synchronized", async function () {
-    const env = await makeMockEnv({
+    await makeMockEnv({
         model: {
             getters: {
                 isFullySynchronized: () => true,
@@ -39,15 +36,13 @@ test("synchronized", async function () {
             },
         },
     });
-    await mountCollaborativeStatusComponent(env);
+    await mountCollaborativeStatusComponent();
 
-    const fixture = getFixture();
-
-    expect(fixture.querySelector(".o_spreadsheet_sync_status")).toHaveText("Saved");
+    expect(".o_spreadsheet_sync_status").toHaveText("Saved");
 });
 
 test("more than one user", async function () {
-    const env = await makeMockEnv({
+    await makeMockEnv({
         model: {
             getters: {
                 isFullySynchronized: () => true,
@@ -58,10 +53,8 @@ test("more than one user", async function () {
             },
         },
     });
-    await mountCollaborativeStatusComponent(env);
+    await mountCollaborativeStatusComponent();
 
-    const fixture = getFixture();
-
-    expect(fixture.querySelector(".o_spreadsheet_number_users")).toHaveText("2");
-    expect(fixture.querySelector(".o_spreadsheet_number_users i.fa")).toHaveClass("fa-users");
+    expect(".o_spreadsheet_number_users").toHaveText("2");
+    expect(".o_spreadsheet_number_users i.fa").toHaveClass("fa-users");
 });

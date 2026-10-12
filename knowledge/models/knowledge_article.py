@@ -9,7 +9,6 @@ from collections import defaultdict
 from datetime import datetime, timedelta
 from lxml import html
 from markupsafe import Markup
-from urllib import parse
 from werkzeug.urls import url_join
 
 from odoo import api, Command, fields, models, _
@@ -62,7 +61,7 @@ class Article(models.Model):
         [('write', 'Can edit'), ('read', 'Can read'), ('none', 'No access')],
         string='Inherited Permission',
         compute="_compute_inherited_permission", compute_sudo=True,
-        store=True, recursive=True)
+        store=True, index=True, recursive=True)
     inherited_permission_parent_id = fields.Many2one(
         "knowledge.article", string="Inherited Permission Parent Article",
         compute="_compute_inherited_permission", compute_sudo=True,
@@ -89,7 +88,7 @@ class Article(models.Model):
     # Hierarchy and sequence
     parent_id = fields.Many2one(
         "knowledge.article", string="Parent Article", tracking=30,
-        ondelete="cascade")
+        index=True, ondelete="cascade")
     # used to speed-up hierarchy operators such as child_of/parent_of
     # see '_parent_store' implementation in the ORM for details
     parent_path = fields.Char(index=True)
@@ -513,28 +512,20 @@ class Article(models.Model):
         if operator not in ('=', '!=') or not isinstance(value, bool):
             raise NotImplementedError("Unsupported search operator")
 
-        articles_with_access = {}
-        if not self.env.user.share:
-            articles_with_access = Article._get_internal_permission(
-                filter_domain=[('internal_permission', 'not in', ['none', False])])
         member_permissions = Article._get_partner_member_permissions(self.env.user.partner_id)
-        articles_with_no_member_access = [article_id for article_id, perm in member_permissions.items() if perm == 'none']
-        articles_with_member_access = list(set(member_permissions.keys() - set(articles_with_no_member_access)))
+        articles_with_member_access = {article_id for article_id, perm in member_permissions.items() if perm != 'none'}
 
-        # If searching articles for which user has access.
-        if (value and operator == '=') or (not value and operator == '!='):
-            if self.env.user.share:
-                return [('id', 'in', articles_with_member_access)]
-            return ['|',
-                    '&', ('id', 'in', list(articles_with_access.keys())), ('id', 'not in', articles_with_no_member_access),
-                    ('id', 'in', articles_with_member_access)]
+        is_positive_search = (value is True and operator == '=') or (value is False and operator == '!=')
+        op = 'in' if is_positive_search else 'not in'
 
-        # If searching articles for which user has NO access.
         if self.env.user.share:
-            return [('id', 'not in', articles_with_member_access)]
-        return ['|',
-                '&', ('id', 'not in', list(articles_with_access.keys())), ('id', 'not in', articles_with_member_access),
-                ('id', 'in', articles_with_no_member_access)]
+            return [('id', op, list(articles_with_member_access))]
+
+        # sudo reason: we're already computing ir.rules, avoid re-applying it.
+        articles_with_access = Article.with_context(active_test=False).sudo().search([('inherited_permission', 'in', ('read', 'write'))])
+        articles_with_no_member_access = member_permissions.keys() - articles_with_member_access
+        article_ids = list((set(articles_with_access.ids) - articles_with_no_member_access) | articles_with_member_access)
+        return [('id', op, article_ids)]
 
     @api.depends_context('uid')
     @api.depends('user_has_access', 'parent_id.user_has_access_parent_path')
@@ -857,9 +848,6 @@ class Article(models.Model):
             manipulation to sudo only those and keep requested ordering based
             on vals_list;
         """
-        if any(vals.get('is_template', False) for vals in vals_list) and not self.env.user.has_group('base.group_system'):
-            raise ValidationError(_('You are not allowed to create a new template.'))
-
         defaults = self.default_get(['article_member_ids', 'internal_permission', 'parent_id'])
         vals_by_parent_id = {}
         vals_as_sudo = []
@@ -952,6 +940,10 @@ class Article(models.Model):
                     vals['sequence'] = current_sequence
                     current_sequence += 1
 
+        # check access rights only if all records needs sudo
+        if all(vals_as_sudo):
+            self.check_access('create')
+
         # sort by sudo / not sudo
         notsudo_articles = iter(super(Article, self).create([
             vals for vals, can_sudo in zip(vals_list, vals_as_sudo)
@@ -967,6 +959,9 @@ class Article(models.Model):
                 articles += next(sudo_articles)
             else:
                 articles += next(notsudo_articles)
+
+        if any(articles.mapped('is_template')) and not self.env.user.has_group('base.group_system'):
+            raise ValidationError(_('You are not allowed to create a new template.'))
 
         return articles
 
@@ -1198,14 +1193,15 @@ class Article(models.Model):
             needs_embed_view_update = False
             fragment = html.fragment_fromstring(article.body, create_parent=True)
             for element in fragment.findall(".//*[@data-embedded='view']"):
-                embedded_props = json.loads(parse.unquote(element.get("data-embedded-props")))
-                context = embedded_props.get("context", {})
+                embedded_props = json.loads(element.get("data-embedded-props"))
+                view_props = embedded_props.get("viewProps", {})
+                context = view_props.get("context", {})
                 if context.get("default_is_article_item") and context.get("active_id") == original_article.id:
                     context.update({
                         "active_id": article.id,
                         "default_parent_id": article.id
                     })
-                    element.set("data-embedded-props", parse.quote(json.dumps(embedded_props), safe="()*!'"))
+                    element.set("data-embedded-props", json.dumps(embedded_props))
                     needs_embed_view_update = True
 
             if needs_embed_view_update:
@@ -1234,7 +1230,7 @@ class Article(models.Model):
             "internal_permission": "none",
             "parent_id": False,
         })
-        article = self.create(article_vals)
+        article = self.env['knowledge.article'].create(article_vals)
         article._update_article_references(self)
         # Copy the related stages for the /kanban command:
         for stage in self.env["knowledge.article.stage"].search([("parent_id", "=", self.id)]):
@@ -1568,8 +1564,10 @@ class Article(models.Model):
 
     def get_user_sorted_articles(self, search_query, limit=40, hidden_mode=False):
         """ Called when using the Command palette to search for articles matching
-            with the given search terms. If no search terms is provided, the
-            function returns the user's favorite articles.
+            with the given search terms. If no search terms are provided, the
+            function returns the user's favorite articles when hidden_mode is False;
+            otherwise, it returns all the hidden articles the user has access to,
+            not exceeding the limit.
 
             To reduce the query runtime, the search method limits the number of
             candidates to consider using the `knowledge.fts_search_cut_off`
@@ -1598,10 +1596,15 @@ class Article(models.Model):
         :param bool hidden_mode: If True, scope the search to the hidden articles.
                                  If False, scope the search to the visible articles.
         """
+        domain = [
+            ('is_template', '=', False),
+            ('is_article_visible', '!=', hidden_mode),
+            ('user_has_access', '=', True),  # Admins won't see other's private articles.
+        ]
         if not search_query:
-            return self.search([
-                ('is_user_favorite', '=', True)
-            ], limit=limit).read([
+            if not hidden_mode:
+                domain = [('is_user_favorite', '=', True)]
+            return self.search(domain, limit=limit).read([
                 'id',
                 'icon',
                 'name',
@@ -1609,11 +1612,7 @@ class Article(models.Model):
                 'root_article_id'
             ])
 
-        query = self._search([
-            ('is_template', '=', False),
-            ('is_article_visible', '!=', hidden_mode),
-            ('user_has_access', '=', True),  # Admins won't see other's private articles.
-        ])
+        query = self._search(domain)
 
         # Escape special characters recognized by the 'ILIKE' keyword
         search_pattern = '%' + re.sub(r'(%|_|\\)', r'\\\1', search_query) + '%'
@@ -2347,37 +2346,41 @@ class Article(models.Model):
         self.env['knowledge.article.member'].flush_model()
 
         if self.ids:
-            base_where_domain = SQL("WHERE perms1.id in %s", tuple(self.ids))
+            where_domain = SQL("WHERE id in %s", tuple(self.ids))
         else:
-            base_where_domain = SQL()
+            where_domain = SQL()
 
         return dict(self.env.execute_query(SQL('''
-    WITH RECURSIVE article_perms as (
-        SELECT a.id, a.parent_id, m.permission, a.is_desynchronized
-          FROM knowledge_article a
-     LEFT JOIN knowledge_article_member m
-            ON a.id=m.article_id and partner_id = %s
-    ), article_rec as (
-        SELECT perms1.id, perms1.id as article_id, perms1.parent_id,
-               perms1.permission, perms1.is_desynchronized
-          FROM article_perms as perms1
-            %s
-         UNION
-        SELECT perms2.id, perms_rec.article_id, perms2.parent_id,
-               COALESCE(perms_rec.permission, perms2.permission),
-               perms2.is_desynchronized
-          FROM article_perms as perms2
-    INNER JOIN article_rec perms_rec
-            ON perms_rec.parent_id=perms2.id
-               AND perms_rec.is_desynchronized IS NOT TRUE
-               AND perms_rec.permission IS NULL
-    )
-    SELECT article_id, max(permission)
-      FROM article_rec
-     WHERE permission IS NOT NULL
-  GROUP BY article_id''',
-            partner.id,
-            base_where_domain,
+            WITH RECURSIVE membered_articles AS (
+                -- base case: all articles the partner is member of
+                SELECT a.id,
+                       a.parent_id,
+                       a.is_desynchronized,
+                       m.permission
+                FROM knowledge_article AS a
+                     JOIN knowledge_article_member AS m ON a.id = m.article_id
+                WHERE m.partner_id = %(partner_id)s
+
+                UNION ALL
+                -- recurse into each child, that is not desync, and the partner is not a member of,
+                -- to propagate the member permission
+                SELECT a.id,
+                       a.parent_id,
+                       a.is_desynchronized,
+                       m.permission
+                FROM membered_articles AS m
+                     JOIN knowledge_article AS a ON m.id = a.parent_id
+                WHERE a.is_desynchronized IS NOT TRUE
+                  AND NOT EXISTS (SELECT 1
+                                  FROM knowledge_article_member AS mm
+                                  WHERE mm.article_id = a.id
+                                    AND mm.partner_id = %(partner_id)s))
+            SELECT id AS article_id, permission
+            FROM membered_articles
+            %(where_domain)s
+            ''',
+            partner_id=partner.id,
+            where_domain=where_domain,
         )))
 
     def _get_article_member_permissions(self, additional_fields=False):
@@ -2409,120 +2412,132 @@ class Article(models.Model):
         self.env['knowledge.article'].flush_model()
         self.env['knowledge.article.member'].flush_model()
 
-        add_where_clause = ''
-        args = []
+        if not additional_fields:
+            additional_fields = {}
+
+        article_ids_clause = SQL()
         if self.ids:
-            args = [tuple(self.ids)]
-            add_where_clause += " AND article_id in %s"
+            article_ids_clause = SQL('WHERE id IN %s', tuple(self.ids))
 
-        additional_select_fields = ''
-        join_clause = ''
-        additional_fields = additional_fields or {}
+        alias = 'ef'
+        select_fields_clause = SQL()
+        join_clauses = SQL()
         if additional_fields:
-            supported_additional_models = [
-                'res.partner',
-                'knowledge.article',
-                'knowledge.article.member',
-            ]
-
-            # 1. build the join clause based on the given models (additional_fields keys)
-            join_clauses = []
-            for model in additional_fields.keys():
-                if model not in supported_additional_models:
-                    continue
-
-                table_name = self.env[model]._table
-                join_condition = ''
-                if model == 'res.partner':
-                    join_condition = f'{table_name}.id = partner_id'
-                elif model == 'knowledge.article':
-                    join_condition = f'{table_name}.id = origin_id'
-                elif model == 'knowledge.article.member':
-                    join_condition = f'{table_name}.id = member_id'
-
-                join_clauses.append(f'LEFT OUTER JOIN {table_name} ON {join_condition}')
-
-            join_clause = ' '.join(join_clauses)
-
-            # 2. build the select clause based on the given fields/aliases pairs
-            # (additional_fields values)
+            # model -> join key
+            supported_models = {
+                'res.partner': 'partner_id',
+                'knowledge.article': 'source_article_id',
+                'knowledge.article.member': 'member_id',
+            }
             select_fields = []
-            for model, fields_list in additional_fields.items():
-                if model not in supported_additional_models:
+            joins = {}
+            for model_name, fields_list in additional_fields.items():
+                if model_name not in supported_models:
                     continue
 
-                table_name = self.env[model]._table
-                for (field, field_alias) in fields_list:
-                    select_fields.append(f'{table_name}.{field} as {field_alias}')
+                model = self.env[model_name]
+                table_name = self.env[model_name]._table
 
-            additional_select_fields = ', %s' % ', '.join(select_fields)
+                # add missing join clauses
+                if model_name not in joins:
+                    joins[model_name] = SQL(
+                        'JOIN %(table_name)s ON %(table_pkey)s = %(effective_membership_fkey)s',
+                        table_name=SQL.identifier(table_name),
+                        table_pkey=SQL.identifier(table_name, 'id'),
+                        effective_membership_fkey=SQL.identifier(alias, supported_models[model_name]),
+                    )
 
-        sql = f'''
-    WITH article_permission as (
-        WITH RECURSIVE article_perms as (
-            SELECT a.id, a.parent_id, a.is_desynchronized, m.id as member_id,
-                   m.partner_id, m.permission
-              FROM knowledge_article a
-         LEFT JOIN knowledge_article_member m
-                ON a.id = m.article_id
-        ), article_rec as (
-            SELECT perms1.id, perms1.id as article_id, perms1.parent_id,
-                   perms1.member_id, perms1.partner_id, perms1.permission,
-                   perms1.id as origin_id, 0 as level,
-                   perms1.is_desynchronized
-              FROM article_perms as perms1
-             UNION
-            SELECT perms2.id, perms_rec.article_id, perms2.parent_id,
-                   perms2.member_id, perms2.partner_id, perms2.permission,
-                   perms2.id as origin_id, perms_rec.level + 1,
-                   perms2.is_desynchronized
-              FROM article_perms as perms2
-        INNER JOIN article_rec perms_rec
-                ON perms_rec.parent_id=perms2.id
-                   AND perms_rec.is_desynchronized is not true
+                # add selected fields
+                for field_name, field_alias in fields_list:
+                    field = model._fields.get(field_name)
+                    has_column = bool(field and field.store and field.column_type)
+                    select_key = SQL('%(table_column)s AS %(field_alias)s',
+                                     table_column=SQL.identifier(table_name, field_name),
+                                     field_alias=SQL.identifier(field_alias))
+                    if has_column and select_key not in select_fields:
+                        select_fields.append(select_key)
+
+            if select_fields:
+                select_fields_clause = SQL(', %s', SQL(', ').join(field for field in select_fields))
+            if joins:
+                join_clauses = SQL('\n').join(joins.values())
+
+        query = SQL("""
+            WITH RECURSIVE
+                article_hierarchy     AS (
+                    SELECT id,
+                           id AS ancestor_id,
+                           parent_id,
+                           is_desynchronized,
+                           0  AS inheritance_level
+                      FROM knowledge_article
+                      %(article_ids_clause)s
+
+                     UNION ALL
+
+                    SELECT child.id,
+                           parent.id AS ancestor_id,
+                           parent.parent_id,
+                           parent.is_desynchronized,
+                           child.inheritance_level + 1
+                      FROM article_hierarchy AS child
+                      JOIN knowledge_article AS parent ON parent.id = child.parent_id
+                     WHERE child.is_desynchronized IS NOT TRUE
+                ),
+                article_memberships   AS (
+                    SELECT h.id          AS target_article_id,
+                           h.ancestor_id AS source_article_id,
+                           m.id          AS member_id,
+                           m.permission,
+                           m.partner_id,
+                           h.inheritance_level
+                      FROM article_hierarchy h
+                      JOIN knowledge_article_member m ON m.article_id = h.ancestor_id
+                ),
+                effective_memberships AS (
+                    SELECT target_article_id,
+                           source_article_id,
+                           member_id,
+                           permission,
+                           partner_id
+                      FROM (
+                          SELECT *,
+                                 RANK() OVER (
+                                     PARTITION BY target_article_id, partner_id
+                                     ORDER BY inheritance_level ASC
+                                     ) AS priority_rank
+                            FROM article_memberships
+                      ) ranked_memberships
+                     WHERE priority_rank = 1
+                )
+            SELECT %(alias)s.*
+                   %(select_fields_clause)s
+              FROM effective_memberships AS %(alias)s
+                   %(join_clauses)s
+            """,
+            alias=SQL(alias),
+            article_ids_clause=article_ids_clause,
+            select_fields_clause=select_fields_clause,
+            join_clauses=join_clauses,
         )
-        SELECT article_id, origin_id, member_id, partner_id,
-               permission, min(level) as min_level
-          FROM article_rec
-         WHERE partner_id is not null
-               {add_where_clause}
-      GROUP BY article_id, origin_id, member_id, partner_id, permission
-    )
-    SELECT article_id, origin_id, member_id, partner_id, permission, min_level
-           {additional_select_fields}
-    FROM article_permission
-    {join_clause}
-        '''
+        results = self.env.execute_query_dict(query)
 
-        self._cr.execute(sql, args)
-        results = self._cr.dictfetchall()
-
-        # Now that we have, for each article, all the members found on themselves and their parents.
-        # We need to keep only the first partners found (lowest level) for each article
         article_members = defaultdict(dict)
-        min_level_dict = defaultdict(dict)
-
-        _nolevel = -1
         for result in results:
-            article_id = result['article_id']
-            origin_id = result['origin_id']
+            article_id = result['target_article_id']
+            origin_id = result['source_article_id']
             partner_id = result['partner_id']
-            level = result['min_level']
-            min_level = min_level_dict[article_id].get(partner_id, _nolevel)
-            if min_level == _nolevel or level < min_level:
-                article_members[article_id][partner_id] = {
-                    'member_id': result['member_id'],
-                    'based_on': origin_id if origin_id != article_id else False,
-                    'permission': result['permission']
-                }
-                min_level_dict[article_id][partner_id] = level
-
-                # update our resulting dict based on additional fields
-                article_members[article_id][partner_id].update({
+            article_members[article_id][partner_id] = {
+                'member_id': result['member_id'],
+                'based_on': origin_id if origin_id != article_id else False,
+                'permission': result['permission'],
+                **{
                     field_alias: result[field_alias] if model != 'knowledge.article' or origin_id != article_id else False
                     for model, fields_list in additional_fields.items()
-                    for (field, field_alias) in fields_list
-                })
+                    for field, field_alias in fields_list
+                }
+            }
+
         # add empty member for each article that doesn't have any.
         empty_member = {
             'based_on': False, 'member_id': False, 'permission': None,

@@ -9,6 +9,7 @@ import {
 import { checkLabels, checkLegend, selectMode } from "@web/../tests/views/graph/graph_test_helpers";
 
 import { defineHelpdeskModels } from "@helpdesk/../tests/helpdesk_test_helpers";
+import { HelpdeskTeam } from "@helpdesk/../tests/mock_server/mock_models/helpdesk_team";
 
 describe.current.tags("desktop");
 defineHelpdeskModels();
@@ -66,6 +67,7 @@ test("Can create group if we are a specific helpdesk team", async () => {
         arch: kanbanViewArch,
         context: {
             active_model: "helpdesk.team",
+            default_team_id: 1,
             active_id: 1,
         },
     });
@@ -83,14 +85,12 @@ test("Delete a column in grouped on m2o", async (assert) => {
         type: "kanban",
         arch: kanbanViewArch,
     });
-    onRpc(({ method, model }) => {
-        if (model === "helpdesk.stage" && method === "action_unlink_wizard") {
-            expect.step(method);
-            return {
-                type: "ir.actions.client",
-                tag: "reload",
-            };
-        }
+    onRpc("helpdesk.stage", "action_unlink_wizard", ({ method }) => {
+        expect.step(method);
+        return {
+            type: "ir.actions.client",
+            tag: "reload",
+        };
     });
 
     const clickColumnAction = await toggleKanbanColumnActions(1);
@@ -137,7 +137,7 @@ test("Test group label for empty SLA Deadline in graph", async () => {
 });
 
 test("Prevent helpdesk users from reordering ticket stages", async () => {
-    onRpc("has_group", (group) => group === "helpdesk.group_helpdesk_user");
+    onRpc("has_group", ({ args }) => args[0][1] === "helpdesk.group_helpdesk_user");
     await mountView({
         resModel: "helpdesk.ticket",
         type: "kanban",
@@ -155,4 +155,33 @@ test("Access for helpdesk manager to reordering ticket stages", async () => {
         arch: kanbanViewArch,
     });
     expect(".o_group_draggable").toHaveCount(2);
+});
+
+test("Verify ghost column is visible when all task stages are deleted in Task Kanban view", async () => {
+    const newTeam = {
+        id: 3,
+        name: "Team 3",
+        stage_ids: undefined,
+    }
+    HelpdeskTeam._records.push(newTeam);
+
+    await mountView({
+        resModel: "helpdesk.ticket",
+        type: "kanban",
+        arch: kanbanViewArch,
+        context: {
+            active_model: "helpdesk.stage.delete.wizard", // simulate stage deletion wizard
+            default_team_id: newTeam.id,
+        },
+        domain: [["team_id", "=", newTeam.id]],
+    });
+
+    // Assertions to check for ghost column visibility
+    expect(".o_kanban_header").toHaveCount(1, {
+        message: "should have 1 column",
+    });
+    expect(".o_column_quick_create").toHaveCount(1);
+    expect(".o_kanban_example_background_container").toHaveCount(1, {
+        message: "Ghost column is visible",
+    });
 });

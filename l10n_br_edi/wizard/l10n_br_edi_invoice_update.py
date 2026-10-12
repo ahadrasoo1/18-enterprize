@@ -1,5 +1,5 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-from odoo import models, fields, _
+from odoo import api, models, fields, _
 from odoo.exceptions import ValidationError, UserError
 
 
@@ -27,6 +27,12 @@ class L10nBrEDIInvoiceUpdate(models.TransientModel):
         help='Technical field used to hide the "reason" field.',
     )
 
+    @api.constrains("move_id", "mode", "reason")
+    def _constrains_reason(self):
+        for wizard in self.filtered(lambda wizard: not wizard.is_service_invoice):
+            if wizard.mode == "cancel" and not 15 <= len(wizard.reason or "") <= 255:
+                raise ValidationError(_("The reason must contain at least 15 characters and cannot exceed a maximum of 255 characters."))
+
     def _create_xml_attachment(self, response):
         return self.env["ir.attachment"].create(
             {
@@ -51,7 +57,6 @@ class L10nBrEDIInvoiceUpdate(models.TransientModel):
     def _finalize_update(self, iap_args):
         move = self.move_id
         if self.mode == "cancel":
-            move.l10n_br_last_edi_status = "cancelled"
             move.button_cancel()
         else:
             move.l10n_br_edi_last_correction_number = iap_args["seq"]
@@ -68,6 +73,8 @@ class L10nBrEDIInvoiceUpdate(models.TransientModel):
             response = move._l10n_br_iap_cancel_invoice_goods(iap_args)
             if error := move._l10n_br_get_error_from_response(response):
                 raise ValidationError(error)
+            if not response.get("xml", {}).get("base64"):
+                raise ValidationError(response["status"]["desc"])
         else:
             success_message = _('E-invoice corrected successfully for reason "%s".', self.reason)
             iap_args["seq"] = move.l10n_br_edi_last_correction_number + 1
@@ -95,7 +102,6 @@ class L10nBrEDIInvoiceUpdate(models.TransientModel):
         move.with_context(no_new_invoice=True).message_post(
             body=_("E-invoice cancelled in Odoo, make sure to also cancel it in your city's portal."),
         )
-        move.l10n_br_last_edi_status = "cancelled"
         move.button_cancel()
 
     def action_submit(self):

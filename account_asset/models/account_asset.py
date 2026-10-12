@@ -201,7 +201,7 @@ class AccountAsset(models.Model):
     def _compute_disposal_date(self):
         for asset in self:
             if asset.state == 'close':
-                dates = asset.depreciation_move_ids.filtered(lambda m: m.date).mapped('date')
+                dates = asset.depreciation_move_ids.filtered(lambda m: m.date and m.state != 'cancel').mapped('date')
                 asset.disposal_date = dates and max(dates)
             else:
                 asset.disposal_date = False
@@ -317,13 +317,22 @@ class AccountAsset(models.Model):
         'depreciation_move_ids.reversal_move_ids'
     )
     def _compute_value_residual(self):
+        grouped_moves = self.env['account.move']._read_group(
+            domain=[('asset_id', 'in', self.ids), ('state', '=', 'posted')],
+            groupby=['asset_id'],
+            aggregates=['depreciation_value:sum'],
+        )
+        depreciation_sum_by_asset = {
+            asset.id: total
+            for asset, total in grouped_moves
+        }
         for record in self:
-            posted_depreciation_moves = record.depreciation_move_ids.filtered(lambda mv: mv.state == 'posted')
+            asset_depreciation = depreciation_sum_by_asset.get(record.id, 0.0)
             record.value_residual = (
                 record.original_value
                 - record.salvage_value
                 - record.already_depreciated_amount_import
-                - sum(posted_depreciation_moves.mapped('depreciation_value'))
+                - asset_depreciation
             )
 
     @api.depends('value_residual', 'salvage_value', 'children_ids.book_value')
@@ -347,7 +356,8 @@ class AccountAsset(models.Model):
                     account = line.account_id
                     auto_create_multi = account.create_asset != 'no' and account.multiple_assets_per_line
                     quantity = line.quantity if auto_create_multi else 1
-                    record.non_deductible_tax_value += record.currency_id.round(line.non_deductible_tax_value / quantity)
+                    converted_non_deductible_tax_value = line.currency_id._convert(line.non_deductible_tax_value / quantity, record.currency_id, record.company_id, line.date)
+                    record.non_deductible_tax_value += record.currency_id.round(converted_non_deductible_tax_value)
 
     @api.depends('depreciation_move_ids.state', 'parent_id')
     def _compute_counts(self):
@@ -460,6 +470,8 @@ class AccountAsset(models.Model):
         for asset in self:
             if asset.original_move_line_ids and asset.related_purchase_value == 0:
                 raise UserError(_("You cannot create an asset from lines containing credit and debit on the account or with a null amount"))
+            if asset.state not in ('model', 'draft'):
+                raise UserError(_("You cannot add or remove bills when the asset is already running or closed."))
 
     # -------------------------------------------------------------------------
     # LOW-LEVEL METHODS
@@ -524,22 +536,23 @@ class AccountAsset(models.Model):
 
     def write(self, vals):
         result = super().write(vals)
-        for move in self.depreciation_move_ids:
-            if move.state == 'draft' and 'analytic_distribution' in vals:
-                # Only draft entries to avoid recreating all the analytic items
-                move.line_ids.analytic_distribution = vals['analytic_distribution']
-            lock_date = move.company_id._get_user_fiscal_lock_date(self.journal_id)
-            if move.date > lock_date:
-                if 'account_depreciation_id' in vals:
-                    # ::2 (0, 2, 4, ...) because we want all first lines of the depreciation entries, which corresponds to the
-                    # lines with account_depreciation_id as account
-                    move.line_ids[::2].account_id = vals['account_depreciation_id']
-                if 'account_depreciation_expense_id' in vals:
-                    # 1::2 (1, 3, 5, ...) because we want all second lines of the depreciation entries, which corresponds to the
-                    # lines with account_depreciation_expense_id as account
-                    move.line_ids[1::2].account_id = vals['account_depreciation_expense_id']
-                if 'journal_id' in vals:
-                    move.journal_id = vals['journal_id']
+        for asset in self:
+            for move in asset.depreciation_move_ids:
+                if move.state == 'draft' and 'analytic_distribution' in vals:
+                    # Only draft entries to avoid recreating all the analytic items
+                    move.line_ids.analytic_distribution = vals['analytic_distribution']
+                lock_date = move.company_id._get_user_fiscal_lock_date(asset.journal_id)
+                if move.date > lock_date:
+                    if 'account_depreciation_id' in vals:
+                        # ::2 (0, 2, 4, ...) because we want all first lines of the depreciation entries, which corresponds to the
+                        # lines with account_depreciation_id as account
+                        move.line_ids[::2].account_id = vals['account_depreciation_id']
+                    if 'account_depreciation_expense_id' in vals:
+                        # 1::2 (1, 3, 5, ...) because we want all second lines of the depreciation entries, which corresponds to the
+                        # lines with account_depreciation_expense_id as account
+                        move.line_ids[1::2].account_id = vals['account_depreciation_expense_id']
+                    if 'journal_id' in vals:
+                        move.journal_id = vals['journal_id']
         return result
 
     # -------------------------------------------------------------------------
@@ -576,12 +589,13 @@ class AccountAsset(models.Model):
             degressive_amount = residual_amount - degressive_total_value
             return self._degressive_linear_amount(residual_amount, degressive_amount, linear_amount)
 
+        if float_is_zero(self.asset_lifetime_days, 2) or float_is_zero(residual_amount, 2):
+            return 0, 0
+
         days_until_period_end = self._get_delta_days(self.paused_prorata_date, period_end_date)
         days_before_period = self._get_delta_days(self.paused_prorata_date, period_start_date + relativedelta(days=-1))
         days_before_period = max(days_before_period, 0)  # if disposed before the beginning of the asset for example
         number_days = days_until_period_end - days_before_period
-        if float_is_zero(self.asset_lifetime_days, 2):
-            return 0, 0
 
         # The amount to depreciate are computed by computing how much the asset should be depreciated at the end of the
         # period minus how much difference it is actually depreciated. It is done that way to avoid having the last move to take
@@ -694,7 +708,7 @@ class AccountAsset(models.Model):
                     }))
 
                 if period_end_depreciation_date == period_end_fiscalyear_date:
-                    start_yearly_period = self.company_id.compute_fiscalyear_dates(period_end_depreciation_date).get('date_from') + relativedelta(years=1)
+                    start_yearly_period = self.company_id.compute_fiscalyear_dates(period_end_depreciation_date + relativedelta(days=1)).get('date_from')
                     residual_declining = residual_amount
 
                 start_depreciation_date = period_end_depreciation_date + relativedelta(days=1)
@@ -886,6 +900,7 @@ class AccountAsset(models.Model):
         if invoice_line_ids and self.children_ids.filtered(lambda a: a.state in ('draft', 'open') or a.value_residual > 0):
             raise UserError(_("You cannot automate the journal entry for an asset that has a running gross increase. Please use 'Dispose' on the increase(s)."))
         full_asset = self + self.children_ids
+        full_asset.state = 'close'
         move_ids = full_asset._get_disposal_moves([invoice_line_ids] * len(full_asset), disposal_date)
         for asset in full_asset:
             asset.message_post(body=
@@ -897,7 +912,6 @@ class AccountAsset(models.Model):
         selling_price = abs(sum(invoice_line.balance for invoice_line in invoice_line_ids))
         self.net_gain_on_sale = self.currency_id.round(selling_price - self.book_value)
 
-        full_asset.write({'state': 'close'})
         if move_ids:
             name = _('Disposal Move')
             view_mode = 'form'
@@ -1047,6 +1061,10 @@ class AccountAsset(models.Model):
         ).sorted('date')).mapped('date')
 
         beginning_fiscal_year = self.company_id.compute_fiscalyear_dates(date).get('date_from') if self.method != 'linear' else False
+        # For degressive methods, the fiscal year start must not precede the asset's
+        # prorata date, otherwise day-count computations produce incorrect results.
+        if beginning_fiscal_year:
+            beginning_fiscal_year = max(beginning_fiscal_year, self.paused_prorata_date)
         first_fiscalyear_move = self.env['account.move']
         if all_move_dates_before_date:
             last_move_date_not_reversed = max(all_move_dates_before_date)
@@ -1185,6 +1203,40 @@ class AccountAsset(models.Model):
             amount = residual_amount
         return amount
 
-    def _get_own_book_value(self):
+    def _get_own_book_value(self, date=None):
         self.ensure_one()
-        return self.value_residual + self.salvage_value
+        return (self._get_residual_value_at_date(date) if date else self.value_residual) + self.salvage_value
+
+    def _get_residual_value_at_date(self, date):
+        """ Computes the theoretical value of the asset at a specific date.
+
+            :param date: the date at which we want the asset's value
+            :return: the value at date of the asset without taking reverse entries into account (as it should be in a "normal" flow of the asset)
+        """
+        current_and_previous_depreciation = self.depreciation_move_ids.filtered(
+            lambda mv:
+            mv.asset_depreciation_beginning_date < date
+            and not mv.reversed_entry_id
+        ).sorted('asset_depreciation_beginning_date', reverse=True)
+        if not current_and_previous_depreciation:
+            return 0
+
+        if len(current_and_previous_depreciation) > 1:
+            previous_value_residual = current_and_previous_depreciation[1].asset_remaining_value
+        else:
+            # If there is only one depreciation, we take the original depreciation value
+            previous_value_residual = self.original_value - self.salvage_value - self.already_depreciated_amount_import
+
+        # We compare the amount_residuals of the depreciations before and during the given date.
+        # It applies the ratio of the period (to-given-date / total-days-of-the-period) to the amount of the depreciation.
+        cur_depr_end_date = self._get_end_period_date(date)
+        current_depreciation = current_and_previous_depreciation[0]
+        cur_depr_beg_date = current_depreciation.asset_depreciation_beginning_date
+
+        rate = self._get_delta_days(cur_depr_beg_date, date) / self._get_delta_days(cur_depr_beg_date, cur_depr_end_date)
+        lost_value_at_date = (previous_value_residual - current_depreciation.asset_remaining_value) * rate
+        residual_value_at_date = self.currency_id.round(previous_value_residual - lost_value_at_date)
+        if self.currency_id.compare_amounts(self.original_value, 0) > 0:
+            return max(residual_value_at_date, 0)
+        else:
+            return min(residual_value_at_date, 0)

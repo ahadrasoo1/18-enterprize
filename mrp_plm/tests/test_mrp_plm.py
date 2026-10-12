@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from .test_common import TestPlmCommon
 from odoo import Command
+from odoo.exceptions import ValidationError
 from odoo.tests import Form
 from odoo.tests.common import new_test_user
+
+from .test_common import TestPlmCommon
+
 
 class TestMrpPlm(TestPlmCommon):
 
@@ -593,3 +596,183 @@ class TestMrpPlm(TestPlmCommon):
         })
         eco = self.create_eco('product')
         self.assertEqual(eco.document_count, 2, 'Document count should be 2, all docs have to be copied.')
+
+    def test_duplicate_eco_template_with_same_user_and_stage(self):
+        """Test that two ECO approval templates cannot be created
+        with the same user for the same stage."""
+        self.env['mrp.eco.approval.template'].create({
+            'name': 'eco approval template',
+            'approval_type': 'mandatory',
+            'user_ids': [Command.set(self.env.ref('base.user_admin').ids)],
+            'stage_id': self.eco_stage.id,
+        })
+        with self.assertRaises(ValidationError):
+            self.env['mrp.eco.approval.template'].create({
+                'name': 'eco approval template',
+                'approval_type': 'mandatory',
+                'user_ids': [Command.set(self.env.ref('base.user_admin').ids)],
+                'stage_id': self.eco_stage.id,
+            })
+
+    def test_eco_count(self):
+        """Test that the ECO count is correctly updated for both
+        the product and the BOM when creating a new revision.
+        """
+        self.assertEqual(self.table.eco_count, 0)
+        self.assertEqual(self.bom_table.eco_count, 0)
+        # Create an ECO for the BOM and verify the count for both the BOM and the product
+        eco = self.env['mrp.eco'].create({
+            'name': 'eco',
+            'product_tmpl_id': self.table.product_tmpl_id.id,
+            'type_id': self.eco_type.id,
+            'type': 'bom',
+            'bom_id': self.bom_table.id,
+        })
+        self.table.invalidate_recordset(['eco_count'])
+        self.table.product_tmpl_id.invalidate_recordset(['eco_count'])
+        self.bom_table.invalidate_recordset(['eco_count'])
+        self.assertEqual(self.table.eco_count, 0)
+        self.assertEqual(self.bom_table.eco_count, 1)
+        # Update the ECO type to "Product" and verify that
+        # the bom_id field is cleared and the count is updated
+        eco.type = 'product'
+        self.assertFalse(eco.bom_id)
+        self.table.invalidate_recordset(['eco_count'])
+        self.table.product_tmpl_id.invalidate_recordset(['eco_count'])
+        self.bom_table.invalidate_recordset(['eco_count'])
+        self.assertEqual(self.table.eco_count, 1)
+        self.assertEqual(self.bom_table.eco_count, 0)
+
+    def _create_eco_approval_workflow(self):
+        """Create an ECO type with an approval workflow for testing purposes."""
+        self.random_approver = new_test_user(
+            self.env, "random_approver", "mrp_plm.group_plm_manager"
+        )
+        self.admin = self.env.ref("base.user_admin")
+        self.approval_eco_type = self.env["mrp.eco.type"].create(
+            {
+                "name": "ECO Type with approval",
+            }
+        )
+        self.approval_new_stage = self.env["mrp.eco.stage"].create(
+            {
+                "name": "New",
+                "sequence": 0,
+                "type_ids": [Command.link(self.approval_eco_type.id)],
+            }
+        )
+        self.approval_first_stage = self.env["mrp.eco.stage"].create(
+            {
+                "name": "First approval",
+                "type_ids": [Command.link(self.approval_eco_type.id)],
+                "sequence": 10,
+                "approval_template_ids": [
+                    Command.create(
+                        {
+                            "name": "First Approval",
+                            "user_ids": [Command.set(self.admin.ids)],
+                            "approval_type": "optional",
+                        }
+                    ),
+                    Command.create(
+                        {
+                            "name": "Second Approval",
+                            "user_ids": [Command.set(self.random_approver.ids)],
+                            "approval_type": "mandatory",
+                        }
+                    ),
+                ],
+            }
+        )
+        self.approval_done_stage = self.env["mrp.eco.stage"].create(
+            {
+                "name": "Done",
+                "type_ids": [Command.link(self.approval_eco_type.id)],
+                "final_stage": True,
+                "sequence": 30,
+            }
+        )
+
+    def test_dashboard_waiting_for_me(self):
+        """Test that the dashboard computes the ECOs waiting for my approval properly."""
+        self._create_eco_approval_workflow()
+        eco = self._create_eco(
+            "ECO1",
+            self.bom_table,
+            self.approval_eco_type.id,
+            self.approval_new_stage.id,
+        )
+        eco.action_new_revision()
+        eco.stage_id = self.approval_first_stage
+        # Just landed on first stage, both users need to approve
+        self.approval_eco_type.invalidate_recordset(["nb_approvals_my"])
+        self.assertEqual(
+            self.approval_eco_type.with_user(self.random_approver).nb_approvals_my,
+            1,
+            "Random approver should have 1 approval waiting",
+        )
+        self.approval_eco_type.invalidate_recordset(["nb_approvals_my"])
+        self.assertEqual(
+            self.approval_eco_type.with_user(self.admin).nb_approvals_my,
+            1,
+            "Admin should have 1 approval waiting",
+        )
+        # Admin approves
+        eco.with_user(self.admin).approve()
+        # Check that counter is correct
+        self.approval_eco_type.invalidate_recordset(["nb_approvals_my"])
+        self.assertEqual(
+            self.approval_eco_type.with_user(self.random_approver).nb_approvals_my,
+            1,
+            "Random approver should have 1 approval waiting",
+        )
+        self.approval_eco_type.invalidate_recordset(["nb_approvals_my"])
+        self.assertEqual(
+            self.approval_eco_type.with_user(self.admin).nb_approvals_my,
+            0,
+            "Admin should have 0 approval waiting",
+        )
+
+    def test_compute_component_upd_product_qty(self):
+        """Test the correct computation of BoM component quantity changes when
+        using high-precision units of measure. We ensure that the updated
+        quantity respects the UoM decimal digits instead of the default precision.
+        """
+        self.env['decimal.precision'].search([('name', '=', 'Product Unit of Measure')]).digits = 4
+        self.bom_table.product_uom_id.rounding = 0.0001
+        bom_eco = self._create_eco('bom_eco', self.bom_table, self.eco_type.id, self.eco_stage.id)
+        bom_eco.action_new_revision()
+        self.assertFalse(bom_eco.bom_change_ids)
+        self.assertEqual(bom_eco.bom_id.bom_line_ids[0].product_qty, 1.0)
+        bom_eco.new_bom_id.bom_line_ids[0].product_qty = 1.0003
+        self.assertEqual(bom_eco.new_bom_id.bom_line_ids[0].product_qty, 1.0003)
+        self.assertEqual(bom_eco.bom_change_ids.upd_product_qty, 0.0003)
+
+    def test_eco_attachments(self):
+        """Test that applying an ECO updates the origin_attachment_id for product.document"""
+        tmpl = self.env["product.template"].create({"name": "Test"})
+        eco_form = Form(self.env["mrp.eco"])
+        eco_form.name = "ELCT ECO"
+        eco_form.type_id = self.eco_type
+        eco_form.type = "product"
+        eco_form.product_tmpl_id = tmpl
+        eco = eco_form.save()
+        eco.stage_id = self.eco_stage
+        eco.action_new_revision()
+        eco.document_ids = [
+            (
+                0,
+                0,
+                {
+                    "name": "test.pdf",
+                    "type": "binary",
+                    "raw": b"Original content",
+                    "res_id": eco.id,
+                    "res_model": "mrp.eco",
+                },
+            )
+        ]
+        doc = eco.document_ids[0]
+        old_origin_id = doc.origin_attachment_id
+        eco.action_apply()
+        self.assertNotEqual(doc.origin_attachment_id, old_origin_id)

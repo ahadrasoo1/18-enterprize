@@ -87,8 +87,8 @@
 
                     <field name="custom_handler_model_id" invisible="1"/>
                     <div class="alert alert-info text-center" invisible="not custom_handler_model_id" role="alert">
-                        This report is linked to a custom handler.
-                        You can customize it manually, but make sure your changes don't clash with what the handler does.
+                        This report uses report-specific code.
+                        You can customize it manually, but any change in the parameters used for its computation could lead to errors.
                     </div>
 
                     <sheet>
@@ -172,6 +172,7 @@
                                         <field name="filter_unfold_all"/>
                                         <field name="filter_growth_comparison"/>
                                         <field name="filter_period_comparison"/>
+                                        <field name="integer_rounding" placeholder="None"/>
                                         <field name="currency_translation" required="1" groups="base.group_multi_currency"/>
                                     </group>
                                     <group string="Filters" class="oe_edit_only">

@@ -1,23 +1,28 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* account_asset
-# 
+# * account_asset
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Daye Jeong, 2025
+# Sarah Park, 2025
+#
+# "Kwanghee Park (kwpa)" <kwpa@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
-"PO-Revision-Date: 2024-09-25 09:43+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Korean (https://app.transifex.com/odoo/teams/41243/ko/)\n"
+"POT-Creation-Date: 2025-12-29 18:45+0000\n"
+"PO-Revision-Date: 2026-02-14 09:05+0000\n"
+"Last-Translator: \"Kwanghee Park (kwpa)\" <kwpa@odoo.com>\n"
+"Language-Team: Korean <https://translate.odoo.com/projects/odoo-18/"
+"account_asset/ko/>\n"
+"Language: ko\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: ko\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 5.14.3\n"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__total_depreciation_entries_count
@@ -38,13 +43,13 @@ msgstr "# 발행된 감가상각 항목"
 #. odoo-python
 #: code:addons/account_asset/models/account_asset.py:0
 msgid "%(asset)s: Disposal"
-msgstr ""
+msgstr "%(asset)s: 처분"
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_asset.py:0
 msgid "%(asset)s: Sale"
-msgstr ""
+msgstr "%(asset)s: 판매"
 
 #. module: account_asset
 #. odoo-python
@@ -56,7 +61,7 @@ msgstr "%(months)s월"
 #. odoo-python
 #: code:addons/account_asset/models/account_move.py:0
 msgid "%(move_line)s (%(current)s of %(total)s)"
-msgstr ""
+msgstr "%(move_line)s (%(current)s, 총 %(total)s)"
 
 #. module: account_asset
 #. odoo-python
@@ -76,7 +81,8 @@ msgstr "%s (복사)"
 msgid ""
 "%s Future entries will be recomputed to depreciate the asset following the "
 "changes."
-msgstr "%s 이후 항목 입력 시 자산의 감가상각 변경사항 반영을 위해 다시 계산됩니다."
+msgstr ""
+"%s 이후 항목 입력 시 자산의 감가상각 변경사항 반영을 위해 다시 계산됩니다."
 
 #. module: account_asset
 #. odoo-python
@@ -99,34 +105,34 @@ msgstr "(전체 중"
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid ""
-"A depreciation entry will be posted on and including the date %(date)s. "
-"<br/> %(extra_text)s Future entries will be recomputed to depreciate the "
-"asset following the changes."
+"A depreciation entry will be posted on and including the date %(date)s. <br/"
+"> %(extra_text)s Future entries will be recomputed to depreciate the asset "
+"following the changes."
 msgstr ""
-"감가상각 항목이 %(date)s 날짜를 기준으로 전기됩니다. <br/> %(extra_text)s 이후의 항목들은 변경 후 자산 "
-"감가상각을 위해 다시 계산됩니다."
+"감가상각 항목이 %(date)s 날짜를 기준으로 전기됩니다. <br/> %(extra_text)s 이"
+"후의 항목들은 변경 후 자산 감가상각을 위해 다시 계산됩니다."
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid ""
-"A depreciation entry will be posted on and including the date %(date)s.<br/>"
-" A disposal entry will be posted on the %(account_type)s account "
-"<b>%(account)s</b>."
+"A depreciation entry will be posted on and including the date %(date)s.<br/> "
+"A disposal entry will be posted on the %(account_type)s account <b>%"
+"(account)s</b>."
 msgstr ""
-"감가상각 항목이 %(date)s 날짜를 포함한 기준으로 발행됩니다.<br/> 처분 항목은 %(account_type)s "
-"<b>%(account)s</b> 계정으로 입력됩니다."
+"감가상각 항목이 %(date)s 날짜를 포함한 기준으로 발행됩니다.<br/> 처분 항목은 "
+"%(account_type)s <b>%(account)s</b> 계정으로 입력됩니다."
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid ""
-"A depreciation entry will be posted on and including the date %(date)s.<br/>"
-" A second entry will neutralize the original income and post the  outcome of"
-" this sale on account <b>%(account)s</b>."
+"A depreciation entry will be posted on and including the date %(date)s.<br/> "
+"A second entry will neutralize the original income and post the  outcome of "
+"this sale on account <b>%(account)s</b>."
 msgstr ""
-"감가상각 항목이 %(date)s 날짜를 기준으로 발행됩니다.<br/> 두 번째 항목은 원래의 수입 금액을 상계 후 매출 결과를 계정 "
-"<b>%(account)s</b>으로 발행합니다."
+"감가상각 항목이 %(date)s 날짜를 기준으로 발행됩니다.<br/> 두 번째 항목은 원래"
+"의 수입 금액을 상계 후 매출 결과를 계정 <b>%(account)s</b>으로 발행합니다."
 
 #. module: account_asset
 #. odoo-python
@@ -150,7 +156,7 @@ msgstr "이 작업에 연결된 문서가 삭제되었습니다: %s"
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "A gross increase has been created: %(link)s"
-msgstr ""
+msgstr "총 금액 증가분이 생성되었습니다: %(link)s"
 
 #. module: account_asset
 #. odoo-python
@@ -158,7 +164,9 @@ msgstr ""
 msgid ""
 "A non deductible tax value of %(tax_value)s was added to %(name)s's initial "
 "value of %(purchase_value)s"
-msgstr "비공제 세금액인 %(tax_value)s이 %(name)s의 기초 금액인 %(purchase_value)s에 추가되었습니다."
+msgstr ""
+"비공제 세금액인 %(tax_value)s이 %(name)s의 기초 금액인 %(purchase_value)s에 "
+"추가되었습니다."
 
 #. module: account_asset
 #: model:ir.model,name:account_asset.model_account_account
@@ -169,10 +177,11 @@ msgstr "계정"
 #: model:ir.model.fields,help:account_asset.field_account_asset__account_type
 msgid ""
 "Account Type is used for information purpose, to generate country-specific "
-"legal reports, and set the rules to close a fiscal year and generate opening"
-" entries."
+"legal reports, and set the rules to close a fiscal year and generate opening "
+"entries."
 msgstr ""
-"계정 유형은 정보 제공을 목적으로, 각 국가별 법적 보고서를 생성하고 회계연도 마감 및 시작 항목에 대한 생성 규칙을 설정합니다."
+"계정 유형은 정보 제공을 목적으로, 각 국가별 법적 보고서를 생성하고 회계연도 "
+"마감 및 시작 항목에 대한 생성 규칙을 설정합니다."
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_asset__account_depreciation_id
@@ -188,8 +197,7 @@ msgstr "자산을 비용 처리하도록 주기적으로 입력하는 계정입�
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_asset__account_asset_id
-msgid ""
-"Account used to record the purchase of the asset at its original price."
+msgid "Account used to record the purchase of the asset at its original price."
 msgstr "자산의 구매시 원래 가격을 기록하는 데 사용하는 계정입니다."
 
 #. module: account_asset
@@ -200,8 +208,7 @@ msgstr "수익 발생과 관련된 전표에 사용되는 계정"
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_res_company__gain_account_id
 msgid ""
-"Account used to write the journal item in case of gain while selling an "
-"asset"
+"Account used to write the journal item in case of gain while selling an asset"
 msgstr "자산 매각 시 차익 발생과 관련한 전표에 사용되는 계정"
 
 #. module: account_asset
@@ -212,8 +219,7 @@ msgstr "손실 발생과 관련된 전표에 사용되는 계정"
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_res_company__loss_account_id
 msgid ""
-"Account used to write the journal item in case of loss while selling an "
-"asset"
+"Account used to write the journal item in case of loss while selling an asset"
 msgstr "자산 매각 시 손실 발생과 관련한 전표에 사용되는 계정"
 
 #. module: account_asset
@@ -315,6 +321,8 @@ msgid ""
 "An asset wil be created for each asset model when this account is used on a "
 "vendor bill or a refund"
 msgstr ""
+"이 계정이 공급업체 청구서 또는 환불에 사용되면 각 자산 모델에 대해 자산이 생"
+"성됩니다."
 
 #. module: account_asset
 #. odoo-python
@@ -373,7 +381,7 @@ msgstr "자산 상대 계정"
 #: model_terms:ir.ui.view,arch_db:account_asset.asset_group_form_view
 #: model_terms:ir.ui.view,arch_db:account_asset.asset_group_list_view
 msgid "Asset Group"
-msgstr ""
+msgstr "자산 그룹"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_bank_statement_line__asset_id_display_name
@@ -519,7 +527,7 @@ msgstr "초안 및 개시된 상태의 자산"
 msgid ""
 "Atleast one asset (%s) couldn't be set as running because it lacks any "
 "required information"
-msgstr "필요한 정보가 없기 때문에 자산 (%s)을 실행 중으로 설정할 수 없습니다."
+msgstr "필요한 정보가 없기 때문에 자산 (%s)을 진행 중으로 설정할 수 없습니다."
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__message_attachment_count
@@ -590,7 +598,8 @@ msgid ""
 "Choose the method to use to compute the amount of depreciation lines.\n"
 "  * Straight Line: Calculated on basis of: Gross Value / Duration\n"
 "  * Declining: Calculated on basis of: Residual Value * Declining Factor\n"
-"  * Declining then Straight Line: Like Declining but with a minimum depreciation value equal to the straight line value."
+"  * Declining then Straight Line: Like Declining but with a minimum "
+"depreciation value equal to the straight line value."
 msgstr ""
 "감가상각 계산법을 선택하세요.\n"
 "  * 정액법: 총 대상 가액/내용 연수를 기준으로 계산\n"
@@ -646,12 +655,12 @@ msgstr "자산 계산"
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__count_linked_asset
 msgid "Count Linked Asset"
-msgstr ""
+msgstr "연결된 자산 개수"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset_group__count_linked_assets
 msgid "Count Linked Assets"
-msgstr ""
+msgstr "연결된 자산 계산"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__country_code
@@ -885,7 +894,7 @@ msgstr "처분"
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__distribution_analytic_account_ids
 msgid "Distribution Analytic Account"
-msgstr ""
+msgstr "분포 분석 계정"
 
 #. module: account_asset
 #: model:ir.model.fields.selection,name:account_asset.selection__account_asset__state__draft
@@ -1002,7 +1011,7 @@ msgstr "계정별 그룹"
 #. odoo-javascript
 #: code:addons/account_asset/static/src/components/depreciation_schedule/groupby.xml:0
 msgid "Group By Asset Group"
-msgstr ""
+msgstr "자산 그룹별 그룹"
 
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_model_search
@@ -1014,13 +1023,13 @@ msgstr "그룹별..."
 #. odoo-javascript
 #: code:addons/account_asset/static/src/components/depreciation_schedule/groupby.xml:0
 msgid "Group by Account"
-msgstr ""
+msgstr "계정별 그룹"
 
 #. module: account_asset
 #. odoo-javascript
 #: code:addons/account_asset/static/src/components/depreciation_schedule/groupby.xml:0
 msgid "Group by Asset Group"
-msgstr ""
+msgstr "자산 그룹별 그룹"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__has_message
@@ -1058,12 +1067,13 @@ msgstr "이 옵션을 선택하면 일부 정보가 전달 오류를 생성합�
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_asset__already_depreciated_amount_import
 msgid ""
-"In case of an import from another software, you might need to use this field"
-" to have the right depreciation table report. This is the value that was "
+"In case of an import from another software, you might need to use this field "
+"to have the right depreciation table report. This is the value that was "
 "already depreciated with entries not computed from this model"
 msgstr ""
-"다른 프로그램에서 가져오는 경우에는, 이 필드를 사용하여 올바른 감가상각표 보고서를 확인할 수 있습니다. 해당 값은 이 모델에서 계산되지"
-" 않은 항목으로 이미 감가상각된 값입니다."
+"다른 프로그램에서 가져오는 경우에는, 이 필드를 사용하여 올바른 감가상각표 보"
+"고서를 확인할 수 있습니다. 해당 값은 이 모델에서 계산되지 않은 항목으로 이미 "
+"감가상각된 값입니다."
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_asset_modify__informational_text
@@ -1152,7 +1162,7 @@ msgstr "선형"
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__linked_assets_ids
 msgid "Linked Assets"
-msgstr ""
+msgstr "연결된 자산"
 
 #. module: account_asset
 #: model:ir.model.fields.selection,name:account_asset.selection__asset_modify__gain_or_loss__loss
@@ -1196,7 +1206,7 @@ msgstr "모델"
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__asset_properties_definition
 msgid "Model Properties"
-msgstr ""
+msgstr "모델 속성"
 
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.asset_modify_form
@@ -1232,7 +1242,9 @@ msgstr "내역 당 여러 항목의 자산"
 msgid ""
 "Multiple asset items will be generated depending on the bill line quantity "
 "instead of 1 global asset."
-msgstr "포괄적인 하나의 항목으로 자산을 생성하지 않고, 청구서 항목 수에 따라서 여러 개의 자산 항목을 생성합니다."
+msgstr ""
+"포괄적인 하나의 항목으로 자산을 생성하지 않고, 청구서 항목 수에 따라서 여러 "
+"개의 자산 항목을 생성합니다."
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__my_activity_date_deadline
@@ -1299,7 +1311,7 @@ msgstr "아니오"
 #. odoo-javascript
 #: code:addons/account_asset/static/src/components/depreciation_schedule/groupby.xml:0
 msgid "No Grouping"
-msgstr ""
+msgstr "그룹화 없음"
 
 #. module: account_asset
 #: model:ir.model.fields.selection,name:account_asset.selection__account_asset__prorata_computation_type__none
@@ -1478,7 +1490,7 @@ msgstr "관련 매입가"
 #. odoo-python
 #: code:addons/account_asset/models/account_asset.py:0
 msgid "Reset to running"
-msgstr "실행으로 재설정"
+msgstr "진행 중으로 초기화"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__activity_user_id
@@ -1501,14 +1513,14 @@ msgstr "감가상각 재개"
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid ""
-"Reverse the depreciation entries posted in the future in order to modify the"
-" depreciation"
+"Reverse the depreciation entries posted in the future in order to modify the "
+"depreciation"
 msgstr "감가 상각을 수정하기 위해 미래에 발행된 감가 상각 항목을 역분개합니다."
 
 #. module: account_asset
 #: model:ir.model.fields.selection,name:account_asset.selection__account_asset__state__open
 msgid "Running"
-msgstr "실행 중"
+msgstr "진행 중"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__message_has_sms_error
@@ -1551,7 +1563,7 @@ msgstr "미결로 설정"
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_form
 msgid "Set to Running"
-msgstr "실행 중으로 설정"
+msgstr "진행 중으로 설정"
 
 #. module: account_asset
 #: model_terms:ir.ui.view,arch_db:account_asset.view_account_asset_search
@@ -1605,7 +1617,9 @@ msgstr "정액법"
 msgid ""
 "Sum of the depreciable value, the salvage value and the book value of all "
 "value increase items"
-msgstr "감가상각 대상금액과 잔존가액 및 장부가액을 합산한 금액입니다 (항목의 가액이 증가한 경우)."
+msgstr ""
+"감가상각 대상금액과 잔존가액 및 장부가액을 합산한 금액입니다 (항목의 가액이 "
+"증가한 경우)."
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_asset__country_code
@@ -1621,11 +1635,12 @@ msgstr ""
 #: code:addons/account_asset/models/account_asset.py:0
 msgid ""
 "The account %(exp_acc)s has been credited by %(exp_delta)s, while the "
-"account %(dep_acc)s has been debited by %(dep_delta)s. This corresponds to "
-"%(move_count)s cancelled %(word)s:"
+"account %(dep_acc)s has been debited by %(dep_delta)s. This corresponds to %"
+"(move_count)s cancelled %(word)s:"
 msgstr ""
-"%(exp_acc)s 계정이 %(exp_delta)s 로 입금 처리되었으며, %(dep_acc)s 계정이 %(dep_delta)s 로 "
-"출금 처리되었습니다. %(move_count)s에 따라 %(word)s 항목이 취소되었습니다."
+"%(exp_acc)s 계정이 %(exp_delta)s 로 입금 처리되었으며, %(dep_acc)s 계정이 %"
+"(dep_delta)s 로 출금 처리되었습니다. %(move_count)s에 따라 %(word)s 항목이 취"
+"소되었습니다."
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_asset__method_period
@@ -1641,8 +1656,8 @@ msgid ""
 "Purchase's value (%(purchase_value)s). Please make sure this is what you "
 "want."
 msgstr ""
-"입력하신 금액 (%(entered_amount)s)이 해당 구매 항목 가치 (%(purchase_value)s)와 일치하지 않습니다. "
-"입력하신 내용이 맞는지 확인해 주세요."
+"입력하신 금액 (%(entered_amount)s)이 해당 구매 항목 가치 (%(purchase_value)s)"
+"와 일치하지 않습니다. 입력하신 내용이 맞는지 확인해 주세요."
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_asset_modify__asset_id
@@ -1683,7 +1698,9 @@ msgstr "이 자산과 관련될 수 있는 여러 내역이 있습니다"
 msgid ""
 "There are unposted depreciations prior to the selected operation date, "
 "please deal with them first."
-msgstr "선택한 운용일 이전의 미발행 감가상각 항목이 있으므로, 먼저 처리하시기 바랍니다."
+msgstr ""
+"선택한 운용일 이전의 미발행 감가상각 항목이 있으므로, 먼저 처리하시기 바랍니"
+"다."
 
 #. module: account_asset
 #. odoo-javascript
@@ -1743,7 +1760,7 @@ msgstr "금액증가자산: %(asset)s"
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__warning_count_assets
 msgid "Warning Count Assets"
-msgstr ""
+msgstr "경고 자산 수"
 
 #. module: account_asset
 #. odoo-python
@@ -1765,16 +1782,20 @@ msgstr "웹사이트 대화 이력"
 #: model:ir.model.fields,help:account_asset.field_account_asset__state
 msgid ""
 "When an asset is created, the status is 'Draft'.\n"
-"If the asset is confirmed, the status goes in 'Running' and the depreciation lines can be posted in the accounting.\n"
-"The 'On Hold' status can be set manually when you want to pause the depreciation of an asset for some time.\n"
+"If the asset is confirmed, the status goes in 'Running' and the depreciation "
+"lines can be posted in the accounting.\n"
+"The 'On Hold' status can be set manually when you want to pause the "
+"depreciation of an asset for some time.\n"
 "You can manually close an asset when the depreciation is over.\n"
 "By cancelling an asset, all depreciation entries will be reversed"
 msgstr ""
-"자산이 생성되면, '초안' 상태입니다.\n"
-"자산을 승인하면, 상태는 '실행 중'으로 변경되며 감가상각 내역을 회계 장부로 발행할 수 있게 됩니다.\n"
-"'보류' 상태로 직접 설정해서 일시적으로 자산의 감가상각을 중단할 수도 있습니다.\n"
-"감가상각이 종료되면 자산 항목을 직접 마감할 수 있습니다.\n"
-"자산 항목을 삭제할 경우, 입력한 모든 감가상각이 역분개 처리됩니다.  "
+"자산 항목을 생성할 경우, '초안' 상태로 설정되어 있습니다.\n"
+"자산 확정 후에는, 상태가 '실행 중' 으로 변경되며 감가상각 내역을 회계 장부로 "
+"발행할 수 있게 됩니다.\n"
+"'보류' 상태로 수동 설정할 경우 일시적으로 자산 감가상각 진행을 중단하는 것도 "
+"가능합니다.\n"
+"감가상각이 완료되면 자산을 수동으로 마감할 수 있습니다.\n"
+"자산 항목을 삭제할 경우, 모든 감가상각 입력 내용이 역분개 처리됩니다."
 
 #. module: account_asset
 #: model:ir.model.fields.selection,name:account_asset.selection__account_asset__method_period__12
@@ -1783,18 +1804,35 @@ msgid "Years"
 msgstr "년"
 
 #. module: account_asset
+#. odoo-javascript
+#: code:addons/account_asset/static/src/views/fields/properties/properties_field.js:0
+msgid "You can add Property fields only on Assets with an Asset Model set."
+msgstr "속성 필드는 자산 모델이 설정된 자산에만 추가할 수 있습니다."
+
+#. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/models/account_move.py:0
 msgid ""
 "You can't post an entry related to a draft asset. Please post the asset "
 "before."
-msgstr "미결 자산과 관련된 전표를 발행할 수 없습니다. 자산 항목을 먼저 발행하시기 바랍니다."
+msgstr ""
+"미결 자산과 관련된 전표를 발행할 수 없습니다. 자산 항목을 먼저 발행하시기 바"
+"랍니다."
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid "You can't re-evaluate the asset before the lock date."
 msgstr "잠금 날짜 이전에는 자산을 재평가할 수 없습니다."
+
+#. module: account_asset
+#. odoo-python
+#: code:addons/account_asset/models/account_asset.py:0
+msgid ""
+"You cannot add or remove bills when the asset is already running or closed."
+msgstr ""
+"자산이 이미 운영 중이거나 종료된 경우에는 청구서를 추가하거나 제거할 수 없습"
+"니다."
 
 #. module: account_asset
 #. odoo-python
@@ -1810,7 +1848,8 @@ msgid ""
 "You cannot automate the journal entry for an asset that has a running gross "
 "increase. Please use 'Dispose' on the increase(s)."
 msgstr ""
-"지속적으로 총액이 증가하는 자산의 경우에는 자동 전표 입력을 할 수 없습니다. 증가분에 대해 '처분' 기능을 사용하시기 바랍니다."
+"지속적으로 총액이 증가하는 자산의 경우에는 자동 전표 입력을 할 수 없습니다. "
+"증가분에 대해 '처분' 기능을 사용하시기 바랍니다."
 
 #. module: account_asset
 #. odoo-python
@@ -1818,7 +1857,9 @@ msgstr ""
 msgid ""
 "You cannot create an asset from lines containing credit and debit on the "
 "account or with a null amount"
-msgstr "계정에 차대 항목이 있거나 값이 유효하지 않은 경우에는 자산을 생성할 수 없습니다."
+msgstr ""
+"계정에 차대 항목이 있거나 값이 유효하지 않은 경우에는 자산을 생성할 수 없습니"
+"다."
 
 #. module: account_asset
 #. odoo-python
@@ -1831,10 +1872,12 @@ msgstr "%s 상태인 문서는 삭제할 수 없습니다."
 #: code:addons/account_asset/models/account_asset.py:0
 msgid ""
 "You cannot delete an asset linked to posted entries.\n"
-"You should either confirm the asset, then, sell or dispose of it, or cancel the linked journal entries."
+"You should either confirm the asset, then, sell or dispose of it, or cancel "
+"the linked journal entries."
 msgstr ""
 "발행된 전표에 연결되어 있는 자산은 삭제할 수 없습니다.\n"
-"자산을 확인한 후 매각 또는 처분하거나, 연결된 전표입력 항목을 취소해야 합니다."
+"자산을 확인한 후 매각 또는 처분하거나, 연결된 전표입력 항목을 취소해야 합니"
+"다."
 
 #. module: account_asset
 #. odoo-python

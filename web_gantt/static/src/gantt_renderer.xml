@@ -59,7 +59,7 @@
         <div class="o_gantt_header_groups o_gantt_grid_columns bg-100 position-sticky">
             <t t-foreach="columnsGroups" t-as="column" t-key="column.id">
                 <div class="o_gantt_header_title position-sticky d-flex align-items-center ps-2 overflow-hidden bg-100"
-                    t-att-style="getGridPosition({column: column.grid.column})"
+                    t-att-style="getGroupHeaderStyle({column: column.grid.column})"
                 >
                     <t t-esc="model.metaData.scale.groupHeaderFormatter(column.start, env)"/>
                 </div>
@@ -97,7 +97,7 @@
                 class="o_connector_creator position-absolute"
                 t-attf-class="o_connector_creator_{{ alignment.vertical }} o_connector_creator_{{ alignment.horizontal }}"
             >
-                <div class="o_connector_creator_bullet position-absolute rounded-circle" />
+                <div class="o_connector_creator_bullet position-absolute z-n1 rounded-circle" />
             </div>
         </div>
     </t>
@@ -214,9 +214,9 @@
 
     <t t-name="web_gantt.GanttRenderer.TotalRow">
         <t t-if="hasRowHeaders">
-            <div class="o_gantt_row_total o_gantt_row_sidebar border-end position-sticky start-0 bg-view d-flex align-items-center justify-content-end">
+            <div class="o_gantt_row_total o_gantt_row_sidebar border-end position-sticky start-0 bg-view d-flex justify-content-end">
                 <h4
-                    class="o_gantt_row_title pe-3 my-0 fw-bold"
+                    class="o_gantt_row_title d-flex align-items-center pe-3 my-0 fw-bold"
                     t-att-class="{ o_sample_data_disabled: isDisabled() }"
                     t-att-title="totalRow.name"
                     t-esc="totalRow.name"

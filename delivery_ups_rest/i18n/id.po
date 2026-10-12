@@ -1,23 +1,26 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* delivery_ups_rest
-# 
+# * delivery_ups_rest
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+#
+# Weblate <noreply-mt-weblate@weblate.org>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:24+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Indonesian (https://app.transifex.com/odoo/teams/41243/id/)\n"
+"POT-Creation-Date: 2026-06-19 17:45+0000\n"
+"PO-Revision-Date: 2025-11-17 14:10+0000\n"
+"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"Language-Team: Indonesian <https://translate.odoo.com/projects/odoo-18/"
+"delivery_ups_rest/id/>\n"
+"Language: id\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: id\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 5.12.2\n"
 
 #. module: delivery_ups_rest
 #: model:ir.model.fields,field_description:delivery_ups_rest.field_delivery_carrier__ups_bill_my_account
@@ -77,6 +80,17 @@ msgstr "Buat akun pada"
 #: model_terms:ir.ui.view,arch_db:delivery_ups_rest.view_delivery_carrier_form
 msgid "Create an app"
 msgstr "Buat app"
+
+#. module: delivery_ups_rest
+#. odoo-python
+#: code:addons/delivery_ups_rest/models/ups_request.py:0
+msgid ""
+"Detected a problem when validating delivery %(delivery_name)s. Invoicing "
+"address of the commercial invoice has been defaulted to %(ship_to_partner)s "
+"instead of %(sold_to_partner)s to avoid the following error from UPS: \"The "
+"Sold To party's country code must be the same as the Ship To party's country "
+"code with the exception of Canada and satellite countries.\""
+msgstr ""
 
 #. module: delivery_ups_rest
 #: model_terms:ir.ui.view,arch_db:delivery_ups_rest.view_delivery_carrier_form
@@ -175,8 +189,7 @@ msgstr ""
 #. module: delivery_ups_rest
 #: model_terms:ir.ui.view,arch_db:delivery_ups_rest.view_delivery_carrier_form
 msgid ""
-"Now open your app, you'll have your <b>Client ID</b> and <b>Client "
-"Secret</b>"
+"Now open your app, you'll have your <b>Client ID</b> and <b>Client Secret</b>"
 msgstr ""
 "Sekarang buka app Anda, Anda akan memiliki <b>Client ID</b> dan <b>Client "
 "Secret</b>"
@@ -238,11 +251,11 @@ msgstr "Telepon Penerima harus setidaknya 10 karakter alfanumerik."
 #. odoo-python
 #: code:addons/delivery_ups_rest/models/delivery_ups.py:0
 msgid ""
-"Return label generated<br/><b>Tracking Numbers:</b> "
-"%(tracking_numbers)s<br/><b>Packages:</b> %(packages)s"
+"Return label generated<br/><b>Tracking Numbers:</b> %(tracking_numbers)s<br/"
+"><b>Packages:</b> %(packages)s"
 msgstr ""
-"Label pengembalian dibuat<br/><b>Nomor Pelacak:</b> "
-"%(tracking_numbers)s<br/><b>Paket:</b> %(packages)s"
+"Label pengembalian dibuat<br/><b>Nomor Pelacak:</b> %(tracking_numbers)s<br/"
+"><b>Paket:</b> %(packages)s"
 
 #. module: delivery_ups_rest
 #: model:ir.model.fields.selection,name:delivery_ups_rest.selection__delivery_carrier__ups_label_file_type__spl
@@ -279,11 +292,11 @@ msgstr "Pengiriman #%s telah dibatalka"
 #. odoo-python
 #: code:addons/delivery_ups_rest/models/delivery_ups.py:0
 msgid ""
-"Shipment created into UPS<br/><b>Tracking Numbers:</b> "
-"%(tracking_numbers)s<br/><b>Packages:</b> %(packages)s"
+"Shipment created into UPS<br/><b>Tracking Numbers:</b> %"
+"(tracking_numbers)s<br/><b>Packages:</b> %(packages)s"
 msgstr ""
-"Pengiriman dibuat untuk Fedex<br/><b>Nomor Pelacak:</b> "
-"%(tracking_numbers)s<br/><b>Paket:</b> %(packages)s"
+"Pengiriman dibuat untuk Fedex<br/><b>Nomor Pelacak:</b> %"
+"(tracking_numbers)s<br/><b>Paket:</b> %(packages)s"
 
 #. module: delivery_ups_rest
 #. odoo-python
@@ -331,8 +344,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/delivery_ups_rest/models/ups_request.py:0
 msgid ""
-"The delivery cannot be done because the weight of your product %s is "
-"missing."
+"The delivery cannot be done because the weight of your product %s is missing."
 msgstr ""
 "Pengiriman tidak dapat dilakukan karena berat produk Anda %s tidak ada."
 
@@ -340,10 +352,13 @@ msgstr ""
 #. odoo-python
 #: code:addons/delivery_ups_rest/models/ups_request.py:0
 msgid ""
-"The estimated price cannot be computed because the weight of your product %s"
-" is missing."
+"The estimated shipping price cannot be computed because the weight is "
+"missing for the following product(s): \n"
+" %s"
 msgstr ""
-"Estimasi biaya tidak dapat dihitung karena berat produk Anda %s tidak ada."
+"Estimasi harga pengiriman tidak dapat dihitung karena berat tidak ada untuk "
+"produk berikut: \n"
+" %s"
 
 #. module: delivery_ups_rest
 #. odoo-python
@@ -373,8 +388,7 @@ msgstr ""
 #. module: delivery_ups_rest
 #: model:ir.model.fields,help:delivery_ups_rest.field_delivery_carrier__ups_saturday_delivery
 msgid ""
-"This value added service will allow you to ship the package on saturday "
-"also."
+"This value added service will allow you to ship the package on saturday also."
 msgstr ""
 "Value added service ini memungkinkan Anda untuk mengirimkan paket pada hari "
 "Sabtu juga."
@@ -506,8 +520,8 @@ msgstr "Nomor akun UPS"
 #. odoo-python
 #: code:addons/delivery_ups_rest/models/ups_request.py:0
 msgid ""
-"UPS address lines can only contain a maximum of 35 characters. You can split"
-" the contacts addresses on multiple lines to try to avoid this limitation."
+"UPS address lines can only contain a maximum of 35 characters. You can split "
+"the contacts addresses on multiple lines to try to avoid this limitation."
 msgstr ""
 "Baris alamat UPS hanya dapat memiliki 35 karakter. Anda dapat memisahkan "
 "alamat menjadi beberapa baris untuk menghindari batasan ini."
@@ -526,8 +540,7 @@ msgstr "Unit Berat Paket Ups"
 #. odoo-python
 #: code:addons/delivery_ups_rest/models/ups_request.py:0
 msgid "Warehouse Phone must be at least 10 alphanumeric characters."
-msgstr ""
-"No. Telepon Gudang harus memiliki setidaknya 10 karakter alfanumerik. "
+msgstr "No. Telepon Gudang harus memiliki setidaknya 10 karakter alfanumerik. "
 
 #. module: delivery_ups_rest
 #. odoo-python
@@ -615,3 +628,9 @@ msgstr "ups.com"
 #: model_terms:ir.ui.view,arch_db:delivery_ups_rest.view_delivery_carrier_form
 msgid "you're ready to go!"
 msgstr "you're ready to go!"
+
+#~ msgid ""
+#~ "The estimated price cannot be computed because the weight of your product "
+#~ "%s is missing."
+#~ msgstr ""
+#~ "Estimasi biaya tidak dapat dihitung karena berat produk Anda %s tidak ada."

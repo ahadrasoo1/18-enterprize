@@ -9,6 +9,7 @@
     'depends': [
         'l10n_us_hr_payroll',
         'l10n_us_hr_payroll_account',
+        'l10n_us_hr_payroll_state_calculation',
     ],
     'license': 'OEEL-1',
     'post_init_hook': '_generate_payslips',

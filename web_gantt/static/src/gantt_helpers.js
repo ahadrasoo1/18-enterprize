@@ -47,7 +47,7 @@ export function dateAddFixedOffset(date, plusParams) {
 }
 
 export function diffColumn(col1, col2, unit) {
-    return col2.diff(col1, unit).values[`${unit}s`];
+    return Math.round(col2.diff(col1, unit).values[`${unit}s`]);
 }
 
 export function getRangeFromDate(rangeId, date) {
@@ -633,9 +633,15 @@ export const useGanttResizable = makeDraggableHook({
     },
 });
 
-function getCellsOnRow(refEl, rowId) {
+/**
+ * @param {HTMLElement} refEl: gantt grid
+ * @param {string} rowId
+ * @param {string} additionalSelector
+ * @returns {cellEl[] | null}: cells found on the row that matched the selector
+ */
+export function getCellsOnRow(refEl, rowId, additionalSelector = "") {
     return refEl.querySelectorAll(
-        `.o_gantt_cell:not(.o_gantt_group)[data-row-id='${CSS.escape(rowId)}']`
+        `.o_gantt_cell${additionalSelector}[data-row-id='${CSS.escape(rowId)}']`
     );
 }
 
@@ -676,7 +682,7 @@ export const useGanttSelectable = makeDraggableHook({
             return;
         }
         const [startCol, stopCol] = getMinMax(current.initialCol, col);
-        for (const cell of getCellsOnRow(ref.el, current.rowId)) {
+        for (const cell of getCellsOnRow(ref.el, current.rowId, ":not(.o_gantt_group)")) {
             const cellCol = +cell.dataset.col;
             if (cellCol < startCol || cellCol > stopCol) {
                 removeClass(cell, "o_drag_hover");

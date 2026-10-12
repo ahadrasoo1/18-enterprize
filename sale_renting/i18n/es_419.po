@@ -1,24 +1,28 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* sale_renting
-# 
+# * sale_renting
+#
 # Translators:
 # Wil Odoo, 2024
-# Fernanda Alvarez, 2024
-# 
+# Fernanda Alvarez, 2025
+# Patricia Gutiérrez Capetillo <pagc@odoo.com>, 2025
+# "Fernanda Alvarez (mfar)" <mfar@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Fernanda Alvarez, 2024\n"
-"Language-Team: Spanish (Latin America) (https://app.transifex.com/odoo/teams/41243/es_419/)\n"
+"POT-Creation-Date: 2026-04-10 18:47+0000\n"
+"PO-Revision-Date: 2026-06-20 09:20+0000\n"
+"Last-Translator: \"Fernanda Alvarez (mfar)\" <mfar@odoo.com>\n"
+"Language-Team: Spanish (Latin America) <https://translate.odoo.com/projects/"
+"odoo-18/sale_renting/es_419/>\n"
+"Language: es_419\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: es_419\n"
-"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=(n == 1) ? 0 : ((n != 0 && n % 1000000 == "
+"0) ? 1 : 2);\n"
+"X-Generator: Weblate 2026.6.1\n"
 
 #. module: sale_renting
 #. odoo-python
@@ -44,7 +48,7 @@ msgstr "%(amount)s / %(duration)s"
 
 #. module: sale_renting
 #. odoo-python
-#: code:addons/sale_renting/controllers/utils.py:0
+#: code:addons/sale_renting/models/product_template.py:0
 #: code:addons/sale_renting/models/sale_order_recurrence.py:0
 msgid "%(duration)s %(unit)s"
 msgstr "%(duration)s %(unit)s"
@@ -74,16 +78,6 @@ msgstr "123 Calle principal"
 #: model:sale.temporal.recurrence,name:sale_renting.recurrence_2_weeks
 msgid "2 Weeks"
 msgstr "2 semanas "
-
-#. module: sale_renting
-#: model_terms:ir.ui.view,arch_db:sale_renting.report_rental_order_document
-msgid "2023-08-01"
-msgstr "01-08-2023"
-
-#. module: sale_renting
-#: model_terms:ir.ui.view,arch_db:sale_renting.report_rental_order_document
-msgid "2023-08-10"
-msgstr "10-08-2023"
 
 #. module: sale_renting
 #: model:sale.temporal.recurrence,name:sale_renting.recurrence_3_hours
@@ -120,27 +114,39 @@ msgstr "<span class=\"o_stat_text\">en alquiler</span>"
 #: model_terms:ir.ui.view,arch_db:sale_renting.rental_order_form_view
 msgid ""
 "<span invisible=\"duration_days != 1\"> day </span>\n"
-"                    <span invisible=\"duration_days in [0,1]\"> days </span>\n"
-"                    <span invisible=\"duration_days == 0 or remaining_hours == 0\">and </span>"
+"                    <span invisible=\"duration_days in [0,1]\"> days </"
+"span>\n"
+"                    <span invisible=\"duration_days == 0 or remaining_hours "
+"== 0\">and </span>"
 msgstr ""
 "<span invisible=\"duration_days != 1\"> día </span>\n"
-"                    <span invisible=\"duration_days in [0,1]\"> días </span>\n"
-"                    <span invisible=\"duration_days == 0 or remaining_hours == 0\">y </span>"
+"                    <span invisible=\"duration_days in [0,1]\"> días </"
+"span>\n"
+"                    <span invisible=\"duration_days == 0 or remaining_hours "
+"== 0\">y </span>"
 
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.rental_order_form_view
 msgid ""
 "<span invisible=\"remaining_hours != 1\"> hour </span>\n"
-"                    <span invisible=\"remaining_hours in [0,1]\"> hours </span>"
+"                    <span invisible=\"remaining_hours in [0,1]\"> hours </"
+"span>"
 msgstr ""
 "<span invisible=\"remaining_hours != 1\"> hora </span>\n"
-"                    <span invisible=\"remaining_hours in [0,1]\"> horas </span>"
+"                    <span invisible=\"remaining_hours in [0,1]\"> horas </"
+"span>"
 
 #. module: sale_renting
 #: model_terms:web_tour.tour,rainbow_man_message:sale_renting.rental_tour
 msgid "<span><b>Good job!</b> You went through all steps of this tour.</span>"
 msgstr ""
-"<span><b>¡Bien hecho!</b> Terminó todos los pasos de este recorrido.</span>"
+"<span><b>¡Bien hecho!</b> Terminaste todos los pasos de este recorrido.</"
+"span>"
+
+#. module: sale_renting
+#: model_terms:ir.ui.view,arch_db:sale_renting.report_rental_order_document
+msgid "<strong class=\"d-block mt-3\">Shipping Address:</strong>"
+msgstr "<strong class=\"d-block mt-3\">Dirección de envío:</strong>"
 
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.rental_schedule_view_gantt
@@ -163,11 +169,6 @@ msgid "<strong>Salesperson:</strong>"
 msgstr "<strong>Persona encargada de ventas:</strong>"
 
 #. module: sale_renting
-#: model_terms:ir.ui.view,arch_db:sale_renting.report_rental_order_document
-msgid "<strong>Shipping Address:</strong>"
-msgstr "<strong>Dirección de envío:</strong>"
-
-#. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.rental_schedule_view_gantt
 msgid "<strong>Status — </strong>"
 msgstr "<strong>Estado — </strong>"
@@ -176,7 +177,7 @@ msgstr "<strong>Estado — </strong>"
 #. odoo-python
 #: code:addons/sale_renting/models/product_template.py:0
 msgid "A rental combo product can only contain rental products."
-msgstr ""
+msgstr "Un producto de paquete solo puede contener productos de alquiler."
 
 #. module: sale_renting
 #: model:ir.model.fields,field_description:sale_renting.field_sale_temporal_recurrence__active
@@ -203,7 +204,7 @@ msgstr "Permitir el alquiler de este producto."
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.res_config_settings_view_form
 msgid "Apply after"
-msgstr "Aplicar después"
+msgstr "Aplicar después de"
 
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.res_config_settings_view_form
@@ -232,6 +233,7 @@ msgstr "Cancelar"
 #: model:ir.model.fields.selection,name:sale_renting.selection__sale_rental_report__state__cancel
 #: model:ir.model.fields.selection,name:sale_renting.selection__sale_rental_schedule__rental_status__cancel
 #: model:ir.model.fields.selection,name:sale_renting.selection__sale_rental_schedule__state__cancel
+#: model_terms:ir.ui.view,arch_db:sale_renting.rental_schedule_view_gantt
 msgid "Cancelled"
 msgstr "Cancelado"
 
@@ -292,8 +294,7 @@ msgstr "Configuración"
 #. odoo-javascript
 #: code:addons/sale_renting/static/src/js/tours/rental.js:0
 msgid "Confirm the order when the customer agrees with the terms."
-msgstr ""
-"Confirmar la orden cuando el cliente esté de acuerdo con los términos."
+msgstr "Confirmar la orden cuando el cliente esté de acuerdo con los términos."
 
 #. module: sale_renting
 #. odoo-javascript
@@ -368,7 +369,7 @@ msgstr "Creado el"
 #: model:ir.model.fields,field_description:sale_renting.field_product_pricing__currency_id
 #: model:ir.model.fields,field_description:sale_renting.field_sale_rental_report__currency_id
 msgid "Currency"
-msgstr "Divisa"
+msgstr "Moneda"
 
 #. module: sale_renting
 #: model:ir.model.fields,field_description:sale_renting.field_product_product__product_pricing_ids
@@ -587,7 +588,7 @@ msgstr "Hora"
 #. module: sale_renting
 #: model:sale.temporal.recurrence,name:sale_renting.recurrence_hourly
 msgid "Hourly"
-msgstr "Por horas "
+msgstr "Por hora"
 
 #. module: sale_renting
 #: model:ir.model.fields.selection,name:sale_renting.selection__sale_temporal_recurrence__unit__hour
@@ -826,7 +827,7 @@ msgstr "Periodo"
 #: model_terms:ir.ui.view,arch_db:sale_renting.sale_temporal_recurrence_view_form
 #: model_terms:ir.ui.view,arch_db:sale_renting.sale_temporal_recurrence_view_tree
 msgid "Periodicity"
-msgstr "Periodicidad "
+msgstr "Periodicidad"
 
 #. module: sale_renting
 #: model:ir.actions.act_window,name:sale_renting.sale_temporal_recurrence_action
@@ -856,7 +857,7 @@ msgstr "Recolección"
 #: model:ir.model.fields.selection,name:sale_renting.selection__sale_rental_schedule__report_line_status__pickedup
 #: model_terms:ir.ui.view,arch_db:sale_renting.report_rental_order_document
 msgid "Pickedup"
-msgstr "Recolección"
+msgstr "Recolectada"
 
 #. module: sale_renting
 #: model:ir.model.fields.selection,name:sale_renting.selection__rental_order_wizard__status__pickup
@@ -903,7 +904,7 @@ msgstr "Precio"
 #: model:ir.model,name:sale_renting.model_product_pricelist
 #: model:ir.model.fields,field_description:sale_renting.field_product_pricing__pricelist_id
 msgid "Pricelist"
-msgstr "Lista de precio"
+msgstr "Lista de precios"
 
 #. module: sale_renting
 #: model:ir.actions.act_window,name:sale_renting.product_pricing_action
@@ -919,7 +920,7 @@ msgstr "Precios"
 #. module: sale_renting
 #: model:ir.model,name:sale_renting.model_product_pricing
 msgid "Pricing rule of rental products"
-msgstr "Regla de fijación de precios para productos de alquiler"
+msgstr "Regla de precios de los productos de alquiler"
 
 #. module: sale_renting
 #: model:product.template,name:sale_renting.rental_product_3_product_template
@@ -1271,7 +1272,7 @@ msgstr "Persona encargada de venta"
 #: model_terms:ir.ui.view,arch_db:sale_renting.rental_report_search_view
 #: model_terms:ir.ui.view,arch_db:sale_renting.rental_schedule_view_search
 msgid "Salesperson"
-msgstr "Persona de ventas"
+msgstr "Vendedor"
 
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.report_rental_order_document
@@ -1303,8 +1304,8 @@ msgid ""
 "Select Variants of the Product for which this rule applies.Leave empty if "
 "this rule applies for any variant of this template."
 msgstr ""
-"Seleccione las Variantes del Producto para las que aplica esta regla. Déjelo"
-" en blanco si esta regla aplica para cualquier variante de esta plantilla. "
+"Seleccione las Variantes del Producto para las que aplica esta regla. Déjelo "
+"en blanco si esta regla aplica para cualquier variante de esta plantilla. "
 
 #. module: sale_renting
 #: model:ir.model.fields,help:sale_renting.field_product_pricing__product_template_id
@@ -1411,28 +1412,27 @@ msgstr "No hay ninguna recolección o devolución programada."
 #. module: sale_renting
 #: model:ir.model.fields,help:sale_renting.field_res_config_settings__extra_day
 msgid ""
-"This is the default extra cost per day set on newly created products. You "
-"can change this value for existing products directly on the product itself."
+"This is the default extra cost per day set on newly created products.You can "
+"change this value for existing products directly on the product itself."
 msgstr ""
 "Este es el costo adicional predeterminado por día en los productos recién "
-"creados. Puede cambiar este valor para los productos existentes directamente"
-" desde el producto."
+"creados. Puede cambiar este valor para los productos existentes directamente "
+"desde el producto."
 
 #. module: sale_renting
 #: model:ir.model.fields,help:sale_renting.field_res_config_settings__extra_hour
 msgid ""
-"This is the default extra cost per hour set on newly created products. You "
+"This is the default extra cost per hour set on newly created products.You "
 "can change this value for existing products directly on the product itself."
 msgstr ""
 "Este es el costo adicional predeterminado por hora en los productos recién "
-"creados. Puede cambiar este valor para los productos existentes directamente"
-" desde el producto."
+"creados. Puede cambiar este valor para los productos existentes directamente "
+"desde el producto."
 
 #. module: sale_renting
 #: model:ir.model.fields,help:sale_renting.field_res_config_settings__extra_product
 msgid "This product will be used to add fines in the Rental Order."
-msgstr ""
-"Se utilizará este producto para agregar multas a la orden de alquiler."
+msgstr "Se utilizará este producto para agregar multas a la orden de alquiler."
 
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.rental_order_form_view
@@ -1457,7 +1457,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:sale_renting.rental_order_view_search
 #: model_terms:ir.ui.view,arch_db:sale_renting.rental_schedule_view_search
 msgid "To Do Today"
-msgstr "Por hacer hoy"
+msgstr "Para hoy"
 
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.rental_order_view_search_without_searchpanel
@@ -1511,8 +1511,7 @@ msgstr "Validar una devolución"
 #. odoo-javascript
 #: code:addons/sale_renting/static/src/js/tours/rental.js:0
 msgid "Validate the operation after checking the picked-up quantities."
-msgstr ""
-"Validar la operación después de comprobar las cantidades recolectadas."
+msgstr "Validar la operación después de comprobar las cantidades recolectadas."
 
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.product_pricelist_view
@@ -1564,11 +1563,11 @@ msgstr "Años"
 #. module: sale_renting
 #: model_terms:ir.actions.act_window,help:sale_renting.rental_product_template_action
 msgid ""
-"You can also create additional products or services to sell by checking *Can"
-" be Sold* in the product form (e.g. insurance)."
+"You can also create additional products or services to sell by checking *Can "
+"be Sold* in the product form (e.g. insurance)."
 msgstr ""
-"Puede crear productos o servicios adicionales para vender al seleccionar *Se"
-" puede vender* en la información del producto (por ejemplo, seguros)."
+"Puede crear productos o servicios adicionales para vender al seleccionar *Se "
+"puede vender* en la información del producto (por ejemplo, seguros)."
 
 #. module: sale_renting
 #. odoo-python
@@ -1603,8 +1602,8 @@ msgid ""
 "You cannot have multiple pricing for the same variant, recurrence and "
 "pricelist"
 msgstr ""
-"No puede tener varios precios para la misma variante, recurrencia y lista de"
-" precios."
+"No puede tener varios precios para la misma variante, recurrencia y lista de "
+"precios."
 
 #. module: sale_renting
 #: model:ir.model.constraint,message:sale_renting.constraint_sale_order_line_rental_stock_coherence
@@ -1627,3 +1626,9 @@ msgstr "todas las variantes"
 #: model_terms:ir.ui.view,arch_db:sale_renting.res_config_settings_view_form
 msgid "hours"
 msgstr "horas"
+
+#~ msgid "2023-08-01"
+#~ msgstr "01-08-2023"
+
+#~ msgid "2023-08-10"
+#~ msgstr "10-08-2023"

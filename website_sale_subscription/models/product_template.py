@@ -28,6 +28,8 @@ class ProductTemplate(models.Model):
         is_template = not product and self._name == 'product.template'
         res = self.env['sale.subscription.plan']
         for pricing in self.product_subscription_pricing_ids.sorted(lambda x: not x.pricelist_id):
+            if not pricing.plan_id.active:
+                continue
             if pricing.pricelist_id and pricing.pricelist_id != pricelist:
                 continue
             if not is_template and not pricing._applies_to(product or self):
@@ -60,7 +62,7 @@ class ProductTemplate(models.Model):
         res['list_price'] = res['price']  # No pricelist discount for subscription prices
         currency = website.currency_id
         pricelist = website.pricelist_id
-        requested_plan = request and request.params.get('plan_id')
+        requested_plan = request.params.get('plan_id') if request and request.env else None
         requested_plan = requested_plan and requested_plan.isdigit() and int(requested_plan)
         possible_pricing_count = 0
 
@@ -99,30 +101,39 @@ class ProductTemplate(models.Model):
         if pricings:
             plan_ids = self.env['sale.subscription.plan'].browse(pricing['plan_id'] for pricing in pricings)
             to_year = {'year': 1, 'month': 12, 'week': 52}
+            translation_mapping = {'year': _('year'),
+                                   'month': _('month'),
+                                   'week': _('week'),
+            }
             minimum_period = min(plan_ids.mapped('billing_period_unit'), key=lambda x: 1/to_year[x])
             for pricing in pricings:
                 plan_id = plan_ids.browse(pricing['plan_id'])
                 price = pricing['price_value'] / plan_id.billing_period_value * to_year[plan_id.billing_period_unit] \
                         / to_year[minimum_period]
-                pricing['to_minimum_billing_period'] = f'{format_amount(self.env, amount=price, currency=currency)} / {minimum_period}'
+                pricing['to_minimum_billing_period'] = f'{format_amount(self.env, amount=price, currency=currency)} / {translation_mapping.get(minimum_period, minimum_period)}'
 
         if not pricings:
             res.update({
                 'is_subscription': True,
                 'is_plan_possible': False,
-                'pricings': False,
+                'pricings': [],
             })
             return res
 
+        unit_price = default_pricing['price_value'] if default_pricing else 0
         return {
             **res,
             'is_subscription': True,
             'pricings': pricings,
             'is_plan_possible': possible_pricing_count > 0,
-            'price': default_pricing['price_value'] if default_pricing else 0,
+            'price': unit_price,
             'subscription_default_pricing_price': default_pricing['price'] if default_pricing else '',
             'subscription_default_pricing_plan_id': default_pricing['plan_id'] if default_pricing else False,
             'subscription_pricing_select': possible_pricing_count > 1,
+            'prevent_zero_price_sale': website.prevent_zero_price_sale and currency.is_zero(
+                unit_price,
+            ),
+            'temporal_unit_display': plan_ids.browse(default_pricing['plan_id']).billing_period_display_sentence if default_pricing else '',
         }
 
     # Search bar

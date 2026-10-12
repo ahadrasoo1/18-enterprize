@@ -2,7 +2,7 @@
 from odoo import _, api, models, fields
 from odoo.tools import date_utils
 from odoo.tools.sql import SQL
-from odoo.tools.misc import format_date, get_lang
+from odoo.tools.misc import format_date
 from odoo.exceptions import UserError
 from odoo.addons.l10n_ph import utils
 
@@ -32,15 +32,13 @@ class SawtQapCustomHandler(models.AbstractModel):
 
         # 1) Build the queries to get the months
         for column_group_key, column_group_options in report._split_options_per_column_group(options).items():
-            domain = [('move_id.move_type', '=', options['move_type'])]
-            query = report._get_report_query(column_group_options, date_scope="strict_range", domain=domain)
+            query = self._get_report_query(report, column_group_options)
             # The joins are there to filter out months for which we would not have any lines in the report.
             queries.append(SQL(
                 """
                   SELECT (date_trunc('month', account_move_line.date::date) + interval '1 month' - interval '1 day')::date AS taxable_month,
                          %(column_group_key)s                                                                              AS column_group_key
                     FROM %(table_references)s
-                    JOIN account_tax account_tax ON account_tax.id = account_move_line.tax_line_id
                    WHERE %(search_condition)s AND account_tax.l10n_ph_atc IS NOT NULL
                 GROUP BY taxable_month
                 ORDER BY taxable_month DESC
@@ -84,20 +82,16 @@ class SawtQapCustomHandler(models.AbstractModel):
         end_date = fields.Date.from_string(month)  # Month is already set to the last day of the month.
         start_date = date_utils.start_of(end_date, 'month')
         queries = []
+
+        extra_domain = [
+            # Make sure to only fetch records that are in the parent's row month
+            ('date', '>=', start_date),
+            ('date', '<=', end_date),
+        ]
         for column_group_key, column_group_options in report._split_options_per_column_group(options).items():
-            domain = [
-                ('move_id.move_type', '=', options['move_type']),
-                # Make sure to only fetch records that are in the parent's row month
-                ('date', '>=', start_date),
-                ('date', '<=', end_date),
-            ]
-            query = report._get_report_query(column_group_options, date_scope="strict_range", domain=domain)
+            query = self._get_report_query(report, column_group_options, extra_domain=extra_domain)
             tail_query = report._get_engine_query_tail(offset, limit)
-            lang = self.env.user.lang or get_lang(self.env).code
-            if self.pool['account.account.tag'].name.translate:
-                account_tag_name = SQL("COALESCE(account_tag.name->>%(lang)s, account_tag.name->>'en_US')", lang=lang)
-            else:
-                account_tag_name = SQL.identifier('account_tag', 'name')
+            account_tag_name = self.env['account.account.tag']._field_to_sql('account_tag', 'name', query)
             queries.append(SQL(
                 """
                   SELECT %(column_group_key)s                                                                               AS column_group_key,
@@ -114,8 +108,6 @@ class SawtQapCustomHandler(models.AbstractModel):
                     FROM %(table_references)s
                     JOIN res_partner p ON p.id = account_move_line__move_id.partner_id
                     JOIN res_partner cp ON cp.id = p.commercial_partner_id
-                    JOIN account_account_tag_account_move_line_rel account_tag_rel ON account_tag_rel.account_move_line_id = account_move_line.id
-                    JOIN account_account_tag account_tag ON account_tag.id = account_tag_rel.account_account_tag_id
                     %(currency_table_join)s
                    WHERE %(search_condition)s
                 GROUP BY p.id, cp.id, %(account_tag_name)s
@@ -198,21 +190,16 @@ class SawtQapCustomHandler(models.AbstractModel):
         end_date = fields.Date.from_string(month)
         start_date = date_utils.start_of(end_date, 'month')
         queries = []
+
+        extra_domain = [
+            ('date', '>=', start_date),
+            ('date', '<=', end_date),
+            ('move_id.commercial_partner_id', '=', partner_id),
+        ]
         for column_group_key, column_group_options in report._split_options_per_column_group(options).items():
-            domain = [
-                ('move_id.move_type', '=', options['move_type']),
-                # Make sure to only fetch records that are in the parent's row month
-                ('date', '>=', start_date),
-                ('date', '<=', end_date),
-                ('move_id.partner_id', '=', partner_id),
-            ]
-            query = report._get_report_query(column_group_options, date_scope="strict_range", domain=domain)
             tail_query = report._get_engine_query_tail(offset, limit)
-            lang = self.env.user.lang or get_lang(self.env).code
-            if self.pool['account.account.tag'].name.translate:
-                account_tag_name = SQL("COALESCE(account_tag.name->>%(lang)s, account_tag.name->>'en_US')", lang=lang)
-            else:
-                account_tag_name = SQL.identifier('account_tag', 'name')
+            query = self._get_report_query(report, column_group_options, extra_domain=extra_domain)
+            account_tag_name = self.env['account.account.tag']._field_to_sql('account_tag', 'name', query)
             queries.append(SQL(
                 """
                   SELECT %(column_group_key)s                                                                               AS column_group_key,
@@ -224,8 +211,6 @@ class SawtQapCustomHandler(models.AbstractModel):
                              * CASE WHEN account_move_line.tax_tag_invert THEN -1 ELSE 1 END
                          )                                                                                                  AS balance
                     FROM %(table_references)s
-                    JOIN account_account_tag_account_move_line_rel account_tag_rel ON account_tag_rel.account_move_line_id = account_move_line.id
-                    JOIN account_account_tag account_tag ON account_tag.id = account_tag_rel.account_account_tag_id
                     %(currency_table_join)s
                     WHERE %(search_condition)s
                 GROUP BY account_move_line__move_id.id, %(account_tag_name)s
@@ -293,18 +278,13 @@ class SawtQapCustomHandler(models.AbstractModel):
         """
         limit = report.load_more_limit + 1 if report.load_more_limit and options['export_mode'] != 'print' else None
         queries = []
+
+        extra_domain = [('move_id', '=', move_id)]
         for column_group_key, column_group_options in report._split_options_per_column_group(options).items():
-            query = report._get_report_query(column_group_options, date_scope="strict_range", domain=[('move_id', '=', move_id)])
+            query = self._get_report_query(report, column_group_options, with_base_lines=False, extra_domain=extra_domain)
             tail_query = report._get_engine_query_tail(offset, limit)
-            lang = self.env.user.lang or get_lang(self.env).code
-            if self.pool['account.account.tag'].name.translate:
-                account_tag_name = SQL("COALESCE(account_tag.name->>%(lang)s, account_tag.name->>'en_US')", lang=lang)
-            else:
-                account_tag_name = SQL.identifier('account_tag', 'name')
-            if self.pool['account.tax'].description.translate:
-                account_tax_description = SQL("COALESCE(account_tax.description->>%(lang)s, account_tax.description->>'en_US')", lang=lang)
-            else:
-                account_tax_description = SQL.identifier('account_tax', 'description')
+            account_tag_name = self.env['account.account.tag'].with_context(lang='en_US')._field_to_sql('account_tag', 'name', query)
+            account_tax_description = self.env['account.tax']._field_to_sql('account_tax', 'description', query)
             queries.append(SQL(
                 """
                   SELECT %(column_group_key)s                                                                               AS column_group_key,
@@ -313,7 +293,7 @@ class SawtQapCustomHandler(models.AbstractModel):
                          account_tax.id                                                                                     AS tax_id,
                          account_tax.l10n_ph_atc                                                                            AS atc,
                          REGEXP_REPLACE(%(account_tax_description)s, '(<([^>]+)>)', '', 'g')                                AS tax_description,
-                         account_tax.amount                                                                                 AS tax_rate,
+                         ABS(account_tax.amount)                                                                            AS tax_rate,
                          REGEXP_REPLACE(%(account_tag_name)s, '^[+-]', '')                                                  AS tag_name,
                          account_move_line.tax_base_amount                                                                  AS tax_base_amount,
                          SUM(%(balance_select)s
@@ -321,9 +301,6 @@ class SawtQapCustomHandler(models.AbstractModel):
                              * CASE WHEN account_move_line.tax_tag_invert THEN -1 ELSE 1 END
                          )                                                                                                  AS balance
                     FROM %(table_references)s
-                    JOIN account_account_tag_account_move_line_rel account_tag_rel ON account_tag_rel.account_move_line_id = account_move_line.id
-                    JOIN account_account_tag account_tag ON account_tag.id = account_tag_rel.account_account_tag_id
-                    JOIN account_tax account_tax ON account_tax.id = account_move_line.tax_line_id
                     %(currency_table_join)s
                    WHERE %(search_condition)s AND account_tax.l10n_ph_atc IS NOT NULL
                 GROUP BY account_move_line__move_id.id, %(account_tag_name)s, account_move_line.id, account_tax.id
@@ -393,7 +370,7 @@ class SawtQapCustomHandler(models.AbstractModel):
             # We only need to get the move type, grid map and the column from the section. The rest is standard.
             section_options = section.get_options(options)
             options.update({
-                'move_type': section_options['move_type'],
+                'journal_type': section_options['journal_type'],
                 'report_grids_map': section_options['report_grids_map'],
                 'columns': section_options['columns'],
             })
@@ -414,11 +391,11 @@ class SawtQapCustomHandler(models.AbstractModel):
                 continue
             move_ids.append(res_id)
         moves = self.env['account.move'].browse(move_ids)
-        file_name = 'sawt' if options['move_type'] == 'out_invoice' else 'qap'
+        file_name = 'sawt' if options['journal_type'] == 'sale' else 'qap'
         generated_file = utils._export_bir_2307(file_name, moves, file_format='xlsx')
 
         return {
-            'file_name': 'sawt' if options['move_type'] == 'out_invoice' else 'qap',
+            'file_name': 'sawt' if options['journal_type'] == 'sale' else 'qap',
             'file_content': generated_file,
             'file_type': 'xlsx',
         }
@@ -432,7 +409,7 @@ class SawtCustomHandler(models.AbstractModel):
     def _custom_options_initializer(self, report, options, previous_options=None):
         super()._custom_options_initializer(report, options, previous_options=previous_options)
         options.update({
-            'move_type': 'out_invoice',
+            'journal_type': 'sale',
             # This mapping will be used to build the amount for each expression_label based on the grid names.
             'report_grids_map': {
                 'tax_base_amount': ['SAWTA'],
@@ -449,7 +426,7 @@ class QapCustomHandler(models.AbstractModel):
     def _custom_options_initializer(self, report, options, previous_options=None):
         super()._custom_options_initializer(report, options, previous_options=previous_options)
         options.update({
-            'move_type': 'in_invoice',
+            'journal_type': 'purchase',
             # This mapping will be used to build the amount for each expression_label based on the grid names.
             'report_grids_map': {
                 'tax_base_amount': ['QAPA'],

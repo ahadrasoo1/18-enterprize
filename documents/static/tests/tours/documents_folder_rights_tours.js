@@ -5,11 +5,18 @@ import { stepUtils } from "@web_tour/tour_service/tour_utils";
 
 registry.category("web_tour.tours").add("test_document_folder_rights_for_multi_company", {
     url: "/odoo",
-    test: true,
     steps: () => [
         stepUtils.showAppsMenuItem(),
         {
             trigger: '.o_app[data-menu-xmlid="documents.menu_root"]',
+            run: "click",
+        },
+        {
+            trigger: 'li[title="All"]',
+            content: "Verify that the All folder is opened by default",
+        },
+        {
+            trigger: 'li[title="Company"] header button',
             run: "click",
         },
         {
@@ -23,6 +30,7 @@ registry.category("web_tour.tours").add("test_document_folder_rights_for_multi_c
         {
             trigger: "div.btn.btn-link[aria-label='Switch to Company_A']",
             run: "click",
+            expectUnloadPage: true,
         },
         {
             trigger: ".o_switch_company_menu:contains('Company_A')",

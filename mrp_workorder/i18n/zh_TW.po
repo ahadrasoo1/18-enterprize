@@ -1,24 +1,28 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* mrp_workorder
-# 
+# * mrp_workorder
+#
 # Translators:
 # Wil Odoo, 2024
-# Tony Ng, 2024
-# 
+# Tony Ng, 2025
+#
+# Weblate <noreply-mt-weblate@weblate.org>, 2026.
+# "Tony Ng (ngto)" <ngto@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Tony Ng, 2024\n"
-"Language-Team: Chinese (Taiwan) (https://app.transifex.com/odoo/teams/41243/zh_TW/)\n"
+"POT-Creation-Date: 2026-04-10 18:48+0000\n"
+"PO-Revision-Date: 2026-06-14 21:21+0000\n"
+"Last-Translator: \"Tony Ng (ngto)\" <ngto@odoo.com>\n"
+"Language-Team: Chinese (Traditional Han script) <https://translate.odoo.com/"
+"projects/odoo-18/mrp_workorder/zh_Hant/>\n"
+"Language: zh_TW\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: zh_TW\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 2026.6.1\n"
 
 #. module: mrp_workorder
 #. odoo-python
@@ -157,7 +161,7 @@ msgstr "允許所有員工"
 
 #. module: mrp_workorder
 #. odoo-javascript
-#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_workcenter_dialog.js:0
+#: code:addons/mrp_workorder/static/src/mrp_display/mrp_display.js:0
 msgid "All MO"
 msgstr "所有製造單"
 
@@ -186,6 +190,11 @@ msgstr "已封存"
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_workorder__employee_assigned_ids
 msgid "Assigned"
 msgstr "已分派"
+
+#. module: mrp_workorder
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.view_employee_form_account
+msgid "Attendance/Point of Sale/Manufacturing"
+msgstr "考勤 / POS 銷售點管理 / 製造管理"
 
 #. module: mrp_workorder
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_production_tree_view_planning
@@ -242,6 +251,12 @@ msgstr "用料清單回應 (%(production)s - %(operation)s)"
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_point__bom_product_ids
 msgid "Bom Product"
 msgstr "BoM產品"
+
+#. module: mrp_workorder
+#. odoo-javascript
+#: code:addons/mrp_workorder/static/src/components/pin_popup.xml:0
+msgid "C"
+msgstr "C"
 
 #. module: mrp_workorder
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_form_tablet
@@ -673,8 +688,7 @@ msgstr "指示（"
 
 #. module: mrp_workorder
 #: model:ir.model.fields,help:mrp_workorder.field_mrp_workorder__move_line_ids
-msgid ""
-"Inventory moves for which you must scan a lot number at this work order"
+msgid "Inventory moves for which you must scan a lot number at this work order"
 msgstr "您必須在此工單掃瞄批次號碼的庫存移動"
 
 #. module: mrp_workorder
@@ -850,7 +864,7 @@ msgstr "我的團隊"
 
 #. module: mrp_workorder
 #. odoo-javascript
-#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_workcenter_dialog.js:0
+#: code:addons/mrp_workorder/static/src/mrp_display/mrp_display.js:0
 msgid "My WO"
 msgstr "我的工作單"
 
@@ -938,7 +952,7 @@ msgstr "沒有工單可作!"
 
 #. module: mrp_workorder
 #. odoo-javascript
-#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_workcenter_dialog.js:0
+#: code:addons/mrp_workorder/static/src/mrp_display/mrp_display.js:0
 msgid ""
 "No workcenters are available, please create one first to add it to the shop "
 "floor view"
@@ -1028,6 +1042,7 @@ msgstr "暫停"
 
 #. module: mrp_workorder
 #. odoo-javascript
+#: code:addons/mrp_workorder/static/src/mrp_display/mrp_display_record.xml:0
 #: code:addons/mrp_workorder/static/src/mrp_display/search_model.js:0
 msgid "Pending"
 msgstr "暫停"
@@ -1105,7 +1120,7 @@ msgstr "列印標籤"
 #. module: mrp_workorder
 #: model:ir.model,name:mrp_workorder.model_stock_move_line
 msgid "Product Moves (Stock Move Line)"
-msgstr "產品移動(移庫明細)"
+msgstr "產品移動（庫存移動資料行）"
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_point__component_id
@@ -1304,18 +1319,6 @@ msgstr "結果"
 
 #. module: mrp_workorder
 #. odoo-javascript
-#: code:addons/mrp_workorder/static/src/mrp_display/mrp_display.js:0
-msgid "STARTED work on workorder %s"
-msgstr "工作單工作開始：%s"
-
-#. module: mrp_workorder
-#. odoo-javascript
-#: code:addons/mrp_workorder/static/src/mrp_display/mrp_display.js:0
-msgid "STOPPED work on workorder %s"
-msgstr "工作單工作停止：%s"
-
-#. module: mrp_workorder
-#. odoo-javascript
 #: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_menu_dialog.xml:0
 msgid "Scrap"
 msgstr "報廢"
@@ -1361,6 +1364,8 @@ msgid "Set a New picture"
 msgstr "設置新圖片"
 
 #. module: mrp_workorder
+#. odoo-javascript
+#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_workcenter_dialog.js:0
 #: model:ir.actions.client,name:mrp_workorder.action_mrp_display
 #: model:ir.model.fields,field_description:mrp_workorder.field_res_config_settings__group_mrp_wo_shop_floor
 #: model:ir.ui.menu,name:mrp_workorder.menu_mrp_workorder_root
@@ -1415,10 +1420,10 @@ msgid ""
 "Today: Activity date is today\n"
 "Planned: Future activities."
 msgstr ""
-"根據活動的狀態 \n"
-" 逾期：已經超過截止日期 \n"
-" 現今：活動日期是當天 \n"
-" 計劃：未來活動。"
+"根據活動設定的狀態：\n"
+"逾期：截止日期已過。\n"
+"今天：活動日期是今天。\n"
+"已規劃：將於未來進行的活動。"
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_point__operation_id
@@ -1456,6 +1461,11 @@ msgid "Stock Move Line"
 msgstr "庫存移動資料行"
 
 #. module: mrp_workorder
+#: model:ir.model,name:mrp_workorder.model_stock_rule
+msgid "Stock Rule"
+msgstr "庫存規則"
+
+#. module: mrp_workorder
 #: model:product.template,name:mrp_workorder.product_template_stool
 msgid "Stool"
 msgstr "凳子"
@@ -1490,8 +1500,10 @@ msgstr "測試類型"
 #: model_terms:ir.actions.act_window,help:mrp_workorder.mrp_stock_picking_type_action
 msgid ""
 "The operation type system allows you to assign each stock\n"
-"            operation a specific type which will alter its views accordingly.\n"
-"            On the operation type you could e.g. specify if packing is needed by default,\n"
+"            operation a specific type which will alter its views "
+"accordingly.\n"
+"            On the operation type you could e.g. specify if packing is "
+"needed by default,\n"
 "            if it should show the customer."
 msgstr ""
 "操作類型系統允許您為每個庫存操作分配一個特定類型，該類型將相應地改變其檢視.\n"
@@ -1556,8 +1568,10 @@ msgstr "總數量"
 #. odoo-javascript
 #: code:addons/mrp_workorder/static/src/mrp_display/mrp_display.xml:0
 msgid ""
-"Track work orders, show instructions and record manufacturing operations from here:\n"
-"                                    quality control, consumed quantities, lot/serial numbers, etc."
+"Track work orders, show instructions and record manufacturing operations "
+"from here:\n"
+"                                    quality control, consumed quantities, "
+"lot/serial numbers, etc."
 msgstr ""
 "此處可追蹤工作單、顯示說明指示，及記錄製造操作：\n"
 "                                    品質控制、已消耗數量、批次/序號等。"
@@ -1632,7 +1646,7 @@ msgstr "取消訂單排期"
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_check__component_uom_id
 msgid "UoM"
-msgstr "計量單位"
+msgstr "量度單位"
 
 #. module: mrp_workorder
 #: model:ir.model.fields.selection,name:mrp_workorder.selection__propose_change__change_type__update_step
@@ -1660,8 +1674,10 @@ msgstr "利用步驟，向操作員顯示工作表中的說明，或在工作單
 #. module: mrp_workorder
 #: model_terms:ir.actions.act_window,help:mrp_workorder.mrp_workorder_action_tablet
 msgid ""
-"Use the table work center control panel to register operations in the shop floor directly.\n"
-"            The tablet provides worksheets for your workers and allow them to scrap products, track time,\n"
+"Use the table work center control panel to register operations in the shop "
+"floor directly.\n"
+"            The tablet provides worksheets for your workers and allow them "
+"to scrap products, track time,\n"
 "            launch a maintenance request, perform quality tests, etc."
 msgstr ""
 "使用桌面工作中心控制面板，直接在車間登記操作。\n"
@@ -1700,9 +1716,15 @@ msgid "Waiting"
 msgstr "正在等待"
 
 #. module: mrp_workorder
+#. odoo-javascript
+#: code:addons/mrp_workorder/static/src/mrp_display/mrp_display_record.js:0
+msgid "What do you want to do?"
+msgstr "您想做什麼？"
+
+#. module: mrp_workorder
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.view_mrp_production_additional_workorder_wizard
 msgid "Will be placed at the beginning if emtpy"
-msgstr ""
+msgstr "若留空，將會放在起首"
 
 #. module: mrp_workorder
 #: model:ir.model,name:mrp_workorder.model_mrp_workcenter
@@ -1750,7 +1772,8 @@ msgstr "工作單"
 #: model_terms:ir.actions.act_window,help:mrp_workorder.mrp_workorder_action_tablet
 msgid ""
 "Work orders are operations to do as part of a manufacturing order.\n"
-"            Operations are defined in the bill of materials or added in the manufacturing order directly."
+"            Operations are defined in the bill of materials or added in the "
+"manufacturing order directly."
 msgstr ""
 "工作訂單是作為製造訂單的一部分執行的操作。\n"
 "             操作在物料清單中定義或直接添加到製造訂單中."
@@ -1840,8 +1863,8 @@ msgstr "若要處理部份這些工作單，必須登入。"
 #. odoo-python
 #: code:addons/mrp_workorder/models/mrp_workorder.py:0
 msgid ""
-"You need to complete Quality Checks using the Shop Floor before marking Work"
-" Order as Done."
+"You need to complete Quality Checks using the Shop Floor before marking Work "
+"Order as Done."
 msgstr "將工作單標記為完成前，你需要使用「工場」功能，完成品質檢查。"
 
 #. module: mrp_workorder
@@ -1851,7 +1874,9 @@ msgid ""
 "You need to define at least one productivity loss in the category "
 "'Productive'. Create one from the Manufacturing app, menu: Configuration / "
 "Productivity Losses."
-msgstr "需要在「生產」類別中定義至少一個生產力損失。請在製造應用程式中建立，然後轉到選單：配置 / 生產力損失。"
+msgstr ""
+"需要在「生產」類別中定義至少一個生產力損失。請在製造應用程式中建立，然後轉到"
+"選單：配置 / 生產力損失。"
 
 #. module: mrp_workorder
 #. odoo-python
@@ -1920,6 +1945,12 @@ msgstr "選單"
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workcenter_form_view_inherit
 msgid "per employee"
 msgstr "每位員工"
+
+#. module: mrp_workorder
+#. odoo-javascript
+#: code:addons/mrp_workorder/static/src/mrp_display/mrp_display_record.xml:0
+msgid "s"
+msgstr ""
 
 #. module: mrp_workorder
 #: model:product.template,description_sale:mrp_workorder.product_template_stool_foot

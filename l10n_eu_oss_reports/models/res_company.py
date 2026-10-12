@@ -16,3 +16,9 @@ class Company(models.Model):
         elif report == self.env.ref('l10n_eu_oss_reports.oss_imports_report'):
             return 'monthly'
         return super()._get_tax_periodicity(report)
+
+    def _get_closing_report_for_tax_closing_move(self, report, fpos):
+        # Since the OSS reports are considered as a tax report but need other moves, we need to specify the report
+        if report.availability_condition == 'oss':
+            return report
+        return super()._get_closing_report_for_tax_closing_move(report, fpos)

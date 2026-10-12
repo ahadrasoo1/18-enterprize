@@ -128,12 +128,14 @@ class TestReconciliationReport(TestAccountReportsCommon):
             #   Name                                            Date            Amount
             [0,                                                   1,                3],
             [
-                ('Balance of \'101403 Bank\'',                   '',           -200.0),
+                ('Balance of \'101405 Bank\'',                   '',           -200.0),
                 ('Last statement balance',                       '',           -200.0),
-                ('Including Unreconciled Receipts',              '',            200.0),
+                ('Including Unreconciled Receipts',              '',            800.0),
                 ('BNKKK/2015/00002',                   '01/02/2015',            200.0),
-                ('Including Unreconciled Payments',              '',           -400.0),
+                ('BNKKK/2014/00001',                   '12/31/2014',            600.0),
+                ('Including Unreconciled Payments',              '',           -900.0),
                 ('BNKKK/2015/00004',                   '01/04/2015',           -400.0),
+                ('BNKKK/2014/00002',                   '12/31/2014',           -500.0),
                 ('Transactions without statement',               '',              0.0),
                 ('Including Unreconciled Receipts',              '',              0.0),
                 ('Including Unreconciled Payments',              '',              0.0),
@@ -170,7 +172,7 @@ class TestReconciliationReport(TestAccountReportsCommon):
 
         # ==== Statement ====
 
-        self.env['account.bank.statement'].create({
+        bank_statement = self.env['account.bank.statement'].create({
             'name': 'statement',
             'line_ids': [
 
@@ -196,6 +198,38 @@ class TestReconciliationReport(TestAccountReportsCommon):
 
             ],
         })
+
+        # Partially reconcile the suspense amount associated with each bank statement line
+        suspense_account = bank_journal.suspense_account_id
+        other_account = bank_journal.company_id.default_cash_difference_income_account_id
+
+        # the first is in company currency
+        bank_move_1 = bank_statement.line_ids[0].move_id
+        bank_move_1_suspense_line = bank_move_1.line_ids.filtered(lambda l: l.account_id == suspense_account)
+        bank_move_1.button_draft()
+        bank_move_1.write({'line_ids': [
+            Command.create({'account_id': other_account.id, 'credit': 10.00}),
+            Command.update(bank_move_1_suspense_line.id, {'credit': 40.01}),
+        ]})
+        bank_move_1.action_post()
+
+        # the second is in neither company nor journal currency
+        bank_move_2 = bank_statement.line_ids[1].move_id
+        bank_move_2_suspense_line = bank_move_2.line_ids.filtered(lambda l: l.account_id == suspense_account)
+        bank_move_2.button_draft()
+        bank_move_2.write({'line_ids': [
+            Command.create({
+                'account_id': other_account.id,
+                'currency_id': bank_move_2_suspense_line.currency_id.id,
+                'credit': 3.33,
+                'amount_currency': -99.99
+            }),
+            Command.update(bank_move_2_suspense_line.id, {
+                'credit': 30.0,
+                'amount_currency': -900.0
+            }),
+        ]})
+        bank_move_2.action_post()
 
         # ==== Payments ====
         self.inbound_payment_method_line.journal_id = bank_journal.id
@@ -236,6 +270,30 @@ class TestReconciliationReport(TestAccountReportsCommon):
         })
         (payment_1 + payment_2 + payment_3).action_post()
 
+        # ==== Misc Entry ====
+
+        move = self.env['account.move'].create({
+            'journal_id': self.company_data['default_journal_misc'].id,
+            'date': '2016-01-01',
+            'line_ids': [
+                Command.create({
+                    'name': 'Line1',
+                    'debit': 100,
+                    'credit': 0,
+                    'amount_currency': 200,
+                    'account_id': bank_journal.default_account_id.id,
+                    'currency_id': journal_currency.id
+                }),
+                Command.create({
+                    'name': 'Line2',
+                    'debit': 0,
+                    'credit': 100,
+                    'account_id': other_account.id,
+                }),
+            ]
+        })
+        move.action_post()
+
         # ==== Report ====
 
         report = self.env.ref('account_reports.bank_reconciliation_report').with_context(
@@ -253,16 +311,16 @@ class TestReconciliationReport(TestAccountReportsCommon):
                 #   Name                                                Date   Am. Cur.                  Cur.       Amount
                 [0,                                                       1,       3,                      4,           5],
                 [
-                    ('Balance of \'101403 Bank\'',                       '',      '',                     '',       200.0),
+                    ('Balance of \'101405 Bank\'',                       '',      '',                     '',       400.0),
                     ('Last statement balance',                           '',      '',                     '',       200.0),
-                    ('Including Unreconciled Receipts',                  '',      '',                     '',       200.0),
-                    ('BNKKK/2016/00002',                       '01/01/2016',  999.99,    choco_currency.name,       100.0),
-                    ('BNKKK/2016/00001',                       '01/01/2016',   50.01,  company_currency.name,       100.0),
+                    ('Including Unreconciled Receipts',                  '',      '',                     '',       170.005),
+                    ('BNKKK/2016/00002',                       '01/01/2016',  900.00,    choco_currency.name,        90.001),
+                    ('BNKKK/2016/00001',                       '01/01/2016',   40.01,  company_currency.name,        80.004),
                     ('Including Unreconciled Payments',                  '',      '',                     '',         0.0),
                     ('Transactions without statement',                   '',      '',                     '',         0.0),
                     ('Including Unreconciled Receipts',                  '',      '',                     '',         0.0),
                     ('Including Unreconciled Payments',                  '',      '',                     '',         0.0),
-                    ('Misc. operations',                                 '',      '',                     '',         0.0),
+                    ('Misc. operations',                                 '',      '',                     '',       200.0),
                     ('Outstanding Receipts/Payments',                    '',      '',                     '',      5900.0),
                     ('(+) Outstanding Receipts',                         '',      '',                     '',      5900.0),
                     ('PBNKKK/2016/00003',                      '01/01/2016',  3000.0,    choco_currency.name,       900.0),
@@ -446,7 +504,7 @@ class TestReconciliationReport(TestAccountReportsCommon):
             #   Name                                                  Date         Amount
             [0,                                                         1,             3],
             [
-                ('Balance of \'101403 Bank\'',                         '',           0.0),
+                ('Balance of \'101405 Bank\'',                         '',           0.0),
                 ('Last statement balance',                             '',           0.0),
                 ('Including Unreconciled Receipts',                    '',           0.0),
                 ('Including Unreconciled Payments',                    '',           0.0),
@@ -508,7 +566,7 @@ class TestReconciliationReport(TestAccountReportsCommon):
             #   Name                                                  Date         Amount
             [0,                                                         1,             3],
             [
-                ('Balance of \'101403 Bank\'',                         '',         800.0),
+                ('Balance of \'101405 Bank\'',                         '',         800.0),
                 ('Last statement balance',                             '',           0.0),
                 ('Including Unreconciled Receipts',                    '',           0.0),
                 ('Including Unreconciled Payments',                    '',           0.0),
@@ -535,7 +593,7 @@ class TestReconciliationReport(TestAccountReportsCommon):
             #   Name                                                  Date         Amount
             [0,                                                         1,             3],
             [
-                ('Balance of \'101403 Bank\'',                         '',           0.0),
+                ('Balance of \'101405 Bank\'',                         '',           0.0),
                 ('Last statement balance',                             '',           0.0),
                 ('Including Unreconciled Receipts',                    '',           0.0),
                 ('Including Unreconciled Payments',                    '',           0.0),
@@ -738,6 +796,64 @@ class TestReconciliationReport(TestAccountReportsCommon):
                 ('Outstanding Receipts/Payments',                                 '',             0.0),
                 ('(+) Outstanding Receipts',                                      '',             0.0),
                 ('(-) Outstanding Payments',                                      '',             0.0),
+            ],
+            options,
+            currency_map={3: {'currency': bank_journal.currency_id}},
+            ignore_folded=False,
+        )
+
+    def test_reconciliation_report_exchange_entry(self):
+        """ This test will check that misc entries reported in the exchange journal
+            do not figure in the report
+        """
+
+        bank_journal = self.company_data['default_journal_bank']
+        exchange_journal = self.env.company.currency_exchange_journal_id
+
+        move_a = self.env['account.move'].create({
+                'journal_id': exchange_journal.id,
+                'move_type': 'entry',
+                'date': '2019-01-01',
+                'line_ids': [
+                    Command.create({
+                        'name': 'line_a_1',
+                        'account_id': bank_journal.default_account_id.id,
+                        'debit': 1000.0,
+                        'credit': 0.0,
+                    }),
+                    Command.create({
+                        'name': 'line_a_2',
+                        'account_id': self.company_data['default_account_expense'].id,
+                        'debit': 0.0,
+                        'credit': 1000.0,
+                    }),
+                ]
+        })
+        move_a.action_post()
+        report = self.env.ref('account_reports.bank_reconciliation_report').with_context(
+            active_id=bank_journal.id,
+            active_model='account.journal'
+        )
+
+        options = self._generate_options(report, fields.Date.from_string('2019-01-01'), fields.Date.from_string('2019-01-12'))
+
+        lines = report._get_lines(options)
+        self.assertLinesValues(
+            lines,
+            #   Name                                                             Date            Amount
+            [0,                                                                     1,              3],
+            [
+                ('Balance of \'101401 Bank\'',                                     '',            0.0),
+                ('Last statement balance',                                         '',            0.0),
+                ('Including Unreconciled Receipts',                                '',            0.0),
+                ('Including Unreconciled Payments',                                '',            0.0),
+                ('Transactions without statement',                                 '',            0.0),
+                ('Including Unreconciled Receipts',                                '',            0.0),
+                ('Including Unreconciled Payments',                                '',            0.0),
+                ('Misc. operations',                                               '',            0.0),
+                ('Outstanding Receipts/Payments',                                  '',            0.0),
+                ('(+) Outstanding Receipts',                                       '',            0.0),
+                ('(-) Outstanding Payments',                                       '',            0.0),
             ],
             options,
             currency_map={3: {'currency': bank_journal.currency_id}},

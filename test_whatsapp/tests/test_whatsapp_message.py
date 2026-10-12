@@ -1,7 +1,12 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from itertools import product
+from unittest.mock import patch
 
+
+from odoo.addons.base.models.ir_cron import ir_cron as IrCronModel
+from odoo.addons.mail.tests.common import mail_new_test_user
+from odoo.addons.whatsapp.models.whatsapp_message import WhatsAppMessage as WhatsappMessageModel
 from odoo.addons.whatsapp.tests.common import MockIncomingWhatsApp
 from odoo.addons.test_whatsapp.tests.common import WhatsAppFullCase
 from odoo.tests import tagged, users
@@ -14,12 +19,17 @@ class WhatsAppMessage(WhatsAppFullCase, MockIncomingWhatsApp):
     def setUpClass(cls):
         super().setUpClass()
 
+        cls.public_user = mail_new_test_user(
+            cls.env, login='public_test', groups='base.group_public',
+            company_id=cls.company_admin.id, name='Public User'
+        )
         # test records for sending messages
         cls.countries = (
             [cls.env.ref('base.be')] * 4 +
             [cls.env.ref('base.in'), cls.env.ref('base.ca'), cls.env.ref('base.us')] +
             [cls.env.ref('base.br')] * 2 +
-            [cls.env.ref('base.ci')] * 2
+            [cls.env.ref('base.ci')] * 2 +
+            [cls.env.ref('base.mx')] * 3
         )
         cls.mobile_numbers = [
             "0456001122",
@@ -33,6 +43,9 @@ class WhatsAppMessage(WhatsAppFullCase, MockIncomingWhatsApp):
             "+55 11 6123 4561",
             "0708151718",
             "+225 0708151719",
+            "5585460749",
+            "15585440749",
+            "+52 15585440659",
         ]
         cls.test_base_records = cls.env['whatsapp.test.base'].create([
             {
@@ -54,6 +67,9 @@ class WhatsAppMessage(WhatsAppFullCase, MockIncomingWhatsApp):
             "5511961234561",
             "2250708151718",
             "2250708151719",
+            "525585460749",
+            "525585440749",
+            "525585440659",
         ]
         # E164 (+ sign) formatting
         cls.mobile_numbers_formatted = [
@@ -68,6 +84,9 @@ class WhatsAppMessage(WhatsAppFullCase, MockIncomingWhatsApp):
             "+5511961234561",
             "+2250708151718",
             "+2250708151719",
+            "+525585460749",
+            "+525585440749",
+            "+525585440659",
         ]
         # International formatting
         cls.mobile_numbers_formatted_intl = [
@@ -82,6 +101,9 @@ class WhatsAppMessage(WhatsAppFullCase, MockIncomingWhatsApp):
             "+55 11 96123-4561",
             "+225 07 08 151 718",
             "+225 07 08 151 719",
+            "+52 55 8546 0749",
+            "+52 55 8544 0749",
+            "+52 55 8544 0659",
         ]
 
         # test templates
@@ -104,6 +126,43 @@ class WhatsAppMessage(WhatsAppFullCase, MockIncomingWhatsApp):
 
         self.assertEqual(self.whatsapp_account.notify_user_ids, self.user_wa_admin)
         self.assertEqual(self.whatsapp_account_2.notify_user_ids, self.user_wa_admin)
+
+    def test_blacklist_enforcement_cross_country(self):
+        """ Test that blacklist enforcement works correctly when the company country
+        differs from the partner's phone number country."""
+        company_de = self.env.ref('base.de')
+        self.company_admin.write({'country_id': company_de.id})
+        self.user_wa_admin.write({'country_id': False})
+
+        phone_number_local = "+32456001122"
+        phone_number_wa = "32456001122"
+
+        partner = self.env['res.partner'].create({
+            'name': 'Test Partner',
+            'country_id': False,
+            'mobile': phone_number_local,
+        })
+
+        with self.mockWhatsappGateway():
+            self._receive_whatsapp_message(self.whatsapp_account, "STOP", phone_number_wa)
+
+        blacklist_entries = self.env['phone.blacklist'].sudo().search([('number', '=', phone_number_local)])
+        self.assertTrue(blacklist_entries, "Blacklist entry should be created")
+
+        composer = self._instanciate_wa_composer_from_records(
+            self.simple_whatsapp_template, partner, with_user=self.user_wa_admin
+        )
+
+        with self.mockWhatsappGateway():
+            composer.action_send_whatsapp_template()
+
+        self.assertWAMessageFromRecord(
+            partner,
+            status='error',
+            fields_values={
+                'failure_type': 'blacklisted',
+            }
+        )
 
     @users('employee')
     def test_message_values_from_composer(self):
@@ -164,7 +223,7 @@ class WhatsAppMessage(WhatsAppFullCase, MockIncomingWhatsApp):
                     },
                     channel_values={
                         'channel_type': 'whatsapp',
-                        'name': mobile_number,
+                        'name': exp_mobile_nbr_formatted,
                         'wa_account_id': self.whatsapp_account,
                         'whatsapp_number': mobile_number,
                         'whatsapp_partner_id': new_partner,
@@ -181,7 +240,7 @@ class WhatsAppMessage(WhatsAppFullCase, MockIncomingWhatsApp):
                         'message_type': 'whatsapp_message',
                         'model': 'discuss.channel',
                         'partner_ids': self.env['res.partner'],
-                        'record_name': mobile_number,  # probably due to channel name
+                        'record_name': exp_mobile_nbr_formatted,  # channel name
                         'subtype_id': self.env.ref('mail.mt_comment'),
                     },
                 )
@@ -260,4 +319,95 @@ class WhatsAppMessage(WhatsAppFullCase, MockIncomingWhatsApp):
             wa_message_fields_values={
                 'state': 'received',
             },
+        )
+
+    def test_receive_attachment(self):
+        """Ensure incoming attachments are processed and attached to messages properly."""
+        # Image
+        with self.mockWhatsappGateway(), self.mock_mail_app():
+            self._wa_document_store['image_doc_id'] = self.image_attachment_wa_admin.raw
+            self._receive_whatsapp_message(
+                self.whatsapp_account, 'Hello', '32499123456', message_type="image", content_values={
+                    'mime_type': self.image_attachment_wa_admin.mimetype,
+                    'sha256': '',  # currently not checked...
+                    'id': 'image_doc_id',
+                }
+            )
+        self.assertWhatsAppDiscussChannel(
+            "32499123456",
+            wa_msg_count=1, msg_count=1,
+            wa_message_fields_values={
+                'state': 'received',
+            },
+        )
+        channel_message = self._new_msgs.filtered(lambda msg: msg.model == 'discuss.channel')
+        self.assertEqual(len(channel_message.attachment_ids), 1)
+        self.assertEqual(channel_message.attachment_ids.datas, self.image_attachment_wa_admin.datas)
+        # Voice
+        with self.mockWhatsappGateway(), self.mock_mail_app():
+            self._wa_document_store['audio_doc_id'] = self.audio_attachment_wa_admin.raw
+            self._receive_whatsapp_message(
+                self.whatsapp_account, 'Hello', '32499123456', message_type="image", content_values={
+                    'filename': 'audio.ogg',
+                    'id': 'audio_doc_id',
+                    'mime_type': self.audio_attachment_wa_admin.mimetype,
+                    'sha256': '',
+                    'voice': True,
+                }
+            )
+        self.assertWhatsAppDiscussChannel(
+            "32499123456",
+            wa_msg_count=2, msg_count=2,
+            wa_message_fields_values={
+                'state': 'received',
+            },
+        )
+        self.assertEqual(len(self._new_msgs), 1)
+        attachment = self._new_msgs.attachment_ids
+        self.assertEqual(len(attachment), 1)
+        self.assertEqual(attachment.datas, self.audio_attachment_wa_admin.datas)
+        self.assertEqual(attachment.name, "audio.ogg")
+        self.assertTrue(attachment.voice_ids)
+
+    @users('public_test')
+    def test_send_as_public_user(self):
+        """Check that public users creating a message properly sends it afterwards."""
+        test_record = self.test_base_records[0].with_user(self.env.user)
+        # clear cache to force fetch as user
+        test_record.invalidate_recordset()
+
+        original_trigger = IrCronModel._trigger
+
+        def patched_cron_trigger(cron, at=None):
+            """Immediately run the send message cron in the current thread if it is not scheduled."""
+            if at is None and cron == self.env.ref('whatsapp.ir_cron_send_whatsapp_queue'):
+                # clear test record as cron wouldn't have anything cached
+                self.test_base_records.invalidate_recordset()
+                cron.with_user(self.env.ref('base.user_root')).sudo(False).method_direct_trigger()
+                return
+            return original_trigger(cron, at=at)
+
+        self.whatsapp_template.write({
+            'body': 'Hi {{1}}, this is {{2}}',
+            'status': 'approved',
+            'variable_ids': [
+                (5, 0, 0),
+                (0, 0, {'name': '{{1}}', 'line_type': 'body', 'field_type': 'field', 'demo_value': 'Customer', 'field_name': 'name'}),
+                (0, 0, {'name': '{{2}}', 'line_type': 'body', 'field_type': 'user_name', 'demo_value': 'Author'}),
+            ],
+        })
+
+        with self.mockWhatsappGateway(), \
+             patch('odoo.addons.base.models.ir_cron.ir_cron._trigger', patched_cron_trigger):
+            self.env['whatsapp.composer'].sudo().create({
+                'wa_template_id': self.whatsapp_template.id,
+                'res_model': test_record._name,
+                'res_ids': str(test_record.id),
+            })._send_whatsapp_template(force_send_by_cron=True)
+        self.assertWAMessageFromRecord(
+            test_record,
+            mail_message_values={
+                'body': '<p>Hi Recipient-BE-0456001122, this is Public User</p>',
+            },
+            status='sent',
         )

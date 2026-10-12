@@ -2,7 +2,7 @@ import { expect, test, beforeEach, describe } from "@odoo/hoot";
 import { queryFirst, queryAll, click } from "@odoo/hoot-dom";
 import { animationFrame, mockDate } from "@odoo/hoot-mock";
 
-import { fields, onRpc, mountView } from "@web/../tests/web_test_helpers";
+import { fields, onRpc, mountView, getKwArgs } from "@web/../tests/web_test_helpers";
 import { mailModels } from "@mail/../tests/mail_test_helpers";
 
 import { definePlanningModels, planningModels } from "./planning_mock_models";
@@ -115,6 +115,11 @@ class ResourceResource extends planningModels.ResourceResource {
             im_status: "online",
         },
     ];
+
+    get_avatar_card_data(ids, fields) {
+        const kwargs = getKwArgs(arguments, "ids", "fields");
+        return this.read(kwargs.ids, kwargs.fields);
+    }
 }
 
 class HrEmployee extends planningModels.HrEmployee {
@@ -253,8 +258,8 @@ test("Employee avatar in Gantt view", async () => {
             },
         ];
     });
-    onRpc("get_gantt_data", async ({ kwargs, parent }) => {
-        const result = await parent();
+    onRpc("get_gantt_data", ({ kwargs, parent }) => {
+        const result = parent();
         expect(kwargs.progress_bar_fields).toEqual(["resource_id"]);
         result.progress_bars.resource_id = {
             1: {
@@ -304,7 +309,7 @@ test("Employee avatar in Gantt view", async () => {
             "material icon should be displayed for the first two gantt rows (material resources)",
     });
     expect(".o_gantt_row_title .o_avatar img").toHaveCount(2, {
-        message: "avatar should be displayed for the third and fourth gantt rows (human resources)"
+        message: "avatar should be displayed for the third and fourth gantt rows (human resources)",
     });
     expect(queryAll(".o_gantt_row_title .o_avatar img")[1].getAttribute("data-src")).toBe(
         "/web/image/resource.resource/4/avatar_128",

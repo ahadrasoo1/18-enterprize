@@ -1,20 +1,25 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* l10n_fi_reports
+# * l10n_fi_reports
 #
+# "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Saara Hakanen <sahak@odoo.com>, 2026.
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 16.2alpha1+e\n"
+"Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-26 14:49+0000\n"
-"PO-Revision-Date: 2023-01-26 14:49+0000\n"
-"Last-Translator: \n"
-"Language-Team: \n"
-"Language: \n"
+"POT-Creation-Date: 2025-12-29 19:02+0000\n"
+"PO-Revision-Date: 2026-01-31 09:03+0000\n"
+"Last-Translator: Saara Hakanen <sahak@odoo.com>\n"
+"Language-Team: Finnish <https://translate.odoo.com/projects/odoo-18-l10n/"
+"l10n_fi_reports/fi/>\n"
+"Language: fi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Plural-Forms: \n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.14.3\n"
 
 #. module: l10n_fi_reports
 #: model:account.report.line,name:l10n_fi_reports.account_financial_report_l10n_fi_pl_line_9_11_1
@@ -250,7 +255,7 @@ msgstr "2. Muut pakolliset vakuutusmaksut"
 
 #. module: l10n_fi_reports
 #: model:account.report.line,name:l10n_fi_reports.account_financial_report_l10n_fi_pl_line_9_12_2
-msgid "2. Other deductible business expenses"
+msgid "2. Other operating expenses"
 msgstr "2. Vähennyskelpoiset muut liikekulut"
 
 #. module: l10n_fi_reports
@@ -370,14 +375,14 @@ msgid "3. Occupational health care"
 msgstr "3. Työterveyshuolto"
 
 #. module: l10n_fi_reports
+#: model:account.report.line,name:l10n_fi_reports.account_financial_report_l10n_fi_pl_line_9_12_3
+msgid "3. Other deductible business expenses"
+msgstr "3. Vähennyskelvottomat muut liikekulut"
+
+#. module: l10n_fi_reports
 #: model:account.report.line,name:l10n_fi_reports.account_financial_report_l10n_fi_bs_line_2_1_5_3
 msgid "3. Other funds (oy)"
 msgstr "3. Muut rahastot (oy)"
-
-#. module: l10n_fi_reports
-#: model:account.report.line,name:l10n_fi_reports.account_financial_report_l10n_fi_pl_line_9_12_3
-msgid "3. Other non-deductible operating expenses"
-msgstr "3. Vähennyskelvottomat muut liikekulut"
 
 #. module: l10n_fi_reports
 #: model:account.report.line,name:l10n_fi_reports.account_financial_report_l10n_fi_pl_line_9_2_3
@@ -477,7 +482,7 @@ msgstr "4. Lainat rahoituslaitoksilta"
 
 #. module: l10n_fi_reports
 #: model:account.report.line,name:l10n_fi_reports.account_financial_report_l10n_fi_pl_line_9_12_4
-msgid "4. Losses on disposal of fixed assets"
+msgid "4. Other non-deductible operating expenses"
 msgstr "4. Käyttöomaisuuden luovutustappiot"
 
 #. module: l10n_fi_reports
@@ -514,6 +519,11 @@ msgstr "5. Tuotot muista pysyvien vastaavien sijoituksista"
 #: model:account.report.line,name:l10n_fi_reports.account_financial_report_l10n_fi_bs_line_2_1_23_5
 msgid "5. Limited partnership accounts"
 msgstr "5. Kommandiittiyhtiön tilit"
+
+#. module: l10n_fi_reports
+#: model:account.report.line,name:l10n_fi_reports.account_financial_report_l10n_fi_pl_line_9_12_5
+msgid "5. Losses on disposal of fixed assets"
+msgstr "5. Käyttöomaisuuden luovutustappiot"
 
 #. module: l10n_fi_reports
 #: model:account.report.line,name:l10n_fi_reports.account_financial_report_l10n_fi_pl_line_9_11_5
@@ -663,8 +673,12 @@ msgstr "B) VAIHTUVAT VASTAAVAT"
 
 #. module: l10n_fi_reports
 #: model:account.report.line,name:l10n_fi_reports.account_financial_report_l10n_fi_pl_line_2
-msgid "B) Increase (+) or decrease (-) of inventories of finished and work-in-progress products"
-msgstr "B) Valmiiden ja keskeneräisten tuotteiden varastojen lisäys (+) tai vähennys (-)"
+msgid ""
+"B) Increase (+) or decrease (-) of inventories of finished and work-in-"
+"progress products"
+msgstr ""
+"B) Valmiiden ja keskeneräisten tuotteiden varastojen lisäys (+) tai vähennys "
+"(-)"
 
 #. module: l10n_fi_reports
 #: model:account.report.line,name:l10n_fi_reports.account_financial_report_l10n_fi_bs_line_2_2
@@ -693,6 +707,17 @@ msgid "Balance sheet Liabilities"
 msgstr "Tase Vastattavaa"
 
 #. module: l10n_fi_reports
+#. odoo-python
+#: code:addons/l10n_fi_reports/models/account_sales_report.py:0
+msgid "Business ID is needed on your current company to export VSRALVYV."
+msgstr "Yritystunnus vaaditaan nykyiselle yrityksellesi VSRALVYV:n viemiseksi."
+
+#. module: l10n_fi_reports
+#: model:account.report.column,name:l10n_fi_reports.finland_ec_sales_report_buyer_vat_number
+msgid "Buyer's VAT number"
+msgstr "Ostajan ALV-numero"
+
+#. module: l10n_fi_reports
 #: model:account.report.line,name:l10n_fi_reports.account_financial_report_l10n_fi_bs_line_2_3
 msgid "C) ACCUMULATION OF ACCOUNTING TRANSFER"
 msgstr "C) TILINPÄÄTÖSSIIRTOJEN KERTYMÄ"
@@ -701,6 +726,11 @@ msgstr "C) TILINPÄÄTÖSSIIRTOJEN KERTYMÄ"
 #: model:account.report.line,name:l10n_fi_reports.account_financial_report_l10n_fi_pl_line_3
 msgid "C) Manufacturing for own use (+)"
 msgstr "C) Valmistus omaan käyttöön (+)"
+
+#. module: l10n_fi_reports
+#: model:account.report.column,name:l10n_fi_reports.finland_ec_sales_report_country_code
+msgid "Country code"
+msgstr "Maatunnus"
 
 #. module: l10n_fi_reports
 #: model:account.report.line,name:l10n_fi_reports.account_financial_report_l10n_fi_bs_line_2_4
@@ -723,6 +753,11 @@ msgid "E) Materials and services"
 msgstr "E) Materiaalit ja palvelut"
 
 #. module: l10n_fi_reports
+#: model:account.report,name:l10n_fi_reports.finland_ec_sales_report
+msgid "EC Sales List"
+msgstr "Myynnit yhteisöalueelle (EU)"
+
+#. module: l10n_fi_reports
 #: model:account.report.line,name:l10n_fi_reports.account_financial_report_l10n_fi_bs_line_2_6
 msgid "F) DEBT CAPITAL"
 msgstr "F) VIERAS PÄÄOMA"
@@ -733,9 +768,41 @@ msgid "F) Variable expenses"
 msgstr "F) Muuttuvat kulut"
 
 #. module: l10n_fi_reports
+#: model:ir.model,name:l10n_fi_reports.model_l10n_fi_reports_ec_sales_report_handler
+msgid "Finland EC Sales Report Custom Handler"
+msgstr "Suomen EU-myyntiraportin erityiskäsittelijä"
+
+#. module: l10n_fi_reports
+#: model:ir.model,name:l10n_fi_reports.model_l10n_fi_reports_tax_report_handler
+msgid "Finland Tax Report"
+msgstr "Suomen veroraportti"
+
+#. module: l10n_fi_reports
 #: model:account.report.line,name:l10n_fi_reports.account_financial_report_l10n_fi_pl_line_7
 msgid "G) Personnel costs"
 msgstr "G) Henkilöstökulut"
+
+#. module: l10n_fi_reports
+#: model:ir.actions.report,name:l10n_fi_reports.action_generate_ec_sales_list_report_export
+msgid "Generate EC Sales List report export"
+msgstr "Luo EU-yhteenvetoilmoitusraportin vienti"
+
+#. module: l10n_fi_reports
+#: model:ir.actions.report,name:l10n_fi_reports.action_generate_tax_report_export
+msgid "Generate Tax report export"
+msgstr "Luo veroraportin vienti"
+
+#. module: l10n_fi_reports
+#. odoo-python
+#: code:addons/l10n_fi_reports/models/tax_report.py:0
+msgid "Generate VSRALVKV"
+msgstr "Luo VSRALVKV"
+
+#. module: l10n_fi_reports
+#. odoo-python
+#: code:addons/l10n_fi_reports/models/account_sales_report.py:0
+msgid "Generate VSRALVYV"
+msgstr "Luo VSRALVYV"
 
 #. module: l10n_fi_reports
 #: model:account.report.line,name:l10n_fi_reports.account_financial_report_l10n_fi_pl_line_8
@@ -829,7 +896,9 @@ msgstr "I. Poistoero"
 
 #. module: l10n_fi_reports
 #: model:account.report.line,name:l10n_fi_reports.account_financial_report_l10n_fi_pl_line_8_2
-msgid "II. Amortisation of consolidated goodwill and reduction of consolidated reserves"
+msgid ""
+"II. Amortisation of consolidated goodwill and reduction of consolidated "
+"reserves"
 msgstr "II. Konserniliikearvon poisto ja konsernireservin vähennys"
 
 #. module: l10n_fi_reports
@@ -1018,9 +1087,39 @@ msgid "L) Financial income and expenses"
 msgstr "L) Rahoitustuotot ja -kulut"
 
 #. module: l10n_fi_reports
+#: model:ir.model,name:l10n_fi_reports.model_report_l10n_fi_reports_ec_sales_list_report_export
+msgid "L10n FI Report - EC Sales List export"
+msgstr "L10n FI -raportti - EU-yhteenvetoilmoituksen vienti"
+
+#. module: l10n_fi_reports
+#: model:ir.model,name:l10n_fi_reports.model_report_l10n_fi_reports_tax_report_export
+msgid "L10n FI Reports - Tax Report export"
+msgstr "L10n FI -raportit – Veroraportin vienti"
+
+#. module: l10n_fi_reports
 #: model:account.report.line,name:l10n_fi_reports.account_financial_report_l10n_fi_pl_line_13
 msgid "M) Incidental items"
 msgstr "M) Satunnaiset erät"
+
+#. module: l10n_fi_reports
+#. odoo-python
+#: code:addons/l10n_fi_reports/report/tax_report_export.py:0
+msgid ""
+"Make sure that you update the Finland localization(l10n_fi) module to have "
+"latest changes. Each tax report line should have a code."
+msgstr ""
+"Varmista, että päivität Suomen lokalisointimoduulin (l10n_fi) uusimpien "
+"muutosten mukaiseksi. Jokaisella veroraportin rivillä tulisi olla koodi."
+
+#. module: l10n_fi_reports
+#. odoo-python
+#: code:addons/l10n_fi_reports/models/account_sales_report.py:0
+msgid ""
+"Make sure to update Finland localization to have the right expressions to "
+"generate your EC Sales report."
+msgstr ""
+"Päivitä Suomen lokalisaatio saadaksesi oikeat lausekkeet EU-"
+"yhteenvetoilmoituksen luomiseksi."
 
 #. module: l10n_fi_reports
 #: model:account.report.line,name:l10n_fi_reports.account_financial_report_l10n_fi_pl_line_14
@@ -1058,6 +1157,63 @@ msgid "S) PROFIT (LOSS) FOR THE FINANCIAL YEAR"
 msgstr "S) TILIKAUDEN VOITTO (TAPPIO)"
 
 #. module: l10n_fi_reports
+#: model:account.report.column,name:l10n_fi_reports.finland_ec_sales_report_goods
+msgid "Selling of goods"
+msgstr "Tavaroiden myynti"
+
+#. module: l10n_fi_reports
+#: model:account.report.column,name:l10n_fi_reports.finland_ec_sales_report_services
+msgid "Selling of services"
+msgstr "Palveluiden myynti"
+
+#. module: l10n_fi_reports
+#. odoo-python
+#: code:addons/l10n_fi_reports/models/account_sales_report.py:0
+#: code:addons/l10n_fi_reports/models/tax_report.py:0
+msgid "TXT"
+msgstr "TXT"
+
+#. module: l10n_fi_reports
+#. odoo-python
+#: code:addons/l10n_fi_reports/models/tax_report.py:0
+msgid "The current company needs a Business ID to export VSRALVKV."
+msgstr "Nykyinen yritys tarvitsee yritystunnuksen voidakseen viedä VSRALVKV:n."
+
+#. module: l10n_fi_reports
+#. odoo-python
+#: code:addons/l10n_fi_reports/models/tax_report.py:0
+msgid "The current company needs a phone number to export VSRALVKV."
+msgstr "Nykyinen yritys tarvitsee puhelinnumeron VSRALVKV:n viemiseksi."
+
+#. module: l10n_fi_reports
+#. odoo-python
+#: code:addons/l10n_fi_reports/models/tax_report.py:0
+msgid ""
+"The declaration should be month by month, quarter per quarter or year by "
+"year. Please select only a right period."
+msgstr ""
+"Ilmoitus tulee tehdä kuukausittain, neljännesvuosittain tai vuosittain. "
+"Valitse vain oikea ajanjakso."
+
+#. module: l10n_fi_reports
+#. odoo-python
+#: code:addons/l10n_fi_reports/models/account_sales_report.py:0
+msgid ""
+"The declaration should be month by month. Please select only a month period."
+msgstr ""
+"Ilmoituksen tulisi olla kuukausittainen. Valitse kuukauden mittainen kausi."
+
+#. module: l10n_fi_reports
+#. odoo-python
+#: code:addons/l10n_fi_reports/models/tax_report.py:0
+msgid ""
+"The file generation raises errors:\n"
+" %s"
+msgstr ""
+"Tiedoston luominen aiheuttaa virheitä:\n"
+" %s"
+
+#. module: l10n_fi_reports
 #: model:account.report.line,name:l10n_fi_reports.account_financial_report_l10n_fi_pl_line_1_5
 msgid "V. Commission and agency"
 msgstr "V. Komissiokauppa ja agentuuri"
@@ -1076,6 +1232,11 @@ msgstr "V. Muut kone- ja kalustokulut"
 #: model:account.report.line,name:l10n_fi_reports.account_financial_report_l10n_fi_bs_line_2_1_5
 msgid "V. Reserve Fund (oy)"
 msgstr "V. Vararahasto (oy)"
+
+#. module: l10n_fi_reports
+#: model:account.report.column,name:l10n_fi_reports.finland_ec_sales_report_triangular
+msgid "VAT Triangulation"
+msgstr "ALV-kolmikantakauppa"
 
 #. module: l10n_fi_reports
 #: model:account.report.line,name:l10n_fi_reports.account_financial_report_l10n_fi_bs_line_2_1_6
@@ -1164,7 +1325,8 @@ msgstr "XI. Vararahasto (osk)"
 
 #. module: l10n_fi_reports
 #: model:account.report.line,name:l10n_fi_reports.account_financial_report_l10n_fi_pl_line_1_11
-msgid "XI. Sales, second-hand goods and works of art, collectors' items and antiques"
+msgid ""
+"XI. Sales, second-hand goods and works of art, collectors' items and antiques"
 msgstr "XI. Myynti, käytetyt tavarat ja taide-, keräily- ja antiikkiesineet"
 
 #. module: l10n_fi_reports
@@ -1473,7 +1635,8 @@ msgstr "e) Laskennalliset verosaamiset"
 
 #. module: l10n_fi_reports
 #: model:account.report.line,name:l10n_fi_reports.account_financial_report_l10n_fi_pl_line_5_1_1_5
-msgid "e) Purchases, second-hand goods and collectors' items of art and antiques"
+msgid ""
+"e) Purchases, second-hand goods and collectors' items of art and antiques"
 msgstr "e) Ostot, käytetyt tavarat ja taide- keräily- ja antiikkiesineet"
 
 #. module: l10n_fi_reports

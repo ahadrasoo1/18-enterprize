@@ -13,7 +13,8 @@ class HrContractSalaryOffer(models.Model):
         compute='_compute_contract_type_id',
         store=True,
         readonly=False,
-        tracking=True)
+        tracking=True,
+        related=None)
     new_car = fields.Boolean(
         string='Show "Company Car (To Order)"', tracking=True,
         compute="_compute_new_car",
@@ -42,11 +43,14 @@ class HrContractSalaryOffer(models.Model):
         for offer in self:
             offer.contract_type_id = offer.contract_template_id.contract_type_id
 
-    @api.depends('applicant_id')
+    @api.depends('applicant_id', 'contract_template_id.available_cars_amount', 'contract_template_id.max_unused_cars')
     def _compute_new_car(self):
         for offer in self:
             # new_car defaults to True for applicants
-            offer.new_car = bool(offer.applicant_id)
+            if offer.applicant_id:
+                offer.new_car = True
+            else:
+                offer.new_car = offer.contract_template_id.available_cars_amount < offer.contract_template_id.max_unused_cars
 
     @api.depends('applicant_id.partner_id', 'employee_id')
     def _compute_car_id(self):
@@ -57,8 +61,8 @@ class HrContractSalaryOffer(models.Model):
                 partner |= offer.employee_id.work_contact_id
                 # In case the car was reserved for an applicant, while
                 # the offer is sent for the corresponding employee
-                if offer.employee_id.candidate_id:
-                    partner |= offer.employee_id.candidate_id.partner_id
+                if candidate_partner_id := offer.employee_id.sudo().candidate_id.partner_id:
+                    partner |= candidate_partner_id
             elif offer.applicant_id:
                 partner |= offer.applicant_id.partner_id
             if partner:
@@ -78,7 +82,7 @@ class HrContractSalaryOffer(models.Model):
     @api.depends('contract_template_id')
     def _compute_l10n_be_canteen_cost(self):
         for offer in self:
-            offer.l10n_be_canteen_cost = self.contract_template_id.l10n_be_canteen_cost
+            offer.l10n_be_canteen_cost = offer.contract_template_id.l10n_be_canteen_cost
 
     @api.depends('applicant_id.partner_id', 'employee_id', 'car_id')
     def _compute_assigned_car_warning(self):
@@ -90,8 +94,8 @@ class HrContractSalaryOffer(models.Model):
                 partners |= offer.applicant_id.partner_id
             elif offer.employee_id:
                 partners |= offer.employee_id.work_contact_id
-                if offer.employee_id.candidate_id:
-                    partners |= offer.employee_id.candidate_id.partner_id
+                if candidate_partner_id := offer.employee_id.sudo().candidate_id.partner_id:
+                    partners |= candidate_partner_id
             if offer.car_id.driver_id and offer.car_id.driver_id not in partners:
                 warning.append(f"Car is already assigned to {offer.car_id.driver_id.name} as a driver.")
             if offer.car_id.future_driver_id and offer.car_id.future_driver_id not in partners:
@@ -102,7 +106,7 @@ class HrContractSalaryOffer(models.Model):
     @api.depends('new_car')
     def _compute_wishlist_car_warning(self):
         for offer in self:
-            if offer.contract_template_id.available_cars_amount > offer.contract_template_id.max_unused_cars:
+            if offer.contract_template_id.available_cars_amount >= offer.contract_template_id.max_unused_cars:
                 offer.wishlist_car_warning = _("We already have %s car(s) without driver(s) available",
                                               offer.employee_contract_id.available_cars_amount)
             else:

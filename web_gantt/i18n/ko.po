@@ -1,22 +1,23 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* web_gantt
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Daye Jeong, 2024
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:29+0000\n"
+"POT-Creation-Date: 2026-05-22 17:59+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
+"Last-Translator: Daye Jeong, 2024\n"
 "Language-Team: Korean (https://app.transifex.com/odoo/teams/41243/ko/)\n"
+"Language: ko\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: ko\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. module: web_gantt
@@ -44,12 +45,14 @@ msgstr "작업 윈도우 보기"
 
 #. module: web_gantt
 #. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer_controls.js:0
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "Activate dense mode"
 msgstr "dense mode 활성화"
 
 #. module: web_gantt
 #. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer_controls.js:0
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "Activate sparse mode"
 msgstr "sparse mode 활성화"
@@ -91,6 +94,12 @@ msgstr "편집"
 
 #. module: web_gantt
 #. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+msgid "Ending date cannot be before the starting date"
+msgstr "종료일은 시작일보다 이전일 수 없습니다."
+
+#. module: web_gantt
+#. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "Expand rows"
 msgstr "행 확장"
@@ -106,6 +115,12 @@ msgstr "오늘의 포커스"
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "From"
 msgstr "시작 시간"
+
+#. module: web_gantt
+#. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer_controls.js:0
+msgid "From: %(from_date)s to: %(to_date)s"
+msgstr "시작일: %(from_date)s 종료일: %(to_date)s"
 
 #. module: web_gantt
 #: model:ir.model.fields.selection,name:web_gantt.selection__ir_actions_act_window_view__view_mode__gantt
@@ -144,7 +159,8 @@ msgid ""
 "Gantt must have a 'dependency_inverted_field' attribute once the "
 "'dependency_field' is specified"
 msgstr ""
-"'dependency_field'가 지정되는 경우, 간트에서 'dependency_inverted_field' 속성을 지정해야 합니다."
+"'dependency_field'가 지정되는 경우, 간트에서 'dependency_inverted_field' 속성"
+"을 지정해야 합니다."
 
 #. module: web_gantt
 #. odoo-javascript
@@ -183,8 +199,8 @@ msgid ""
 "Invalid attributes (%(invalid_attributes)s) in gantt view. Attributes must "
 "be in (%(valid_attributes)s)"
 msgstr ""
-"간트 보기에 잘못된 속성 (%(invalid_attributes)s)이 있습니다. 속성은 (%(valid_attributes)s)에 "
-"위치해야 합니다."
+"간트 보기에 잘못된 속성 (%(invalid_attributes)s)이 있습니다. 속성은 (%"
+"(valid_attributes)s)에 위치해야 합니다."
 
 #. module: web_gantt
 #. odoo-python
@@ -232,13 +248,19 @@ msgstr "계획"
 #. odoo-python
 #: code:addons/web_gantt/models/models.py:0
 msgid "Reschedule done successfully."
-msgstr ""
+msgstr "일정 변경이 성공적으로 완료되었습니다."
 
 #. module: web_gantt
 #. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_popover.xml:0
 msgid "Start"
 msgstr "시작"
+
+#. module: web_gantt
+#. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+msgid "Starting date cannot be after the ending date"
+msgstr "종료일은 시작일보다 이전일 수 없습니다."
 
 #. module: web_gantt
 #. odoo-javascript
@@ -354,9 +376,3 @@ msgstr "월"
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "to"
 msgstr "종료"
-
-#. module: web_gantt
-#. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_row_progress_bar.xml:0
-msgid "{{ props.progressBar.warning }}"
-msgstr "{{ props.progressBar.warning }}"

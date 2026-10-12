@@ -23,6 +23,8 @@ class IntrastatReportCustomHandler(models.AbstractModel):
         xlsx_button_option['action_param'] = 'dk_export_to_xlsx'
         xlsx_button_option['name'] = _('XLSX (IDEP.web)')
 
+        options['rounding_unit'] = 'units'
+
     def _get_exporting_query_data(self):
         res = super()._get_exporting_query_data()
         return SQL('%s %s', res, SQL("""
@@ -31,9 +33,10 @@ class IntrastatReportCustomHandler(models.AbstractModel):
 
     def _get_exporting_dict_data(self, result_dict, query_res):
         super()._get_exporting_dict_data(result_dict, query_res)
-        result_dict.update({
-            'name': query_res['name'],
-        })
+        if self.env.company.partner_id.country_id.code == 'DK':
+            result_dict.update({
+                'name': query_res['name'],
+            })
         return result_dict
 
     def dk_export_to_xlsx(self, options):
@@ -173,10 +176,12 @@ class IntrastatReportCustomHandler(models.AbstractModel):
         for line in lines:
             res_line = []
             for column in column_labels:
-                res_line.append(str(line[column] or ''))
-
                 if column == 'value':
+                    res_line.append(str(round(line['value'] or 0)))
                     res_line.append(line['name'])
+                else:
+                    res_line.append(str(line[column] or ''))
+
             results.append(res_line)
 
         return results

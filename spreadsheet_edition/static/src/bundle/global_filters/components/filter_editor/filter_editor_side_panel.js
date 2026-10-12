@@ -6,10 +6,11 @@ import { CommandResult } from "@spreadsheet/o_spreadsheet/cancelled_reason";
 import { useService } from "@web/core/utils/hooks";
 import { globalFiltersFieldMatchers } from "@spreadsheet/global_filters/plugins/global_filters_core_plugin";
 import { FilterEditorLabel } from "./filter_editor_label";
+import { ModelNotFoundError } from "@spreadsheet/data_sources/data_source";
 
 import { onWillStart, Component, useRef, useState, toRaw } from "@odoo/owl";
 
-const { Checkbox, Section, SidePanelCollapsible } = spreadsheet.components;
+const { Checkbox, Section, SidePanelCollapsible, ValidationMessages } = spreadsheet.components;
 const { toNumber } = spreadsheet.helpers;
 const uuidGenerator = new spreadsheet.helpers.UuidGenerator();
 
@@ -34,6 +35,7 @@ export class AbstractFilterEditorSidePanel extends Component {
         SidePanelCollapsible,
         Checkbox,
         Section,
+        ValidationMessages,
     };
     static props = {
         id: { type: String, optional: true },
@@ -140,6 +142,7 @@ export class AbstractFilterEditorSidePanel extends Component {
     }
 
     async onWillStart() {
+        this.isValid = true;
         this.loadValues();
         const proms = [];
         proms.push(
@@ -147,8 +150,25 @@ export class AbstractFilterEditorSidePanel extends Component {
                 .map((el) => el.waitForReady())
                 .flat()
         );
-        await this._loadFieldMatchings();
-        await Promise.all(proms);
+        proms.push(this._loadFieldMatchings());
+        try {
+            await Promise.all(proms);
+        } catch (e) {
+            if (e instanceof ModelNotFoundError) {
+                this.isValid = false;
+                if (odoo.debug) {
+                    console.error(e);
+                }
+            } else {
+                throw e;
+            }
+        }
+    }
+
+    get invalidModel() {
+        return _t(
+            "At least one data source has an invalid model. Please delete it before editing this global filter."
+        );
     }
 
     /**
@@ -163,10 +183,20 @@ export class AbstractFilterEditorSidePanel extends Component {
      * Function that will be called by ModelFieldSelector on each fields, to
      * filter the ones that should be displayed
      * @param {OdooField} field
+     * @param {string} path
+     * @param {[string]} coModel Only set when the filter is relation
      * @returns {boolean}
      */
-    filterModelFieldSelectorField(field) {
+    filterModelFieldSelectorField(field, path, coModel) {
         if (!field.searchable) {
+            return false;
+        }
+        if (field.name === "id" && this.type === "relation") {
+            const paths = path.split(".");
+            const lastField = paths.at(-2);
+            if (!lastField || (lastField.relation && lastField.relation === coModel)) {
+                return true;
+            }
             return false;
         }
         return this.ALLOWED_FIELD_TYPES.includes(field.type) || !!field.relation;
@@ -202,7 +232,7 @@ export class AbstractFilterEditorSidePanel extends Component {
             chain: fieldName,
             type: field?.type || "",
         };
-        if (!field || !this.matchingRelation(field) || !field.searchable) {
+        if (!field || (field.name !== "id" && !this.matchingRelation(field)) || !field.searchable) {
             this._wrongFieldMatchingsSet.add(index);
         } else {
             this._wrongFieldMatchingsSet.delete(index);

@@ -1,9 +1,11 @@
+import base64
 import logging
 from lxml import etree
 import re
 from requests.exceptions import Timeout, ConnectionError, HTTPError
+import textwrap
 
-from odoo import _, api, fields, models
+from odoo import _, api, fields, models, tools
 
 from odoo.tools import float_compare
 from odoo.tools.zeep import Client, Settings
@@ -77,12 +79,23 @@ class L10nUyEdiDocument(models.Model):
     attachment_file = fields.Binary(copy=False, attachment=True)
 
     # Related fields from origin record
-    l10n_latam_document_type_id = fields.Many2one(related="move_id.l10n_latam_document_type_id")
-    l10n_latam_document_number = fields.Char(related="move_id.l10n_latam_document_number")
-    company_id = fields.Many2one(related="move_id.company_id")
-    partner_id = fields.Many2one(related="move_id.partner_id")
+    l10n_latam_document_type_id = fields.Many2one(
+        "l10n_latam.document.type", "Document Type", related=False, compute="_compute_from_origin"
+    )
+    l10n_latam_document_number = fields.Char(related=False, compute="_compute_from_origin")
+    company_id = fields.Many2one("res.company", related=False, compute="_compute_from_origin")
+    partner_id = fields.Many2one("res.partner", related=False, compute="_compute_from_origin")
 
     # Compute methods
+
+    @api.depends('move_id.l10n_latam_document_number', 'move_id.l10n_latam_document_type_id', 'move_id.company_id', 'move_id.partner_id')
+    def _compute_from_origin(self):
+        for doc in self:
+            if doc.move_id:
+                doc.l10n_latam_document_number = doc.move_id.l10n_latam_document_number
+                doc.l10n_latam_document_type_id = doc.move_id.l10n_latam_document_type_id
+                doc.company_id = doc.move_id.company_id
+                doc.partner_id = doc.move_id.partner_id
 
     def _compute_linked_attachment_id(self, attachment_field, binary_field):
         """Helper to retrieve Attachment from Binary fields
@@ -120,7 +133,15 @@ class L10nUyEdiDocument(models.Model):
         Will return None and the result will be update the cfe_state field (error field
         if applies)"""
         for edi_doc in self:
-            result = edi_doc._ucfe_inbox("360", {"Uuid": edi_doc.uuid})
+            if edi_doc.move_id.journal_id.type == 'sale':
+                result = edi_doc._ucfe_inbox("360", {"Uuid": edi_doc.uuid})
+            else:
+                document_number = re.search(r"([A-Z]*)([0-9]*)", edi_doc.move_id.l10n_latam_document_number).groups()
+                result = edi_doc._ucfe_inbox("650", {
+                    "TipoCfe": edi_doc.move_id.l10n_latam_document_type_id_code,
+                    "Serie": document_number[0],
+                    "NumeroCfe": document_number[1],
+                    "RutEmisor": edi_doc.move_id.partner_id.vat})
             edi_doc._update_cfe_state(result)
 
     # Extended methods
@@ -128,6 +149,12 @@ class L10nUyEdiDocument(models.Model):
     def unlink(self):
         self.attachment_id.unlink()
         return super().unlink()
+
+    def _get_fields_to_detach(self):
+        # EXTENDS account
+        fields_list = super()._get_fields_to_detach()
+        fields_list.append('attachment_file')
+        return fields_list
 
     # Helpers
 
@@ -195,8 +222,9 @@ class L10nUyEdiDocument(models.Model):
 
     @api.model
     def _get_doc_parts(self, record):
-        """ return list [serie, number] """
-        return re.findall(r"([A-Z])[-]*([0-9]*)", record.l10n_latam_document_number)[-1]
+        """ Return list [serie, number] of the give CFE. If not valid then return [False, False]"""
+        res = re.findall(r"([A-Z]{1,2})[-]*([0-9]{1,8})", record.l10n_latam_document_number)
+        return res[-1] if res else [False, False]
 
     @api.model
     def _get_legends(self, addenda_type, move_id):
@@ -207,7 +235,8 @@ class L10nUyEdiDocument(models.Model):
         res = []
         addendas = move_id.l10n_uy_edi_addenda_ids.filtered(lambda x: x.type == addenda_type)
         for addenda in addendas:
-            res.append("{ %s }" % addenda.content if addenda.is_legend else addenda.content)
+            content = addenda.content.strip()
+            res.append("{ %s }" % content if addenda.is_legend else content)
         return "\n".join(res)
 
     @api.model
@@ -234,7 +263,7 @@ class L10nUyEdiDocument(models.Model):
         response = result.get("response")
 
         if response is not None:
-            res.update({"file_content": response.findtext(".//{*}ObtenerPdfResult").encode()})
+            res.update({"file_content": response.findtext(".//{*}" + report_params + "Result").encode()})
 
         if result.get("errors"):
             res.update({"errors": result.get("errors")})
@@ -242,9 +271,51 @@ class L10nUyEdiDocument(models.Model):
         return res
 
     def _get_report_params(self):
-        """ Print the default representation of the PDF report, extra params not needed.
-        This has been implemented in a separate method to be inheritable for some
-        partner and customer custom reports """
+        """ Print the default representation of the PDF report with extra params when applicable.
+        Extra params available:
+        1. ("adenda", "true") to print the adenda in a separate sheet if it is longer than 6 lines.
+        2. ("reporte", "ingles") In case document is an e-ticket or e-factura expo or their respective CN and DN,
+        if the partner's configured language is not Spanish it will print the report both in spanish and english.
+        """
+
+        available_doc_types = (
+            self.env.ref('l10n_uy.dc_e_ticket') |
+            self.env.ref('l10n_uy.dc_cn_e_ticket') |
+            self.env.ref('l10n_uy.dc_dn_e_ticket') |
+            self.env.ref('l10n_uy.dc_e_inv_exp') |
+            self.env.ref('l10n_uy.dc_cn_e_inv_exp') |
+            self.env.ref('l10n_uy.dc_dn_e_inv_exp')
+        )
+        addenda = self.move_id._l10n_uy_edi_get_addenda()
+        parameters = {}
+
+        if addenda:
+            # The addenda (e.g. terms and conditions) is added in a small box at the bottom of the standard PDF report.
+            # This can only accommodate roughly 6 lines of 140 characters.If the addenda exceeds that, the remainder is
+            # cut off, which is problematic for mandatory disclosures etc.
+            max_chars_per_line = 140
+            max_lines_without_addenda = 6
+            wrapped = textwrap.wrap(addenda, width=max_chars_per_line, replace_whitespace=False)
+
+            # The resulting list will preserve newlines from the addenda because of replace_whitespace=False, join to
+            # create the final string. Count the lines of the final string and request a dedicated addenda page if
+            # needed, adding the parameter to the report.
+            if len("\n".join(wrapped).splitlines()) > max_lines_without_addenda:
+                parameters["adenda"] = "true"
+
+        if (
+            self.l10n_latam_document_type_id.code in available_doc_types.mapped('code')
+            and self.partner_id.lang
+            and not self.partner_id.lang.startswith("es_")
+        ):
+            parameters["reporte"] = "ingles"
+
+        if parameters:
+            return "ObtenerPdfConParametros", {
+                "nombreParametros": {"string": list(parameters.keys())},
+                "valoresParametros": {"string": list(parameters.values())}
+            }
+
         return "ObtenerPdf", {}
 
     def _get_ucfe_username(self, company):
@@ -302,8 +373,6 @@ class L10nUyEdiDocument(models.Model):
     @api.model
     def _is_connection_info_incomplete(self, company):
         """ False if everything is ok, Message if there is a problem or something missing """
-        if company.l10n_uy_edi_ucfe_env == "demo":
-            return False
 
         field_data = company.fields_get([])
         missing_info = []
@@ -317,17 +386,17 @@ class L10nUyEdiDocument(models.Model):
                 missing_info.append(field_data[field]["string"])
         inbox_url = self._get_ws_url("inbox", company)
         if not inbox_url:
-            missing_info.append(_("Uruware Inbox URL"))
+            missing_info.append(_("UCFE Provider Inbox URL"))
         query_url = self._get_ws_url("query", company)
         if not query_url:
-            missing_info.append(_("Uruware Query URL"))
+            missing_info.append(_("UCFE Provider Query URL"))
         username = self._get_ucfe_username(company)
         if not username:
-            missing_info.append(_("Uruware Username"))
+            missing_info.append(_("UCFE Provider Username"))
 
         if missing_info:
             return _(
-                "Incomplete Data to connect to Uruware on company %(company)s: Please complete the UCFE data to test "
+                "Incomplete Data to connect to UCFE Provider on company %(company)s: Please complete the UCFE data to test "
                 "the connection: %(missing)s",
                 company=company.name,
                 missing=", ".join(missing_info),
@@ -375,16 +444,16 @@ class L10nUyEdiDocument(models.Model):
             820 - Check Credentials
         :returns: dictionary ({"response" etree obj }, "errors": str()) """
         now = fields.Datetime.now()
-        company = self.company_id or self.env.company
+        company = extra_req.get('company') or self.company_id or self.env.company
         data = {
-            "CodComercio": company.l10n_uy_edi_ucfe_commerce_code,
-            "CodTerminal": company.l10n_uy_edi_ucfe_terminal_code,
+            "CodComercio": company.sudo().l10n_uy_edi_ucfe_commerce_code,
+            "CodTerminal": company.sudo().l10n_uy_edi_ucfe_terminal_code,
             "RequestDate": now.replace(microsecond=0).isoformat(),
             "Tout": "30000",
             "Req": {
                 "TipoMensaje": msg_type,
-                "CodComercio": company.l10n_uy_edi_ucfe_commerce_code,
-                "CodTerminal": company.l10n_uy_edi_ucfe_terminal_code,
+                "CodComercio": company.sudo().l10n_uy_edi_ucfe_commerce_code,
+                "CodTerminal": company.sudo().l10n_uy_edi_ucfe_terminal_code,
                 "IdReq": 1,
                 **extra_req,
             },
@@ -399,9 +468,12 @@ class L10nUyEdiDocument(models.Model):
     def _ucfe_ws_call(self, company, endpoint, method, *args, **kwargs):
         response = None
         errors = []
-        url = self._get_ws_url(endpoint, company)
 
-        if not url.endswith("?wsdl"):
+        if error := self._is_connection_info_incomplete(company):
+            # An error is possible if the company does not have credentials or if they are incorrect
+            return {'response': None, "errors": [error]}
+        url = self._get_ws_url(endpoint, company)
+        if url and not url.endswith("?wsdl"):
             url += "?wsdl"
         try:
             username_token = UsernameToken(self._get_ucfe_username(company), company.l10n_uy_edi_ucfe_password)
@@ -437,3 +509,217 @@ class L10nUyEdiDocument(models.Model):
                     self.message = _("CODE %(code)s: %(msg)s", code=ucfe_result_code, msg=result_msg)
                 elif self.state in ["received", "accepted"]:
                     self.message = False
+
+    def _create_partner_from_notification(self, xml_tree, partner_vat_RUC):
+        """DEPRECATED: Use _get_partner_from_xml instead."""
+        return self._get_partner_from_xml(xml_tree, partner_vat_RUC)
+
+    def _get_partner_from_xml(self, xml_tree, partner_vat_RUC):
+        """Select partner if exists or create partner from vendor bill XML data. """
+        partner = self.env["res.partner"]._retrieve_partner(vat=partner_vat_RUC, company=self.company_id)
+        state_id = None
+        if departamento := xml_tree.findtext(".//{*}Departamento"):
+            state_id = self.env["res.country.state"].search([("name", "ilike", departamento), ("country_id.code", "=", "UY")], limit=1)
+        return partner or self.env["res.partner"].create({
+            "name": xml_tree.findtext(".//{*}RznSoc"),
+            "vat": partner_vat_RUC,
+            "city": xml_tree.findtext(".//{*}Ciudad"),
+            "street": xml_tree.findtext(".//{*}DomFiscal"),
+            "state_id": state_id.id if state_id else None,
+            "country_id": self.env.ref("base.uy").id,
+            "l10n_latam_identification_type_id": self.env.ref("l10n_uy.it_rut").id,
+            "is_company": True
+        })
+
+    def _create_pdf_vendor_bill(self, move, req_data_pdf):
+        """ DEPRECATED PARAMETER: 'move' is no longer used.
+        Will connect to Uruware to get the a legal PDF representation of the EDI doc and attach it to the vendor
+        bill. """
+        self.ensure_one()
+        result = self._ucfe_query('ObtenerPdfCfeRecibido', req_data_pdf)
+        errors = result.get('errors')
+        if errors := result.get('errors'):
+            msg_error = _("It is not possible to create the pdf for this move. Error: %(errors)s.", errors="\n - ".join(errors))
+            self.move_id.message_post(body=msg_error)
+            return
+
+        response = result.get("response")
+        name = f"{self.move_id.l10n_latam_document_type_id.doc_code_prefix} {req_data_pdf['serieCfe']}{req_data_pdf['numeroCfe'].zfill(7).replace('/', '_')}.pdf"
+        return self.env["ir.attachment"].create({
+            "name": name,
+            "res_model": self.move_id._name,
+            "res_field": "invoice_pdf_report_file",
+            "res_id": self.move_id.id,
+            "type": "binary",
+            "datas": response.findtext('.//{*}ObtenerPdfCfeRecibidoResult').encode()
+        })
+
+    def cron_l10n_uy_edi_get_vendor_bills(self, batch_size=10):
+        """ UY: Create vendor bills from Uruware. If there are notifications available on Uruware side then here
+        is pulled that information, then we create the vendor bill and after that we dismiss the notification to
+        continue reading the next one until there are no more notifications available. """
+        company_errors = {}
+        cron_limit_time = tools.config['limit_time_real_cron'] or -1
+        limit_time = cron_limit_time if 0 < cron_limit_time < 300 else 300
+        start_time = fields.Datetime.now()
+        processed_notifications = 0
+        for company in self.env['res.company'].search([]).filtered(lambda x: x.country_code == 'UY'):
+            if not self.env['account.journal'].search([
+                *self.env['account.tax']._check_company_domain(company),
+                ('type', '=', 'purchase')
+            ], limit=1):
+                continue
+            notifications = True
+            while notifications and processed_notifications < batch_size:
+                # 600 - Check for available notifications.
+                response_600 = self._notification_consult(company)
+                if errors := response_600['errors']:
+                    joined_errors_msg = ". ".join(errors)
+                    error_msg = _("We found an error while consulting a notification %(joined_errors_msg)s.", joined_errors_msg=joined_errors_msg)
+                    company_errors[f'{company.id}'] = error_msg
+                    notifications = False
+                    continue
+
+                # Verify response_600 code
+                cod_rta_status = self._notification_verify_codrta(company, response_600['response'])
+                if not cod_rta_status['response']:
+                    if error := cod_rta_status['error']:
+                        company_errors[f'{company.id}'] = error
+                    notifications = False
+                    continue
+
+                # 610 - Request notification details.
+                l10n_uy_idreq = response_600['response'].findtext('.//{*}IdReq')
+                response_610 = self._ucfe_inbox("610", {"IdReq": l10n_uy_idreq, 'company': company})
+                if errors := response_610['errors']:
+                    company_errors[f'{company.id}'] = "\n".join(errors)
+                    notifications = False
+                    continue
+
+                doc_type = self.env['account.move']._l10n_uy_edi_get_cfe_document_type(response_610['response'])
+                # Only implemented for vendor bills and vendor refunds
+                if doc_type and doc_type.code not in ['124', '181', '182', '224', '281', '282']:
+                    move = self._create_edi_move(
+                        response_610['response'],
+                        company=company,
+                        doc_type=doc_type,
+                        l10n_uy_idreq=l10n_uy_idreq + '-notification'
+                    )
+                    xml_cfe_firmado = response_610['response'].findtext(".//{*}XmlCfeFirmado")
+
+                    document_number = response_610['response'].findtext(".//{*}Serie") +\
+                        (response_610['response'].findtext(".//{*}NumeroCfe") or response_610['response'].findtext(".//{*}Nro")).zfill(7)
+
+                    self.env["ir.attachment"].create({
+                        "name": f"CFE_{document_number}.xml",
+                        "res_model": "l10n_uy_edi.document",
+                        "res_id": move.l10n_uy_edi_document_id.id,
+                        "res_field": "attachment_file",
+                        "type": "binary",
+                        "datas": base64.b64encode(xml_cfe_firmado.encode()
+                                                  if xml_cfe_firmado
+                                                  else etree.tostring(response_610['response']))})
+                    move._l10n_uy_edi_complete_cfe_from_xml(etree.fromstring(xml_cfe_firmado))
+                else:
+                    # Until now we are not supporting the creation of e-Resguardos and e-Remitos
+                    doc_type_name = doc_type.name if doc_type else 'undefined'
+                    company_errors[f'{company.id}'] = _("Up to now it is not possible to create %(doc_type_name)s documents. IdReq: %(l10n_uy_idreq)s",
+                                                        doc_type_name=doc_type_name,
+                                                        l10n_uy_idreq=l10n_uy_idreq + '-notification')
+                response_620 = self._notification_dismiss(company, response_600['response'])
+                if response_620['response'].findtext('.//{*}CodRta') != "00":
+                    company_errors[f'{company.id}'] = etree.tostring(response_620['response'])
+                    notifications = False
+                    continue
+                if errors := response_620['errors']:
+                    company_errors[f'{company.id}'] = str(errors)
+                    notifications = False
+                    continue
+                processed_notifications += 1
+            self._verify_company_errors_cron_l10n_uy_edi_get_vendor_bills(company_errors)
+            if (fields.Datetime.now().timestamp() - start_time.timestamp() > limit_time) or notifications:
+                self.env.ref('l10n_uy_edi.ir_cron_get_vendor_bills_received')._trigger()
+
+    def _verify_company_errors_cron_l10n_uy_edi_get_vendor_bills(self, company_errors={}):
+        if company_errors:
+            _logger.warning(_('An error was found when synchronizing vendor bills\n'))
+            for key, value in company_errors.items():
+                _logger.warning(_('Company Name: "%(company_name)s", Company ID: (%(company_id)s), Errors: "%(error)s"',
+                    company_name=self.env['res.company'].browse(int(key)).name, company_id=key, error=value)
+                )
+
+    @api.model
+    def _create_edi_move(self, file_data, move=None, company=None, doc_type=None, l10n_uy_idreq=None):
+        """Create move if does not exists and create edi document. 'uuid' edi document field containts the suffix
+        '-manual' if the move was created by uploading the xml manually or the suffix '-notification' if the move was
+        created by the cron 'UY: Create vendor bills (sync from Uruware)'."""
+        company = company or self.env.company
+        values = {
+            'company_id': company.id,
+            'move_type': doc_type._l10n_uy_edi_get_move_type(),
+            'journal_id': self.env["account.journal"]
+            .search(
+                [
+                    *self.env["account.journal"]._check_company_domain(company),
+                    ("type", "=", "purchase"),
+                    ("currency_id", "=", False),
+                ],
+                limit=1,
+            )
+            .id,
+        }
+        if move:
+            move.write(values)
+        else:
+            move = self.env["account.move"].create(values)
+        edi_doc = self.env["l10n_uy_edi.document"].create(
+            {
+                'move_id': move.id,
+                'uuid': l10n_uy_idreq,
+            }
+        )
+        move.l10n_uy_edi_document_id = edi_doc
+        return move
+
+    def _notification_consult(self, company=False):
+        """ 600 - Consult notifications available on Uruware. """
+        return self._ucfe_inbox("600", {"TipoNotificacion": "7", "company": company})
+
+    def _notification_dismiss(self, company, response):
+        """ This is implemented for vendor bills. It is needed to dismiss the last notification if the last vendor bill was
+        created in Odoo from Uruware. To dismiss the last notification is needed to use the operation "620 - Descartar
+        una notificación" with IdReq and TipoNotificacion. If is not possible to dismiss the last notification it will
+        be returned the code "00" """
+        id_req = response.findtext('.//{*}IdReq')
+        response_620 = self._ucfe_inbox("620", {
+            "IdReq": id_req,
+            "TipoNotificacion": response.findtext('.//{*}TipoNotificacion'),
+            "company": company})
+        return response_620
+
+    def _notification_verify_codrta(self, company, response_600):
+        """ DEPRECATED PARAMETER: 'company' is no longer used.
+        Verify response code from notifications (vendor bills). If response code is != 0 return False (can`t create
+        new vendor bill), else return True (continue the process and create vendor bill).
+        Available values for response code:
+        00 Petición aceptada y procesada.
+        01 Petición denegada.
+        03 Comercio inválido.
+        12 Requerimiento inválido.
+        30 Error en formato.
+        31 Error en formato de CFE.
+        89 Terminal inválida.
+        96 Error en sistema.
+        99 Sesión no iniciada.
+        ? Any other no specified code must be understanded as
+        denied requirement."""
+        cod_rta = response_600.findtext('.//{*}CodRta')
+        response = {'response': False, 'error': ''}
+        if cod_rta == "01":
+            return response
+        elif cod_rta != "00":
+            response_msg = _("ERROR: This is what we receive when requesting notification data (610) %(tree)s", tree=etree.tostring(response_600))
+            response['error'] = response_msg
+            return response
+        response['response'] = True
+        return response

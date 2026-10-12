@@ -40,16 +40,16 @@ class TestSynchStatementCreation(AccountOnlineSynchronizationCommon):
         self.BankStatementLine._online_sync_bank_statement(transactions, self.account_online_account)
         # Since ending balance is 1000$ and we only have 20$ of transactions and that it is the first statement
         # it should create a statement before this one with the initial statement line
-        created_st_lines = self.BankStatementLine.search([('journal_id', '=', self.euro_bank_journal.id)], order='date asc')
+        created_st_lines = self.BankStatementLine.search([('journal_id', '=', self.euro_bank_journal.id)], order='internal_index asc')
         self.assertEqual(len(created_st_lines), 3, 'Should have created an initial bank statement line and two for the synchronization')
         transactions = self._create_online_transactions(['2016-01-05'])
         self.account_online_account.balance = 2000
         self.BankStatementLine._online_sync_bank_statement(transactions, self.account_online_account)
-        created_st_lines = self.BankStatementLine.search([('journal_id', '=', self.euro_bank_journal.id)], order='date asc')
+        created_st_lines = self.BankStatementLine.search([('journal_id', '=', self.euro_bank_journal.id)], order='internal_index asc')
         self.assertRecordValues(
             created_st_lines,
             [
-                {'date': fields.Date.from_string('2015-12-31'), 'amount': 980.0},
+                {'date': fields.Date.from_string('2016-01-01'), 'amount': 980.0},
                 {'date': fields.Date.from_string('2016-01-01'), 'amount': 10.0},
                 {'date': fields.Date.from_string('2016-01-03'), 'amount': 10.0},
                 {'date': fields.Date.from_string('2016-01-05'), 'amount': 10.0},
@@ -62,7 +62,7 @@ class TestSynchStatementCreation(AccountOnlineSynchronizationCommon):
         self.BankStatementLine._online_sync_bank_statement(transactions, self.account_online_account)
         # Since ending balance is 20$ and we only have 20$ of transactions and that it is the first statement
         # it should NOT create a initial statement before this one
-        created_st_lines = self.BankStatementLine.search([('journal_id', '=', self.euro_bank_journal.id)], order='date asc')
+        created_st_lines = self.BankStatementLine.search([('journal_id', '=', self.euro_bank_journal.id)], order='internal_index asc')
         self.assertRecordValues(
             created_st_lines,
             [
@@ -79,12 +79,12 @@ class TestSynchStatementCreation(AccountOnlineSynchronizationCommon):
         self.BankStatementLine._online_sync_bank_statement(transactions, self.account_online_account)
         # Since ending balance is 1000$ and we only have 20$ of transactions and that it is the first statement
         # it should create a statement before this one with the initial statement line
-        created_st_lines = self.BankStatementLine.search([('journal_id', '=', self.euro_bank_journal.id)], order='date asc')
+        created_st_lines = self.BankStatementLine.search([('journal_id', '=', self.euro_bank_journal.id)], order='internal_index asc')
         self.assertEqual(len(created_st_lines), 2, 'Should have created two bank statement lines for the synchronization')
         transactions = self._create_online_transactions(['2016-01-05'])
         self.account_online_account.balance = -30
         self.BankStatementLine._online_sync_bank_statement(transactions, self.account_online_account)
-        created_st_lines = self.BankStatementLine.search([('journal_id', '=', self.euro_bank_journal.id)], order='date asc')
+        created_st_lines = self.BankStatementLine.search([('journal_id', '=', self.euro_bank_journal.id)], order='internal_index asc')
         self.assertRecordValues(
             created_st_lines,
             [
@@ -95,8 +95,8 @@ class TestSynchStatementCreation(AccountOnlineSynchronizationCommon):
         )
 
     @patch('odoo.addons.account_online_synchronization.models.account_online.AccountOnlineLink._fetch_transactions')
-    @patch('odoo.addons.account_online_synchronization.models.account_online.AccountOnlineLink._get_consent_expiring_date')
-    def test_automatic_journal_assignment(self, patched_get_consent, patched_fetch_transactions):
+    @patch('odoo.addons.account_online_synchronization.models.account_online.AccountOnlineLink._update_connection_status')
+    def test_automatic_journal_assignment(self, patched_update_connection_status, patched_fetch_transactions):
         def create_online_account(name, link_id, iban, currency_id):
             return self.env['account.online.account'].create({
                 'name': name,
@@ -131,7 +131,11 @@ class TestSynchStatementCreation(AccountOnlineSynchronizationCommon):
         online_account_3 = create_online_account('OnlineAccount3', self.account_online_link.id, 'BE23798242487495', self.other_currency.id)
 
         patched_fetch_transactions.return_value = True
-        patched_get_consent.return_value = True
+        patched_update_connection_status.return_value = {
+            'consent_expiring_date': None,
+            'is_payment_enabled': False,
+            'is_payment_activated': False,
+        }
 
         account_link_journal_wizard = self.env['account.bank.selection'].create({'account_online_link_id': self.account_online_link.id})
         account_link_journal_wizard.with_context(active_model='account.journal', active_id=bank_journal_with_account_gol.id).sync_now()
@@ -219,18 +223,19 @@ class TestSynchStatementCreation(AccountOnlineSynchronizationCommon):
         """ This test verifies that the duplicate transaction wizard is detects transactions with
             same date, amount, account_number and currency
         """
-        # Create 2 groups of respectively 2 and 3 duplicate transactions
+        # Create 2 groups of respectively 2 and 3 duplicate transactions. We create one transaction the day before so the opening statement does not interfere with the test.
         transactions = self._create_online_transactions([
-            '2024-01-01', '2024-01-01',
-            '2024-01-02', '2024-01-02', '2024-01-02',
+            '2024-01-01',
+            '2024-01-02', '2024-01-02',
+            '2024-01-03', '2024-01-03', '2024-01-03',
         ])
         bsls = self.BankStatementLine._online_sync_bank_statement(transactions, self.account_online_account)
         self.env.flush_all()  # _get_duplicate_transactions make sql request, must write to db
         duplicate_transactions = self.euro_bank_journal._get_duplicate_transactions(
             fields.Date.to_date('2000-01-01')
         )
-        group_1 = bsls.filtered(lambda bsl: bsl.date == fields.Date.from_string('2024-01-01')).ids
-        group_2 = bsls.filtered(lambda bsl: bsl.date == fields.Date.from_string('2024-01-02')).ids
+        group_1 = bsls.filtered(lambda bsl: bsl.date == fields.Date.from_string('2024-01-02')).ids
+        group_2 = bsls.filtered(lambda bsl: bsl.date == fields.Date.from_string('2024-01-03')).ids
 
         self.assertEqual(duplicate_transactions, [group_1, group_2])
 

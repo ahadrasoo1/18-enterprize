@@ -1,7 +1,11 @@
 import { beforeEach, describe, expect, test } from "@odoo/hoot";
-import { click, queryText } from "@odoo/hoot-dom";
+import { click, queryText, waitFor } from "@odoo/hoot-dom";
 import { animationFrame, mockDate } from "@odoo/hoot-mock";
-import { clickEvent, resizeEventToTime } from "@web/../tests/views/calendar/calendar_test_helpers";
+import {
+    clickEvent,
+    resizeEventToTime,
+    clickDate,
+} from "@web/../tests/views/calendar/calendar_test_helpers";
 import {
     definePlanningModels,
     planningModels,
@@ -15,50 +19,15 @@ import {
     mountWithCleanup,
     onRpc,
     patchWithCleanup,
+    mountView,
+    contains,
 } from "@web/../tests/web_test_helpers";
 import { WebClient } from "@web/webclient/webclient";
 
 describe.current.tags("desktop");
 
 class PlanningSlot extends planningModels.PlanningSlot {
-    _views = {
-        calendar: `<calendar class="o_planning_calendar_test"
-                        event_open_popup="true"
-                        date_start="start_datetime"
-                        date_stop="end_datetime"
-                        color="color"
-                        mode="week"
-                        js_class="planning_calendar">
-                            <field name="resource_id" />
-                            <field name="role_id" filters="1" color="color"/>
-                            <field name="state"/>
-                            <field name="repeat"/>
-                            <field name="recurrence_update"/>
-                            <field name="end_datetime"/>
-                    </calendar>`,
-        list: `<list js_class="planning_tree"><field name="resource_id"/></list>`,
-        search: `<search/>`,
-    };
-}
-
-planningModels.PlanningSlot = PlanningSlot;
-
-definePlanningModels();
-defineActions([
-    {
-        id: 1,
-        name: "planning action",
-        res_model: "planning.slot",
-        type: "ir.actions.act_window",
-        views: [
-            [false, "calendar"],
-            [false, "list"],
-        ],
-    },
-]);
-
-beforeEach(() => {
-    PlanningSlot._records = [
+    _records = [
         {
             id: 1,
             name: "First Record",
@@ -81,6 +50,47 @@ beforeEach(() => {
             state: "published",
         },
     ];
+    _views = {
+        calendar: `<calendar class="o_planning_calendar_test"
+                        event_open_popup="true"
+                        date_start="start_datetime"
+                        date_stop="end_datetime"
+                        color="color"
+                        mode="week"
+                        js_class="planning_calendar">
+                            <field name="resource_id" />
+                            <field name="role_id" filters="1" color="color"/>
+                            <field name="state"/>
+                            <field name="repeat"/>
+                            <field name="recurrence_update"/>
+                            <field name="end_datetime"/>
+                    </calendar>`,
+        list: `<list js_class="planning_tree"><field name="resource_id"/></list>`,
+        "form,1": `<form>
+                    <field name="start_datetime"/>
+                    <field name="end_datetime"/>
+                </form>`,
+    };
+}
+
+planningModels.PlanningSlot = PlanningSlot;
+
+definePlanningModels();
+defineActions([
+    {
+        id: 1,
+        name: "planning action",
+        res_model: "planning.slot",
+        views: [
+            [false, "calendar"],
+            [false, "list"],
+        ],
+    },
+]);
+
+onRpc("has_access", () => true);
+
+beforeEach(() => {
     ResourceResource._records = [
         { id: 1, name: "Chaganlal" },
         { id: 2, name: "Maganlal" },
@@ -90,10 +100,6 @@ beforeEach(() => {
         { id: 2, name: "Functional Consultant", color: 2 },
     ];
 
-    onRpc("has_access", () => {
-        return true;
-    });
-
     mockDate("2019-03-13 00:00:00", +1);
 });
 
@@ -102,8 +108,8 @@ test("planning calendar view: copy previous week", async () => {
         expect.step("copy_previous_week()");
         return {};
     });
-    onRpc("auto_plan_ids", async function () {
-        await this.env["planning.slot"].write([2], { resource_id: 1 });
+    onRpc("auto_plan_ids", function () {
+        this.env["planning.slot"].write([2], { resource_id: 1 });
         return { open_shift_assigned: [2] };
     });
     await mountWithCleanup(WebClient);
@@ -149,6 +155,46 @@ test("planning calendar view: copy previous week", async () => {
     await click(".o_switch_view.o_calendar");
     await animationFrame();
     expect(".o_notification_body").toHaveCount(0);
+});
+
+test("Verify Hours in Planning Dialog When Clicking on Off Days and Working Days Calendar view", async () => {
+    onRpc("get_unusual_days", () => ({ "2019-03-03": true, "2019-03-09": true }));
+    await mountView({
+        resModel: "planning.slot",
+        type: "calendar",
+        arch: `<calendar class="o_planning_calendar_test"
+                    date_start="start_datetime"
+                    date_stop="end_datetime"
+                    color="color"
+                    mode="month"
+                    show_unusual_days="1"
+                    quick_create="1"
+                    quick_create_view_id="1"
+                    js_class="planning_calendar"
+                />`,
+    });
+
+    // click on dayoff day
+    await clickDate("2019-03-09");
+    await waitFor(".o_dialog .o_form_view");
+    expect(`.o_field_widget[name="start_datetime"] input`).toHaveValue("03/09/2019 00:00:00", {
+        message: "The start date should be the minimum time for the selected date.",
+    });
+    expect(`.o_field_widget[name="end_datetime"] input`).toHaveValue("03/09/2019 23:59:59", {
+        message: "The end date should be the maximum time for the selected date.",
+    });
+    await contains(`.modal-dialog .o_form_button_save`).click();
+
+    // click on working day
+    await clickDate("2019-03-21");
+    await waitFor(".o_dialog .o_form_view");
+    expect(`.o_field_widget[name="start_datetime"] input`).toHaveValue("03/21/2019 00:00:00", {
+        message: "The start date should be the minimum time for the selected date.",
+    });
+    expect(`.o_field_widget[name="end_datetime"] input`).toHaveValue("03/21/2019 23:59:59", {
+        message: "The end date should be the maximum time for the selected date.",
+    });
+    await contains(`.modal-dialog .o_form_button_save`).click();
 });
 
 test("Resize or Drag-Drop should open recurrence update wizard", async () => {

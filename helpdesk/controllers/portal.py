@@ -41,6 +41,7 @@ class CustomerPortal(portal.CustomerPortal):
             'ticket_link_section': [],
             'ticket_closed': kwargs.get('ticket_closed', False),
             'preview_object': ticket,
+            'res_company': ticket.company_id  # Used to display correct company logo
         }
         return self._get_page_view_values(ticket, access_token, values, 'my_tickets_history', False, **kwargs)
 
@@ -76,7 +77,7 @@ class CustomerPortal(portal.CustomerPortal):
         elif search_in in self._ticket_get_searchbar_inputs():
             return [(search_in, 'ilike', search)]
         else:
-            return FALSE_DOMAIN
+            return ['|', ('name', 'ilike', search), ('ticket_ref', 'ilike', search)]
 
     def _prepare_my_tickets_values(self, page=1, date_begin=None, date_end=None, sortby=None, filterby='all', search=None, groupby='none', search_in='name'):
         values = self._prepare_portal_layout_values()
@@ -185,7 +186,7 @@ class CustomerPortal(portal.CustomerPortal):
         if not ticket_sudo.team_id.allow_portal_ticket_closing:
             raise UserError(_("The team does not allow ticket closing through portal"))
 
-        if not ticket_sudo.closed_by_partner:
+        if not ticket_sudo.closed_by_partner and request.httprequest.method == 'GET':
             closing_stage = ticket_sudo.team_id._get_closing_stage()
             if ticket_sudo.stage_id != closing_stage:
                 ticket_sudo.write({'stage_id': closing_stage[0].id, 'closed_by_partner': True})

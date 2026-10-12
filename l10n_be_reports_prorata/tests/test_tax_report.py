@@ -59,11 +59,12 @@ class TestBelgiumTaxReportProrata(AccountSalesReportCommon):
                 </ns2:Period>
                 <ns2:Deduction>
                     <AdjustedPeriod>2019</AdjustedPeriod>
-                    <AdjustedValue>25</AdjustedValue>
+                    <AdjustedValue>25.00</AdjustedValue>
                     <SpecialAdjustedValue>
-                        <UseProRataPercentage GridNumber="1">50</UseProRataPercentage>
-                        <UseProRataPercentage GridNumber="2">50</UseProRataPercentage>
-                        <UseProRataPercentage GridNumber="3">0</UseProRataPercentage>
+                        <moreSpecialProrata>false</moreSpecialProrata>
+                        <UseProRataPercentage GridNumber="1">50.00</UseProRataPercentage>
+                        <UseProRataPercentage GridNumber="2">50.00</UseProRataPercentage>
+                        <UseProRataPercentage GridNumber="3">0.00</UseProRataPercentage>
                     </SpecialAdjustedValue>
                 </ns2:Deduction>
                 <ns2:Data>
@@ -71,7 +72,6 @@ class TestBelgiumTaxReportProrata(AccountSalesReportCommon):
                 </ns2:Data>
                 <ns2:ClientListingNihil>NO</ns2:ClientListingNihil>
                 <ns2:Ask Restitution="NO"/>
-                <ns2:Comment>/</ns2:Comment>
             </ns2:VATDeclaration>
         </ns2:VATConsignment>
         """ % ref

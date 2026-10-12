@@ -71,10 +71,10 @@ class AppointmentType(models.Model):
     end_datetime = fields.Datetime('End Datetime')
     # mail templates
     booked_mail_template_id = fields.Many2one(
-        'mail.template', string='Confirmation Email', ondelete='restrict',
+        'mail.template', string='Booking Email', ondelete='restrict',
         domain=[('model', '=', 'calendar.attendee')],
         default=_default_booked_mail_template_id,
-        help="If set an email will be sent to the customer when the appointment is confirmed.")
+        help="If set an email will be sent to the customer when the appointment is booked.")
     canceled_mail_template_id = fields.Many2one(
         'mail.template', string='Cancellation Email', ondelete='restrict',
         domain=[('model', '=', 'calendar.event')],
@@ -93,17 +93,17 @@ class AppointmentType(models.Model):
         string='Front-End Display', compute='_compute_avatars_display', readonly=False, store=True,
         help="""Display the Users'/Resources' picture on the Website.""")
     category = fields.Selection([
-        ('recurring', 'Recurring'),
+        ('recurring', 'Regular'),
         ('punctual', 'Punctual'),
-        ('custom', 'Custom'),
-        ('anytime', 'Any Time')],
+        ('custom', 'Specific Slots'),
+        ('anytime', 'Shared Calendar')],
         string="Category", compute="_compute_category", inverse="_inverse_category", store="True",
         help="""Used to define this appointment type's category.\n
         Can be one of:\n
-            - Recurring: the default category, weekly recurring slots. Accessible from the website\n
-            - Punctual: recurring slots limited between 2 datetimes. Accessible from the website\n
-            - Custom: the user will create and share to another user a custom appointment type with hand-picked time slots\n
-            - Anytime: the user will create and share to another user an appointment type covering all their time slots""")
+            - Regular: the default category, weekly recurring slots. Accessible from the website\n
+            - Punctual: regular slots limited between 2 datetimes. Accessible from the website\n
+            - Specific Slots: the user will create and share to another user a custom appointment type with hand-picked time slots\n
+            - Shared Calendar: the user will create and share to another user an appointment type covering all their time slots""")
     category_time_display = fields.Selection([
         ('recurring_fields', 'Available now'),
         ('punctual_fields', 'Within a date range')],
@@ -172,7 +172,7 @@ class AppointmentType(models.Model):
     is_published = fields.Boolean('Is Published')
     # override mail.thread for better string/help
     message_partner_ids = fields.Many2many(string='CC to',
-                                           help="Contacts that need to be notified whenever a new appointment is booked or cancelled, \
+                                           help="Contacts that need to be notified whenever a new appointment is requested, booked or cancelled, \
                                                  regardless of whether they attend or not")
 
     _sql_constraints = [
@@ -206,9 +206,17 @@ class AppointmentType(models.Model):
 
     @api.depends('appointment_duration')
     def _compute_appointment_duration_formatted(self):
+        """
+        When appointment duration exceeds a day or is not a multiple of hours e.g., 2 hours 30 minutes,
+        it is not fitting in one line, thus we are now using shorter time format.
+        E.g., Default (long) format: 2 hours 30 minutes
+              Short format: 2 hr 30 min
+        """
         for record in self:
             record.appointment_duration_formatted = self.env['ir.qweb.field.duration'].value_to_html(
-                record.appointment_duration * 3600, {})
+                record.appointment_duration * 3600,
+                {} if record.appointment_duration % 1 == 0 and record.appointment_duration < 24 else {'format': 'short'}
+            )
 
     @api.depends('appointment_invite_ids')
     def _compute_appointment_invite_count(self):
@@ -854,7 +862,7 @@ class AppointmentType(models.Model):
                     if day == today.date() and day.month == today.month:
                         today_cls = 'o_today'
                     if day.month != start.month:
-                        mute_cls = 'text-muted o_mute_day'
+                        mute_cls = 'd-none'
                     else:
                         # slots are ordered, so check all unprocessed slots from until > day
                         while slots and (slots[0][timezone][0].date() <= day):
@@ -915,7 +923,7 @@ class AppointmentType(models.Model):
 
             months.append({
                 'id': len(months),
-                'month': format_datetime(start, 'MMMM Y', locale=get_lang(self.env).code),
+                'month': format_datetime(start, 'LLLL Y', locale=get_lang(self.env).code),
                 'weeks': dates,
                 'has_availabilities': has_availabilities,
                 'nb_slots_previous_months': nb_slots_previous_months,
@@ -1054,7 +1062,7 @@ class AppointmentType(models.Model):
         )
 
         for slot in slots:
-            if self.assign_method == 'time_resource':
+            if self.assign_method == 'time_resource' or self.env.context.get('slots_check_all_users', False):
                 available_staff_users = available_users_tz.filtered(
                     lambda staff_user: self._slot_availability_is_user_available(
                         slot,
@@ -1071,7 +1079,7 @@ class AppointmentType(models.Model):
                     )),
                     False)
             if available_staff_users:
-                if self.assign_method == 'time_resource':
+                if self.assign_method == 'time_resource' or self.env.context.get('slots_check_all_users', False):
                     slot['available_staff_users'] = available_staff_users
                 else:
                     slot['staff_user_id'] = available_staff_users
@@ -1168,16 +1176,17 @@ class AppointmentType(models.Model):
         # on start_date and allday
         all_events = self.env['calendar.event']
         if related_partners:
-            all_events = self.env['calendar.event'].search(
-                ['&',
-                 ('partner_ids', 'in', related_partners.ids),
-                 '&', '&',
-                 ('show_as', '=', 'busy'),
-                 ('stop', '>=', datetime.combine(start_dt, time.min)),
-                 ('start', '<=', datetime.combine(end_dt, time.max)),
-                ],
-                order='start asc',
-            )
+            domain = [
+                ('partner_ids', 'in', related_partners.ids),
+                ('show_as', '=', 'busy'),
+                ('stop', '>=', datetime.combine(start_dt, time.min)),
+                ('start', '<=', datetime.combine(end_dt, time.max)),
+            ]
+            # todo: clean in master: method arguments?
+            ignore_event_ids = self.env.context.get('ignore_event_ids', False)
+            if ignore_event_ids:
+                domain = expression.AND([domain, [('id', 'not in', ignore_event_ids)]])
+            all_events = self.env['calendar.event'].search(domain, order='start asc')
         partner_to_events = {}
         for event in all_events:
             for attendee in event.attendee_ids.filtered_domain([
@@ -1301,7 +1310,7 @@ class AppointmentType(models.Model):
 
         slot_start_dt_utc_l, slot_end_dt_utc_l = pytz.utc.localize(slot_start_dt_utc), pytz.utc.localize(slot_end_dt_utc)
         for i_start, i_stop in availability_values.get('resource_unavailabilities', {}).get(resource, []):
-            if i_start != i_stop and i_start < slot_end_dt_utc_l and i_stop > slot_start_dt_utc_l:
+            if (i_stop - i_start) > timedelta(microseconds=1) and i_start < slot_end_dt_utc_l and i_stop > slot_start_dt_utc_l:
                 return False
 
         return True
@@ -1436,10 +1445,16 @@ class AppointmentType(models.Model):
 
         resource_to_bookings = {}
         if resources:
-            booking_lines = self.env['appointment.booking.line'].sudo().search([
+            domain = [
                 ('appointment_resource_id', 'in', resources.ids),
                 ('event_stop', '>', datetime.combine(start_dt_utc, time.min)),
-                ('event_start', '<', datetime.combine(end_dt_utc, time.max))])
+                ('event_start', '<', datetime.combine(end_dt_utc, time.max)),
+            ]
+            # todo: clean in master: method arguments?
+            ignore_event_ids = self.env.context.get('ignore_event_ids', False)
+            if ignore_event_ids:
+                domain = expression.AND([domain, [('calendar_event_id', 'not in', ignore_event_ids)]])
+            booking_lines = self.env['appointment.booking.line'].sudo().search(domain)
             resource_to_bookings = booking_lines.grouped('appointment_resource_id')
 
         return {

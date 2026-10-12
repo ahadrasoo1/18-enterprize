@@ -77,6 +77,13 @@ class View(models.Model):
         'web.external_layout_bubble',
     ]
 
+    def _get_closest_primary_view(self):
+        self.ensure_one()
+        view = self
+        while view.mode != "primary":
+            view = view.inherit_id
+        return view
+
     def _get_x2many_missing_view_archs(self, field, field_node, node_info):
         missing = super()._get_x2many_missing_view_archs(field, field_node, node_info)
         if not missing or not self._context.get("studio"):
@@ -103,7 +110,7 @@ class View(models.Model):
             group_definitions = self.env['res.groups']._get_group_definitions()
 
             node_groups = {}
-            set_invisible_nodes = set()
+            set_invisible_nodes = dict()
 
             for node in tree.xpath('//*[@groups]'):
                 if node.get('groups'):
@@ -120,7 +127,7 @@ class View(models.Model):
                 if not has_access(node.attrib.pop('__groups_key__')):
                     # Make invisible nodes for which the user is not part of the group,
                     # and remove the `groups` from the node before calling super so the nodes are not deleted.
-                    set_invisible_nodes.add(node)
+                    set_invisible_nodes[node] = node.get("invisible") or node.get("column_invisible") or "False"
 
                 if node.tag == 'field' and 'model_groups' in node.attrib and not has_access(node.attrib.pop('model_groups')):
                     # fields with `groups` in the Python model cannot be read at all by users not part of the group.
@@ -135,13 +142,14 @@ class View(models.Model):
                 parent = node.getparent()
                 return parent is not None and parent.tag == "list"
 
-            for node in set_invisible_nodes:
+            for node, invisible_value in set_invisible_nodes.items():
                 if is_in_list(node):
                     column_invisible = 'True'
                     node.set('column_invisible', column_invisible)
                 else:
                     invisible = 'True'
                     node.set('invisible', invisible)
+                node.set('actual_invisible', invisible_value)
 
             model = tree.get('model_access_rights')
             res = super()._postprocess_access_rights(tree)
@@ -174,12 +182,16 @@ class View(models.Model):
     def set_studio_groups(self, node):
         studio_groups = []
         for xml_id in node.attrib['groups'].split(','):
+            forbid = xml_id.startswith("!")
+            if forbid:
+                xml_id = xml_id[1:]
             group = self.env.ref(xml_id, raise_if_not_found=False)
             if group:
                 studio_groups.append({
                     "id": group.id,
                     "name": group.name,
-                    "display_name": group.display_name
+                    "display_name": group.display_name,
+                    "forbid": forbid,
                 })
         node.attrib['studio_groups'] = json.dumps(studio_groups)
 
@@ -366,6 +378,21 @@ class View(models.Model):
             fields.append(E.field(name='x_studio_tag_ids'))
         if 'x_studio_stage_id' in model._fields:
             groupbys.append(E.filter(name='x_studio_stage_id', string=_('Stage'), context="{'group_by': 'x_studio_stage_id'}", domain="[]"))
+        if isinstance(model, self.pool['mail.activity.mixin']):
+            filters.append(E.separator())
+            filters.append(E.filter(
+                invisible="1", string=_('Late Activities'), name='activities_overdue',
+                domain="[('my_activity_date_deadline', '<', context_today().strftime('%Y-%m-%d'))]")
+            )
+            filters.append(E.filter(
+                invisible="1", string=_('Today Activities'), name='activities_today',
+                domain="[('my_activity_date_deadline', '=', context_today().strftime('%Y-%m-%d'))]")
+            )
+            filters.append(E.filter(
+                invisible="1", string=_('Future Activities'), name='activities_upcoming_all',
+                domain="[('my_activity_date_deadline', '>', context_today().strftime('%Y-%m-%d'))]")
+            )
+            filters.append(E.separator())
         search = E.search(*fields)
         search.extend(filters)
         if groupbys:
@@ -636,16 +663,29 @@ class View(models.Model):
 
         new_view_arch_string = self._stringify_view(new_view_tree)
         old_view_arch_string = self._stringify_view(old_view_tree)
-        diff = difflib.ndiff(old_view_arch_string.split('\n'), new_view_arch_string.split('\n'))
 
-        # Format of difflib.ndiff output is:
-        #   unchanged
-        # - removed
-        # + added
-        # ? details
-        # <empty line after details>
-        #   unchanged
+        def get_unified_diff(old, new):
+            """
+            Get all diff lines using unified_diff without the header.
+            Format of difflib.unified_diff output is:
+            ---
+            +++
+            @@  @@
+            unchanged
+            -removed
+            +added
+            """
+            # set n to infinity to get all unchanged lines
+            diff = difflib.unified_diff(old.split('\n'), new.split('\n'), n=float('inf'))
+            for i in range(3):
+                # handle empty diff generator
+                try:
+                    next(diff)
+                except StopIteration:
+                    break
+            return diff
 
+        diff = get_unified_diff(old_view_arch_string, new_view_arch_string)
         old_view_iterator = old_view_tree.iter()
         new_view_iterator = new_view_tree.iter()
 
@@ -673,9 +713,9 @@ class View(models.Model):
                     added_fields[node.get('name')] = node
 
         for line in diff:
-            if line.strip() and not line.startswith('?'):
+            if line.strip():
                 if line.startswith('-') or line.startswith('+'):
-                    operation, line = line.split(' ', 1)
+                    operation, line = line[0], line[1:]
                     nodes = changes[operation]
 
                     if line.endswith('[@closed]') and nodes and nodes[-1] + '[@closed]' == line:
@@ -744,7 +784,7 @@ class View(models.Model):
         new_view_iterator = new_view_tree.iter()
         new_view_arch_string = self._stringify_view(new_view_tree, moved_fields)
         old_view_arch_string = self._stringify_view(old_view_tree)
-        diff = difflib.ndiff(old_view_arch_string.split('\n'), new_view_arch_string.split('\n'))
+        diff = get_unified_diff(old_view_arch_string, new_view_arch_string)
 
         # Keep track of nameless elements with more than 1 occurrence
         nameless_count = defaultdict(int)
@@ -756,7 +796,7 @@ class View(models.Model):
         xpath = etree.Element('xpath')
         for line in diff:
             # Ignore details lines and [@closed] that are used so diff has correct order
-            if line.strip() and not line.startswith('?') and not line.endswith('[@closed]'):
+            if line.strip() and not line.endswith('[@closed]'):
                 line = line.replace('[@moved]', '')
                 if line.startswith('-'):
                     node = next(old_view_iterator)
@@ -775,8 +815,8 @@ class View(models.Model):
                         # Maybe we are already removing the parent of this
                         # node so this one will be removed automatically
                         current_xpath_target = next(iter(old_view_tree.xpath('.' + xpath.get('expr'))), None)
-                        if xpath.get('position') == 'replace' and \
-                                current_xpath_target in node.iterancestors():
+                        is_xpath_target_an_ancestor = None if current_xpath_target is None else current_xpath_target in node.iterancestors()
+                        if xpath.get('position') == 'replace' and is_xpath_target_an_ancestor:
                             continue
                         # If we are already adding stuff just before this node,
                         # we could as well replace it directly by what we want to add
@@ -785,6 +825,13 @@ class View(models.Model):
                         elif ((node.tag != 'attributes' and xpath.get('position') != 'after') or
                                 (node.tag == 'attributes' and xpath.get('position') != 'attributes')):
                             # Consecutive removals need different xpath
+                            xpath = self._close_and_get_new(arch, xpath)
+
+                        # The current xpath does not contain the current removed node
+                        # and they are not siblings either.
+                        # So it is safe to say the current xpath cannot be aggregated
+                        # to contain the removal we are about to do.
+                        elif is_xpath_target_an_ancestor is False and current_xpath_target.getparent() != node.getparent():
                             xpath = self._close_and_get_new(arch, xpath)
 
                     xpath.attrib['expr'] = self._node_to_xpath(node)
@@ -1240,7 +1287,7 @@ class View(models.Model):
             ('key', '!=', new.key),
             ('key', '=like', '%s_copy_%%' % new.key),
             '!', ('key', '=like', '%s_copy_%%_copy_%%' % new.key)]
-        old_copies = self.search_read(domain, order='key desc')
+        old_copies = self.with_context(active_test=False).search_read(domain, order='key desc')
         nos = [int(old_copy.get('key').split('_copy_').pop()) for old_copy in old_copies]
         copy_no = (nos and max(nos) or 0) + 1
         new_key = '%s_copy_%s' % (new.key, copy_no)

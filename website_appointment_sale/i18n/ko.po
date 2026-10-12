@@ -1,22 +1,24 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* website_appointment_sale
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Daye Jeong, 2024
+# Sarah Park, 2024
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:29+0000\n"
+"POT-Creation-Date: 2025-12-29 18:49+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
+"Last-Translator: Sarah Park, 2024\n"
 "Language-Team: Korean (https://app.transifex.com/odoo/teams/41243/ko/)\n"
+"Language: ko\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: ko\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. module: website_appointment_sale
@@ -28,6 +30,11 @@ msgstr "(시간대 :"
 #: model_terms:ir.ui.view,arch_db:website_appointment_sale.appointment_sale_confirmation_cards
 msgid "<i class=\"fa fa-check me-2\"/>Booked"
 msgstr "<i class=\"fa fa-check me-2\"/>예약 완료"
+
+#. module: website_appointment_sale
+#: model_terms:ir.ui.view,arch_db:website_appointment_sale.appointment_sale_confirmation_cards
+msgid "<i class=\"fa fa-thumbs-up me-2\"/>Reserved"
+msgstr "<i class=\"fa fa-thumbs-up me-2\"/>예약됨"
 
 #. module: website_appointment_sale
 #: model_terms:ir.ui.view,arch_db:website_appointment_sale.appointment_sale_confirmation_cards
@@ -98,7 +105,7 @@ msgstr "판매 주문"
 #. module: website_appointment_sale
 #: model:ir.model.fields,field_description:website_appointment_sale.field_calendar_event__sale_order_count
 msgid "Sales Order Count"
-msgstr ""
+msgstr "판매 주문 수"
 
 #. module: website_appointment_sale
 #: model:ir.model,name:website_appointment_sale.model_sale_order_line
@@ -109,10 +116,15 @@ msgstr "판매 주문 내역"
 #. odoo-python
 #: code:addons/website_appointment_sale/models/sale_order.py:0
 msgid ""
-"The following bookings are not available anymore during the selected period and your cart must be updated. We are sorry for the inconvenience.\n"
+"The following bookings are not available anymore during the selected period "
+"and your cart must be updated. We are sorry for the inconvenience.\n"
 "\n"
 "%(bookings)s"
 msgstr ""
+"선택한 기간에 대해 다음의 예약을 더 이상 진행할 수 없습니다. 장바구니를 업데"
+"이트하세요. 불편을 드려 죄송합니다.\n"
+"\n"
+"%(bookings)s"
 
 #. module: website_appointment_sale
 #. odoo-python
@@ -120,7 +132,8 @@ msgstr ""
 msgid ""
 "The following bookings were not confirmed due to insufficient availability "
 "or configuration changes: %s"
-msgstr "자리가 충분하지 않거나 설정이 변경되어 다음의 예약이 확정되지 않았습니다: %s"
+msgstr ""
+"자리가 충분하지 않거나 설정이 변경되어 다음의 예약이 확정되지 않았습니다: %s"
 
 #. module: website_appointment_sale
 #: model_terms:ir.ui.view,arch_db:website_appointment_sale.appointment_sale_confirmation_cards

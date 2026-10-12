@@ -156,6 +156,35 @@ const TEST_RECORDS = {
                 name: "Bar",
             },
         ],
+        threeRecords: [
+            {
+                id: 1,
+                name: "Foo",
+                partner_latitude: 10.0,
+                partner_longitude: 10.5,
+                contact_address_complete: "Chaussée de Namur 40, 1367, Ramillies",
+                sequence: 1,
+                user_id: 1,
+            },
+            {
+                id: 2,
+                name: "Bar",
+                partner_latitude: 11.0,
+                partner_longitude: 11.5,
+                contact_address_complete: "Chaussée de Wavre 50, 1367, Ramillies",
+                sequence: 2,
+                user_id: 2,
+            },
+            {
+                id: 3,
+                name: "Baz",
+                partner_latitude: 12.0,
+                partner_longitude: 12.5,
+                contact_address_complete: "Chaussée de Louvain 94, 5310 Éghezée",
+                sequence: 3,
+                user_id: false,
+            },
+        ],
         unlocatedRecords: [{ id: 1, name: "Foo" }],
         noCoordinatesWrongAddress: [
             {
@@ -199,6 +228,16 @@ class Task extends models.Model {
     _records = [{ id: 1, name: "project", partner_id: 1 }];
 }
 
+class Users extends models.Model {
+    _name = "res.users";
+
+    name = fields.Char();
+    _records = [
+        { id: 1, name: "Mitchell Admin" },
+        { id: 2, name: "Marc Demo" },
+    ];
+}
+
 class Partner extends models.Model {
     _name = "res.partner";
 
@@ -212,6 +251,10 @@ class Partner extends models.Model {
         relation_field: "partner_id",
     });
     sequence = fields.Integer();
+    user_id = fields.Many2one({
+        string: "Salesperson",
+        relation: "res.users",
+    });
 
     _records = [
         {
@@ -221,6 +264,7 @@ class Partner extends models.Model {
             partner_longitude: 10.5,
             contact_address_complete: "Chaussée de Namur 40, 1367, Ramillies",
             sequence: 1,
+            user_id: 1,
         },
         {
             id: 2,
@@ -229,6 +273,7 @@ class Partner extends models.Model {
             partner_longitude: 10.5,
             contact_address_complete: "Chaussée de Namur 40, 1367, Ramillies",
             sequence: 3,
+            user_id: 2,
         },
         {
             id: 3,
@@ -237,6 +282,7 @@ class Partner extends models.Model {
             partner_longitude: 11.5,
             contact_address_complete: "Chaussée de Wavre 50, 1367, Ramillies",
             sequence: 4,
+            user_id: false,
         },
     ];
 
@@ -245,7 +291,7 @@ class Partner extends models.Model {
     }
 }
 
-defineModels([Task, Partner]);
+defineModels([Task, Users, Partner]);
 
 beforeEach(() => {
     patchWithCleanup(MapModel, {
@@ -253,7 +299,7 @@ beforeEach(() => {
         COORDINATE_FETCH_DELAY: 0,
     });
     patchWithCleanup(MapModel.prototype, {
-        _fetchCoordinatesFromAddressMB(metaData, data, record) {
+        async _fetchCoordinatesFromAddressMB(metaData, data, record) {
             if (metaData.mapBoxToken !== MAP_BOX_TOKEN) {
                 return Promise.reject({ status: 401 });
             }
@@ -267,24 +313,24 @@ beforeEach(() => {
             const failResponse = { features: [] };
             switch (record.contact_address_complete) {
                 case "Cfezfezfefes":
-                    return Promise.resolve(failResponse);
+                    return failResponse;
                 case "":
-                    return Promise.resolve(failResponse);
+                    return failResponse;
             }
-            return Promise.resolve(successResponse);
+            return successResponse;
         },
-        _fetchCoordinatesFromAddressOSM(metaData, data, record) {
+        async _fetchCoordinatesFromAddressOSM(metaData, data, record) {
             const coordinates = [];
             coordinates[0] = { lat: "10.0", lon: "10.5" };
             switch (record.contact_address_complete) {
                 case "Cfezfezfefes":
-                    return Promise.resolve([]);
+                    return [];
                 case "":
-                    return Promise.resolve([]);
+                    return [];
             }
-            return Promise.resolve(coordinates);
+            return coordinates;
         },
-        _fetchRoute(metaData, data) {
+        async _fetchRoute(metaData, data) {
             if (metaData.mapBoxToken !== MAP_BOX_TOKEN) {
                 return Promise.reject({ status: 401 });
             }
@@ -300,7 +346,7 @@ beforeEach(() => {
             }
             const routes = [];
             routes[0] = { legs };
-            return Promise.resolve({ routes });
+            return { routes };
         },
         _notifyFetchedCoordinate(metaData, data) {
             // do not notify in tests as coords fetching is " synchronous "
@@ -312,7 +358,8 @@ beforeEach(() => {
     });
 });
 
-describe.tags("desktop")("map_view_desktop", () => {
+describe.tags("desktop");
+describe("map_view_desktop", () => {
     //--------------------------------------------------------------------------
     // Testing data fetching
     //--------------------------------------------------------------------------
@@ -482,10 +529,7 @@ describe.tags("desktop")("map_view_desktop", () => {
         Task._records = TEST_RECORDS.task.oneRecord;
         Partner._records = TEST_RECORDS.partner.noCoordinatesGoodAddress;
 
-        onRpc("/web/dataset/call_kw/res.partner/update_latitude_longitude", async (request) => {
-            const {
-                params: { args },
-            } = await request.json();
+        onRpc("res.partner", "update_latitude_longitude", ({ args }) => {
             expect(args[0]).toHaveLength(1, {
                 message: "There should be one record needing caching",
             });
@@ -520,10 +564,7 @@ describe.tags("desktop")("map_view_desktop", () => {
 
         Task._records = TEST_RECORDS.task.oneRecord;
         Partner._records = TEST_RECORDS.partner.noCoordinatesGoodAddress;
-        onRpc("/web/dataset/call_kw/res.partner/update_latitude_longitude", async (request) => {
-            const {
-                params: { args },
-            } = await request.json();
+        onRpc("res.partner", "update_latitude_longitude", ({ args }) => {
             expect(args[0]).toHaveLength(1, {
                 message: "There should be one record needing caching",
             });
@@ -691,10 +732,7 @@ describe.tags("desktop")("map_view_desktop", () => {
 
         Task._records = TEST_RECORDS.task.twoRecords;
         Partner._records = TEST_RECORDS.partner.twoRecordsAddressNoCoordinates;
-        onRpc("/web/dataset/call_kw/res.partner/update_latitude_longitude", async (request) => {
-            const {
-                params: { args },
-            } = await request.json();
+        onRpc("res.partner", "update_latitude_longitude", ({ args }) => {
             expect(args[0]).toHaveLength(2, {
                 message: "Should have 2 record needing caching",
             });
@@ -769,6 +807,42 @@ describe.tags("desktop")("map_view_desktop", () => {
     });
 
     /**
+     * Data: 3 partner records with user_id used as groupBy
+     * Test if the map view displays the many2one field's name as the group name
+     */
+    test("Create a view with many2one groupBy and res.partner model", async () => {
+        patchWithCleanup(session, { map_box_token: MAP_BOX_TOKEN });
+
+        Partner._records = TEST_RECORDS.partner.threeRecords;
+
+        await mountView({
+            type: "map",
+            resModel: "res.partner",
+            arch: `<map res_partner="id" />`,
+            groupBy: ["user_id"],
+        });
+
+        expect(".o-map-renderer--pin-list-group-header").toHaveCount(3, {
+            message: "Should have 3 groups",
+        });
+
+        expect(queryAllTexts(".o-map-renderer--pin-list-group-header")).toEqual(
+            ["Mitchell Admin", "Marc Demo", "None"],
+            {
+                message: "Should have correct group headers",
+            }
+        );
+
+        expect(".o-map-renderer--pin-list-details").toHaveCount(3, {
+            message: "Should have 3 group detail sections",
+        });
+
+        expect(".o-map-renderer--pin-list-details li").toHaveCount(3, {
+            message: "Should have 3 total records across all groups",
+        });
+    });
+
+    /**
      * data: 3 records linked to one located partner and one unlocated
      * test if only the 2 located records are displayed
      */
@@ -827,8 +901,8 @@ describe.tags("desktop")("map_view_desktop", () => {
 
         expect("a.btn.btn-primary").toHaveAttribute(
             "href",
-            "https://www.google.com/maps/dir/?api=1&waypoints=10,10.5",
-            { message: "The link's URL should contain the right sets of coordinates" }
+            "https://www.google.com/maps/dir/?api=1&waypoints=Chauss%C3%A9e%20de%20Louvain%2094%2C%205310%20%C3%89ghez%C3%A9e|Chauss%C3%A9e%20de%20Namur%2040%2C%201367%2C%20Ramillies",
+            { message: "The link's URL should contain the address" }
         );
 
         await contains(".leaflet-marker-icon").click();
@@ -851,8 +925,8 @@ describe.tags("desktop")("map_view_desktop", () => {
 
         expect("a.btn.btn-primary").toHaveAttribute(
             "href",
-            "https://www.google.com/maps/dir/?api=1&destination=10,10.5",
-            { message: "The link's URL should contain the right sets of coordinates" }
+            "https://www.google.com/maps/dir/?api=1&destination=Chauss%C3%A9e%20de%20Namur%2040%2C%201367%2C%20Ramillies&waypoints=Chauss%C3%A9e%20de%20Louvain%2094%2C%205310%20%C3%89ghez%C3%A9e",
+            { message: "The link's URL should contain the address" }
         );
 
         await contains(".leaflet-marker-icon").click();
@@ -876,8 +950,8 @@ describe.tags("desktop")("map_view_desktop", () => {
         });
         expect("a.btn.btn-primary").toHaveAttribute(
             "href",
-            "https://www.google.com/maps/dir/?api=1&waypoints=10.5,10",
-            { message: "The link's URL should contain unqiue sets of coordinates" }
+            "https://www.google.com/maps/dir/?api=1&waypoints=Chauss%C3%A9e%20de%20Louvain%2094%2C%205310%20%C3%89ghez%C3%A9e",
+            { message: "The link's URL should contain the address" }
         );
         await contains(".leaflet-marker-icon").click();
         expect("div.leaflet-popup a.btn.btn-primary").toHaveAttribute(
@@ -1008,7 +1082,7 @@ describe.tags("desktop")("map_view_desktop", () => {
         Task._records = TEST_RECORDS.task.twoRecords;
         Partner._records = TEST_RECORDS.partner.twoRecordsAddressNoCoordinates;
         onRpc("project.task", "web_search_read", ({ kwargs }) => {
-            expect(kwargs.order).toEqual("name ASC", {
+            expect(kwargs.order).toBe("name ASC", {
                 message: "The sorting order should be on the field name in a ascendant way",
             });
         });
@@ -1452,8 +1526,6 @@ describe.tags("desktop")("map_view_desktop", () => {
      */
 
     test("Content of the marker popup with one field", async () => {
-        Task._views.form = "<form/>";
-
         Task._records = TEST_RECORDS.task.oneRecord;
         Partner._records = TEST_RECORDS.partner.twoRecordsAddressCoordinates;
 
@@ -1487,8 +1559,6 @@ describe.tags("desktop")("map_view_desktop", () => {
     });
 
     test("Content of the marker popup with date time", async () => {
-        Task._views.form = "<form/>";
-
         mockTimeZone(+2); // UTC+2
         patchWithCleanup(session, { map_box_token: MAP_BOX_TOKEN });
 
@@ -1525,8 +1595,6 @@ describe.tags("desktop")("map_view_desktop", () => {
      */
 
     test("Content of the marker with no field", async () => {
-        Task._views.form = "<form/>";
-
         Task._records = TEST_RECORDS.task.twoRecords;
         Partner._records = TEST_RECORDS.partner.twoRecordsAddressNoCoordinates;
         patchWithCleanup(session, { map_box_token: MAP_BOX_TOKEN });
@@ -1641,12 +1709,17 @@ describe.tags("desktop")("map_view_desktop", () => {
     test("Pager", async () => {
         patchWithCleanup(session, { map_box_token: MAP_BOX_TOKEN });
 
-        Task._records = Array.from({ length: 101 }, (_, index) => {
-            return { id: index + 1, name: "project", partner_id: index + 1 };
-        });
-        Partner._records = Array.from({ length: 101 }, (_, index) => {
-            return { id: index + 1, name: "Foo", partner_latitude: 10.0, partner_longitude: 10.5 };
-        });
+        Task._records = Array.from({ length: 101 }, (_, index) => ({
+            id: index + 1,
+            name: "project",
+            partner_id: index + 1,
+        }));
+        Partner._records = Array.from({ length: 101 }, (_, index) => ({
+            id: index + 1,
+            name: "Foo",
+            partner_latitude: 10.0,
+            partner_longitude: 10.5,
+        }));
 
         await mountView({
             type: "map",
@@ -1887,14 +1960,9 @@ describe.tags("desktop")("map_view_desktop", () => {
                 name: "FooProject",
                 sequence: 1,
                 partner_id: 1,
-                task_properties: [
-                    {
-                        name: "bd6404492c244cff",
-                        type: "char",
-                        string: "Reference Number",
-                        value: "1234",
-                    },
-                ],
+                task_properties: {
+                    bd6404492c244cff: "1234",
+                },
             },
         ];
 
@@ -2008,7 +2076,6 @@ describe.tags("desktop")("map_view_desktop", () => {
                 expect(props).toEqual({ resId: 1 }, { message: "Props should be correct" });
             },
         });
-        Task._views.form = "<form/>";
 
         Task._records = TEST_RECORDS.task.oneRecord;
         Partner._records = TEST_RECORDS.partner.oneLocatedRecord;
@@ -2097,8 +2164,8 @@ describe.tags("desktop")("map_view_desktop", () => {
 
         expect("a.btn.btn-primary").toHaveAttribute(
             "href",
-            "https://www.google.com/maps/dir/?api=1&waypoints=10,10.5|11,11.5",
-            { message: "The link's URL initially should contain the coordinates for all records" }
+            "https://www.google.com/maps/dir/?api=1&waypoints=Chauss%C3%A9e%20de%20Namur%2040%2C%201367%2C%20Ramillies|Chauss%C3%A9e%20de%20Wavre%2050%2C%201367%2C%20Ramillies",
+            { message: "The link's URL initially should contain the addresses for all records" }
         );
 
         //apply domain and check that the Google Maps URL on the button reflects the changes
@@ -2106,10 +2173,10 @@ describe.tags("desktop")("map_view_desktop", () => {
         await toggleMenuItem("FooProject only");
         expect("a.btn.btn-primary").toHaveAttribute(
             "href",
-            "https://www.google.com/maps/dir/?api=1&waypoints=10,10.5",
+            "https://www.google.com/maps/dir/?api=1&waypoints=Chauss%C3%A9e%20de%20Namur%2040%2C%201367%2C%20Ramillies",
             {
                 message:
-                    "The link's URL after domain is applied should only contain coordinates for filtered records",
+                    "The link's URL after domain is applied should only contain addresses for filtered records",
             }
         );
     });
@@ -2128,8 +2195,8 @@ describe.tags("desktop")("map_view_desktop", () => {
 
         expect("a.btn.btn-primary").toHaveAttribute(
             "href",
-            "https://www.google.com/maps/dir/?api=1&destination=11,11.5&waypoints=10,10.5",
-            { message: "The link's URL initially should contain the coordinates for all records" }
+            "https://www.google.com/maps/dir/?api=1&destination=Chauss%C3%A9e%20de%20Wavre%2050%2C%201367%2C%20Ramillies&waypoints=Chauss%C3%A9e%20de%20Namur%2040%2C%201367%2C%20Ramillies",
+            { message: "The link's URL initially should contain the addresses for all records" }
         );
     });
 
@@ -2193,9 +2260,11 @@ describe.tags("desktop")("map_view_desktop", () => {
         Task._records = [
             { id: 1, name: "Project", sequence: 1, partner_id: 1, task_status: "abc" },
         ];
-        onRpc("res.partner", "search_read", () => {
-            return TEST_RECORDS.partner.twoRecordsAddressCoordinates;
-        });
+        onRpc(
+            "res.partner",
+            "search_read",
+            () => TEST_RECORDS.partner.twoRecordsAddressCoordinates
+        );
 
         await mountView({
             type: "map",
@@ -2207,7 +2276,8 @@ describe.tags("desktop")("map_view_desktop", () => {
     });
 });
 
-describe.tags("mobile")("map_view_mobile", () => {
+describe.tags("mobile");
+describe("map_view_mobile", () => {
     test("use pin list container on mobile", async () => {
         await mountView({
             type: "map",

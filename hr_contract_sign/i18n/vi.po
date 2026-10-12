@@ -1,22 +1,23 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* hr_contract_sign
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Thi Huong Nguyen, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:27+0000\n"
+"POT-Creation-Date: 2025-12-29 18:47+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
+"Last-Translator: Thi Huong Nguyen, 2025\n"
 "Language-Team: Vietnamese (https://app.transifex.com/odoo/teams/41243/vi/)\n"
+"Language: vi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: vi\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. module: hr_contract_sign
@@ -35,7 +36,7 @@ msgstr "%(user_name)s đã yêu cầu một chữ ký mới cho các tài liệu
 #. odoo-python
 #: code:addons/hr_contract_sign/wizard/hr_contract_sign_document_wizard.py:0
 msgid "%s does not have a private email set."
-msgstr "%s không được thiết lập email riêng tư nào."
+msgstr "%s không được thiết lập email cá nhân nào."
 
 #. module: hr_contract_sign
 #. odoo-python
@@ -48,7 +49,7 @@ msgstr "%s không được thiết lập email công việc nào."
 #: model_terms:ir.ui.view,arch_db:hr_contract_sign.hr_employee_sign_view_form
 #: model_terms:ir.ui.view,arch_db:hr_contract_sign.res_users_request_sign_view_form
 msgid "<span class=\"o_stat_text\">Signature Requests</span>"
-msgstr "<span class=\"o_stat_text\">Yêu cầu chữ ký</span>"
+msgstr "<span class=\"o_stat_text\">Yêu cầu ký tên</span>"
 
 #. module: hr_contract_sign
 #: model:ir.model,name:hr_contract_sign.model_mail_activity_plan_template
@@ -69,6 +70,11 @@ msgstr "Đính kèm một tập tin"
 #: model:ir.model.fields,field_description:hr_contract_sign.field_hr_contract_sign_document_wizard__attachment_ids
 msgid "Attachment"
 msgstr "Tệp đính kèm"
+
+#. module: hr_contract_sign
+#: model:sign.template,redirect_url_text:hr_contract_sign.template_sign_termination
+msgid "Close"
+msgstr "Đóng"
 
 #. module: hr_contract_sign
 #: model:ir.model.fields,field_description:hr_contract_sign.field_hr_contract_sign_document_wizard__contract_id
@@ -123,12 +129,18 @@ msgstr "Tài liệu cần ký"
 #. module: hr_contract_sign
 #: model:ir.model.fields,help:hr_contract_sign.field_hr_contract_sign_document_wizard__sign_template_ids
 msgid ""
-"Documents to sign. Only documents with 1 or 2 different responsible are selectable.\n"
-"        Documents with 1 responsible will only have to be signed by the employee while documents with 2 different responsible will have to be signed by both the employee and the responsible.\n"
+"Documents to sign. Only documents with 1 or 2 different responsible are "
+"selectable.\n"
+"        Documents with 1 responsible will only have to be signed by the "
+"employee while documents with 2 different responsible will have to be signed "
+"by both the employee and the responsible.\n"
 "        "
 msgstr ""
-"Tài liệu cần ký. Chỉ có thể chọn tài liệu có 1 hoặc 2 người phụ trách khác nhau.\n"
-"        Tài liệu có 1 người phụ trách chỉ cần ký bởi nhân viên trong khi tài liệu có 2 người phụ trách khác nhau sẽ cần được ký bởi cả nhân viên và người phụ trách.\n"
+"Tài liệu cần ký. Chỉ có thể chọn tài liệu có 1 hoặc 2 người phụ trách khác "
+"nhau.\n"
+"        Tài liệu có 1 người phụ trách chỉ cần ký bởi nhân viên trong khi tài "
+"liệu có 2 người phụ trách khác nhau sẽ cần được ký bởi cả nhân viên và người "
+"phụ trách.\n"
 "        "
 
 #. module: hr_contract_sign
@@ -142,12 +154,15 @@ msgid ""
 "Email used to send the signature request.\n"
 "                - Work takes the email defined in \"work email\"\n"
 "                - Private takes the email defined in Private Information\n"
-"                - If the selected email is not defined, the available one will be used."
+"                - If the selected email is not defined, the available one "
+"will be used."
 msgstr ""
-"Email dùng để gửi yêu cầu chữ ký.\n"
-"               - Công việc lấy email được xác định trong \"email công việc\"\n"
+"Email dùng để gửi yêu cầu ký tên.\n"
+"               - Công việc lấy email được xác định trong \"email công "
+"việc\"\n"
 "               - Riêng tư lấy email được xác định trong Thông tin cá nhân\n"
-"               - Nếu email đã chọn chưa được xác định, thì email có sẵn sẽ được sử dụng."
+"               - Nếu email đã chọn chưa được xác định, thì email có sẵn sẽ "
+"được sử dụng."
 
 #. module: hr_contract_sign
 #: model:ir.model,name:hr_contract_sign.model_hr_employee
@@ -198,7 +213,7 @@ msgstr "ID"
 #. module: hr_contract_sign
 #: model:ir.model.fields,field_description:hr_contract_sign.field_mail_activity_plan_template__is_signature_request
 msgid "Is Signature Request"
-msgstr "Là yêu cầu chữ ký"
+msgstr "Là yêu cầu ký tên"
 
 #. module: hr_contract_sign
 #: model:ir.model.fields,field_description:hr_contract_sign.field_hr_contract_sign_document_wizard__write_uid
@@ -229,11 +244,10 @@ msgstr "Tin nhắn"
 #. odoo-python
 #: code:addons/hr_contract_sign/wizard/hr_contract_sign_document_wizard.py:0
 msgid ""
-"No appropriate template could be found, please make sure you configured them"
-" properly."
+"No appropriate template could be found, please make sure you configured them "
+"properly."
 msgstr ""
-"Không tìm thấy mẫu thích hợp, vui lòng bảo đảm bạn đã đặt cấu hình đúng "
-"cách."
+"Không tìm thấy mẫu thích hợp, vui lòng bảo đảm bạn đã đặt cấu hình đúng cách."
 
 #. module: hr_contract_sign
 #: model_terms:ir.ui.view,arch_db:hr_contract_sign.view_hr_contract_sign
@@ -245,11 +259,6 @@ msgstr "Không có sẵn mẫu "
 #: code:addons/hr_contract_sign/wizard/hr_contract_sign_document_wizard.py:0
 msgid "Only %s has to sign."
 msgstr "Chỉ cần %s ký."
-
-#. module: hr_contract_sign
-#: model:sign.template,redirect_url_text:hr_contract_sign.template_sign_termination
-msgid "Open Link"
-msgstr "Mở liên kết"
 
 #. module: hr_contract_sign
 #: model_terms:ir.ui.view,arch_db:hr_contract_sign.view_hr_contract_sign
@@ -292,12 +301,12 @@ msgstr "Gửi"
 #: model:ir.model.fields,field_description:hr_contract_sign.field_hr_employee__sign_request_count
 #: model:ir.model.fields,field_description:hr_contract_sign.field_res_users__sign_request_count
 msgid "Sign Request Count"
-msgstr "Số yêu cầu ký"
+msgstr "Số yêu cầu ký tên"
 
 #. module: hr_contract_sign
 #: model_terms:ir.ui.view,arch_db:hr_contract_sign.view_hr_contract_sign
 msgid "Sign Request Options"
-msgstr "Tuỳ chọn yêu cầu chữ ký"
+msgstr "Tuỳ chọn yêu cầu ký tên"
 
 #. module: hr_contract_sign
 #: model:ir.model.fields,field_description:hr_contract_sign.field_hr_contract_sign_document_wizard__sign_template_responsible_ids
@@ -319,12 +328,12 @@ msgstr "Tài liệu ký trong hợp đồng"
 #: model_terms:ir.ui.view,arch_db:hr_contract_sign.hr_employee_sign_view_form
 #: model_terms:ir.ui.view,arch_db:hr_contract_sign.view_hr_contract_sign
 msgid "Signature Request"
-msgstr "Yêu cầu chữ ký"
+msgstr "Yêu cầu ký tên"
 
 #. module: hr_contract_sign
 #: model:ir.actions.server,name:hr_contract_sign.action_signature_request_wizard
 msgid "Signature request"
-msgstr "Yêu cầu chữ ký"
+msgstr "Yêu cầu ký tên"
 
 #. module: hr_contract_sign
 #: model:ir.model.fields,field_description:hr_contract_sign.field_hr_contract_sign_document_wizard__subject
@@ -342,7 +351,7 @@ msgstr "Cảnh báo mẫu"
 msgid ""
 "This sign request has been cancelled due to the cancellation of the related "
 "contract."
-msgstr "Yêu cầu chữ ký này đã bị hủy do hợp đồng liên quan bị hủy bỏ."
+msgstr "Yêu cầu ký tên này đã bị hủy do hợp đồng liên quan bị hủy bỏ."
 
 #. module: hr_contract_sign
 #: model:ir.model,name:hr_contract_sign.model_res_users
@@ -365,8 +374,8 @@ msgstr "Viết email hoặc tìm kiếm liên hệ..."
 msgid ""
 "You can't delete a contract linked to a signed document, archive it instead."
 msgstr ""
-"Bạn không thể xóa hợp đồng được liên kết với một tài liệu đã ký, hãy lưu trữ"
-" thay vì xóa."
+"Bạn không thể xóa hợp đồng được liên kết với một tài liệu đã ký, hãy lưu trữ "
+"thay vì xóa."
 
 #. module: hr_contract_sign
 #: model_terms:ir.ui.view,arch_db:hr_contract_sign.hr_contract_history_view_form

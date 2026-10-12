@@ -5,8 +5,8 @@ import json
 import logging
 import threading
 
+from datetime import timedelta, date
 from ast import literal_eval
-from datetime import timedelta, date, datetime
 from dateutil.relativedelta import relativedelta
 
 from odoo import api, fields, models, _
@@ -252,11 +252,20 @@ class MarketingActivity(models.Model):
         return super(MarketingActivity, self).copy_data(default=default)
 
     def write(self, values):
-        if any(field in values.keys() for field in ('interval_number', 'interval_type')):
+        if any(activity.campaign_id.state == 'running' for activity in self) and any(field in values for field in ('interval_number', 'interval_type')):
             values['require_sync'] = True
+        if 'parent_id' in values and self.trace_ids and not all(t.is_test for t in self.trace_ids):
+            # Prevent modifying relationships when real traces exist, as it could create duplicates
+            # and would require a full trace resynchronization in some cases.
+            raise ValidationError(_("Error! You can't modify the hierarchy of an active Activity."))
         return super(MarketingActivity, self).write(values)
 
     def _get_full_statistics(self):
+        self.env['marketing.trace'].flush_model(['activity_id', 'participant_id', 'state'])
+        self.env['mailing.trace'].flush_model([
+            'marketing_trace_id', 'links_click_datetime', 'sent_datetime', 'trace_status',
+        ])
+        self.env['marketing.participant'].flush_model(['is_test'])
         self.env.cr.execute("""
             SELECT
                 trace.activity_id,
@@ -285,11 +294,12 @@ class MarketingActivity(models.Model):
 
     def _get_graph_statistics(self):
         """ Compute activities statistics based on their traces state for the last fortnight """
-        past_date = (Datetime.from_string(Datetime.now()) + timedelta(days=-14)).strftime('%Y-%m-%d 00:00:00')
+        past_date = (self.env.cr.now() + timedelta(days=-14)).strftime('%Y-%m-%d 00:00:00')
         stat_map = {}
         base = date.today() + timedelta(days=-14)
         date_range = [base + timedelta(days=d) for d in range(0, 15)]
 
+        self.env['marketing.trace'].flush_model(['activity_id', 'is_test', 'schedule_date', 'state'])
         self.env.cr.execute("""
             SELECT
                 activity.id AS activity_id,
@@ -337,7 +347,7 @@ class MarketingActivity(models.Model):
 
         # organize traces by activity
         trace_domain = [
-            ('schedule_date', '<=', Datetime.now()),
+            ('schedule_date', '<=', self.env.cr.now()),
             ('state', '=', 'scheduled'),
             ('activity_id', 'in', self.ids),
             ('participant_id.state', '=', 'running'),
@@ -365,12 +375,13 @@ class MarketingActivity(models.Model):
         :param traces: record set of traces on which the activity should run
         """
         self.ensure_one()
+        now = self.env.cr.now()
         new_traces = self.env['marketing.trace']
 
         if self.validity_duration:
             duration = relativedelta(**{self.validity_duration_type: self.validity_duration_number})
             invalid_traces = traces.filtered(
-                lambda trace: not trace.schedule_date or trace.schedule_date + duration < datetime.now()
+                lambda trace: not trace.schedule_date or trace.schedule_date + duration < now
             )
             invalid_traces.action_cancel()
             traces = traces - invalid_traces
@@ -412,6 +423,7 @@ class MarketingActivity(models.Model):
 
         # Do a loop here because we have to try / catch each execution separately to ensure other traces are executed
         # and proper state message stored
+        now = self.env.cr.now()
         traces_ok = self.env['marketing.trace']
         for trace in traces:
             action = self.server_action_id.with_context(
@@ -425,7 +437,7 @@ class MarketingActivity(models.Model):
                 _logger.warning('Marketing Automation: activity <%s> encountered server action issue %s', self.id, str(e), exc_info=True)
                 trace.write({
                     'state': 'error',
-                    'schedule_date': Datetime.now(),
+                    'schedule_date': now,
                     'state_msg': _('Exception in server action: %s', e),
                 })
             else:
@@ -434,7 +446,7 @@ class MarketingActivity(models.Model):
         # Update status
         traces_ok.write({
             'state': 'processed',
-            'schedule_date': Datetime.now(),
+            'schedule_date': self.env.cr.now(),
         })
         return True
 
@@ -449,13 +461,15 @@ class MarketingActivity(models.Model):
         res_ids = _uniquify_list(traces.mapped('res_id'))
         ctx = dict(clean_context(self._context), default_marketing_activity_id=self.ids[0], active_ids=res_ids)
         mailing = self.mass_mailing_id.sudo().with_context(ctx)
+        now = self.env.cr.now()
+
         try:
             mailing.action_send_mail(res_ids)
         except Exception as e:
             _logger.warning('Marketing Automation: activity <%s> encountered mass mailing issue %s', self.id, str(e), exc_info=True)
             traces.write({
                 'state': 'error',
-                'schedule_date': Datetime.now(),
+                'schedule_date': now,
                 'state_msg': _('Exception in mass mailing: %s', e),
             })
         else:
@@ -474,27 +488,33 @@ class MarketingActivity(models.Model):
             if canceled_traces:
                 canceled_traces.write({
                     'state': 'canceled',
-                    'schedule_date': Datetime.now(),
+                    'schedule_date': now,
                     'state_msg': _('Email cancelled')
                 })
                 processed_traces = processed_traces - canceled_traces
             if error_traces:
                 error_traces.write({
                     'state': 'error',
-                    'schedule_date': Datetime.now(),
+                    'schedule_date': now,
                     'state_msg': _('Email failed')
                 })
                 processed_traces = processed_traces - error_traces
             if processed_traces:
                 processed_traces.write({
                     'state': 'processed',
-                    'schedule_date': Datetime.now(),
+                    'schedule_date': now,
                 })
         return True
 
     def _generate_children_traces(self, traces):
-        """Generate child traces for child activities and compute their schedule date except for mail_open,
-        mail_click, mail_reply, mail_bounce which are computed when processing the mail event """
+        """Generate child traces for child activities that are directly time
+        dependant e.g. after an activity, after not opened email, ...
+        Action-based traces (mail open, ...) have no specific scheduled date
+        as they depend on external actions.
+
+        :param traces: marketing.trace records which have been processed and
+          validated and for which we want to generate children traces
+        """
         child_traces = self.env['marketing.trace']
         cron_trigger_dates = set()
         for activity in self.child_ids:
@@ -522,11 +542,12 @@ class MarketingActivity(models.Model):
         return child_traces
 
     def _get_reschedule_trigger_types(self):
-        """ Retrieve a set of trigger types used for rescheduling actions.
-        The marketing activity will be rescheduled after these triggers are activated.
-        :returns set[str]: set of elements, each containing trigger_type
+        """ Retrieve a set of trigger types that have a schedule_date that depends
+        on parent or activity / campaign, not on external user actions.
+
+        :returns set[str]: set of ``trigger_type`` elements
         """
-        return {'activity', 'mail_not_open', 'mail_not_click', 'mail_not_reply'}
+        return {'activity', 'begin', 'mail_not_open', 'mail_not_click', 'mail_not_reply'}
 
     def action_view_sent(self):
         return self._action_view_documents_filtered('sent')

@@ -23,6 +23,20 @@
         height: 100%;
         width: 100%;
 
+        @include media-breakpoint-down(lg) {
+            &.o_kanban_grouped {
+                div:has(.o_kanban_record) {
+                    width: 100%;
+                }
+                .o_kanban_record {
+                    width: 95%;
+                }
+                &.o_documents_recent {
+                    overflow: auto !important;
+                }
+            }
+        }
+
         .o_kanban_record {
             display: flex;
             flex-direction: column;
@@ -30,34 +44,43 @@
             margin: .5rem;
             border: none;
 
+            @include media-breakpoint-down(lg) {
+                width: 160px;
+                flex-basis: auto;
+            }
             .o_kanban_progress_card {
                 height: 100%;
             }
 
             > div:nth-of-type(1) {
-                border: 1px solid #d8dadd;
+                border: $border-width solid var(--border-color);
             }
 
             &.o_drag_hover {
                 & > div {
-                    border-color: $o-success !important;
-                    background-color: mix($o-success, $o-white, 10%) !important;
+                    --border-color: #{$o-success};
+
+                    background-color: mix($o-success, $o-view-background-color, 10%);
                 }
             }
 
             &.o_drag_invalid {
                 & > div {
-                    border-color: $o-danger !important;
-                    background-color: mix($o-danger, $o-white, 10%) !important;
+                    --border-color: #{$o-danger} !important;
+
+                    background-color: mix($o-danger, $o-view-background-color, 10%) !important;
                 }
             }
 
-            &:not(.o_folder_record) {
+            &:not(.o_folder_record):not(:has(.o_documents_pre_18_1)) {
                 min-height: 200px;
             }
 
             &.o_kanban_ghost {
-                min-height: 0;
+                min-height: 0 !important;
+                @include media-breakpoint-down(lg) {
+                    display: none;
+                }
             }
 
             &:hover .o-file-upload-progress-bar-abort {
@@ -67,9 +90,9 @@
 
             .o_kanban_stack {
                 width: calc(100% - 6px);
-                border: 1px solid #d8dadd;
+                border: $border-width solid $border-color;
                 height: 100%;
-                background-color: white;
+                background-color: $o-view-background-color;
                 &:nth-of-type(1){
                     z-index: $o-dms-kanban-stack-zindex;
                 }
@@ -85,16 +108,21 @@
                 }
             }
 
-            .o_kanban_record_body {
+            &:not(:has(.o_documents_pre_18_1)) .o_kanban_record_body {
                 max-height: 1rem;
                 line-height: 1rem;
+            }
+
+            .o_documents_in_folder {
+                font-size: 13px;
             }
         }
 
         .o_kanban_record .o_kanban_attachment {
             &.o_record_selected, &.o_record_selected ~ div  {
+                --border-color: #{$o-component-active-border};
+
                 opacity: 1;
-                border-color: $o-component-active-border;
                 background-color: $o-component-active-bg;
             }
 
@@ -104,7 +132,7 @@
             }
 
             .o_kanban_image_wrapper {
-                background-color: $gray-200;
+                background-color: $body-bg;
                 height: 140px;
                 width: 100%;
                 display: flex;
@@ -120,8 +148,22 @@
                 }
 
                 img {
-                    width: 100%;
-                    height: 100%;
+                    max-width: 100%;
+                    max-height: 100%;
+                }
+
+                .fa-star,.fa-star-o {
+                    &:before {
+                        position: relative;
+                        z-index: 1;
+                    }
+                    &:after {
+                        position: absolute;
+                        content: "\f005";
+                        color: white;
+                        z-index: 0;
+                        right: 8px;
+                    }
                 }
             }
 
@@ -152,18 +194,28 @@
                 transform: translate(-6px);
             }
 
+            @include media-breakpoint-up(lg) {
+                &.o_documents_pre_18_1:not(:hover) {
+                    .fa-eye-slash,.fa-star-o,.o_field_kanban_activity:has(.fa-clock-o) {
+                        visibility: hidden;
+                    }
+                }
+            }
+
             .fa-star-o {
-                @include o-hover-text-color($gray-400, $o-main-favorite-color);
                 &:hover:before {
                     content: "\f005";
                 }
             }
 
             .fa-star {
-                @include o-hover-text-color($o-main-favorite-color, $gray-400);
                 &:hover:before {
                     content: "\f006";
                 }
+            }
+
+            .o_field_kanban_activity {
+                margin-top: 2px;
             }
         }
 
@@ -205,6 +257,9 @@
         &.o_documents_drop_over_unauthorized {
             @extend .o_documents_drop_over;
             background: $red-100;
+        }
+        &.o_kanban_ungrouped {
+            min-height: 0;
         }
     }
 }

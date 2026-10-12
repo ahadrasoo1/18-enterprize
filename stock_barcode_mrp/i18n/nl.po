@@ -1,24 +1,26 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* stock_barcode_mrp
-# 
+# * stock_barcode_mrp
+#
 # Translators:
-# Wil Odoo, 2024
-# Erwin van der Ploeg <erwin@odooexperts.nl>, 2024
-# 
+# Erwin van der Ploeg <erwin@odooexperts.nl>, 2025
+# Wil Odoo, 2025
+# Bren Driesen <brdri@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:28+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Erwin van der Ploeg <erwin@odooexperts.nl>, 2024\n"
-"Language-Team: Dutch (https://app.transifex.com/odoo/teams/41243/nl/)\n"
+"POT-Creation-Date: 2025-12-29 18:49+0000\n"
+"PO-Revision-Date: 2026-05-27 15:25+0000\n"
+"Last-Translator: Bren Driesen <brdri@odoo.com>\n"
+"Language-Team: Dutch <https://translate.odoo.com/projects/odoo-18/"
+"stock_barcode_mrp/nl/>\n"
+"Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: nl\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.17\n"
 
 #. module: stock_barcode_mrp
 #: model_terms:ir.ui.view,arch_db:stock_barcode_mrp.res_config_settings_view_form
@@ -51,8 +53,8 @@ msgstr "Sta het aanmaken van serie/partijnummers toe voor de onderdelen"
 #: model_terms:ir.ui.view,arch_db:stock_barcode_mrp.view_picking_type_form
 msgid "Allow user to produce all even if no components were scanned"
 msgstr ""
-"Gebruiker toestaan om alles te produceren, zelfs als er geen onderdelen zijn"
-" gescand"
+"Gebruiker toestaan om alles te produceren, zelfs als er geen onderdelen zijn "
+"gescand"
 
 #. module: stock_barcode_mrp
 #. odoo-javascript
@@ -106,7 +108,7 @@ msgstr "Maak nieuwe partijen/serienummers aan voor onderdelen"
 #. module: stock_barcode_mrp
 #: model_terms:ir.actions.act_window,help:stock_barcode_mrp.mrp_action_kanban
 msgid "Create a new Manufacturing Order"
-msgstr "Een nieuw productieorder aanmaken"
+msgstr "Een nieuwe productieorder aanmaken"
 
 #. module: stock_barcode_mrp
 #: model_terms:ir.ui.view,arch_db:stock_barcode_mrp.mrp_product_selector
@@ -175,7 +177,7 @@ msgstr "Bewerkingen"
 #. module: stock_barcode_mrp
 #: model:ir.model,name:stock_barcode_mrp.model_stock_picking_type
 msgid "Picking Type"
-msgstr "Picking type"
+msgstr "Pickingsoort"
 
 #. module: stock_barcode_mrp
 #. odoo-javascript
@@ -253,9 +255,13 @@ msgstr "Scan een product om de orders te filteren."
 
 #. module: stock_barcode_mrp
 #. odoo-javascript
-#: code:addons/stock_barcode_mrp/static/src/kanban/stock_barcode_kanban_renderer.xml:0
-msgid "Scan an"
-msgstr "Scan een"
+#: code:addons/stock_barcode_mrp/static/src/kanban/stock_barcode_kanban_renderer.js:0
+msgid ""
+"Scan an %(bold_start)s order %(bold_end)s or a %(bold_start)s product %"
+"(bold_end)s to filter your records"
+msgstr ""
+"Scan een %(bold_start)s order %(bold_end)s of een %(bold_start)s product %"
+"(bold_end)s om records te filteren"
 
 #. module: stock_barcode_mrp
 #. odoo-javascript
@@ -300,7 +306,7 @@ msgstr "De productieorder is bevestigd"
 #. odoo-javascript
 #: code:addons/stock_barcode_mrp/static/src/models/barcode_mrp_model.js:0
 msgid "This order is already done"
-msgstr "Deze order is al gereed"
+msgstr "Deze order is al voltooid"
 
 #. module: stock_barcode_mrp
 #. odoo-javascript
@@ -334,11 +340,15 @@ msgstr "Maateenheid"
 #. module: stock_barcode_mrp
 #: model:ir.model.fields,help:stock_barcode_mrp.field_stock_move_line__manual_consumption
 msgid ""
-"When activated, then the registration of consumption for that component is recorded manually exclusively.\n"
-"If not activated, and any of the components consumption is edited manually on the manufacturing order, Odoo assumes manual consumption also."
+"When activated, then the registration of consumption for that component is "
+"recorded manually exclusively.\n"
+"If not activated, and any of the components consumption is edited manually "
+"on the manufacturing order, Odoo assumes manual consumption also."
 msgstr ""
-"Indien geactiveerd, wordt de registratie van het verbruik voor dat onderdeel uitsluitend handmatig geregistreerd.\n"
-"Indien niet geactiveerd en een van de onderdelenverbruik wordt handmatig op de fabricageorder bewerkt, neemt Odoo ook handmatig verbruik aan."
+"Indien geactiveerd, wordt de registratie van het verbruik voor dat onderdeel "
+"uitsluitend handmatig geregistreerd.\n"
+"Indien niet geactiveerd en een van de onderdelenverbruik wordt handmatig op "
+"de fabricageorder bewerkt, neemt Odoo ook handmatig verbruik aan."
 
 #. module: stock_barcode_mrp
 #: model:ir.model,name:stock_barcode_mrp.model_mrp_production_backorder
@@ -348,30 +358,12 @@ msgstr "Wizard om als klaar te markeren of om een backorder te maken"
 #. module: stock_barcode_mrp
 #. odoo-javascript
 #: code:addons/stock_barcode_mrp/static/src/models/barcode_mrp_model.js:0
+msgid "You are expected to scan one or more products."
+msgstr "Er wordt verwacht dat je één of meerdere producten scant."
+
+#. module: stock_barcode_mrp
+#. odoo-javascript
+#: code:addons/stock_barcode_mrp/static/src/models/barcode_mrp_model.js:0
 msgid "You can't add the final product of a MO as a byproduct."
 msgstr ""
-"Je kan het eindproduct van een productieorder niet als bijproduct toevoegen."
-
-#. module: stock_barcode_mrp
-#. odoo-javascript
-#: code:addons/stock_barcode_mrp/static/src/kanban/stock_barcode_kanban_renderer.xml:0
-msgid "or a"
-msgstr "of een"
-
-#. module: stock_barcode_mrp
-#. odoo-javascript
-#: code:addons/stock_barcode_mrp/static/src/kanban/stock_barcode_kanban_renderer.xml:0
-msgid "order"
-msgstr "bestelling"
-
-#. module: stock_barcode_mrp
-#. odoo-javascript
-#: code:addons/stock_barcode_mrp/static/src/kanban/stock_barcode_kanban_renderer.xml:0
-msgid "product"
-msgstr "product"
-
-#. module: stock_barcode_mrp
-#. odoo-javascript
-#: code:addons/stock_barcode_mrp/static/src/kanban/stock_barcode_kanban_renderer.xml:0
-msgid "to filter your records"
-msgstr "om je records te filteren"
+"Je kunt het eindproduct van een productieorder niet als bijproduct toevoegen."

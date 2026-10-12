@@ -4,6 +4,7 @@ from lxml import etree
 import re
 from unittest.mock import patch, Mock
 
+from odoo import Command
 from odoo.tests import tagged, freeze_time
 from odoo.addons.l10n_co_dian import xml_utils
 from .common import TestCoDianCommon
@@ -20,7 +21,7 @@ class TestDianMisc(TestCoDianCommon):
 
     def test_cufe1_generation(self):
         # Invoice -> CUFE
-        xml = self.env['account.edi.xml.ubl_dian']._export_invoice(self.invoice)[0]
+        xml = self._generate_xml(self.invoice)
         self.env['l10n_co_dian.document']._create_document(xml, self.invoice, state='invoice_accepted')
         self.assertEqual(
             self.invoice.l10n_co_edi_cufe_cude_ref,
@@ -33,7 +34,7 @@ class TestDianMisc(TestCoDianCommon):
             move_type='out_refund',
             l10n_co_edi_description_code_credit='1',
         )
-        xml = self.env['account.edi.xml.ubl_dian']._export_invoice(credit_note)[0]
+        xml = self._generate_xml(credit_note)
         self.env['l10n_co_dian.document']._create_document(xml, credit_note, state='invoice_accepted')
         self.assertEqual(
             credit_note.l10n_co_edi_cufe_cude_ref,
@@ -47,7 +48,7 @@ class TestDianMisc(TestCoDianCommon):
             l10n_co_edi_description_code_debit='1',
         )
         self.assertTrue(debit_note.l10n_co_edi_debit_note)
-        xml = self.env['account.edi.xml.ubl_dian']._export_invoice(debit_note)[0]
+        xml = self._generate_xml(debit_note)
         self.env['l10n_co_dian.document']._create_document(xml, debit_note, state='invoice_accepted')
         self.assertEqual(
             debit_note.l10n_co_edi_cufe_cude_ref,
@@ -62,7 +63,7 @@ class TestDianMisc(TestCoDianCommon):
             invoice_date=self.frozen_today,
         )
         self.assertTrue(bill.l10n_co_edi_is_support_document)
-        xml = self.env['account.edi.xml.ubl_dian']._export_invoice(bill)[0]
+        xml = self._generate_xml(bill)
         self.env['l10n_co_dian.document']._create_document(xml, bill, state='invoice_accepted')
         self.assertEqual(
             bill.l10n_co_edi_cufe_cude_ref,
@@ -87,7 +88,7 @@ class TestDianMisc(TestCoDianCommon):
             response.text = '<A><IsValid>true</IsValid></A>'
             return response
 
-        with self._mock_get_status(), patch('requests.post', side_effect=post), self._mock_uuid_generation():
+        with self._mock_get_status(), patch('requests.post', side_effect=post), self._mock_uuid_generation(), self._disable_get_acquirer_call():
             self.env['account.move.send.wizard'] \
                 .with_context(active_model=self.invoice._name, active_ids=self.invoice.ids) \
                 .create({}) \
@@ -100,7 +101,7 @@ class TestDianMisc(TestCoDianCommon):
         In case of error, validator will raise: "ZE02, Rechazo: Valor de la firma inválido."
         """
         with self._mock_uuid_generation():
-            xml = self.env['account.edi.xml.ubl_dian']._export_invoice(self.invoice)[0]
+            xml = self._generate_xml(self.invoice)
         # the namespaces 'sts' and 'ext' should be declared on the root node otherwise DIAN raises
         # "Namespace prefix not defined"
         root = etree.fromstring(xml)
@@ -149,7 +150,7 @@ class TestDianMisc(TestCoDianCommon):
         """ Check that the colombian codes is correctly padded (length 5 for cities, length 2 for states) """
         self.invoice.partner_id.city_id = self.env.ref('l10n_co_edi.city_co_01')
         self.invoice.partner_id.state_id = self.invoice.partner_id.city_id.state_id
-        xml = self.env['account.edi.xml.ubl_dian']._export_invoice(self.invoice)[0]
+        xml = self._generate_xml(self.invoice)
         root = etree.fromstring(xml)
         self.assertEqual(
             root.find('.//{*}AccountingCustomerParty//{*}RegistrationAddress/{*}CountrySubentityCode').text,
@@ -164,7 +165,7 @@ class TestDianMisc(TestCoDianCommon):
         self.invoice.partner_id.email = "tmp@odoo.com"  # so the email is sent by default when Send & Printing
 
         # Send & Print to generate the zip (containing the AttachedDocument + the PDF)
-        with patch(f'{self.document_path}._get_status', return_value=self._mocked_response('GetStatus_invoice.xml', 200)):
+        with self._mock_get_status():
             self._mock_send_and_print(move=self.invoice, response_file='SendBillSync_warnings.xml')
 
         attachments = self.env['ir.attachment'].search([
@@ -174,7 +175,17 @@ class TestDianMisc(TestCoDianCommon):
         self.assertIn("SETP202400001.zip", attachments.mapped('name'))
 
         # regenerate the attached document
-        with patch(f'{self.document_path}._get_status', return_value=self._mocked_response('GetStatus_invoice.xml', 200)):
+        with self._mock_get_status():
             xml, error = self.invoice.l10n_co_dian_document_ids._get_attached_document()
         self.assertEqual(error, "")
         self._assert_document_dian(xml, "l10n_co_dian/tests/attachments/attached_document.xml")
+
+    def test_account_manager_update_journal(self):
+        """
+        This test serves both purposes of checking the DIAN configuration reload
+        and making sure an account manager has all access needed in this flow
+        """
+        self.user.groups_id = [Command.unlink(self.env.ref('base.group_system').id)]
+        journal = self.support_document_journal
+        message = self._mock_button_l10n_co_dian_fetch_numbering_range(journal=journal, response_file='GetNumberingRange_journal.xml')
+        self.assertEqual(message['params']['message'], 'The journal values were successfully updated.')

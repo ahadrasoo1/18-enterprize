@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data noupdate="1">
+        <function model="documents.tag" name="_ensure_documents_project_tags_exist"/>
         <!-- Tags: Remove -->
 
         <record id="ir_actions_server_tag_remove_draft" model="ir.actions.server" forcecreate="0">
-            <field name="name">Add Tag Draft</field>
+            <field name="name">Remove Tag Draft</field>
             <field name="model_id" ref="documents.model_documents_document"/>
             <field name="groups_id" eval="[Command.link(ref('base.group_user'))]"/>
             <field name="sequence">7</field> <!-- Higher than the sequence of "_code" checks -->
@@ -228,10 +229,10 @@ if tag_deprecated and tag_deprecated in records.tag_ids:
 tag_validated = env.ref('documents.documents_tag_validated', raise_if_not_found=False)
 if tag_validated and tag_validated in records.tag_ids:
     # Easier than remembering not to remove activities
-    raise UserError(_("Impossible to validate twice."))
+    raise UserError(env._("Document has already been validated."))
 tag_deprecated = env.ref('documents.documents_tag_deprecated', raise_if_not_found=False)
 if tag_deprecated and tag_deprecated in records.tag_ids:
-    raise UserError(_("Impossible to validate documents tagged with Deprecated."))
+    raise UserError(env._("Impossible to validate documents tagged with Deprecated."))
             </field>
         </record>
 

@@ -1,36 +1,27 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* website_helpdesk_livechat
+# * website_helpdesk_livechat
 #
 # Translators:
 # Martin Trigaux, 2022
 # Dragan Vukosavljevic <dragan.vukosavljevic@gmail.com>, 2022
-#
+# Weblate <noreply-mt-weblate@weblate.org>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-03 09:03+0000\n"
-"PO-Revision-Date: 2022-09-22 05:50+0000\n"
-"Last-Translator: Dragan Vukosavljevic <dragan.vukosavljevic@gmail.com>, "
-"2022\n"
-"Language-Team: Serbian (https://app.transifex.com/odoo/teams/41243/sr/)\n"
-"Language: sr\n"
+"POT-Creation-Date: 2025-12-29 18:46+0000\n"
+"PO-Revision-Date: 2025-11-13 16:24+0000\n"
+"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"Language-Team: Serbian (Latin script) <https://translate.odoo.com/projects/"
+"odoo-18/website_helpdesk_livechat/sr_Latn/>\n"
+"Language: sr@latin\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
-"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-
-#. module: website_helpdesk_livechat
-#. odoo-python
-#: code:addons/website_helpdesk_livechat/models/helpdesk.py:0
-msgid ""
-"\n"
-"                    Create a new helpdesk ticket by typing <b>/ticket "
-"<i>ticket title</i></b><br>\n"
-"                    "
-msgstr ""
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"X-Generator: Weblate 5.12.2\n"
 
 #. module: website_helpdesk_livechat
 #. odoo-python
@@ -46,7 +37,6 @@ msgstr "U redu, trebalo bi da imamo sve što nam treba"
 #. module: website_helpdesk_livechat
 #. odoo-python
 #: code:addons/website_helpdesk_livechat/models/chatbot_script.py:0
-#, python-format
 msgid ""
 "An \"Email\" step type must exist before the \"Create Ticket\" step for a "
 "ticket to be created."
@@ -92,6 +82,14 @@ msgstr "Kreiraj tiket"
 #. odoo-javascript
 #: code:addons/website_helpdesk_livechat/static/src/core/web/store_service_patch.js:0
 msgid "Create a new helpdesk ticket (/ticket ticket title)"
+msgstr ""
+
+#. module: website_helpdesk_livechat
+#. odoo-python
+#: code:addons/website_helpdesk_livechat/models/helpdesk.py:0
+msgid ""
+"Create a new helpdesk ticket by typing: %(pre_start)s%(ticket_command)s %"
+"(i_start)sticket title%(i_end)s%(pre_end)s"
 msgstr ""
 
 #. module: website_helpdesk_livechat
@@ -155,18 +153,12 @@ msgstr ""
 #. module: website_helpdesk_livechat
 #: model:ir.model.fields,field_description:website_helpdesk_livechat.field_helpdesk_team__use_website_helpdesk_livechat
 msgid "Live Chat"
-msgstr ""
+msgstr "Live Chat"
 
 #. module: website_helpdesk_livechat
 #. odoo-python
 #: code:addons/website_helpdesk_livechat/models/helpdesk.py:0
 msgid "Load More"
-msgstr ""
-
-#. module: website_helpdesk_livechat
-#. odoo-python
-#: code:addons/website_helpdesk_livechat/models/helpdesk.py:0
-msgid "Make sure you are using the right format:"
 msgstr ""
 
 #. module: website_helpdesk_livechat
@@ -177,7 +169,10 @@ msgstr "Ne"
 #. module: website_helpdesk_livechat
 #. odoo-python
 #: code:addons/website_helpdesk_livechat/models/helpdesk.py:0
-msgid "No tickets found for %s."
+msgid ""
+"No tickets found for %(b_start)s%(keywords)s%(b_end)s.%(br)sMake sure you "
+"are using the right format: %(pre_start)s%(search_tickets_command)s %"
+"(i_start)skeywords%(i_end)s%(pre_end)s"
 msgstr ""
 
 #. module: website_helpdesk_livechat
@@ -208,7 +203,9 @@ msgstr ""
 #. module: website_helpdesk_livechat
 #. odoo-python
 #: code:addons/website_helpdesk_livechat/models/helpdesk.py:0
-msgid "Search helpdesk tickets by typing <b>/search_tickets <i>keyword</i></b>"
+msgid ""
+"Search helpdesk tickets by typing: %(pre_start)s%(search_tickets_command)s %"
+"(i_start)skeywords%(i_end)s%(pre_end)s"
 msgstr ""
 
 #. module: website_helpdesk_livechat
@@ -242,7 +239,9 @@ msgstr "Tiketi"
 #. module: website_helpdesk_livechat
 #. odoo-python
 #: code:addons/website_helpdesk_livechat/models/helpdesk.py:0
-msgid "Tickets search results for "
+msgid ""
+"Tickets search results for %(b_start)s%(keywords)s%(b_end)s: %(br)s%"
+"(tickets)s"
 msgstr ""
 
 #. module: website_helpdesk_livechat
@@ -273,12 +272,6 @@ msgstr "Sve je spremno. Šta je vaš problem?"
 #: model:chatbot.script.answer,name:website_helpdesk_livechat.chatbot_script_helpdesk_step_administrative_customer_ref_answer_yes
 msgid "Yes"
 msgstr "Da"
-
-#. module: website_helpdesk_livechat
-#. odoo-python
-#: code:addons/website_helpdesk_livechat/models/helpdesk.py:0
-msgid "keyword"
-msgstr ""
 
 #~ msgid "Canned Responses"
 #~ msgstr "Pripremljeni odgovori"

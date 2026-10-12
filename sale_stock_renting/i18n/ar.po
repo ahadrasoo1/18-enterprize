@@ -1,23 +1,27 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* sale_stock_renting
-# 
+# * sale_stock_renting
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Malaz Abuidris <msea@odoo.com>, 2025
+# Weblate <noreply-mt-weblate@weblate.org>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:28+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Arabic (https://app.transifex.com/odoo/teams/41243/ar/)\n"
+"POT-Creation-Date: 2025-12-29 18:49+0000\n"
+"PO-Revision-Date: 2025-12-13 09:15+0000\n"
+"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"Language-Team: Arabic <https://translate.odoo.com/projects/odoo-18/"
+"sale_stock_renting/ar/>\n"
+"Language: ar\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: ar\n"
-"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
+"&& n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
+"X-Generator: Weblate 5.14.3\n"
 
 #. module: sale_stock_renting
 #. odoo-python
@@ -36,12 +40,14 @@ msgstr "%(product)s (%(qty)s عناصر) "
 msgid ""
 "<i class=\"fa fa-warning\"/>\n"
 "                        <span>\n"
-"                            Some products don't have the requested qty available for pickup\n"
+"                            Some products don't have the requested qty "
+"available for pickup\n"
 "                        </span>"
 msgstr ""
 "<i class=\"fa fa-warning\"/>\n"
 "                        <span>\n"
-"                            بعض المنتجات ليس لها الكمية المطلوبة متاحة لاستلامها\n"
+"                            بعض المنتجات ليس لها الكمية المطلوبة متاحة "
+"لاستلامها\n"
 "                        </span>"
 
 #. module: sale_stock_renting
@@ -51,10 +57,18 @@ msgstr "قم بالتفعيل لاستخدام عمليات توصيل المخ�
 
 #. module: sale_stock_renting
 #: model:ir.model.fields,help:sale_stock_renting.field_res_company__padding_time
-#: model:ir.model.fields,help:sale_stock_renting.field_res_config_settings__padding_time
 msgid ""
 "Amount of time (in hours) during which a product is considered unavailable "
 "prior to renting (preparation time)."
+msgstr ""
+"الوقت (بالساعات) الذي يتم اعتبار المنتج فيه غير متاح قبل التأجير (وقت "
+"التجهيز). "
+
+#. module: sale_stock_renting
+#: model:ir.model.fields,help:sale_stock_renting.field_res_config_settings__padding_time
+msgid ""
+"Amount of time (in hours) during which a product is considered "
+"unavailableprior to renting (preparation time)."
 msgstr ""
 "الوقت (بالساعات) الذي يتم اعتبار المنتج فيه غير متاح قبل التأجير (وقت "
 "التجهيز). "
@@ -73,7 +87,7 @@ msgstr "متاح"
 #. module: sale_stock_renting
 #: model:ir.model.fields,field_description:sale_stock_renting.field_sale_order_line__available_reserved_lots
 msgid "Available Reserved Lots"
-msgstr ""
+msgstr "المجموعات المحجوزة المتاحة "
 
 #. module: sale_stock_renting
 #. odoo-javascript
@@ -113,11 +127,6 @@ msgid "Has lines with tracked products"
 msgstr "يحتوي على بنود مع منتجات متتبعة "
 
 #. module: sale_stock_renting
-#: model:ir.model.fields,field_description:sale_stock_renting.field_res_company__rental_loc_id
-msgid "In rent"
-msgstr "قيد التأجير "
-
-#. module: sale_stock_renting
 #: model:ir.model.fields,field_description:sale_stock_renting.field_sale_rental_schedule__is_available
 msgid "Is Available"
 msgstr "متاح "
@@ -131,6 +140,11 @@ msgstr "المنتج قابل للتأجير "
 #: model:ir.model,name:sale_stock_renting.model_account_move
 msgid "Journal Entry"
 msgstr "قيد اليومية"
+
+#. module: sale_stock_renting
+#: model:ir.model,name:sale_stock_renting.model_account_move_line
+msgid "Journal Item"
+msgstr "عنصر اليومية"
 
 #. module: sale_stock_renting
 #: model:ir.model,name:sale_stock_renting.model_stock_lot
@@ -151,16 +165,11 @@ msgstr "الحد الأدنى للوقت بين عمليتي تأجير "
 #. odoo-python
 #: code:addons/sale_stock_renting/models/sale_order_line.py:0
 msgid ""
-"No valid quant has been found in location %(location)s for serial number "
-"%(serial_number)s!"
+"No valid quant has been found in location %(location)s for serial number %"
+"(serial_number)s!"
 msgstr ""
-"لم يتم العثور على كمية صالحة في الموقع %(location)s للرقم التسلسلي "
-"%(serial_number)s! "
-
-#. module: sale_stock_renting
-#: model_terms:ir.ui.view,arch_db:sale_stock_renting.rental_schedule_view_gantt_inherit_stock
-msgid "Other rental(s) in conflict."
-msgstr "التأجير (التأجيرات) الأخرى المتعارضة. "
+"لم يتم العثور على كمية صالحة في الموقع %(location)s للرقم التسلسلي %"
+"(serial_number)s! "
 
 #. module: sale_stock_renting
 #: model:ir.model.fields,field_description:sale_stock_renting.field_res_config_settings__padding_time
@@ -211,6 +220,8 @@ msgid "Product Variant"
 msgstr "متغير المنتج "
 
 #. module: sale_stock_renting
+#. odoo-python
+#: code:addons/sale_stock_renting/models/res_company.py:0
 #: model:stock.route,name:sale_stock_renting.route_rental
 msgid "Rental"
 msgstr "تأجير "
@@ -219,6 +230,11 @@ msgstr "تأجير "
 #: model:ir.model,name:sale_stock_renting.model_sale_rental_report
 msgid "Rental Analysis Report"
 msgstr "تقرير تحليل التأجير "
+
+#. module: sale_stock_renting
+#: model:ir.model.fields,field_description:sale_stock_renting.field_res_company__rental_loc_id
+msgid "Rental Location"
+msgstr "موقع الإيجار "
 
 #. module: sale_stock_renting
 #: model:ir.model,name:sale_stock_renting.model_sale_rental_schedule
@@ -234,7 +250,7 @@ msgstr "تحويلات التأجير "
 #. odoo-python
 #: code:addons/sale_stock_renting/models/sale_order_line.py:0
 msgid "Rental move: %(order)s"
-msgstr ""
+msgstr "حركة التأجير: %(order)s "
 
 #. module: sale_stock_renting
 #: model:ir.model.fields,field_description:sale_stock_renting.field_res_config_settings__group_rental_stock_picking
@@ -315,10 +331,15 @@ msgid "Temporarily make this product unavailable before pickup."
 msgstr "جعل هذا المنتج غير متاح مؤقتاً قبل الاستلام. "
 
 #. module: sale_stock_renting
+#: model_terms:ir.ui.view,arch_db:sale_stock_renting.rental_schedule_view_gantt_inherit_stock
+msgid "The product is not available during this period."
+msgstr "المنتج غير متاح خلال هذه الفترة. "
+
+#. module: sale_stock_renting
 #: model:ir.model.fields,help:sale_stock_renting.field_res_company__rental_loc_id
 msgid ""
-"This technical location serves as stock for products currently in rentalThis"
-" location is internal because products in rentalare still considered as "
+"This technical location serves as stock for products currently in rentalThis "
+"location is internal because products in rentalare still considered as "
 "company assets."
 msgstr ""
 "يعمل هذا الموقع التقني كمخزون للمنتجات قيد التأجير حالياً. هذا الموقع داخلي "
@@ -339,6 +360,11 @@ msgid ""
 msgstr ""
 "عملية التتبع حسب المجموعة غير مدعومة لمنتجات التأجير. \n"
 "عليك تغيير نوع التتبع إلى الأرقام التسلسلية الفريدة. "
+
+#. module: sale_stock_renting
+#: model:ir.model,name:sale_stock_renting.model_stock_picking
+msgid "Transfer"
+msgstr "تحويل"
 
 #. module: sale_stock_renting
 #: model:ir.model.fields,field_description:sale_stock_renting.field_sale_order_line__unavailable_lot_ids

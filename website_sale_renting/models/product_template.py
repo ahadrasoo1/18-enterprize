@@ -146,6 +146,9 @@ class ProductTemplate(models.Model):
             'base_unit_price': 0,
             'base_unit_name': False,
             'pricing_table': pricing_table,
+            'prevent_zero_price_sale': website.prevent_zero_price_sale and currency.is_zero(
+                current_price,
+            ),
         }
 
     @api.model
@@ -186,7 +189,7 @@ class ProductTemplate(models.Model):
     def _get_default_start_date(self):
         """ Get the default pickup date and make it extensible """
         return self._get_first_potential_date(
-            fields.Datetime.now() + relativedelta(days=1, minute=0, second=0, microsecond=0)
+            fields.Datetime.now() + relativedelta(days=1, hours=1, minute=0, second=0, microsecond=0)
         )
 
     @api.model

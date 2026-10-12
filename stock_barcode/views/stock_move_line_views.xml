@@ -26,7 +26,7 @@
                         <div class="fs-5">
                             <field name="product_id" placeholder="Product"
                                 context="{'default_is_storable': True}"
-                                domain="[('type', '=', 'consu'), '|', ('company_id', '=', False), ('company_id', '=', company_id)]"
+                                domain="[('type', '=', 'consu'), '|', ('company_id', '=', False), ('company_id', 'parent_of', company_id)]"
                                 required="1"
                                 readonly="state == 'done' or move_id" nolabel="1"/>
                         </div>
@@ -153,7 +153,7 @@
     <field name="model">stock.quant</field>
     <field name="priority">1000</field>
     <field name="arch" type="xml">
-        <kanban class="o_kanban_mobile">
+        <kanban class="o_kanban_mobile" create="0">
             <templates>
                 <t t-name="card">
                     <field name="location_id" class="fw-bolder"/>

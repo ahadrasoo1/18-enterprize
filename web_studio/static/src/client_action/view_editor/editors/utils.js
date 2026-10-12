@@ -162,7 +162,7 @@ export function xpathToLegacyXpathInfo(xpath) {
     // eg: /form[1]/field[3]
     // RegExp notice: group 1 : form ; group 2: [1], group 3: 1
     const xpathInfo = [];
-    const matches = xpath.matchAll(/\/?(\w+)(\[(\d+)\])?/g);
+    const matches = xpath.matchAll(/\/?(\w+|\*)(\[(\d+)\])?/g);
     for (const m of matches) {
         const info = {
             tag: m[1],
@@ -187,15 +187,22 @@ export function fieldsToChoices(fields, availableTypes, filterCallback) {
     }));
 }
 
-export function getStudioNoFetchFields(_fieldNodes) {
-    const fieldNames = [];
+export function getStudioNoFetchFields(_fieldNodes, xml) {
+    let fieldNames = [];
     const fieldNodes = [];
-    Object.entries(_fieldNodes)
-        .filter(([fNode, field]) => field.attrs && field.attrs.studio_no_fetch)
-        .forEach(([fNode, field]) => {
-            fieldNames.push(field.name);
-            fieldNodes.push(fNode);
-        });
+    if (_fieldNodes && !xml) {
+        Object.entries(_fieldNodes)
+            .filter(([fNode, field]) => field.attrs && field.attrs.studio_no_fetch)
+            .forEach(([fNode, field]) => {
+                fieldNames.push(field.name);
+                fieldNodes.push(fNode);
+            });
+    }
+    if (xml && !_fieldNodes) {
+        fieldNames = Array.from(xml.querySelectorAll(`field[studio_no_fetch="1"]`)).map((n) =>
+            n.getAttribute("name")
+        );
+    }
     return {
         fieldNames,
         fieldNodes,

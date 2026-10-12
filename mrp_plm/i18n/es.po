@@ -1,28 +1,35 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* mrp_plm
-# 
+# * mrp_plm
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Pedro M. Baeza <pedro.baeza@tecnativa.com>, 2025
+# Larissa Manderfeld, 2025
+# "Larissa Manderfeld (lman)" <lman@odoo.com>, 2025.
+# "Noemi Pla Garcia (nopl)" <nopl@odoo.com>, 2026.
+# Weblate <noreply-mt-weblate@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Spanish (https://app.transifex.com/odoo/teams/41243/es/)\n"
+"POT-Creation-Date: 2026-04-10 18:47+0000\n"
+"PO-Revision-Date: 2026-06-13 09:08+0000\n"
+"Last-Translator: \"Noemi Pla Garcia (nopl)\" <nopl@odoo.com>\n"
+"Language-Team: Spanish <https://translate.odoo.com/projects/odoo-18/mrp_plm/"
+"es/>\n"
+"Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: es\n"
-"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=(n == 1) ? 0 : ((n != 0 && n % 1000000 == "
+"0) ? 1 : 2);\n"
+"X-Generator: Weblate 2026.6.1\n"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__document_count
 msgid "# Attachments"
-msgstr "# Archivos adjuntos"
+msgstr "N. ° de archivos adjuntos"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_bom__eco_count
@@ -36,8 +43,8 @@ msgstr "# Órdenes de cambio de ingeniería"
 #: code:addons/mrp_plm/models/mrp_eco.py:0
 msgid "%(approval_name)s %(approver_name)s %(approval_status)s this ECO"
 msgstr ""
-"%(approval_name)s %(approver_name)s %(approval_status)s esta orden de cambio"
-" de ingeniería"
+"%(approval_name)s %(approver_name)s %(approval_status)s esta orden de cambio "
+"de ingeniería"
 
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_type_dashboard_view_kanban
@@ -53,15 +60,19 @@ msgstr ""
 #: code:addons/mrp_plm/models/mrp_eco.py:0
 msgid ""
 "<p class=\"o_view_nocontent_smiling_face\">\n"
-"                        Upload files to your ECO, that will be applied to the product later\n"
+"                        Upload files to your ECO, that will be applied to "
+"the product later\n"
 "                    </p><p>\n"
-"                        Use this feature to store any files, like drawings or specifications.\n"
+"                        Use this feature to store any files, like drawings "
+"or specifications.\n"
 "                    </p>"
 msgstr ""
 "<p class=\"o_view_nocontent_smiling_face\">\n"
-"                        Suba archivos a su orden de cambio de ingeniería, que se aplicarán al producto más tarde\n"
+"                        Suba archivos a su orden de cambio de ingeniería, "
+"que se aplicarán al producto más tarde\n"
 "                    </p><p>\n"
-"                        Utilice esta función para almacenar cualquier archivo, como diagramas o especificaciones.\n"
+"                        Utilice esta función para almacenar cualquier "
+"archivo, como diagramas o especificaciones.\n"
 "                    </p>"
 
 #. module: mrp_plm
@@ -82,6 +93,12 @@ msgid ""
 msgstr ""
 "Un diccionario Python que será evaluado para proporcionar valores por "
 "defecto al crear nuevos registros para este alias."
+
+#. module: mrp_plm
+#. odoo-python
+#: code:addons/mrp_plm/models/mrp_eco.py:0
+msgid "A user cannot be assigned more than once to the same stage"
+msgstr "Un usuario no puede ser asignado más de una vez a la misma etapa"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__message_needaction
@@ -112,23 +129,23 @@ msgstr "Estado de la actividad"
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__activity_type_icon
 msgid "Activity Type Icon"
-msgstr "Icono de tipo de actvidad"
+msgstr "Icono de tipo de actividad"
 
 #. module: mrp_plm
 #: model:ir.model.fields.selection,name:mrp_plm.selection__mrp_eco_bom_change__change_type__add
 #: model:ir.model.fields.selection,name:mrp_plm.selection__mrp_eco_routing_change__change_type__add
 msgid "Add"
-msgstr "Agregar"
+msgstr "Añadir"
 
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_stage_view_form
 msgid "Add a description..."
-msgstr "Agregar una descripción.."
+msgstr "Añadir una descripción.."
 
 #. module: mrp_plm
 #: model_terms:ir.actions.act_window,help:mrp_plm.mrp_eco_tag_action
 msgid "Add a new tag"
-msgstr "Agregar una nueva etiqueta"
+msgstr "Añadir una nueva etiqueta"
 
 #. module: mrp_plm
 #: model:res.groups,name:mrp_plm.group_plm_manager
@@ -219,7 +236,7 @@ msgstr "Aplicar transferencia de base"
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__type
 msgid "Apply on"
-msgstr "Aplicar en"
+msgstr "Aplicar a"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_approval__approval_date
@@ -357,9 +374,9 @@ msgid ""
 "              used to make a finished product; through a manufacturing\n"
 "              order or a pack of products."
 msgstr ""
-"Las listas de materiales permiten definir la lista de componentes necesarios"
-" para fabricar un producto terminado, mediante una orden de fabricación o un"
-" paquete de productos."
+"Las listas de materiales permiten definir la lista de componentes necesarios "
+"para fabricar un producto terminado, mediante una orden de fabricación o un "
+"paquete de productos."
 
 #. module: mrp_plm
 #. odoo-python
@@ -640,7 +657,7 @@ msgstr "Diferencia entre la revisión de la operación anterior y la nueva"
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_tag__display_name
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_type__display_name
 msgid "Display Name"
-msgstr "Nombre mostrado"
+msgstr "Nombre para mostrar"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__displayed_image_id
@@ -953,11 +970,11 @@ msgstr "ID"
 #. module: mrp_plm
 #: model:ir.model.fields,help:mrp_plm.field_mrp_eco_type__alias_parent_thread_id
 msgid ""
-"ID of the parent record holding the alias (example: project holding the task"
-" creation alias)"
+"ID of the parent record holding the alias (example: project holding the task "
+"creation alias)"
 msgstr ""
-"ID del registro padre que tiene el alias. (ejemplo: el proyecto que contiene"
-" el alias para la creación de tareas)"
+"ID del registro padre que tiene el alias. (ejemplo: el proyecto que contiene "
+"el alias para la creación de tareas)"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__activity_exception_icon
@@ -998,8 +1015,8 @@ msgid ""
 "If the active field is set to False, it will allow you to hide the "
 "engineering change order without removing it."
 msgstr ""
-"Si el campo activo se establece como False, le permitirá ocultar la orden de"
-" cambio de ingeniería sin eliminarla."
+"Si el campo activo se establece como False, le permitirá ocultar la orden de "
+"cambio de ingeniería sin eliminarla."
 
 #. module: mrp_plm
 #: model:ir.model.fields,help:mrp_plm.field_mrp_eco__will_update_version
@@ -1007,6 +1024,8 @@ msgid ""
 "If unchecked, the version of the product/BoM will remain unchanged once the "
 "ECO is applied"
 msgstr ""
+"Si se deja sin marcar, la versión del producto o la lista de materiales no "
+"cambiará una vez que se aplique la orden de cambio de ingeniería."
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_bom__image_128
@@ -1132,11 +1151,14 @@ msgstr "Detección de entradas basada en partes locales"
 #: model_terms:ir.actions.act_window,help:mrp_plm.mrp_eco_action_report
 msgid ""
 "Manage your products and bills of materials changes with the ECO's.\n"
-"              Gather the related documentation and receive the necessary approvals\n"
+"              Gather the related documentation and receive the necessary "
+"approvals\n"
 "              before applying your changes."
 msgstr ""
-"Gestione sus cambios en los productos y en listas de materiales con las órdenes de cambio de ingeniería.\n"
-"              Recolecte los documentos relacionados y reciba las aprobaciones necesarias\n"
+"Gestione sus cambios en los productos y en listas de materiales con las "
+"órdenes de cambio de ingeniería.\n"
+"              Recolecte los documentos relacionados y reciba las "
+"aprobaciones necesarias\n"
 "              antes de aplicar sus cambios."
 
 #. module: mrp_plm
@@ -1448,12 +1470,12 @@ msgstr "ID del hilo del registro padre"
 #. module: mrp_plm
 #: model:ir.model.fields,help:mrp_plm.field_mrp_eco_type__alias_parent_model_id
 msgid ""
-"Parent model holding the alias. The model holding the alias reference is not"
-" necessarily the model given by alias_model_id (example: project "
+"Parent model holding the alias. The model holding the alias reference is not "
+"necessarily the model given by alias_model_id (example: project "
 "(parent_model) and task (model))"
 msgstr ""
-"Modelo padre que contiene el alias. El modelo que contiene la referencia del"
-" alias no es necesariamente el modelo dado por alias_model_id (example: "
+"Modelo padre que contiene el alias. El modelo que contiene la referencia del "
+"alias no es necesariamente el modelo dado por alias_model_id (example: "
 "project (parent_model) and task (model))"
 
 #. module: mrp_plm
@@ -1462,12 +1484,15 @@ msgid ""
 "Policy to post a message on the document using the mailgateway.\n"
 "- everyone: everyone can post\n"
 "- partners: only authenticated partners\n"
-"- followers: only followers of the related document or members of following channels\n"
+"- followers: only followers of the related document or members of following "
+"channels\n"
 msgstr ""
-"Política para publicar un mensaje en el documento utilizando el servidor de correo.\n"
-"- todo el mundo: todos pueden publicar\n"
-"- contactos: sólo contactos autenticados\n"
-"- seguidores: sólo seguidores del documento relacionado o miembros de los siguientes canales\n"
+"Política para enviar un mensaje en el documento usando la pasarela de "
+"correo.\n"
+"- Todos: cualquiera puede enviar\n"
+"- Contactos: sólo contactos autenticados\n"
+"- Seguidores: sólo seguidores del documento relacionado o miembros de los "
+"siguientes canales\n"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_bom__previous_bom_id
@@ -1700,7 +1725,7 @@ msgstr "Etapa"
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_stage_view_form
 msgid "Stage Description and Tooltips"
-msgstr "Descripción de la tarea y información sobre herramientas"
+msgstr "Descripción de la tarea e información sobre herramientas"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_type__stage_ids
@@ -1745,8 +1770,8 @@ msgstr "¡Transferencia de base exitosa!"
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_form
 msgid ""
-"System will automatically resolved the conflict(s) and apply changes. Do you"
-" agree?"
+"System will automatically resolved the conflict(s) and apply changes. Do you "
+"agree?"
 msgstr ""
 "El sistema resolverá automáticamente cualquier conflicto y aplicará los "
 "cambios. ¿Está de acuerdo?"
@@ -1782,8 +1807,7 @@ msgstr ""
 #: model:ir.model.fields,help:mrp_plm.field_mrp_eco__user_can_approve
 msgid "Technical field to check if approval by current user is required"
 msgstr ""
-"Campo técnico para verificar si la aprobación del usuario actual es "
-"necesaria"
+"Campo técnico para verificar si la aprobación del usuario actual es necesaria"
 
 #. module: mrp_plm
 #: model:ir.model.fields,help:mrp_plm.field_mrp_eco__user_can_reject
@@ -1818,9 +1842,9 @@ msgstr "La versión actual del producto."
 #. module: mrp_plm
 #: model:ir.model.fields,help:mrp_plm.field_mrp_eco_type__alias_model_id
 msgid ""
-"The model (Odoo Document Kind) to which this alias corresponds. Any incoming"
-" email that does not reply to an existing record will cause the creation of "
-"a new record of this model (e.g. a Project Task)"
+"The model (Odoo Document Kind) to which this alias corresponds. Any incoming "
+"email that does not reply to an existing record will cause the creation of a "
+"new record of this model (e.g. a Project Task)"
 msgstr ""
 "El modelo (Tipo de documento de Odoo) al que corresponde este alias. "
 "Cualquier correo entrante que no sea respuesta a un registro existente, "
@@ -1833,8 +1857,8 @@ msgid ""
 "The name of the email alias, e.g. 'jobs' if you want to catch emails for "
 "<jobs@example.odoo.com>"
 msgstr ""
-"El nombre de este alias de correo electrónico. Por ejemplo, \"trabajos\",  "
-"si lo que quiere es obtener los correos para <trabajos@example.odoo.com>"
+"El nombre de este alias de correo electrónico, por ejemplo, «vacantes» para "
+"recibir los correos enviados a <vacantes@ejemplo.odoo.com>"
 
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_stage_view_form
@@ -1896,7 +1920,7 @@ msgstr "Actualizar"
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__will_update_version
 msgid "Update Version"
-msgstr ""
+msgstr "Actualizar versión"
 
 #. module: mrp_plm
 #: model:res.groups,name:mrp_plm.group_plm_user
@@ -1907,6 +1931,11 @@ msgstr "Usuario"
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_approval_template__user_ids
 msgid "Users"
 msgstr "Usuarios"
+
+#. module: mrp_plm
+#: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_form
+msgid "V"
+msgstr "V"
 
 #. module: mrp_plm
 #: model:mrp.eco.stage,name:mrp_plm.ecostage_bom_update_validated
@@ -1967,11 +1996,11 @@ msgstr "Centros de trabajo"
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_stage_view_form
 msgid ""
-"You can also add a description to help your coworkers understand the meaning"
-" and purpose of the stage."
+"You can also add a description to help your coworkers understand the meaning "
+"and purpose of the stage."
 msgstr ""
-"También puede agregar una descripción para ayudar a sus compañeros de "
-"trabajo a entender el significado y el propósito de esta etapa."
+"También puede añadir una descripción para ayudar a sus compañeros de trabajo "
+"a entender el significado y el propósito de esta etapa."
 
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_stage_view_form

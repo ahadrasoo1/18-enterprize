@@ -19,18 +19,7 @@ export class AccountReportController {
         this.reportOptionsMap = {};
         this.reportInformationMap = {};
         this.lastOpenedSectionByReport = {};
-        this.loadingCallNumberByCacheKey = new Proxy(
-            {},
-            {
-                get(target, name) {
-                    return name in target ? target[name] : 0;
-                },
-                set(target, name, newValue) {
-                    target[name] = newValue;
-                    return true;
-                },
-            }
-        );
+        this.loadingCallNumber = 0;
         this.actionReportId = this.action.context.report_id;
         const isOpeningReport = !this.action?.keep_journal_groups_options  // true when opening the report, except when coming from the breadcrumb
         const mainReportOptions = await this.loadReportOptions(this.actionReportId, false, this.action.params?.ignore_session, isOpeningReport);
@@ -39,8 +28,6 @@ export class AccountReportController {
         // We need the options to be set and saved in order for the loading to work properly
         this.options = mainReportOptions;
         this.reportOptionsMap[cacheKey] = mainReportOptions;
-        this.incrementCallNumber(cacheKey);
-        this.options["loading_call_number"] = this.loadingCallNumberByCacheKey[cacheKey];
         this.saveSessionOptions(mainReportOptions);
 
         const activeSectionPromise = this.displayReport(mainReportOptions['report_id']);
@@ -52,21 +39,15 @@ export class AccountReportController {
         return `${sectionsSourceId}_${reportId}`
     }
 
-    incrementCallNumber(cacheKey = null) {
-        if (!cacheKey) {
-            cacheKey = this.getCacheKey(this.options['sections_source_id'], this.options['report_id']);
-        }
-        this.loadingCallNumberByCacheKey[cacheKey] += 1;
-    }
-
     async displayReport(reportId) {
+        const loadingCallNumber = ++this.loadingCallNumber;
         const cacheKey = await this.loadReport(reportId);
         const options = await this.reportOptionsMap[cacheKey];
         const informationMap = await this.reportInformationMap[cacheKey];
         if (
             options !== undefined
-            && this.loadingCallNumberByCacheKey[cacheKey] === options["loading_call_number"]
-            && (this.lastOpenedSectionByReport === {} || this.lastOpenedSectionByReport[options['selected_variant_id']] === options['selected_section_id'])
+            && this.loadingCallNumber === loadingCallNumber
+            && (!Object.keys(this.lastOpenedSectionByReport).length || this.lastOpenedSectionByReport[options['selected_variant_id']] === options['selected_section_id'])
         ) {
             // the options gotten from the python correspond to the ones that called this displayReport
             this.options = options;
@@ -88,6 +69,7 @@ export class AccountReportController {
     }
 
     async reload(optionPath, newOptions) {
+        this.loadingCallNumber++;
         const rootOptionKey = optionPath ? optionPath.split(".")[0] : "";
 
         /*
@@ -109,12 +91,19 @@ export class AccountReportController {
     }
 
     async preLoadClosedSections() {
+        if (this.destroyed) return;
+        
+        const loadingCallNumber = this.loadingCallNumber;
         let sectionLoaded = false;
         for (const section of this.options['sections']) {
             // Preload the first non-loaded section we find amongst this report's sections.
             const cacheKey = this.getCacheKey(this.options['sections_source_id'], section.id);
             if (section.id != this.options['report_id'] && !this.reportInformationMap[cacheKey]) {
                 await this.loadReport(section.id, true);
+
+                if (this.loadingCallNumber !== loadingCallNumber) {
+                    break; // The user changed report while we were preloading, stop here.
+                }
 
                 sectionLoaded = true;
                 // Stop iterating and schedule next call. We don't go on in the loop in case the cache is reset and we need to restart preloading.
@@ -136,7 +125,7 @@ export class AccountReportController {
         if (!this.reportInformationMap[cacheKey]) {
             this.reportInformationMap[cacheKey] = this.orm.call(
                 "account.report",
-                "get_report_information",
+                options.readonly_query ? "get_report_information_readonly" : "get_report_information",
                 [
                     reportToDisplayId,
                     options,
@@ -160,11 +149,6 @@ export class AccountReportController {
     async loadReportOptions(reportId, preloading=false, ignore_session=false, isOpeningReport=false) {
         const loadOptions = (ignore_session || !this.hasSessionOptions()) ? (this.action.params?.options || {}) : this.sessionOptions();
         const cacheKey = this.getCacheKey(loadOptions['sections_source_id'] || reportId, reportId);
-
-        if (!(cacheKey in this.loadingCallNumberByCacheKey)) {
-            this.incrementCallNumber(cacheKey);
-        }
-        loadOptions["loading_call_number"] = this.loadingCallNumberByCacheKey[cacheKey];
 
         loadOptions["is_opening_report"] = isOpeningReport;
 
@@ -203,8 +187,6 @@ export class AccountReportController {
                 delete this.reportOptionsMap[cacheKey];
                 this.reportOptionsMap[loadedOptionsCacheKey] = reportOptions;
 
-                this.loadingCallNumberByCacheKey[loadedOptionsCacheKey] = 1;
-                delete this.loadingCallNumberByCacheKey[cacheKey];
                 return reportOptions;
             }
         }
@@ -298,6 +280,10 @@ export class AccountReportController {
         return this.options.column_percent_comparison === "growth";
     }
 
+    get needsAnalyticCoverageColumn() {
+        return this.options.column_percent_comparison === "analytic_coverage";
+    }
+
     get hasCustomSubheaders() {
         return this.columnHeadersRenderData.custom_subheaders.length > 0;
     }
@@ -312,14 +298,6 @@ export class AccountReportController {
 
     get hasVisibleAnnotations() {
         return Boolean(this.visibleAnnotations.length);
-    }
-
-    get hasBudgetColumn() {
-        return this.options.column_headers.some((columns) => {
-            return columns.some((column) => {
-                return Boolean(column.forced_options?.compute_budget);
-            });
-        });
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -354,7 +332,6 @@ export class AccountReportController {
         }
 
         if (reloadUI) {
-            this.incrementCallNumber();
             await this.reload(optionPath, this.options);
         }
     }
@@ -423,7 +400,7 @@ export class AccountReportController {
     }
 
     isNextLineChild(index, lineId) {
-        return index < this.lines.length && this.lines[index].id.startsWith(lineId);
+        return index < this.lines.length && this.lines[index].id.startsWith(`${lineId}|`);
     }
 
     isNextLineDirectChild(index, lineId) {
@@ -478,9 +455,10 @@ export class AccountReportController {
     }
 
     async unfoldNewLine(lineIndex) {
+        const options = await this.options;
         const newLines = await this.orm.call(
             "account.report",
-            "get_expanded_lines",
+            options.readonly_query ? "get_expanded_lines_readonly" : "get_expanded_lines",
             [
                 this.options['report_id'],
                 this.options,
@@ -502,6 +480,14 @@ export class AccountReportController {
 
         if (this.filters.show_totals && this.lines[totalIndex] && this.isTotalLine(totalIndex))
             this.lines[totalIndex].visible = true;
+
+        // Update options
+        this.options.unfolded_lines.push(
+            ...newLines.filter(line => line.unfolded).map(({ id }) => id)
+        );
+
+        this.saveSessionOptions(this.options);
+
         return totalIndex
     }
 
@@ -738,7 +724,8 @@ export class AccountReportController {
 
         const number_figure_types = ['integer', 'float', 'monetary', 'percentage'];
         reversed_lines.forEach((line) => {
-            const isZero = line.columns.every(column => !number_figure_types.includes(column.figure_type) || column.is_zero);
+            const isLoadMoreLine = line.id.includes("|load_more~~");
+            const isZero = !isLoadMoreLine && line.columns.every(column => Object.keys(column).length && (!number_figure_types.includes(column.figure_type) || column.is_zero));
 
             // If the line has no visible children and all the columns are equals to zero then the line needs to be hidden
             if (!hasVisibleChildren.has(line.id) && isZero) {
@@ -757,7 +744,13 @@ export class AccountReportController {
     //------------------------------------------------------------------------------------------------------------------
     // Server calls
     //------------------------------------------------------------------------------------------------------------------
-    async reportAction(ev, action, actionParam = null, callOnSectionsSource = false) {
+    buttonAction(ev, button) {
+        // Might be overidden to add specific functionality to button
+        // For instance adding context to a call ...
+        this.reportAction(ev, button.error_action || button.action, button.action_param, true);
+    }
+
+    async reportAction(ev, action, actionParam = null, callOnSectionsSource = false, actionContext=null) {
         // 'ev' might be 'undefined' if event is not triggered from a button/anchor
         ev?.preventDefault();
         ev?.stopPropagation();
@@ -787,6 +780,9 @@ export class AccountReportController {
                 actionParam,
                 callOnSectionsSource,
             ],
+            {
+                context: Object.assign({}, this.context, actionContext)
+            }
         );
         if (dispatchReportAction?.help) {
             dispatchReportAction.help = owl.markup(dispatchReportAction.help)

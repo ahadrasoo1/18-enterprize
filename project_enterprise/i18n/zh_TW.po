@@ -1,22 +1,24 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* project_enterprise
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Tony Ng, 2024
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:28+0000\n"
+"POT-Creation-Date: 2025-12-29 18:48+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Chinese (Taiwan) (https://app.transifex.com/odoo/teams/41243/zh_TW/)\n"
+"Last-Translator: Tony Ng, 2024\n"
+"Language-Team: Chinese (Taiwan) (https://app.transifex.com/odoo/teams/41243/"
+"zh_TW/)\n"
+"Language: zh_TW\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: zh_TW\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. module: project_enterprise
@@ -30,7 +32,9 @@ msgstr "%(partner)s 同一時間有 %(amount)s 項任務。"
 msgid ""
 "<i class=\"fa fa-exclamation-circle me-2\" role=\"img\" title=\"Dependency "
 "warning\"/>"
-msgstr "<i class=\"fa fa-exclamation-circle me-2\" role=\"img\" title=\"相依性警告\"/>"
+msgstr ""
+"<i class=\"fa fa-exclamation-circle me-2\" role=\"img\" title=\"相依性警告\"/"
+">"
 
 #. module: project_enterprise
 #: model_terms:ir.ui.view,arch_db:project_enterprise.project_sharing_project_task_view_kanban_inherited
@@ -39,8 +43,8 @@ msgid ""
 "<i class=\"fa fa-long-arrow-right mx-2 oe_read_only\" aria-label=\"Arrow "
 "icon\" title=\"Arrow\" invisible=\"not planned_date_begin\"/>"
 msgstr ""
-"<i class=\"fa fa-long-arrow-right mx-2 oe_read_only\" aria-label=\"箭嘴圖示\" "
-"title=\"箭嘴\" invisible=\"not planned_date_begin\"/>"
+"<i class=\"fa fa-long-arrow-right mx-2 oe_read_only\" aria-label=\"箭嘴圖示"
+"\" title=\"箭嘴\" invisible=\"not planned_date_begin\"/>"
 
 #. module: project_enterprise
 #: model_terms:ir.ui.view,arch_db:project_enterprise.project_project_view_gantt
@@ -50,13 +54,17 @@ msgstr "<i class=\"fa fa-long-arrow-right\" title=\"箭嘴\"/>"
 
 #. module: project_enterprise
 #: model_terms:ir.ui.view,arch_db:project_enterprise.project_task_view_form
-msgid "<i class=\"fa fa-random me-2\" role=\"img\" title=\"Planning overlap\"/>"
+msgid ""
+"<i class=\"fa fa-random me-2\" role=\"img\" title=\"Planning overlap\"/>"
 msgstr "<i class=\"fa fa-random me-2\" role=\"img\" title=\"規劃重疊\"/>"
 
 #. module: project_enterprise
 #: model_terms:ir.ui.view,arch_db:project_enterprise.project_task_view_gantt
-msgid "<span class=\"fst-italic text-muted\"><i class=\"fa fa-lock\"/> Private</span>"
-msgstr "<span class=\"fst-italic text-muted\"><i class=\"fa fa-lock\"/> 私密</span>"
+msgid ""
+"<span class=\"fst-italic text-muted\"><i class=\"fa fa-lock\"/> Private</"
+"span>"
+msgstr ""
+"<span class=\"fst-italic text-muted\"><i class=\"fa fa-lock\"/> 私密</span>"
 
 #. module: project_enterprise
 #: model_terms:ir.ui.view,arch_db:project_enterprise.project_task_view_gantt
@@ -149,8 +157,8 @@ msgstr "里程碑"
 #. odoo-python
 #: code:addons/project_enterprise/models/project_task.py:0
 msgid ""
-"One parameter is missing to use this method. You should give a start and end"
-" dates."
+"One parameter is missing to use this method. You should give a start and end "
+"dates."
 msgstr "尚欠一個參數才可使用此方法。你應該提供開始日期及結束日期。"
 
 #. module: project_enterprise
@@ -159,7 +167,8 @@ msgstr "尚欠一個參數才可使用此方法。你應該提供開始日期及
 msgid ""
 "Operation not supported, you should always compare dependency_warning to "
 "True or False."
-msgstr "不支援此操作。 dependency_warning 應該只與 True（真）或 False（假）進行比較。"
+msgstr ""
+"不支援此操作。 dependency_warning 應該只與 True（真）或 False（假）進行比較。"
 
 #. module: project_enterprise
 #. odoo-python
@@ -167,7 +176,8 @@ msgstr "不支援此操作。 dependency_warning 應該只與 True（真）或 F
 msgid ""
 "Operation not supported, you should always compare planning_overlap to True "
 "or False."
-msgstr "不支援此操作。 planning_overlap 應該只與 True（真）或 False（假）進行比較。"
+msgstr ""
+"不支援此操作。 planning_overlap 應該只與 True（真）或 False（假）進行比較。"
 
 #. module: project_enterprise
 #. odoo-python
@@ -229,9 +239,11 @@ msgstr "部份任務是在其最初的截止期限後，就已經再規劃。"
 #: code:addons/project_enterprise/models/project_task.py:0
 msgid ""
 "Some tasks were scheduled concurrently, resulting in a conflict due to the "
-"limited availability of the assignees. The planned dates for these tasks may"
-" not align with their allocated hours."
-msgstr "有些任務已安排在同一時間，因受指派人的空檔有限，導致衝突。這些任務的規劃日期，可能與分配的時間不一致。"
+"limited availability of the assignees. The planned dates for these tasks may "
+"not align with their allocated hours."
+msgstr ""
+"有些任務已安排在同一時間，因受指派人的空檔有限，導致衝突。這些任務的規劃日"
+"期，可能與分配的時間不一致。"
 
 #. module: project_enterprise
 #. odoo-python
@@ -265,7 +277,7 @@ msgstr "任務分析"
 #. module: project_enterprise
 #: model_terms:ir.ui.view,arch_db:project_enterprise.project_task_view_search_conflict_task_project_enterprise
 msgid "Tasks Scheduled"
-msgstr ""
+msgstr "已排程任務"
 
 #. module: project_enterprise
 #. odoo-javascript
@@ -303,8 +315,8 @@ msgstr "此進度列未被採用。"
 #. odoo-python
 #: code:addons/project_enterprise/models/project_task.py:0
 msgid ""
-"This task cannot be planned before the following tasks on which it depends: "
-"%(task_list)s"
+"This task cannot be planned before the following tasks on which it depends: %"
+"(task_list)s"
 msgstr "此任務不可規劃至早於它所依賴的以下任務: %(task_list)s"
 
 #. module: project_enterprise

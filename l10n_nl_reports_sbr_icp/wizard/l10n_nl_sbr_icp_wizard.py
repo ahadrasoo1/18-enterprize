@@ -1,7 +1,7 @@
 from odoo import models, api, _
 from odoo.exceptions import RedirectWarning, ValidationError
 from odoo.tools.misc import format_date
-from odoo.addons.l10n_nl_reports_sbr.wizard.l10n_nl_reports_sbr_tax_report_wizard import _create_soap_client
+from odoo.addons.l10n_nl_reports_sbr.wizard.l10n_nl_reports_sbr_tax_report_wizard import _create_soap_client_logius
 
 import base64
 import json
@@ -77,19 +77,28 @@ class L10nNlICPSBRWizard(models.TransientModel):
         try:
             with NamedTemporaryFile(delete=False) as f:
                 f.write(serv_root_cert)
-            wsdl = 'https://' + ('preprod-' if self.is_test else '') + 'dgp2.procesinfrastructuur.nl/wus/2.0/aanleverservice/1.2?wsdl'
-            delivery_client = _create_soap_client(wsdl, f, certificate, private_key)
-            factory = delivery_client.type_factory('ns0')
-            aanleverkenmerk = wsse.utils.get_unique_id()
-            response = delivery_client.service.aanleveren(
-                berichtsoort='ICP',
-                aanleverkenmerk=aanleverkenmerk,
-                identiteitBelanghebbende=factory.identiteitType(nummer=self._get_sbr_identifier() or (self.env.company.vat[2:] if self.env.company.vat.startswith('NL') else self.env.company.vat), type='BTW'),
-                rolBelanghebbende='Bedrijf',
-                berichtInhoud=factory.berichtInhoudType(mimeType='application/xml', bestandsnaam='ICPReport.xbrl', inhoud=report_file),
-                autorisatieAdres='http://geenausp.nl',
-            )
-            kenmerk = response.kenmerk
+                f.flush()
+                wsdl = 'https://' + ('preprod-' if self.is_test else '') + 'dgp2.procesinfrastructuur.nl/wus/2.0/aanleverservice/1.2?wsdl'
+                service_address = 'https://' + ('wus.preproductie.digipoort.' if self.is_test else 'wus.digipoort.') + 'logius.nl/wus/2.0/aanleverservice/1.2'
+                delivery_client, delivery_service = _create_soap_client_logius(
+                    wsdl,
+                    f,
+                    certificate,
+                    private_key,
+                    serv_root_cert,
+                    service_address,
+                )
+                factory = delivery_client.type_factory('ns0')
+                aanleverkenmerk = wsse.utils.get_unique_id()
+                response = delivery_service.aanleveren(
+                    berichtsoort='ICP',
+                    aanleverkenmerk=aanleverkenmerk,
+                    identiteitBelanghebbende=factory.identiteitType(nummer=self._get_sbr_identifier(options), type='BTW'),
+                    rolBelanghebbende='Bedrijf',
+                    berichtInhoud=factory.berichtInhoudType(mimeType='application/xml', bestandsnaam='ICPReport.xbrl', inhoud=report_file),
+                    autorisatieAdres='http://geenausp.nl',
+                )
+                kenmerk = response.kenmerk
         except Fault as fault:
             detail_fault = fault.detail.getchildren()[0]
             raise RedirectWarning(

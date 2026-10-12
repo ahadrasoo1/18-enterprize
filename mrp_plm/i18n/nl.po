@@ -1,23 +1,28 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* mrp_plm
-# 
+# * mrp_plm
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Manon Rondou, 2025
+# Erwin van der Ploeg <erwin@odooexperts.nl>, 2025
+# "Manon Rondou (ronm)" <ronm@odoo.com>, 2025.
+# Bren Driesen <brdri@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Dutch (https://app.transifex.com/odoo/teams/41243/nl/)\n"
+"POT-Creation-Date: 2026-04-10 18:47+0000\n"
+"PO-Revision-Date: 2026-05-27 15:24+0000\n"
+"Last-Translator: Bren Driesen <brdri@odoo.com>\n"
+"Language-Team: Dutch <https://translate.odoo.com/projects/odoo-18/mrp_plm/"
+"nl/>\n"
+"Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: nl\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.17\n"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__document_count
@@ -51,14 +56,18 @@ msgstr ""
 #: code:addons/mrp_plm/models/mrp_eco.py:0
 msgid ""
 "<p class=\"o_view_nocontent_smiling_face\">\n"
-"                        Upload files to your ECO, that will be applied to the product later\n"
+"                        Upload files to your ECO, that will be applied to "
+"the product later\n"
 "                    </p><p>\n"
-"                        Use this feature to store any files, like drawings or specifications.\n"
+"                        Use this feature to store any files, like drawings "
+"or specifications.\n"
 "                    </p>"
 msgstr ""
 "<p class=\"o_view_nocontent_smiling_face\">\n"
-"Klik om je bestanden te uploaden naar je ECO, welke later gekoppeld worden aan het product\n"
-"</p><p>Gebruik deze optie om bestanden, zoals tekeningen of specificaties op te slaan.\n"
+"Klik om je bestanden te uploaden naar je ECO, welke later gekoppeld worden "
+"aan het product\n"
+"</p><p>Gebruik deze optie om bestanden, zoals tekeningen of specificaties op "
+"te slaan.\n"
 "</p>"
 
 #. module: mrp_plm
@@ -77,8 +86,15 @@ msgid ""
 "A Python dictionary that will be evaluated to provide default values when "
 "creating new records for this alias."
 msgstr ""
-"Een Python bibliotheek dat zal worden gebruikt om standaardwaarden te bieden"
-" bij het maken van nieuwe records voor deze alias."
+"Een Python bibliotheek dat zal worden gebruikt om standaardwaarden te bieden "
+"bij het maken van nieuwe records voor deze alias."
+
+#. module: mrp_plm
+#. odoo-python
+#: code:addons/mrp_plm/models/mrp_eco.py:0
+msgid "A user cannot be assigned more than once to the same stage"
+msgstr ""
+"Een gebruiker kan niet meer dan eenmaal aan dezelfde fase worden toegewezen"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__message_needaction
@@ -320,7 +336,7 @@ msgstr "Stuklijstoverzichtsrapport"
 #. module: mrp_plm
 #: model:mrp.eco.type,name:mrp_plm.ecotype_bom_update
 msgid "BOM Updates"
-msgstr "Stuklijst updates"
+msgstr "Stuklijst aanpassingen"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_routing_change__upd_time_mode_batch
@@ -345,7 +361,7 @@ msgstr "Stuklijstregel"
 #: model:ir.ui.menu,name:mrp_plm.menu_mrp_plm_boms
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_search
 msgid "Bill of Materials"
-msgstr "Stuklijsten"
+msgstr "Stuklijst"
 
 #. module: mrp_plm
 #: model_terms:ir.actions.act_window,help:mrp_plm.mrp_bom_action_kanban
@@ -355,7 +371,8 @@ msgid ""
 "              order or a pack of products."
 msgstr ""
 "Met stuklijsten kun je de lijst met vereiste onderdelen definiëren\n"
-"gebruikt om een eindproduct te maken; door een productieorder of een pakket van losse onderdelen."
+"gebruikt om een eindproduct te maken; door een productieorder of een pakket "
+"van losse onderdelen."
 
 #. module: mrp_plm
 #. odoo-python
@@ -370,12 +387,12 @@ msgstr ""
 #: model:mrp.eco.stage,legend_blocked:mrp_plm.ecostage_progress
 #: model:mrp.eco.stage,legend_blocked:mrp_plm.ecostage_validated
 msgid "Blocked"
-msgstr "Geblokkeerd"
+msgstr "Vergrendeld"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_stage__is_blocking
 msgid "Blocking Stage"
-msgstr "Geblokkeerde fase"
+msgstr "Vergrendelde fase"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_bom_change__byproduct_id
@@ -648,7 +665,7 @@ msgstr "Documenten"
 #: model:ir.model.fields.selection,name:mrp_plm.selection__mrp_eco__state__done
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_search
 msgid "Done"
-msgstr "Afgehandeld"
+msgstr "Voltooid"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_approval__eco_id
@@ -879,7 +896,7 @@ msgstr "Volgers"
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__message_partner_ids
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_type__message_partner_ids
 msgid "Followers (Partners)"
-msgstr "Volgers (Relaties)"
+msgstr "Volgers (Partners)"
 
 #. module: mrp_plm
 #: model:ir.model.fields,help:mrp_plm.field_mrp_eco__activity_type_icon
@@ -942,8 +959,8 @@ msgstr "ID"
 #. module: mrp_plm
 #: model:ir.model.fields,help:mrp_plm.field_mrp_eco_type__alias_parent_thread_id
 msgid ""
-"ID of the parent record holding the alias (example: project holding the task"
-" creation alias)"
+"ID of the parent record holding the alias (example: project holding the task "
+"creation alias)"
 msgstr ""
 "ID van het bovenliggende record dat de alias bezit (bijvoorbeeld: het "
 "project bezit de alias van de aangemaakte taken)"
@@ -996,6 +1013,8 @@ msgid ""
 "If unchecked, the version of the product/BoM will remain unchanged once the "
 "ECO is applied"
 msgstr ""
+"Als dit niet is aangevinkt, blijft de versie van het product/BoM ongewijzigd "
+"nadat de ECO is toegepast."
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_bom__image_128
@@ -1109,7 +1128,7 @@ msgstr "Laatste stuklijst"
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_type__alias_incoming_local
 msgid "Local-part based incoming detection"
-msgstr "Lokale deelgebaseerde inkomende detectie"
+msgstr "Inkomende mail detectie alleen op eerste deel en niet het domein"
 
 #. module: mrp_plm
 #: model_terms:ir.actions.act_window,help:mrp_plm.mrp_eco_action
@@ -1121,11 +1140,13 @@ msgstr "Lokale deelgebaseerde inkomende detectie"
 #: model_terms:ir.actions.act_window,help:mrp_plm.mrp_eco_action_report
 msgid ""
 "Manage your products and bills of materials changes with the ECO's.\n"
-"              Gather the related documentation and receive the necessary approvals\n"
+"              Gather the related documentation and receive the necessary "
+"approvals\n"
 "              before applying your changes."
 msgstr ""
 "Beheer je product- en stuklijstwijzigingen met de ECO's.\n"
-"               Verzamel de bijbehorende documentatie en ontvang de nodige goedkeuringen\n"
+"               Verzamel de bijbehorende documentatie en ontvang de nodige "
+"goedkeuringen\n"
 "               voordat je je wijzigingen toepast."
 
 #. module: mrp_plm
@@ -1232,7 +1253,7 @@ msgstr "Nieuwe productmaateenheid"
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_bom_change__new_product_qty
 msgid "New revision quantity"
-msgstr "Nieuwe revisie hoeveelheid"
+msgstr "Nieuwe revisieaantal"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__activity_calendar_event_id
@@ -1325,7 +1346,7 @@ msgstr "Onderdeel openen"
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_form
 msgid "Open Operation"
-msgstr "Operatie openen"
+msgstr "Bewerking openen"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_routing_change__operation_name
@@ -1340,7 +1361,7 @@ msgstr "Bewerking wijzigingen"
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_routing_change__operation_id
 msgid "Operation Id"
-msgstr "Operatie-Id"
+msgstr "Bewerking-Id"
 
 #. module: mrp_plm
 #. odoo-python
@@ -1355,9 +1376,9 @@ msgid ""
 "attached, even if they did not reply to it. If set, this will disable the "
 "creation of new records completely."
 msgstr ""
-"Optionele ID van een thread (record) waaraan alle inkomende berichten worden"
-" gekoppeld, zelfs als ze hierop niet geantwoord hebben. Indien ingesteld, "
-"zal dit het aanmaken van nieuwe records uitzetten."
+"Optionele ID van een thread (record) waaraan alle inkomende berichten worden "
+"gekoppeld, zelfs als ze hierop niet geantwoord hebben. Indien ingesteld, zal "
+"dit het aanmaken van nieuwe records uitzetten."
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_product_document__origin_attachment_id
@@ -1391,7 +1412,7 @@ msgid ""
 "Override the default value displayed for the done state for kanban "
 "selection, when the ECO is in that stage."
 msgstr ""
-"Overschrijf de standaardwaarde die wordt weergegeven voor de status gereed "
+"Overschrijf de standaardwaarde die wordt weergegeven voor de status voltooid "
 "voor kanbanselectie, wanneer de ECO zich in die fase bevindt."
 
 #. module: mrp_plm
@@ -1433,12 +1454,14 @@ msgstr "Bovenliggende record Thread ID"
 #. module: mrp_plm
 #: model:ir.model.fields,help:mrp_plm.field_mrp_eco_type__alias_parent_model_id
 msgid ""
-"Parent model holding the alias. The model holding the alias reference is not"
-" necessarily the model given by alias_model_id (example: project "
+"Parent model holding the alias. The model holding the alias reference is not "
+"necessarily the model given by alias_model_id (example: project "
 "(parent_model) and task (model))"
 msgstr ""
-"Bovenliggend model dat de alias bevat. Het model dat de aliasverwijzing bevat,\n"
-"is niet noodzakelijk het model dat door alias_model_id wordt gegeven (bijvoorbeeld: project (parent_model) en taak (model))"
+"Bovenliggend model dat de alias bevat. Het model dat de aliasverwijzing "
+"bevat,\n"
+"is niet noodzakelijk het model dat door alias_model_id wordt gegeven "
+"(bijvoorbeeld: project (parent_model) en taak (model))"
 
 #. module: mrp_plm
 #: model:ir.model.fields,help:mrp_plm.field_mrp_eco_type__alias_contact
@@ -1446,12 +1469,15 @@ msgid ""
 "Policy to post a message on the document using the mailgateway.\n"
 "- everyone: everyone can post\n"
 "- partners: only authenticated partners\n"
-"- followers: only followers of the related document or members of following channels\n"
+"- followers: only followers of the related document or members of following "
+"channels\n"
 msgstr ""
-"Beleid om een bericht te versturen bij een document door gebruik te maken van de mail gateway.\n"
+"Beleid om een bericht te versturen bij een document door gebruik te maken "
+"van de mail gateway.\n"
 "-iedereen: iedereen mag posten\n"
-"-relaties: alleen geautoriseerde relaties\n"
-"-volgers: alleen volgers van een bijbehorend document of leden van gevolgde kanalen\n"
+"-partners: alleen geautoriseerde partners\n"
+"-volgers: alleen volgers van een bijbehorend document of leden van gevolgde "
+"kanalen\n"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_bom__previous_bom_id
@@ -1481,7 +1507,7 @@ msgstr "Vorige productmaateenheid"
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_bom_change__old_product_qty
 msgid "Previous revision quantity"
-msgstr "Vorige revisiehoeveelheid"
+msgstr "Vorige revisieaantal"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__priority
@@ -1568,8 +1594,8 @@ msgstr "Rebase"
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_form
 msgid "Rebase new revision of BoM with previous eco bom and old bom changes."
 msgstr ""
-"Baseer de nieuwe revisie van de stuklijst op de vorige eco stuklijst en oude"
-" stuklijst veranderingen."
+"Baseer de nieuwe revisie van de stuklijst op de vorige eco stuklijst en oude "
+"stuklijst veranderingen."
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_type__alias_force_thread_id
@@ -1715,7 +1741,7 @@ msgid ""
 msgstr ""
 "Status gebaseerd op activiteiten\n"
 "Te laat: Datum is al gepasseerd\n"
-"Vandaag: Activiteit datum is vandaag\n"
+"Vandaag: Datum van activiteit is vandaag\n"
 "Gepland: Toekomstige activiteiten."
 
 #. module: mrp_plm
@@ -1727,8 +1753,8 @@ msgstr "Succesvol geherbaseerd!"
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_form
 msgid ""
-"System will automatically resolved the conflict(s) and apply changes. Do you"
-" agree?"
+"System will automatically resolved the conflict(s) and apply changes. Do you "
+"agree?"
 msgstr ""
 "Het systeem zal automatisch de conflict(en) oplossen en wijzigingen "
 "doorvoeren. Ga je akkoord?"
@@ -1752,13 +1778,13 @@ msgstr "Labels"
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_stage_view_form
 msgid "Task in progress. Click to block or set as done."
-msgstr "Taak in behandeling. Klik op blokkeer of zet op gereed."
+msgstr "Taak in behandeling. Klik op blokkeer of zet op voltooid."
 
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_stage_view_form
 msgid "Task is blocked. Click to unblock or set as done."
 msgstr ""
-"Taak is geblokkeerd. Klik om blokkering ongedaan te maken of zet op gereed."
+"Taak is geblokkeerd. Klik om blokkering ongedaan te maken of zet op voltooid."
 
 #. module: mrp_plm
 #: model:ir.model.fields,help:mrp_plm.field_mrp_eco__user_can_approve
@@ -1798,12 +1824,12 @@ msgstr "De huidige versie van het product."
 #. module: mrp_plm
 #: model:ir.model.fields,help:mrp_plm.field_mrp_eco_type__alias_model_id
 msgid ""
-"The model (Odoo Document Kind) to which this alias corresponds. Any incoming"
-" email that does not reply to an existing record will cause the creation of "
-"a new record of this model (e.g. a Project Task)"
+"The model (Odoo Document Kind) to which this alias corresponds. Any incoming "
+"email that does not reply to an existing record will cause the creation of a "
+"new record of this model (e.g. a Project Task)"
 msgstr ""
-"Het model waar deze alias bijhoort. Iedere inkomende e-mail dat niet bij een"
-" bestaande regel hoort zal leiden tot het aanmaken van een nieuwe regel in "
+"Het model waar deze alias bijhoort. Iedere inkomende e-mail dat niet bij een "
+"bestaande regel hoort zal leiden tot het aanmaken van een nieuwe regel in "
 "dit model (Bijv. een projecttaak)."
 
 #. module: mrp_plm
@@ -1812,13 +1838,13 @@ msgid ""
 "The name of the email alias, e.g. 'jobs' if you want to catch emails for "
 "<jobs@example.odoo.com>"
 msgstr ""
-"De naam van de e-mailalias, bijvoorbeeld: 'vacature' als je alle e-mails van"
-" vacature@uwbedrijf.nl wilt afvangen."
+"De naam van de e-mailalias, bv. 'vacature' als je alle mails van "
+"<vacature@jouwbedrijf.com> wilt opvangen"
 
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_stage_view_form
 msgid "This step is done. Click to block or set in progress."
-msgstr "Deze stap is gedaan. Klik op blokkeer of zet op gereed."
+msgstr "Deze stap is gedaan. Klik op vergrendel of zet op voltooid."
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_type__nb_validation
@@ -1874,7 +1900,7 @@ msgstr "Bijwerken"
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__will_update_version
 msgid "Update Version"
-msgstr ""
+msgstr "Versie bijwerken"
 
 #. module: mrp_plm
 #: model:res.groups,name:mrp_plm.group_plm_user
@@ -1885,6 +1911,11 @@ msgstr "Gebruiker"
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_approval_template__user_ids
 msgid "Users"
 msgstr "Gebruikers"
+
+#. module: mrp_plm
+#: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_form
+msgid "V"
+msgstr "V"
 
 #. module: mrp_plm
 #: model:mrp.eco.stage,name:mrp_plm.ecostage_bom_update_validated
@@ -1945,8 +1976,8 @@ msgstr "Werkplekken"
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_stage_view_form
 msgid ""
-"You can also add a description to help your coworkers understand the meaning"
-" and purpose of the stage."
+"You can also add a description to help your coworkers understand the meaning "
+"and purpose of the stage."
 msgstr ""
 "Je kunt ook een omschrijving toevoegen om je werknemers te helpen begrijpen "
 "wat de bedoeling is van de fase."
@@ -1957,7 +1988,8 @@ msgid ""
 "You can define here labels that will be displayed for the state instead\n"
 "                            of the default labels."
 msgstr ""
-"Je kunt hier labels definiëren die in plaats daarvan voor de status worden weergegeven\n"
+"Je kunt hier labels definiëren die in plaats daarvan voor de status worden "
+"weergegeven\n"
 "                            van de standaardlabels."
 
 #. module: mrp_plm
@@ -1973,8 +2005,7 @@ msgstr ""
 #: code:addons/mrp_plm/models/mrp_eco.py:0
 msgid "You cannot change the stage, as approvals are still required."
 msgstr ""
-"Je kunt de fase niet veranderen, aangezien er nog goedkeuringen vereist "
-"zijn."
+"Je kunt de fase niet veranderen, aangezien er nog goedkeuringen vereist zijn."
 
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_type_view_form

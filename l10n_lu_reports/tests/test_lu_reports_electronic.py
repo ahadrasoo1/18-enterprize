@@ -88,6 +88,14 @@ class LuxembourgElectronicReportTest(TestAccountReportsCommon):
         # Remove the <?xml version='1.0' encoding='UTF-8'?> from the string
         return options, b64decode(wizard.report_data.decode('utf-8'))[38:]
 
+    def _get_oss_ioss_sme_values(self):
+        oss_value = hasattr(self.env['res.config.settings'], "l10n_eu_oss_eu_country") and '1' or '0'
+        ioss_value = hasattr(self.env.company, "ioss") and self.env.company.ioss and '1' or '0'
+        report = self.env.ref('l10n_lu.tax_report')
+        sme_lines = report.line_ids.filtered(lambda line: line.code in ['LUTAX_481', 'LUTAX_482']).mapped('expression_ids')
+        sme_value = any(value.value for value in self.env['account.report.external.value'].search([('target_report_expression_id', 'in', sme_lines.ids)])) and '1' or '0'
+        return oss_value, ioss_value, sme_value
+
     def test_balance_sheet(self):
         report = self.env.ref('l10n_lu_reports.account_financial_report_l10n_lu_bs')
         options = self._generate_options(report, fields.Date.from_string('2019-01-01'), fields.Date.from_string('2019-12-31'))
@@ -231,7 +239,9 @@ class LuxembourgElectronicReportTest(TestAccountReportsCommon):
                 </Declarer>
             </Declarations>
         </eCDFDeclarations>
-        """ % options['filename']
+        """ % (
+            options['filename'],
+        )
 
         self.assertXmlTreeEqual(
             self.get_xml_tree_from_string(declaration_to_compare),
@@ -338,11 +348,27 @@ class LuxembourgElectronicReportTest(TestAccountReportsCommon):
                                     <NumericField id="110">35,00</NumericField>
                                     <NumericField id="108">35,00</NumericField>
                                     <NumericField id="192">271,82</NumericField>
+                                    <NumericField id="193">25,42</NumericField>
                                     <NumericField id="253">271,82</NumericField>
                                     <NumericField id="254">42,00</NumericField>
                                     <NumericField id="255">271,82</NumericField>
                                     <NumericField id="361">31,42</NumericField>
                                     <NumericField id="362">25,42</NumericField>
+                                    <NumericField id="129">0,00</NumericField>
+                                    <NumericField id="394">0,00</NumericField>
+                                    <NumericField id="128">0,00</NumericField>
+                                    <NumericField id="137">0,00</NumericField>
+                                    <NumericField id="153">0,00</NumericField>
+                                    <NumericField id="136">0,00</NumericField>
+                                    <NumericField id="145">0,00</NumericField>
+                                    <NumericField id="149">0,00</NumericField>
+                                    <NumericField id="144">0,00</NumericField>
+                                    <NumericField id="163">0,00</NumericField>
+                                    <NumericField id="396">0,00</NumericField>
+                                    <NumericField id="162">0,00</NumericField>
+                                    <NumericField id="175">0,00</NumericField>
+                                    <NumericField id="164">0,00</NumericField>
+                                    <NumericField id="165">0,00</NumericField>
                                     <Choice id="998">1</Choice>
                                     <NumericField id="414">31,42</NumericField>
                                     <NumericField id="415">25,42</NumericField>
@@ -360,7 +386,6 @@ class LuxembourgElectronicReportTest(TestAccountReportsCommon):
                                     <NumericField id="234">1</NumericField>
                                     <NumericField id="235">31</NumericField>
                                     <NumericField id="236">12</NumericField>
-                                    <NumericField id="193">25,42</NumericField>
                                     <Table>
                                         <Line num="1">
                                             <TextField id="411">Holistic Detective Agency</TextField>
@@ -373,8 +398,9 @@ class LuxembourgElectronicReportTest(TestAccountReportsCommon):
                     </Declarer>
                 </Declarations>
             </eCDFDeclarations>
-        """ % options['filename']
-
+        """ % (
+            options['filename'],
+        )
         self.assertXmlTreeEqual(
             self.get_xml_tree_from_string(declaration_to_compare),
             self.get_xml_tree_from_string(expected_xml)
@@ -519,6 +545,13 @@ class LuxembourgElectronicReportTest(TestAccountReportsCommon):
     def test_generate_bs_pnl_xml(self):
         report = self.env.ref('l10n_lu_reports.account_financial_report_l10n_lu_bs')
         options = report.get_options({})
+        # Add custom range date to test that it is correctly reported in the XML
+        options['date'].update({
+            'date_from': '2019-01-01',
+            'date_to': '2019-12-31',
+            'mode': 'range',
+            'filter': 'custom',
+        })
         # Add the filename in the options, which is initially done by the get_report_filename() method
         now_datetime = datetime.now()
         file_ref_data = {
@@ -611,7 +644,7 @@ class LuxembourgElectronicReportTest(TestAccountReportsCommon):
                                     <NumericField id="1115">800,00</NumericField>
                                     <NumericField id="1852">1000,00</NumericField>
                                     <NumericField id="1862">1000,00</NumericField>
-                                    <NumericField id="1112">-0,00</NumericField>
+                                    <NumericField id="1112">0,00</NumericField>
                                     <NumericField id="2258">200,00</NumericField>
                                     <NumericField id="0162">200,00</NumericField>
                                     <NumericField id="0158">200,00</NumericField>
@@ -628,6 +661,308 @@ class LuxembourgElectronicReportTest(TestAccountReportsCommon):
         new_context['report_generation_options'] = options
         wizard.with_context(new_context).get_xml()
         declaration_to_compare = b64decode(wizard.report_data.decode("utf-8"))[38:]
+
+        self.assertXmlTreeEqual(
+            self.get_xml_tree_from_string(declaration_to_compare),
+            self.get_xml_tree_from_string(expected_xml)
+        )
+
+    @freeze_time('2019-12-31')
+    def test_xml_export_with_annotations(self):
+        """Test that annotations on the P&L report are exported as references when the checkbox is checked."""
+        pl_report = self.env.ref('l10n_lu_reports.account_financial_report_l10n_lu_pl')
+        options = pl_report.get_options({})
+        options['date'].update({
+            'date_from': '2019-01-01',
+            'date_to': '2019-12-31',
+            'mode': 'range',
+            'filter': 'custom',
+        })
+
+        pl_line = self.env['account.report.line'].search([
+            ('report_id', '=', pl_report.id),
+            ('code', 'like', '%701'),
+        ], limit=1)
+        account = self.company_data['default_account_revenue']
+        annotation_line_id = pl_report._build_line_id([
+            (None, 'account.report.line', pl_line.id),
+            (None, 'account.account', account.id),
+        ])
+        self.env['account.report.annotation'].create({
+            'report_id': pl_report.id,
+            'line_id': annotation_line_id,
+            'text': 'NoteRef',
+        })
+
+        wizard = self.env['l10n_lu.generate.accounts.report'].create({
+            'import_notes_as_references': True,
+        })
+        wizard.with_context(report_generation_options=options).get_xml()
+        xml_content = b64decode(wizard.report_data.decode("utf-8")).decode('utf-8')
+        self.assertIn('id="1701"', xml_content)
+        self.assertIn('NoteRef', xml_content)
+
+    @freeze_time('2025-12-31')
+    def test_generate_xml_post_2025(self):
+        """From 2025, the tax report must contain tags 491, 492 and 493 for OSS, IOSS and SME."""
+        first_tax = self.env['account.tax'].search([('name', '=', '17% G'), ('company_id', '=', self.company_data['company'].id)], limit=1)
+        second_tax = self.env['account.tax'].search([('name', '=', '14% S'), ('company_id', '=', self.company_data['company'].id)], limit=1)
+
+        # Create and post a move with two move lines to get some data in the report
+        move = self.env['account.move'].create({
+            'move_type': 'in_invoice',
+            'journal_id': self.company_data['default_journal_purchase'].id,
+            'partner_id': self.partner_a.id,
+            'invoice_date': '2025-11-12',
+            'date': '2025-11-12',
+            'invoice_line_ids': [(0, 0, {
+                'product_id': self.product_a.id,
+                'quantity': 1.0,
+                'name': 'product test 1',
+                'price_unit': 150,
+                'tax_ids': first_tax.ids,
+            }), (0, 0, {
+                'product_id': self.product_b.id,
+                'quantity': 1.0,
+                'name': 'product test 2',
+                'price_unit': 100,
+                'tax_ids': second_tax.ids,
+            })]
+        })
+        move.action_post()
+
+        options, declaration_to_compare = self._get_xml_declaration('l10n_lu.tax_report')
+        # Depending on the modules installed, the following values can change and the test is more about the values being present than their actual value.
+        oss, ioss, sme = self._get_oss_ioss_sme_values()
+        expected_xml = """
+        <eCDFDeclarations xmlns="http://www.ctie.etat.lu/2011/ecdf">
+            <FileReference>%s</FileReference>
+            <eCDFFileVersion>2.0</eCDFFileVersion>
+            <Interface>MODL5</Interface>
+            <Agent>
+                <MatrNbr>12345678900</MatrNbr>
+                <RCSNbr>NE</RCSNbr>
+                <VATNbr>12345613</VATNbr>
+            </Agent>
+            <Declarations>
+                <Declarer>
+                    <MatrNbr>12345678900</MatrNbr>
+                    <RCSNbr>NE</RCSNbr>
+                    <VATNbr>12345613</VATNbr>
+                    <Declaration model="1" type="TVA_DECM" language="EN">
+                        <Year>2025</Year>
+                        <Period>11</Period>
+                        <FormData>
+                                <NumericField id="012">0,00</NumericField>
+                                <NumericField id="021">0,00</NumericField>
+                                <NumericField id="457">0,00</NumericField>
+                                <NumericField id="014">0,00</NumericField>
+                                <NumericField id="018">0,00</NumericField>
+                                <NumericField id="423">0,00</NumericField>
+                                <NumericField id="419">0,00</NumericField>
+                                <NumericField id="022">0,00</NumericField>
+                                <NumericField id="037">0,00</NumericField>
+                                <NumericField id="033">0,00</NumericField>
+                                <NumericField id="046">0,00</NumericField>
+                                <NumericField id="051">0,00</NumericField>
+                                <NumericField id="056">0,00</NumericField>
+                                <NumericField id="152">0,00</NumericField>
+                                <NumericField id="065">0,00</NumericField>
+                                <NumericField id="407">0,00</NumericField>
+                                <NumericField id="409">0,00</NumericField>
+                                <NumericField id="436">0,00</NumericField>
+                                <NumericField id="463">0,00</NumericField>
+                                <NumericField id="765">0,00</NumericField>
+                                <NumericField id="410">0,00</NumericField>
+                                <NumericField id="462">0,00</NumericField>
+                                <NumericField id="464">0,00</NumericField>
+                                <NumericField id="766">0,00</NumericField>
+                                <NumericField id="767">0,00</NumericField>
+                                <NumericField id="768">0,00</NumericField>
+                                <NumericField id="076">0,00</NumericField>
+                                <NumericField id="093">39,50</NumericField>
+                                <NumericField id="458">39,50</NumericField>
+                                <NumericField id="097">0,00</NumericField>
+                                <NumericField id="102">39,50</NumericField>
+                                <NumericField id="103">0,00</NumericField>
+                                <NumericField id="104">39,50</NumericField>
+                                <NumericField id="105">-39,50</NumericField>
+                                <Choice id="204">0</Choice>
+                                <Choice id="205">1</Choice>
+                                <Choice id="491">%s</Choice>
+                                <Choice id="492">%s</Choice>
+                                <Choice id="493">%s</Choice>
+                                <NumericField id="403">0</NumericField>
+                                <NumericField id="418">0</NumericField>
+                                <NumericField id="453">0</NumericField>
+                                <NumericField id="042">0,00</NumericField>
+                                <NumericField id="416">0,00</NumericField>
+                                <NumericField id="417">0,00</NumericField>
+                                <NumericField id="451">0,00</NumericField>
+                                <NumericField id="452">0,00</NumericField>
+                        </FormData>
+                    </Declaration>
+                </Declarer>
+            </Declarations>
+        </eCDFDeclarations>
+        """ % (
+            options['filename'],
+            oss,
+            ioss,
+            sme,
+        )
+
+        self.assertXmlTreeEqual(
+            self.get_xml_tree_from_string(declaration_to_compare),
+            self.get_xml_tree_from_string(expected_xml)
+        )
+
+    @freeze_time('2026-01-15')
+    def test_generate_balance_sheet_xml_current_year_earnings(self):
+        company_id = self.company_data['company'].id
+        tax_17 = self.env['account.tax'].search([('name', '=', '17% S'), ('company_id', '=', company_id)], limit=1)
+        account_142 = self.env['account.account'].search([('code', '=', '142000'), ('company_ids', '=', company_id)], limit=1)
+        account_999 = self.env['account.account'].search([('code', '=', '999999'), ('company_ids', '=', company_id)], limit=1)
+        if not account_999:
+            account_999 = self.env['account.account'].create({
+                'name': 'Account 999999',
+                'account_type': 'equity',
+                'code': '999999',
+            })
+        # Remove any potential noise.
+        self.env['account.move'].search([('company_id', '=', company_id), ('state', '=', 'posted')]).button_draft()
+
+        invoice = self.env['account.move'].create({
+            'move_type': 'out_invoice',
+            'journal_id': self.company_data['default_journal_sale'].id,
+            'partner_id': self.partner_a.id,
+            'invoice_date': '2025-12-12',
+            'invoice_line_ids': [Command.create({
+                'product_id': self.product_a.id,
+                'quantity': 1.0,
+                'price_unit': 1_000_000.0,
+                'tax_ids': tax_17.ids,
+            })]
+        })
+        misc_entry = self.env['account.move'].create({
+            'move_type': 'entry',
+            'journal_id': self.company_data['default_journal_misc'].id,
+            'date': '2025-12-31',
+            'line_ids': [
+                Command.create({
+                    'name': '142',
+                    'account_id': account_142.id,
+                    'debit': 1_000_000.0,
+                    'credit': 0.0,
+                }),
+                Command.create({
+                    'name': '999',
+                    'account_id': account_999.id,
+                    'debit': 0.0,
+                    'credit': 1_000_000.0,
+                }),
+            ],
+        })
+        (invoice + misc_entry).action_post()
+
+        report = self.env.ref('l10n_lu_reports.account_financial_report_l10n_lu_bs')
+        options = self._generate_options(report, date_from='2025-01-01', date_to='2025-12-31')
+
+        wizard = self.env['l10n_lu.generate.accounts.report'].create({})
+        new_context = self.env.context.copy()
+        new_context['report_generation_options'] = options
+        wizard.with_context(new_context).get_xml()
+        declaration_to_compare = b64decode(wizard.report_data.decode("utf-8"))[38:]
+
+        expected_xml = """
+        <eCDFDeclarations xmlns="http://www.ctie.etat.lu/2011/ecdf">
+            <FileReference>___ignore___</FileReference>
+            <eCDFFileVersion>2.0</eCDFFileVersion>
+            <Interface>MODL5</Interface>
+            <Agent>
+                <MatrNbr>12345678900</MatrNbr>
+                <RCSNbr>NE</RCSNbr>
+                <VATNbr>12345613</VATNbr>
+            </Agent>
+            <Declarations>
+                <Declarer>
+                    <MatrNbr>12345678900</MatrNbr>
+                    <RCSNbr>NE</RCSNbr>
+                    <VATNbr>12345613</VATNbr>
+                    <DeclarationGroup>
+                        <Declaration type="CA_COMPP" model="1" language="EN">
+                            <Year>2025</Year>
+                            <Period>1</Period>
+                            <FormData>
+                                <TextField id="01">01/01/2025</TextField>
+                                <TextField id="02">31/12/2025</TextField>
+                                <TextField id="03">EUR</TextField>
+                                <NumericField id="701">1000000,00</NumericField>
+                                <NumericField id="667">1000000,00</NumericField>
+                                <NumericField id="669">1000000,00</NumericField>
+                            </FormData>
+                        </Declaration>
+                        <Declaration type="CA_BILAN" model="1" language="EN">
+                            <Year>2025</Year>
+                            <Period>1</Period>
+                            <FormData>
+                                <TextField id="01">01/12/2025</TextField>
+                                <TextField id="02">31/12/2025</TextField>
+                                <TextField id="03">EUR</TextField>
+                                <NumericField id="151">1000000,00</NumericField>
+                                <NumericField id="163">1000000,00</NumericField>
+                                <NumericField id="165">1170000,00</NumericField>
+                                <NumericField id="167">1170000,00</NumericField>
+                                <NumericField id="183">-170000,00</NumericField>
+                                <NumericField id="185">-170000,00</NumericField>
+                                <NumericField id="201">1000000,00</NumericField>
+                                <NumericField id="202">0,00</NumericField>
+                                <NumericField id="319">-1000000,00</NumericField>
+                                <NumericField id="301">0,00</NumericField>
+                                <NumericField id="321">1000000,00</NumericField>
+                                <NumericField id="405">0,00</NumericField>
+                                <NumericField id="406">0,00</NumericField>
+                            </FormData>
+                        </Declaration>
+                        <Declaration type="CA_PLANCOMPTA" model="1" language="EN">
+                            <Year>2025</Year>
+                            <Period>1</Period>
+                            <FormData>
+                                <TextField id="01">01/12/2025</TextField>
+                                <TextField id="02">31/12/2025</TextField>
+                                <TextField id="03">EUR</TextField>
+                                <NumericField id="0565">1170000,00</NumericField>
+                                <NumericField id="0567">1170000,00</NumericField>
+                                <NumericField id="0569">1170000,00</NumericField>
+                                <NumericField id="0658">170000,00</NumericField>
+                                <NumericField id="0660">170000,00</NumericField>
+                                <NumericField id="0688">170000,00</NumericField>
+                                <NumericField id="0690">170000,00</NumericField>
+                                <NumericField id="0692">170000,00</NumericField>
+                                <NumericField id="1852">1000000,00</NumericField>
+                                <NumericField id="2780">1000000,00</NumericField>
+                                <NumericField id="1862">1000000,00</NumericField>
+                                <NumericField id="1111">1170000,00</NumericField>
+                                <NumericField id="1112">170000,00</NumericField>
+                                <NumericField id="2257">0,00</NumericField>
+                                <NumericField id="2258">1000000,00</NumericField>
+                                <NumericField id="2956">0,00</NumericField>
+                                <NumericField id="2957">1170000,00</NumericField>
+                                <NumericField id="2958">1170000,00</NumericField>
+                                <NumericField id="0161">1000000,00</NumericField>
+                                <NumericField id="0158">0,00</NumericField>
+                                <NumericField id="2939">1,00</NumericField>
+                                <Choice id="2940">1</Choice>
+                                <Choice id="2941">1</Choice>
+                                <Choice id="2942">1</Choice>
+                            </FormData>
+                        </Declaration>
+                        <MappingTable mapping="standard"></MappingTable>
+                    </DeclarationGroup>
+                </Declarer>
+            </Declarations>
+        </eCDFDeclarations>
+        """
 
         self.assertXmlTreeEqual(
             self.get_xml_tree_from_string(declaration_to_compare),

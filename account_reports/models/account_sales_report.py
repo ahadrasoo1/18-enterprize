@@ -107,11 +107,17 @@ class ECSalesReportCustomHandler(models.AbstractModel):
             ('code', 'in', tuple(self._get_ec_country_codes(options)))
         ]).ids
         other_country_ids = tuple(set(country_ids) - {self.env.company.account_fiscal_country_id.id})
-        options.setdefault('forced_domain', []).append(('partner_id.country_id', 'in', other_country_ids))
+        options.setdefault('forced_domain', []).extend([
+            '|',
+            ('move_id.partner_shipping_id.country_id', 'in', other_country_ids),
+            '&',
+            ('move_id.partner_shipping_id', '=', False),
+            ('partner_id.country_id', 'in', other_country_ids),
+        ])
 
         report._init_options_journals(options, previous_options=previous_options)
 
-        self._enable_export_buttons_for_common_vat_groups_in_branches(options)
+        options['enable_export_buttons_for_common_vat_in_branches'] = True
 
     def _init_core_custom_options(self, report, options, previous_options):
         """
@@ -124,7 +130,15 @@ class ECSalesReportCustomHandler(models.AbstractModel):
             {'id': 'triangular', 'name': _('Triangular'), 'selected': True},
             {'id': 'services', 'name': _('Services'), 'selected': True},
         ]
-        options['ec_tax_filter_selection'] = previous_options.get('ec_tax_filter_selection', default_tax_filter)
+
+        ec_tax_filter_selection = previous_options.get('ec_tax_filter_selection', default_tax_filter)
+        # In case we have a EC sale list report with more ec_tax_filter_selection the previous options will have extra
+        # item we just keep the default ones, and we let variant extend the function to add the ones they need
+        if ec_tax_filter_selection != default_tax_filter:
+            filtered_ec_tax_filter_selection = [item for item in ec_tax_filter_selection if item['id'] in {item['id'] for item in default_tax_filter}]
+            options['ec_tax_filter_selection'] = filtered_ec_tax_filter_selection
+        else:
+            options['ec_tax_filter_selection'] = ec_tax_filter_selection
 
     def _get_report_line_partner(self, report, options, partner, partner_values, markup=''):
         """
@@ -190,6 +204,7 @@ class ECSalesReportCustomHandler(models.AbstractModel):
         :return:                    (accounts_values, taxes_results)
         '''
         groupby_partners = {}
+        vat_set = set()
 
         def assign_sum(row):
             """
@@ -205,21 +220,23 @@ class ECSalesReportCustomHandler(models.AbstractModel):
             :param dict row:
             """
             if not company_currency.is_zero(row['balance']):
-                groupby_partners.setdefault(row['groupby'], defaultdict(lambda: defaultdict(float)))
+                vat = row['vat_number'] or ''
+                vat_country_code = vat[:2] if vat[:2].isalpha() else None
+                duplicated_vat = vat and vat in vat_set and row['groupby'] not in groupby_partners
+                if vat:
+                    vat_set.add(vat)
 
+                groupby_partners.setdefault(row['groupby'], defaultdict(lambda: defaultdict(float)))
                 groupby_partners_keyed = groupby_partners[row['groupby']][row['column_group_key']]
-                if row['tax_element_id'] in options['sales_report_taxes']['goods']:
-                    groupby_partners_keyed['goods'] += row['balance']
-                elif row['tax_element_id'] in options['sales_report_taxes']['triangular']:
-                    groupby_partners_keyed['triangular'] += row['balance']
-                elif row['tax_element_id'] in options['sales_report_taxes']['services']:
-                    groupby_partners_keyed['services'] += row['balance']
+                for key in options['sales_report_taxes']:
+                    # options['sales_report_taxes'][key] could be either a list, set, tuple or boolean, in case of boolean
+                    # the in operator would traceback
+                    if not isinstance(options['sales_report_taxes'][key], bool) and row['tax_element_id'] in options['sales_report_taxes'][key]:
+                        groupby_partners_keyed[key] += row['balance']
 
                 groupby_partners_keyed.setdefault('tax_element_id', []).append(row['tax_element_id'])
                 groupby_partners_keyed.setdefault('sales_type_code', []).append(row['sales_type_code'])
 
-                vat = row['vat_number'] or ''
-                vat_country_code = vat[:2] if vat[:2].isalpha() else None
                 groupby_partners_keyed.setdefault('vat_number', vat if not vat_country_code else vat[2:])
                 groupby_partners_keyed.setdefault('full_vat_number', vat)
                 groupby_partners_keyed.setdefault('country_code', vat_country_code or row.get('country_code'))
@@ -231,6 +248,11 @@ class ECSalesReportCustomHandler(models.AbstractModel):
                         warnings['account_reports.sales_report_warning_missing_vat'] = {'alert_type': 'warning'}
                     if row.get('same_country') and row['country_code']:
                         warnings['account_reports.sales_report_warning_same_country'] = {'alert_type': 'warning'}
+                    if duplicated_vat:
+                        if warnings.get('account_reports.sales_report_warning_duplicated_vat'):
+                            warnings['account_reports.sales_report_warning_duplicated_vat']['duplicated_partners_vat'].append(vat)
+                        else:
+                            warnings['account_reports.sales_report_warning_duplicated_vat'] = {'alert_type': 'warning', 'duplicated_partners_vat': [vat]}
 
         company_currency = self.env.company.currency_id
 
@@ -259,6 +281,7 @@ class ECSalesReportCustomHandler(models.AbstractModel):
         queries = []
         # Create the currency table.
         allowed_ids = self._get_tag_ids_filtered(options)
+        service_ids = self._get_tag_ids_filtered(options, operation_types=['services'])
 
         # In the case of the generic report, we don't have a country defined. So no reliable tax report whose
         # tag_ids can be used. So we have a fallback to tax_ids.
@@ -278,6 +301,9 @@ class ECSalesReportCustomHandler(models.AbstractModel):
             query = report._get_report_query(column_group_options, 'strict_range')
             if allowed_ids:
                 query.add_where(SQL('%s.id IN %s', tax_elem_table, tuple(allowed_ids)))
+                if service_ids:
+                    query.add_where(SQL("(%s.id NOT IN %s OR LEFT(res_partner.vat, 2) IS DISTINCT FROM 'XI')", tax_elem_table, tuple(service_ids)))
+
             queries.append(SQL(
                 """
                 SELECT
@@ -314,17 +340,19 @@ class ECSalesReportCustomHandler(models.AbstractModel):
         return SQL(' UNION ALL ').join(queries)
 
     @api.model
-    def _get_tag_ids_filtered(self, options):
+    def _get_tag_ids_filtered(self, options, operation_types=None):
         """
         Helper function to get all the tag_ids concerned by the report for the given options.
         :param dict options: Report options
-        :return tuple: tag_ids untyped after filtering
+        :param list operation_types: only retrieve the taxes or tags of the specified types (if selected)
+        :return set: tag_ids untyped after filtering
         """
-        allowed_taxes = set()
-        for operation_type in options.get('ec_tax_filter_selection', []):
-            if operation_type.get('selected'):
-                allowed_taxes.update(options['sales_report_taxes'][operation_type.get('id')])
-        return allowed_taxes
+        return {
+            tag_id
+            for op in options.get('ec_tax_filter_selection', [])
+            if op.get('selected') and (operation_types is None or op['id'] in operation_types)
+            for tag_id in options.get('sales_report_taxes', {}).get(op['id'], [])
+        }
 
     @api.model
     def _get_ec_country_codes(self, options):
@@ -359,6 +387,8 @@ class ECSalesReportCustomHandler(models.AbstractModel):
         elif params['type'] == 'non_ec_country':
             aml_domains = [('partner_id.country_id.code', 'not in', tuple(self._get_ec_country_codes(options)))]
             act_window['name'] = _("EC tax on non EC countries")
+        elif params['type'] == 'duplicated_vat':
+            return self._get_duplicated_vat_partners(tuple(params['duplicated_partners_vat']))
         else:
             aml_domains = [('partner_id.country_id.code', '=', options.get('same_country_warning'))]
             act_window['name'] = _("EC tax on same country")
@@ -384,3 +414,14 @@ class ECSalesReportCustomHandler(models.AbstractModel):
             })
 
         return act_window
+
+    def _get_duplicated_vat_partners(self, duplicated_partners_vat):
+        view_ref = self.env.ref('account_reports.duplicated_vat_partner_tree_view', raise_if_not_found=False)
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Partners with duplicated VAT numbers'),
+            'context': {'group_by': 'vat', 'expand': 1, 'duplicated_partners_vat': duplicated_partners_vat},
+            'views': [(view_ref and view_ref.id or False, 'list'), (False, 'form')],
+            'res_model': 'res.partner',
+            'domain': [('vat', 'in', duplicated_partners_vat)],
+        }

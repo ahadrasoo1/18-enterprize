@@ -88,11 +88,24 @@ export class GanttRendererControls extends Component {
             case "day":
                 return formatDate(focusDate);
             default:
-                return this.model.metaData.scales[rangeId].groupHeaderFormatter(
+                return this.model.metaData.ranges[rangeId].groupHeaderFormatter(
                     focusDate,
                     this.env
                 );
         }
+    }
+
+    get displayModeTitle() {
+        return this.model.displayParams.displayMode === "dense"
+            ? _t("Activate sparse mode")
+            : _t("Activate dense mode");
+    }
+
+    get formattedDateRange() {
+        return _t("From: %(from_date)s to: %(to_date)s", {
+            from_date: formatDate(this.state.startDate),
+            to_date: formatDate(this.state.stopDate),
+        });
     }
 
     getFormattedDate(date) {

@@ -244,3 +244,37 @@ class TestPlanningContract(TestPlanningContractCommon):
             'end_datetime': datetime(2015, 12, 17, 8, 0, 0),
         })
         self.assertEqual(slot.allocated_hours, 8, "The allocated hours should be computed without any issue")
+
+    def test_access_rights_for_getting_working_hours_over_period(self):
+
+        self.env['hr.contract'].create({
+            'date_start': datetime.strptime('2015-11-16', '%Y-%m-%d'),
+            'date_end': datetime.strptime('2015-12-16', '%Y-%m-%d'),
+            'name': 'Fully flex contract for Joseph',
+            'resource_calendar_id': False,
+            'wage': 5000.0,
+            'employee_id': self.employee_joseph.id,
+            'state': 'open',
+            'kanban_state': 'normal',
+        })
+
+        bert_user = new_test_user(self.env,
+                                  login='bert_user',
+                                  groups='planning.group_planning_manager',
+                                  name='Bert User',
+                                  email='user@example.com')
+
+        slot = self.env['planning.slot'].create({
+            'start_datetime': datetime(2015, 12, 16, 8, 0, 0),
+            'end_datetime': datetime(2015, 12, 17, 12, 0, 0),
+            'resource_id': self.resource_joseph.id,
+        })
+
+        start = datetime(2015, 12, 16, 8, 0, 0, tzinfo=UTC)
+        end = datetime(2015, 12, 17, 12, 0, 0, tzinfo=UTC)
+        resource_intervals, calendar_intervals = slot.resource_id._get_valid_work_intervals(start, end)
+
+        # A user with Administrator rights on Planning but no access to Employee and Contract records
+        # should be able to compute the working hours over a period without access rights error.
+        working_hours = slot.with_user(bert_user)._get_working_hours_over_period(start, end, resource_intervals, calendar_intervals)
+        self.assertEqual(working_hours, 16.0, "Working hours should be ")

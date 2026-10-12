@@ -49,7 +49,7 @@
                     title="I Take It"
                     string="I Take It"
                     class="btn btn-link float-end"
-                    invisible="not context.get('my_planning_action') or is_past or not start_datetime or not end_datetime or (resource_id and not request_to_switch) or (user_id == uid and (allow_self_unassign or request_to_switch))"
+                    invisible="is_past or not start_datetime or not end_datetime or resource_id and not request_to_switch or user_id == uid and (allow_self_unassign or request_to_switch)"
                     groups="!planning.group_planning_manager"
                 />
                 <button name="action_cancel_switch"
@@ -78,9 +78,9 @@
                     <button string="Publish &amp; Send" type="object" name="action_send" class="btn btn-primary"
                         close="1" groups="planning.group_planning_manager" data-hotkey="q" invisible="context.get('my_planning_action') or (state == 'published' or resource_type == 'material')"/>
                     <button name="action_self_assign" class="btn btn-primary" type="object" string="I Take It" groups="!planning.group_planning_manager"
-                        close="1" invisible="context.get('my_planning_action') or (not is_users_role or is_past or not start_datetime or not end_datetime or resource_id and not request_to_switch or user_id == uid and (allow_self_unassign or request_to_switch))"/>
+                        close="1" invisible="not is_users_role or is_past or not start_datetime or not end_datetime or resource_id and not request_to_switch or user_id == uid and (allow_self_unassign or request_to_switch)"/>
                     <button name="action_self_assign" class="btn btn-secondary" type="object" string="I Take It" groups="!planning.group_planning_manager"
-                        close="1" invisible="context.get('my_planning_action') or (is_users_role or is_past or not start_datetime or not end_datetime or resource_id and not request_to_switch or user_id == uid and (allow_self_unassign or request_to_switch))"/>
+                        close="1" invisible="is_users_role or is_past or not start_datetime or not end_datetime or resource_id and not request_to_switch or user_id == uid and (allow_self_unassign or request_to_switch)"/>
                     <button name="action_switch_shift" class="btn btn-secondary" type="object" string="Ask To Switch" groups="!planning.group_planning_manager"
                         invisible="not is_assigned_to_me or is_past or request_to_switch or allow_self_unassign"/>
                     <button name="action_cancel_switch" class="btn btn-secondary" type="object" string="Cancel Switch" groups="!planning.group_planning_manager"
@@ -94,7 +94,7 @@
                         class="btn btn-secondary" close="1" groups="planning.group_planning_manager"
                         invisible="state == 'draft' or resource_type == 'material'" data-hotkey="q"/>
                     <button string="Auto Plan" type="object" name="auto_plan_id" class="btn btn-secondary"
-                        groups="planning.group_planning_manager" data-hotkey="p" invisible="context.get('my_planning_action') or resource_id"/>
+                        groups="planning.group_planning_manager" data-hotkey="p" invisible="context.get('my_planning_action') or resource_id or not start_datetime or not end_datetime"/>
                     <field name="state" widget="statusbar" groups="planning.group_planning_manager" invisible="context.get('my_planning_action')"/>
                 </header>
                 <field name="is_past" invisible="1"/>
@@ -110,16 +110,16 @@
                 <field name="overlap_slot_count" invisible="1"/>
                 <field name="repeat" invisible="1"/>
                 <field name="color" invisible="1" />
-                <div class="alert alert-info oe_edit_only d-lg-flex align-items-center" role="status" invisible="not id or not repeat">
+                <div class="alert alert-info oe_edit_only d-lg-flex align-items-center" role="status" invisible="not recurrency_id or not repeat">
                     <div class="my-2">
                         <span class="ms-0 me-4">Edit</span>
                     </div>
                     <field name="recurrence_update" widget="radio" class="mb-0 d-sm-block d-lg-none" options="{'horizontal': false}"/>
                     <field name="recurrence_update" widget="radio" class="mb-0 d-lg-block d-none" options="{'horizontal': true}"/>
                 </div>
-                <div role="alert" class="alert alert-warning text-center pt-4" invisible="overlap_slot_count == 0 and (not request_to_switch or allow_self_unassign)">
+                <div role="alert" class="alert alert-warning text-center py-2 mb-2" invisible="overlap_slot_count == 0 and (not request_to_switch or allow_self_unassign)">
                     <field name="conflicting_slot_ids" widget="conflicting_slot_ids" invisible="not conflicting_slot_ids.length"/>
-                    <p class="align-middle"
+                    <p class="align-middle mb-0"
                         invisible="not request_to_switch or allow_self_unassign">
                         <span>The employee assigned would like to switch shifts with someone else.</span>
                     </p>
@@ -200,16 +200,12 @@
                         <t t-if="widget.deletable"><a role="menuitem" type="delete" class="dropdown-item">Delete</a></t>
                     </t>
                     <t t-name="card">
-                        <div name="card_top">
-                            <div class="d-flex fw-bold fs-5 fst-italic">
-                                <i class="me-1 mt-1 fa fa-clock-o" role="img" aria-label="Date" title="Date"/>
-                                <t t-if="record.start_datetime.raw_value and record.end_datetime.raw_value">
-                                    <field name="start_datetime"/>
-                                    -
-                                    <field name="end_datetime"/>
-                                </t>
-                            </div>
-                            <span class="d-flex fw-bold fs-5 fst-italic">
+                        <div name="card_top" class="d-flex flex-wrap gap-1 fw-bold fs-5 fst-italic mb-1">
+                            <i class="mt-1 fa fa-clock-o" role="img" aria-label="Date" title="Date"/>
+                            <t t-if="record.start_datetime.raw_value and record.end_datetime.raw_value">
+                                <field name="start_datetime"/> - <field name="end_datetime"/>
+                            </t>
+                            <span class="d-inline-flex">
                                 <t t-if="record.start_datetime.raw_value and record.end_datetime.raw_value">
                                     (<field name="allocated_hours" widget="float_time"/>)
                                 </t>
@@ -321,15 +317,15 @@
                 <filter name="my_shifts" string="My Shifts" domain="[('user_id', '=', uid)]" />
                 <filter name="my_team_shifts" string="My Team" domain="[('manager_id.user_id', '=', uid)]" help="Shifts of Your Team Member" groups="planning.group_planning_user"/>
                 <filter name="my_department_shifts" string="My Department" domain="[('employee_id.member_of_department', '=', True)]" help="Shifts of Your Department Member" groups="planning.group_planning_user"/>
-                <filter name="unwanted_shifts" string="Requests to Switch" domain="[('request_to_switch', '=', True), ('end_datetime', '&gt;', datetime.datetime.now())]"/>
+                <filter name="unwanted_shifts" string="Requests to Switch" domain="[('request_to_switch', '=', True), ('end_datetime', '&gt;', datetime.datetime.now().to_utc())]"/>
                 <separator/>
                 <filter string="My Roles" name="my_role" domain="[('role_id.resource_ids.user_id','=', uid)]" groups="planning.group_planning_user"/>
                 <separator/>
                 <filter name="shift_planned" invisible="1" string="Shifts Planned" groups="planning.group_planning_user" context="{'highlight_planned': 1}"/>
                 <filter name="conflict_shifts" string="Shifts in Conflict" groups="planning.group_planning_manager" context="{'highlight_conflicting': 1}"/>
                 <separator/>
-                <filter string="Employees" name="employees" domain="['|', '|', ('resource_type','=', 'user'), ('role_id.resource_ids.resource_type','=', 'user'), ('role_id','=', False)]" groups="planning.group_planning_user"/>
-                <filter string="Materials" name="materials" domain="['|', '|', ('resource_type','=', 'material'), ('role_id.resource_ids.resource_type','=', 'material'), ('role_id','=', False)]" groups="planning.group_planning_user"/>
+                <filter string="Employees" name="employees" domain="[('resource_type','=', 'user'), '|', ('role_id.resource_ids.resource_type', '=', 'user'), ('role_id', '=', False)]" groups="planning.group_planning_user"/>
+                <filter string="Materials" name="materials" domain="[('resource_type','=', 'material'), '|', ('role_id.resource_ids.resource_type', '=', 'material'), ('role_id', '=', False)]" groups="planning.group_planning_user"/>
                 <separator/>
                 <filter name="unpublished_shifts" string="Draft" domain="[('state', '=', 'draft')]" groups="planning.group_planning_manager"/>
                 <filter name="published_shifts" string="Published" domain="[('state', '=', 'published')]" groups="planning.group_planning_manager"/>
@@ -340,12 +336,12 @@
                         ('start_datetime', '&gt;=', datetime.datetime.combine(context_today(), datetime.time(0,0,0)).to_utc()),
                     ]"/>
                     <filter name="start_this_week" string="This Week" domain="[
-                        ('start_datetime', '&gt;=', datetime.datetime.combine(context_today() + relativedelta(weeks=-1,weekday=0), datetime.time(0,0,0)).to_utc()),
-                        ('start_datetime', '&lt;', datetime.datetime.combine(context_today() + relativedelta(weekday=0), datetime.time(0,0,0)).to_utc()),
+                        ('start_datetime', '&gt;=', datetime.datetime.combine(context_today() + relativedelta(weeks=-1,days=1,weekday=0), datetime.time(0,0,0)).to_utc()),
+                        ('start_datetime', '&lt;', datetime.datetime.combine(context_today() + relativedelta(days=1,weekday=0), datetime.time(0,0,0)).to_utc()),
                     ]"/>
                     <filter name="start_next_week" string="Next Week" domain="[
-                        ('start_datetime', '&gt;=', datetime.datetime.combine(context_today() + relativedelta(weekday=0), datetime.time(0,0,0)).to_utc()),
-                        ('start_datetime', '&lt;', datetime.datetime.combine(context_today() + relativedelta(weeks=1,weekday=0), datetime.time(0,0,0)).to_utc()),
+                        ('start_datetime', '&gt;=', datetime.datetime.combine(context_today() + relativedelta(days=1,weekday=0), datetime.time(0,0,0)).to_utc()),
+                        ('start_datetime', '&lt;', datetime.datetime.combine(context_today() + relativedelta(weeks=1,days=1,weekday=0), datetime.time(0,0,0)).to_utc()),
                     ]"/>
                 </filter>
                 <filter string="End Date" name="end_datetime" date="end_datetime" end_month="1">
@@ -354,12 +350,12 @@
                         ('end_datetime', '&lt;=', datetime.datetime.combine(context_today(), datetime.time(23,59,59)).to_utc()),
                     ]"/>
                     <filter name="end_this_week" string="This Week" domain="[
-                        ('end_datetime', '&gt;=', datetime.datetime.combine(context_today() + relativedelta(weeks=-1,weekday=0), datetime.time(0,0,0)).to_utc()),
-                        ('end_datetime', '&lt;', datetime.datetime.combine(context_today() + relativedelta(weekday=0), datetime.time(0,0,0)).to_utc()),
+                        ('end_datetime', '&gt;=', datetime.datetime.combine(context_today() + relativedelta(weeks=-1,days=1,weekday=0), datetime.time(0,0,0)).to_utc()),
+                        ('end_datetime', '&lt;', datetime.datetime.combine(context_today() + relativedelta(days=1,weekday=0), datetime.time(0,0,0)).to_utc()),
                     ]"/>
                     <filter name="end_next_week" string="Next Week" domain="[
-                        ('end_datetime', '&gt;=', datetime.datetime.combine(context_today() + relativedelta(weekday=0), datetime.time(0,0,0)).to_utc()),
-                        ('end_datetime', '&lt;', datetime.datetime.combine(context_today() + relativedelta(weeks=1,weekday=0), datetime.time(0,0,0)).to_utc()),
+                        ('end_datetime', '&gt;=', datetime.datetime.combine(context_today() + relativedelta(days=1,weekday=0), datetime.time(0,0,0)).to_utc()),
+                        ('end_datetime', '&lt;', datetime.datetime.combine(context_today() + relativedelta(weeks=1,days=1,weekday=0), datetime.time(0,0,0)).to_utc()),
                     ]"/>
                 </filter>    
                 <group string="Group By">
@@ -383,6 +379,10 @@
         <field name="inherit_id" ref="planning_view_search_base"/>
         <field name="arch" type="xml">
             <search position="attributes"/>
+            <xpath expr="//group" position="inside">
+                <separator/>
+                <filter name="group_by_properties" string="Properties" context="{'group_by': 'slot_properties'}"/>
+            </xpath>
         </field>
     </record>
 
@@ -512,7 +512,7 @@
                             <t t-esc="overlap_slot_count"/> other shift(s) in conflict.
                         </p>
                         <footer replace="0">
-                            <button name="unlink" type="object" string="Delete" class="btn btn-sm btn-secondary"
+                            <button t-if="0" name="unlink" type="object" string="Delete" class="btn btn-sm btn-secondary"
                                 groups="planning.group_planning_manager"/>
                         </footer>
                     </div>

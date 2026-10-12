@@ -84,6 +84,28 @@ publicWidget.registry.appointmentSlotSelect = publicWidget.Widget.extend({
             .addEventListener("click", () => this.selectFirstAvailableMonth());
     },
 
+    _updateResourceCapacityOptions: function () {
+        const capacitySelect = document.querySelector("select[name='resourceCapacity']");
+        const resourceId = document.querySelector("#slots_form select[name='resource_id']")?.value;
+
+        if (resourceId && capacitySelect?.value) {
+            const max_resource_capacity = parseInt(
+                document.querySelector("input[name='max_resource_capacity']")?.value || 0
+            );
+            const max_default_capacity = parseInt(
+                document.querySelector("input[name='max_capacity']").value
+            );
+            const previousCapacitySelected = parseInt(capacitySelect.value);
+            const max_capacity = max_resource_capacity || max_default_capacity;
+            capacitySelect.replaceChildren(
+                renderToFragment("appointment.resources_capacity_options", {
+                    asked_capacity: previousCapacitySelected <= max_capacity ? previousCapacitySelected : false,
+                    max_capacity: max_capacity,
+                })
+            );
+        }
+    },
+
     /**
      * Checks whether any slot is available in the calendar.
      * If there isn't, adds an explicative message in the slot list, and hides the appointment details,
@@ -387,7 +409,7 @@ publicWidget.registry.appointmentSlotSelect = publicWidget.Widget.extend({
             const filterResourceIds = this.el.querySelector(
                 "input[name='filter_resource_ids']"
             ).value;
-            const timezone = this.el.querySelector("select[name='timezone']").value;
+            const timezone = this.el.querySelector("select[name='timezone']")?.value;
             const resourceCapacity =
                 (this.el.querySelector("select[name='resourceCapacity']") &&
                     parseInt(this.el.querySelector("select[name='resourceCapacity']").value)) ||
@@ -431,13 +453,15 @@ publicWidget.registry.appointmentSlotSelect = publicWidget.Widget.extend({
             if (updatedAppointmentCalendarHtml) {
                 this.el.querySelector("#slots_availabilities").outerHTML = updatedAppointmentCalendarHtml;
                 this.initSlots();
+                this._updateResourceCapacityOptions();
                 // If possible, we keep the current month, and display the helper if it has no availability.
                 const displayedMonthEl = this.el.querySelector(".o_appointment_month:not(.d-none)");
                 if (!!this.firstEl && !displayedMonthEl.querySelector(".o_day")) {
                     this._renderNoAvailabilityForMonth(displayedMonthEl);
                 }
                 this._removeLoadingSpinner();
-                this.el.querySelector(`div[data-slot-date="${daySlotSelected}"]`)?.click();
+                // Select previous selected date (in displayed month) if possible.
+                displayedMonthEl?.querySelector(`div[data-slot-date="${daySlotSelected}"]`)?.click();
             }
         }
     },

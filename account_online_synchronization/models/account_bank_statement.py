@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import threading
 import time
+import json
 
 from odoo import api, fields, models, SUPERUSER_ID, tools, _
 from odoo.tools import date_utils
@@ -21,6 +22,27 @@ class AccountBankStatementLine(models.Model):
         store=True,
         readonly=True,
     )
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        """
+            Some transactions can be marked as "Zero Balancing",
+            which is a transaction used at the end of the day to summarize all the transactions
+            of the day. As we already manage the details of all the transactions, this one is not
+            useful and moreover create duplicates. To deal with that, we cancel the move and so
+            the bank statement line.
+        """
+        # EXTEND account
+        bank_statement_lines = super().create(vals_list)
+        moves_to_cancel = self.env['account.move']
+        for bank_statement_line in bank_statement_lines:
+            transaction_details = json.loads(bank_statement_line.transaction_details) if bank_statement_line.transaction_details else {}
+            if not transaction_details.get('is_zero_balancing'):
+                continue
+            moves_to_cancel |= bank_statement_line.move_id
+        moves_to_cancel.button_cancel()
+
+        return bank_statement_lines
 
     @api.model
     def _online_sync_bank_statement(self, transactions, online_account):
@@ -51,13 +73,15 @@ class AccountBankStatementLine(models.Model):
                 # For first synchronization, an opening line is created to fill the missing bank statement data
                 any_st_line = self.search_count([('journal_id', '=', journal.id)], limit=1)
                 journal_currency = journal.currency_id or journal.company_id.currency_id
-                # If there are neither statement and the ending balance != 0, we create an opening bank statement
+                # If there are neither statement and the ending balance != 0, we create an opening bank statement at the day of the oldest transaction.
+                # We set the sequence to >1 to ensure the computed internal_index will force its display before any other statement with the same date.
                 if not any_st_line and not journal_currency.is_zero(online_account.balance - total):
                     opening_st_line = self.with_context(skip_statement_line_cron_trigger=True).create({
-                        'date': date_utils.subtract(sorted_transactions[0]['date'], days=1),
+                        'date': sorted_transactions[0]['date'],
                         'journal_id': journal.id,
                         'payment_ref': _("Opening statement: first synchronization"),
                         'amount': online_account.balance - total,
+                        'sequence': 2,
                     })
                     lines_to_reconcile += opening_st_line
 
@@ -67,7 +91,7 @@ class AccountBankStatementLine(models.Model):
                 if filtered_transactions:
                     # split transactions import in batch and commit after each batch except in testing mode
                     for index in range(0, len(filtered_transactions), STATEMENT_LINE_CREATION_BATCH_SIZE):
-                        lines_to_reconcile += self.with_user(SUPERUSER_ID).with_context(skip_statement_line_cron_trigger=True).create(filtered_transactions[index:index+STATEMENT_LINE_CREATION_BATCH_SIZE])
+                        lines_to_reconcile += self.with_user(SUPERUSER_ID).with_company(journal.company_id).with_context(skip_statement_line_cron_trigger=True).create(filtered_transactions[index:index + STATEMENT_LINE_CREATION_BATCH_SIZE])
                         if do_commit:
                             self.env.cr.commit()
                     # Set last sync date as the last transaction date

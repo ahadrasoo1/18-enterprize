@@ -1,23 +1,26 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* delivery_dhl
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Maitê Dietze, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
+"POT-Creation-Date: 2025-12-29 18:50+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Portuguese (Brazil) (https://app.transifex.com/odoo/teams/41243/pt_BR/)\n"
+"Last-Translator: Maitê Dietze, 2025\n"
+"Language-Team: Portuguese (Brazil) (https://app.transifex.com/odoo/teams/"
+"41243/pt_BR/)\n"
+"Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: pt_BR\n"
-"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % "
+"1000000 == 0 ? 1 : 2;\n"
 
 #. module: delivery_dhl
 #: model_terms:ir.ui.view,arch_db:delivery_dhl.view_delivery_carrier_form_with_provider_dhl
@@ -182,8 +185,8 @@ msgstr "D - Expresso Mundial"
 #. module: delivery_dhl
 #: model:ir.model.fields.selection,name:delivery_dhl.selection__delivery_carrier__delivery_type__dhl
 #: model:ir.model.fields.selection,name:delivery_dhl.selection__stock_package_type__package_carrier_type__dhl
-msgid "DHL"
-msgstr "DHL"
+msgid "DHL (Legacy)"
+msgstr "DHL (Legado)"
 
 #. module: delivery_dhl
 #: model:ir.model.fields,field_description:delivery_dhl.field_delivery_carrier__dhl_account_number
@@ -214,11 +217,6 @@ msgid "DHL EU -> International"
 msgstr "DHL EU -> Internacional"
 
 #. module: delivery_dhl
-#: model:ir.model.fields,field_description:delivery_dhl.field_delivery_carrier__dhl_default_package_type_id
-msgid "DHL Package Type"
-msgstr "Tipo de pacote DHL"
-
-#. module: delivery_dhl
 #: model:ir.model.fields,field_description:delivery_dhl.field_delivery_carrier__dhl_password
 msgid "DHL Password"
 msgstr "Senha DHL"
@@ -229,17 +227,10 @@ msgid "DHL Product"
 msgstr "Produto DHL"
 
 #. module: delivery_dhl
-#: model_terms:ir.ui.view,arch_db:delivery_dhl.res_config_settings_view_form_sale
-#: model_terms:ir.ui.view,arch_db:delivery_dhl.res_config_settings_view_form_stock
-msgid "DHL Shipping Methods"
-msgstr "Métodos de envio DHL"
-
-#. module: delivery_dhl
 #. odoo-python
 #: code:addons/delivery_dhl/models/dhl_request.py:0
 msgid "DHL Site ID is missing, please modify your delivery method settings."
-msgstr ""
-"Falta o Site ID DHL, modifique as definições do seu método de entrega."
+msgstr "Falta o Site ID DHL, modifique as definições do seu método de entrega."
 
 #. module: delivery_dhl
 #: model:ir.model.fields,field_description:delivery_dhl.field_delivery_carrier__dhl_SiteID
@@ -279,6 +270,11 @@ msgstr ""
 #: code:addons/delivery_dhl/models/dhl_request.py:0
 msgid "DHL password is missing, please modify your delivery method settings."
 msgstr "Senha da DHL ausente; modifique suas definições de método de entrega."
+
+#. module: delivery_dhl
+#: model:ir.model.fields,field_description:delivery_dhl.field_delivery_carrier__dhl_default_package_type_id
+msgid "DHLxw Package Type"
+msgstr "Tipo de pacote DHLxw"
 
 #. module: delivery_dhl
 #: model:ir.model.fields,field_description:delivery_dhl.field_delivery_carrier__dhl_duty_payment
@@ -429,8 +425,8 @@ msgid ""
 "Please define an incoterm in the associated sale order or set a default "
 "incoterm for the company in the accounting's settings."
 msgstr ""
-"Defina um incoterm no pedido de venda associado ou defina um incoterm padrão"
-" para a empresa nas configurações financeiras."
+"Defina um incoterm no pedido de venda associado ou defina um incoterm padrão "
+"para a empresa nas configurações financeiras."
 
 #. module: delivery_dhl
 #. odoo-python
@@ -513,31 +509,38 @@ msgstr ""
 #. odoo-python
 #: code:addons/delivery_dhl/models/dhl_request.py:0
 msgid ""
-"The address of your company warehouse is missing or wrong (Missing field(s) :\n"
+"The address of your company warehouse is missing or wrong (Missing "
+"field(s) :\n"
 " %s)"
 msgstr ""
-"O endereço do armazém da empresa está ausente ou incorreto (campos ausentes:\n"
+"O endereço do armazém da empresa está ausente ou incorreto (campos "
+"ausentes:\n"
 " %s)"
 
 #. module: delivery_dhl
 #: model:ir.model.fields,help:delivery_dhl.field_delivery_carrier__dhl_custom_data_request
 msgid ""
 "The custom data in DHL is organized like the inside of a json file.\n"
-"        There are 3 possible keys: 'rate', 'ship', 'return', to which you can add your custom data.\n"
+"        There are 3 possible keys: 'rate', 'ship', 'return', to which you "
+"can add your custom data.\n"
 "        More info on https://xmlportal.dhl.com/"
 msgstr ""
-"Os dados personalizados na DHL são organizados como o interior de um arquivo json.\n"
-"Há 3 chaves possíveis: 'taxa', 'envio', 'devolução', às quais você pode adicionar seus dados personalizados.\n"
+"Os dados personalizados na DHL são organizados como o interior de um arquivo "
+"json.\n"
+"Há 3 chaves possíveis: 'taxa', 'envio', 'devolução', às quais você pode "
+"adicionar seus dados personalizados.\n"
 "Mais informações em https://xmlportal.dhl.com/"
 
 #. module: delivery_dhl
 #. odoo-python
 #: code:addons/delivery_dhl/models/dhl_request.py:0
 msgid ""
-"The estimated shipping price cannot be computed because the weight is missing for the following product(s): \n"
+"The estimated shipping price cannot be computed because the weight is "
+"missing for the following product(s): \n"
 " %s"
 msgstr ""
-"O preço de envio estimado não pode ser calculado porque o peso está faltando para os seguintes produtos:\n"
+"O preço de envio estimado não pode ser calculado porque o peso está faltando "
+"para os seguintes produtos:\n"
 "%s"
 
 #. module: delivery_dhl
@@ -547,8 +550,8 @@ msgid ""
 "There is no price available for this shipping, you should rather try with "
 "the DHL product %s"
 msgstr ""
-"Não há preço disponível para essa remessa, você deve tentar com o produto da"
-" DHL %s"
+"Não há preço disponível para essa remessa, você deve tentar com o produto da "
+"DHL %s"
 
 #. module: delivery_dhl
 #: model:ir.model.fields.selection,name:delivery_dhl.selection__delivery_carrier__dhl_product_code__u

@@ -45,7 +45,7 @@ class AccountMove(models.Model):
     # -------------------------------------------------------------------------
     # COMPUTE METHODS
     # -------------------------------------------------------------------------
-    @api.depends('asset_id', 'depreciation_value', 'asset_id.total_depreciable_value', 'asset_id.already_depreciated_amount_import')
+    @api.depends('asset_id', 'depreciation_value', 'asset_id.total_depreciable_value', 'asset_id.already_depreciated_amount_import', 'state')
     def _compute_depreciation_cumulative_value(self):
         self.asset_depreciated_value = 0
         self.asset_remaining_value = 0
@@ -57,11 +57,12 @@ class AccountMove(models.Model):
         fields = [self._fields['asset_remaining_value'], self._fields['asset_depreciated_value']]
         with self.env.protecting(fields, self.asset_id.depreciation_move_ids):
             for asset in self.asset_id:
-                depreciated = 0
+                depreciated = asset.already_depreciated_amount_import
                 remaining = asset.total_depreciable_value - asset.already_depreciated_amount_import
                 for move in asset.depreciation_move_ids.sorted(lambda mv: (mv.date, mv._origin.id)):
-                    remaining -= move.depreciation_value
-                    depreciated += move.depreciation_value
+                    if move.state != 'cancel':
+                        remaining -= move.depreciation_value
+                        depreciated += move.depreciation_value
                     move.asset_remaining_value = remaining
                     move.asset_depreciated_value = depreciated
 
@@ -70,10 +71,8 @@ class AccountMove(models.Model):
         for move in self:
             asset = move.asset_id or move.reversed_entry_id.asset_id  # reversed moves are created before being assigned to the asset
             if asset:
-                account_internal_group = 'expense'
-                asset_depreciation = sum(
-                    move.line_ids.filtered(lambda l: l.account_id.internal_group == account_internal_group or l.account_id == asset.account_depreciation_expense_id).mapped('balance')
-                )
+                depreciation_lines = move._get_asset_depreciation_line()
+                asset_depreciation = sum(depreciation_lines.mapped('balance'))
                 # Special case of closing entry - only disposed assets of type 'purchase' should match this condition
                 # The condition on len(move.line_ids) is to avoid the case where there is only one depreciation move, and it is not a disposal move
                 # The condition will be matched because a disposal move from a disposal move will always have more than 2 lines, unlike a normal depreciation move
@@ -106,12 +105,10 @@ class AccountMove(models.Model):
     # -------------------------------------------------------------------------
     def _inverse_depreciation_value(self):
         for move in self:
-            asset = move.asset_id
-            amount = abs(move.depreciation_value)
-            account = asset.account_depreciation_expense_id
+            depreciation_lines = set(move._get_asset_depreciation_line())
             move.write({'line_ids': [
                 Command.update(line.id, {
-                    'balance': amount if line.account_id == account else -amount,
+                    'balance': move.depreciation_value * (1 if line in depreciation_lines else -1),
                 })
                 for line in move.line_ids
             ]})
@@ -151,8 +148,10 @@ class AccountMove(models.Model):
                 if first_draft:
                     # If there is a draft, simply move/add the depreciation amount here
                     first_draft.depreciation_value += move.depreciation_value
-                else:
-                    # If there was no draft move left, create one
+                elif move.asset_id.state != 'close':
+                    # If there was no draft move left, create one.
+                    # Unless the asset is being closed, then the closing move
+                    # takes care of balancing the asset.
                     last_date = max(move.asset_id.depreciation_move_ids.mapped('date'))
                     method_period = move.asset_id.method_period
 
@@ -222,7 +221,7 @@ class AccountMove(models.Model):
                     else:
                         units_quantity = 1
 
-                    model_ids = move_line.account_id.asset_model_ids
+                    model_ids = move_line.account_id.asset_model_ids.filtered(lambda model: model.company_id in move_line.company_id.parent_ids)
                     vals = {
                         'name': move_line.name,
                         'company_id': move_line.company_id.id,
@@ -277,7 +276,6 @@ class AccountMove(models.Model):
             'account_id': asset.account_depreciation_id.id,
             'debit': 0.0 if float_compare(amount, 0.0, precision_digits=prec) > 0 else -amount,
             'credit': amount if float_compare(amount, 0.0, precision_digits=prec) > 0 else 0.0,
-            'analytic_distribution': analytic_distribution,
             'currency_id': current_currency.id,
             'amount_currency': -amount_currency,
         }
@@ -287,10 +285,14 @@ class AccountMove(models.Model):
             'account_id': asset.account_depreciation_expense_id.id,
             'credit': 0.0 if float_compare(amount, 0.0, precision_digits=prec) > 0 else -amount,
             'debit': amount if float_compare(amount, 0.0, precision_digits=prec) > 0 else 0.0,
-            'analytic_distribution': analytic_distribution,
             'currency_id': current_currency.id,
             'amount_currency': amount_currency,
         }
+        # Only set the 'analytic_distribution' key if there is an analytic distribution on the asset.
+        # Otherwise, it prevents the computation of the analytic distribution.
+        if analytic_distribution:
+            move_line_1['analytic_distribution'] = analytic_distribution
+            move_line_2['analytic_distribution'] = analytic_distribution
         move_vals = {
             'partner_id': partner.id,
             'date': depreciation_date,
@@ -300,7 +302,6 @@ class AccountMove(models.Model):
             'ref': name,
             'asset_depreciation_beginning_date': vals['depreciation_beginning_date'],
             'asset_number_days': vals['asset_number_days'],
-            'name': '/',
             'asset_value_change': vals.get('asset_value_change', False),
             'move_type': 'entry',
             'currency_id': current_currency.id,
@@ -308,6 +309,10 @@ class AccountMove(models.Model):
             'company_id': asset.company_id.id,
         }
         return move_vals
+
+    def _get_asset_depreciation_line(self):
+        asset = self.asset_id
+        return self.line_ids.filtered(lambda line: line.account_id.internal_group == 'expense' or line.account_id == asset.account_depreciation_expense_id)
 
     @api.depends('line_ids.asset_ids')
     def _compute_asset_ids(self):
@@ -366,7 +371,7 @@ class AccountMoveLine(models.Model):
         ).tax_id
 
         res = {}
-        if non_deductible_tax_ids:
+        if non_deductible_tax_ids and self.ids:
             domain = [('move_id', 'in', self.move_id.ids)]
             tax_details_query = self._get_query_tax_details_from_domain(domain)
 

@@ -48,7 +48,7 @@ export const studioService = {
 
         function _getCurrentAction() {
             const currentController = env.services.action.currentController;
-            return currentController ? currentController.action : null;
+            return currentController && !currentController.virtual ? currentController.action : null;
         }
 
         function _isStudioEditable(action) {
@@ -82,6 +82,9 @@ export const studioService = {
                     // The employee profile view is too complex to handle inside studio.
                     // @see SELF_READABLE_FIELDS.
                     return false;
+                }
+                if (action.res_model === "account.bank.statement.line") {
+                    return false; // bank reconciliation isn't editable
                 }
                 return action.res_model ? true : false;
             }
@@ -142,8 +145,13 @@ export const studioService = {
                 const editedActionId = urlState[URL_ACTION_KEY];
                 const additionalContext = {};
                 if (state.studioMode === MODES.EDITOR) {
-                    if (urlState.active_id) {
-                        additionalContext.active_id = urlState.active_id;
+                    const { active_id, active_ids } = urlState;
+                    if (active_id) {
+                        additionalContext.active_id = active_id;
+                        additionalContext.active_ids = [active_id];
+                    }
+                    if (active_ids) {
+                        additionalContext.active_ids = active_ids.split(",").map(Number);
                     }
                     if (editedActionId) {
                         state.editedAction = await env.services.action.loadAction(

@@ -1,5 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+import re
+
 from werkzeug.exceptions import NotFound
 from werkzeug.utils import redirect
 
@@ -7,8 +9,9 @@ from odoo import http, _
 from odoo.http import request
 from odoo.osv import expression
 
-from odoo.addons.base.models.ir_qweb_fields import nl2br_enclose
-from odoo.addons.website.controllers import form
+from odoo.addons.website.controllers import form, main
+from odoo.addons.base.models.ir_qweb_fields import nl2br, nl2br_enclose
+from odoo.tools import html2plaintext
 
 
 class WebsiteHelpdesk(http.Controller):
@@ -23,7 +26,7 @@ class WebsiteHelpdesk(http.Controller):
     def website_helpdesk_teams(self, team=None, **kwargs):
         search = kwargs.get('search')
 
-        teams_domain = [('use_website_helpdesk_form', '=', True)]
+        teams_domain = [('use_website_helpdesk_form', '=', True), ('website_id', '=', request.website.id)]
         if not request.env.user.has_group('helpdesk.group_helpdesk_manager'):
             if team and not team.is_published:
                 raise NotFound()
@@ -141,7 +144,8 @@ class WebsiteForm(form.WebsiteForm):
             if request.env.user.email == email:
                 partner = request.env.user.partner_id
             else:
-                partner = request.env['res.partner'].sudo().search([('email', '=', email)], limit=1)
+                team_company = request.env['helpdesk.team'].sudo().browse(int(request.params.get('team_id'))).company_id.id if request.params.get('team_id') else False
+                partner = request.env['mail.thread'].sudo()._mail_find_partner_from_emails(emails=[email], extra_domain=[('company_id', 'in', [team_company, False])])[0]
             if not partner:
                 partner = request.env['res.partner'].sudo().create({
                     'email': email,
@@ -150,7 +154,9 @@ class WebsiteForm(form.WebsiteForm):
                     'company_name': request.params.get('partner_company_name', False),
                     'lang': request.lang.code,
                 })
-            request.params['partner_id'] = partner.id
+            kwargs.update({'partner_id': partner.id})
+            if not request.env.user._is_internal():
+                kwargs.pop('partner_phone', None)  # disallow partner's phone modification via _inverse_partner_phone
 
         return super(WebsiteForm, self)._handle_website_form(model_name, **kwargs)
 
@@ -160,10 +166,12 @@ class WebsiteForm(form.WebsiteForm):
         # Give access token to these attachments and make the message
         # accessible to the portal user
         # (which will be able to view and download its own documents).
-        model_name = model.model
+        model_name = model.sudo().model
         if model_name == "helpdesk.ticket":
             ticket = model.env[model_name].browse(id_record)
             attachments = request.env['ir.attachment'].sudo().search([('res_model', '=', model_name), ('res_id', '=', ticket.id), ('access_token', '=', False)])
+            if not attachments:
+                return
             attachments.generate_access_token()
             message = ticket.message_ids.filtered(lambda m: m.attachment_ids == attachments)
             message.is_internal = False
@@ -171,13 +179,40 @@ class WebsiteForm(form.WebsiteForm):
 
     def insert_record(self, request, model, values, custom, meta=None):
         res = super().insert_record(request, model, values, custom, meta=meta)
-        if model.model != 'helpdesk.ticket':
+        if model.sudo().model != 'helpdesk.ticket':
             return res
         ticket = request.env['helpdesk.ticket'].sudo().browse(res)
+        custom_label = nl2br_enclose(_("Other Information"), 'h4')  # Title for custom fields
         default_field = model.website_form_default_field_id
-        if default_field.name and ticket[default_field.name]:
+        default_field_data = values.get(default_field.name, '')
+        if not custom:
+            default_field_content = nl2br_enclose(html2plaintext(default_field_data), 'p')
+        else:
+            default_field_content = nl2br_enclose(default_field.field_description, 'h4') + nl2br_enclose(html2plaintext(default_field_data), 'p')
+        custom_content = (default_field_content if default_field_data else '') \
+                        + (custom_label + custom if custom else '') \
+                        + (self._meta_label + meta if meta else '')
+
+        if default_field.name:
+            if default_field.ttype == 'html':
+                custom_content = nl2br(custom_content)
+            ticket[default_field.name] = custom_content
             ticket._message_log(
-                body=nl2br_enclose(ticket[default_field.name], 'p'),
+                body=custom_content,
                 message_type='comment',
             )
+        return res
+
+class Website(main.Website):
+
+    @http.route()
+    def get_suggested_link(self, needle, limit=10):
+        # filter matching pages where url of format : /helpdesk/<team-slug>
+        def _is_helpdesk_team_page(page):
+            url = page.get('value', '')
+            pattern = r'^/helpdesk/([a-zA-Z]+-)+\d+$'
+            return re.match(pattern, url)
+
+        res = super(Website, self).get_suggested_link(needle, limit)
+        res['matching_pages'] = [page for page in res['matching_pages'] if not _is_helpdesk_team_page(page)]
         return res

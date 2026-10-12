@@ -4,10 +4,9 @@ import { registry } from "@web/core/registry";
 import * as tourUtils from '@website_sale/js/tours/tour_utils';
 
 registry.category("web_tour.tours").add('shop_buy_accessory_rental_product', {
-    test: true,
     url: '/shop',
     steps: () => [
-        ...tourUtils.addToCart({productName: "Parent product"}),
+        ...tourUtils.addToCart({ productName: "Parent product", expectUnloadPage: true }),
         tourUtils.goToCart({quantity: 1}),
         {
             content: "Verify there are 1 quantity of Parent product",

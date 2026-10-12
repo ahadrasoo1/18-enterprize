@@ -2,11 +2,22 @@
 from dateutil.relativedelta import relativedelta
 
 from odoo import models, fields
-from odoo.tools import SQL
+from odoo.tools import SQL, create_index
 
 
 class AccountReconcileModel(models.Model):
     _inherit = 'account.reconcile.model'
+
+    def init(self):
+        # Create a GIN index on the pattern matching the sale order name for the invoice matching rule
+        if self.env.registry.has_trigram:
+            create_index(self.env.cr,
+                            indexname='sale_order__invoice_matching_name_trgm',
+                            tablename='sale_order',
+                            method='gin',
+                            expressions=[r"SUBSTRING(REGEXP_REPLACE(LOWER(sale_order.name), '[^0-9a-z\s]', '', 'g'), '\S(?:.*\S)*') gin_trgm_ops"],
+            )
+        return super().init()
 
     def _get_invoice_matching_so_candidates(self, st_line, partner):
         """ Find a match between the bank transaction and some sale orders. If none of them are invoiced, there are
@@ -42,27 +53,15 @@ class AccountReconcileModel(models.Model):
         if not sale_orders and text_tokens:
             query = self.env['sale.order']._where_calc(domain)
 
-            additional_conditions = SQL(" OR ").join(
-                SQL("%s ~ sub.name", token.lower())
-                for token in text_tokens
-            )
-
             sale_order_ids = [r[0] for r in self.env.execute_query(SQL(
                 r'''
-                    WITH sale_order_name AS (
-                        SELECT
-                            sale_order.id,
-                            SUBSTRING(REGEXP_REPLACE(LOWER(sale_order.name), '[^0-9a-z\s]', '', 'g'), '\S(?:.*\S)*') AS name
-                        FROM %s
-                        WHERE %s
-                    )
-                    SELECT sub.id
-                    FROM sale_order_name sub
+                    SELECT sale_order.id
+                    FROM sale_order
                     WHERE %s
+                    AND SUBSTRING(REGEXP_REPLACE(LOWER(sale_order.name), '[^0-9a-z\s]', '', 'g'), '\S(?:.*\S)*') LIKE ANY(%s)
                 ''',
-                query.from_clause,
                 query.where_clause or SQL("TRUE"),
-                additional_conditions or SQL("TRUE"),
+                [t.lower() for t in set(text_tokens)],
             ))]
             if sale_order_ids:
                 sale_orders = sale_orders.browse(sale_order_ids)

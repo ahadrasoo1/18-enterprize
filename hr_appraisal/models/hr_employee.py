@@ -11,7 +11,7 @@ class HrEmployee(models.Model):
     _inherit = "hr.employee"
 
     next_appraisal_date = fields.Date(
-        string='Next Appraisal Date', compute='_compute_next_appraisal_date', groups="hr.group_hr_user", readonly=False, store=True,
+        string='Next Appraisal Date', compute='_compute_next_appraisal_date', groups="hr.group_hr_user", readonly=False, store=True, copy=False,
         help="The date of the next appraisal is computed by the appraisal plan's dates (first appraisal + periodicity).")
     last_appraisal_date = fields.Date(
         string='Last Appraisal Date', groups="hr.group_hr_user",
@@ -60,13 +60,18 @@ class HrEmployee(models.Model):
         for employee in self:
             employee.goals_count = result.get(employee.id, 0)
 
-    @api.depends('ongoing_appraisal_count', 'company_id.appraisal_plan')
+    @api.depends('ongoing_appraisal_count', 'company_id.appraisal_plan', 'company_id.duration_after_recruitment', 'company_id.duration_first_appraisal', 'company_id.duration_next_appraisal')
     def _compute_next_appraisal_date(self):
         self.filtered('ongoing_appraisal_count').next_appraisal_date = False
-        employees_without_appraisal = self.filtered(lambda e: e.ongoing_appraisal_count == 0)
+        employees_without_appraisal = self.filtered(lambda e: e.ongoing_appraisal_count == 0 and e.company_id.appraisal_plan and e.active)
         dates = employees_without_appraisal._upcoming_appraisal_creation_date()
         for employee in employees_without_appraisal:
             employee.next_appraisal_date = dates[employee.id]
+
+    def action_archive(self):
+        res = super().action_archive()
+        self.next_appraisal_date = False
+        return res
 
     def _upcoming_appraisal_creation_date(self):
         today = fields.Date.today()

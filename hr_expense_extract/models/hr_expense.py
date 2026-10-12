@@ -6,11 +6,12 @@ from odoo.addons.iap.tools import iap_tools
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 from odoo.tools import is_html_empty
+from odoo.tools.misc import DEFAULT_SERVER_DATE_FORMAT
 
 import time
 
 
-OCR_VERSION = 132
+OCR_VERSION = 133
 
 
 class HrExpense(models.Model):
@@ -21,16 +22,16 @@ class HrExpense(models.Model):
 
     sample = fields.Boolean(help='Expenses created from sample receipt')
 
-    def _needs_product_price_computation(self):
-        # OVERRIDES 'hr_expense'
-        self.ensure_one()
-        is_extracted = self.extract_state in {'waiting_validation', 'to_validate', 'done'} and self.is_editable
-        return self.product_has_cost and not is_extracted
-
     @api.depends('state')
     def _compute_is_in_extractable_state(self):
         for expense in self:
             expense.is_in_extractable_state = expense.state == 'draft' and not expense.sheet_id
+
+    @api.depends('extract_state', 'state')
+    def _compute_extract_state_processed(self):
+        # Overrides 'iap_extract'
+        for expense in self:
+            expense.extract_state_processed = expense.extract_state == 'waiting_extraction' and expense.state == 'draft'
 
     @api.model
     def _contact_iap_extract(self, pathinfo, params):
@@ -67,41 +68,57 @@ class HrExpense(models.Model):
 
     def _fill_document_with_results(self, ocr_results):
         if ocr_results is not None:
+            vals = {'state': 'draft'}
+
             description_ocr = self._get_ocr_selected_value(ocr_results, 'description', "")
             total_ocr = self._get_ocr_selected_value(ocr_results, 'total', 0.0)
-            date_ocr = self._get_ocr_selected_value(ocr_results, 'date', "")
-            currency_ocr = self._get_ocr_selected_value(ocr_results, 'currency', "")
+            date_ocr = self._get_ocr_selected_value(ocr_results, 'date', fields.Date.context_today(self).strftime(DEFAULT_SERVER_DATE_FORMAT))
+            currency_ocr = self._get_ocr_selected_value(ocr_results, 'currency', self.env.company.currency_id.name)
 
-            self.state = 'draft'
-            if description_ocr and not self.name or self.name == self.message_main_attachment_id.name.split('.')[0]:
-                predicted_product_id = self._predict_product(description_ocr, category=True)
+            if description_ocr and not self.name or self.name == '.'.join(self.message_main_attachment_id.name.split('.')[:-1]):
+                predicted_product_id = self._predict_product(description_ocr)
                 if predicted_product_id:
-                    self.product_id = predicted_product_id if predicted_product_id else self.product_id
-                    self.total_amount_currency = total_ocr
-            self.name = description_ocr
-            # We need to set the name after the product change as changing the product may change the name
-            self.predicted_category = description_ocr
+                    vals['product_id'] = predicted_product_id or self.product_id.id
+                vals['name'] = description_ocr
 
             context_create_date = fields.Date.context_today(self, self.create_date)
-            if date_ocr and not self.date or self.date == context_create_date:
-                self.date = date_ocr
+            if not self.date or self.date == context_create_date:
+                vals['date'] = date_ocr
 
-            if total_ocr and not self.total_amount_currency:
-                self.total_amount_currency = total_ocr
+            product_id = vals.get('product_id', self.product_id.id)
+            product_price = product_id and self.env['product.product'].with_company(self.company_id).browse(product_id).standard_price
+            if product_price:
+                vals['price_unit'] = product_price
+                vals['total_amount_currency'] = product_price
+                vals['total_amount'] = product_price
+            else:
+                vals['total_amount_currency'] = total_ocr
+                vals['quantity'] = 1  # Always the case for expense that are not using a flat rate
+                vals['price_unit'] = total_ocr
+                current_currency = self.currency_id
+                if not self.currency_id or self.currency_id == self.env.company.currency_id:
+                    for comparison in ['=ilike', 'ilike']:
+                        matched_currency = self.env["res.currency"].with_context(active_test=False).search([
+                            '|', '|',
+                            ('currency_unit_label', comparison, currency_ocr),
+                            ('name', comparison, currency_ocr),
+                            ('symbol', comparison, currency_ocr),
+                        ])
+                        if len(matched_currency) == 1:
+                            current_currency = matched_currency
 
-            self.flush_model()
+                vals['currency_id'] = current_currency.id
+                if current_currency and current_currency != self.company_currency_id:
+                    vals['total_amount'] = current_currency._convert(
+                        total_ocr,
+                        self.company_currency_id,
+                        company=self.company_id,
+                        date=vals.get('date', self.date),
+                    )
+                else:
+                    vals['total_amount'] = total_ocr
 
-            if currency_ocr and (not self.currency_id or self.currency_id == self.env.company.currency_id):
-                for comparison in ['=ilike', 'ilike']:
-                    possible_currencies = self.env["res.currency"].search([
-                        '|', '|',
-                        ('currency_unit_label', comparison, currency_ocr),
-                        ('name', comparison, currency_ocr),
-                        ('symbol', comparison, currency_ocr),
-                    ])
-                    if len(possible_currencies) == 1:
-                        self.currency_id = possible_currencies
-                        break
+            self.write(vals)
 
     @api.model
     def get_empty_list_help(self, help_message):
@@ -204,3 +221,13 @@ class HrExpenseSheet(models.Model):
             return
 
         return super().action_sheet_move_post()
+
+
+class HrExpenseSplit(models.TransientModel):
+    _inherit = ['hr.expense.split']
+
+    def _get_values(self):
+        self.ensure_one()
+        vals = super()._get_values()
+        vals['extract_state'] = 'done'  # Marking the state as done will disable the OCR on the split expenses
+        return vals

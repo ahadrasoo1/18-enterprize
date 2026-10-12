@@ -172,6 +172,9 @@ QUnit.module("Knowledge External Embeds Tests", (hooks) => {
                             return {articles: [], favorite_ids: []};
                     }
                 }
+                if (route === '/web/dataset/call_kw/knowledge.article/has_access') {
+                    return Promise.resolve(true);
+                }
             }
         });
         const htmlField = await htmlFieldReadyPromise;

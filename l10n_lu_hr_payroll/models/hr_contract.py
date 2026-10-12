@@ -9,7 +9,7 @@ class HrContract(models.Model):
     l10n_lu_index_on_contract_signature = fields.Float(
         string='Index on Contract Signature (LU)', readonly=True, compute='_compute_indexed_wage')
     l10n_lu_indexed_wage = fields.Monetary(string='Indexed Wage (LU)', compute='_compute_indexed_wage')
-    l10n_lu_current_index = fields.Monetary(string='Current Index (LU)', compute='_compute_indexed_wage')
+    l10n_lu_current_index = fields.Float(string='Current Index (LU)', compute='_compute_indexed_wage')
 
     l10n_lu_meal_voucher_amount = fields.Monetary(string='Meal Vouchers (LU)')
     l10n_lu_meal_voucher_employer_cost = fields.Monetary(
@@ -26,7 +26,9 @@ class HrContract(models.Model):
             contract.l10n_lu_index_on_contract_signature = self.env['hr.rule.parameter']._get_parameter_from_code('l10n_lu_index', date=contract.date_start, raise_if_not_found=False)
             contract.l10n_lu_current_index = self.env['hr.rule.parameter']._get_parameter_from_code('l10n_lu_index', raise_if_not_found=False)
             if contract.l10n_lu_index_on_contract_signature and contract.l10n_lu_current_index:
-                contract.l10n_lu_indexed_wage = contract.wage / contract.l10n_lu_index_on_contract_signature * contract.l10n_lu_current_index
+                contract.l10n_lu_indexed_wage = (
+                    contract.wage if contract.wage_type == 'monthly' else contract.hourly_wage
+                ) / contract.l10n_lu_index_on_contract_signature * contract.l10n_lu_current_index
             else:
                 contract.l10n_lu_indexed_wage = contract.wage
 

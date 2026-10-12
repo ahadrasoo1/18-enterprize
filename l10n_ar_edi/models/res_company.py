@@ -46,6 +46,16 @@ class ResCompany(models.Model):
         [('SCA', 'SCA - TRANSFERENCIA AL SISTEMA DE CIRCULACION ABIERTA'), ('ADC', 'ADC - AGENTE DE DEPOSITO COLECTIVO')],
         'FCE: Transmission Option Default',
         help='Default value for "FCE: Transmission Option" on electronic invoices')
+    l10n_ar_payment_foreign_currency = fields.Selection(
+        selection=[("Yes", "Yes"), ("No", "No"), ("account", "Account's Currency Dependant")],
+        compute="_compute_l10n_ar_payment_foreign_currency",
+        string="Default Policy for Payment in Foreign Currency",
+    )
+
+    def _compute_l10n_ar_payment_foreign_currency(self):
+        for company in self:
+            company.l10n_ar_payment_foreign_currency = self.env["ir.config_parameter"].sudo().get_param(
+                f"l10n_ar_edi.{company.id}_foreign_currency_payment", "No")
 
     @api.depends('l10n_ar_afip_ws_key_id')
     def _compute_afip_crt(self):
@@ -53,16 +63,29 @@ class ResCompany(models.Model):
         certs = self.env['certificate.certificate'].search([('private_key_id', 'in', key_ids)])
         key_to_cert = {cert.private_key_id: cert for cert in certs}
         key_to_cert[False] = False
-
         for company in self:
+            if company.country_code != 'AR':
+                continue
             if not company.l10n_ar_afip_ws_crt_id:
                 company.l10n_ar_afip_ws_crt_id = key_to_cert.get(company.l10n_ar_afip_ws_key_id)
             else:
                 company.l10n_ar_afip_ws_crt_id.private_key_id = company.l10n_ar_afip_ws_key_id
 
+    @api.depends('l10n_ar_afip_ws_crt')
+    def _compute_l10n_ar_afip_ws_crt_fname(self):
+        """ Set the certificate name in the company. Needed in unit tests, solved by a similar onchange method in res.config.settings while setting the certificate via web interface """
+        with_crt = self.filtered(lambda x: x.l10n_ar_afip_ws_crt)
+        remaining = self - with_crt
+        for rec in with_crt:
+            certificate = self._l10n_ar_get_certificate_object(rec.with_context(bin_size=False).l10n_ar_afip_ws_crt)
+            rec.l10n_ar_afip_ws_crt_fname = certificate.get_subject().CN
+        remaining.l10n_ar_afip_ws_crt_fname = ''
+
     @api.depends('l10n_ar_afip_ws_crt_id.private_key_id')
     def _compute_afip_key(self):
         for company in self:
+            if company.country_code != 'AR':
+                continue
             company.l10n_ar_afip_ws_key_id = company.l10n_ar_afip_ws_crt_id.private_key_id
 
     def _get_environment_type(self):
@@ -112,6 +135,8 @@ class ResCompany(models.Model):
         wizard to let the user change the certificate randomly if the one been set is blocked (because someone else
         is using the same certificate in another database) """
         for company in self:
+            if company.country_code != 'AR':
+                continue
             old_cert_name = company.l10n_ar_afip_ws_crt_id.name
             rid = random.randint(1, 10)
             new_cert_name = 'AR demo certificate %d' % rid

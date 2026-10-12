@@ -1,32 +1,40 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* account_accountant_batch_payment
-# 
+#
 # Translators:
-# Wil Odoo, 2024
-# 
+# 何彬 <vnsoft.he@gmail.com>, 2024
+# Raymond Yu <cl_yu@hotmail.com>, 2024
+# Chloe Wang, 2024
+# Wil Odoo, 2025
+# Jeffery CHEN <jeffery9@gmail.com>, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:26+0000\n"
+"POT-Creation-Date: 2025-12-29 18:46+0000\n"
 "PO-Revision-Date: 2024-09-25 09:43+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Chinese (China) (https://app.transifex.com/odoo/teams/41243/zh_CN/)\n"
+"Last-Translator: Jeffery CHEN <jeffery9@gmail.com>, 2025\n"
+"Language-Team: Chinese (China) (https://app.transifex.com/odoo/teams/41243/"
+"zh_CN/)\n"
+"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: zh_CN\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. module: account_accountant_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_accountant_batch_payment.view_account_batch_payment_rejection_form
 msgid ""
 "<br/>\n"
-"                        <span>Do you want to cancel payments to retry them later or keep the batch open with unprocess payments, if you expect them later.</span>"
+"                        <span>Do you want to cancel payments to retry them "
+"later or keep the batch open with unprocess payments, if you expect them "
+"later.</span>"
 msgstr ""
 "<br/>\n"
-"                        <span>您是否希望取消支付并稍后重试，或将批次保持为未处理的付款，以便稍后处理？</span>"
+"                        <span>您是否希望取消支付并稍后重试，或将批次保持为未"
+"处理的付款，以便稍后处理？</span>"
 
 #. module: account_accountant_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_accountant_batch_payment.view_account_batch_payment_list_bank_rec_widget
@@ -36,7 +44,7 @@ msgstr "到期金额"
 #. module: account_accountant_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_accountant_batch_payment.view_account_batch_payment_list_bank_rec_widget
 msgid "Amount Due (in currency)"
-msgstr "到期应付金额（以币种表示）"
+msgstr "到期应付金额（以币别表示）"
 
 #. module: account_accountant_batch_payment
 #: model:ir.model,name:account_accountant_batch_payment.model_bank_rec_widget
@@ -44,14 +52,8 @@ msgid "Bank reconciliation widget for a single statement line"
 msgstr "用于单个对账单行的银行对账工具"
 
 #. module: account_accountant_batch_payment
-#: model:ir.model.fields,field_description:account_accountant_batch_payment.field_bank_rec_widget_line__batch_pay_content
-msgid "Batch Pay Content"
-msgstr ""
-
-#. module: account_accountant_batch_payment
 #. odoo-python
 #: code:addons/account_accountant_batch_payment/models/account_batch_payment.py:0
-#: code:addons/account_accountant_batch_payment/models/bank_rec_widget.py:0
 #: model:ir.model,name:account_accountant_batch_payment.model_account_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_accountant_batch_payment.view_account_batch_payment_rejection_form
 #: model_terms:ir.ui.view,arch_db:account_accountant_batch_payment.view_account_batch_payment_search_bank_rec_widget
@@ -98,7 +100,7 @@ msgstr "显示名称"
 #. odoo-python
 #: code:addons/account_accountant_batch_payment/models/bank_rec_widget.py:0
 msgid "Exchange Difference: %(batch_name)s - %(currency)s"
-msgstr ""
+msgstr "兑换差额：%(batch_name)s-%(currency)s"
 
 #. module: account_accountant_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_accountant_batch_payment.view_account_batch_payment_rejection_form
@@ -124,7 +126,7 @@ msgstr "付款对账"
 #. odoo-python
 #: code:addons/account_accountant_batch_payment/models/bank_rec_widget.py:0
 msgid "Includes %(count)s payment(s)"
-msgstr ""
+msgstr "包括%(count)s支付"
 
 #. module: account_accountant_batch_payment
 #: model:ir.model.fields,field_description:account_accountant_batch_payment.field_account_batch_payment_rejection__write_uid
@@ -190,7 +192,7 @@ msgstr "源批量付款"
 #. module: account_accountant_batch_payment
 #: model:ir.model.fields,field_description:account_accountant_batch_payment.field_bank_rec_widget_line__source_batch_payment_name
 msgid "Source Batch Payment Name"
-msgstr ""
+msgstr "批量付款来源名称"
 
 #. module: account_accountant_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_accountant_batch_payment.view_account_batch_payment_list_bank_rec_widget
@@ -198,9 +200,14 @@ msgid "Suggestions"
 msgstr "建议"
 
 #. module: account_accountant_batch_payment
+#: model_terms:ir.ui.view,arch_db:account_accountant_batch_payment.view_account_batch_payment_search_bank_rec_widget
+msgid "Unreconciled"
+msgstr "未对账"
+
+#. module: account_accountant_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_accountant_batch_payment.view_account_batch_payment_list_bank_rec_widget
 msgid "View"
-msgstr "视图"
+msgstr "查看"
 
 #. module: account_accountant_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_accountant_batch_payment.view_account_batch_payment_rejection_form
@@ -210,7 +217,7 @@ msgstr "批次已删除。"
 #. module: account_accountant_batch_payment
 #: model:ir.model.fields.selection,name:account_accountant_batch_payment.selection__bank_rec_widget_line__flag__new_batch
 msgid "new_batch"
-msgstr ""
+msgstr "new_batch"
 
 #. module: account_accountant_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_accountant_batch_payment.view_account_batch_payment_rejection_form

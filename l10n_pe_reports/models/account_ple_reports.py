@@ -141,6 +141,9 @@ class PeruvianTaxPleReportCustomHandler(models.AbstractModel):
 
             return result
 
+        if self.env.company.parent_id:
+            raise UserError(
+                _("When branches are used, it is necessary to access from the main company to generate the reports."))
         report = self.env["account.report"].browse(options["report_id"])
         query = report._get_report_query(options, 'strict_range')
         if self.env.company.chart_template != 'pe':
@@ -391,9 +394,8 @@ ORDER BY
     def _get_file_txt(self, options, data):
         txt_result = ""
         if data:
-            csv.register_dialect("pipe_separator", delimiter="|", skipinitialspace=True)
             output = StringIO()
-            writer = csv.DictWriter(output, dialect="pipe_separator", fieldnames=data[0].keys())
+            writer = csv.DictWriter(output, delimiter="|", skipinitialspace=True, fieldnames=data[0].keys())
             writer.writerows(data)
             txt_result = output.getvalue()
 

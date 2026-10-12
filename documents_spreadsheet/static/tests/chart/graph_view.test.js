@@ -2,14 +2,17 @@ import {
     createSpreadsheetFromGraphView,
     spawnGraphViewForSpreadsheet,
 } from "@documents_spreadsheet/../tests/helpers/chart_helpers";
-import { defineDocumentSpreadsheetModels } from "@documents_spreadsheet/../tests/helpers/data";
+import {
+    defineDocumentSpreadsheetModels,
+    getBasicServerData,
+} from "@documents_spreadsheet/../tests/helpers/data";
 import { SpreadsheetAction } from "@documents_spreadsheet/bundle/actions/spreadsheet_action";
 import { beforeEach, describe, expect, test } from "@odoo/hoot";
-import { getBasicServerData } from "@spreadsheet/../tests/helpers/data";
 import { getSpreadsheetActionModel } from "@spreadsheet_edition/../tests/helpers/webclient_helpers";
 import { patchGraphSpreadsheet } from "@spreadsheet_edition/assets/graph_view/graph_view";
 import {
     contains,
+    defineActions,
     patchWithCleanup,
     toggleMenu,
     toggleMenuItem,
@@ -125,6 +128,28 @@ test("graph measure is not saved in spreadsheet context", async () => {
     );
 });
 
+test("can insert chart from action with evaluated context", async function () {
+    const actionXmlId = "spreadsheet.partner_action";
+    defineActions([
+        {
+            id: 1,
+            name: "partner Action",
+            res_model: "partner",
+            xml_id: actionXmlId,
+            views: [[false, "graph"]],
+            context: "{'my_evaluated_context_key': active_id}",
+        },
+    ]);
+
+    const { model } = await createSpreadsheetFromGraphView({
+        actionXmlId,
+        additionalContext: { active_id: 1 },
+    });
+    const sheetId = model.getters.getActiveSheetId();
+    const chartId = model.getters.getChartIds(sheetId)[0];
+    expect(model.getters.getChart(chartId).actionXmlId).toBe(actionXmlId);
+});
+
 test("Chart name can be changed from the dialog", async () => {
     await spawnGraphViewForSpreadsheet();
 
@@ -176,10 +201,25 @@ test("graph with a contextual domain", async () => {
     const chartId = model.getters.getFigures(sheetId)[0].id;
 
     const chart = model.getters.getChartDefinition(chartId);
-    expect(chart.searchParams.domain).toEqual('[("foo", "=", uid)]');
+    expect(chart.searchParams.domain).toBe('[("foo", "=", uid)]');
     expect(model.exportData().sheets[0].figures[0].data.searchParams.domain).toEqual(
         '[("foo", "=", uid)]',
         { message: "domain is exported with the dynamic value" }
     );
     expect.verifySteps(["web_read_group", "web_read_group"]);
 });
+
+test("'cumulated_start' is fetched from the graph view", async () => {
+    const serverData = getBasicServerData();
+    serverData.views["partner,false,graph"] = /* xml */ `
+        <graph string="Partner" cumulated_start="true">
+            <field name="foo" type="measure"/>
+        </graph>
+    `;
+    const { model } = await createSpreadsheetFromGraphView({ serverData });
+
+    const sheetId = model.getters.getActiveSheetId();
+    const chartIds = model.getters.getChartIds(sheetId)
+    expect(chartIds.length).toBe(1);
+    expect(model.getters.getChart(chartIds[0]).metaData.cumulatedStart).toBe(true);
+})

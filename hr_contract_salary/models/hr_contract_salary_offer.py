@@ -63,12 +63,20 @@ class HrContractSalaryOffer(models.Model):
                                  store=True, readonly=False,
                                  copy=False, tracking=True)
     url = fields.Char('Link', compute='_compute_url')
+    contract_type_id = fields.Many2one(related='contract_template_id.contract_type_id', string='Contract Type', readonly=True, store=False)
+
+    _sql_constraints = [
+        ('check_validity_days_count', 'CHECK(validity_days_count >= 0)', 'The validity should not be negative.'),
+    ]
 
     @api.depends("access_token", "applicant_id")
     def _compute_url(self):
-        base_url = self.get_base_url()
+        base_url = self.env['hr.contract.salary.offer'].get_base_url()
         for offer in self:
-            offer.url = base_url + f"/salary_package/simulation/offer/{offer.id}" + (f"?token={offer.access_token}" if offer.applicant_id else "")
+            offer.url = base_url \
+                      + f"/salary_package/simulation/offer/{offer.id}" \
+                      + f"?final_yearly_costs={round(offer.final_yearly_costs, 2)}" \
+                      + (f"&token={offer.access_token}" if offer.applicant_id else "")
 
     @api.depends('applicant_id', 'employee_contract_id')
     def _compute_display_name(self):
@@ -248,11 +256,20 @@ class HrContractSalaryOffer(models.Model):
 
     def action_view_contract(self):
         self.ensure_one()
+        contract_id = self.employee_contract_id.id or self.env['hr.contract'].search([("applicant_id", "=", self.applicant_id.id)], limit=1).id
         return {
             'type': 'ir.actions.act_window',
             'name': _('Contract'),
             'view_mode': 'form',
             'res_model': 'hr.contract',
-            'res_id': self.employee_contract_id.id,
+            'res_id': contract_id,
             'target': 'current',
         }
+
+    def _message_get_suggested_recipients(self):
+        recipients = super()._message_get_suggested_recipients()
+        if self.applicant_id:
+            self._message_add_suggested_recipient(recipients, email=self.applicant_id.email_from, reason=_('Contact Email'))
+        elif self.employee_id:
+            self._message_add_suggested_recipient(recipients, partner=self.employee_id.work_contact_id.sudo(), reason=_('Contact'))
+        return recipients

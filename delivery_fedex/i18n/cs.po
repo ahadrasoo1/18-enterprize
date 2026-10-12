@@ -1,23 +1,25 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* delivery_fedex
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Stanislav Kurinec, 2024
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
+"POT-Creation-Date: 2025-12-29 18:50+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
+"Last-Translator: Stanislav Kurinec, 2024\n"
 "Language-Team: Czech (https://app.transifex.com/odoo/teams/41243/cs/)\n"
+"Language: cs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: cs\n"
-"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
+"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n "
+"<= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
 
 #. module: delivery_fedex
 #: model_terms:ir.ui.view,arch_db:delivery_fedex.view_delivery_carrier_form_with_provider_fedex
@@ -42,7 +44,8 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:delivery_fedex.view_delivery_carrier_form_with_provider_fedex
 msgid ""
 "<span invisible=\"fedex_weight_unit != 'KG'\">CM</span>\n"
-"                                <span invisible=\"fedex_weight_unit != 'LB'\">IN</span>"
+"                                <span invisible=\"fedex_weight_unit != "
+"'LB'\">IN</span>"
 msgstr ""
 
 #. module: delivery_fedex
@@ -117,17 +120,17 @@ msgstr ""
 
 #. module: delivery_fedex
 #: model:ir.model.fields,field_description:delivery_fedex.field_delivery_carrier__fedex_extra_data_rate_request
-msgid "Extra data for rate"
+msgid "Extra data for rate (legacy)"
 msgstr ""
 
 #. module: delivery_fedex
 #: model:ir.model.fields,field_description:delivery_fedex.field_delivery_carrier__fedex_extra_data_return_request
-msgid "Extra data for return"
+msgid "Extra data for return (legacy)"
 msgstr ""
 
 #. module: delivery_fedex
 #: model:ir.model.fields,field_description:delivery_fedex.field_delivery_carrier__fedex_extra_data_ship_request
-msgid "Extra data for ship"
+msgid "Extra data for ship (legacy)"
 msgstr ""
 
 #. module: delivery_fedex
@@ -238,24 +241,18 @@ msgstr "FIRST_OVERNIGHT"
 #. module: delivery_fedex
 #: model:ir.model.fields.selection,name:delivery_fedex.selection__delivery_carrier__delivery_type__fedex
 #: model:ir.model.fields.selection,name:delivery_fedex.selection__stock_package_type__package_carrier_type__fedex
-msgid "FedEx"
-msgstr "FedEx"
+msgid "FedEx (Legacy)"
+msgstr ""
 
 #. module: delivery_fedex
 #: model:ir.model.fields,field_description:delivery_fedex.field_delivery_carrier__fedex_account_number
-msgid "FedEx Account Number"
-msgstr "Číslo účtu FedEx"
+msgid "FedEx Legacy Account Number"
+msgstr ""
 
 #. module: delivery_fedex
 #: model:ir.model.fields,field_description:delivery_fedex.field_delivery_carrier__fedex_saturday_delivery
 msgid "FedEx Saturday Delivery"
 msgstr "FedEx Sobotní doručení"
-
-#. module: delivery_fedex
-#: model_terms:ir.ui.view,arch_db:delivery_fedex.res_config_settings_view_form_sale
-#: model_terms:ir.ui.view,arch_db:delivery_fedex.res_config_settings_view_form_stock
-msgid "FedEx Shipping Methods"
-msgstr "Způsoby přepravy FedEx"
 
 #. module: delivery_fedex
 #: model_terms:ir.ui.view,arch_db:delivery_fedex.view_delivery_carrier_form_with_provider_fedex
@@ -473,7 +470,7 @@ msgstr "Adresát"
 #. odoo-python
 #: code:addons/delivery_fedex/models/delivery_fedex.py:0
 msgid "Return Label"
-msgstr ""
+msgstr "Návratový štítek"
 
 #. module: delivery_fedex
 #: model:ir.model.fields.selection,name:delivery_fedex.selection__delivery_carrier__fedex_service_type__standard_overnight
@@ -558,8 +555,8 @@ msgstr "Zásilka číslo %s byla zrušena"
 #. odoo-python
 #: code:addons/delivery_fedex/models/delivery_fedex.py:0
 msgid ""
-"Shipment created into Fedex<br/><b>Tracking Numbers:</b> "
-"%(tracking_numbers)s<br/><b>Packages:</b> %(packages)s"
+"Shipment created into Fedex<br/><b>Tracking Numbers:</b> %"
+"(tracking_numbers)s<br/><b>Packages:</b> %(packages)s"
 msgstr ""
 
 #. module: delivery_fedex
@@ -596,14 +593,18 @@ msgstr "Typ balení"
 #: model:ir.model.fields,help:delivery_fedex.field_delivery_carrier__fedex_extra_data_ship_request
 msgid ""
 "The extra data in FedEx is organized like the inside of a json file.\n"
-"This functionality is advanced/technical and should only be used if you know what you are doing.\n"
+"This functionality is advanced/technical and should only be used if you know "
+"what you are doing.\n"
 "\n"
 "Example of valid value: ```\n"
-"\"ShipmentDetails\": {\"Pieces\": {\"Piece\": {\"AdditionalInformation\": \"extra info\"}}}\n"
+"\"ShipmentDetails\": {\"Pieces\": {\"Piece\": {\"AdditionalInformation\": "
+"\"extra info\"}}}\n"
 "```\n"
 "\n"
-"With the above example, the AdditionalInformation of each piece will be updated.\n"
-"More info on https://www.fedex.com/en-us/developer/web-services/process.html#documentation"
+"With the above example, the AdditionalInformation of each piece will be "
+"updated.\n"
+"More info on https://www.fedex.com/en-us/developer/web-services/"
+"process.html#documentation"
 msgstr ""
 
 #. module: delivery_fedex
@@ -614,8 +615,8 @@ msgstr "Posledním krokem je"
 #. module: delivery_fedex
 #: model_terms:ir.ui.view,arch_db:delivery_fedex.view_delivery_carrier_form_with_provider_fedex
 msgid ""
-"These certifications usually require that you contact the FedEx support team"
-" by email."
+"These certifications usually require that you contact the FedEx support team "
+"by email."
 msgstr ""
 "Tyto certifikace obvykle vyžadují, abyste kontaktovali tým podpory "
 "společnosti FedEx e-mailem."

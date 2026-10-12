@@ -1,22 +1,23 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* hr_appraisal_survey
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Thi Huong Nguyen, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
+"POT-Creation-Date: 2025-12-29 18:45+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
+"Last-Translator: Thi Huong Nguyen, 2025\n"
 "Language-Team: Vietnamese (https://app.transifex.com/odoo/teams/41243/vi/)\n"
+"Language: vi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: vi\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. module: hr_appraisal_survey
@@ -51,47 +52,63 @@ msgstr "<span>/</span>"
 #. module: hr_appraisal_survey
 #: model:mail.template,body_html:hr_appraisal_survey.mail_template_appraisal_ask_feedback
 msgid ""
-"<t t-set=\"logged_user\" t-value=\"ctx.get('logged_user')\"></t>\n"
-"                <t t-set=\"employee\" t-value=\"ctx.get('employee')\"></t>\n"
-"                <t t-set=\"deadline\" t-value=\"ctx.get('deadline')\"></t>\n"
+"<t t-set=\"logged_user\" t-value=\"ctx.get('logged_user')\"/>\n"
+"                <t t-set=\"employee\" t-value=\"ctx.get('employee')\"/>\n"
+"                <t t-set=\"deadline\" t-value=\"ctx.get('deadline')\"/>\n"
 "                <div style=\"margin: 0px; padding: 0px;\">\n"
-"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
-"                        <p style=\"margin-left:5px\">Dear <t t-out=\"object.partner_id.name or 'participant'\">[participant]</t></p>\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
+"\">\n"
+"                        </p><p style=\"margin-left:5px\">Dear <t t-"
+"out=\"object.partner_id.name or 'participant'\">[participant]</t></p>\n"
 "                        <span>\n"
-"                            <t t-out=\"logged_user\">[Current user]</t> invites you to participate in a survey and provide your feedback on <t t-out=\"employee\">[employee]</t>.\n"
-"                            Please complete the survey before the <t t-out=\"deadline\">[specified deadline]</t>.\n"
+"                            <t t-out=\"logged_user\">[Current user]</t> "
+"invites you to participate in a survey and provide your feedback on <t t-"
+"out=\"employee\">[employee]</t>.\n"
+"                            Please complete the survey before the <t t-"
+"out=\"deadline\">[specified deadline]</t>.\n"
 "                        </span>\n"
-"                        <br>\n"
+"                        <br/>\n"
 "                        Thank you!\n"
-"                        <br><br>\n"
-"                        <div style=\"margin: 16px 0px 16px 0px; text-align: center;\">\n"
-"                            <a t-att-href=\"object.get_start_url()\" style=\"background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;\">\n"
+"                        <br/><br/>\n"
+"                        <div style=\"margin: 16px 0px 16px 0px; text-align: "
+"center;\">\n"
+"                            <a t-att-href=\"object.get_start_url()\" "
+"style=\"background-color: #875A7B; padding: 8px 16px 8px 16px; text-"
+"decoration: none; color: #fff; border-radius: 5px; font-size:13px;\">\n"
 "                                Give your feedback\n"
 "                            </a>\n"
 "                        </div>\n"
-"                    </p>\n"
+"                    \n"
 "                </div>\n"
 "            "
 msgstr ""
-"<t t-set=\"logged_user\" t-value=\"ctx.get('logged_user')\"></t>\n"
-"                <t t-set=\"employee\" t-value=\"ctx.get('employee')\"></t>\n"
-"                <t t-set=\"deadline\" t-value=\"ctx.get('deadline')\"></t>\n"
+"<t t-set=\"logged_user\" t-value=\"ctx.get('logged_user')\"/>\n"
+"                <t t-set=\"employee\" t-value=\"ctx.get('employee')\"/>\n"
+"                <t t-set=\"deadline\" t-value=\"ctx.get('deadline')\"/>\n"
 "                <div style=\"margin: 0px; padding: 0px;\">\n"
-"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
-"                        <p style=\"margin-left:5px\">Xin chào <t t-out=\"object.partner_id.name or 'participant'\">[participant]</t></p>\n"
+"                   <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
+"\"> \n"
+"                        </p><p style=\"margin-left:5px\">Xin chào <t t-"
+"out=\"object.partner_id.name or 'participant'\">[participant]</t></p>\n"
 "                        <span>\n"
-"                            <t t-out=\"logged_user\">[Current user]</t> đã mời bạn tham gia một bản khảo sát và nêu phản hồi về <t t-out=\"employee\">[employee]</t>.\n"
-"                            Vui lòng hoàn thành khảo sát trước <t t-out=\"deadline\">[specified deadline]</t>.\n"
+"                            <t t-out=\"logged_user\">[Current user]</t> đã "
+"mời bạn tham gia một bản khảo sát và nêu phản hồi về <t t-"
+"out=\"employee\">[employee]</t>.\n"
+"                            Vui lòng hoàn thành khảo sát trước <t t-"
+"out=\"deadline\">[specified deadline]</t>.\n"
 "                        </span>\n"
-"                        <br>\n"
+"                        <br/>\n"
 "                        Cảm ơn bạn!\n"
-"                        <br><br>\n"
-"                        <div style=\"margin: 16px 0px 16px 0px; text-align: center;\">\n"
-"                            <a t-att-href=\"object.get_start_url()\" style=\"background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;\">\n"
+"                        <br/><br/>\n"
+"                        <div style=\"margin: 16px 0px 16px 0px; text-align: "
+"center;\">\n"
+"                            <a t-att-href=\"object.get_start_url()\" "
+"style=\"background-color: #875A7B; padding: 8px 16px 8px 16px; text-"
+"decoration: none; color: #fff; border-radius: 5px; font-size:13px;\">\n"
 "                                Phản hồi\n"
 "                            </a>\n"
 "                        </div>\n"
-"                    </p>\n"
+"                    \n"
 "                </div>\n"
 "            "
 
@@ -99,11 +116,11 @@ msgstr ""
 #. odoo-python
 #: code:addons/hr_appraisal_survey/models/hr_appraisal.py:0
 msgid ""
-"A new 360 Feedback report has been completed for the appraisal of "
-"%(employee_name)s."
+"A new 360 Feedback report has been completed for the appraisal of %"
+"(employee_name)s."
 msgstr ""
-"Đã hoàn thành một báo cáo Phản hồi 360 mới cho đánh giá của "
-"%(employee_name)s."
+"Đã hoàn thành một báo cáo Phản hồi 360 mới cho đánh giá của %"
+"(employee_name)s."
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.arow_3_1_1
@@ -157,7 +174,7 @@ msgstr "Thêm bình luận"
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.y_360_5_6
 msgid "Admit his/her mistakes"
-msgstr ""
+msgstr "Thừa nhận lỗi của anh/cô ấy"
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_survey_user_input_view_tree
@@ -412,7 +429,7 @@ msgstr "Tên hiển thị"
 #. module: hr_appraisal_survey
 #: model:survey.question,title:hr_appraisal_survey.appraisal_360_10
 msgid "Do you have any comment to tell him/her in order to improve?"
-msgstr ""
+msgstr "Bạn có góp ý nào giúp anh/cô ấy cải thiện không?"
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_survey_user_input_view_tree
@@ -474,7 +491,7 @@ msgstr "Đi đến biểu mẫu đánh giá"
 #. module: hr_appraisal_survey
 #: model:survey.question,title:hr_appraisal_survey.appraisal_360_5
 msgid "How does it feel to work with the employee? Is he/she ... "
-msgstr ""
+msgstr "Bạn cảm thấy thế nào khi làm việc với nhân viên này? Anh/cô ấy..."
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.appraisal_360_3_sug5
@@ -513,19 +530,19 @@ msgstr "Sáng kiến và tự chủ"
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_appraisal_ask_feedback__is_mail_template_editor
 msgid "Is Editor"
-msgstr "Là biên tập"
+msgstr "Là trình chỉnh sửa"
 
 #. module: hr_appraisal_survey
 #: model_terms:survey.question,description:hr_appraisal_survey.appraisal_1
 msgid ""
 "It is the joint responsibility of the employee and the supervisor "
-"(appraiser) to establish a feasible work plan for the coming year, including"
-" major employee responsibilities and corresponding benchmarks against which "
+"(appraiser) to establish a feasible work plan for the coming year, including "
+"major employee responsibilities and corresponding benchmarks against which "
 "results will be evaluated."
 msgstr ""
 "Trách nhiệm chung của nhân viên và người giám sát (người đánh giá) là thiết "
-"lập một kế hoạch làm việc khả thi cho năm tới, bao gồm các trách nhiệm chính"
-" của nhân viên và các tiêu chuẩn tương ứng để đánh giá kết quả."
+"lập một kế hoạch làm việc khả thi cho năm tới, bao gồm các trách nhiệm chính "
+"của nhân viên và các tiêu chuẩn tương ứng để đánh giá kết quả."
 
 #. module: hr_appraisal_survey
 #: model_terms:survey.question,description:hr_appraisal_survey.appraisal_1
@@ -558,8 +575,8 @@ msgid ""
 "Leadership: create a challenging and motivating work environment aligned "
 "with the company's strategy"
 msgstr ""
-"Lãnh đạo: tạo ra một môi trường làm việc đầy thách thức và năng động phù hợp"
-" với chiến lược của công ty"
+"Lãnh đạo: tạo ra một môi trường làm việc đầy thách thức và năng động phù hợp "
+"với chiến lược của công ty"
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.arow_3_2_4
@@ -569,7 +586,7 @@ msgstr "Lãnh đạo: duy trì phát triển chuyên môn cho cấp dưới"
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.y_360_5_1
 msgid "Listening well to others"
-msgstr ""
+msgstr "Biết lắng nghe"
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.appraisal_ask_feedback_view_form
@@ -627,8 +644,8 @@ msgstr "Tin nhắn tùy chọn"
 msgid ""
 "Optional translation language (ISO code) to select when sending out an "
 "email. If not set, the english version will be used. This should usually be "
-"a placeholder expression that provides the appropriate language, e.g. {{ "
-"object.partner_id.lang }}."
+"a placeholder expression that provides the appropriate language, e.g. "
+"{{ object.partner_id.lang }}."
 msgstr ""
 "Ngôn ngữ dịch tuỳ chọn (mã ISO) để chọn khi gửi email. Nếu không đặt, phiên "
 "bản tiếng Anh sẽ được sử dụng. Đây luôn là biểu thức placeholder cung cấp "
@@ -672,7 +689,7 @@ msgstr "Mục tiêu dự án"
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.arow_3_1_12
 msgid "Promptness and attendance record"
-msgstr "Phản ứng nhanh và hồ sơ điểm danh"
+msgstr "Phản ứng nhanh và hồ sơ chấm công"
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.x_360_5_2
@@ -725,8 +742,8 @@ msgid ""
 "Results of the bottom-up survey and mitigation actions to face technical, "
 "organizational, structural and/or relational issues"
 msgstr ""
-"Kết quả khảo sát từ cấp dưới và hành động giảm nhẹ để đối mặt với các vấn đề"
-" kỹ thuật, tổ chức, cơ cấu hoặc/và quan hệ."
+"Kết quả khảo sát từ cấp dưới và hành động giảm nhẹ để đối mặt với các vấn đề "
+"kỹ thuật, tổ chức, cơ cấu hoặc/và quan hệ."
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.appraisal_ask_feedback_view_form
@@ -856,7 +873,7 @@ msgstr "Kỹ năng kỹ thuật liên quan đến yêu cầu công việc"
 #. module: hr_appraisal_survey
 #: model_terms:survey.survey,description_done:hr_appraisal_survey.appraisal_360_feedback_template
 msgid "Thanks a lot for your time and participation !"
-msgstr ""
+msgstr "Cảm ơn bạn đã dành thời gian tham gia!"
 
 #. module: hr_appraisal_survey
 #: model_terms:survey.question,description:hr_appraisal_survey.appraisal_3
@@ -887,8 +904,8 @@ msgid ""
 msgstr ""
 "Nhân viên sẽ chịu trách nhiệm hoàn thành Biểu mẫu đánh giá nháp, đây được "
 "coi như một công cụ tự đánh giá và là điểm khởi đầu cho phần đánh giá của "
-"người giám sát. Nhân viên có thể thêm ví dụ về thành tích cho từng tiêu chí."
-" Sau khi điền xong biểu mẫu, nhân viên sẽ gửi cho người giám sát của mình."
+"người giám sát. Nhân viên có thể thêm ví dụ về thành tích cho từng tiêu chí. "
+"Sau khi điền xong biểu mẫu, nhân viên sẽ gửi cho người giám sát của mình."
 
 #. module: hr_appraisal_survey
 #. odoo-python
@@ -897,6 +914,8 @@ msgid ""
 "The following employees do not have any email: \n"
 "%s"
 msgstr ""
+"Những nhân viên sau đây không có email: \n"
+"%s"
 
 #. module: hr_appraisal_survey
 #: model_terms:survey.question,description:hr_appraisal_survey.appraisal_1
@@ -911,8 +930,8 @@ msgstr ""
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,help:hr_appraisal_survey.field_hr_department__appraisal_survey_template_id
 msgid ""
-"This field is used with 360 Feedback setting on Appraisal App, the aim is to"
-" define a default Survey Template related to this department."
+"This field is used with 360 Feedback setting on Appraisal App, the aim is to "
+"define a default Survey Template related to this department."
 msgstr ""
 "Trường này được sử dụng với cài đặt Phản hồi 360 trong ứng dụng Đánh giá. "
 "Mục đích là để xác định mẫu khảo sát mặc định liên quan tới phòng ban này."
@@ -923,8 +942,8 @@ msgid ""
 "This survey allows you to give a feedback about your collaboration with an "
 "employee. Filling it helps us improving the appraisal process."
 msgstr ""
-"Khảo sát này là cơ hội để bạn phản hồi về sự hợp tác giữa bạn với nhân viên."
-" Dựa vào đó, chúng tôi sẽ có thể cải thiện quá trình đánh giá."
+"Khảo sát này là cơ hội để bạn phản hồi về sự hợp tác giữa bạn với nhân viên. "
+"Dựa vào đó, chúng tôi sẽ có thể cải thiện quá trình đánh giá."
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.arow_3_1_15
@@ -934,11 +953,11 @@ msgstr "Quản lý thời gian: các dự án/nhiệm vụ được hoàn thành
 #. module: hr_appraisal_survey
 #: model_terms:survey.question,description:hr_appraisal_survey.appraisal_1
 msgid ""
-"To assist employees in their professional growth, through the identification"
-" of strengths and opportunities for development"
+"To assist employees in their professional growth, through the identification "
+"of strengths and opportunities for development"
 msgstr ""
-"Để hỗ trợ nhân viên phát triển nghề nghiệp, thông qua việc xác định các điểm"
-" mạnh và cơ hội phát triển"
+"Để hỗ trợ nhân viên phát triển nghề nghiệp, thông qua việc xác định các điểm "
+"mạnh và cơ hội phát triển"
 
 #. module: hr_appraisal_survey
 #: model_terms:survey.question,description:hr_appraisal_survey.appraisal_1
@@ -953,8 +972,8 @@ msgstr "Tổng số khảo sát"
 #. module: hr_appraisal_survey
 #: model:survey.question,title:hr_appraisal_survey.appraisal_5_1
 msgid ""
-"Use the following space to make any comments regarding the above performance"
-" evaluation."
+"Use the following space to make any comments regarding the above performance "
+"evaluation."
 msgstr ""
 "Sử dụng chỗ trống sau đây để đưa ra bất kỳ nhận xét nào liên quan đến đánh "
 "giá hiệu suất ở trên."
@@ -978,30 +997,41 @@ msgstr "Chúng ta là đồng nghiệp, khác bộ phận."
 #: model_terms:survey.survey,description:hr_appraisal_survey.appraisal_360_feedback_template
 msgid ""
 "Welcome to this survey, <br><br>\n"
-"                You've been asked to participate to a 360 Feedback. It's a small survey that will allow managers to get more feedback about their employee. \n"
-"                By working with him/her, you're the best to share your thoughts and explain how your collaboration was.<br><br>\n"
-"                Your answers will be viewed only by the managers. This is not an anonymous survey."
+"                You've been asked to participate to a 360 Feedback. It's a "
+"small survey that will allow managers to get more feedback about their "
+"employee. \n"
+"                By working with him/her, you're the best to share your "
+"thoughts and explain how your collaboration was.<br><br>\n"
+"                Your answers will be viewed only by the managers. This is "
+"not an anonymous survey."
 msgstr ""
+"Chào mừng bạn tham gia khảo sát này,<br><br>\n"
+"Bạn đã được yêu cầu tham gia Phản hồi 360. Đây là một cuộc khảo sát nhỏ để "
+"các quản lý có thể nhận thêm phản hồi về nhân viên của họ.\n"
+"Bằng cách làm việc với nhân viên này, bạn là người phù hợp nhất để chia sẻ "
+"suy nghĩ của mình và cho biết về mối quan hệ hợp tác với anh/cô ấy.<br><br>\n"
+"Chỉ các quản lý mới có thể xem câu trả lời của bạn và đây không phải là một "
+"cuộc khảo sát ẩn danh."
 
 #. module: hr_appraisal_survey
 #: model:survey.question,title:hr_appraisal_survey.appraisal_360_6
 msgid "What should he/she does in order to improve on his/her day-to-day job?"
-msgstr ""
+msgstr "Anh/cô ấy nên làm gì để cải thiện công việc hàng ngày của mình?"
 
 #. module: hr_appraisal_survey
 #: model:survey.question,title:hr_appraisal_survey.appraisal_360_7
 msgid "What's his/her greatest strength?"
-msgstr ""
+msgstr "Điểm mạnh lớn nhất của anh/cô ấy là gì?"
 
 #. module: hr_appraisal_survey
 #: model:survey.question,title:hr_appraisal_survey.appraisal_360_8
 msgid "What's his/her greatest weakness?"
-msgstr ""
+msgstr "Điểm yếu lớn nhất của anh/cô ấy là gì?"
 
 #. module: hr_appraisal_survey
 #: model:survey.question,title:hr_appraisal_survey.appraisal_360_3
 msgid "What's the relation between the employee and you?"
-msgstr ""
+msgstr "Mối quan hệ giữa nhân viên này và bạn là gì?"
 
 #. module: hr_appraisal_survey
 #: model:survey.question,title:hr_appraisal_survey.appraisal_360_2

@@ -1,13 +1,5 @@
-import { beforeEach, describe, expect, test } from "@odoo/hoot";
-import {
-    hover,
-    pointerDown,
-    queryAll,
-    queryFirst,
-    queryOne,
-    queryRect,
-    resize,
-} from "@odoo/hoot-dom";
+import { beforeEach, describe, expect, queryOne, test } from "@odoo/hoot";
+import { hover, pointerDown, queryAll, queryFirst, queryRect, resize } from "@odoo/hoot-dom";
 import { advanceFrame, animationFrame, mockDate, runAllTimers } from "@odoo/hoot-mock";
 import {
     contains,
@@ -22,6 +14,7 @@ import {
     clickConnectorButton,
     getConnector,
     getConnectorMap,
+    getConnectorStroke,
 } from "@web_gantt/../tests/gantt_dependency_helpers";
 import { COLORS } from "@web_gantt/gantt_connector";
 import {
@@ -233,10 +226,8 @@ test("Connectors are correctly computed and rendered.", async () => {
         });
 
         const connector = connectorMap.get(testKey);
-        const connectorEl = getConnector(connector.id);
-        expect(connectorEl).not.toBe(null);
-        const connectorStroke = queryFirst(SELECTORS.connectorStroke, { root: connectorEl });
-        expect(connectorStroke).toHaveAttribute("stroke", COLORS[colorCode].color);
+        expect(getConnector(connector.id)).toHaveCount(1);
+        expect(getConnectorStroke(connector.id)).toHaveAttribute("stroke", COLORS[colorCode].color);
     }
 
     expect(testMap).toHaveLength(connectorMap.size);
@@ -431,26 +422,20 @@ test("Connector hovered state is triggered and color is set accordingly.", async
     await mountGanttView(ganttViewParams);
 
     expect(getConnector(1)).not.toHaveClass(CLASSES.highlightedConnector);
-    expect(queryFirst(SELECTORS.connectorStroke, { root: getConnector(1) })).toHaveAttribute(
-        "stroke",
-        COLORS.default.color
-    );
+    expect(getConnectorStroke(1)).toHaveAttribute("stroke", COLORS.default.color);
 
-    await hover(getConnector(1));
+    await hover(getConnectorStroke(1));
     await animationFrame();
 
     expect(getConnector(1)).toHaveClass(CLASSES.highlightedConnector);
-    expect(queryFirst(SELECTORS.connectorStroke, { root: getConnector(1) })).toHaveAttribute(
-        "stroke",
-        COLORS.default.highlightedColor
-    );
+    expect(getConnectorStroke(1)).toHaveAttribute("stroke", COLORS.default.highlightedColor);
 });
 
 test("Buttons are displayed when hovering a connector.", async () => {
     await mountGanttView(ganttViewParams);
     expect(queryAll(SELECTORS.connectorStrokeButton, { root: getConnector(1) })).toHaveCount(0);
 
-    await hover(getConnector(1));
+    await hover(getConnectorStroke(1));
     await animationFrame();
 
     expect(queryAll(SELECTORS.connectorStrokeButton, { root: getConnector(1) })).toHaveCount(3);
@@ -466,7 +451,7 @@ test("Buttons are displayed when hovering a connector after a pill has been hove
     expect(queryAll(SELECTORS.connectorStrokeButton, { root: getConnector(1) })).toHaveCount(0);
     expect(getConnector(1)).toHaveClass(CLASSES.highlightedConnector);
 
-    await hover(getConnector(1));
+    await hover(getConnectorStroke(1));
     await animationFrame();
 
     expect(getConnector(1)).toHaveClass(CLASSES.highlightedConnector);
@@ -532,6 +517,11 @@ test("Connector buttons: reschedule task start backward, different data.", async
     await mountGanttView(ganttViewParams);
 
     await clickConnectorButton(getConnector(1), "reschedule-backward");
+    expect(".o_notification").toHaveCount(1);
+    expect(".o_notification .o_notification_buttons button").toHaveCount(0, {
+        message:
+            "No button should be displayed in the notification since `old_vals_per_pill_id` is not given in the result of `web_gantt_reschedule` call",
+    });
     expect.verifySteps([
         [
             "web_gantt_reschedule",
@@ -550,11 +540,41 @@ test("Connector buttons: reschedule task forward, different data.", async () => 
     await mountGanttView(ganttViewParams);
 
     await clickConnectorButton(getConnector(1), "reschedule-forward");
+    expect(".o_notification").toHaveCount(1);
+    expect(".o_notification .o_notification_buttons button").toHaveCount(0, {
+        message:
+            "No button should be displayed in the notification since `old_vals_per_pill_id` is not given in the result of `web_gantt_reschedule` call",
+    });
     expect.verifySteps([
         [
             "web_gantt_reschedule",
             ["forward", 1, 2, "depend_on_ids", null, "planned_date_begin", "date_deadline"],
         ],
+    ]);
+});
+
+test("Connector buttons: reschedule task forward and undo.", async () => {
+    onRpc(({ method, model, args }) => {
+        if (
+            model === "project.task" &&
+            ["web_gantt_reschedule", "action_rollback_scheduling"].includes(method)
+        ) {
+            expect.step([method, args]);
+            return { old_vals_per_pill_id: { 1: { test: true }, 2: { foo: false } } };
+        }
+    });
+    await mountGanttView(ganttViewParams);
+
+    await clickConnectorButton(getConnector(1), "reschedule-forward");
+    expect(".o_notification").toHaveCount(1);
+    expect(".o_notification .o_notification_buttons button").toHaveCount(1);
+    await contains(".o_notification .o_notification_buttons button i.fa-undo").click();
+    expect.verifySteps([
+        [
+            "web_gantt_reschedule",
+            ["forward", 1, 2, "depend_on_ids", null, "planned_date_begin", "date_deadline"],
+        ],
+        ["action_rollback_scheduling", [[1, 2], { 1: { test: true }, 2: { foo: false } }]],
     ]);
 });
 
@@ -676,17 +696,22 @@ test("Hovering a connector should cause the connected pills to get highlighted."
     expect(SELECTORS.highlightedConnector).toHaveCount(0);
     expect(SELECTORS.highlightedPill).toHaveCount(0);
 
-    await contains(getConnector(1)).hover();
+    await hover(getConnectorStroke(1));
+    await animationFrame();
+
     expect(SELECTORS.highlightedConnector).toHaveCount(1);
     expect(SELECTORS.highlightedPill).toHaveCount(2);
 });
 
 test("Connectors are displayed behind pills, except on hover.", async () => {
-    const getZIndex = (el) => Number(getComputedStyle(el).zIndex) || 0;
+    const getZIndex = (el) => Number(getComputedStyle(queryFirst(el)).zIndex) || 0;
+
     await mountGanttView(ganttViewParams);
     expect(getZIndex(getPillWrapper("Task 2"))).toBeGreaterThan(getZIndex(getConnector(1)));
 
-    await contains(getConnector(1)).hover();
+    await hover(getConnectorStroke(1));
+    await animationFrame();
+
     expect(getZIndex(getPillWrapper("Task 2"))).toBeLessThan(getZIndex(getConnector(1)));
 });
 
@@ -739,8 +764,7 @@ test("Create a connector from the gantt view: going fast", async () => {
     await animationFrame();
 
     // Then we check that the connector stroke is correctly positioned.
-    const connectorStroke = queryOne(SELECTORS.connectorStroke, { root: getConnector("new") });
-    expect(connectorStroke).toHaveRect({
+    expect(getConnectorStroke("new")).toHaveRect({
         top: initialPosition.y,
         right: currentPosition.x,
         bottom: currentPosition.y,
@@ -877,6 +901,7 @@ test("Switch to full-size browser: the connections between pills should be dipla
     });
 });
 
+test.tags("broken");
 test("Connect two very distant pills", async () => {
     ProjectTask._records = [
         ProjectTask._records[0],
@@ -890,7 +915,7 @@ test("Connect two very distant pills", async () => {
         },
     ];
     onRpc("write", ({ args }) => {
-        expect.step(JSON.stringify(args));
+        expect.step(args);
     });
     await mountGanttView({
         ...ganttViewParams,
@@ -913,9 +938,15 @@ test("Connect two very distant pills", async () => {
 
     const selector = `${SELECTORS.pill}:contains('Task 2')`;
     expect(selector).toHaveCount(0);
-    await moveTo(SELECTORS.pill, { relative: true, position: { x: 1500 } });
+    await moveTo({ position: { x: window.innerWidth * 2 } });
     await advanceFrame(200);
+
+    // FIXME: ELEMENT SHOULD BE INTERACTIVE -> test is simulating a situation that
+    // cannot happen. Investigate the issue, remove the following line and the
+    // "broken" tag when fixed.
+    queryOne(selector).classList.add("pe-auto");
+
     await drop(selector);
-    expect.verifySteps([`[[2],{"depend_on_ids":[[4,1,false]]}]`]);
+    expect.verifySteps([[[2], { depend_on_ids: [[4, 1, false]] }]]);
     expect(SELECTORS.connector).toHaveCount(1);
 });

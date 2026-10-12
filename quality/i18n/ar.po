@@ -1,23 +1,24 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* quality
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
+"POT-Creation-Date: 2026-05-22 17:54+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
 "Last-Translator: Wil Odoo, 2024\n"
 "Language-Team: Arabic (https://app.transifex.com/odoo/teams/41243/ar/)\n"
+"Language: ar\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: ar\n"
-"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
+"&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert_team__alert_count
@@ -36,8 +37,14 @@ msgid ""
 "A Python dictionary that will be evaluated to provide default values when "
 "creating new records for this alias."
 msgstr ""
-"قاموس بايثون الذي سيتم تقييمه لتوفير قيم افتراضية عند إنشاء سجلات جديدة لهذا"
-" اللقب. "
+"قاموس بايثون الذي سيتم تقييمه لتوفير قيم افتراضية عند إنشاء سجلات جديدة لهذا "
+"اللقب. "
+
+#. module: quality
+#. odoo-python
+#: code:addons/quality/models/quality.py:0
+msgid "A quality team must have a company assigned."
+msgstr ""
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert__message_needaction
@@ -400,8 +407,8 @@ msgstr "المُعرف"
 #. module: quality
 #: model:ir.model.fields,help:quality.field_quality_alert_team__alias_parent_thread_id
 msgid ""
-"ID of the parent record holding the alias (example: project holding the task"
-" creation alias)"
+"ID of the parent record holding the alias (example: project holding the task "
+"creation alias)"
 msgstr ""
 "معرف السجل الأصل الذي يحتوي على اللقب (مثال: المشروع الذي يحتوي على اللقب "
 "لإنشاء المهمة) "
@@ -444,8 +451,8 @@ msgid ""
 "If set, this content will automatically be sent out to unauthorized users "
 "instead of the default message."
 msgstr ""
-"إذا كان محدداً، سوف يتم إرسال هذا المحتوى تلقائياً إلى المستخدمين غير المصرح"
-" لهم عوضاً عن الرسالة الافتراضية. "
+"إذا كان محدداً، سوف يتم إرسال هذا المحتوى تلقائياً إلى المستخدمين غير المصرح "
+"لهم عوضاً عن الرسالة الافتراضية. "
 
 #. module: quality
 #: model_terms:ir.ui.view,arch_db:quality.quality_alert_view_search
@@ -660,8 +667,8 @@ msgid ""
 "creation of new records completely."
 msgstr ""
 "معرف اختياري لمناقشة (سجل) سيتم إرفاق كافة رسائل البريد الإلكتروني الواردة "
-"فيه، حتى لو لم يتم الرد عليها. إذا تم تعيين قيمة له، سيعطل هذا إنشاء السجلات"
-" الجديدة بالكامل. "
+"فيه، حتى لو لم يتم الرد عليها. إذا تم تعيين قيمة له، سيعطل هذا إنشاء السجلات "
+"الجديدة بالكامل. "
 
 #. module: quality
 #: model:quality.reason,name:quality.reason_other
@@ -681,8 +688,8 @@ msgstr "معرف مناقشة السجل الرئيسي "
 #. module: quality
 #: model:ir.model.fields,help:quality.field_quality_alert_team__alias_parent_model_id
 msgid ""
-"Parent model holding the alias. The model holding the alias reference is not"
-" necessarily the model given by alias_model_id (example: project "
+"Parent model holding the alias. The model holding the alias reference is not "
+"necessarily the model given by alias_model_id (example: project "
 "(parent_model) and task (model))"
 msgstr ""
 "النموذج الرئيسي الذي يحتفظ بلقب البريد الإلكتروني. ليس بالضرورة أن يكون "
@@ -721,7 +728,8 @@ msgid ""
 "Policy to post a message on the document using the mailgateway.\n"
 "- everyone: everyone can post\n"
 "- partners: only authenticated partners\n"
-"- followers: only followers of the related document or members of following channels\n"
+"- followers: only followers of the related document or members of following "
+"channels\n"
 msgstr ""
 "سياسة لنشر رسالة في المستند باستخدام بوابة البريد الإلكتروني.\n"
 "- الجميع: يمكن للجميع النشر\n"
@@ -959,9 +967,9 @@ msgstr "نوع الاختبار"
 #. module: quality
 #: model:ir.model.fields,help:quality.field_quality_alert_team__alias_model_id
 msgid ""
-"The model (Odoo Document Kind) to which this alias corresponds. Any incoming"
-" email that does not reply to an existing record will cause the creation of "
-"a new record of this model (e.g. a Project Task)"
+"The model (Odoo Document Kind) to which this alias corresponds. Any incoming "
+"email that does not reply to an existing record will cause the creation of a "
+"new record of this model (e.g. a Project Task)"
 msgstr ""
 "النموذج (مستندات أودو) الذي يقترن به هذا اللقب. أي رسالة واردة لا ترد على "
 "سجل موجود ستقوم بإنشاء سجل جديد من نفس نوع هذا النموذج (مثلًا: مهمة مشروع) "
@@ -972,8 +980,8 @@ msgid ""
 "The name of the email alias, e.g. 'jobs' if you want to catch emails for "
 "<jobs@example.odoo.com>"
 msgstr ""
-"اسم لقب البريد الإلكتروني، مثلًا: 'وظائف' إذا كنت ترغب في جمع الرسائل "
-"المرسلة لـ<jobs@example.odoo.com> "
+"اسم لقب البريد الإلكتروني، مثلًا: 'وظائف' إذا كنت ترغب في جمع الرسائل المرسلة "
+"لـ<jobs@example.odoo.com> "
 
 #. module: quality
 #: model:res.groups,comment:quality.group_quality_manager

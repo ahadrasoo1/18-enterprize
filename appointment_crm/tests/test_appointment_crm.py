@@ -3,11 +3,12 @@
 from datetime import datetime, timedelta
 
 from odoo.tests import users
+from odoo.tools import html2plaintext
 from odoo.addons.crm.tests.common import TestCrmCommon
 from odoo.addons.mail.tests.common import mail_new_test_user
 
 
-class AppointmentCRMTest(TestCrmCommon):
+class AppointmentCRMTestCommon(TestCrmCommon):
     @classmethod
     def _create_appointment_type(cls, **kwargs):
         default = {
@@ -23,7 +24,7 @@ class AppointmentCRMTest(TestCrmCommon):
 
     @classmethod
     def setUpClass(cls):
-        super(AppointmentCRMTest, cls).setUpClass()
+        super(AppointmentCRMTestCommon, cls).setUpClass()
         cls.user_employee = mail_new_test_user(
             cls.env, login='user_employee',
             name='Eglantine Employee', email='eglantine.employee@test.example.com',
@@ -39,11 +40,9 @@ class AppointmentCRMTest(TestCrmCommon):
         default = {
             'name': '%s with %s' % (appointment_type.name, contact.name),
             'start': datetime.now(),
-            'start_date': datetime.now(),
             'stop': datetime.now() + timedelta(hours=1),
             'allday': False,
             'duration': appointment_type.appointment_duration,
-            'description': "<p>Test</p>",
             'location': appointment_type.location,
             'partner_ids': [(4, pid, False) for pid in partner_ids],
             'appointment_type_id': appointment_type.id,
@@ -54,6 +53,7 @@ class AppointmentCRMTest(TestCrmCommon):
     def _create_meetings_from_appointment_type(self, appointment_type, user, contact, **kwargs):
         return self.env['calendar.event'].create(self._prepare_event_value(appointment_type, user, contact, **kwargs))
 
+class AppointmentCRMTest(AppointmentCRMTestCommon):
     @users('user_employee')
     def test_create_opportunity(self):
         """ Test the creation of a lead based on the creation of an event
@@ -61,24 +61,28 @@ class AppointmentCRMTest(TestCrmCommon):
         """
         # add current user to staff users so they can read the appointment during create
         self.appointment_type_create.sudo().staff_user_ids += self.env.user
+        future_date = datetime.now() + timedelta(days=1)
         event = self._create_meetings_from_appointment_type(
-            self.appointment_type_create, self.user_sales_leads, self.contact_1
+            self.appointment_type_create, self.user_sales_leads, self.contact_1,
+            start=future_date, stop=future_date + timedelta(hours=1)
         )
 
         self.assertEqual(event.res_model_id, self.env['ir.model']._get('crm.lead'),
             "Event should be linked with the model crm.lead")
         self.assertTrue(event.res_id)
         self.assertTrue(event.opportunity_id)
-        lead = event.opportunity_id
+        lead = event.opportunity_id.sudo()
         self.assertEqual(lead.user_id, event.user_id)
         self.assertEqual(lead.name, event.name)
-        self.assertEqual(lead.description, event.description)
+        self.assertTrue(lead.description)
+        self.assertIn('crm_leads@test.example.com', lead.description, 'Description should contain contact info of the attendee')
+        self.assertEqual(html2plaintext(lead.description), html2plaintext(event._get_attendee_description()))
         self.assertEqual(lead.partner_id, self.contact_1)
         self.assertTrue(lead.activity_ids[0], "Lead should have a next activity")
         self.assertNotIn(self.env.user.partner_id, lead.message_partner_ids)
 
         next_activity = lead.activity_ids[0]
-        self.assertEqual(next_activity.date_deadline, event.start_date)
+        self.assertEqual(next_activity.date_deadline, event.start.date())
         self.assertEqual(next_activity.calendar_event_id, event)
 
     @users('user_employee')
@@ -104,18 +108,17 @@ class AppointmentCRMTest(TestCrmCommon):
                 self.user_sales_leads,
                 self.contact_1,
                 start=datetime.now() + timedelta(hours=1),
-                start_date=datetime.now() + timedelta(hours=1),
                 stop=datetime.now() + timedelta(hours=2),
-        )])
+        )]).sudo()
         self.assertTrue(events[0].opportunity_id)
         self.assertFalse(events[1].opportunity_id)
         self.assertTrue(events[2].opportunity_id)
         event1 = events[0]
         next_activity1 = event1.opportunity_id.activity_ids[0]
-        self.assertEqual(next_activity1.date_deadline, event1.start_date)
+        self.assertEqual(next_activity1.date_deadline, event1.start.date())
         event2 = events[2]
         next_activity2 = event2.opportunity_id.activity_ids[0]
-        self.assertEqual(next_activity2.date_deadline, event2.start_date)
+        self.assertEqual(next_activity2.date_deadline, event2.start.date())
 
     @users('user_employee')
     def test_create_opportunity_multi_company(self):

@@ -4,7 +4,6 @@ import { registry } from "@web/core/registry";
 import * as wsTourUtils from '@website_sale/js/tours/tour_utils';
 
 registry.category("web_tour.tours").add('shop_buy_subscription_product', {
-    test: true,
     url: '/shop',
     steps: () => [
         {
@@ -16,11 +15,13 @@ registry.category("web_tour.tours").add('shop_buy_subscription_product', {
             content: "Search streaming click",
             trigger: 'form:has(input[name="search"]) .oe_search_button',
             run: "click",
+            expectUnloadPage: true,
         },
         {
             content: "Select streaming",
             trigger: '.oe_product_cart:first a:contains("Streaming SUB Weekly")',
             run: "click",
+            expectUnloadPage: true,
         },
         {
             content: "Add one quantity",
@@ -38,6 +39,7 @@ registry.category("web_tour.tours").add('shop_buy_subscription_product', {
             run: function () {
                 window.location.href = '/shop';
             },
+            expectUnloadPage: true,
         },
         {
             content: "Search streaming monthly write text",
@@ -48,12 +50,18 @@ registry.category("web_tour.tours").add('shop_buy_subscription_product', {
             content: "Search streaming monthly click",
             trigger: 'form:has(input[name="search"]) .oe_search_button',
             run: "click",
+            expectUnloadPage: true,
         },
         {
             content: "Select streaming monthly",
             trigger: '.oe_product_cart:first a:contains("Streaming SUB Monthly")',
             run: "click",
+            expectUnloadPage: true,
         },
         wsTourUtils.goToCart({quantity: 2}),
+        {
+            content: 'Order overview page',
+            trigger: 'h3:contains("Order overview")',
+        },
     ]
 });

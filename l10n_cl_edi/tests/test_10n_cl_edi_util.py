@@ -4,6 +4,7 @@ import os
 from lxml import etree
 from unittest.mock import patch
 
+from odoo import fields
 from odoo.tools import misc
 from odoo.tests.common import tagged
 from .common import TestL10nClEdiCommon, _check_with_xsd_patch, _is_valid_certificate
@@ -272,3 +273,37 @@ class TestL10nClDte(TestL10nClEdiCommon):
 
         response_parsed = etree.fromstring(sii_message)
         self.assertEqual(self.env['l10n_cl.edi.util']._analyze_sii_result(response_parsed), 'ask_for_status')
+
+    @patch('odoo.fields.Date.context_today', return_value=fields.Date.from_string('2019-11-23'))
+    def test_create_invoice_from_attachment_with_accountant_user(self, context_today):
+        partner_sii_same_company = self.env['res.partner'].create({
+            'name': 'Other Partner SII Same Company',
+            'is_company': 1,
+            'company_id': self.company_data['company'].id,
+            'vat': '76086428-1',
+        })
+        self.simple_accountman.email = 'test@test.test'
+
+        att_name = 'incoming_invoice_33.xml'
+        att_content = misc.file_open(f'l10n_cl_edi/tests/fetchmail_dtes/{att_name}', filter_ext=('.xml',)).read()
+        attachment = self.env['ir.attachment'].with_user(self.simple_accountman).create({
+            'name': att_name,
+            'raw': att_content,
+        })
+
+        with patch('odoo.addons.mail.models.mail_template.MailTemplate.send_mail', return_value=None):
+            moves = self.company_data['default_journal_sale'].with_user(self.simple_accountman)._create_document_from_attachment(attachment.ids)
+
+        self.assertEqual(len(moves), 1)
+        move = moves[0]
+        self.assertEqual(move.name, 'FAC 000001')
+        self.assertEqual(move.partner_id, partner_sii_same_company)
+        self.assertEqual(move.date, fields.Date.from_string('2019-11-23'))
+        self.assertEqual(move.invoice_date, fields.Date.from_string('2019-10-23'))
+        self.assertEqual(move.invoice_date_due, fields.Date.from_string('2019-10-23'))
+        self.assertEqual(move.journal_id.type, 'purchase')
+        self.assertEqual(move.l10n_latam_document_number, '000001')
+        self.assertEqual(move.l10n_latam_document_type_id.code, '33')
+        self.assertEqual(move.company_id, self.company_data['company'])
+        self.assertEqual(len(move.invoice_line_ids), 2)
+        self.assertEqual(move.currency_id.name, 'CLP')

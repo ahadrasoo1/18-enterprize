@@ -35,7 +35,7 @@
                     <filter string="Achieved" name="achieved" domain="[('line_type','=','achieved')]"/>
                     <filter string="Committed" name="committed" domain="[('line_type','=','committed')]"/>
                     <separator/>
-                    <filter string="In a Budget" name="in_a_budget" domain="[('budget_analytic_id', '=', False)]"/>
+                    <filter string="In a Budget" name="in_a_budget" domain="[('budget_analytic_id', '!=', False)]"/>
                     <filter string="Open Budget" name="open_budget" domain="[('budget_analytic_id.state', '=', 'confirmed')]"/>
                     <separator/>
                     <group expand="0" string="Group By">

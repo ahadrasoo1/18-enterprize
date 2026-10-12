@@ -1,58 +1,54 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* account_followup
+# * account_followup
 #
 # Translators:
-# Stjepan Lovasić <stjepan.lovasic@gmail.com>, 2022
-# Vladimir Olujić <olujic.vladimir@storm.hr>, 2022
-# Đurđica Žarković <durdica.zarkovic@storm.hr>, 2022
-# Karolina Tonković <karolina.tonkovic@storm.hr>, 2022
-# Tina Milas, 2022
-# Martin Trigaux, 2022
-# Bole <bole@dajmi5.com>, 2023
-#
+# Carlo Štefanac, 2024
+# Karolina Tonković <karolina.tonkovic@storm.hr>, 2024
+# Kristina Palaš, 2024
+# Gordana Bilas, 2024
+# Vladimir Vrgoč, 2024
+# Martin Trigaux, 2024
+# Vladimir Olujić <olujic.vladimir@storm.hr>, 2024
+# Tina Milas, 2024
+# Bole <bole@dajmi5.com>, 2024
+# Ivica Dimjašević, 2025
+# Luka Carević <luka@uvid.hr>, 2025
+# Karlo Mikešić <karlo@uvid.hr>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2026.
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 16.0+e\n"
+"Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-16 16:02+0000\n"
-"PO-Revision-Date: 2022-09-22 05:45+0000\n"
-"Last-Translator: Bole <bole@dajmi5.com>, 2023\n"
-"Language-Team: Croatian (https://app.transifex.com/odoo/teams/41243/hr/)\n"
+"POT-Creation-Date: 2026-04-10 18:48+0000\n"
+"PO-Revision-Date: 2026-04-11 18:35+0000\n"
+"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"Language-Team: Croatian <https://translate.odoo.com/projects/odoo-18/"
+"account_followup/hr/>\n"
 "Language: hr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-
-#. module: account_followup
-#. odoo-python
-#: code:addons/account_followup/models/account_followup.py:0
-msgid "%s (copy)"
-msgstr "%s (kopija)"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"X-Generator: Weblate 5.16.2\n"
 
 #. module: account_followup
 #. odoo-python
 #: code:addons/account_followup/models/account_followup_report.py:0
-msgid "%s Payment Reminder - %s"
-msgstr ""
+msgid "%(company)s Payment Reminder - %(partner)s"
+msgstr "%(company)s Podsjetnik za plaćanje - %(partner)s"
+
+#. module: account_followup
+#. odoo-python
+#: code:addons/account_followup/models/account_followup.py:0
+msgid "%(delay)s days (copy of %(name)s)"
+msgstr "%(delay)s dana (kopija od %(name)s)"
 
 #. module: account_followup
 #: model:ir.actions.report,print_report_name:account_followup.action_report_followup
 msgid "'Follow-up ' + object.display_name"
-msgstr ""
-
-#. module: account_followup
-#: model:ir.model.fields,help:account_followup.field_res_partner__type
-#: model:ir.model.fields,help:account_followup.field_res_users__type
-msgid ""
-"- Contact: Use this to organize the contact details of employees of a given company (e.g. CEO, CFO, ...).\n"
-"- Invoice Address: Preferred address for all invoices. Selected by default when you invoice an order that belongs to this company.\n"
-"- Delivery Address: Preferred address for all deliveries. Selected by default when you deliver an order that belongs to this company.\n"
-"- Private: Private addresses are only visible by authorized users and contain sensitive data (employee home addresses, ...).\n"
-"- Follow-up Address: Preferred address for follow-up reports. Selected by default when you send reminders about overdue invoices.\n"
-"- Other: Other address for the company (e.g. subsidiary, ...)"
-msgstr ""
+msgstr "'Poduzimanje daljnje radnje ' + object.display_name"
 
 #. module: account_followup
 #: model:account_followup.followup.line,name:account_followup.demo_followup_line1
@@ -67,56 +63,64 @@ msgstr "30 dana"
 #. module: account_followup
 #: model:account_followup.followup.line,name:account_followup.demo_followup_line3
 msgid "40 Days"
-msgstr ""
+msgstr "40 dana"
 
 #. module: account_followup
 #: model:account_followup.followup.line,name:account_followup.demo_followup_line4
 msgid "50 Days"
-msgstr ""
+msgstr "50 dana"
 
 #. module: account_followup
 #: model:account_followup.followup.line,name:account_followup.demo_followup_line5
 msgid "60 Days"
-msgstr ""
+msgstr "60 dana"
 
 #. module: account_followup
 #: model:mail.template,body_html:account_followup.email_template_followup_1
 msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
-"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
-"                        <t t-if=\"object.id != object.commercial_partner_id.id\">Dear <t t-out=\"object.name or ''\"></t> (<t t-out=\"object.commercial_partner_id.name or ''\"></t>),</t>\n"
-"                        <t t-else=\"\">Dear <t t-out=\"object.name or ''\"></t>,</t>\n"
-"                        <br>\n"
-"                    </p>\n"
-"                    <p>\n"
-"                        It has come to our attention that you have an outstanding balance of <t t-out=\"format_amount(object.total_overdue, object.currency_id) or ''\"></t>\n"
-"                        <br>\n"
-"                    </p>\n"
-"                    <p>\n"
-"                        We kindly request that you take necessary action to settle this amount within the next 8 days.\n"
-"                    </p>\n"
-"                    <p>\n"
-"                        If you have already made the payment after receiving this message, please disregard it.\n"
-"                        Our accounting department is available if you require any assistance or have any questions.\n"
-"                        <br>\n"
-"                    </p>\n"
-"                    <p>\n"
+"                    <p style=\"margin: 0px; padding: 0px;\">\n"
+"                        <t t-if=\"object.id != "
+"object.commercial_partner_id.id\">Dear <t t-out=\"object.name or ''\"/> (<t "
+"t-out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
+"                        <t t-else=\"\">Dear <t t-out=\"object.name or ''\"/>,"
+"</t>\n"
+"                        <br/>\n"
+"                        It has come to our attention that you have&nbsp;an "
+"outstanding balance of <t t-"
+"out=\"format_amount(object.total_overdue_followup, object.currency_id) or "
+"''\"/>\n"
+"                        <br/>\n"
+"                        We kindly request that you take necessary action to "
+"settle this amount within the next 8 days.\n"
+"                        <br/>\n"
+"                        </p><div t-if=\"object._show_pay_now_button()\" "
+"class=\"d-flex\">\n"
+"                            <a t-att-href=\"'/my/invoices/overdue'\" "
+"class=\"btn btn-primary\">Pay now</a>\n"
+"                        </div>\n"
+"                        If you have already made the payment after receiving "
+"this message, please disregard it.\n"
+"                        Our accounting department is available if you "
+"require any assistance or have any questions.\n"
+"                        <br/>\n"
 "                        Thank you for your cooperation.\n"
-"                        <br>\n"
-"                    </p>\n"
-"                    <p>\n"
+"                        <br/>\n"
 "                        Sincerely,\n"
-"                        <t t-if=\"not is_html_empty(object._get_followup_responsible().signature)\">\n"
-"                            <br>\n"
-"                            <t t-out=\"object._get_followup_responsible().signature\"></t>\n"
+"                        <t t-if=\"not "
+"is_html_empty(object._get_followup_responsible().signature)\">\n"
+"                            <br/>\n"
+"                            <t t-"
+"out=\"object._get_followup_responsible().signature\"/>\n"
 "                        </t>\n"
 "                        <t t-else=\"\">\n"
-"                            <br>\n"
+"                            <br/>\n"
 "                            --\n"
-"                            <br>\n"
-"                            <t t-out=\"object._get_followup_responsible().name\"></t>\n"
+"                            <br/>\n"
+"                            <t t-"
+"out=\"object._get_followup_responsible().name\"/>\n"
 "                        </t>\n"
-"                    </p>\n"
+"                    \n"
 "                </div>\n"
 "            "
 msgstr ""
@@ -126,91 +130,196 @@ msgstr ""
 msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                    <p>\n"
-"                        <t t-if=\"object.id != object.commercial_partner_id.id\">Dear <t t-out=\"object.name or ''\"></t> (<t t-out=\"object.commercial_partner_id.name or ''\"></t>),</t>\n"
-"                        <t t-else=\"\">Dear <t t-out=\"object.name or ''\"></t>,</t>\n"
-"                        <br>\n"
-"                    </p>\n"
-"                    <p>\n"
-"                        Despite several reminders, your account is still not settled.\n"
-"                        Unless full payment is made in next 8 days, then legal action for the recovery of the debt will be taken without further notice.\n"
-"                        I trust that this action will prove unnecessary and details of due payments is printed below.\n"
-"                        In case of any queries concerning this matter, do not hesitate to contact our accounting department.\n"
-"                    </p>\n"
-"                    <p>\n"
+"                        <t t-if=\"object.id != "
+"object.commercial_partner_id.id\">Dear <t t-out=\"object.name or ''\"/> (<t "
+"t-out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
+"                        <t t-else=\"\">Dear <t t-out=\"object.name or ''\"/>,"
+"</t>\n"
+"                        <br/>\n"
+"                        Despite several reminders, your account is still not "
+"settled.\n"
+"                        Unless full payment is made in next 8 days, then "
+"legal action for the recovery of the debt will be taken without further "
+"notice.\n"
+"                        I trust that this action will prove unnecessary and "
+"details of due payments is printed below.\n"
+"                        In case of any queries concerning this matter, do "
+"not hesitate to contact our accounting department.\n"
+"                        <br/>\n"
 "                        Best Regards,\n"
-"                        <t t-if=\"not is_html_empty(object._get_followup_responsible().signature)\">\n"
-"                            <br>\n"
-"                            <t t-out=\"object._get_followup_responsible().signature\"></t>\n"
+"                        <br/>\n"
+"                        <t t-if=\"not "
+"is_html_empty(object._get_followup_responsible().signature)\">\n"
+"                            <br/>\n"
+"                            <t t-"
+"out=\"object._get_followup_responsible().signature\"/>\n"
 "                        </t>\n"
 "                        <t t-else=\"\">\n"
-"                            <br>\n"
+"                            <br/>\n"
 "                            --\n"
-"                            <br>\n"
-"                            <t t-out=\"object._get_followup_responsible().name\"></t>\n"
+"                            <br/>\n"
+"                            <t t-"
+"out=\"object._get_followup_responsible().name\"/>\n"
 "                        </t>\n"
 "                    </p>\n"
 "                </div>\n"
 "            "
 msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                    <p>\n"
+"                        <t t-if=\"object.id != "
+"object.commercial_partner_id.id\">Poštovani <t t-out=\"object.name or ''\"/> "
+"(<t t-out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
+"                        <t t-else=\"\">Poštovani <t t-out=\"object.name or "
+"''\"/>,</t>\n"
+"                        <br/>\n"
+"                        Unatoč nekoliko podsjetnika, vaš račun još uvijek "
+"nije podmiren.\n"
+"                        Ako u sljedećih 8 dana ne bude izvršeno puno "
+"plaćanje, bit će poduzete pravne mjere za naplatu duga bez daljnje "
+"obavijesti.\n"
+"                        Vjerujem da će se ova akcija pokazati nepotrebnom, a "
+"pojedinosti dospjelih plaćanja ispisane su u nastavku.\n"
+"                        U slučaju bilo kakvih pitanja vezanih za ovu stvar, "
+"slobodno se obratite našem računovodstvenom odjelu.\n"
+"                        <br/>\n"
+"                        Srdačan pozdrav,\n"
+"                        <br/>\n"
+"                        <t t-if=\"not is_html_empty"
+"(object._get_followup_responsible().signature)\">\n"
+"                            <br/>\n"
+"                            <t t-out=\"object._get_followup_responsible()"
+".signature\"/>\n"
+"                        </t>\n"
+"                        <t t-else=\"\">\n"
+"                            <br/>\n"
+"                            --\n"
+"                            <br/>\n"
+"                            <t t-out=\"object._get_followup_responsible()"
+".name\"/>\n"
+"                        </t>\n"
+"                    </p>\n"
+"                </div>\n"
+"            "
 
 #. module: account_followup
 #: model:mail.template,body_html:account_followup.demo_followup_email_template_2
 msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                    <p>\n"
-"                        <t t-if=\"object.id != object.commercial_partner_id.id\">Dear <t t-out=\"object.name or ''\"></t> (<t t-out=\"object.commercial_partner_id.name or ''\"></t>),</t>\n"
-"                        <t t-else=\"\">Dear <t t-out=\"object.name or ''\"></t>,</t>\n"
-"                        <br>\n"
-"                    </p>\n"
-"                    <p>\n"
-"                        We are disappointed to see that despite sending a reminder, that your account is now seriously overdue.\n"
-"                    </p>\n"
-"                    <p>\n"
-"                        It is essential that immediate payment is made, otherwise we will have to consider placing a stop on your account which means that we will no longer be able to supply your company with (goods/services).\n"
-"                        Please, take appropriate measures in order to carry out this payment in the next 8 days.\n"
-"                    </p>\n"
-"                    <p>\n"
-"                        If there is a problem with paying invoice that we are not aware of, do not hesitate to contact our accounting department, so that we can resolve the matter quickly.\n"
-"                    </p>\n"
-"                    <p>\n"
+"                        <t t-if=\"object.id != "
+"object.commercial_partner_id.id\">Dear <t t-out=\"object.name or ''\"/> (<t "
+"t-out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
+"                        <t t-else=\"\">Dear <t t-out=\"object.name or ''\"/>,"
+"</t>\n"
+"                        <br/>\n"
+"                        We are disappointed to see that despite sending a "
+"reminder, that your account is now seriously overdue.\n"
+"                        <br/>\n"
+"                        It is essential that immediate payment is made, "
+"otherwise we will have to consider placing a stop on your account which "
+"means that we will no longer be able to supply your company with (goods/"
+"services). Please, take appropriate measures in order to carry out this "
+"payment in the next 8 days.\n"
+"                        <br/>\n"
+"                        If there is a problem with paying invoice that we "
+"are not aware of, do not hesitate to contact our accounting department, so "
+"that we can resolve the matter quickly.\n"
+"                        <br/>\n"
 "                        Details of due payments is printed below.\n"
-"                    </p>\n"
-"                    <p>\n"
+"                        <br/>\n"
 "                        Best Regards,\n"
-"                        <t t-if=\"not is_html_empty(object._get_followup_responsible().signature)\">\n"
-"                            <br>\n"
-"                            <t t-out=\"object._get_followup_responsible().signature\"></t>\n"
+"                        <t t-if=\"not "
+"is_html_empty(object._get_followup_responsible().signature)\">\n"
+"                            <br/>\n"
+"                            <t t-"
+"out=\"object._get_followup_responsible().signature\"/>\n"
 "                        </t>\n"
 "                        <t t-else=\"\">\n"
-"                            <br>\n"
+"                            <br/>\n"
 "                            --\n"
-"                            <br>\n"
-"                            <t t-out=\"object._get_followup_responsible().name\"></t>\n"
+"                            <br/>\n"
+"                            <t t-"
+"out=\"object._get_followup_responsible().name\"/>\n"
 "                        </t>\n"
 "                    </p>\n"
 "                </div>\n"
 "            "
 msgstr ""
-
-#. module: account_followup
-#: model_terms:ir.ui.view,arch_db:account_followup.customer_statements_form_view
-msgid "<span class=\"o_stat_text\">Customer</span>"
-msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                    <p>\n"
+"                        <t t-if=\"object.id != "
+"object.commercial_partner_id.id\">Poštovani <t t-out=\"object.name or ''\"/> "
+"(<t t-out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
+"                        <t t-else=\"\">Poštovani <t t-out=\"object.name or "
+"''\"/>,</t>\n"
+"                        <br/>\n"
+"                        S razočaranjem primjećujemo da je vaš račun, unatoč "
+"poslanim podsjetnicima, sada ozbiljno u kašnjenju.\n"
+"                        <br/>\n"
+"                        Nužno je da se izvrši hitno plaćanje, inače ćemo "
+"morati razmotriti blokadu vašeg računa što znači da više nećemo moći "
+"isporučivati vašoj tvrtki (robu/usluge). Molimo vas da poduzmete "
+"odgovarajuće mjere kako biste izvršili ovo plaćanje u sljedećih 8 dana.\n"
+"                        <br/>\n"
+"                        Ako postoji problem s plaćanjem računa kojeg nismo "
+"svjesni, slobodno se obratite našem računovodstvenom odjelu, kako bismo brzo "
+"riješili stvar.\n"
+"                        <br/>\n"
+"                        Pojedinosti dospjelih plaćanja ispisane su u "
+"nastavku.\n"
+"                        <br/>\n"
+"                        Srdačan pozdrav,\n"
+"                        <t t-if=\"not is_html_empty"
+"(object._get_followup_responsible().signature)\">\n"
+"                            <br/>\n"
+"                            <t t-out=\"object._get_followup_responsible()"
+".signature\"/>\n"
+"                        </t>\n"
+"                        <t t-else=\"\">\n"
+"                            <br/>\n"
+"                            --\n"
+"                            <br/>\n"
+"                            <t t-out=\"object._get_followup_responsible()"
+".name\"/>\n"
+"                        </t>\n"
+"                    </p>\n"
+"                </div>\n"
+"            "
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.res_partner_view_form
-msgid "<span class=\"o_stat_text\">Due</span>"
-msgstr ""
+msgid "<span class=\"o_stat_text\">Customer Statement</span>"
+msgstr "<span class=\"o_stat_text\">Kartica partnera</span>"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.res_partner_view_form
-msgid "<span>Preferred address for follow-up reports. Selected by default when you send reminders about overdue invoices.</span>"
+msgid ""
+"<span>Preferred address for follow-up reports. Selected by default when you "
+"send reminders about overdue invoices.</span>"
 msgstr ""
+"<span>Preferirana adresa za opomene. Zadana postava kada šaljete podsjetnike "
+"o dospjelim računima.</span>"
+
+#. module: account_followup
+#: model_terms:ir.ui.view,arch_db:account_followup.template_followup_report
+msgid ""
+"<strong>\n"
+"                                Pending Invoices\n"
+"                            </strong>"
+msgstr ""
+"<strong>\n"
+"                                Dospjele obveze\n"
+"                            </strong>"
 
 #. module: account_followup
 #: model:ir.model.constraint,message:account_followup.constraint_account_followup_followup_line_uniq_name
-msgid "A follow-up action name must be unique. This name is already set to another action."
+msgid ""
+"A follow-up action name must be unique. This name is already set to another "
+"action."
 msgstr ""
+"Naziv akcije opomene mora biti jedinstven. Ovaj naziv je već postavljen za "
+"drugu akciju."
 
 #. module: account_followup
 #: model:ir.model.fields.selection,name:account_followup.selection__account_followup_followup_line__activity_default_responsible_type__account_manager
@@ -220,13 +329,12 @@ msgstr "Voditelj računovodstva"
 #. module: account_followup
 #: model:ir.actions.server,name:account_followup.ir_cron_auto_post_draft_entry_ir_actions_server
 msgid "Account Report Followup; Execute followup"
-msgstr ""
+msgstr "Računovodstveni izvještaj opomena; Izvršenje opomene"
 
 #. module: account_followup
-#: model_terms:ir.ui.view,arch_db:account_followup.manual_reminder_view_form
 #: model_terms:ir.ui.view,arch_db:account_followup.view_account_followup_followup_line_form
 msgid "Actions"
-msgstr "Akcije"
+msgstr "Radnje"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.view_account_followup_followup_line_form
@@ -237,12 +345,12 @@ msgstr "Aktivnost"
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.view_account_followup_followup_line_form
 msgid "Activity Notes"
-msgstr ""
+msgstr "Bilješke aktivnosti"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_followup_line__activity_type_id
 msgid "Activity Type"
-msgstr "Vrsta aktivnosti"
+msgstr "Tip aktivnosti"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.template_followup_report
@@ -252,7 +360,17 @@ msgstr "Dodaj bilješku"
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.manual_reminder_view_form
 msgid "Add contacts to notify..."
-msgstr "Dodaj kontakte kojima ide obavijest..."
+msgstr "Dodaj kontakte za obavijestiti..."
+
+#. module: account_followup
+#: model:ir.model.fields,field_description:account_followup.field_account_followup_followup_line__additional_follower_ids
+msgid "Add followers"
+msgstr "Dodaj pratitelje"
+
+#. module: account_followup
+#: model_terms:ir.ui.view,arch_db:account_followup.followup_filter_info_template
+msgid "Address"
+msgstr "Adresa"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_res_partner__type
@@ -261,15 +379,10 @@ msgid "Address Type"
 msgstr "Vrsta adrese"
 
 #. module: account_followup
-#: model_terms:ir.ui.view,arch_db:account_followup.customer_statements_search_view
-msgid "Assigned to me"
-msgstr ""
-
-#. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_followup_line__join_invoices
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__join_invoices
 msgid "Attach Invoices"
-msgstr ""
+msgstr "Priloži račune"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__attachment_ids
@@ -279,36 +392,35 @@ msgstr "Prilog"
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_followup_line__auto_execute
 #: model:ir.model.fields.selection,name:account_followup.selection__res_partner__followup_reminder_type__automatic
-#: model_terms:ir.ui.view,arch_db:account_followup.customer_statements_search_view
 #: model_terms:ir.ui.view,arch_db:account_followup.view_account_followup_line_filter
 msgid "Automatic"
 msgstr "Automatski"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__body_has_template_value
-msgid "Body content is the same as tmeplate"
-msgstr ""
+msgid "Body content is the same as the template"
+msgstr "Sadržaj tijela je identičan kao i predložak"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__can_edit_body
 msgid "Can Edit Body"
-msgstr "Može uređivati tijelo"
+msgstr "Može urediti sadržaj"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.manual_reminder_view_form
 msgid "Cancel"
-msgstr "Odustani"
+msgstr "Otkaži"
 
 #. module: account_followup
-#: model_terms:ir.ui.view,arch_db:account_followup.template_followup_report
-msgid "Check them"
-msgstr ""
+#: model_terms:ir.ui.view,arch_db:account_followup.missing_information_view_form
+msgid "Close"
+msgstr "Zatvori"
 
 #. module: account_followup
 #. odoo-python
 #: code:addons/account_followup/models/account_followup_report.py:0
 msgid "Communication"
-msgstr "Veza"
+msgstr "Komunikacija"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_followup_line__company_id
@@ -324,27 +436,24 @@ msgstr "Kontakt"
 #: model_terms:ir.ui.view,arch_db:account_followup.manual_reminder_view_form
 #: model_terms:ir.ui.view,arch_db:account_followup.view_account_followup_followup_line_form
 msgid "Content Template"
-msgstr ""
+msgstr "Predložak sadržaja"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__body
 msgid "Contents"
-msgstr "Sadržaj"
-
-#. module: account_followup
-#: model_terms:ir.ui.view,arch_db:account_followup.customer_statements_search_view
-msgid "Country"
-msgstr "Država"
+msgstr "Sadržaji"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_followup_line__create_uid
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__create_uid
+#: model:ir.model.fields,field_description:account_followup.field_account_followup_missing_information_wizard__create_uid
 msgid "Created by"
 msgstr "Kreirao"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_followup_line__create_date
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__create_date
+#: model:ir.model.fields,field_description:account_followup.field_account_followup_missing_information_wizard__create_date
 msgid "Created on"
 msgstr "Kreirano"
 
@@ -356,19 +465,13 @@ msgstr "Šifra kupca:"
 #. module: account_followup
 #: model:ir.actions.client,name:account_followup.action_account_followup
 msgid "Customers Statement"
-msgstr ""
+msgstr "Kartica partnera"
 
 #. module: account_followup
 #. odoo-python
 #: code:addons/account_followup/models/account_followup_report.py:0
-#: model_terms:ir.ui.view,arch_db:account_followup.customer_statements_form_view
 msgid "Date"
 msgstr "Datum"
-
-#. module: account_followup
-#: model:ir.model.fields,help:account_followup.field_account_move_line__next_action_date
-msgid "Date where the next action should be taken for a receivable item. Usually, automatically set when sending reminders through the customer statement."
-msgstr ""
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.followup_filter_info_template
@@ -378,7 +481,7 @@ msgstr "Datum:"
 #. module: account_followup
 #: model:ir.model.constraint,message:account_followup.constraint_account_followup_followup_line_days_uniq
 msgid "Days of the follow-up lines must be different per company"
-msgstr ""
+msgstr "Dani stavki opomene moraju biti različiti po tvrtki"
 
 #. module: account_followup
 #. odoo-python
@@ -387,24 +490,47 @@ msgid ""
 "Dear %s,\n"
 "\n"
 "\n"
-"Exception made if there was a mistake of ours, it seems that the following amount stays unpaid. Please, take appropriate measures in order to carry out this payment in the next 8 days.\n"
+"Exception made if there was a mistake of ours, it seems that the following "
+"amount stays unpaid. Please, take appropriate measures in order to carry out "
+"this payment in the next 8 days.\n"
 "\n"
-"Would your payment have been carried out after this mail was sent, please ignore this message. Do not hesitate to contact our accounting department.\n"
+"Would your payment have been carried out after this mail was sent, please "
+"ignore this message. Do not hesitate to contact our accounting department.\n"
 "\n"
 "Best Regards,\n"
 "\n"
 msgstr ""
+"Poštovani %s,\n"
+"\n"
+"\n"
+"Osim ako se ne radi o našoj pogrešci, čini se da sljedeći iznos ostaje "
+"neplaćen. Molimo vas da poduzmete odgovarajuće mjere kako biste izvršili ovo "
+"plaćanje u sljedećih 8 dana.\n"
+"\n"
+"Ako je vaše plaćanje izvršeno nakon slanja ovog e-maila, molimo zanemarite "
+"ovu poruku. Ne ustručavajte se kontaktirati naš računovodstveni odjel. \n"
+"\n"
+"Srdačan pozdrav,\n"
 
 #. module: account_followup
 #. odoo-python
 #: code:addons/account_followup/models/account_followup_report.py:0
-msgid "Dear client, we kindly remind you that you still have unpaid invoices. Please check them and take appropriate action. %s"
+msgid ""
+"Dear client, we kindly remind you that you still have unpaid invoices. "
+"Please check them and take appropriate action. %s"
 msgstr ""
+"Poštovani kliente, ljubazno vas podsjećamo da još uvijek imate neplaćene "
+"račune. Molimo provjerite ih i poduzmite odgovarajuće radnje. %s"
 
 #. module: account_followup
 #: model_terms:ir.actions.act_window,help:account_followup.action_account_followup_line_definition_form
 msgid "Define follow-up levels and their related actions"
-msgstr ""
+msgstr "Definirajte razine opomena i njihove povezane akcije"
+
+#. module: account_followup
+#: model_terms:ir.ui.view,arch_db:account_followup.followup_filter_info_template
+msgid "Demo Ref"
+msgstr "Demo Ref"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_followup_line__name
@@ -419,12 +545,17 @@ msgid ""
 "- Salesperson: Sales Person defined on the invoice\n"
 "- Account Manager: Sales Person defined on the customer"
 msgstr ""
+"Odredite tko će biti dodijeljen aktivnosti:\n"
+"- Odgovorna osoba za opomene (zadano)\n"
+"- Prodavač: osoba prodaje definirana na računu\n"
+"- Voditelj računa: osoba prodaje definirana na kupcu"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_followup_line__display_name
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__display_name
+#: model:ir.model.fields,field_description:account_followup.field_account_followup_missing_information_wizard__display_name
 msgid "Display Name"
-msgstr "Naziv"
+msgstr "Naziv za prikaz"
 
 #. module: account_followup
 #. odoo-python
@@ -440,151 +571,147 @@ msgstr "Prekoračeni dani"
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__email
 msgid "Email"
-msgstr "E-pošta"
+msgstr "Email"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.manual_reminder_view_form
 msgid "Email Recipients"
-msgstr ""
+msgstr "Primatelji e-pošte"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.manual_reminder_view_form
 msgid "Email Subject"
-msgstr ""
-
-#. module: account_followup
-#: model_terms:ir.ui.view,arch_db:account_followup.customer_statements_form_view
-msgid "Exclude from Follow-ups"
-msgstr ""
+msgstr "Predmet e-pošte"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__email_recipient_ids
 msgid "Extra Recipients"
-msgstr ""
-
-#. module: account_followup
-#: model_terms:ir.ui.view,arch_db:account_followup.customer_statements_form_view
-msgid "Follow up"
-msgstr ""
+msgstr "Dodatni primatelji"
 
 #. module: account_followup
 #. odoo-python
-#: code:addons/account_followup/models/account_followup_report.py:0
-msgid "Follow-up %s - %s"
-msgstr ""
+#: code:addons/account_followup/models/res_partner.py:0
+msgid "Follow-up %(partner)s - %(date)s.pdf"
+msgstr "Opomena %(partner)s - %(date)s.pdf"
 
 #. module: account_followup
 #: model:ir.model.fields.selection,name:account_followup.selection__res_partner__type__followup
 msgid "Follow-up Address"
-msgstr ""
+msgstr "Adresa Praćenja"
 
 #. module: account_followup
 #: model:ir.model,name:account_followup.model_account_followup_followup_line
 msgid "Follow-up Criteria"
-msgstr "Kriterij pratećih koraka"
+msgstr "Kriterij Praćenja"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_move_line__followup_line_id
 #: model:ir.model.fields,field_description:account_followup.field_res_partner__followup_line_id
 #: model:ir.model.fields,field_description:account_followup.field_res_users__followup_line_id
 msgid "Follow-up Level"
-msgstr "Nivo IOSa"
+msgstr "Nivo Praćenja"
 
 #. module: account_followup
 #: model:ir.actions.act_window,name:account_followup.action_account_followup_line_definition_form
 #: model:ir.ui.menu,name:account_followup.account_followup_menu
 msgid "Follow-up Levels"
-msgstr ""
+msgstr "Nivoi praćenja"
 
 #. module: account_followup
 #: model:ir.model,name:account_followup.model_account_followup_report
 msgid "Follow-up Report"
-msgstr ""
-
-#. module: account_followup
-#: model:ir.actions.act_window,name:account_followup.action_view_list_customer_statements
-#: model:ir.ui.menu,name:account_followup.customer_statements_menu
-msgid "Follow-up Reports"
-msgstr ""
-
-#. module: account_followup
-#: model_terms:ir.ui.view,arch_db:account_followup.customer_statements_tree_view
-msgid "Follow-up Reports Tree View"
-msgstr ""
+msgstr "Praćenje otvorenih stavki kupaca"
 
 #. module: account_followup
 #: model:ir.model.fields.selection,name:account_followup.selection__account_followup_followup_line__activity_default_responsible_type__followup
 msgid "Follow-up Responsible"
-msgstr ""
+msgstr "Odgovoran Praćenja"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_res_partner__followup_status
 #: model:ir.model.fields,field_description:account_followup.field_res_users__followup_status
 msgid "Follow-up Status"
-msgstr ""
+msgstr "Status Praćenja"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.view_account_followup_followup_line_form
 #: model_terms:ir.ui.view,arch_db:account_followup.view_account_followup_followup_line_tree
 msgid "Follow-up Steps"
-msgstr "Prateći koraci"
+msgstr "Koraci Praćenja"
+
+#. module: account_followup
+#: model_terms:ir.ui.view,arch_db:account_followup.report_followup_print_all
+msgid "Follow-up details"
+msgstr "Pojedinosti opomene"
 
 #. module: account_followup
 #. odoo-python
 #: code:addons/account_followup/models/account_followup_report.py:0
 msgid "Follow-up letter generated"
-msgstr ""
+msgstr "Dopis opomene generiran"
 
 #. module: account_followup
-#: model_terms:ir.ui.view,arch_db:account_followup.account_followup_journal_dashboard_kanban_view
-msgid "Follow-up reports"
-msgstr ""
+#: model:ir.model,name:account_followup.model_account_followup_missing_information_wizard
+msgid "Followup missing information wizard"
+msgstr "Čarobnjak za opomene s nedostajućim podacima"
 
 #. module: account_followup
 #: model_terms:ir.actions.act_window,help:account_followup.action_account_followup_line_definition_form
 msgid ""
 "For each step, specify the actions to be taken and delay in days. It is\n"
-"            possible to use print and e-mail templates to send specific messages to\n"
+"            possible to use print and e-mail templates to send specific "
+"messages to\n"
 "            the customer."
 msgstr ""
+"Za svaki korak navedite akcije koje treba poduzeti i odgodu u danima. Moguće "
+"je\n"
+"            koristiti predloške za ispis i e-poštu za slanje specifičnih "
+"poruka\n"
+"            kupcu."
 
 #. module: account_followup
 #: model:mail.template,name:account_followup.demo_followup_email_template_4
 msgid "Fourth reminder followup"
-msgstr ""
+msgstr "Četvrti opomenski podsjetnik"
 
 #. module: account_followup
-#: model_terms:ir.ui.view,arch_db:account_followup.customer_statements_search_view
-msgid "Group By"
-msgstr "Grupiraj po"
+#: model:ir.model.fields,field_description:account_followup.field_res_partner__has_moves
+#: model:ir.model.fields,field_description:account_followup.field_res_users__has_moves
+msgid "Has Moves"
+msgstr "Ima knjiženja"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_followup_line__id
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__id
+#: model:ir.model.fields,field_description:account_followup.field_account_followup_missing_information_wizard__id
 msgid "ID"
 msgstr "ID"
 
 #. module: account_followup
+#: model:ir.model.fields,help:account_followup.field_account_followup_followup_line__additional_follower_ids
+msgid ""
+"If set, those users will be added as followers on the partner and receive "
+"notifications about any email reply made by the partner on the reminder "
+"email."
+msgstr ""
+"Ako je postavljeno, ti korisnici bit će dodani kao pratitelji na partneru i "
+"primat će obavijesti o svakom odgovoru na e-poštu podsjetnika koji partner "
+"pošalje."
+
+#. module: account_followup
 #: model:ir.model.fields.selection,name:account_followup.selection__res_partner__followup_status__in_need_of_action
-#: model_terms:ir.ui.view,arch_db:account_followup.customer_statements_form_view
-#: model_terms:ir.ui.view,arch_db:account_followup.customer_statements_search_view
 msgid "In need of action"
-msgstr ""
+msgstr "Zahtijeva akciju"
 
 #. module: account_followup
-#: model_terms:ir.ui.view,arch_db:account_followup.customer_statements_form_view
-msgid "Invoice No."
-msgstr ""
+#: model_terms:ir.ui.view,arch_db:account_followup.view_partner_property_form_followup
+msgid "Invoice Follow-ups"
+msgstr "Podsjetnici za račune"
 
 #. module: account_followup
-#: model:ir.model.fields,field_description:account_followup.field_account_move_line__invoice_date
-msgid "Invoice/Bill Date"
-msgstr "Datum računa"
-
-#. module: account_followup
-#: model_terms:ir.ui.view,arch_db:account_followup.customer_statements_form_view
-msgid "Invoices"
-msgstr "Računi"
+#: model_terms:ir.ui.view,arch_db:account_followup.template_followup_report
+msgid "Invoices Analysis"
+msgstr "Analiza računa"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__is_mail_template_editor
@@ -599,7 +726,7 @@ msgstr "Stavka dnevnika"
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.manual_reminder_view_form
 msgid "Kind reminder!"
-msgstr ""
+msgstr "Ljubazni podsjetnik!"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__lang
@@ -609,24 +736,21 @@ msgstr "Jezik"
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_followup_line__write_uid
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__write_uid
+#: model:ir.model.fields,field_description:account_followup.field_account_followup_missing_information_wizard__write_uid
 msgid "Last Updated by"
 msgstr "Promijenio"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_followup_line__write_date
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__write_date
+#: model:ir.model.fields,field_description:account_followup.field_account_followup_missing_information_wizard__write_date
 msgid "Last Updated on"
-msgstr "Vrijeme promjene"
-
-#. module: account_followup
-#: model:ir.model.fields,field_description:account_followup.field_account_move_line__last_followup_date
-msgid "Latest Follow-up"
-msgstr "Zadnji IOS-i"
+msgstr "Promijenjeno"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.manual_reminder_view_form
 msgid "Letter/Email Content"
-msgstr ""
+msgstr "Sadržaj pisma/e-pošte"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_followup_line__mail_template_id
@@ -636,37 +760,50 @@ msgstr "Predložak maila"
 
 #. module: account_followup
 #: model:ir.model.fields.selection,name:account_followup.selection__res_partner__followup_reminder_type__manual
-#: model_terms:ir.ui.view,arch_db:account_followup.customer_statements_search_view
 #: model_terms:ir.ui.view,arch_db:account_followup.view_account_followup_line_filter
 msgid "Manual"
 msgstr "Ručno"
 
 #. module: account_followup
-#: model:ir.model.fields,field_description:account_followup.field_account_move_line__next_action_date
-msgid "Next Action Date"
-msgstr "Datum sljedeće akcije"
+#. odoo-python
+#: code:addons/account_followup/models/res_partner.py:0
+#: code:addons/account_followup/wizard/followup_missing_information.py:0
+msgid "Missing information"
+msgstr "Nedostajući podaci"
+
+#. module: account_followup
+#: model_terms:ir.ui.view,arch_db:account_followup.line_template
+msgid "Name"
+msgstr "Naziv"
 
 #. module: account_followup
 #. odoo-python
 #: code:addons/account_followup/models/res_partner.py:0
 msgid "Next Reminder Date set to %s"
-msgstr ""
+msgstr "Datum sljedeće opomene postavljen na %s"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_res_partner__followup_next_action_date
 #: model:ir.model.fields,field_description:account_followup.field_res_users__followup_next_action_date
 msgid "Next reminder"
-msgstr ""
+msgstr "Sljedeći podsjetnik"
 
 #. module: account_followup
 #: model:ir.model.fields.selection,name:account_followup.selection__res_partner__followup_status__no_action_needed
 msgid "No action needed"
-msgstr ""
+msgstr "Nije potrebna nikakva radnja"
 
 #. module: account_followup
-#: model_terms:ir.actions.act_window,help:account_followup.action_view_list_customer_statements
-msgid "No follow-up to send!"
+#: model:ir.model.fields,help:account_followup.field_res_partner__followup_next_action_date
+#: model:ir.model.fields,help:account_followup.field_res_users__followup_next_action_date
+msgid ""
+"No follow-up action will be taken before this date.\n"
+"                Sending a reminder will set this date depending on the "
+"levels configuration, and you can change it manually."
 msgstr ""
+"Prije ovog datuma neće se poduzeti nikakve daljnje radnje..\n"
+"                Slanjem podsjetnika ovaj će se datum postaviti ovisno o "
+"konfiguraciji razina, a možete ga ručno promijeniti."
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_followup_line__activity_note
@@ -680,7 +817,11 @@ msgstr "Obavijest"
 
 #. module: account_followup
 #: model:ir.model.fields,help:account_followup.field_account_followup_manual_reminder__lang
-msgid "Optional translation language (ISO code) to select when sending out an email. If not set, the english version will be used. This should usually be a placeholder expression that provides the appropriate language, e.g. {{ object.partner_id.lang }}."
+msgid ""
+"Optional translation language (ISO code) to select when sending out an "
+"email. If not set, the english version will be used. This should usually be "
+"a placeholder expression that provides the appropriate language, e.g. "
+"{{ object.partner_id.lang }}."
 msgstr ""
 
 #. module: account_followup
@@ -697,14 +838,15 @@ msgstr "Izvor"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.customer_statements_search_view
-msgid "Overdue Invoices"
-msgstr ""
+msgid "Overdue Customer Invoices"
+msgstr "Dospjeli računi kupaca"
 
 #. module: account_followup
 #. odoo-python
 #: code:addons/account_followup/models/res_partner.py:0
-msgid "Overdue Payments for %s"
-msgstr ""
+#: model_terms:ir.ui.view,arch_db:account_followup.view_partner_property_form_followup
+msgid "Overdue Invoices"
+msgstr "Dospjeli računi"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__partner_id
@@ -712,11 +854,9 @@ msgid "Partner"
 msgstr "Partner"
 
 #. module: account_followup
-#. odoo-python
-#: code:addons/account_followup/models/account_followup_report.py:0
 #: model:mail.template,name:account_followup.email_template_followup_1
 msgid "Payment Reminder"
-msgstr ""
+msgstr "Podsjetnik za plaćanje"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__print
@@ -727,22 +867,23 @@ msgstr "Ispis"
 #. module: account_followup
 #: model:ir.actions.report,name:account_followup.action_report_followup
 msgid "Print Follow-up Letter"
-msgstr ""
+msgstr "Ispiši opomenu"
 
 #. module: account_followup
 #: model:ir.actions.server,name:account_followup.action_account_reports_customer_statements_do_followup
-msgid "Process Automatic Follow-ups"
-msgstr ""
+msgid "Process Follow-ups"
+msgstr "Pošalji opomene"
 
 #. module: account_followup
-#: model_terms:ir.ui.view,arch_db:account_followup.customer_statements_form_view
-msgid "Reconcile"
-msgstr "Zatvori"
+#. odoo-python
+#: code:addons/account_followup/models/account_followup_report.py:0
+msgid "Reference"
+msgstr "Vezna oznaka"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.view_account_followup_followup_line_form
 msgid "Remind"
-msgstr ""
+msgstr "Podsjeti"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_res_partner__followup_reminder_type
@@ -753,12 +894,17 @@ msgstr "Podsjetnici"
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__render_model
 msgid "Rendering Model"
-msgstr ""
+msgstr "Model renderiranja"
 
 #. module: account_followup
-#: model_terms:ir.ui.view,arch_db:account_followup.customer_statements_form_view
-msgid "Residual Amount"
-msgstr "Preostali iznos"
+#: model:ir.model,name:account_followup.model_ir_actions_report
+msgid "Report Action"
+msgstr "Akcija izvještaja"
+
+#. module: account_followup
+#: model_terms:ir.ui.view,arch_db:account_followup.customer_statements_search_view
+msgid "Requires Follow-up"
+msgstr "Potrebna dodatna provjera"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_followup_line__activity_default_responsible_type
@@ -774,7 +920,6 @@ msgstr "SMS"
 
 #. module: account_followup
 #: model:ir.model.fields.selection,name:account_followup.selection__account_followup_followup_line__activity_default_responsible_type__salesperson
-#: model_terms:ir.ui.view,arch_db:account_followup.customer_statements_search_view
 msgid "Salesperson"
 msgstr "Prodavač"
 
@@ -786,15 +931,16 @@ msgstr "Zakaži aktivnost"
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.view_account_followup_line_filter
 msgid "Search Follow-up"
-msgstr "Pretraži prateće korake"
+msgstr "Pretraži opomene"
 
 #. module: account_followup
 #: model:mail.template,name:account_followup.demo_followup_email_template_2
 msgid "Second reminder followup"
-msgstr ""
+msgstr "Drugi podsjetnik za naplatu"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.manual_reminder_view_form
+#: model_terms:ir.ui.view,arch_db:account_followup.view_partner_property_form_followup
 msgid "Send"
 msgstr "Pošalji"
 
@@ -816,33 +962,28 @@ msgstr ""
 #. module: account_followup
 #: model:ir.actions.act_window,name:account_followup.manual_reminder_action
 msgid "Send and Print"
-msgstr ""
+msgstr "Pošalji i ispis"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__sms
 msgid "Sms"
-msgstr ""
+msgstr "SMS"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__sms_body
 msgid "Sms Body"
-msgstr ""
+msgstr "Tijelo SMS-a"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.manual_reminder_view_form
 msgid "Sms Content"
-msgstr ""
+msgstr "Sadržaj SMS poruke"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_followup_line__sms_template_id
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__sms_template_id
 msgid "Sms Template"
-msgstr ""
-
-#. module: account_followup
-#: model_terms:ir.ui.view,arch_db:account_followup.template_followup_report
-msgid "Some journal items appear to point to obsolete report lines."
-msgstr ""
+msgstr "Predložak SMS poruke"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__subject
@@ -855,17 +996,14 @@ msgid "Summary"
 msgstr "Sažetak"
 
 #. module: account_followup
-#: model:ir.model.fields,help:account_followup.field_res_partner__followup_next_action_date
-#: model:ir.model.fields,help:account_followup.field_res_users__followup_next_action_date
-msgid ""
-"The date before which no follow-up action should be taken.\n"
-"                You can set it manually if desired but it is automatically set when follow-ups are processed.\n"
-"                The date is computed according to the following rules (depending on the follow-up levels):\n"
-"                - default -> next date set in {next level delay - current level delay} days\n"
-"                - if no next level -> next date set in {current level delay - previous level delay} days\n"
-"                - if no next level AND no previous level -> next date set in {current level delay} days\n"
-"                - if no level defined at all -> next date never automatically set"
-msgstr ""
+#: model_terms:ir.ui.view,arch_db:account_followup.table_header_template_followup_report
+msgid "Table Header"
+msgstr "Zaglavlje tablice"
+
+#. module: account_followup
+#: model_terms:ir.ui.view,arch_db:account_followup.line_template
+msgid "Table Value"
+msgstr "Vrijednost tablice"
 
 #. module: account_followup
 #: model:ir.model.fields,help:account_followup.field_account_move_line__invoice_origin
@@ -874,19 +1012,23 @@ msgstr "Dokument(i) koji su generirali ovaj račun."
 
 #. module: account_followup
 #: model:ir.model.fields,help:account_followup.field_account_followup_followup_line__delay
-msgid "The number of days after the due date of the invoice to wait before sending the reminder. Can be negative if you want to send the reminder before the invoice due date."
+msgid ""
+"The number of days after the due date of the invoice to wait before sending "
+"the reminder. Can be negative if you want to send the reminder before the "
+"invoice due date."
 msgstr ""
+"Broj dana nakon datuma dospijeća računa prije slanja podsjetnika. Može biti "
+"negativan ako želite poslati podsjetnik prije datuma dospijeća računa."
 
 #. module: account_followup
 #: model:ir.model.fields,help:account_followup.field_res_partner__followup_responsible_id
 #: model:ir.model.fields,help:account_followup.field_res_users__followup_responsible_id
-msgid "The responsible assigned to manual followup activities, if defined in the level."
+msgid ""
+"The responsible assigned to manual followup activities, if defined in the "
+"level."
 msgstr ""
-
-#. module: account_followup
-#: model_terms:ir.ui.view,arch_db:account_followup.template_followup_report
-msgid "There are"
-msgstr ""
+"Odgovorna osoba dodijeljena ručnim aktivnostima praćenja, ako su definirane "
+"na razini."
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.customer_statements_tree_view
@@ -894,9 +1036,16 @@ msgid "Total"
 msgstr "Ukupno"
 
 #. module: account_followup
-#: model_terms:ir.ui.view,arch_db:account_followup.customer_statements_form_view
-msgid "Total Amount"
-msgstr "Ukupni iznos"
+#: model:ir.model.fields,field_description:account_followup.field_res_partner__total_all_due
+#: model:ir.model.fields,field_description:account_followup.field_res_users__total_all_due
+msgid "Total All Due"
+msgstr "Ukupno sva dospjela"
+
+#. module: account_followup
+#: model:ir.model.fields,field_description:account_followup.field_res_partner__total_all_overdue
+#: model:ir.model.fields,field_description:account_followup.field_res_users__total_all_overdue
+msgid "Total All Overdue"
+msgstr "Sveukupno dospjelo"
 
 #. module: account_followup
 #. odoo-python
@@ -904,7 +1053,7 @@ msgstr "Ukupni iznos"
 #: model:ir.model.fields,field_description:account_followup.field_res_partner__total_due
 #: model:ir.model.fields,field_description:account_followup.field_res_users__total_due
 msgid "Total Due"
-msgstr "Ukupno dospjelo"
+msgstr "Ukupan iznos"
 
 #. module: account_followup
 #. odoo-python
@@ -918,87 +1067,93 @@ msgstr "Ukupno dospjelo"
 #: model:ir.model.fields,field_description:account_followup.field_res_partner__unpaid_invoice_ids
 #: model:ir.model.fields,field_description:account_followup.field_res_users__unpaid_invoice_ids
 msgid "Unpaid Invoice"
-msgstr ""
+msgstr "Neplaćeni račun"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_res_partner__unpaid_invoices_count
 #: model:ir.model.fields,field_description:account_followup.field_res_users__unpaid_invoices_count
 msgid "Unpaid Invoices Count"
-msgstr ""
+msgstr "Broj neplaćenih računa"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_res_partner__unreconciled_aml_ids
 #: model:ir.model.fields,field_description:account_followup.field_res_users__unreconciled_aml_ids
 msgid "Unreconciled Aml"
+msgstr "Nezatvorene stavke"
+
+#. module: account_followup
+#: model_terms:ir.ui.view,arch_db:account_followup.missing_information_view_form
+msgid "View partners"
+msgstr "Prikaži partnere"
+
+#. module: account_followup
+#: model_terms:ir.ui.view,arch_db:account_followup.missing_information_view_form
+msgid ""
+"We were not able to process some of the automated follow-up actions due to "
+"missing information on the partners."
 msgstr ""
+"Nismo mogli obraditi neke automatske akcije opomene zbog nedostajućih "
+"podataka o partnerima."
 
 #. module: account_followup
 #: model:ir.model.fields.selection,name:account_followup.selection__res_partner__followup_status__with_overdue_invoices
-#: model_terms:ir.ui.view,arch_db:account_followup.customer_statements_form_view
 msgid "With overdue invoices"
-msgstr ""
+msgstr "S dospjelim računima"
 
 #. module: account_followup
 #: model:ir.model,name:account_followup.model_account_followup_manual_reminder
 msgid "Wizard for sending manual reminders to clients"
-msgstr ""
+msgstr "Čarobnjak za slanje ručnih podsjetnika klijentima"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.manual_reminder_view_form
 msgid "Write your message here..."
-msgstr ""
+msgstr "Ovdje napišite svoju poruku..."
 
 #. module: account_followup
 #. odoo-python
 #: code:addons/account_followup/models/account_followup_report.py:0
-msgid "You are trying to send an Email, but no follow-up contact has any email address set for customer '%s'"
+msgid ""
+"You are trying to send an Email, but no follow-up contact has any email "
+"address set for customer '%s'"
 msgstr ""
+"Pokušavate poslati e-poštu, ali nijedan kontakt za opomene nema postavljenu "
+"e-mail adresu za kupca '%s'"
 
 #. module: account_followup
 #. odoo-python
 #: code:addons/account_followup/models/account_followup_report.py:0
-msgid "You are trying to send an SMS, but no follow-up contact has any mobile/phone number set for customer '%s'"
+msgid ""
+"You are trying to send an SMS, but no follow-up contact has any mobile/phone "
+"number set for customer '%s'"
 msgstr ""
-
-#. module: account_followup
-#: model_terms:ir.ui.view,arch_db:account_followup.template_followup_report
-msgid "[Draft]"
-msgstr ""
-
-#. module: account_followup
-#: model_terms:ir.ui.view,arch_db:account_followup.template_followup_report
-msgid "and correct their tax tags if necessary."
-msgstr ""
+"Pokušavate poslati SMS, ali nijedan kontakt za opomene nema postavljen "
+"mobilni/telefonski broj za kupca '%s'"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.view_account_followup_followup_line_form
 msgid "days after due date"
-msgstr ""
+msgstr "dana nakon datuma dospijeća"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.view_account_followup_followup_line_form
 msgid "e.g. First Reminder Email"
-msgstr ""
+msgstr "npr. e-pošta prvog podsjetnika"
 
 #. module: account_followup
 #. odoo-python
 #: code:addons/account_followup/models/account_followup_report.py:0
 msgid "payment reminder"
-msgstr ""
-
-#. module: account_followup
-#: model_terms:ir.ui.view,arch_db:account_followup.template_followup_report
-msgid "prior or included in this period"
-msgstr ""
-
-#. module: account_followup
-#: model_terms:ir.ui.view,arch_db:account_followup.template_followup_report
-msgid "unposted Journal Entries"
-msgstr ""
+msgstr "podsjetnik za plaćanje"
 
 #. module: account_followup
 #: model:mail.template,subject:account_followup.demo_followup_email_template_2
 #: model:mail.template,subject:account_followup.demo_followup_email_template_4
 #: model:mail.template,subject:account_followup.email_template_followup_1
-msgid "{{ (object.company_id or object._get_followup_responsible().company_id).name }} Payment Reminder - {{ object.commercial_company_name }}"
+msgid ""
+"{{ (object.company_id or "
+"object._get_followup_responsible().company_id).name }} Payment Reminder - "
+"{{ object.commercial_company_name }}"
 msgstr ""
+"{{ (object.company_id or object._get_followup_responsible().company_id)"
+".name }} Podsjetnik za plaćanje - {{ object.commercial_company_name }}"

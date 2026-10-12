@@ -160,7 +160,7 @@ class AccountTestFecImport(AccountTestInvoicingCommon):
         accounts = self.env['account.account'].with_company(self.company.id).search(domain, order='code')
 
         expected_values = [{
-            'name': 'Suppliers - Purchase of goods and services',
+            'name': 'Suppliers',
             'account_type': 'liability_payable',
             'reconcile': True
         }, {
@@ -197,6 +197,22 @@ class AccountTestFecImport(AccountTestInvoicingCommon):
 
         expected_values = [{'name': 'PARTNER 01'}]
         self.assertRecordValues(partners, expected_values)
+
+    def test_fec_import_ignores_empty_partner_refs(self):
+        """ Ensure that FEC import does not assign a partner when no reference is provided. """
+        self.env['res.partner'].create({'name': 'Partner A', 'ref': '', 'company_id': self.company.id})
+
+        test_partner_content = """
+        JournalCode\tJournalLib\tEcritureNum\tEcritureDate\tCompteNum\tCompteLib\tCompAuxNum\tCompAuxLib\tPieceRef\tPieceDate\tEcritureLib\tDebit\tCredit\tEcritureLet\tDateLet\tValidDate\tMontantdevise\tIdevise
+        ACH\tACHATS\tACH000004\t20180910\t40100000\tFOURNISSEURS DIVERS\t\t\t3\t20180910\tPARTNER 01\t0,00\t49,80\tAA\t\t20190725\t\t
+        ACH\tACHATS\tACH000004\t20180910\t40100000\tFOURNISSEURS DIVERS\t\t\t3\t20180910\tPARTNER 01\t49,80\t0,00\tAA\t\t20190725\t\t
+        """
+        self._attach_file_to_wizard(test_partner_content, self.wizard)
+
+        self.wizard._import_files(['account.account', 'account.journal', 'account.move'])
+        move = self.env['account.move'].search([('company_id', '=', self.company.id), ('name', '=', 'ACH000004')])
+        self.assertFalse(move.mapped('line_ids.partner_id'))
+        self.assertFalse(move.partner_id)
 
     def test_import_fec_partners_no_duplicate(self):
         """
@@ -290,7 +306,12 @@ class AccountTestFecImport(AccountTestInvoicingCommon):
         last = self.env['account.move'].search([], order='id desc', limit=1)
         self.wizard._import_files(['account.account', 'account.journal', 'res.partner', 'account.move'])
         new = self.env['account.move'].search([('id', '>', last.id)])
-        new.action_post()
+        # We delay one move to be sure the FEC matching number is not lost
+        # when performing the first posting/auto matching
+        delayed_move = self.env['account.move.line'].search([('matching_number', '=', 'IAA')], limit=1).move_id
+
+        (new - delayed_move).action_post()
+        delayed_move.action_post()
 
         # Verify move_lines presence
         move_names = ('ACH000001', 'ACH000002', 'ACH000003')
@@ -318,7 +339,8 @@ class AccountTestFecImport(AccountTestInvoicingCommon):
 
         # Generate the FEC content with the export wizard
 
-        content = base64.encodebytes(self.export_wizard.generate_fec()['file_content'])
+        fec_stream = self.export_wizard.with_context(fec_test_mode=True).generate_fec()['file_content']
+        content = base64.encodebytes(b''.join(fec_stream))
         self.wizard.attachment_id = content
 
         # Import the exported FEC file in the test's main company
@@ -496,6 +518,34 @@ class AccountTestFecImport(AccountTestInvoicingCommon):
         self.env['account.account'].search([('name', '=', 'Subscribed capital - uncalled')]).unlink()
         self._attach_file_to_wizard(test_content, self.wizard)
         self.wizard._import_files(['account.account', 'account.journal', 'res.partner', 'account.move'])
-        account = self.env['account.account'].search([('name', '=', 'Subscribed capital - uncalled')]).with_context(lang="fr_FR")
+        account = self.env['account.account'].search([('name', '=', 'Capital')]).with_context(lang="fr_FR")
 
         self.assertEqual(account.name, 'Capital souscrit - non appelé')
+
+    def test_currency_rounding_with_decimal_values(self):
+        """
+        Test that it doesn't fail even when the currency has a rounding of 1, and the lines include values with decimal points.
+        """
+        test_content = """
+            JournalCode\tJournalLib\tEcritureNum\tEcritureDate\tCompteNum\tCompteLib\tCompAuxNum\tCompAuxLib\tPieceRef\tPieceDate\tEcritureLib\tDebit\tCredit\tEcritureLet\tDateLet\tValidDate\tMontantdevise\tIdevise
+            ACH\tACHATS\tTEST_MONTANT_DEVISE\t20180808\t62270000\tFRAIS D'ACTES ET CONTENTIEUX\t\t\t1\t20180808\tACOMPTE FORMALITES ENTREPRISE\t100,50\t0,00\t\t\t20190725\t100,50\txxx
+            ACH\tACHATS\tTEST_MONTANT_DEVISE\t20180808\t62270000\tFRAIS D'ACTES ET CONTENTIEUX\t\t\t1\t20180808\tACOMPTE FORMALITES ENTREPRISE\t100,50\t0,00\t\t\t20190725\t100,50\txxx
+            ACH\tACHATS\tTEST_MONTANT_DEVISE\t20180808\t44566000\tTVA SUR AUTRES BIEN ET SERVICE\t\t\t1\t20180808\tACOMPTE FORMALITES ENTREPRISE\t0\t201,00\t\t\t20190725\t201,00\txxx
+        """
+
+        self.env["res.currency"].create({"name": "xxx", "symbol": "X", "rounding": 1})
+        self._attach_file_to_wizard(test_content, self.wizard)
+        self.wizard._import_files()
+
+    def test_account_name(self):
+        """
+        Template should not override the account's name given by the user
+        We defined
+        ACH\tACHATS\tACH000001\t20180808\t45500000\tAssociate's current account\t\t\t1\t20180808\tADVANCE PAYMENT COMPANY FORMALITIES\t0,00\t600,00\t\t\t20190725\t\t
+        We should retrieve the name "Associate's current account"
+        """
+
+        self._attach_file_to_wizard(self.test_content_imbalanced_month, self.wizard)
+        self.wizard._import_files(['account.account', 'account.journal', 'res.partner', 'account.move'])
+        account = self.env['account.account'].search([('code', '=', '455000')])
+        self.assertEqual(account.name, "Associate's current account")

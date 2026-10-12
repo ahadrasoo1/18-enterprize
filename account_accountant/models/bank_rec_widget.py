@@ -76,6 +76,7 @@ class BankRecWidget(models.Model):
     )
     partner_name = fields.Char(
         related='st_line_id.partner_name',
+        depends=['st_line_id'],
     )
 
     company_id = fields.Many2one(
@@ -132,34 +133,30 @@ class BankRecWidget(models.Model):
         for wizard in self:
             if wizard.st_line_id:
 
-                is_reconciled = wizard.st_line_id.is_reconciled
-
                 # Liquidity line.
                 line_ids_commands = [
                     Command.clear(),
                     Command.create(wizard._lines_prepare_liquidity_line()),
                 ]
 
-                # Existing amls if the statement line is already reconciled.
-                if is_reconciled:
-                    _liquidity_lines, _suspense_lines, other_lines = wizard.st_line_id._seek_for_lines()
-                    for aml in other_lines:
-                        exchange_diff_amls = (aml.matched_debit_ids + aml.matched_credit_ids) \
-                            .exchange_move_id.line_ids.filtered(lambda l: l.account_id != aml.account_id)
-                        if wizard.state == 'reconciled' and exchange_diff_amls:
+                _liquidity_lines, _suspense_lines, other_lines = wizard.st_line_id._seek_for_lines()
+                for aml in other_lines:
+                    exchange_diff_amls = (aml.matched_debit_ids + aml.matched_credit_ids) \
+                        .exchange_move_id.line_ids.filtered(lambda l: l.account_id != aml.account_id)
+                    if wizard.state == 'reconciled' and exchange_diff_amls:
+                        line_ids_commands.append(
+                            Command.create(wizard._lines_prepare_aml_line(
+                                aml,  # Create the aml line with un-squashed amounts (aml - exchange diff)
+                                balance=aml.balance - sum(exchange_diff_amls.mapped('balance')),
+                                amount_currency=aml.amount_currency - sum(exchange_diff_amls.mapped('amount_currency')),
+                            ))
+                        )
+                        for exchange_diff_aml in exchange_diff_amls:
                             line_ids_commands.append(
-                                Command.create(wizard._lines_prepare_aml_line(
-                                    aml,  # Create the aml line with un-squashed amounts (aml - exchange diff)
-                                    balance=aml.balance - sum(exchange_diff_amls.mapped('balance')),
-                                    amount_currency=aml.amount_currency - sum(exchange_diff_amls.mapped('amount_currency')),
-                                ))
+                                Command.create(wizard._lines_prepare_aml_line(exchange_diff_aml))
                             )
-                            for exchange_diff_aml in exchange_diff_amls:
-                                line_ids_commands.append(
-                                    Command.create(wizard._lines_prepare_aml_line(exchange_diff_aml))
-                                )
-                        else:
-                            line_ids_commands.append(Command.create(wizard._lines_prepare_aml_line(aml)))
+                    else:
+                        line_ids_commands.append(Command.create(wizard._lines_prepare_aml_line(aml)))
 
                 wizard.line_ids = line_ids_commands
 
@@ -215,7 +212,7 @@ class BankRecWidget(models.Model):
     def _compute_journal_currency_id(self):
         for wizard in self:
             wizard.journal_currency_id = wizard.st_line_id.journal_id.currency_id \
-                                         or wizard.st_line_id.journal_id.company_id.currency_id
+                                         or wizard.st_line_id.journal_id.sudo().company_id.currency_id
 
     def _format_transaction_details(self):
         """ Format the 'transaction_details' field of the statement line to be more readable for the end user.
@@ -252,7 +249,7 @@ class BankRecWidget(models.Model):
             return
 
         if isinstance(details, str):
-            details = json.loads(details)
+            details = json.loads(details, strict=False)
 
         def node_to_html(header, node):
             if not node:
@@ -500,6 +497,7 @@ class BankRecWidget(models.Model):
             balance=-aml.amount_residual,
             source_amount_currency=-aml.amount_residual_currency,
             source_balance=-aml.amount_residual,
+            source_rate=(aml.amount_currency / aml.balance) if aml.balance else 0.0,
             **kwargs,
         )
 
@@ -553,7 +551,7 @@ class BankRecWidget(models.Model):
             balance_after_partial = current_balance + auto_balance
 
             # Get the rate of the original journal item.
-            rate = abs(line.source_amount_currency) / abs(line.source_balance)
+            rate = line.source_rate
 
             # Compute the amounts to make a partial.
             new_line_balance = line.company_currency_id.round(balance_after_partial * abs(line.balance) / abs(current_balance))
@@ -566,6 +564,9 @@ class BankRecWidget(models.Model):
                 'exchange_balance': exchange_diff_line_balance,
             }
         return None
+
+    def _do_amounts_apply_for_early_payment(self, open_amount_currency, total_early_payment_discount):
+        return self.transaction_currency_id.compare_amounts(open_amount_currency, total_early_payment_discount) == 0
 
     def _lines_check_apply_early_payment_discount(self):
         """ Try to apply the early payment discount on the currently mounted journal items.
@@ -610,7 +611,7 @@ class BankRecWidget(models.Model):
 
         if is_same_currency \
             and at_least_one_aml_for_early_payment \
-            and self.transaction_currency_id.compare_amounts(open_amount_currency, total_early_payment_discount) == 0:
+            and self._do_amounts_apply_for_early_payment(open_amount_currency, total_early_payment_discount):
             # == Compute the early payment discount lines ==
             # Remove the partials on existing lines.
             for aml_line in all_aml_lines:
@@ -778,7 +779,7 @@ class BankRecWidget(models.Model):
             line = base_line['record']
             amount_currency = to_update['amount_currency']
             balance = self.st_line_id\
-                ._prepare_counterpart_amounts_using_st_line_rate(line.currency_id, line.source_balance, amount_currency)['balance']
+                ._prepare_counterpart_amounts_using_st_line_rate(line.currency_id, None, amount_currency)['balance']
 
             line_ids_commands.append(Command.update(line.id, {
                 'balance': balance,
@@ -894,7 +895,7 @@ class BankRecWidget(models.Model):
             'amount_currency': exchange_diff_balance if line.currency_id == self.company_currency_id else 0.0,
             'balance': exchange_diff_balance,
             'source_amount_currency': line.amount_currency,
-            'source_balance': line.balance,
+            'source_balance': exchange_diff_balance,
         }]
 
     def _lines_recompute_exchange_diff(self, lines):
@@ -1045,9 +1046,8 @@ class BankRecWidget(models.Model):
                 line.balance = line.source_balance
             else:
                 # Apply the rate.
-                if line.source_balance:
-                    rate = abs(line.source_amount_currency / line.source_balance)
-                    line.balance = line.company_currency_id.round(line.amount_currency / rate)
+                if line.source_rate:
+                    line.balance = line.company_currency_id.round(line.amount_currency / line.source_rate)
                 else:
                     line.balance = 0.0
         elif line.flag in ('manual', 'early_payment', 'tax_line'):
@@ -1094,6 +1094,8 @@ class BankRecWidget(models.Model):
         if line.currency_id == line.company_currency_id:
             line.amount_currency = line.balance
             self._line_value_changed_amount_currency(line)
+        elif line.flag == 'exchange_diff':
+            self._lines_add_auto_balance_line()
         else:
             self._lines_recompute_exchange_diff(line)
             self._lines_add_auto_balance_line()
@@ -1126,6 +1128,8 @@ class BankRecWidget(models.Model):
         self.ensure_one()
         if line.flag == 'liquidity':
             self.st_line_id.partner_id = line.partner_id
+            if not line.partner_id:
+                self.st_line_id.partner_name = False
             self._action_reload_liquidity_line()
             self.return_todo_command = {'reset_global_info': True, 'reset_record': True}
             return
@@ -1159,6 +1163,15 @@ class BankRecWidget(models.Model):
     def _line_value_changed_analytic_distribution(self, line):
         self.ensure_one()
         self._lines_turn_auto_balance_into_manual_line(line)
+
+        if line.flag == 'liquidity':
+            st_line = self.st_line_id
+            liquidity_line, _suspense_lines, _write_off_lines = self.st_line_id._seek_for_lines()
+            liquidity_line.analytic_distribution = line.analytic_distribution
+            # We need to keep track of the statement line to avoid losing the data.
+            # Will be improved in master by turning _action_reload_liquidity_line into a context manager.
+            self.with_context(default_st_line_id=st_line.id)._action_reload_liquidity_line()
+            return
 
         # Recompute taxes.
         if line.flag not in ('tax_line', 'early_payment') and any(x.analytic for x in line.tax_ids):
@@ -1352,8 +1365,20 @@ class BankRecWidget(models.Model):
         self._js_action_mount_line_in_edit(self.line_ids.filtered(lambda x: x.flag == 'liquidity').index)
 
     def _validation_lines_vals(self, line_ids_create_command_list, aml_to_exchange_diff_vals, to_reconcile):
-        partners = (self.line_ids.filtered(lambda x: x.flag != 'liquidity')).partner_id
-        partner_to_set = partners if len(partners) == 1 else self.env['res.partner']
+        # Check which partner to set.
+        lines = self.line_ids.filtered(lambda x: x.flag != 'liquidity')
+        partners = lines.partner_id
+        partner_to_set = self.env['res.partner']
+        if len(partners) == 1:
+            # To avoid "Incompatible companies on records" error, make sure the user is linked to a main company.
+            allowed_companies = partners.company_id.root_id
+            if len(lines.company_id) == 1:
+                # Or the user is linked to the aml's company.
+                allowed_companies |= lines.company_id
+            # Or the user is not linked to any company.
+            if not partners.company_id or partners.company_id in allowed_companies:
+                partner_to_set = partners
+
         source2exchange = self.line_ids.filtered(lambda l: l.flag == 'exchange_diff').grouped('source_aml_id')
         for line in self.line_ids:
             if line.flag == 'exchange_diff':
@@ -1382,9 +1407,6 @@ class BankRecWidget(models.Model):
 
     def _action_validate(self):
         self.ensure_one()
-        partners = (self.line_ids.filtered(lambda x: x.flag != 'liquidity')).partner_id
-        partner_to_set = partners if len(partners) == 1 else self.env['res.partner']
-
         # Prepare the lines to be created.
         to_reconcile = []
         line_ids_create_command_list = []
@@ -1400,7 +1422,7 @@ class BankRecWidget(models.Model):
             force_delete=True,
             skip_readonly_check=True,
         )
-        move_ctx.write({'partner_id': partner_to_set.id, 'line_ids': [Command.clear()] + line_ids_create_command_list})
+        move_ctx.write({'line_ids': [Command.clear()] + line_ids_create_command_list})
 
         AccountMoveLine = self.env['account.move.line']
         sequence2lines = move_ctx.line_ids.grouped('sequence')
@@ -1430,8 +1452,11 @@ class BankRecWidget(models.Model):
             exchange_diff_moves = AccountMoveLine._create_exchange_difference_moves(exchange_diff_vals_list)
 
         # Perform the reconciliation.
-        self.env['account.move.line'].with_context(no_exchange_difference=True)._reconcile_plan(
-            [(line + counterpart).with_prefetch(all_line_ids) for line, counterpart in lines])
+        self.env['account.move.line']\
+            .with_context(no_exchange_difference_no_recursive=True)._reconcile_plan([
+                (line + counterpart).with_prefetch(all_line_ids)
+                for line, counterpart in lines
+            ])
 
         # Assign exchange move to partials.
         for index, line in enumerate(lines_with_exch_diff):
@@ -1443,15 +1468,13 @@ class BankRecWidget(models.Model):
 
         # Fill missing partner.
         st_line_ctx = st_line.with_context(skip_account_move_synchronization=True, skip_readonly_check=True)
-        st_line_ctx.partner_id = partner_to_set
 
         # Create missing partner bank if necessary.
         if st_line.account_number and st_line.partner_id:
             st_line_ctx.partner_bank_id = st_line._find_or_create_bank_account() or st_line.partner_bank_id
 
         # Refresh analytic lines.
-        move.line_ids.analytic_line_ids.unlink()
-        move.line_ids.with_context(validate_analytic=True)._create_analytic_lines()
+        move.line_ids.with_context(validate_analytic=True)._inverse_analytic_distribution()
 
     @contextmanager
     def _action_validate_method(self):

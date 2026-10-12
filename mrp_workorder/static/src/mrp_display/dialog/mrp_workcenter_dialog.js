@@ -15,7 +15,7 @@ export class MrpWorkcenterDialog extends ConfirmationDialog {
         disabled: { type: Array, optional: true },
         active: { type: Array, optional: true },
         radioMode: { type: Boolean, default: false, optional: true },
-        showWarning: { type: Boolean, default: false, optional: true },
+        loadWorkcenters: { type: Function, optional: true },
     };
 
     setup() {
@@ -31,13 +31,13 @@ export class MrpWorkcenterDialog extends ConfirmationDialog {
 
         onWillStart(async () => {
             if (!this.workcenters.length) {
-                await this._loadWorkcenters();
+                this.workcenters = await this.props.loadWorkcenters();
             }
         });
     }
 
     get appName() {
-        return encodeURIComponent(this.menu.getCurrentApp().name);
+        return encodeURIComponent(this.menu.getCurrentApp()?.name || _t("Shop Floor"));
     }
 
     get active() {
@@ -71,24 +71,5 @@ export class MrpWorkcenterDialog extends ConfirmationDialog {
             }, [])
         );
         this.props.close();
-    }
-
-    async _loadWorkcenters() {
-        this.workcenters = await this.ormService.searchRead("mrp.workcenter", [], ["display_name"]);
-        if (!this.workcenters.length) {
-            if (this.props.showWarning) {
-                this.notification.add(
-                    _t(
-                        "No workcenters are available, please create one first to add it to the shop floor view"
-                    ),
-                    { type: "warning" }
-                );
-            }
-        }
-        this.workcenters = [
-            { id: 0, display_name: _t("All MO") },
-            { id: -1, display_name: _t("My WO") },
-            ...this.workcenters,
-        ];
     }
 }

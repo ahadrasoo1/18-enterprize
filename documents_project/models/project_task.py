@@ -3,7 +3,7 @@
 
 import ast
 
-from odoo import api, fields, models, _
+from odoo import api, Command, fields, models, _
 from odoo.osv import expression
 
 
@@ -60,6 +60,9 @@ class ProjectTask(models.Model):
     def _get_document_folder(self):
         return self.project_id.documents_folder_id
 
+    def _get_document_partner(self):
+        return self.partner_id
+
     def _check_create_documents(self):
         return self.project_use_documents and super()._check_create_documents()
 
@@ -91,3 +94,22 @@ class ProjectTask(models.Model):
             'type': 'ir.actions.act_url',
             'url': f"/my/tasks/{self.id}/documents/",
         }
+
+    def write(self, vals):
+        if 'project_id' in vals:
+            documents_to_move = self.env['documents.document']
+            for task in self:
+                documents_to_move |= task.document_ids.filtered(
+                    lambda d: d.folder_id == task.documents_folder_id
+                )
+        res = super().write(vals)
+
+        if 'project_id' in vals:
+            for task in self:
+                if not task.document_ids:
+                    continue
+                if not (vals.get('project_id') and task.project_use_documents):
+                    task.document_ids = [Command.clear()]
+                elif task.project_use_documents:
+                    (task.document_ids & documents_to_move).folder_id = task.documents_folder_id.id
+        return res

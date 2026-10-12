@@ -351,6 +351,8 @@ class MrpProductionWorkcenterLine(models.Model):
         action = self.env['ir.actions.actions']._for_xml_id('mrp_workorder.action_mrp_display')
         action['context'] = {
             'workcenter_id': self.workcenter_id.id,
+            'search_default_progress': False,
+            'search_default_ready': False,
             'search_default_name': self.production_id.name,
             'shouldHideNewWorkcenterButton': True,
         }
@@ -831,7 +833,7 @@ class MrpProductionWorkcenterLine(models.Model):
             loss_type_times[time.loss_id.loss_type] |= time
         duration = 0
         for dummy, times in loss_type_times.items():
-            duration += self._intervals_duration([(t.date_start, t.date_end or now, t) for t in times])
+            duration += self._intervals_duration([(t.date_start or now, t.date_end or now, t) for t in times])
         return duration
 
     def get_working_duration(self):
@@ -851,13 +853,23 @@ class MrpProductionWorkcenterLine(models.Model):
 
     def _cal_cost(self, date=False):
         if date:
-            return super()._cal_cost(date) + sum(self.time_ids.filtered(lambda t: t.date_end <= date).mapped('total_cost'))
+            return super()._cal_cost(date) + sum(self.time_ids.filtered(lambda t: t.date_end and t.date_end <= date).mapped('total_cost'))
         else:
             return super()._cal_cost(date) + sum(self.time_ids.mapped('total_cost'))
 
     def button_pending(self):
-        for emp in self.employee_ids:
-            self.stop_employee([emp.id])
+        Employee = self.env['hr.employee']
+        # Determine current employee
+        if not self.env.context.get('mrp_display'):
+            employee = self.env.user.employee_id
+        else:
+            connected_employees = Employee.get_employees_connected()
+            if not connected_employees:
+                raise UserError(_("You need to log in to process this work order."))
+            employee = Employee.get_session_owner()
+        if employee:
+            # Stop productivity only for the current employee
+            self.stop_employee([employee.id])
         super().button_pending()
 
     def action_mark_as_done(self):
@@ -879,7 +891,7 @@ class MrpProductionWorkcenterLine(models.Model):
         if len(loss_id) < 1:
             raise UserError(_("You need to define at least one productivity loss in the category 'Productive'. Create one from the Manufacturing app, menu: Configuration / Productivity Losses."))
 
-        wo.state = 'done'
+        self.state = 'done'
         self._set_default_time_log(loss_id)
 
     def _set_default_time_log(self, loss_id):
@@ -943,3 +955,9 @@ class MrpProductionWorkcenterLine(models.Model):
         if self.env.user.has_group('mrp.group_mrp_workorder_dependencies'):
             action['views'] = [(self.env.ref(ref).id, 'gantt')] + [(id, kind) for id, kind in action['views'] if kind != 'gantt']
         return action
+
+    def _prepare_timeline_vals(self, duration, date_start, date_end=False):
+        time_data = super()._prepare_timeline_vals(duration=duration, date_start=date_start, date_end=date_end)
+        if self.employee_assigned_ids:
+            time_data['employee_id'] = self.employee_assigned_ids[0].id
+        return time_data

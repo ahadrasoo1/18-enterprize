@@ -7,6 +7,7 @@ from odoo.tools import SQL
 
 from datetime import timedelta
 from collections import defaultdict
+from copy import deepcopy
 
 
 class PartnerLedgerCustomHandler(models.AbstractModel):
@@ -49,7 +50,7 @@ class PartnerLedgerCustomHandler(models.AbstractModel):
             for column_group_key in options['column_groups']
         }
 
-        partners_results = self._query_partners(options)
+        partners_results = self._query_partners(report, options)
 
         search_filter = options.get('filter_search_bar', '')
         accept_unknown_in_filter = search_filter.lower() in self._get_no_partner_line_label().lower()
@@ -124,29 +125,34 @@ class PartnerLedgerCustomHandler(models.AbstractModel):
             domain += [
                 '|', ('matched_debit_ids.debit_move_id.partner_id.name', 'ilike', options['filter_search_bar']),
                 '|', ('matched_credit_ids.credit_move_id.partner_id.name', 'ilike', options['filter_search_bar']),
-                ('partner_id.name', 'ilike', options['filter_search_bar']),
+                '|', ('partner_id.name', 'ilike', options['filter_search_bar']),
+                ('partner_id', '=', False),
             ]
 
         options['forced_domain'] = options.get('forced_domain', []) + domain
 
         if self.env.user.has_group('base.group_multi_currency'):
             options['multi_currency'] = True
+        else:
+            options['columns'] = [col for col in options['columns'] if col['expression_label'] != 'amount_currency']
 
-        columns_to_hide = []
-        options['hide_account'] = (previous_options or {}).get('hide_account', False)
-        columns_to_hide += ['journal_code', 'account_code', 'matching_number'] if options['hide_account'] else []
+        if not self.env.ref('account_reports.customer_statement_report', raise_if_not_found=False):
+            # Deprecated, will be removed in master
+            columns_to_hide = []
+            options['hide_account'] = (previous_options or {}).get('hide_account', False)
+            columns_to_hide += ['journal_code', 'account_code', 'matching_number'] if options['hide_account'] else []
 
-        options['hide_debit_credit'] = (previous_options or {}).get('hide_debit_credit', False)
-        columns_to_hide += ['debit', 'credit'] if options['hide_debit_credit'] else ['amount']
+            options['hide_debit_credit'] = (previous_options or {}).get('hide_debit_credit', False)
+            columns_to_hide += ['debit', 'credit'] if options['hide_debit_credit'] else ['amount']
 
-        options['columns'] = [col for col in options['columns'] if col['expression_label'] not in columns_to_hide]
+            options['columns'] = [col for col in options['columns'] if col['expression_label'] not in columns_to_hide]
 
-        options['buttons'].append({
-            'name': _('Send'),
-            'action': 'action_send_statements',
-            'sequence': 90,
-            'always_show': True,
-        })
+            options['buttons'].append({
+                'name': _('Send'),
+                'action': 'action_send_statements',
+                'sequence': 90,
+                'always_show': True,
+            })
 
     def _custom_unfold_all_batch_data_generator(self, report, options, lines_to_expand_by_function):
         partner_ids_to_expand = []
@@ -182,16 +188,20 @@ class PartnerLedgerCustomHandler(models.AbstractModel):
         }
 
     def _get_report_send_recipients(self, options):
+        # Deprecated, to be moved to customer statement handler in master
         partners = options.get('partner_ids', [])
         if not partners:
-            self._cr.execute(self._get_query_sums(options))
+            report = self.env['account.report'].browse(options['report_id'])
+            self._cr.execute(self._get_query_sums(report, options))
             partners = [row['groupby'] for row in self._cr.dictfetchall() if row['groupby']]
         return self.env['res.partner'].browse(partners)
 
     def action_send_statements(self, options):
+        # Deprecated, to be moved to customer statement handler in master
         template = self.env.ref('account_reports.email_template_customer_statement', False)
+        partners = self.env['res.partner'].browse(options.get('partner_ids', []))
         return {
-            'name': _("Send Partner Ledgers"),
+            'name': _("Send %s Statement", partners.name) if len(partners) == 1 else _("Send Partner Ledgers"),
             'type': 'ir.actions.act_window',
             'views': [[False, 'form']],
             'res_model': 'account.report.send',
@@ -214,7 +224,7 @@ class PartnerLedgerCustomHandler(models.AbstractModel):
             'target': 'current',
         }
 
-    def _query_partners(self, options):
+    def _query_partners(self, report, options):
         """ Executes the queries and performs all the computation.
         :return:        A list of tuple (partner, column_group_values) sorted by the table's model _order:
                         - partner is a res.parter record.
@@ -235,7 +245,7 @@ class PartnerLedgerCustomHandler(models.AbstractModel):
         company_currency = self.env.company.currency_id
 
         # Execute the queries and dispatch the results.
-        query = self._get_query_sums(options)
+        query = self._get_query_sums(report, options)
 
         groupby_partners = {}
 
@@ -244,31 +254,7 @@ class PartnerLedgerCustomHandler(models.AbstractModel):
             assign_sum(res)
 
         # Correct the sums per partner, for the lines without partner reconciled with a line having a partner
-        query = self._get_sums_without_partner(options)
-
-        self._cr.execute(query)
-        totals = {}
-        for total_field in ['debit', 'credit', 'amount', 'balance']:
-            totals[total_field] = {col_group_key: 0 for col_group_key in options['column_groups']}
-
-        for row in self._cr.dictfetchall():
-            totals['debit'][row['column_group_key']] += row['debit']
-            totals['credit'][row['column_group_key']] += row['credit']
-            totals['amount'][row['column_group_key']] += row['amount']
-            totals['balance'][row['column_group_key']] += row['balance']
-
-            if row['groupby'] not in groupby_partners:
-                continue
-
-            assign_sum(row)
-
-        if None in groupby_partners:
-            # Debit/credit are inverted for the unknown partner as the computation is made regarding the balance of the known partner
-            for column_group_key in options['column_groups']:
-                groupby_partners[None][column_group_key]['debit'] += totals['credit'][column_group_key]
-                groupby_partners[None][column_group_key]['credit'] += totals['debit'][column_group_key]
-                groupby_partners[None][column_group_key]['amount'] += totals['amount'][column_group_key]
-                groupby_partners[None][column_group_key]['balance'] -= totals['balance'][column_group_key]
+        self._add_sums_of_lines_without_partners(options, groupby_partners)
 
         # Retrieve the partners to browse.
         # groupby_partners.keys() contains all account ids affected by:
@@ -286,7 +272,7 @@ class PartnerLedgerCustomHandler(models.AbstractModel):
 
         return [(partner, groupby_partners[partner.id if partner else None]) for partner in partners]
 
-    def _get_query_sums(self, options) -> SQL:
+    def _get_query_sums(self, report, options) -> SQL:
         """ Construct a query retrieving all the aggregated sums to build the report. It includes:
         - sums for all partners.
         - sums for the initial balances.
@@ -294,25 +280,34 @@ class PartnerLedgerCustomHandler(models.AbstractModel):
         :return:                    query as SQL object
         """
         queries = []
-        report = self.env.ref('account_reports.partner_ledger_report')
 
         # Create the currency table.
         for column_group_key, column_group_options in report._split_options_per_column_group(options).items():
             query = report._get_report_query(column_group_options, 'from_beginning')
+            date_from = options['date']['date_from']
             queries.append(SQL(
                 """
-                SELECT
-                    account_move_line.partner_id  AS groupby,
-                    %(column_group_key)s          AS column_group_key,
-                    SUM(%(debit_select)s)         AS debit,
-                    SUM(%(credit_select)s)        AS credit,
-                    SUM(%(balance_select)s)       AS amount,
-                    SUM(%(balance_select)s)       AS balance
-                FROM %(table_references)s
-                %(currency_table_join)s
-                WHERE %(search_condition)s
-                GROUP BY account_move_line.partner_id
-                """,
+                (WITH partner_sums AS (
+                    SELECT
+                        account_move_line.partner_id            AS groupby,
+                        %(column_group_key)s                    AS column_group_key,
+                        SUM(%(debit_select)s)                   AS debit,
+                        SUM(%(credit_select)s)                  AS credit,
+                        SUM(%(balance_select)s)                 AS amount,
+                        SUM(%(balance_select)s)                 AS balance,
+                        BOOL_AND(account_move_line.reconciled)  AS all_reconciled,
+                        MAX(account_move_line.date)             AS latest_date
+                    FROM %(table_references)s
+                    %(currency_table_join)s
+                    WHERE %(search_condition)s
+                    GROUP BY account_move_line.partner_id
+                )
+                SELECT *
+                FROM partner_sums
+                WHERE partner_sums.balance != 0
+                OR partner_sums.all_reconciled = FALSE
+                OR partner_sums.latest_date >= %(date_from)s
+                )""",
                 column_group_key=column_group_key,
                 debit_select=report._currency_table_apply_rate(SQL("account_move_line.debit")),
                 credit_select=report._currency_table_apply_rate(SQL("account_move_line.credit")),
@@ -320,13 +315,19 @@ class PartnerLedgerCustomHandler(models.AbstractModel):
                 table_references=query.from_clause,
                 currency_table_join=report._currency_table_aml_join(column_group_options),
                 search_condition=query.where_clause,
+                date_from=date_from,
             ))
 
         return SQL(' UNION ALL ').join(queries)
 
     def _get_initial_balance_values(self, partner_ids, options):
+        report = self.env['account.report'].browse(options['report_id'])
+
+        if not report.filter_date_range:
+            # Happens when the report has been manually customized to not use date ranges anymore.
+            return {partner_id: {col_group_key: {} for col_group_key in options['column_groups']} for partner_id in partner_ids}
+
         queries = []
-        report = self.env.ref('account_reports.partner_ledger_report')
         for column_group_key, column_group_options in report._split_options_per_column_group(options).items():
             # Get sums for the initial balance.
             # period: [('date' <= options['date_from'] - 1)]
@@ -358,11 +359,15 @@ class PartnerLedgerCustomHandler(models.AbstractModel):
         self._cr.execute(SQL(" UNION ALL ").join(queries))
 
         init_balance_by_col_group = {
-            partner_id: {column_group_key: {} for column_group_key in options['column_groups']}
+            partner_id: {column_group_key: defaultdict(float) for column_group_key in options['column_groups']}
             for partner_id in partner_ids
         }
         for result in self._cr.dictfetchall():
             init_balance_by_col_group[result['partner_id']][result['column_group_key']] = result
+
+        # Correct the sums per partner, for the lines without partner reconciled with a line having a partner
+        new_options = self._get_options_initial_balance(options)
+        self._add_sums_of_lines_without_partners(new_options, init_balance_by_col_group)
 
         return init_balance_by_col_group
 
@@ -374,8 +379,30 @@ class PartnerLedgerCustomHandler(models.AbstractModel):
         :return:        A copy of the options, modified to match the dates to use to get the initial balances.
         """
         new_date_to = fields.Date.from_string(options['date']['date_from']) - timedelta(days=1)
-        new_date_options = dict(options['date'], date_from=False, date_to=fields.Date.to_string(new_date_to))
-        return dict(options, date=new_date_options)
+        new_options = deepcopy(options)
+        new_options['date']['date_from'] = False
+        new_options['date']['date_to'] = fields.Date.to_string(new_date_to)
+        for column_group in new_options['column_groups'].values():
+            column_group['forced_options']['date'] = new_options['date']
+        return new_options
+
+    def _add_sums_of_lines_without_partners(self, options, result_dict):
+        fields2inverse = {
+            'balance': ('balance', -1),
+            'debit': ('credit', 1),
+            'amount': ('amount', 1),
+            'credit': ('debit', 1),
+        }
+        query = self._get_sums_without_partner(options)
+        self._cr.execute(query)
+        rows = self._cr.dictfetchall()
+        for row in rows:
+            for field, (inverse_field, inverse_sign) in fields2inverse.items():
+                if partner_vals := result_dict.get(row['groupby']):
+                    partner_vals[row['column_group_key']][field] += row[field]
+                if no_partner_vals := result_dict.get(None):
+                    # Debit/credit are inverted for the unknown partner as the computation is made regarding the balance of the known partner
+                    no_partner_vals[row['column_group_key']][inverse_field] += inverse_sign * row[field]
 
     def _get_sums_without_partner(self, options):
         """ Get the sum of lines without partner reconciled with a line with a partner, grouped by partner. Those lines
@@ -418,14 +445,7 @@ class PartnerLedgerCustomHandler(models.AbstractModel):
         return SQL(" UNION ALL ").join(queries)
 
     def _report_expand_unfoldable_line_partner_ledger(self, line_dict_id, groupby, options, progress, offset, unfold_all_batch_data=None):
-        def init_load_more_progress(line_dict):
-            return {
-                column['column_group_key']: line_col.get('no_format', 0)
-                for column, line_col in  zip(options['columns'], line_dict['columns'])
-                if column['expression_label'] == 'balance'
-            }
-
-        report = self.env.ref('account_reports.partner_ledger_report')
+        report = self.env['account.report'].browse(options['report_id'])
         markup, model, record_id = report._parse_line_id(line_dict_id)[-1]
 
         if model != 'res.partner':
@@ -440,7 +460,7 @@ class PartnerLedgerCustomHandler(models.AbstractModel):
         lines = []
 
         # Get initial balance
-        if offset == 0:
+        if offset == 0 and not options.get('hide_initial_balance'):
             if unfold_all_batch_data:
                 init_balance_by_col_group = unfold_all_batch_data['initial_balances'][record_id]
             else:
@@ -450,7 +470,7 @@ class PartnerLedgerCustomHandler(models.AbstractModel):
                 lines.append(initial_balance_line)
 
                 # For the first expansion of the line, the initial balance line gives the progress
-                progress = init_load_more_progress(initial_balance_line)
+                progress = self._init_load_more_progress(options, initial_balance_line)
 
         limit_to_load = report.load_more_limit + 1 if report.load_more_limit and options['export_mode'] != 'print' else None
 
@@ -459,19 +479,8 @@ class PartnerLedgerCustomHandler(models.AbstractModel):
         else:
             aml_results = self._get_aml_values(options, [record_id], offset=offset, limit=limit_to_load)[record_id]
 
-        has_more = False
-        treated_results_count = 0
-        next_progress = progress
-        for result in aml_results:
-            if options['export_mode'] != 'print' and report.load_more_limit and treated_results_count == report.load_more_limit:
-                # We loaded one more than the limit on purpose: this way we know we need a "load more" line
-                has_more = True
-                break
-
-            new_line = self._get_report_line_move_line(options, result, line_dict_id, next_progress, level_shift=level_shift)
-            lines.append(new_line)
-            next_progress = init_load_more_progress(new_line)
-            treated_results_count += 1
+        aml_report_lines, next_progress, treated_results_count, has_more = self._get_partner_aml_report_lines(report, options, line_dict_id, aml_results, progress, offset, level_shift=level_shift)
+        lines.extend(aml_report_lines)
 
         return {
             'lines': lines,
@@ -479,6 +488,47 @@ class PartnerLedgerCustomHandler(models.AbstractModel):
             'has_more': has_more,
             'progress': next_progress
         }
+
+    def _init_load_more_progress(self, options, line_dict):
+        return {
+            column['column_group_key']: line_col.get('no_format', 0)
+            for column, line_col in zip(options['columns'], line_dict['columns'])
+            if column['expression_label'] == 'balance'
+        }
+
+    def _get_partner_aml_report_lines(self, report, options, partner_line_id, aml_results, progress, offset=0, level_shift=0):
+        lines = []
+        has_more = False
+        treated_results_count = 0
+        next_progress = progress
+        for result in aml_results:
+            if self._is_report_limit_reached(report, options, treated_results_count):
+                # We loaded one more than the limit on purpose: this way we know we need a "load more" line
+                has_more = True
+                break
+
+            new_line = self._get_report_line_move_line(options, result, partner_line_id, next_progress, level_shift=level_shift)
+            lines.append(new_line)
+            next_progress = self._init_load_more_progress(options, new_line)
+            treated_results_count += 1
+        return lines, next_progress, treated_results_count, has_more
+
+    def _is_report_limit_reached(self, report, options, results_count):
+        return options['export_mode'] != 'print' and report.load_more_limit and results_count == report.load_more_limit
+
+    def _get_additional_column_aml_values(self):
+        """
+        Allows customization of additional fields in the partner ledger query.
+
+        This method is intended to be overridden by other modules to add custom fields
+        to the partner ledger query, e.g. SQL("account_move_line.date AS date,").
+
+        By default, it returns an empty SQL object.
+        """
+        return SQL()
+
+    def _get_order_by_aml_values(self):
+        return SQL('account_move_line.date, account_move_line.id')
 
     def _get_aml_values(self, options, partner_ids, offset=0, limit=None):
         rslt = {partner_id: [] for partner_id in partner_ids}
@@ -496,6 +546,8 @@ class PartnerLedgerCustomHandler(models.AbstractModel):
         queries = []
         journal_name = self.env['account.journal']._field_to_sql('journal', 'name')
         report = self.env.ref('account_reports.partner_ledger_report')
+        additional_columns = self._get_additional_column_aml_values()
+        order_by = self._get_order_by_aml_values()
         for column_group_key, group_options in report._split_options_per_column_group(options).items():
             query = report._get_report_query(group_options, 'strict_range')
             account_alias = query.left_join(lhs_alias='account_move_line', lhs_column='account_id', rhs_table='account_account', rhs_column='id', link='account_id')
@@ -508,7 +560,7 @@ class PartnerLedgerCustomHandler(models.AbstractModel):
                 '''
                 SELECT
                     account_move_line.id,
-                    account_move_line.date_maturity,
+                    COALESCE(account_move_line.date_maturity, account_move_line.date) AS date_maturity,
                     account_move_line.name,
                     account_move_line.ref,
                     account_move_line.company_id,
@@ -518,6 +570,7 @@ class PartnerLedgerCustomHandler(models.AbstractModel):
                     account_move_line.currency_id,
                     account_move_line.amount_currency,
                     account_move_line.matching_number,
+                    %(additional_columns)s
                     COALESCE(account_move_line.invoice_date, account_move_line.date) AS invoice_date,
                     %(debit_select)s                                                 AS debit,
                     %(credit_select)s                                                AS credit,
@@ -532,6 +585,7 @@ class PartnerLedgerCustomHandler(models.AbstractModel):
                     %(column_group_key)s                                             AS column_group_key,
                     'directly_linked_aml'                                            AS key,
                     0                                                                AS partial_id
+                    %(extra_select)s
                 FROM %(table_references)s
                 JOIN account_move ON account_move.id = account_move_line.move_id
                 %(currency_table_join)s
@@ -539,8 +593,9 @@ class PartnerLedgerCustomHandler(models.AbstractModel):
                 LEFT JOIN res_partner partner               ON partner.id = account_move_line.partner_id
                 LEFT JOIN account_journal journal           ON journal.id = account_move_line.journal_id
                 WHERE %(search_condition)s AND %(directly_linked_aml_partner_clause)s
-                ORDER BY account_move_line.date, account_move_line.id
+                ORDER BY %(order_by)s
                 ''',
+                additional_columns=additional_columns,
                 debit_select=report._currency_table_apply_rate(SQL("account_move_line.debit")),
                 credit_select=report._currency_table_apply_rate(SQL("account_move_line.credit")),
                 balance_select=report._currency_table_apply_rate(SQL("account_move_line.balance")),
@@ -552,6 +607,8 @@ class PartnerLedgerCustomHandler(models.AbstractModel):
                 currency_table_join=report._currency_table_aml_join(group_options),
                 search_condition=query.where_clause,
                 directly_linked_aml_partner_clause=directly_linked_aml_partner_clause,
+                order_by=order_by,
+                extra_select=SQL(' ').join(self._get_aml_value_extra_select()),
             ))
 
             # For the move lines linked to no partner, but reconciled with this partner. They will appear in grey in the report
@@ -559,7 +616,7 @@ class PartnerLedgerCustomHandler(models.AbstractModel):
                 '''
                 SELECT
                     account_move_line.id,
-                    account_move_line.date_maturity,
+                    COALESCE(account_move_line.date_maturity, account_move_line.date) AS date_maturity,
                     account_move_line.name,
                     account_move_line.ref,
                     account_move_line.company_id,
@@ -569,6 +626,7 @@ class PartnerLedgerCustomHandler(models.AbstractModel):
                     account_move_line.currency_id,
                     account_move_line.amount_currency,
                     account_move_line.matching_number,
+                    %(additional_columns)s
                     COALESCE(account_move_line.invoice_date, account_move_line.date) AS invoice_date,
                     %(debit_select)s                                                 AS debit,
                     %(credit_select)s                                                AS credit,
@@ -583,6 +641,7 @@ class PartnerLedgerCustomHandler(models.AbstractModel):
                     %(column_group_key)s                                             AS column_group_key,
                     'indirectly_linked_aml'                                          AS key,
                     partial.id                                                       AS partial_id
+                    %(extra_select)s
                 FROM %(table_references)s
                     %(currency_table_join)s,
                     account_partial_reconcile partial,
@@ -599,8 +658,9 @@ class PartnerLedgerCustomHandler(models.AbstractModel):
                     AND %(account_alias)s.id = account_move_line.account_id
                     AND %(search_condition)s
                     AND partial.max_date BETWEEN %(date_from)s AND %(date_to)s
-                ORDER BY account_move_line.date, account_move_line.id
+                ORDER BY %(order_by)s
                 ''',
+                additional_columns=additional_columns,
                 debit_select=report._currency_table_apply_rate(SQL("CASE WHEN aml_with_partner.balance > 0 THEN 0 ELSE partial.amount END")),
                 credit_select=report._currency_table_apply_rate(SQL("CASE WHEN aml_with_partner.balance < 0 THEN 0 ELSE partial.amount END")),
                 balance_select=report._currency_table_apply_rate(SQL("-SIGN(aml_with_partner.balance) * partial.amount")),
@@ -615,6 +675,8 @@ class PartnerLedgerCustomHandler(models.AbstractModel):
                 search_condition=query.where_clause,
                 date_from=group_options['date']['date_from'],
                 date_to=group_options['date']['date_to'],
+                order_by=order_by,
+                extra_select=SQL(' ').join(self._get_aml_value_extra_select()),
             ))
 
         query = SQL(" UNION ALL ").join(SQL("(%s)", query) for query in queries)
@@ -647,6 +709,10 @@ class PartnerLedgerCustomHandler(models.AbstractModel):
 
         return rslt
 
+    def _get_aml_value_extra_select(self):
+        """ Hook method to add extra select fields to the aml queries. """
+        return []
+
     ####################################################
     # COLUMNS/LINES
     ####################################################
@@ -659,7 +725,7 @@ class PartnerLedgerCustomHandler(models.AbstractModel):
         report = self.env['account.report'].browse(options['report_id'])
         for column in options['columns']:
             col_expr_label = column['expression_label']
-            value = partner_values[column['column_group_key']].get(col_expr_label)
+            value = None if options.get('hide_partner_totals') else partner_values[column['column_group_key']].get(col_expr_label)
             unfoldable = unfoldable or (col_expr_label in ('debit', 'credit', 'amount') and not company_currency.is_zero(value))
             column_values.append(report._build_column_dict(value, column, options=options))
 
@@ -690,15 +756,7 @@ class PartnerLedgerCustomHandler(models.AbstractModel):
         :param move_name:   The name of the account.move record.
         :return:            The formatted name of the account.move.line record.
         '''
-        names = []
-        if move_name is not None and move_name != '/':
-            names.append(move_name)
-        if move_ref and move_ref != '/':
-            names.append(move_ref)
-        if line_name and line_name != move_name and line_name != '/':
-            names.append(line_name)
-        name = ' - '.join(names)
-        return name
+        return self.env['account.move.line']._format_aml_name(line_name, move_ref, move_name=move_name)
 
     def _get_report_line_move_line(self, options, aml_query_result, partner_line_id, init_bal_by_col_group, level_shift=0):
         if aml_query_result['payment_id']:
@@ -710,6 +768,10 @@ class PartnerLedgerCustomHandler(models.AbstractModel):
         report = self.env['account.report'].browse(options['report_id'])
         for column in options['columns']:
             col_expr_label = column['expression_label']
+
+            if col_expr_label not in aml_query_result:
+                raise UserError(_("The column '%s' is not available for this report.", col_expr_label))
+
             col_value = aml_query_result[col_expr_label] if column['column_group_key'] == aml_query_result['column_group_key'] else None
 
             if col_value is None:

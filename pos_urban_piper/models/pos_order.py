@@ -1,3 +1,7 @@
+# Part of Odoo. See LICENSE file for full copyright and licensing details.
+
+import json
+
 from odoo import fields, models
 
 
@@ -29,3 +33,21 @@ class PosOrder(models.Model):
         Generate unique id for the urban piper order.
         """
         return f'{delivery_provider} {pos_session_id:05}-{config_id:03}-{sequence_number:04}'
+
+    def mark_urbanpiper_prep_order_as_printed(self):
+        self.ensure_one()
+        # Lock the line
+        self.env.cr.execute(
+            'SELECT id FROM pos_order WHERE id = %s FOR UPDATE NOWAIT',
+            (self.id,)
+        )
+
+        lopc = json.loads(self.last_order_preparation_change) if self.last_order_preparation_change else {
+            'lines': {},
+            'metadata': {},
+        }
+        if lopc.get('urbanpiper_printed', False):
+            raise ValueError("This delivery order has already been printed automatically.")
+
+        lopc['urbanpiper_printed'] = True
+        self.last_order_preparation_change = json.dumps(lopc)

@@ -1,24 +1,25 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* sale_planning
-# 
+#
 # Translators:
 # Wil Odoo, 2024
 # Marianna Ciofani, 2024
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:28+0000\n"
+"POT-Creation-Date: 2025-12-29 18:48+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
 "Last-Translator: Marianna Ciofani, 2024\n"
 "Language-Team: Italian (https://app.transifex.com/odoo/teams/41243/it/)\n"
+"Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: it\n"
-"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? "
+"1 : 2;\n"
 
 #. module: sale_planning
 #. odoo-python
@@ -81,8 +82,8 @@ msgstr "<strong>Articolo ordine di vendita  — </strong>"
 #. odoo-javascript
 #: code:addons/sale_planning/static/src/views/planning_hooks.js:0
 msgid ""
-"All open shifts and sales orders have already been assigned, or there are no"
-" resources available to take them at this time."
+"All open shifts and sales orders have already been assigned, or there are no "
+"resources available to take them at this time."
 msgstr ""
 "Tutti i turni e gli ordini di vendita aperti sono stati già assegnati o al "
 "momento non ci sono risorse disponibili per prenderli in carico. "
@@ -144,21 +145,21 @@ msgstr "Tecnico informatico"
 msgid ""
 "If enabled, a shift will automatically be generated for the selected role "
 "when confirming the Sales Order.                 With the 'auto plan' "
-"feature, only employees with this role will be automatically assigned shifts"
-" for Sales Orders containing this service.                 The system will "
-"consider employee availability and the remaining time to be planned."
-"                 You can also manually schedule open shifts for your Sales "
-"Order or assign them to any employee you prefer."
+"feature, only employees with this role will be automatically assigned shifts "
+"for Sales Orders containing this service.                 The system will "
+"consider employee availability and the remaining time to be "
+"planned.                 You can also manually schedule open shifts for your "
+"Sales Order or assign them to any employee you prefer."
 msgstr ""
 "Se abilitato, verrà generato automaticamente un turno per il ruolo "
-"selezionato al momento della conferma dell'Ordine di vendita."
-"                 Grazie alla funzionalità 'pianificazione automatica', solo "
-"ai dipendenti con questo ruolo verranno assegnati automaticamente turni per "
-"gli Ordini di vendita che contengono questo servizio.                 Il "
-"sistema considererà le disponibilità del dipendente e il tempo restante da "
-"pianificare.                 Inoltre, è possibile pianificare manualmente i "
-"turni aperti per il tuo Ordine di vendita o assegnarli al dipendente che "
-"preferisci."
+"selezionato al momento della conferma dell'Ordine di "
+"vendita.                 Grazie alla funzionalità 'pianificazione "
+"automatica', solo ai dipendenti con questo ruolo verranno assegnati "
+"automaticamente turni per gli Ordini di vendita che contengono questo "
+"servizio.                 Il sistema considererà le disponibilità del "
+"dipendente e il tempo restante da pianificare.                 Inoltre, è "
+"possibile pianificare manualmente i turni aperti per il tuo Ordine di "
+"vendita o assegnarli al dipendente che preferisci."
 
 #. module: sale_planning
 #: model_terms:ir.ui.view,arch_db:sale_planning.planning_slot_view_search_inherit_sale_planning
@@ -200,8 +201,8 @@ msgstr "Turni aperti e ordini di vendita non programmati"
 #: model_terms:product.template,description:sale_planning.developer_product_product_template
 msgid "Our developer will help you to add new features to your Software."
 msgstr ""
-"Il nostro sviluppatore vi aiuterà ad aggiungere nuove funzionalità al vostro"
-" software."
+"Il nostro sviluppatore vi aiuterà ad aggiungere nuove funzionalità al vostro "
+"software."
 
 #. module: sale_planning
 #: model:ir.model.fields,field_description:sale_planning.field_product_product__planning_enabled
@@ -230,8 +231,8 @@ msgstr ""
 #: code:addons/sale_planning/models/product.py:0
 msgid "Plannable services should use an UoM within the %s category."
 msgstr ""
-"I servizi pianificabili dovrebbero utilizzare un'unità di misura all'interno"
-" della categoria %s."
+"I servizi pianificabili dovrebbero utilizzare un'unità di misura all'interno "
+"della categoria %s."
 
 #. module: sale_planning
 #: model:ir.model,name:sale_planning.model_planning_analysis_report
@@ -302,8 +303,8 @@ msgid ""
 msgstr ""
 "Elemento dell'ordine di vendita per il quale verrà effettuato il cambio. "
 "Quando gli ordini di vendita vengono pianificati in automatico, vengono "
-"presi in considerazione le ore restanti dell'articolo dell'ordine di vendita"
-" così come il ruolo definito sul servizio."
+"presi in considerazione le ore restanti dell'articolo dell'ordine di vendita "
+"così come il ruolo definito sul servizio."
 
 #. module: sale_planning
 #: model:ir.actions.act_window,name:sale_planning.sale_planning_action_schedule_by_sale_order
@@ -368,6 +369,8 @@ msgstr ""
 "selezionato."
 
 #. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/views/sale_planning_gantt/sale_planning_gantt_renderer.js:0
 #: model_terms:ir.ui.view,arch_db:sale_planning.planning_slot_view_gantt_inherit_sale_planning
 #: model_terms:ir.ui.view,arch_db:sale_planning.planning_view_form_in_gantt_inherit_sale_planning
 msgid "Unschedule"
@@ -394,10 +397,12 @@ msgstr "Stai cercando di creare uno slot per un ordine di vendita annullato."
 #. odoo-python
 #: code:addons/sale_planning/models/sale_order.py:0
 msgid ""
-"You cannot update the company for sales order %(order_name)s as it's linked to shifts in another company.\n"
+"You cannot update the company for sales order %(order_name)s as it's linked "
+"to shifts in another company.\n"
 "Please transfer shifts %(slots_names)s to the destination company first."
 msgstr ""
-"Non è possibile aggiornare l'azienda dell'ordine di vendita%(order_name)s perché collegato a turni di un'altra azienda.\n"
+"Non è possibile aggiornare l'azienda dell'ordine di vendita%(order_name)s "
+"perché collegato a turni di un'altra azienda.\n"
 "Trasferisci i turni %(slots_names)s all'azienda di destinazione."
 
 #. module: sale_planning

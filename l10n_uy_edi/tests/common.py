@@ -21,6 +21,7 @@ class TestUyEdi(AccountTestInvoicingCommon):
     def setUpClass(cls):
         super().setUpClass()
         cls.frozen_today = "2024-06-15T10:00:00"
+        cls.env.ref("base.lang_es_UY").active = True
 
         cls.company_data["company"].write({
             "name": "(UY) Uruguay Company (Unit Tests)",
@@ -34,6 +35,17 @@ class TestUyEdi(AccountTestInvoicingCommon):
             "website": "www.example.com",
         })
         cls.company_uy = cls.company_data["company"]
+        cls.partner_local_tk = cls.env["res.partner"].create({
+            "name": "IEB Internacional",
+            "l10n_latam_identification_type_id": cls.env.ref("l10n_uy.it_dni").id,
+            "vat": "218435730016",
+            "street": "Bach 0",
+            "city": "Aeroparque",
+            "state_id": cls.env.ref("base.state_uy_02").id,
+            "country_id": cls.env.ref("base.uy").id,
+            "email": "rut@example.com",
+            "lang": "es_UY",
+        })
         cls.partner_local = cls.env["res.partner"].create({
             "name": "IEB Internacional",
             "l10n_latam_identification_type_id": cls.env.ref("l10n_uy.it_rut").id,
@@ -62,6 +74,7 @@ class TestUyEdi(AccountTestInvoicingCommon):
         cls.tax_22 = cls.env.ref("account.%s_vat1" % cls.company_uy.id)
         cls.tax_10 = cls.env.ref("account.%s_vat2" % cls.company_uy.id)
         cls.tax_0 = cls.env.ref("account.%s_vat3" % cls.company_uy.id)
+        cls.reduced_tax = cls.env.ref("account.%s_vat11" % cls.company_uy.id)
 
         # Products
         cls.service_vat_22 = cls.env["product.product"].create({
@@ -79,6 +92,14 @@ class TestUyEdi(AccountTestInvoicingCommon):
             "type": "service",
             "default_code": "VAT 10",
             "taxes_id": [(6, 0, cls.tax_10.ids)],
+        })
+        cls.service_reduced_vat = cls.env["product.product"].create({
+            "name": "Virtual Home Staging (Reduced VAT)",
+            "list_price": 38.25,
+            "standard_price": 45.5,
+            "type": "service",
+            "default_code": "Reduced VAT",
+            "taxes_id": [(6, 0, cls.reduced_tax.ids)],
         })
         cls.product_vat_22 = cls.env["product.product"].create({
             "name": "Customizable Desk (VAT 10)",
@@ -104,12 +125,14 @@ class TestUyEdi(AccountTestInvoicingCommon):
         })
 
         cls.utils_path = "odoo.addons.l10n_uy_edi.models.l10n_uy_edi_document.L10nUyEdiDocument"
+        cls.mocked_responses_path = "l10n_uy_edi/tests/responses/"
+        cls.mocked_cfes_path = "l10n_uy_edi/tests/expected_cfes/"
 
     @classmethod
     def _create_move(cls, **kwargs):
         with freeze_time(cls.frozen_today, tz_offset=3):
             invoice = cls.env['account.move'].create({
-                'partner_id': cls.partner_local.id,
+                'partner_id': cls.partner_local_tk.id,
                 'move_type': 'out_invoice',
                 'journal_id': cls.company_data['default_journal_sale'].id,
                 'invoice_line_ids': [
@@ -149,7 +172,7 @@ class TestUyEdi(AccountTestInvoicingCommon):
         if response_file == "NO_RESPONSE" or not response_file:
             mock_response = None
         else:
-            xml_content = misc.file_open("l10n_uy_edi/tests/responses/" + response_file + ".xml", mode="rb").read()
+            xml_content = misc.file_open(self.mocked_responses_path + response_file + ".xml", mode="rb").read()
             mock_response = mock.Mock(spec=requests.Response)
             mock_response.status_code = 200
             mock_response.headers = ""
@@ -178,6 +201,20 @@ class TestUyEdi(AccountTestInvoicingCommon):
             error_msg = self.env["l10n_uy_edi.document"]._validate_credentials(company)
         return error_msg
 
+    def _mock_cron_l10n_uy_edi_get_vendor_bills(self, expected_folder, get_pdf=False):
+        """ Call the cron to create vendor bills, will simulate that we have a notification, we read it and process
+        the info and pdf of the vendor bill and then will stop the cron because there ar not more notificactions """
+        with patch(f"{self.utils_path}._ucfe_inbox") as mock_inbox, patch(f"{self.utils_path}._ucfe_query",
+            return_value=self._mocked_response(expected_folder + '_pdf' if get_pdf else False)):
+            mock_inbox.side_effect = [
+                self._mocked_response(expected_folder + '/response_600'),  # Find if they are notifications available
+                self._mocked_response(expected_folder + '/response_610'),  # Read the notification
+                self._mocked_response(expected_folder + '/_status'),  # Update the status of the CFE
+                self._mocked_response(expected_folder + '/response_620'),  # Discard Notification
+                self._mocked_response(expected_folder + '/response_600_end'),  # No more notifications
+            ]
+            self.env["l10n_uy_edi.document"].cron_l10n_uy_edi_get_vendor_bills()
+
     def _send_and_print(self, invoice):
         self.env["account.move.send.wizard"] \
             .with_context(active_model=invoice._name, active_ids=invoice.ids) \
@@ -187,7 +224,7 @@ class TestUyEdi(AccountTestInvoicingCommon):
     def _check_cfe(self, invoice, expected_prefix, expected_xml_file):
         self.assertEqual(invoice.name, "%s DE%07d" % (expected_prefix, invoice.id), "Not valid name")
         self.assertEqual(invoice.l10n_uy_edi_cfe_state, "accepted", "CFE not accepted in demo mode not possible (it is always accepted)")
-        expected_xml = self.get_xml_tree_from_string(misc.file_open("l10n_uy_edi/tests/expected_cfes/" + expected_xml_file + ".xml").read())
+        expected_xml = self.get_xml_tree_from_string(misc.file_open(self.mocked_cfes_path + expected_xml_file + ".xml").read())
         result_xml = self.get_xml_tree_from_attachment(invoice.l10n_uy_edi_document_id.attachment_id)
 
         # For Debit/Credit Notes we need to change the original expected document to add the proper tag.
@@ -200,3 +237,30 @@ class TestUyEdi(AccountTestInvoicingCommon):
             namespace = {"cfe": "http://cfe.dgi.gub.uy"}
             expected_xml.find(".//cfe:Referencia/cfe:Referencia/cfe:NroCFERef", namespace).text = ref_number
         self.assertXmlTreeEqual(expected_xml, result_xml)
+
+    def _mock_upload_document_on_journal(self, journal, filename):
+        filename = filename + ".xml"
+        content = misc.file_open("l10n_uy_edi/tests/sobres_from_uruware/" + filename, mode="rb").read()
+        attachment = self.env['ir.attachment'].create({
+            'raw': content,
+            'name': filename,
+        })
+        with patch(f"{self.utils_path}._create_pdf_vendor_bill", return_value=None):
+            action_vals = journal.create_document_from_attachment(attachment.ids)
+        return self.env['account.move'].browse(action_vals['res_id'])
+
+    def _configure_usd_company_currency(self):
+        USD = self.env.ref("base.USD")
+        UYU = self.env.ref("base.UYU")
+        self.company_uy.currency_id = USD
+        self.env["res.currency.rate"].search([('currency_id', '=', USD.id)]).unlink()
+        self.env["res.currency.rate"].search([('currency_id', '=', UYU.id)]).unlink()
+
+        rate_date = "2025-09-25"
+        self.env["res.currency.rate"].create([
+            {"name": rate_date, "company_id": self.company_uy.id, "currency_id": USD.id, "rate": 1.0},
+            {"name": rate_date, "company_id": self.company_uy.id, "currency_id": UYU.id, "rate": 1.0 / 0.02602066},
+        ])
+
+        self.assertEqual(self.company_uy.currency_id, USD)
+        self.assertEqual(self.company_uy.currency_id.rate, 1.0)

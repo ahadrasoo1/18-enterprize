@@ -1,24 +1,26 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* hr_payroll_account
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# Marianna Ciofani, 2024
-# 
+# Marianna Ciofani, 2025
+# Sergio Zanchetta <primes2h@gmail.com>, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:27+0000\n"
+"POT-Creation-Date: 2025-12-29 18:47+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Marianna Ciofani, 2024\n"
+"Last-Translator: Sergio Zanchetta <primes2h@gmail.com>, 2025\n"
 "Language-Team: Italian (https://app.transifex.com/odoo/teams/41243/it/)\n"
+"Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: it\n"
-"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? "
+"1 : 2;\n"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_account_bank_statement_line__payslip_count
@@ -30,13 +32,19 @@ msgstr "N. buste paga"
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_payslip_run_view_form
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_payslip_view_form
 msgid ""
-"<span class=\"o_stat_text\" invisible=\"move_state != 'draft'\">Journal Entry <br/>(Draft)</span>\n"
-"                        <span class=\"o_stat_text\" invisible=\"move_state != 'posted'\">Journal Entry <br/>(Posted)</span>\n"
-"                        <span class=\"o_stat_text\" invisible=\"move_state != 'cancel'\">Journal Entry <br/>(Canceled)</span>"
+"<span class=\"o_stat_text\" invisible=\"move_state != 'draft'\">Journal "
+"Entry <br/>(Draft)</span>\n"
+"                        <span class=\"o_stat_text\" invisible=\"move_state !"
+"= 'posted'\">Journal Entry <br/>(Posted)</span>\n"
+"                        <span class=\"o_stat_text\" invisible=\"move_state !"
+"= 'cancel'\">Journal Entry <br/>(Canceled)</span>"
 msgstr ""
-"<span class=\"o_stat_text\" invisible=\"move_state != 'draft'\">Registrazione contabile <br/>(bozza)</span>\n"
-"                        <span class=\"o_stat_text\" invisible=\"move_state != 'posted'\">Registrazione contabile <br/>(pubblicata)</span>\n"
-"                        <span class=\"o_stat_text\" invisible=\"move_state != 'cancel'\">Registrazione contabile <br/>(annullata)</span>"
+"<span class=\"o_stat_text\" invisible=\"move_state != "
+"'draft'\">Registrazione contabile <br/>(bozza)</span>\n"
+"                        <span class=\"o_stat_text\" invisible=\"move_state !"
+"= 'posted'\">Registrazione contabile <br/>(pubblicata)</span>\n"
+"                        <span class=\"o_stat_text\" invisible=\"move_state !"
+"= 'cancel'\">Registrazione contabile <br/>(annullata)</span>"
 
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.view_move_form_inherit
@@ -63,7 +71,7 @@ msgstr "Contabilità"
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_payslip__move_id
 msgid "Accounting Entry"
-msgstr "Voce contabile"
+msgstr "Registrazione contabile"
 
 #. module: hr_payroll_account
 #. odoo-python
@@ -122,7 +130,7 @@ msgstr "Cronologia contratto"
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_payslip_run_view_form
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_payslip_view_form
 msgid "Create Draft Entry"
-msgstr "Crea voce in bozza"
+msgstr "Crea registrazione in bozza"
 
 #. module: hr_payroll_account
 #: model_terms:ir.actions.act_window,help:hr_payroll_account.action_res_partner_bank_account_form
@@ -132,7 +140,7 @@ msgstr "Creazione di un conto corrente bancario"
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_salary_rule__account_credit
 msgid "Credit Account"
-msgstr "Conto Credito"
+msgstr "Conto avere"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_payslip_line__credit_tag_ids
@@ -143,12 +151,12 @@ msgstr "Griglie imposte di credito"
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_payslip__date
 msgid "Date Account"
-msgstr "Data Conto"
+msgstr "Data conto"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_salary_rule__account_debit
 msgid "Debit Account"
-msgstr "Conto Debito"
+msgstr "Conto dare"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_payslip_line__debit_tag_ids
@@ -174,16 +182,16 @@ msgid ""
 "into a single account move line. This will anonymize the accounting entries "
 "but also disable single payment generations."
 msgstr ""
-"Attiva quest'opzione per unire tutte le registrazioni contabili dello stesso"
-" periodo in un'unica riga di movimento del conto. Questo renderà anonime le "
+"Attiva quest'opzione per unire tutte le registrazioni contabili dello stesso "
+"periodo in un'unica riga di movimento del conto. Questo renderà anonime le "
 "registrazioni contabili ma disabiliterà anche le generazioni di pagamenti "
 "singoli."
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,help:hr_payroll_account.field_hr_salary_rule__split_move_lines
 msgid ""
-"Enable this option to split the accountig entries for this rule according to"
-" the payslip line name. It could be useful for deduction/reimbursement or "
+"Enable this option to split the accountig entries for this rule according to "
+"the payslip line name. It could be useful for deduction/reimbursement or "
 "salary attachments for instance."
 msgstr ""
 "Abilita l'opzione per dividere le registrazioni contabili per la regola "
@@ -206,7 +214,7 @@ msgstr "Procedura guidata resoconto pagamenti HR"
 #: model:ir.model.fields,field_description:hr_payroll_account.field_account_setup_bank_manual_config__has_alt_bank_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_res_partner_bank__has_alt_bank_account
 msgid "Has Alt Bank Account"
-msgstr ""
+msgstr "Ha conto bancario alternativo"
 
 #. module: hr_payroll_account
 #. odoo-python
@@ -214,7 +222,7 @@ msgstr ""
 msgid ""
 "Incorrect journal: The journal must be in the same currency as the company"
 msgstr ""
-"Giornale errato: Il giornale deve essere nella stessa valuta dell'azienda"
+"Registro non corretto: il registro deve avere la stessa valuta dell'azienda"
 
 #. module: hr_payroll_account
 #. odoo-python
@@ -243,8 +251,7 @@ msgstr "Registrazione contabile"
 #: model:ir.model.fields,help:hr_payroll_account.field_hr_payslip__date
 msgid "Keep empty to use the period of the validation(Payslip) date."
 msgstr ""
-"Tenere vuoto per utilizzare il periodo della data di validazione (busta "
-"paga)"
+"Lasciare vuoto per usare il periodo della data di validazione (busta paga)."
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_payslip_run__move_id
@@ -254,24 +261,18 @@ msgstr "Movimento"
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_payslip_run__move_state
 msgid "Move State"
-msgstr ""
+msgstr "Stato movimento"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_salary_rule__not_computed_in_net
 msgid "Not computed in net accountably"
-msgstr "Non computati nel netto contabile"
+msgstr "Non calcolato nel netto contabile"
 
 #. module: hr_payroll_account
 #. odoo-python
 #: code:addons/hr_payroll_account/models/hr_payslip.py:0
 msgid "One of the contract for these payslips has no structure type."
-msgstr "Uno dei contratti di queste buste paga non ha un tipo di struttura."
-
-#. module: hr_payroll_account
-#. odoo-python
-#: code:addons/hr_payroll_account/models/hr_payslip.py:0
-msgid "One of the payroll structures has no account journal defined on it."
-msgstr "Nessun registro contabile definito in una delle strutture libro paga."
+msgstr "Tipo di schema non presente in uno dei contratti di queste buste paga."
 
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_account_payment_register
@@ -282,7 +283,7 @@ msgstr "Paga"
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_hr_payslip
 msgid "Pay Slip"
-msgstr "Busta paga"
+msgstr "Cedolino paga"
 
 #. module: hr_payroll_account
 #. odoo-python
@@ -321,23 +322,23 @@ msgstr "SLR"
 #. odoo-python
 #: code:addons/hr_payroll_account/models/account_chart_template.py:0
 msgid "Salaries"
-msgstr "Stipendi"
+msgstr "Retribuzioni"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_payroll_structure__journal_id
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_payslip__journal_id
 msgid "Salary Journal"
-msgstr "Giornale stipendi"
+msgstr "Registro retribuzione"
 
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_hr_salary_rule
 msgid "Salary Rule"
-msgstr "Regola di retribuzione"
+msgstr "Regola retributiva"
 
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_hr_payroll_structure
 msgid "Salary Structure"
-msgstr "Struttura stipendio"
+msgstr "Schema retributivo"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_salary_rule__split_move_lines
@@ -374,8 +375,8 @@ msgstr ""
 msgid ""
 "The Expense Journal \"%s\" has not properly configured the default Account!"
 msgstr ""
-"Il giornale delle spese \"%s\" non possiede un conto configurato "
-"correttamente!"
+"Il registro spese \"%s\" non ha il conto predefinito configurato "
+"correttamente."
 
 #. module: hr_payroll_account
 #. odoo-python
@@ -394,9 +395,9 @@ msgstr "Il conto bancario del dipendente non è affidabile"
 #. module: hr_payroll_account
 #: model:ir.model.fields,help:hr_payroll_account.field_hr_salary_rule__not_computed_in_net
 msgid ""
-"This field allows you to delete the value of this rule in the \"Net Salary\""
-" rule at the accounting level to explicitly display the value of this rule "
-"in the accounting. For example, if you want to display the value of your "
+"This field allows you to delete the value of this rule in the \"Net Salary\" "
+"rule at the accounting level to explicitly display the value of this rule in "
+"the accounting. For example, if you want to display the value of your "
 "representation fees, you can check this field."
 msgstr ""
 "Il campo consente di eliminare il valore di questa regola nella regola "
@@ -407,15 +408,14 @@ msgstr ""
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.view_partner_bank_form_inherit_hr_payroll_account
 msgid "This will replace the employee existing bank account."
-msgstr ""
+msgstr "Questo sostituirà il conto bancario esistente del dipendente."
 
 #. module: hr_payroll_account
 #. odoo-python
 #: code:addons/hr_payroll_account/models/hr_payslip.py:0
 msgid "You can only register payment for posted journal entries."
 msgstr ""
-"È possibile registrare pagamenti solo per registrazioni contabili "
-"confermate."
+"È possibile registrare pagamenti solo per registrazioni contabili confermate."
 
 #. module: hr_payroll_account
 #. odoo-python
@@ -425,8 +425,17 @@ msgstr "È possibile registrare pagamenti solo per documenti non pagati."
 
 #. module: hr_payroll_account
 #. odoo-python
+#: code:addons/hr_payroll_account/models/hr_payslip.py:0
+msgid "You can't create a journal entry for a paid payslip."
+msgstr "Non puoi creare una registrazione contabile per una busta paga pagata."
+
+#. module: hr_payroll_account
+#. odoo-python
 #: code:addons/hr_payroll_account/models/account_journal.py:0
 msgid "You cannot delete the journal linked to a Salary Structure"
 msgstr ""
 "Non è possibile eliminare il registro collegato alla struttura dello "
 "stipendio"
+
+#~ msgid "One of the payroll structures has no account journal defined on it."
+#~ msgstr "Nessun registro contabile definito in uno degli schemi libro paga."

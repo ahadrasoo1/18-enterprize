@@ -6,7 +6,6 @@ import { user } from "@web/core/user";
 import { PDFIframe } from "./PDF_iframe";
 import { startSignItemNavigator } from "./sign_item_navigator";
 import { AlertDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
-import { MobileInputBottomSheet } from "@sign/components/sign_request/mobile_input_bottom_sheet";
 import {
     SignNameAndSignatureDialog,
     ThankYouDialog,
@@ -14,8 +13,6 @@ import {
     SMSSignerDialog,
     NextDirectSignDialog,
 } from "@sign/dialogs/dialogs";
-
-const { DateTime } = luxon;
 
 export class SignablePDFIframe extends PDFIframe {
     /**
@@ -70,7 +67,7 @@ export class SignablePDFIframe extends PDFIframe {
 
     /**
      * Modify the selected sign item of the corresponding radio set.
-     * @param {SignItem} signItem 
+     * @param {SignItem} signItem
      */
     handleRadioItemSelected(signItem) {
         const radio_set_id = signItem.data.radio_set_id;
@@ -92,7 +89,7 @@ export class SignablePDFIframe extends PDFIframe {
         const { name, item_type: type, auto_value: autoValue } = signItemType;
         if (name === _t("Date")) {
             signItemElement.addEventListener("focus", (e) => {
-                this.fillTextSignItem(e.currentTarget, DateTime.now().toLocaleString());
+                this.fillTextSignItem(e.currentTarget, this.signInfo.get('todayFormattedDate'));
             });
         } else if (type === "signature" || type === "initial") {
             signItemElement.addEventListener("click", (e) => {
@@ -107,31 +104,6 @@ export class SignablePDFIframe extends PDFIframe {
         if (autoValue && ["text", "textarea"].includes(type)) {
             signItemElement.addEventListener("focus", (e) => {
                 this.fillTextSignItem(e.currentTarget, autoValue);
-            });
-        }
-
-        if (this.env.isSmall && ["text", "textarea"].includes(type)) {
-            const inputBottomSheet = new MobileInputBottomSheet({
-                type: type,
-                element: signItemElement,
-                value: signItemElement.value,
-                label: `${signItemType.tip}: ${signItemType.placeholder}`,
-                placeholder: signItemElement.placeholder,
-                onTextChange: (value) => {
-                    signItemElement.value = value;
-                },
-                onValidate: (value) => {
-                    signItemElement.value = value;
-                    signItemElement.dispatchEvent(new Event("input", { bubbles: true }));
-                    inputBottomSheet.hide();
-                    this.navigator.goToNextSignItem();
-                },
-                buttonText: _t("next"),
-            });
-
-            signItemElement.addEventListener("focus", () => {
-                inputBottomSheet.updateInputText(signItemElement.value);
-                inputBottomSheet.show();
             });
         }
 
@@ -300,10 +272,6 @@ export class SignablePDFIframe extends PDFIframe {
         this.dialogOpen = true;
         // If we already have an image, we propagate it to populate the "draw" tab
         const signatureImage = signatureItem?.dataset?.signature;
-        const signMode = type.auto_value ? "draw" : "auto"
-        if (signMode == "draw" && signatureImage) {
-            signature.signatureImage = signatureImage;
-        }
         this.closeFn = this.dialog.add(
             SignNameAndSignatureDialog,
             {
@@ -312,7 +280,7 @@ export class SignablePDFIframe extends PDFIframe {
                 signatureType: type.item_type,
                 displaySignatureRatio: width / height,
                 activeFrame: Boolean(signFrame) || !type.auto_value,
-                mode: signMode,
+                mode: "auto",
                 defaultFrame: type.frame_value || "",
                 hash: this.frameHash,
                 signatureImage,
@@ -543,7 +511,6 @@ export class SignablePDFIframe extends PDFIframe {
                 title: _t("Warning"),
                 body: _t("Some fields have still to be completed"),
             });
-            this.props.validateButton.textContent = this.props.validateButtonText;
             this.props.validateBanner.removeAttribute("disabled");
             return;
         }
@@ -554,7 +521,6 @@ export class SignablePDFIframe extends PDFIframe {
     }
 
     async _signDocument() {
-        this.props.validateButton.textContent = this.props.validateButtonText;
         this.props.validateButton.setAttribute("disabled", true);
         if (this.signatureInfo.hasNoSignature) {
             const signature = {
@@ -636,9 +602,9 @@ export class SignablePDFIframe extends PDFIframe {
         const [route, params] = this._getRouteAndParams();
         this.ui.block();
         const response = await rpc(route, params).finally(() => this.ui.unblock());
-        this.props.validateButton.textContent = this.props.validateButtonText;
         this.props.validateButton.removeAttribute("disabled");
         if (response.success) {
+            this.signInfo.set({companyCountryCode: response.company_country_code});
             if (response.url) {
                 document.location.pathname = response.url;
             } else {

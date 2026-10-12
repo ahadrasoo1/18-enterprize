@@ -29,14 +29,17 @@ class MailActivity(models.Model):
     def create(self, vals_list):
         activities = super().create(vals_list)
         call_activities = activities.filtered(
-            lambda activity: (activity.phone or activity.mobile) and activity.activity_category == "phonecall"
+            lambda activity: (activity.phone or activity.mobile) and activity.user_id and activity.activity_category == "phonecall"
         )
         call_activities.user_id._bus_send("refresh_call_activities", {})
         return activities
 
     def write(self, values):
         if "date_deadline" in values and self.user_id:
-            self.user_id._bus_send("refresh_call_activities", {})
+            call_activities = self.filtered(
+                lambda activity: (activity.phone or activity.mobile) and activity.user_id and activity.activity_category == "phonecall"
+            )
+            call_activities.user_id._bus_send("refresh_call_activities", {})
         return super().write(values)
 
     @api.model
@@ -67,7 +70,7 @@ class MailActivity(models.Model):
             record_ids_by_model_name[activity.res_model].add(activity.res_id)
         allowed_record_ids_by_model_name = defaultdict(list)
         for model_name, ids in record_ids_by_model_name.items():
-            # calling search will filter out records that are irrelevant to the current company
+            # calling search will filter out records that are irrelevant to the current company / unlinked
             allowed_record_ids_by_model_name[model_name] = self.env[model_name].search([("id", "in", list(ids))]).ids
         store = Store()
         overdue_call_activities_of_current_user.filtered(
@@ -92,6 +95,9 @@ class MailActivity(models.Model):
             model = self.env[model_name]
             records = model.browse(activities.mapped("res_id"))
             partners_by_records = records._mail_get_partners(introspect_fields=True)
+            # Store all the partner at once to avoid O(n) queries in the loop
+            partner_ids = [p[0].id for p in partners_by_records.values() if p]
+            store.add(self.env["res.partner"].browse(partner_ids))
             for activity in activities:
                 activity_data = {
                     **activity.read(["id", "res_name", "phone", "mobile", "res_id", "res_model", "state", "date_deadline", "mail_template_ids"])[0],
@@ -101,7 +107,7 @@ class MailActivity(models.Model):
                 }
                 partner = partners_by_records.get(activity.res_id)[:1]
                 if partner:
-                    activity_data["partner"] = Store.one(partner)
+                    activity_data["partner"] = Store.one(partner, only_id=True)
                 store.add("Activity", activity_data)
 
     def _get_phone_numbers_by_activity(self):
@@ -115,7 +121,12 @@ class MailActivity(models.Model):
         data_by_model = self._classify_by_model()
         for model, data in data_by_model.items():
             records = self.env[model].browse(data["record_ids"])
+            existing = records.exists()
             for record, activity in zip(records, data["activities"]):
+                # cascade-deleted records might make this crash, be defensive
+                if record not in existing:
+                    phone_numbers_by_activity[activity] = {"mobile": False, "phone": False}
+                    continue
                 mobile = record.mobile if "mobile" in record else False
                 phone = record.phone if "phone" in record else False
                 if not mobile and not phone:

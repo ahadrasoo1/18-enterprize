@@ -291,8 +291,8 @@ class TestJournalReport(TestAccountReportsCommon):
                 ('400000',         0,       7150,      -7150),
                 ('BNK1',         570,        570,         ''),
                 ('101401',       200,          0,        200),
+                ('101403',       370,          0,        370),
                 ('400000',         0,        570,       -570),
-                ('OSTR00',       370,          0,        370),
             ],
             options_show_payment,
         )
@@ -304,6 +304,7 @@ class TestJournalReport(TestAccountReportsCommon):
         options = self._generate_options(self.report, '2017-01-01', '2017-01-31', default_options={'show_payment_lines': False})
 
         journal_report_handler = self.env[self.report.custom_handler_model_name]
+        move_2_pref = self.move_sales_2.payment_reference
         self.assert_journal_vals_for_export(
             self.report,
             options,
@@ -313,20 +314,20 @@ class TestJournalReport(TestAccountReportsCommon):
                     'id': self.default_sale_journal.id,
                     'columns': ['document', 'account_label', 'name', 'debit', 'credit', 'taxes', 'tax_grids'],
                     'lines': [
-                        {'name': 'ref123',          'debit': '$\xa03,000.00',             'credit': '$\xa00.00'},
+                        {'name': 'partner_a ref123',          'debit': '$\xa03,000.00',             'credit': '$\xa00.00'},
                         {'name': 'ref123',          'debit': '$\xa00.00',                 'credit': '$\xa03,000.00'},
 
-                        {'name': 'ref234',          'debit': '$\xa01,500.00',             'credit': '$\xa00.00'},
+                        {'name': 'partner_a ref234',          'debit': '$\xa01,500.00',             'credit': '$\xa00.00'},
                         {'name': 'ref234',          'debit': '$\xa00.00',                 'credit': '$\xa01,500.00'},
 
                         {'currency_id': self.other_currency.id, 'amount': 3000},  # Special line for multicurrency
 
-                        {'name': '',                'debit': '$\xa01,000.00',             'credit': '$\xa00.00'},
-                        {'name': '',                'debit': '$\xa00.00',                 'credit': '$\xa01,000.00'},
+                        {'name': f'partner_a {move_2_pref}',  'debit': '$\xa01,000.00',             'credit': '$\xa00.00'},
+                        {'name': move_2_pref,       'debit': '$\xa00.00',                 'credit': '$\xa01,000.00'},
 
                         {'currency_id': self.other_currency.id, 'amount': 2000},  # Special line for multicurrency
 
-                        {'name': 'ref345',          'debit': '$\xa01,650.00',             'credit': '$\xa00.00'},
+                        {'name': 'partner_a ref345',          'debit': '$\xa01,650.00',             'credit': '$\xa00.00'},
                         {'name': 'ref345',          'debit': '$\xa00.00',                 'credit': '$\xa01,500.00',    'taxes': 'T: Tax 10%'},
                         {'name': 'Tax 10%',         'debit': '$\xa00.00',                 'credit': '$\xa0150.00',      'taxes': 'B: $\xa01,500.00'},
 
@@ -356,6 +357,7 @@ class TestJournalReport(TestAccountReportsCommon):
         """
         options = self._generate_options(self.report, '2017-01-01', '2017-01-31', default_options={'show_payment_lines': True})
         journal_report_handler = self.env[self.report.custom_handler_model_name]
+        move_2_pref = self.move_sales_2.payment_reference
         self.assert_journal_vals_for_export(
             self.report,
             options,
@@ -365,20 +367,20 @@ class TestJournalReport(TestAccountReportsCommon):
                     'id': self.default_sale_journal.id,
                     'columns': ['document', 'account_label', 'name', 'debit', 'credit', 'taxes', 'tax_grids'],
                     'lines': [
-                        {'name': 'ref123',          'debit': '$\xa03,000.00',             'credit': '$\xa00.00'},
+                        {'name': 'partner_a ref123',          'debit': '$\xa03,000.00',             'credit': '$\xa00.00'},
                         {'name': 'ref123',          'debit': '$\xa00.00',                 'credit': '$\xa03,000.00'},
 
-                        {'name': 'ref234',          'debit': '$\xa01,500.00',             'credit': '$\xa00.00'},
+                        {'name': 'partner_a ref234',          'debit': '$\xa01,500.00',             'credit': '$\xa00.00'},
                         {'name': 'ref234',          'debit': '$\xa00.00',                 'credit': '$\xa01,500.00'},
 
                         {'currency_id': self.other_currency.id, 'amount': 3000},  # Special line for multicurrency
 
-                        {'name': '',                'debit': '$\xa01,000.00',             'credit': '$\xa00.00'},
-                        {'name': '',                'debit': '$\xa00.00',                 'credit': '$\xa01,000.00'},
+                        {'name': f'partner_a {move_2_pref}',  'debit': '$\xa01,000.00',             'credit': '$\xa00.00'},
+                        {'name': move_2_pref,       'debit': '$\xa00.00',                 'credit': '$\xa01,000.00'},
 
                         {'currency_id': self.other_currency.id, 'amount': 2000},  # Special line for multicurrency
 
-                        {'name': 'ref345',          'debit': '$\xa01,650.00',             'credit': '$\xa00.00'},
+                        {'name': 'partner_a ref345',          'debit': '$\xa01,650.00',             'credit': '$\xa00.00'},
                         {'name': 'ref345',          'debit': '$\xa00.00',                 'credit': '$\xa01,500.00',    'taxes': 'T: Tax 10%'},
                         {'name': 'Tax 10%',         'debit': '$\xa00.00',                 'credit': '$\xa0150.00',      'taxes': 'B: $\xa01,500.00'},
 
@@ -489,3 +491,23 @@ class TestJournalReport(TestAccountReportsCommon):
                 },
             ],
         )
+
+    def test_global_tax_summary_rounding_unit(self):
+        """ Test that Global Tax Summary applies rounding filter correctly. """
+        report = self.env.ref('account_reports.journal_report')
+        options = self._generate_options(report, '2017-01-01', '2017-01-31')
+        options['unfold_all'] = True
+
+        # Get tax summary lines with default formatting
+        lines = report._get_lines(options)
+        tax_lines = list(filter(lambda line: line.get('is_tax_section_line'), lines))
+
+        default_balance = tax_lines[0]['tax_grid_summary_lines']['United States']['c10']['+']
+        self.assertEqual(default_balance, '$\xa0150.00')  # Default: $150.00
+
+        # Test with thousands rounding unit, call via dispatch_report_action like the frontend does
+        options['rounding_unit'] = 'thousands'
+        report.dispatch_report_action(options, 'format_column_values_from_client', lines)
+
+        thousands_balance = tax_lines[0]['tax_grid_summary_lines']['United States']['c10']['+']
+        self.assertEqual(thousands_balance, '$\xa00')  # Thousands: $0 (150/1000 = 0.15 rounded to 0)

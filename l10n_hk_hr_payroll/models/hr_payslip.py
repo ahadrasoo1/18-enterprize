@@ -182,8 +182,8 @@ class Payslip(models.Model):
                 out_time = reference_calendar.get_work_duration_data(start, stop, compute_leaves=False, domain=domain)
                 out_days += out_time['days']
                 out_hours += out_time['hours']
-            if out_days or out_hours:
-                work_entry_type = self.env.ref('hr_payroll.hr_work_entry_type_out_of_contract')
+            work_entry_type = self.env.ref('hr_payroll.hr_work_entry_type_out_of_contract', raise_if_not_found=False)
+            if work_entry_type and (out_days or out_hours):
                 existing = False
                 for worked_days in res:
                     if worked_days['work_entry_type_id'] == work_entry_type.id:
@@ -222,14 +222,14 @@ class Payslip(models.Model):
         header = (
             f'PHF{header_data["payment_set_code"]}{header_data["ref"]:<12}{header_data["payment_date"]:%Y%m%d}'
             f'{acc_number + "SA" + header_data["currency"]:<35}'
-            f'{header_data["currency"]}{header_data["payslips_count"]:07}{int(header_data["amount_total"] * 100):017}'
+            f'{header_data["currency"]}{header_data["payslips_count"]:07}{round(header_data["amount_total"] * 100):017}'
             f'{"":<1}{"":<311}\n'
         )
         datas = []
         for payment in payments_data:
             datas.append(
                 f'PD{payment["bank_code"]:<3}{payment["type"].upper()}{payment["autopay_field"]:<34}'
-                f'{int(payment["amount"] * 100):017}{payment["identifier"]:<35}{payment["ref"]:<35}'
+                f'{round(payment["amount"] * 100):017}{payment["identifier"]:<35}{payment["ref"]:<35}'
                 f'{payment["bank_account_name"]:<140}{"":<130}'
             )
         data = '\n'.join(datas)

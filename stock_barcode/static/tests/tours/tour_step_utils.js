@@ -23,7 +23,7 @@ export const stepUtils = {
             { trigger: 'input#manual_barcode+button', run: "click" },
         ];
     },
-    validateBarcodeOperation(trigger = ".o_barcode_client_action") {
+    validateBarcodeOperation(trigger = ".o_barcode_client_action .o_barcode_lines") {
         return [
             {
                 trigger: "body:not(:has(.modal))",
@@ -46,9 +46,30 @@ export const stepUtils = {
                 run: "click",
             },
             {
-                isActive: ["auto"],
                 content: "wait to be back on the barcode lines",
                 trigger: ".o_add_line",
+            },
+        ];
+    },
+    // RFID utils.
+    countUniqRFID(count) {
+        return [{ trigger: `.o_barcode_count_rfid .o_rfid_unique_tags:contains(${count})` }];
+    },
+    countTotalRFID(count) {
+        return [{ trigger: `.o_barcode_count_rfid .o_rfid_total_read:contains(${count})` }];
+    },
+    closeCountRFID() {
+        return [{ trigger: ".o_barcode_count_rfid button.btn-close" }];
+    },
+    decrementLotLineQty(lineName) {
+        return [
+            {
+                trigger: `.o_barcode_line_details .o_line_lot_name:contains(${lineName})`,
+                run: "click",
+            },
+            {
+                trigger: `.o_barcode_line:contains(${lineName}) .o_remove_unit`,
+                run: "click",
             },
         ];
     },

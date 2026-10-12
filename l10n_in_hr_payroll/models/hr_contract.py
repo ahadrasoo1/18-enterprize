@@ -40,7 +40,7 @@ class HrContract(models.Model):
             ])
             for contract in contracts:
                 contract.activity_schedule(
-                    'note.mail_activity_data_reminder',
+                    'mail.mail_activity_data_todo',
                     user_id=contract.hr_responsible_id.id,
                     note=_("End date of %(name)s's contract is today.", name=contract.employee_id.name),
                 )

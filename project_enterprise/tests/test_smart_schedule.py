@@ -1,94 +1,15 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details
 
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from odoo.tests import tagged, freeze_time
-from odoo.addons.project.tests.test_project_base import TestProjectCommon
+
+from .test_smart_schedule_common import TestSmartScheduleCommon
 
 
 @tagged('-at_install', 'post_install')
 @freeze_time('2023-01-01')
-class TestSmartSchedule(TestProjectCommon):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.projectuser_resource, cls.projectmanager_resource = cls.env['resource.resource'].create([
-            {
-                'calendar_id': cls.project_pigs.resource_calendar_id.id,
-                'company_id': cls.user_projectuser.company_id.id,
-                'name': cls.user_projectuser.name,
-                'user_id': cls.user_projectuser.id,
-                'tz': cls.user_projectuser.tz,
-            },
-            {
-                'calendar_id': cls.project_pigs.resource_calendar_id.id,
-                'company_id': cls.user_projectmanager.company_id.id,
-                'name': cls.user_projectmanager.name,
-                'user_id': cls.user_projectmanager.id,
-                'tz': cls.user_projectmanager.tz,
-            },
-        ])
-
-        tasks = cls.env['project.task'].create([
-            # Tasks with project pigs
-            {
-                'name': 'task_project_pigs_with_allocated_hours_user',
-                'allocated_hours': 8,
-                'project_id': cls.project_pigs.id,
-                'user_ids': [cls.user_projectuser.id],
-            },
-            {
-                'name': 'task_project_pigs_with_allocated_hours_manager',
-                'allocated_hours': 10,
-                'project_id': cls.project_pigs.id,
-                'user_ids': [cls.user_projectmanager.id],
-            },
-            {
-                'name': 'task_project_pigs_with_allocated_hours_no_user',
-                'allocated_hours': 10,
-                'project_id': cls.project_pigs.id,
-                'user_ids': None,
-            },
-            {
-                'name': 'task_project_pigs_no_allocated_hours_user',
-                'project_id': cls.project_pigs.id,
-                'user_ids': [cls.user_projectuser.id],
-            },
-            {
-                'name': 'task_project_pigs_no_allocated_hours_manager',
-                'project_id': cls.project_pigs.id,
-                'user_ids': [cls.user_projectmanager.id],
-            },
-            {
-                'name': 'task_project_pigs_no_allocated_hours_no_user',
-                'project_id': cls.project_pigs.id,
-                'user_ids': None,
-            },
-            # Tasks with project goats
-            {
-                'name': 'task_project_goats_with_allocated_hours_user',
-                'project_id': cls.project_goats.id,
-                'allocated_hours': 10,
-                'user_ids': [cls.user_projectuser.id],
-            },
-            {
-                'name': 'task_project_goats_no_allocated_hours_user',
-                'project_id': cls.project_goats.id,
-                'user_ids': [cls.user_projectuser.id],
-            },
-        ])
-
-        cls.task_project_pigs_with_allocated_hours_user, cls.task_project_pigs_with_allocated_hours_manager, \
-            cls.task_project_pigs_with_allocated_hours_no_user, cls.task_project_pigs_no_allocated_hours_user, \
-            cls.task_project_pigs_no_allocated_hours_manager, cls.task_project_pigs_no_allocated_hours_no_user, \
-            cls.task_project_goats_with_allocated_hours_user, cls.task_project_goats_no_allocated_hours_user = tasks
-
-        cls.start_date_view = datetime.now()
-        cls.end_date_view = cls.start_date_view + relativedelta(days=31)
-        cls.start_date_view_str = cls.start_date_view.strftime('%Y-%m-%d %H:%M:%S')
-        cls.end_date_view_str = cls.end_date_view.strftime('%Y-%m-%d %H:%M:%S')
-
+class TestSmartSchedule(TestSmartScheduleCommon):
     def test_tasks_allocated_hours_multiple_users(self):
         result = (
             self.task_project_pigs_with_allocated_hours_user + self.task_project_pigs_with_allocated_hours_manager
@@ -140,25 +61,19 @@ class TestSmartSchedule(TestProjectCommon):
             "user_ids": [self.user_projectuser.id],
         })
 
-        self.env["hr.employee"].create([{
-            "name": self.user_projectuser.name,
-            "user_id": self.user_projectuser.id
-        }, {
-            "name": self.user_projectmanager.name,
-            "user_id": self.user_projectmanager.id
-        }])
+        self.user_projectmanager.resource_calendar_id = self.user_projectmanager.resource_calendar_id.copy()
 
         self.env['resource.calendar.leaves'].create([{
             'name': 'scheduled leave',
             'date_from': datetime(2023, 1, 3, 0),
             'date_to': datetime(2023, 1, 6, 23),
-            'resource_id': self.user_projectuser.employee_id.resource_id.id,
+            'calendar_id': self.user_projectuser.resource_calendar_id.id,
             'time_type': 'leave',
         }, {
             'name': 'scheduled leave',
             'date_from': datetime(2023, 1, 5, 0),
             'date_to': datetime(2023, 1, 10, 23),
-            'resource_id': self.user_projectmanager.employee_id.resource_id.id,
+            'calendar_id': self.user_projectmanager.resource_calendar_id.id,
             'time_type': 'leave',
         }])
 
@@ -183,7 +98,7 @@ class TestSmartSchedule(TestProjectCommon):
         # user_projectmanager is off till 10
         # the first possible time for both of them is starting from 11
         self.assertEqual(self.task_project_pigs_with_allocated_hours_manager.planned_date_begin, datetime(2023, 1, 11, 7))
-        self.assertEqual(self.task_project_pigs_with_allocated_hours_manager.date_deadline, datetime(2023, 1, 12, 9))
+        self.assertEqual(self.task_project_pigs_with_allocated_hours_manager.date_deadline, datetime(2023, 1, 12, 9 if self.is_module_timesheet_grid_installed else 11))
 
         # even that task_project_pigs_with_allocated_hours_manager was planned first as it has a deadline
         # smart scheduling is optimizing resources so
@@ -193,8 +108,8 @@ class TestSmartSchedule(TestProjectCommon):
 
         # should not be planned after the old deadline of its parent, as its parent will be planned again
         # if the new deadline is before the old one, no need to block the task and plan it ASAP
-        self.assertEqual(self.task_project_pigs_no_allocated_hours_user.planned_date_begin, datetime(2023, 1, 12, 9))
-        self.assertEqual(self.task_project_pigs_no_allocated_hours_user.date_deadline, datetime(2023, 1, 13, 14))
+        self.assertEqual(self.task_project_pigs_no_allocated_hours_user.planned_date_begin, datetime(2023, 1, 12, 9 if self.is_module_timesheet_grid_installed else 12))
+        self.assertEqual(self.task_project_pigs_no_allocated_hours_user.date_deadline, datetime(2023, 1, 13, 14 if self.is_module_timesheet_grid_installed else 16))
 
     def test_tasks_allocated_hours_no_user(self):
         result = (
@@ -501,13 +416,19 @@ class TestSmartSchedule(TestProjectCommon):
                          '2023-01-31 09:00:00',
                          )
         self.assertEqual(self.task_project_pigs_no_allocated_hours_manager.date_deadline.strftime('%Y-%m-%d %H:%M:%S'),
-                         '2023-02-27 11:00:00',
+                         '2023-02-28 09:00:00',
+                         'when no allocated hours, delta hours = 160, from 9H day 31/01 to 9H day 28/02, duration = 20 * 8 = 160'
                          )
         self.assertEqual(self.task_project_pigs_no_allocated_hours_no_user.planned_date_start.strftime('%Y-%m-%d %H:%M:%S'),
-                         '2023-02-27 12:00:00',
+                         '2023-02-28 09:00:00',
                          )
         self.assertEqual(self.task_project_pigs_no_allocated_hours_no_user.date_deadline.strftime('%Y-%m-%d %H:%M:%S'),
-                         '2023-03-23 16:00:00',
+                         '2023-03-28 08:00:00',
+                         """
+                            when no allocated hours, delta hours = 160, from 9H day 28/02 to 9H day 28/03, duration = 20 * 8 = 160
+                            It's 8H on day 28 instead of 9H in the assert because Daylight Saving Time (DST) in Europe in 2023 began
+                            on Sunday, March 26, 2023
+                         """
                          )
         # Check if the user is the target one
         self.assertEqual(self.task_project_pigs_with_allocated_hours_manager.user_ids, self.user_projectmanager, "Wrong user id")
@@ -544,18 +465,21 @@ class TestSmartSchedule(TestProjectCommon):
             'date_deadline': '2023-10-16 21:59:59',
             'user_ids': self.user_projectmanager.ids,
         })
-
+        # the project will automatically be timesheetable since the default value is true and so the allocated_hours will
+        # not be recomputed when the project is timesheetable since we assume the user will manually set the allocated
+        # hours on his tasks to correctly timesheets.
+        allocated_hours = 0 if self.is_module_timesheet_grid_installed else 12
         self.assertEqual(
             tasks.sorted('planned_date_begin').mapped(lambda t: (t.name, t.allocated_hours, t.planned_date_begin, t.date_deadline)),
             [
                 ('Task (deadline: Tuesday, allocated: 8h, priority: 1)', 8.0, datetime(2023, 10, 16, 6, 0), datetime(2023, 10, 16, 15, 0)),
                 ('Task (deadline: Tuesday, allocated: 8h, priority: 0)', 8.0, datetime(2023, 10, 17, 6, 0), datetime(2023, 10, 17, 15, 0)),
-                ('Task (deadline: Tuesday, allocated: 0h, priority: 1)', 0.0, datetime(2023, 10, 18, 6, 0), datetime(2023, 10, 19, 10, 0)),
-                ('Task (deadline: Tuesday, allocated: 0h, priority: 0)', 0.0, datetime(2023, 10, 19, 11, 0), datetime(2023, 10, 20, 15, 0)),
+                ('Task (deadline: Tuesday, allocated: 0h, priority: 1)', allocated_hours, datetime(2023, 10, 18, 6, 0), datetime(2023, 10, 19, 10, 0)),
+                ('Task (deadline: Tuesday, allocated: 0h, priority: 0)', allocated_hours, datetime(2023, 10, 19, 11, 0), datetime(2023, 10, 20, 15, 0)),
                 ('Task (deadline: Wednesday, allocated: 8h, priority: 1)', 8.0, datetime(2023, 10, 23, 6, 0), datetime(2023, 10, 23, 15, 0)),
                 ('Task (deadline: Wednesday, allocated: 8h, priority: 0)', 8.0, datetime(2023, 10, 24, 6, 0), datetime(2023, 10, 24, 15, 0)),
-                ('Task (deadline: Wednesday, allocated: 0h, priority: 1)', 0.0, datetime(2023, 10, 25, 6, 0), datetime(2023, 10, 26, 10, 0)),
-                ('Task (deadline: Wednesday, allocated: 0h, priority: 0)', 0.0, datetime(2023, 10, 26, 11, 0), datetime(2023, 10, 27, 15, 0)),
+                ('Task (deadline: Wednesday, allocated: 0h, priority: 1)', allocated_hours, datetime(2023, 10, 25, 6, 0), datetime(2023, 10, 26, 10, 0)),
+                ('Task (deadline: Wednesday, allocated: 0h, priority: 0)', allocated_hours, datetime(2023, 10, 26, 11, 0), datetime(2023, 10, 27, 15, 0)),
                 ('Task (deadline: None, allocated: 8h, priority: 1)', 8.0, datetime(2023, 10, 30, 7, 0), datetime(2023, 10, 30, 16, 0)),
                 ('Task (deadline: None, allocated: 8h, priority: 0)', 8.0, datetime(2023, 10, 31, 7, 0), datetime(2023, 10, 31, 16, 0)),
                 ('Task (deadline: None, allocated: 0h, priority: 1)', 12.0, datetime(2023, 11, 1, 7, 0), datetime(2023, 11, 2, 11, 0)),
@@ -606,7 +530,7 @@ class TestSmartSchedule(TestProjectCommon):
         self.assertEqual(
             tasks.sorted('planned_date_begin').mapped(lambda t: (t.allocated_hours, t.planned_date_begin, t.date_deadline)),
             [
-                (16.0, datetime(2023, 10, 16, 6, 0), datetime(2023, 10, 18, 15, 0)),
+                (16.0 if self.is_module_timesheet_grid_installed else 24.0, datetime(2023, 10, 16, 6, 0), datetime(2023, 10, 18, 15, 0)),
                 (8.0, datetime(2023, 10, 19, 6, 0), datetime(2023, 10, 19, 15, 0)),
             ],
         )
@@ -663,3 +587,24 @@ class TestSmartSchedule(TestProjectCommon):
                 for field in ["planned_date_begin", "date_deadline", "user_ids"]:
                     if field in old_vals[task.id]:
                         self.assertEqual(task[field].ids or False if field == "user_ids" else task[field], old_vals[task.id][field])
+
+    def test_load_more_intervals(self):
+        """
+            first, valid intervals will be between planned_date_begin and last_date_view
+            only 16 hours can be planned during these 2 days (30, 31)
+
+            then, loading more intervals will run and get other ranges starting from 01 Dec 2023
+            day 01, 02 and 03 will be enough to plan the 24 remaining hours
+        """
+        self.task_project_pigs_with_allocated_hours_user.allocated_hours = 40
+        self.task_project_pigs_with_allocated_hours_user.with_context({
+            'last_date_view': '2023-10-31 22:00:00',
+            'cell_part': 2.0,
+        }).schedule_tasks({
+            'planned_date_begin': '2023-10-30 00:00:00',
+            'date_deadline': '2023-10-31 22:00:00',
+            'user_ids': self.user_projectmanager.ids,
+        })
+
+        self.assertEqual(self.task_project_pigs_with_allocated_hours_user.planned_date_begin, datetime(2023, 10, 30, 7))
+        self.assertEqual(self.task_project_pigs_with_allocated_hours_user.date_deadline, datetime(2023, 11, 3, 16))

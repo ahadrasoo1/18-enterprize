@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from unittest.mock import patch
 
 from odoo import fields
@@ -20,7 +19,7 @@ class TestItalianTaxReport(TestAccountReportsCommon):
         cls.tax_4a = cls.env.ref(f'account.{cls.env.company.id}_4am')
         cls.tax_4a.active = True
         cls.tax_4v = cls.env.ref(f'account.{cls.env.company.id}_4v')
-        cls.tax_4v.tax_group_id.tax_payable_account_id = cls.company_data['default_account_payable']
+        cls.tax_4v.tax_group_id.tax_payable_account_id = cls.company_data['default_tax_account_payable']
         cls.tax_4v.active = True
 
         cls.l10n_it_tax_report_partner = cls.env['res.partner'].create({
@@ -36,7 +35,7 @@ class TestItalianTaxReport(TestAccountReportsCommon):
             'website': 'http://www.blue-interior.it'
         })
 
-        cls.report = cls.env.ref('l10n_it.tax_report_vat')
+        cls.report = cls.env.ref('l10n_it.tax_monthly_report_vat')
 
     def test_tax_report_carryover_vp14_credit_period(self):
         """
@@ -57,6 +56,26 @@ class TestItalianTaxReport(TestAccountReportsCommon):
                 fields.Date.from_string('2015-04-30')),
             'VP8',
             40.0)
+
+    def test_tax_report_carryover_vp14_credit_period_rounding(self):
+        """
+        Test to have a non-integer value in line vp14 credit at a period inside the year.
+        In this case, we should put that value in line vp8.
+        """
+        self._test_line_report_carryover(
+            '2015-03-10',
+            10,
+            self.tax_4a,
+            self._generate_options(
+                self.report,
+                fields.Date.from_string('2015-03-01'),
+                fields.Date.from_string('2015-03-31')),
+            self._generate_options(
+                self.report,
+                fields.Date.from_string('2015-04-01'),
+                fields.Date.from_string('2015-04-30')),
+            'VP8',
+            0.4)
 
     def test_tax_report_carryover_vp14_credit_year(self):
         """
@@ -80,7 +99,7 @@ class TestItalianTaxReport(TestAccountReportsCommon):
 
     def test_tax_report_carryover_vp14_debit_valid(self):
         """
-        Test to have a value in line vp14 debit between 0 and 25.82.
+        Test to have a value in line vp14 debit between 0 and 100.00.
         In this case, we should put that value in line vp7.
         """
         self._test_line_report_carryover(
@@ -100,12 +119,12 @@ class TestItalianTaxReport(TestAccountReportsCommon):
 
     def test_tax_report_carryover_vp14_debit_invalid(self):
         """
-        Test to have a value in line vp14 debit > 25.82.
+        Test to have a value in line vp14 debit > 100.00.
         In this case, we should never put that value in line vp7.
         """
         self._test_line_report_carryover(
             '2015-05-10',
-            1000,
+            10000,
             self.tax_4v,
             self._generate_options(
                 self.report,
@@ -140,7 +159,7 @@ class TestItalianTaxReport(TestAccountReportsCommon):
             20.0)
         self._test_line_report_carryover(
             '2015-06-10',
-            500,
+            5000,
             self.tax_4v,
             self._generate_options(
                 self.report,
@@ -180,7 +199,8 @@ class TestItalianTaxReport(TestAccountReportsCommon):
 
         with patch.object(type(self.env['account.move']), '_get_vat_report_attachments', autospec=True, side_effect=_get_attachment):
             vat_closing_move = self.env['account.generic.tax.report.handler']._generate_tax_closing_entries(self.report, first_month_options)
-            vat_closing_move.action_post()
+            # with_context() is needed to avoid opening the tax report export wizard like it should when posting a closing entry.
+            vat_closing_move.with_context({"l10n_it_xml_export_monthly_tax_report_options": True}).action_post()
 
             # Get to the next month
             report_lines = self.report._get_lines(second_month_options)

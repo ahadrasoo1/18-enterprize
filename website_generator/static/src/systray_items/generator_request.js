@@ -3,7 +3,7 @@
 import { _t } from "@web/core/l10n/translation";
 import {registry} from "@web/core/registry";
 import { user } from "@web/core/user";
-import {Component, useState, onWillStart, onWillUnmount} from "@odoo/owl";
+import {Component, useState, onMounted, onWillStart, onWillUnmount} from "@odoo/owl";
 import {useService} from "@web/core/utils/hooks";
 import {session} from "@web/session";
 
@@ -20,9 +20,6 @@ export class GeneratorRequest extends Component {
 
         onWillStart(async () => {
             this.checkRequestStatus();
-            this.interval = setInterval(() => {
-                this.checkRequestStatus();
-            }, 60000);
             const searchParams = new URLSearchParams(window.location.search);
 
             if (searchParams.get("showWebsiteGeneratorNotification")) {
@@ -38,6 +35,9 @@ export class GeneratorRequest extends Component {
                     },
                 );
             }
+        });
+        onMounted(() => {
+            this.interval = setInterval(() => this.checkRequestStatus(), 60000);
         });
         onWillUnmount(() => {
             clearInterval(this.interval);

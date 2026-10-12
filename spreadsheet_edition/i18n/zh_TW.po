@@ -1,24 +1,27 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* spreadsheet_edition
-# 
+# * spreadsheet_edition
+#
 # Translators:
-# Wil Odoo, 2024
-# Tony Ng, 2024
-# 
+# Wil Odoo, 2025
+# Tony Ng, 2025
+#
+# Weblate <noreply-mt-weblate@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-26 09:16+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Tony Ng, 2024\n"
-"Language-Team: Chinese (Taiwan) (https://app.transifex.com/odoo/teams/41243/zh_TW/)\n"
+"POT-Creation-Date: 2026-06-19 17:50+0000\n"
+"PO-Revision-Date: 2026-02-21 18:31+0000\n"
+"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"Language-Team: Chinese (Traditional Han script) <https://translate.odoo.com/"
+"projects/odoo-18/spreadsheet_edition/zh_Hant/>\n"
+"Language: zh_TW\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: zh_TW\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 5.14.3\n"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -60,7 +63,7 @@ msgstr "%(pivot_title)s 依據 %(group_by)s（%(granularity)s）"
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/comments/side_panel/comment_threads_side_panel.js:0
 msgid "%s threads"
-msgstr ""
+msgstr "%s 個對話串"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -78,7 +81,7 @@ msgstr "- 數字：%s"
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/comments/side_panel/comment_threads_side_panel.js:0
 msgid "1 thread"
-msgstr ""
+msgstr "1 個對話串"
 
 #. module: spreadsheet_edition
 #: model:ir.model.constraint,message:spreadsheet_edition.constraint_spreadsheet_revision_parent_unique
@@ -145,6 +148,14 @@ msgid "Ascending"
 msgstr "升序"
 
 #. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/filter_editor/filter_editor_side_panel.js:0
+msgid ""
+"At least one data source has an invalid model. Please delete it before "
+"editing this global filter."
+msgstr "至少一個數據來源的模型無效。請在編輯此全域篩選器之前將其刪除。"
+
+#. module: spreadsheet_edition
 #: model:ir.model.fields,field_description:spreadsheet_edition.field_spreadsheet_cell_thread__message_attachment_count
 msgid "Attachment Count"
 msgstr "附件數目"
@@ -169,6 +180,7 @@ msgstr "數軸"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/actions/version_history/side_panel/version_history_side_panel.xml:0
 #: code:addons/spreadsheet_edition/static/src/bundle/version_history/side_panel/version_history_side_panel.xml:0
 msgid "Back"
 msgstr "返回"
@@ -195,9 +207,9 @@ msgstr "底部"
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/assets/components/spreadsheet_selector_dialog/spreadsheet_selector_dialog.xml:0
 #: code:addons/spreadsheet_edition/static/src/bundle/actions/input_dialog/input_dialog.xml:0
+#: code:addons/spreadsheet_edition/static/src/bundle/actions/version_history/restore_version_dialog/restore_version_dialog.xml:0
 #: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/filter_editor/filter_editor_side_panel.xml:0
 #: code:addons/spreadsheet_edition/static/src/bundle/ir_menu_selector/ir_menu_selector.xml:0
-#: code:addons/spreadsheet_edition/static/src/bundle/version_history/restore_version_dialog/restore_version_dialog.xml:0
 msgid "Cancel"
 msgstr "取消"
 
@@ -208,6 +220,12 @@ msgid ""
 "Changing the pivot definition requires to reload the data. It may take some "
 "time."
 msgstr "若更改樞紐分析表的定義，會需要重新載入資料，可能會花一些時間。"
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/pivot_missing_cell_dialog/pivot_missing_cell_dialog.xml:0
+msgid "Close"
+msgstr "關閉"
 
 #. module: spreadsheet_edition
 #: model:ir.model,name:spreadsheet_edition.model_spreadsheet_revision
@@ -256,12 +274,6 @@ msgstr "建立人員"
 #: model:ir.model.fields,field_description:spreadsheet_edition.field_spreadsheet_revision__create_date
 msgid "Created on"
 msgstr "建立於"
-
-#. module: spreadsheet_edition
-#. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/chart/side_panels/odoo_line/odoo_line_config_panel.js:0
-msgid "Cumulative data"
-msgstr "累計式數據"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -328,6 +340,24 @@ msgstr "學位"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/chart/side_panels/common/config_panel.xml:0
+msgid "Delete Chart"
+msgstr ""
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/list/side_panels/list_details_side_panel.xml:0
+msgid "Delete List"
+msgstr ""
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/pivot/side_panels/pivot_details_side_panel.xml:0
+msgid "Delete Pivot"
+msgstr "刪除樞紐分析表"
+
+#. module: spreadsheet_edition
+#. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/list/side_panels/edit_list_sorting_section/edit_list_sorting_section.xml:0
 msgid "Descending"
 msgstr "降序"
@@ -336,16 +366,24 @@ msgstr "降序"
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/components/locale_status/locale_status.js:0
 msgid ""
-"Difference between user locale (%(user_locale)s) and spreadsheet locale "
-"(%(spreadsheet_locale)s). This spreadsheet is using the formats below:"
+"Difference between user locale (%(user_locale)s) and spreadsheet locale (%"
+"(spreadsheet_locale)s). This spreadsheet is using the formats below:"
 msgstr ""
-"使用者地區設定（%(user_locale)s）與試算表地區設定（%(spreadsheet_locale)s）不同。試算表使用了以下格式："
+"使用者地區設定（%(user_locale)s）與試算表地區設定（%(spreadsheet_locale)s）不"
+"同。試算表使用了以下格式："
 
 #. module: spreadsheet_edition
 #: model:ir.model.fields,field_description:spreadsheet_edition.field_spreadsheet_cell_thread__display_name
 #: model:ir.model.fields,field_description:spreadsheet_edition.field_spreadsheet_revision__display_name
 msgid "Display Name"
 msgstr "顯示名稱"
+
+#. module: spreadsheet_edition
+#: model:ir.model.fields,field_description:spreadsheet_edition.field_spreadsheet_dashboard__display_thumbnail
+#: model:ir.model.fields,field_description:spreadsheet_edition.field_spreadsheet_dashboard_share__display_thumbnail
+#: model:ir.model.fields,field_description:spreadsheet_edition.field_spreadsheet_mixin__display_thumbnail
+msgid "Display Thumbnail"
+msgstr "顯示縮圖"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -389,7 +427,7 @@ msgstr "編輯篩選範圍"
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/chart/side_panels/odoo_chart_with_axis/design_panel.xml:0
 msgid "Exponential"
-msgstr ""
+msgstr "指數"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -415,7 +453,7 @@ msgstr "篩選器屬性"
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/filter_editor/text_filter_editor_side_panel.xml:0
 msgid "Filter value"
-msgstr ""
+msgstr "篩選值"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -489,6 +527,12 @@ msgstr ""
 #: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/filter_editor/relation_filter_editor_side_panel.xml:0
 msgid "Include children"
 msgstr "包括子項"
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/pivot_missing_cell_dialog/pivot_missing_cell_dialog.xml:0
+msgid "Insert a pivot cell"
+msgstr "插入樞紐儲存格"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -622,26 +666,34 @@ msgstr "列表屬性"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/actions/version_history/side_panel/version_history_side_panel.xml:0
 #: code:addons/spreadsheet_edition/static/src/bundle/version_history/side_panel/version_history_side_panel.xml:0
 msgid "Load More"
 msgstr "載入更多"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/chart/side_panels/odoo_chart_with_axis/design_panel.xml:0
-msgid "Logarithmic"
-msgstr ""
+#: code:addons/spreadsheet_edition/static/src/bundle/chart/side_panels/common/config_panel.xml:0
+#: code:addons/spreadsheet_edition/static/src/bundle/list/plugins/list_autofill_plugin.js:0
+msgid "Loading..."
+msgstr "載入中⋯"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/chart/side_panels/odoo_chart_with_axis/design_panel.xml:0
+msgid "Logarithmic"
+msgstr "對數"
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/actions/version_history/side_panel/version_history_item.js:0
 #: code:addons/spreadsheet_edition/static/src/bundle/o_spreadsheet/menu_item_registry.js:0
-#: code:addons/spreadsheet_edition/static/src/bundle/version_history/side_panel/version_history_item.js:0
 msgid "Make a copy"
 msgstr "建立副本"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/version_history/restore_version_dialog/restore_version_dialog.xml:0
+#: code:addons/spreadsheet_edition/static/src/bundle/actions/version_history/restore_version_dialog/restore_version_dialog.xml:0
 msgid "Make a copy instead"
 msgstr "改為製作複製本"
 
@@ -732,12 +784,6 @@ msgstr "%s名稱："
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/version_history/side_panel/version_history_item.js:0
-msgid "Name this version"
-msgstr "命名此版本"
-
-#. module: spreadsheet_edition
-#. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/o_spreadsheet/menu_item_registry.js:0
 msgid "New"
 msgstr "新增"
@@ -759,6 +805,12 @@ msgstr "以下項目有新的提及:%s"
 #: code:addons/spreadsheet_edition/static/src/assets/components/spreadsheet_selector_dialog/spreadsheet_selector_panel.js:0
 msgid "New sheet inserted in '%s'"
 msgstr "新的試算表已插入至 \"%s\"。"
+
+#. module: spreadsheet_edition
+#. odoo-python
+#: code:addons/spreadsheet_edition/models/spreadsheet_mixin.py:0
+msgid "New spreadsheet created"
+msgstr "新試算表已建立"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -800,6 +852,12 @@ msgstr "有發送錯誤的郵件數量"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/actions/version_history/side_panel/version_history_item.xml:0
+msgid "OLD"
+msgstr "舊"
+
+#. module: spreadsheet_edition
+#. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/actions/input_dialog/input_dialog.js:0
 #: code:addons/spreadsheet_edition/static/src/bundle/actions/version_history/version_history_action.js:0
 msgid "Odoo Spreadsheet"
@@ -821,7 +879,7 @@ msgstr "訂單"
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/actions/version_history/version_history_action.js:0
 msgid "Original data"
-msgstr ""
+msgstr "原始數據"
 
 #. module: spreadsheet_edition
 #: model:ir.model.fields,field_description:spreadsheet_edition.field_spreadsheet_revision__parent_revision_id
@@ -862,20 +920,20 @@ msgstr "請輸入有效的數字。"
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/chart/side_panels/odoo_chart_with_axis/design_panel.xml:0
 msgid "Polynomial"
-msgstr ""
+msgstr "多項式"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/filter_editor/relation_filter_editor_side_panel.xml:0
 #: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/filter_editor/text_filter_editor_side_panel.xml:0
 msgid "Possible values"
-msgstr ""
+msgstr "可接受的值"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/filter_field_offset.js:0
 msgid "Previous"
-msgstr "前一個"
+msgstr "上一頁"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -900,7 +958,7 @@ msgstr "季度及年"
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/filter_editor/date_filter_editor_side_panel.xml:0
 msgid "Quarters"
-msgstr ""
+msgstr "季度"
 
 #. module: spreadsheet_edition
 #: model:ir.model.fields,field_description:spreadsheet_edition.field_spreadsheet_cell_thread__rating_ids
@@ -911,7 +969,7 @@ msgstr "評分"
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/o_spreadsheet/menu_item_registry.js:0
 msgid "Re-insert dynamic pivot"
-msgstr ""
+msgstr "重新插入動態樞紐分析表"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -923,8 +981,14 @@ msgstr "重新插入列表"
 #. module: spreadsheet_edition
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/o_spreadsheet/menu_item_registry.js:0
+msgid "Re-insert pivot cell"
+msgstr "重新插入樞紐儲存格"
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/o_spreadsheet/menu_item_registry.js:0
 msgid "Re-insert static pivot"
-msgstr ""
+msgstr "重新插入靜態樞紐分析表"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -936,7 +1000,7 @@ msgstr "重開此對話串"
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/list/plugins/list_autofill_plugin.js:0
 msgid "Record #%(record_number)s"
-msgstr ""
+msgstr "記錄 #%(record_number)s"
 
 #. module: spreadsheet_edition
 #: model:ir.model.fields,field_description:spreadsheet_edition.field_spreadsheet_revision__res_id
@@ -976,7 +1040,6 @@ msgstr "移除"
 #. module: spreadsheet_edition
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/actions/control_panel/spreadsheet_name.xml:0
-#: code:addons/spreadsheet_edition/static/src/bundle/version_history/side_panel/version_history_item.js:0
 msgid "Rename"
 msgstr "重新命名"
 
@@ -1000,7 +1063,7 @@ msgstr "已解決"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/version_history/side_panel/version_history_item.js:0
+#: code:addons/spreadsheet_edition/static/src/bundle/actions/version_history/side_panel/version_history_item.js:0
 msgid "Restore this version"
 msgstr "還原至此版本"
 
@@ -1014,7 +1077,7 @@ msgstr "將數值限制在一定範圍內"
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/filter_editor/relation_filter_editor_side_panel.xml:0
 msgid "Restrict values with a domain"
-msgstr ""
+msgstr "將數值限制在一定數域/搜尋範圍內"
 
 #. module: spreadsheet_edition
 #: model:ir.model.fields,field_description:spreadsheet_edition.field_spreadsheet_revision__revision_uuid
@@ -1131,7 +1194,7 @@ msgstr "設為篩選器"
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/chart/side_panels/odoo_chart_with_axis/design_panel.xml:0
 msgid "Show trend line"
-msgstr ""
+msgstr "顯示趨勢線"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -1161,6 +1224,7 @@ msgstr "排序"
 #. module: spreadsheet_edition
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/assets/spreadsheet_cog_menu/spreadsheet_cog_menu.xml:0
+#: code:addons/spreadsheet_edition/static/src/bundle/components/spreadsheet_navbar/spreadsheet_navbar.xml:0
 #: model:ir.ui.menu,name:spreadsheet_edition.menu_technical_spreadsheet
 msgid "Spreadsheet"
 msgstr "試算表"
@@ -1209,13 +1273,6 @@ msgstr "堆疊線"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/chart/side_panels/odoo_bar/odoo_bar_config_panel.js:0
-#: code:addons/spreadsheet_edition/static/src/bundle/chart/side_panels/odoo_line/odoo_line_config_panel.js:0
-msgid "Stacked linechart"
-msgstr "堆疊折線圖"
-
-#. module: spreadsheet_edition
-#. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/global_filters/global_filter_side_panel.xml:0
 msgid "Text"
 msgstr "文字"
@@ -1229,6 +1286,34 @@ msgid ""
 msgstr "試算表的歷史記錄已損壞，你很可能會遺失最近的修訂。無法使用此功能。"
 
 #. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/chart/side_panels/common/config_panel.js:0
+msgid ""
+"The model (%(model)s) of this chart is not valid (it may have been renamed/"
+"deleted). Please re-insert a new chart."
+msgstr ""
+"此圖表的模型「%(model)s」無效（可能已被重新命名或刪除）。請重新插入新的圖表。"
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/list/side_panels/list_details_side_panel.js:0
+msgid ""
+"The model (%(model)s) of this list is not valid (it may have been renamed/"
+"deleted). Please re-insert a new list."
+msgstr ""
+"此列表的模型「%(model)s」無效（可能已被重新命名或刪除）。請重新插入新的列表。"
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/pivot/side_panels/pivot_details_side_panel.js:0
+msgid ""
+"The model (%(model)s) of this pivot is not valid (it may have been renamed/"
+"deleted). Please re-insert a new pivot."
+msgstr ""
+"此樞紐分析表的模型「%(model)s」無效（可能已被重新命名或刪除）。請重新插入新的"
+"樞紐分析表。"
+
+#. module: spreadsheet_edition
 #. odoo-python
 #: code:addons/spreadsheet_edition/models/spreadsheet_mixin.py:0
 msgid ""
@@ -1240,7 +1325,8 @@ msgstr "由於有同時發生的更新，無法套用該操作。請再試。"
 #. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/actions/version_history/version_history_action.js:0
 msgid ""
-"There are missing revisions that prevent to restore the whole edition history.\n"
+"There are missing revisions that prevent to restore the whole edition "
+"history.\n"
 "\n"
 "Would you like to load the more recent modifications?"
 msgstr ""
@@ -1250,6 +1336,7 @@ msgstr ""
 
 #. module: spreadsheet_edition
 #. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/actions/version_history/side_panel/version_history_side_panel.xml:0
 #: code:addons/spreadsheet_edition/static/src/bundle/version_history/side_panel/version_history_side_panel.xml:0
 msgid "There are no prior revisions for this spreadsheet."
 msgstr "此試算表之前沒有任何修訂。"
@@ -1304,13 +1391,20 @@ msgstr "類型"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/filter_editor/date_filter_editor_side_panel.xml:0
-msgid "Value options"
-msgstr ""
+#: code:addons/spreadsheet_edition/static/src/bundle/pivot/plugins/pivot_autofill_plugin.js:0
+msgid "Unknown"
+msgstr "未知"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/version_history/index.js:0
+#: code:addons/spreadsheet_edition/static/src/bundle/global_filters/components/filter_editor/date_filter_editor_side_panel.xml:0
+msgid "Value options"
+msgstr "數值選項"
+
+#. module: spreadsheet_edition
+#. odoo-javascript
+#: code:addons/spreadsheet_edition/static/src/bundle/actions/version_history/side_panel/version_history_side_panel.xml:0
+#: code:addons/spreadsheet_edition/static/src/bundle/version_history/side_panel/version_history_side_panel.xml:0
 msgid "Version History"
 msgstr "版本歷史"
 
@@ -1363,21 +1457,9 @@ msgstr "年"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/version_history/restore_version_dialog/restore_version_dialog.xml:0
+#: code:addons/spreadsheet_edition/static/src/bundle/actions/version_history/restore_version_dialog/restore_version_dialog.xml:0
 msgid "Yes, restore"
 msgstr "好，還原"
-
-#. module: spreadsheet_edition
-#. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/comments/side_panel/comment_threads_side_panel.xml:0
-msgid "activeSheet"
-msgstr "activeSheet"
-
-#. module: spreadsheet_edition
-#. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/comments/side_panel/comment_threads_side_panel.xml:0
-msgid "allSheets"
-msgstr "allSheets"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -1387,45 +1469,15 @@ msgstr "由小至大"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/chart/side_panels/odoo_chart_with_axis/design_panel.xml:0
-msgid "bottom"
-msgstr "底部"
-
-#. module: spreadsheet_edition
-#. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/bundle/pivot/side_panels/pivot_details_side_panel.js:0
 msgid "descending"
 msgstr "由大至小"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/chart/side_panels/odoo_chart_with_axis/design_panel.xml:0
-msgid "exponential"
-msgstr ""
-
-#. module: spreadsheet_edition
-#. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/list/side_panels/edit_list_sorting_section/edit_list_sorting_section.xml:0
-msgid "false"
-msgstr "假"
-
-#. module: spreadsheet_edition
-#. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/assets/components/spreadsheet_selector_dialog/spreadsheet_selector_dialog.js:0
 msgid "graph"
 msgstr "圖表"
-
-#. module: spreadsheet_edition
-#. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/chart/side_panels/odoo_chart_with_axis/design_panel.xml:0
-msgid "left"
-msgstr "左方"
-
-#. module: spreadsheet_edition
-#. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/chart/side_panels/odoo_chart_with_axis/design_panel.xml:0
-msgid "linear"
-msgstr ""
 
 #. module: spreadsheet_edition
 #. odoo-javascript
@@ -1438,12 +1490,6 @@ msgstr "連結"
 #: code:addons/spreadsheet_edition/static/src/assets/components/spreadsheet_selector_dialog/spreadsheet_selector_dialog.js:0
 msgid "list"
 msgstr "清單"
-
-#. module: spreadsheet_edition
-#. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/chart/side_panels/odoo_chart_with_axis/design_panel.xml:0
-msgid "logarithmic"
-msgstr ""
 
 #. module: spreadsheet_edition
 #: model_terms:ir.ui.view,arch_db:spreadsheet_edition.mail_notification_layout
@@ -1460,45 +1506,15 @@ msgstr "從不"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/chart/side_panels/odoo_chart_with_axis/design_panel.xml:0
-msgid "none"
-msgstr "無"
-
-#. module: spreadsheet_edition
-#. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/assets/components/spreadsheet_selector_dialog/spreadsheet_selector_dialog.js:0
 msgid "pivot"
 msgstr "樞紐分析表"
 
 #. module: spreadsheet_edition
 #. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/chart/side_panels/odoo_chart_with_axis/design_panel.xml:0
-msgid "polynomial"
-msgstr ""
-
-#. module: spreadsheet_edition
-#. odoo-javascript
 #: code:addons/spreadsheet_edition/static/src/assets/components/spreadsheet_selector_dialog/spreadsheet_selector_dialog.xml:0
 msgid "records of the list."
 msgstr "項記錄，用以插入試算表。"
-
-#. module: spreadsheet_edition
-#. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/chart/side_panels/odoo_chart_with_axis/design_panel.xml:0
-msgid "right"
-msgstr "右方"
-
-#. module: spreadsheet_edition
-#. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/chart/side_panels/odoo_chart_with_axis/design_panel.xml:0
-msgid "top"
-msgstr "頂部"
-
-#. module: spreadsheet_edition
-#. odoo-javascript
-#: code:addons/spreadsheet_edition/static/src/bundle/list/side_panels/edit_list_sorting_section/edit_list_sorting_section.xml:0
-msgid "true"
-msgstr "否"
 
 #. module: spreadsheet_edition
 #: model:ir.model,name:spreadsheet_edition.model_ir_websocket

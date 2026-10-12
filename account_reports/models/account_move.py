@@ -57,7 +57,7 @@ class AccountMove(models.Model):
 
     def button_draft(self):
         # Overridden in order to delete the carryover values when resetting the tax closing to draft
-        super().button_draft()
+        res = super().button_draft()
         for closing_move in self.filtered(lambda m: m.tax_closing_report_id):
             report = closing_move.tax_closing_report_id
             options = closing_move._get_tax_closing_report_options(closing_move.company_id, closing_move.fiscal_position_id, report, closing_move.date)
@@ -69,15 +69,20 @@ class AccountMove(models.Model):
             ])
 
             carryover_impacted_period_end = fields.Date.from_string(options['date']['date_to']) + relativedelta(months=closing_months_delay)
-            tax_lock_date = closing_move.company_id.tax_lock_date
-            if carryover_values and tax_lock_date and tax_lock_date >= carryover_impacted_period_end:
-                raise UserError(_("You cannot reset this closing entry to draft, as it would delete carryover values impacting the tax report of a "
-                                  "locked period. To do this, you first need to modify you tax return lock date."))
+            violated_lock_dates = closing_move.company_id._get_lock_date_violations(
+                carryover_impacted_period_end, fiscalyear=False, sale=False, purchase=False, tax=True, hard=True,
+            ) if carryover_values else None
+
+            if violated_lock_dates:
+                raise UserError(_("You cannot reset this closing entry to draft, as it would delete carryover values impacting the tax report of a locked period. "
+                                  "Please change the following lock dates to proceed: %(lock_date_info)s.",
+                                  lock_date_info=self.env['res.company']._format_lock_dates(violated_lock_dates)))
 
             if self._has_subsequent_posted_closing_moves():
                 raise UserError(_("You cannot reset this closing entry to draft, as another closing entry has been posted at a later date."))
 
             carryover_values.unlink()
+        return res
 
     def _has_subsequent_posted_closing_moves(self):
         self.ensure_one()
@@ -100,6 +105,13 @@ class AccountMove(models.Model):
 
     def _action_tax_to_pay_wizard(self):
         # hook for l10n tax payment wizard
+        return self.action_open_tax_report()
+
+    def _action_tax_to_send(self):
+        return self.action_open_tax_report()
+
+    def _action_tax_report_error(self):
+        # hook for l10n tax report errors
         return self.action_open_tax_report()
 
     def action_open_tax_report(self):
@@ -125,10 +137,6 @@ class AccountMove(models.Model):
             raise UserError(_('Only Billing Administrators are allowed to change lock dates!'))
         report = self.tax_closing_report_id
         options = self._get_tax_closing_report_options(self.company_id, self.fiscal_position_id, report, self.date)
-
-        if not self.company_id.tax_lock_date or self.date > self.company_id.tax_lock_date:
-            self.company_id.sudo().tax_lock_date = self.date
-            self.env['account.report']._generate_default_external_values(options['date']['date_from'], options['date']['date_to'], True)
 
         sender_company = report._get_sender_company_for_export(options)
         company_ids = report.get_report_company_ids(options)
@@ -166,9 +174,11 @@ class AccountMove(models.Model):
 
             # Log a note on depending closings, redirecting to the main one
             for closing_move in depending_closings:
-                closing_move.message_post(
-                    body=Markup("%s") % _("The attachments of the tax report can be found on the <a href='#' data-oe-model='account.move' data-oe-id='%s'>closing entry</a> of the representative company.", self.id),
-                )
+                closing_move.message_post(body=_(
+                    "The attachments of the tax report can be found on the %(link_start)sclosing entry%(link_end)s of the representative company.",
+                    link_start=Markup('<a href="#" data-oe-model="account.move" data-oe-id="%s">') % self.id,
+                    link_end=Markup("</a>"),
+                ))
 
             # End activity
             activity = self.company_id._get_tax_closing_reminder_activity(report.id, self.date, self.fiscal_position_id.id)
@@ -178,38 +188,65 @@ class AccountMove(models.Model):
             # Generate next activity
             self.company_id._generate_tax_closing_reminder_activity(self.tax_closing_report_id, self.date + relativedelta(days=1), self.fiscal_position_id if self.fiscal_position_id.foreign_vat else None)
 
-        self._close_tax_period_pay_activity()
+        if not self.fiscal_position_id and (not self.company_id.tax_lock_date or self.date > self.company_id.tax_lock_date):
+            self.env['account.report']._generate_default_external_values(options['date']['date_from'], options['date']['date_to'], True)
+            self.company_id.sudo().tax_lock_date = self.date
 
-    def _close_tax_period_pay_activity(self):
-        MailActivity = self.env['mail.activity'].with_context(mail_activity_quick_update=True)
-        activity_type = self.env.ref('account_reports.mail_activity_type_tax_report_to_pay', raise_if_not_found=False)
-        if not activity_type:
-            return
-        act_user = activity_type.default_user_id
-        if act_user and not (self.company_id in act_user.company_ids and self.env.ref(
-                'account.group_account_manager') in act_user.groups_id):
+        self._close_tax_period_create_activities()
+
+    def _get_tax_period_description(self):
+        self.ensure_one()
+        period_start, period_end = self.company_id._get_tax_closing_period_boundaries(self.date, self.tax_closing_report_id)
+        return self.company_id._get_tax_closing_move_description(self.company_id._get_tax_periodicity(self.tax_closing_report_id), period_start, period_end, self.fiscal_position_id, self.tax_closing_report_id)
+
+    def _close_tax_period_create_activities(self):
+        mat_to_send_xml_id = 'account_reports.mail_activity_type_tax_report_to_be_sent'
+        mat_to_send = self.env.ref(mat_to_send_xml_id, raise_if_not_found=False)
+        if not mat_to_send:
+            # As this is introduced in stable, we ensure data exists by creating them on the fly if needed
+            mat_to_send = self.env['mail.activity.type'].sudo()._load_records([{
+                'xml_id': mat_to_send_xml_id,
+                'noupdate': False,
+                'values': {
+                    'name': 'Tax Report Ready',
+                    'summary': 'Tax report is ready to be sent to the administration',
+                    'category': 'tax_report',
+                    'delay_count': '0',
+                    'delay_unit': 'days',
+                    'delay_from': 'current_date',
+                    'res_model': 'account.move',
+                    'chaining_type': 'suggest',
+                }
+            }])
+        mat_to_pay_xml_id = 'account_reports.mail_activity_type_tax_report_to_pay'
+        mat_to_pay = self.env.ref(mat_to_pay_xml_id, raise_if_not_found=False)
+
+        act_user = mat_to_send.default_user_id
+        if act_user and not (self.company_id in act_user.company_ids and act_user.has_group('account.group_account_manager')):
             act_user = self.env['res.users']
 
-        move_ids_with_activity = self.env['mail.activity'].search([
-            ('res_model', '=', self._name),
-            ('res_id', 'in', self.ids),
-            ('activity_type_id', '=', activity_type.id),
-        ]).mapped('res_id')
+        moves_without_send_activity = self.filtered_domain([
+            '|',
+            ('activity_ids', '=', False),
+            ('activity_ids', 'not any', [('activity_type_id.id', '=', mat_to_send.id)]),
+        ])
 
-        for move in self.filtered(lambda m: m.id not in move_ids_with_activity and m._get_tax_to_pay_on_closing() > 0):
-            period_start, period_end = move.company_id._get_tax_closing_period_boundaries(move.date, move.tax_closing_report_id)
-            period_desc = move.company_id._get_tax_closing_move_description(move.company_id._get_tax_periodicity(move.tax_closing_report_id), period_start, period_end, move.fiscal_position_id, move.tax_closing_report_id)
-            MailActivity.create({
-                'res_id': move.id,
-                'res_model_id': self.env.ref('account.model_account_move').id,
-                'activity_type_id': activity_type.id,
-                'summary': _("Pay tax: %s", period_desc),
-                'note': activity_type.default_note,
-                'date_deadline': fields.Date.context_today(move),
-                'automated': True,
-                'user_id': act_user.id or self.env.user.id,
-                'chaining_type': 'suggest',  # the next activity should only be created by closing the next tax entry
-            })
+        for move in moves_without_send_activity:
+            period_desc = move._get_tax_period_description()
+            move.with_context(mail_activity_quick_update=True).activity_schedule(
+                act_type_xmlid=mat_to_send_xml_id,
+                summary=_("Send tax report: %s", period_desc),
+                date_deadline=fields.Date.context_today(move),
+                user_id=act_user.id or self.env.user.id,
+            )
+
+            if mat_to_pay and mat_to_pay not in move.activity_ids.activity_type_id and move._get_tax_to_pay_on_closing() > 0:
+                move.with_context(mail_activity_quick_update=True).activity_schedule(
+                    act_type_xmlid=mat_to_pay_xml_id,
+                    summary=_("Pay tax: %s", period_desc),
+                    date_deadline=fields.Date.context_today(move),
+                    user_id=act_user.id or self.env.user.id,
+                )
 
     def refresh_tax_entry(self):
         for move in self.filtered(lambda m: m.tax_closing_report_id and m.state == 'draft'):

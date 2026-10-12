@@ -17,18 +17,25 @@ class SaleOrder(models.Model):
         self.ensure_one()
         super()._set_deferred_end_date_from_template()
         if self.end_date:
-            self.order_line.task_id.recurrence_id.write({
+            self.order_line.task_id.recurrence_id.sudo().write({
                 'repeat_type': 'until',
                 'repeat_until': self.end_date,
             })
         else:
-            self.order_line.task_id.recurrence_id.write({
+            self.order_line.task_id.recurrence_id.sudo().write({
                 'repeat_type': 'forever',
             })
 
-    def _set_closed_state(self, renew=False):
-        super()._set_closed_state(renew)
-        self.filtered('is_subscription').order_line.task_id.action_unlink_recurrence()
+    def set_close(self, close_reason_id=None, renew=False):
+        self._unlink_tasks_recurrence()
+        return super().set_close(close_reason_id, renew)
+
+    def _action_cancel(self):
+        self._unlink_tasks_recurrence()
+        return super()._action_cancel()
+
+    def _unlink_tasks_recurrence(self):
+        self.filtered('is_subscription').order_line.sudo().task_id.action_unlink_recurrence()
 
     def _prepare_upsell_renew_order_values(self, subscription_state):
         res = super()._prepare_upsell_renew_order_values(subscription_state)

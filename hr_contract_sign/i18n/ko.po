@@ -1,23 +1,26 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* hr_contract_sign
-# 
+# * hr_contract_sign
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+#
+# "Kwanghee Park (kwpa)" <kwpa@odoo.com>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:27+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Korean (https://app.transifex.com/odoo/teams/41243/ko/)\n"
+"POT-Creation-Date: 2025-12-29 18:47+0000\n"
+"PO-Revision-Date: 2025-10-23 22:30+0000\n"
+"Last-Translator: \"Kwanghee Park (kwpa)\" <kwpa@odoo.com>\n"
+"Language-Team: Korean <https://translate.odoo.com/projects/odoo-18/"
+"hr_contract_sign/ko/>\n"
+"Language: ko\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: ko\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 5.12.2\n"
 
 #. module: hr_contract_sign
 #. odoo-python
@@ -69,6 +72,11 @@ msgstr "파일 첨부"
 #: model:ir.model.fields,field_description:hr_contract_sign.field_hr_contract_sign_document_wizard__attachment_ids
 msgid "Attachment"
 msgstr "첨부 파일"
+
+#. module: hr_contract_sign
+#: model:sign.template,redirect_url_text:hr_contract_sign.template_sign_termination
+msgid "Close"
+msgstr "닫기"
 
 #. module: hr_contract_sign
 #: model:ir.model.fields,field_description:hr_contract_sign.field_hr_contract_sign_document_wizard__contract_id
@@ -123,12 +131,16 @@ msgstr "서명할 문서"
 #. module: hr_contract_sign
 #: model:ir.model.fields,help:hr_contract_sign.field_hr_contract_sign_document_wizard__sign_template_ids
 msgid ""
-"Documents to sign. Only documents with 1 or 2 different responsible are selectable.\n"
-"        Documents with 1 responsible will only have to be signed by the employee while documents with 2 different responsible will have to be signed by both the employee and the responsible.\n"
+"Documents to sign. Only documents with 1 or 2 different responsible are "
+"selectable.\n"
+"        Documents with 1 responsible will only have to be signed by the "
+"employee while documents with 2 different responsible will have to be signed "
+"by both the employee and the responsible.\n"
 "        "
 msgstr ""
 "서명할 문서. 담당자가 1명이거나 2명인 문서만 선택할 수 있습니다.\n"
-"        담당자가 1명인 문서는 해당 직원의 서명만 필요하며, 담당자가 2명인 문서는 신청자와 담당자모두의 서명이 필요합니다.\n"
+"        담당자가 1명인 문서는 해당 직원의 서명만 필요하며, 담당자가 2명인 문"
+"서는 신청자와 담당자모두의 서명이 필요합니다.\n"
 "        "
 
 #. module: hr_contract_sign
@@ -142,12 +154,14 @@ msgid ""
 "Email used to send the signature request.\n"
 "                - Work takes the email defined in \"work email\"\n"
 "                - Private takes the email defined in Private Information\n"
-"                - If the selected email is not defined, the available one will be used."
+"                - If the selected email is not defined, the available one "
+"will be used."
 msgstr ""
 "서명을 요청할 문서를 보내는 데 사용될 이메일입니다.\n"
 "                - 회사 이메일은 \"업무용\"으로 설정된 이메일입니다.\n"
 "                - 개인 이메일은 개인 정보에 설정된 이메일입니다.\n"
-"                - 이메일을 따로 선택하지 않으면, 사용 가능 이메일로 문서가 보내집니다. "
+"                - 이메일을 따로 선택하지 않으면, 사용 가능 이메일로 문서가 보"
+"내집니다. "
 
 #. module: hr_contract_sign
 #: model:ir.model,name:hr_contract_sign.model_hr_employee
@@ -171,7 +185,9 @@ msgstr "직원 업무"
 msgid ""
 "Employee's role on the templates to sign. The same role must be present in "
 "all the templates"
-msgstr "서명할 서식에 명시된 직원의 직책입니다. 모든 서식에는 동일한 직책이 적혀 있어야 합니다."
+msgstr ""
+"서명할 서식에 명시된 직원의 직책입니다. 모든 서식에는 동일한 직책이 적혀 있어"
+"야 합니다."
 
 #. module: hr_contract_sign
 #: model:ir.model.fields,field_description:hr_contract_sign.field_hr_contract_sign_document_wizard__employee_ids
@@ -227,9 +243,10 @@ msgstr "메시지"
 #. odoo-python
 #: code:addons/hr_contract_sign/wizard/hr_contract_sign_document_wizard.py:0
 msgid ""
-"No appropriate template could be found, please make sure you configured them"
-" properly."
-msgstr "적절한 양식을 찾을 수 없습니다. 양식을 올바르게 구성했는지 확인해보십시오."
+"No appropriate template could be found, please make sure you configured them "
+"properly."
+msgstr ""
+"적절한 양식을 찾을 수 없습니다. 양식을 올바르게 구성했는지 확인해보십시오."
 
 #. module: hr_contract_sign
 #: model_terms:ir.ui.view,arch_db:hr_contract_sign.view_hr_contract_sign
@@ -241,11 +258,6 @@ msgstr "사용 가능한 서식이 없습니다."
 #: code:addons/hr_contract_sign/wizard/hr_contract_sign_document_wizard.py:0
 msgid "Only %s has to sign."
 msgstr "%s의 서명이 필요합니다."
-
-#. module: hr_contract_sign
-#: model:sign.template,redirect_url_text:hr_contract_sign.template_sign_termination
-msgid "Open Link"
-msgstr "링크 열기"
 
 #. module: hr_contract_sign
 #: model_terms:ir.ui.view,arch_db:hr_contract_sign.view_hr_contract_sign

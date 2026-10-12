@@ -26,8 +26,11 @@ class TestPerformance(AccountTestInvoicingCommon):
             'street': 'Rue du Paradis',
             'zip': '6870',
             'city': 'Eghezee',
-            'vat': 'BE0897223670',
+            'vat': '83914571673',
             'phone': '061928374',
+            "l10n_au_bms_id": "ODOO_TEST_BMS_ID",
+            "email": "au_company@odoo.com",
+            'l10n_au_branch_code': '100'
         })
 
         cls.company = cls.env.company
@@ -95,6 +98,14 @@ class TestPerformance(AccountTestInvoicingCommon):
             'lang': 'en_US',
             'spouse_birthdate': datetime.today() + relativedelta(years=-25, month=1, day=1),
             'gender': 'male',
+            'birthday': "1990-01-01",
+            'private_email': "test%i@example.com" % i,
+            'private_phone': '123456789',
+            'private_street': 'My Street',
+            'private_city': 'Sydney',
+            'private_zip': '2000',
+            "private_state_id": cls.env.ref("base.state_au_2").id,
+            'private_country_id': cls.env.ref('base.au').id,
         } for i in range(cls.EMPLOYEES_COUNT)])
 
         cls.super_fund = cls.env['l10n_au.super.fund'].create({
@@ -111,6 +122,7 @@ class TestPerformance(AccountTestInvoicingCommon):
 
         cls.employees[1].user_id = new_test_user(cls.env, login='employee1', groups='hr.group_hr_manager')
         cls.company.l10n_au_hr_super_responsible_id = cls.employees[1]
+        cls.company.l10n_au_stp_responsible_id = cls.employees[1]
 
         cls.contracts = cls.env['hr.contract'].create([{
             'name': "Contract For Payslip Test %i" % i,
@@ -119,7 +131,7 @@ class TestPerformance(AccountTestInvoicingCommon):
             'company_id': cls.company.id,
             'date_generated_from': datetime(2020, 9, 1, 0, 0, 0),
             'date_generated_to': datetime(2020, 9, 1, 0, 0, 0),
-            'structure_type_id': cls.env.ref('l10n_au_hr_payroll.hr_payroll_structure_au_regular').id,
+            'structure_type_id': cls.env.ref('l10n_au_hr_payroll.structure_type_schedule_1').id,
             'date_start': date(2018, 12, 31),
             'wage': 10000,
             'state': "open",
@@ -165,6 +177,9 @@ class TestPerformance(AccountTestInvoicingCommon):
     @users('admin')
     @warmup
     def test_performance_l10n_au_payroll_whole_flow(self):
+        # Create Opening Balances
+        self.company._create_ytd_values(self.employees, self.date_from)
+
         # Work entry generation
         self.employees.generate_work_entries(self.date_from, self.date_to)
 
@@ -180,7 +195,7 @@ class TestPerformance(AccountTestInvoicingCommon):
         } for i in range(self.EMPLOYEES_COUNT)]
 
         # Payslip Creation
-        with self.assertQueryCount(admin=1000):  # randomness
+        with self.assertQueryCount(admin=1300):  # randomness
             start_time = time.time()
             payslips = self.env['hr.payslip'].with_context(allowed_company_ids=self.company.ids).create(payslips_values)
             # --- 0.11892914772033691 seconds ---
@@ -194,8 +209,26 @@ class TestPerformance(AccountTestInvoicingCommon):
             _logger.info("Payslips Computation: --- %s seconds ---", time.time() - start_time)
 
         # Payslip Validation
-        with self.assertQueryCount(admin=3600):
+        with self.assertQueryCount(admin=600):
             start_time = time.time()
             payslips.action_payslip_done()
             # --- 0.3815627098083496 seconds ---
             _logger.info("Payslips Validation: --- %s seconds ---", time.time() - start_time)
+
+        # STP Submission
+        with self.assertQueryCount(admin=2000):
+            start_time = time.time()
+            stp = payslips._get_payslip_stp()[payslips[0].id]
+            self.assertTrue(stp, "The STP record should have been created when the payslip was created")
+            self.assertEqual(stp.state, "draft", "The STP record should be in draft state")
+            stp.submit_date = stp.submit_date or date.today()
+            action = self.env['l10n_au.stp.submit'].create(
+                {'l10n_au_stp_id': stp.id}
+            )
+            action.stp_terms = True
+            action.action_submit()
+
+            self.assertTrue(stp.xml_file, "The XML file should have been generated")
+            self.assertEqual(stp.state, "sent", "The STP record should be in sent state")
+            # --- 0.0 seconds ---
+            _logger.info("STP Submission: --- %s seconds ---", time.time() - start_time)

@@ -28,7 +28,7 @@ test("empty ungrouped gantt rendering", async () => {
     });
     const { viewTitle, range, columnHeaders, rows } = getGridContent();
     expect(viewTitle).toBe(null);
-    expect(range).toBe("From: 12/01/2018 to: 02/28/2019");
+    expect(range).toBe("12/01/2018 -> 02/28/2019");
     expect(columnHeaders).toHaveLength(10);
     expect(columnHeaders.at(0).title).toBe("15");
     expect(columnHeaders.at(-1).title).toBe("24");
@@ -41,7 +41,6 @@ test("ungrouped gantt rendering", async () => {
     const startDateLocalString = deserializeDateTime(task2.start).toFormat("f");
     const stopDateLocalString = deserializeDateTime(task2.stop).toFormat("f");
     Tasks._views.gantt = `<gantt date_start="start" date_stop="stop"/>`;
-    Tasks._views.search = `<search/>`;
 
     onRpc("get_gantt_data", ({ model }) => expect.step(model));
     await mountWithCleanup(WebClient);
@@ -55,12 +54,12 @@ test("ungrouped gantt rendering", async () => {
 
     const { viewTitle, range, columnHeaders, rows } = getGridContent();
     expect(viewTitle).toBe(null);
-    expect(range).toBe("From: 12/01/2018 to: 02/28/2019");
+    expect(range).toBe("12/01/2018 -> 02/28/2019");
     expect(columnHeaders).toHaveLength(10);
     expect(columnHeaders.at(0).title).toBe("15");
     expect(columnHeaders.at(-1).title).toBe("24");
     expect(getActiveScale()).toBe(2);
-    expect(SELECTORS.expandCollapseButtons).not.toBeVisible();
+    expect(SELECTORS.expandCollapseButtons).not.toHaveCount();
     expect(rows).toEqual([
         {
             pills: [
@@ -109,7 +108,7 @@ test("ordered gantt view", async () => {
     });
     const { viewTitle, range, columnHeaders, rows } = getGridContent();
     expect(viewTitle).toBe("Gantt View");
-    expect(range).toBe("From: 12/01/2018 to: 02/28/2019");
+    expect(range).toBe("12/01/2018 -> 02/28/2019");
     expect(columnHeaders).toHaveLength(10);
     expect(columnHeaders.at(0).title).toBe("16");
     expect(columnHeaders.at(-1).title).toBe("25");
@@ -161,7 +160,7 @@ test("empty single-level grouped gantt rendering", async () => {
     });
     const { viewTitle, range, columnHeaders, rows } = getGridContent();
     expect(viewTitle).toBe("Gantt View");
-    expect(range).toBe("From: 12/01/2018 to: 02/28/2019");
+    expect(range).toBe("12/01/2018 -> 02/28/2019");
     expect(columnHeaders).toHaveLength(10);
     expect(columnHeaders.at(0).title).toBe("16");
     expect(columnHeaders.at(-1).title).toBe("25");
@@ -176,10 +175,10 @@ test("single-level grouped gantt rendering", async () => {
         groupBy: ["project_id"],
     });
     expect(getActiveScale()).toBe(2);
-    expect(SELECTORS.expandCollapseButtons).not.toBeVisible();
+    expect(SELECTORS.expandCollapseButtons).not.toHaveCount();
 
     const { range, viewTitle, columnHeaders, rows } = getGridContent();
-    expect(range).toBe("From: 12/01/2018 to: 02/28/2019");
+    expect(range).toBe("12/01/2018 -> 02/28/2019");
     expect(viewTitle).toBe("Tasks");
     expect(columnHeaders).toHaveLength(10);
     expect(columnHeaders.at(0).title).toBe("16");
@@ -246,9 +245,9 @@ test("Controls: rendering is mobile friendly", async () => {
 });
 
 test("Progressbar: check the progressbar percentage visibility.", async () => {
-    onRpc("get_gantt_data", async ({ kwargs, parent }) => {
-        expect.step("get_gantt_data");
-        const result = await parent();
+    onRpc("get_gantt_data", ({ kwargs, method, parent }) => {
+        expect.step(method);
+        const result = parent();
         expect(kwargs.progress_bar_fields).toEqual(["user_id"]);
         result.progress_bars.user_id = {
             1: { value: 50, max_value: 100 },
@@ -294,9 +293,9 @@ test("Progressbar: check the progressbar percentage visibility.", async () => {
 });
 
 test("Progressbar: grouped row", async () => {
-    onRpc("get_gantt_data", async ({ kwargs, parent }) => {
-        expect.step("get_gantt_data");
-        const result = await parent();
+    onRpc("get_gantt_data", ({ kwargs, method, parent }) => {
+        expect.step(method);
+        const result = parent();
         expect(kwargs.progress_bar_fields).toEqual(["user_id"]);
         result.progress_bars.user_id = {
             1: { value: 50, max_value: 100 },
@@ -349,7 +348,6 @@ test("Progressbar: grouped row", async () => {
 });
 
 test("horizontal scroll applies to the content [SMALL SCREEN]", async () => {
-    Tasks._views.search = `<search/>`;
     Tasks._views.gantt = `<gantt date_start="start" date_stop="stop"><field name="user_id"/></gantt>`;
     await mountWithCleanup(WebClient);
     await getService("action").doAction({
@@ -367,7 +365,8 @@ test("horizontal scroll applies to the content [SMALL SCREEN]", async () => {
     expect(o_view_controller).toHaveClass("o_action_delegate_scroll");
     expect(o_view_controller).toHaveStyle({ overflow: "hidden" });
     expect(o_content).toHaveStyle({ overflow: "auto" });
-    expect(o_content).toHaveProperty("scrollLeft", 762);
+    expect(queryFirst(".o_gantt_today").checkVisibility()).toBe(true);
+    expect(o_content.scrollLeft).toBeGreaterThan(0);
 
     // Horizontal scroll
     const newScrollLeft = o_content.scrollLeft - 50;

@@ -44,9 +44,8 @@ class GeneralLedgerCustomHandler(models.AbstractModel):
     def _l10n_pe_get_file_txt(self, options, data, report_number):
         txt_result = ""
         if data:
-            csv.register_dialect("pipe_separator", delimiter="|", skipinitialspace=True, lineterminator='|\n')
             output = StringIO()
-            writer = csv.DictWriter(output, dialect="pipe_separator", fieldnames=data[0].keys())
+            writer = csv.DictWriter(output, delimiter="|", skipinitialspace=True, lineterminator='\n', fieldnames=[*data[0], object()])
             writer.writerows(data)
             txt_result = output.getvalue()
 
@@ -169,7 +168,7 @@ class GeneralLedgerCustomHandler(models.AbstractModel):
                         "date": line["date"].strftime("%d/%m/%Y") if line["move_date"] else "",
                         "due_date": line["move_date_due"].strftime("%d/%m/%Y") if line["move_date_due"] else "",
                         "invoice_date": (line["move_invoice_date"] or line["move_date"]).strftime("%d/%m/%Y") if line["move_invoice_date"] or line["date"] else "",
-                        "glosa": line["move_name"].replace(" ", "").replace("/", ""),
+                        "glosa": line["move_name"],
                         "glosa_ref": "",
                         "debit": float_repr(line["debit"], precision_digits=2),
                         "credit": float_repr(line["credit"], precision_digits=2),

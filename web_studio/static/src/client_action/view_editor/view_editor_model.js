@@ -3,6 +3,7 @@
 import { rpc } from "@web/core/network/rpc";
 import { registry } from "@web/core/registry";
 import { SearchModel } from "@web/search/search_model";
+import { GROUPABLE_TYPES } from "@web/search/utils/misc";
 import {
     computeXpath,
     getNodesFromXpath,
@@ -129,7 +130,7 @@ export class ViewEditorModel extends Reactive {
 
         this._editionFlow = editionFlow;
 
-        this.GROUPABLE_TYPES = ["many2one", "char", "boolean", "selection", "date", "datetime"];
+        this.GROUPABLE_TYPES = [...GROUPABLE_TYPES];
 
         this._activeNodeXpath = undefined;
         this.lastActiveNodeXpath = undefined;
@@ -218,6 +219,7 @@ export class ViewEditorModel extends Reactive {
             const searchModel = this.editorInfo.editor.SearchModel || SearchModel;
             return {
                 context: { ...context, studio: 1 },
+                domain: editedAction.domain,
                 resModel: this.resModel,
                 SearchModel: searchModel,
                 setOverlay:
@@ -416,7 +418,7 @@ export class ViewEditorModel extends Reactive {
 
     async editX2ManyView({ viewType, fieldName, record, xpath, fieldContext }) {
         const staticList = record.data[fieldName];
-        const resIds = staticList.records.map((r) => r.resId);
+        const resIds = staticList.records.map((r) => r.resId).filter((id) => !!id);
         const resModel = staticList.resModel;
         const archTag = viewType;
 
@@ -607,7 +609,12 @@ export class ViewEditorModel extends Reactive {
             .replace(/[\s_-]+/g, "_") // swap any length of whitespace, underscore, hyphen characters with a single _
             .replace(/^-+|-+$/g, ""); // remove leading, trailing
 
-        if (!newName.startsWith("x_studio_")) {
+        if (newName.startsWith("_")) {
+            // keep default fieldName (randomly generated) if the new name is full of
+            // invalid chars (example arabic letters) to prevent having x_studio__ (which contains
+            // forbidden double underscore pattern)
+            newName = fieldName;
+        } else if (!newName.startsWith("x_studio_")) {
             newName = `x_studio_${newName}`;
         }
 

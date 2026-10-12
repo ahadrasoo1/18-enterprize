@@ -11,9 +11,9 @@ class HrRecruitmentPostJobWizard(models.TransientModel):
 
     def _prepare_monster_data(self):
         def convert_hours_to_monster_id():
-            if self.job_id.schedule_id.is_flexible_hours:
+            if self.job_id.schedule_id.flexible_hours:
                 return 6
-            hours = self.job_id.schedule_id.hours_per_week
+            hours = self.job_id.schedule_id._calculate_hours_per_week()
             if hours < 10:
                 return 1
             if hours < 20:
@@ -28,7 +28,7 @@ class HrRecruitmentPostJobWizard(models.TransientModel):
             # pay per diem
             if self.job_id.payment_interval == 'daily':
                 return 3
-            if self.job_id.schedule_id.is_fulltime:
+            if self.job_id.schedule_id._calculate_is_fulltime():
                 return 2
             return 1
 
@@ -143,7 +143,7 @@ class HrRecruitmentPostJobWizard(models.TransientModel):
                     'SalaryMin': self.job_id.salary_min,
                     'SalaryMax': self.job_id.salary_max,
                     'CompensationType': {
-                        'monsterId': monster_time_unit.monster_id,
+                        'monsterId': monster_time_unit,
                     },
                 }
 

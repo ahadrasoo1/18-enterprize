@@ -1,23 +1,24 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* account_loans
-# 
+#
 # Translators:
-# Wil Odoo, 2024
-# Tony Ng, 2024
-# 
+# Wil Odoo, 2025
+# Tony Ng, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
+"POT-Creation-Date: 2025-12-29 18:45+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Tony Ng, 2024\n"
-"Language-Team: Chinese (Taiwan) (https://app.transifex.com/odoo/teams/41243/zh_TW/)\n"
+"Last-Translator: Tony Ng, 2025\n"
+"Language-Team: Chinese (Taiwan) (https://app.transifex.com/odoo/teams/41243/"
+"zh_TW/)\n"
+"Language: zh_TW\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: zh_TW\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. module: account_loans
@@ -49,19 +50,23 @@ msgstr "30U/360"
 #: model_terms:ir.ui.view,arch_db:account_loans.account_loan_form_view
 msgid ""
 "<span class=\"oe_inline\" invisible=\"duration == 1\">months</span>\n"
-"                                        <span class=\"oe_inline\" invisible=\"duration != 1\">month</span>"
+"                                        <span class=\"oe_inline\" "
+"invisible=\"duration != 1\">month</span>"
 msgstr ""
 "<span class=\"oe_inline\" invisible=\"duration == 1\">個月</span>\n"
-"                                        <span class=\"oe_inline\" invisible=\"duration != 1\">個月</span>"
+"                                        <span class=\"oe_inline\" "
+"invisible=\"duration != 1\">個月</span>"
 
 #. module: account_loans
 #: model_terms:ir.ui.view,arch_db:account_loans.view_account_loan_compute_wizard
 msgid ""
 "<span class=\"oe_inline\" invisible=\"loan_term == 1\">years</span>\n"
-"                                    <span class=\"oe_inline\" invisible=\"loan_term != 1\">year</span>"
+"                                    <span class=\"oe_inline\" "
+"invisible=\"loan_term != 1\">year</span>"
 msgstr ""
 "<span class=\"oe_inline\" invisible=\"loan_term == 1\">年</span>\n"
-"                                    <span class=\"oe_inline\" invisible=\"loan_term != 1\">年</span>"
+"                                    <span class=\"oe_inline\" "
+"invisible=\"loan_term != 1\">年</span>"
 
 #. module: account_loans
 #: model_terms:ir.ui.view,arch_db:account_loans.view_account_loan_compute_wizard
@@ -137,7 +142,7 @@ msgstr "資產組別"
 #. module: account_loans
 #: model:ir.model,name:account_loans.model_account_asset
 msgid "Asset/Revenue Recognition"
-msgstr "資產/收入識別"
+msgstr "資產/收入認列"
 
 #. module: account_loans
 #: model:ir.model.fields.selection,name:account_loans.selection__account_loan_compute_wizard__payment_end_of_month__at_anniversary
@@ -303,6 +308,12 @@ msgid "Draft & Running Loans"
 msgstr "草稿及正在運行的貸款"
 
 #. module: account_loans
+#. odoo-python
+#: code:addons/account_loans/models/account_loan.py:0
+msgid "Due"
+msgstr "到期"
+
+#. module: account_loans
 #: model:ir.model.fields,field_description:account_loans.field_account_loan__duration
 #: model_terms:ir.ui.view,arch_db:account_loans.account_loan_form_view
 msgid "Duration"
@@ -391,6 +402,7 @@ msgstr "勾選代表有訊息發生傳送錯誤。"
 
 #. module: account_loans
 #. odoo-python
+#: code:addons/account_loans/models/account_loan.py:0
 #: code:addons/account_loans/wizard/account_loan_compute_wizard.py:0
 #: model:ir.model.fields,field_description:account_loans.field_account_loan__interest
 #: model:ir.model.fields,field_description:account_loans.field_account_loan_line__interest
@@ -698,10 +710,17 @@ msgstr "預覽"
 
 #. module: account_loans
 #. odoo-python
+#: code:addons/account_loans/models/account_loan.py:0
 #: code:addons/account_loans/wizard/account_loan_compute_wizard.py:0
 #: model:ir.model.fields,field_description:account_loans.field_account_loan_line__principal
 msgid "Principal"
 msgstr "本金"
+
+#. module: account_loans
+#. odoo-python
+#: code:addons/account_loans/models/account_loan.py:0
+msgid "Principal & Interest"
+msgstr "本金及利息"
 
 #. module: account_loans
 #: model_terms:ir.ui.view,arch_db:account_loans.account_loan_line_list_view
@@ -718,6 +737,12 @@ msgstr "屬性"
 #: model:ir.model.fields,field_description:account_loans.field_account_loan__rating_ids
 msgid "Ratings"
 msgstr "評分"
+
+#. module: account_loans
+#. odoo-python
+#: code:addons/account_loans/models/account_loan.py:0
+msgid "Reclassification LT - ST"
+msgstr "重新分類 LT - ST"
 
 #. module: account_loans
 #: model_terms:ir.ui.view,arch_db:account_loans.account_loan_form_view
@@ -748,8 +773,8 @@ msgstr "重設"
 #. module: account_loans
 #. odoo-python
 #: code:addons/account_loans/models/account_loan.py:0
-msgid "Reversal of %s"
-msgstr "撤銷 %s"
+msgid "Reversal reclassification LT - ST"
+msgstr "撤銷重新分類 LT - ST"
 
 #. module: account_loans
 #: model:ir.model.fields.selection,name:account_loans.selection__account_loan__state__running
@@ -777,7 +802,9 @@ msgstr "設為草稿"
 msgid ""
 "Set up your amortization schedule, or import it, and let Odoo handle the "
 "monthly interest and principal adjustments automatically."
-msgstr "設定分期還款時間表，或匯入現有的還款計劃，然後讓 Odoo 自動處理每月的利息及本金調整。"
+msgstr ""
+"設定分期還款時間表，或匯入現有的還款計劃，然後讓 Odoo 自動處理每月的利息及本"
+"金調整。"
 
 #. module: account_loans
 #: model:ir.model.fields,field_description:account_loans.field_account_loan__short_term_account_id
@@ -844,7 +871,8 @@ msgid ""
 "The loan amount %(loan_amount)s should be equal to the sum of the "
 "principals: %(principal_sum)s (difference %(principal_difference)s)"
 msgstr ""
-"貸款金額 %(loan_amount)s 應等於本金總和 %(principal_sum)s（差額為 %(principal_difference)s）"
+"貸款金額 %(loan_amount)s 應等於本金總和 %(principal_sum)s（差額為 %"
+"(principal_difference)s）"
 
 #. module: account_loans
 #. odoo-python
@@ -882,6 +910,12 @@ msgstr "請設定貸款名稱。"
 #: code:addons/account_loans/models/account_loan.py:0
 msgid "This entry has been %s"
 msgstr "記項已被 %s"
+
+#. module: account_loans
+#. odoo-python
+#: code:addons/account_loans/models/account_loan.py:0
+msgid "This entry has been reversed from %s"
+msgstr "記項已從 %s 撤銷"
 
 #. module: account_loans
 #: model_terms:ir.ui.view,arch_db:account_loans.account_loan_list_view
@@ -925,10 +959,10 @@ msgstr "已上載的檔案"
 msgid ""
 "Upon confirmation of the loan, Odoo will ignore the loan lines that are up "
 "to this date (included) and not create entries for them. This is useful if "
-"you have already manually created entries prior to the creation of this "
-"loan."
+"you have already manually created entries prior to the creation of this loan."
 msgstr ""
-"貸款確認後，Odoo 會忽略截至此日期（包括當天）的貸款資料行，不會為它們建立記項。若在建立此貸款之前，已經有手動建立的記項，此功能便很有用。"
+"貸款確認後，Odoo 會忽略截至此日期（包括當天）的貸款資料行，不會為它們建立記"
+"項。若在建立此貸款之前，已經有手動建立的記項，此功能便很有用。"
 
 #. module: account_loans
 #: model:ir.model.fields,field_description:account_loans.field_account_loan__website_message_ids

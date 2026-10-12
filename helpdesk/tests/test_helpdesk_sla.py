@@ -8,6 +8,7 @@ from freezegun import freeze_time
 
 from odoo import fields, Command
 from odoo.tests.common import TransactionCase
+from odoo.tests import Form
 
 NOW = datetime(2018, 10, 10, 9, 18)
 NOW2 = datetime(2019, 1, 8, 9, 0)
@@ -274,3 +275,36 @@ class HelpdeskSLA(TransactionCase):
             # Success rate checks
             self.assertEqual(self.test_team_reached.success_rate, 100.0, "Team without late tickets should have 100.0 success rate")
             self.assertEqual(self.test_team_late.success_rate, 0.0, "Team with only late tickets should have 0.0 success rate")
+
+        # Check that an SLA team that has closed tickets before, but hasn't
+        # closed any in the past 7 days has a -1 success rate. This test makes
+        # sure that the success rate is correctly only meaningful for the past
+        # 7 days.
+        with self._ticket_patch_now(NOW + relativedelta(days=14)):
+            # Need to manually recompute the field because the value is stored
+            # in memory and not recomputed automatically.
+            self.test_team_reached._compute_success_rate()
+            self.assertEqual(self.test_team_reached.success_rate, -1,
+                "Team with no tickets closed in the past 7 days should have a -1 success rate"
+            )
+
+    def test_move_ticket_to_done_and_cancel_with_disabled_sla_and_no_calendar(self):
+        """ Test moving a ticket does not cause an exception when SLAs are disabled when the calendar is empty. """
+        # Create a ticket on a team with SLAs enabled
+        ticket = self.create_ticket(team=self.test_team_reached)
+
+        # remove calendar from team
+        self.test_team_reached.write({
+            'resource_calendar_id': False,
+            'use_sla': False,
+        })
+
+        # Move the ticket to the 'Done' stage and verify it does not crash
+        with Form(ticket) as ticket_form:
+            ticket_form.stage_id = self.stage_done
+        self.assertEqual(ticket.stage_id, self.stage_done)
+
+        # Move the ticket to the 'Cancelled' stage and verify it does not crash
+        with Form(ticket) as ticket_form:
+            ticket_form.stage_id = self.stage_cancel
+        self.assertEqual(ticket.stage_id, self.stage_cancel)

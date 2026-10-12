@@ -1,23 +1,51 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-
-from datetime import datetime
-
+from dateutil.relativedelta import relativedelta
 from odoo import fields, models
 
 
 class HrEmployee(models.Model):
     _inherit = "hr.employee"
 
-    l10n_ae_annual_leave_days_taken = fields.Float(string="Annual Leave Days Taken", compute="_compute_l10n_ae_annual_leave_days")
-    l10n_ae_annual_leave_days_total = fields.Float(string="Annual Leave Days Total", compute="_compute_l10n_ae_annual_leave_days")
+    l10n_ae_annual_leave_days_taken = fields.Float(
+        string="Annual Leave Days Taken",
+        groups="hr.group_hr_user",
+        compute="_compute_l10n_ae_annual_leave_days")
+    l10n_ae_annual_leave_days_total = fields.Float(
+        string="Annual Leave Days Total",
+        groups="hr.group_hr_user",
+        compute="_compute_l10n_ae_annual_leave_days")
+    l10n_ae_total_unpaid_days = fields.Float(
+        string="Total Unpaid Days",
+        groups="hr.group_hr_user",
+        compute="_compute_l10n_ae_total_unpaid_days",
+    )
+
+    def _l10n_ae_get_worked_duration(self):
+        """ Return the PAID duration that the employee has worked as (years, months, days)"""
+        self.ensure_one()
+        if self.first_contract_date and self.contract_id.date_end:
+            unpaid_days = int(self.l10n_ae_total_unpaid_days)
+            unpaid_hours = int((self.l10n_ae_total_unpaid_days % 1) * 24)
+            adjustment_values = relativedelta(days=unpaid_days + (1 if unpaid_hours else 0)) + relativedelta(hours=unpaid_hours)
+            diff = relativedelta(self.contract_id.date_end - adjustment_values, self.first_contract_date)
+            return diff.years, diff.months, (diff.days + (diff.hours / 24))
+        return 0, 0, 0
 
     def _l10n_ae_get_worked_years(self):
-        self.ensure_one()
-        if self.contract_id.date_start and self.contract_id.date_end:
-            start_datetime = datetime.combine(self.contract_id.first_contract_date, datetime.min.time())
-            end_datetime = datetime.combine(self.contract_id.date_end, datetime.max.time())
-            return self._get_work_days_data_batch(start_datetime, end_datetime)[self.id]["days"] / 365
-        return 0
+        years, months, days = self._l10n_ae_get_worked_duration()
+        return years + (months / 12) + (days / 365)
+
+    def _compute_l10n_ae_total_unpaid_days(self):
+        employee_duration_sums = dict(self.env['hr.work.entry']._read_group(
+            domain=[
+                ('employee_id', 'in', self.ids),
+                ('code', 'in', ('SICKLEAVE0', 'LEAVE90', 'OUT')),
+            ],
+            groupby=['employee_id'],
+            aggregates=['duration:sum'],
+        ))
+        for employee in self:
+            employee.l10n_ae_total_unpaid_days = employee_duration_sums.get(employee, 0) / (employee._get_hours_per_day(employee.contract_id.date_start) or 8)
 
     def _compute_l10n_ae_annual_leave_days(self):
         self._cr.execute("""

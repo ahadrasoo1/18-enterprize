@@ -1,7 +1,6 @@
 import logging
 
 from odoo import api, fields, models, _
-from odoo.fields import Datetime
 from odoo.tools import SQL
 
 _logger = logging.getLogger(__name__)
@@ -77,7 +76,17 @@ class MarketingActivity(models.Model):
         return summary_dependency
 
     def _get_full_statistics(self):
-        super_stats = super()._get_full_statistics()
+        whatsapp_activities = self.filtered(lambda activity: activity.activity_type == 'whatsapp')
+        non_whatsapp_activities = self - whatsapp_activities
+
+        non_whatsapp_stats = (
+            super(MarketingActivity, non_whatsapp_activities)._get_full_statistics()
+            if non_whatsapp_activities else []
+        )
+
+        if not whatsapp_activities:
+            return non_whatsapp_stats
+
         self.env["marketing.trace"].flush_model(["activity_id", "whatsapp_message_id", "participant_id"])
         self.env["whatsapp.message"].flush_model(["state", "links_click_datetime"])
         self.env.cr.execute(SQL("""
@@ -101,8 +110,9 @@ class MarketingActivity(models.Model):
                 trace.activity_id IN %s
             GROUP BY
             trace.activity_id;
-        """, tuple(self.ids)))
-        return super_stats + self.env.cr.dictfetchall()
+        """, tuple(whatsapp_activities.ids)))
+
+        return non_whatsapp_stats + self.env.cr.dictfetchall()
 
     def _get_reschedule_trigger_types(self):
         types = super()._get_reschedule_trigger_types()
@@ -111,6 +121,8 @@ class MarketingActivity(models.Model):
 
     def _execute_whatsapp(self, traces):
         res_ids = [res_id for res_id in set(traces.mapped('res_id')) if res_id]
+        now = self.env.cr.now()
+
         composer_vals = {
             'res_model': self.model_name, 'res_ids': res_ids,
             'wa_template_id': self.whatsapp_template_id.id,
@@ -136,31 +148,30 @@ class MarketingActivity(models.Model):
             _logger.warning('Marketing Automation: activity <%s> encountered WhatsApp message issue %s', self.id, str(e))
             traces.write({
                 'state': 'error',
-                'schedule_date': Datetime.now(),
+                'schedule_date': now,
                 'state_msg': _('Exception in Whatsapp Marketing: %s', e),
             })
         else:
             cancelled_traces = traces.filtered(lambda trace: trace.whatsapp_message_id.state == 'cancel')
             error_traces = traces.filtered(lambda trace: trace.whatsapp_message_id.state == 'error')
-            schedule_date = Datetime.now()
 
             if cancelled_traces:
                 cancelled_traces.write({
                     'state': 'canceled',
-                    'schedule_date': schedule_date,
+                    'schedule_date': now,
                     'state_msg': _('WhatsApp canceled')
                 })
             if error_traces:
                 error_traces.write({
                     'state': 'error',
-                    'schedule_date': schedule_date,
+                    'schedule_date': now,
                     'state_msg': _('WhatsApp failed')
                 })
             processed_traces = traces - (cancelled_traces | error_traces)
             if processed_traces:
                 processed_traces.write({
                     'state': 'processed',
-                    'schedule_date': schedule_date,
+                    'schedule_date': now,
                 })
         return True
 

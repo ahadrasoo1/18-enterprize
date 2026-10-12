@@ -11,7 +11,7 @@ from typing import Dict, Any, List, Optional
 
 from odoo import _, fields, models, api
 from odoo.exceptions import AccessError, UserError
-from odoo.tools import mute_logger, OrderedSet
+from odoo.tools import mute_logger, OrderedSet, image_process
 
 _logger = logging.getLogger(__name__)
 
@@ -23,6 +23,7 @@ class SpreadsheetMixin(models.AbstractModel):
     _inherit = ["spreadsheet.mixin", "bus.listener.mixin"]
 
     spreadsheet_snapshot = fields.Binary()
+    display_thumbnail = fields.Binary(compute='_compute_display_thumbnail', inverse='_inverse_display_thumbnail')
     spreadsheet_revision_ids = fields.One2many(
         "spreadsheet.revision",
         "res_id",
@@ -54,11 +55,13 @@ class SpreadsheetMixin(models.AbstractModel):
         return super().write(vals)
 
     def copy(self, default=None):
+        default = default or {}
         new_spreadsheets = super().copy(default)
-        if not default or "spreadsheet_revision_ids" not in default:
-            for old_spreadsheet, new_spreadsheet in zip(self, new_spreadsheets):
-                old_spreadsheet._copy_revisions_to(new_spreadsheet)
-        if not default or "spreadsheet_data" not in default:
+        is_data_changed = bool(default.keys() & {"spreadsheet_data", "spreadsheet_binary_data"})
+        if not is_data_changed:
+            if "spreadsheet_revision_ids" not in default:
+                for old_spreadsheet, new_spreadsheet in zip(self, new_spreadsheets):
+                    old_spreadsheet._copy_revisions_to(new_spreadsheet)
             new_spreadsheets = new_spreadsheets.with_context(preserve_spreadsheet_revisions=True)
             for old_spreadsheet, new_spreadsheet in zip(self, new_spreadsheets):
                 new_spreadsheet.spreadsheet_data = old_spreadsheet.spreadsheet_data
@@ -227,12 +230,16 @@ class SpreadsheetMixin(models.AbstractModel):
         return is_accepted
 
     def _get_spreadsheet_snapshot(self):
-        snapshot = self.with_context(bin_size=False).spreadsheet_snapshot
-        if snapshot is False and self.spreadsheet_data is False:
+        snapshot_attachment = self.env['ir.attachment'].with_context(bin_size=False).search([
+            ('res_model', '=', self._name),
+            ('res_field', '=', 'spreadsheet_snapshot'),
+            ('res_id', '=', self.id),
+        ])
+        if not snapshot_attachment and self.spreadsheet_data is False:
             return False
-        elif snapshot is False:
-            return json.loads(self.spreadsheet_data)
-        return json.loads(base64.decodebytes(snapshot) or '{}')
+        elif not snapshot_attachment:
+            return json.loads(self.spreadsheet_data or '{}')
+        return json.loads(snapshot_attachment.raw or '{}')
 
     def _should_be_snapshotted(self):
         if not self.spreadsheet_revision_ids:
@@ -359,7 +366,7 @@ class SpreadsheetMixin(models.AbstractModel):
 
     @api.model
     def _creation_msg(self):
-        raise NotImplementedError("This method is not implemented for model %s." % self._name)
+        return self.env._("New spreadsheet created")
 
     @api.model
     def get_spreadsheets(self, domain=(), offset=0, limit=None):
@@ -407,6 +414,7 @@ class SpreadsheetMixin(models.AbstractModel):
                 for rev in revisions
             ],
             "initial_date": initial_date,
+            "default_currency": self.env["res.currency"].get_company_currency_for_spreadsheet(),
         }
 
     def rename_revision(self, revision_id, name):
@@ -437,16 +445,18 @@ class SpreadsheetMixin(models.AbstractModel):
     def restore_spreadsheet_version(self, revision_id: int, spreadsheet_snapshot: dict):
         self.ensure_one()
         self._check_collaborative_spreadsheet_access("write")
-        all_revisions = self.sudo().with_context(active_test=False).spreadsheet_revision_ids
+        
+        spreadsheet = self.sudo()
+        all_revisions = spreadsheet.with_context(active_test=False).spreadsheet_revision_ids
         revisions_after = all_revisions.filtered(lambda r: r.id > revision_id)
         revisions_after.unlink()
 
-        current_revision_uuid = self.env["spreadsheet.revision"].browse(revision_id).revision_uuid
+        current_revision_uuid = spreadsheet.env["spreadsheet.revision"].browse(revision_id).revision_uuid
         snapshot_revision_uuid = str(uuid.uuid4())
         spreadsheet_snapshot["revisionId"] = snapshot_revision_uuid
         # other collaborative users will receive the snapshot message based on
         # a server revision id they do not expect. This will cause them to reload.
-        is_accepted = self._snapshot_spreadsheet(
+        is_accepted = spreadsheet._snapshot_spreadsheet(
             current_revision_uuid,
             snapshot_revision_uuid,
             spreadsheet_snapshot,
@@ -587,6 +597,42 @@ class SpreadsheetMixin(models.AbstractModel):
             mapping[attachment_id] = attachment_copy
             return attachment_copy
         return self.env["ir.attachment"]
+    
+    def _inverse_display_thumbnail(self):
+        for spreadsheet in self:
+            value = base64.b64encode(image_process(base64.b64decode(self.display_thumbnail or ''), (150, 150), crop='center'))
+            thumbnail = self.sudo().env["ir.attachment"].search([
+                ("res_model", "=", self._name),
+                ("res_id", "=", spreadsheet.id),
+                ("create_uid", "=", self.env.uid),
+                ("res_field", "=", "display_thumbnail"),
+            ], limit=1)
+            if thumbnail:
+                thumbnail.datas = value
+            else:
+                self.env["ir.attachment"].create({
+                    "res_model": self._name,
+                    "res_id": spreadsheet.id,
+                    "res_field": "display_thumbnail",
+                    "datas": value,
+                    "name": f"{self._name},{spreadsheet.id},{self.env.uid}"
+                })
+
+    @api.depends_context('uid')
+    @api.depends('thumbnail')
+    def _compute_display_thumbnail(self):
+        # Spreadsheet thumbnails cannot be computed from their binary data.
+        # They should be saved independently.
+        spreadsheets = self.filtered(lambda d: (d.handler if "handler" in d._fields else 'spreadsheet') == 'spreadsheet')
+        thumbnails = spreadsheets.sudo().env["ir.attachment"].search([
+            ("res_model", "=", self._name),
+            ("res_id", "in", spreadsheets.ids),
+            ("res_field", "=", "display_thumbnail"),
+            ("create_uid", "=", spreadsheets.env.uid),
+        ])
+        thumbnails = {self.browse(tn.res_id): tn.datas for tn in thumbnails}
+        for spreadsheet in spreadsheets:
+            spreadsheet.display_thumbnail = thumbnails.get(spreadsheet, False)
 
     def _get_writable_record_name_field(self):
         if self._rec_name and not self._fields[self._rec_name].readonly:

@@ -197,11 +197,11 @@ class TestEditView(TestStudioController):
                 'tag': 'field',
                 'attrs': {'name': 'groups_id'},
                 'xpath_info': [
-                    {'tag': 'group', 'indice': 1},
-                    {'tag': 'group', 'indice': 2},
+                    {'tag': 'form', 'indice': 1},
+                    {'tag': 'sheet', 'indice': 1},
                     {'tag': 'field', 'indice': 2}
                 ],
-                'subview_xpath': "//field[@name='user_ids']/form"
+                'subview_xpath': "//field[@name='user_ids']/form[2]"
             },
             'position': 'attributes',
             'node': {
@@ -226,8 +226,10 @@ class TestEditView(TestStudioController):
                         <sheet>
                             <field name="display_name"/>
                             <field name="user_ids">
+                                <form />
                                 <form>
                                     <sheet>
+                                        <field name="display_name" />
                                         <field name="groups_id" widget='many2many_tags' options="{'color_field': 'color'}"/>
                                     </sheet>
                                 </form>
@@ -244,8 +246,10 @@ class TestEditView(TestStudioController):
                     <sheet>
                         <field name="display_name"/>
                         <field name="user_ids">
+                            <form />
                             <form>
                                 <sheet>
+                                    <field name="display_name"/>
                                     <field name="groups_id" widget="many2many_tags" options="{&quot;color_field&quot;: &quot;color&quot;, &quot;no_create&quot;: true}"/>
                                 </sheet>
                             </form>
@@ -288,6 +292,41 @@ class TestEditView(TestStudioController):
                 <kanban create="true">
                     <templates><t t-name="card" /></templates>
                 </kanban>
+            """
+        )
+
+    def test_edit_view_remove_attribute(self):
+        op = {
+            'type': 'attributes',
+            'target': {
+                'tag': 'calendar',
+                'attrs': {},
+                'xpath_info': [
+                    {'tag': 'calendar', 'indice': 1},
+                ],
+            },
+            'position': 'attributes',
+            'new_attrs': {'date_stop': None}
+        }
+
+        base_view = self.env['ir.ui.view'].create({
+            'name': 'TestKanban',
+            'type': 'calendar',
+            'model': 'res.partner',
+            'arch': """
+                <calendar date_start="create_date" date_stop="write_date">
+                    <field name="display_name" />
+                </calendar>
+            """
+        })
+        self.edit_view(base_view, operations=[op])
+
+        self.assertViewArchEqual(
+            base_view.get_combined_arch(),
+            """
+                <calendar date_start="create_date">
+                    <field name="display_name" />
+                </calendar>
             """
         )
 
@@ -630,3 +669,38 @@ class TestEditView(TestStudioController):
               </form>
             """
         )
+
+    def test_edit_inherited_view(self):
+        # accidentally pass the id of extension view instead of the primary
+        main = self.env["ir.ui.view"].create({
+            "name": "test",
+            "model": "res.partner",
+            "type": "list",
+            "arch": """<list><field name="display_name" /></list>"""
+        })
+        inherit = self.env["ir.ui.view"].create({
+            "name": "test",
+            "mode": "extension",
+            "inherit_id": main.id,
+            "model": "res.partner",
+            "type": "list",
+            "arch": """<xpath position="after" expr="//field[@name='display_name']">
+                <field name="function" />
+                </xpath>
+            """
+        })
+        op = {
+            'type': 'attributes',
+            'target': {
+                'tag': 'list',
+                'attrs': {},
+                'xpath_info': [
+                    {'tag': 'list', 'indice': 1},
+                ],
+            },
+            'position': 'attributes',
+            'new_attrs': {'create': True}
+        }
+        res = self.edit_view(inherit, "", [op])
+        studio_view_id = self.env["ir.ui.view"].browse(res["studio_view_id"])
+        self.assertEqual(studio_view_id.inherit_id, main)

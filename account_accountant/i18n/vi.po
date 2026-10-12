@@ -1,25 +1,28 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* account_accountant
-# 
+# * account_accountant
+#
 # Translators:
 # Martin Trigaux, 2024
-# Wil Odoo, 2024
-# Thi Huong Nguyen, 2024
-# 
+# Wil Odoo, 2025
+# Thi Huong Nguyen, 2025
+#
+# Weblate <noreply-mt-weblate@weblate.org>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
-"PO-Revision-Date: 2024-09-25 09:43+0000\n"
-"Last-Translator: Thi Huong Nguyen, 2024\n"
-"Language-Team: Vietnamese (https://app.transifex.com/odoo/teams/41243/vi/)\n"
+"POT-Creation-Date: 2026-04-10 18:48+0000\n"
+"PO-Revision-Date: 2025-11-10 12:45+0000\n"
+"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"Language-Team: Vietnamese <https://translate.odoo.com/projects/odoo-18/"
+"account_accountant/vi/>\n"
+"Language: vi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: vi\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 5.12.2\n"
 
 #. module: account_accountant
 #. odoo-python
@@ -35,11 +38,11 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_accountant/models/bank_rec_widget_line.py:0
 msgid ""
-"%(display_name_html)s with an open amount of %(open_amount)s will be reduced"
-" by %(amount)s."
+"%(display_name_html)s with an open amount of %(open_amount)s will be reduced "
+"by %(amount)s."
 msgstr ""
-"%(display_name_html)s với số tiền mở là %(open_amount)s sẽ được giảm "
-"%(amount)s."
+"%(display_name_html)s với số tiền mở là %(open_amount)s sẽ được giảm %"
+"(amount)s."
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_account_form
@@ -61,28 +64,20 @@ msgstr ""
 "của bạn</b>"
 
 #. module: account_accountant
-#. odoo-javascript
-#: code:addons/account_accountant/static/src/js/tours/account_accountant.js:0
-msgid ""
-"<br>See how to manage your customer invoices in the "
-"<b>Customers/Invoices</b> menu"
-msgstr ""
-"<br>Xem cách quản lý hóa đơn bán hàng của bạn trong menu <b>Khách hàng/Hóa "
-"đơn</b>"
-
-#. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.account_reconcile_model_form_inherit_account_accountant
 msgid ""
-"<i title=\"Run manually\" role=\"img\" aria-label=\"Run manually\" class=\"fa fa-refresh\"/>\n"
+"<i title=\"Run manually\" role=\"img\" aria-label=\"Run manually\" "
+"class=\"fa fa-refresh\"/>\n"
 "                            Run manually"
 msgstr ""
-"<i title=\"Chạy thủ công\" role=\"img\" aria-label=\"Chạy thủ công\" class=\"fa fa-refresh\"/>\n"
+"<i title=\"Chạy thủ công\" role=\"img\" aria-label=\"Chạy thủ công\" "
+"class=\"fa fa-refresh\"/>\n"
 "                            Chạy thủ công"
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_account_change_lock_date
 msgid "<i>Lock transactions up to specific dates, inclusive</i>"
-msgstr ""
+msgstr "<i>Khoá sổ giao dịch cho đến ngày cụ thể, kể cả ngày đó</i>"
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_move_form_inherit
@@ -97,6 +92,15 @@ msgstr "<span class=\"o_stat_text\">Sao kê ngân hàng</span>"
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_account_reconcile_wizard
 msgid ""
+"<span class=\"oe_inline o_form_label mx-3\" invisible=\"reco_currency_id == "
+"company_currency_id\"> in </span>"
+msgstr ""
+"<span class=\"oe_inline o_form_label mx-3\" invisible=\"reco_currency_id == "
+"company_currency_id\"> bằng </span>"
+
+#. module: account_accountant
+#: model_terms:ir.ui.view,arch_db:account_accountant.view_account_reconcile_wizard
+msgid ""
 "<span class=\"oe_inline o_form_label mx-3\" "
 "invisible=\"single_currency_mode\"> in </span>"
 msgstr ""
@@ -106,77 +110,113 @@ msgstr ""
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_account_change_lock_date
 msgid ""
-"<span class=\"text-muted o_form_label\" invisible=\"not min_fiscalyear_lock_date_exception_for_me_id                                                  or not min_fiscalyear_lock_date_exception_for_everyone_id\">\n"
-"                                      <span style=\"white-space: pre\">; </span>\n"
-"                                </span>"
+"<span class=\"text-danger o_form_label\" invisible=\"hard_lock_date == "
+"current_hard_lock_date\">\n"
+"                                            <i>This change is irreversible</"
+"i>\n"
+"                                        </span>"
 msgstr ""
+"<span class=\"text-danger o_form_label\" invisible=\"hard_lock_date == "
+"current_hard_lock_date\">\n"
+"                                            <i>Thay đổi này không thể đảo "
+"ngược</i>\n"
+"                                        </span>"
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_account_change_lock_date
 msgid ""
-"<span class=\"text-muted o_form_label\" invisible=\"not min_purchase_lock_date_exception_for_me_id                                                  or not min_purchase_lock_date_exception_for_everyone_id\">\n"
-"                                      <span style=\"white-space: pre\">; </span>\n"
+"<span class=\"text-muted o_form_label\" invisible=\"not "
+"min_fiscalyear_lock_date_exception_for_me_id                                                  "
+"or not min_fiscalyear_lock_date_exception_for_everyone_id\">\n"
+"                                      <span style=\"white-space: pre\">; </"
+"span>\n"
 "                                </span>"
 msgstr ""
+"<span class=\"text-muted o_form_label\" invisible=\"not "
+"min_fiscalyear_lock_date_exception_for_me_id                                                  "
+"or not min_fiscalyear_lock_date_exception_for_everyone_id\">\n"
+"                                      <span style=\"white-space: pre\">; </"
+"span>\n"
+"                                </span>"
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_account_change_lock_date
 msgid ""
-"<span class=\"text-muted o_form_label\" invisible=\"not min_sale_lock_date_exception_for_me_id                                                  or not min_sale_lock_date_exception_for_everyone_id\">\n"
-"                                      <span style=\"white-space: pre\">; </span>\n"
+"<span class=\"text-muted o_form_label\" invisible=\"not "
+"min_purchase_lock_date_exception_for_me_id                                                  "
+"or not min_purchase_lock_date_exception_for_everyone_id\">\n"
+"                                      <span style=\"white-space: pre\">; </"
+"span>\n"
 "                                </span>"
 msgstr ""
+"<span class=\"text-muted o_form_label\" invisible=\"not "
+"min_purchase_lock_date_exception_for_me_id                                                  "
+"or not min_purchase_lock_date_exception_for_everyone_id\">\n"
+"                                      <span style=\"white-space: pre\">; </"
+"span>\n"
+"                                </span>"
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_account_change_lock_date
 msgid ""
-"<span class=\"text-muted o_form_label\" invisible=\"not min_tax_lock_date_exception_for_me_id                                                  or not min_tax_lock_date_exception_for_everyone_id\">\n"
-"                                      <span style=\"white-space: pre\">; </span>\n"
+"<span class=\"text-muted o_form_label\" invisible=\"not "
+"min_sale_lock_date_exception_for_me_id                                                  "
+"or not min_sale_lock_date_exception_for_everyone_id\">\n"
+"                                      <span style=\"white-space: pre\">; </"
+"span>\n"
 "                                </span>"
 msgstr ""
+"<span class=\"text-muted o_form_label\" invisible=\"not "
+"min_sale_lock_date_exception_for_me_id                                                  "
+"or not min_sale_lock_date_exception_for_everyone_id\">\n"
+"                                      <span style=\"white-space: pre\">; </"
+"span>\n"
+"                                </span>"
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_account_change_lock_date
 msgid ""
-"<span class=\"text-muted\" invisible=\"hard_lock_date != current_hard_lock_date\">\n"
-"                                    <i>to ensure inalterability</i>\n"
-"                                </span>\n"
-"                                <span class=\"text-danger o_form_label\" invisible=\"hard_lock_date == current_hard_lock_date\">\n"
-"                                    <i>This change is irreversible</i>\n"
+"<span class=\"text-muted o_form_label\" invisible=\"not "
+"min_tax_lock_date_exception_for_me_id                                                  "
+"or not min_tax_lock_date_exception_for_everyone_id\">\n"
+"                                      <span style=\"white-space: pre\">; </"
+"span>\n"
 "                                </span>"
 msgstr ""
+"<span class=\"text-muted o_form_label\" invisible=\"not "
+"min_tax_lock_date_exception_for_me_id                                                  "
+"or not min_tax_lock_date_exception_for_everyone_id\">\n"
+"                                      <span style=\"white-space: pre\">; </"
+"span>\n"
+"                                </span>"
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_account_change_lock_date
 msgid ""
-"<span class=\"text-muted\" invisible=\"min_fiscalyear_lock_date_exception_for_me_id or min_fiscalyear_lock_date_exception_for_everyone_id\">\n"
+"<span class=\"text-muted\" "
+"invisible=\"min_fiscalyear_lock_date_exception_for_me_id or "
+"min_fiscalyear_lock_date_exception_for_everyone_id\">\n"
 "                                    <i>but allow exceptions</i>\n"
 "                                </span>"
 msgstr ""
-
-#. module: account_accountant
-#: model_terms:ir.ui.view,arch_db:account_accountant.view_account_change_lock_date
-msgid ""
-"<span class=\"text-muted\" invisible=\"min_purchase_lock_date_exception_for_me_id or min_purchase_lock_date_exception_for_everyone_id\">\n"
-"                                    <i>to lock bills</i>\n"
+"<span class=\"text-muted\" "
+"invisible=\"min_fiscalyear_lock_date_exception_for_me_id or "
+"min_fiscalyear_lock_date_exception_for_everyone_id\">\n"
+"                                    <i>nhưng cho phép ngoại lệ</i>\n"
 "                                </span>"
-msgstr ""
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_account_change_lock_date
 msgid ""
-"<span class=\"text-muted\" invisible=\"min_sale_lock_date_exception_for_me_id or min_sale_lock_date_exception_for_everyone_id\">\n"
-"                                    <i>to lock invoices</i>\n"
-"                                </span>"
-msgstr ""
-
-#. module: account_accountant
-#: model_terms:ir.ui.view,arch_db:account_accountant.view_account_change_lock_date
-msgid ""
-"<span class=\"text-muted\" invisible=\"min_tax_lock_date_exception_for_me_id or min_tax_lock_date_exception_for_everyone_id\">\n"
+"<span class=\"text-muted\" invisible=\"min_tax_lock_date_exception_for_me_id "
+"or min_tax_lock_date_exception_for_everyone_id\">\n"
 "                                    <i>after a tax closing</i>\n"
 "                                </span>"
 msgstr ""
+"<span class=\"text-muted\" invisible=\"min_tax_lock_date_exception_for_me_id "
+"or min_tax_lock_date_exception_for_everyone_id\">\n"
+"                                    <i>sau khi chốt thuế</i>\n"
+"                                </span>"
 
 #. module: account_accountant
 #: model_terms:digest.tip,tip_description:account_accountant.digest_tip_account_accountant_1
@@ -189,26 +229,33 @@ msgid "<span class=\"tip_button_text\">Register your Accounting Firm</span>"
 msgstr "<span class=\"tip_button_text\">Đăng ký Công ty kế toán của bạn</span>"
 
 #. module: account_accountant
+#: model_terms:ir.ui.view,arch_db:account_accountant.view_account_reconcile_wizard
+msgid "<span> (</span>"
+msgstr "<span> (</span>"
+
+#. module: account_accountant
+#: model_terms:ir.ui.view,arch_db:account_accountant.view_account_reconcile_wizard
+msgid "<span>)</span>"
+msgstr "<span>)</span>"
+
+#. module: account_accountant
 #: model_terms:web_tour.tour,rainbow_man_message:account_accountant.account_accountant_tour
 msgid ""
-"<span><strong><b>Good job!</b> You went through all steps of this tour.</strong>\n"
-"            <br>See how to manage your customer invoices in the <b>Customers/Invoices</b> menu\n"
+"<span><strong><b>Good job!</b> You went through all steps of this tour.</"
+"strong>\n"
+"            <br>See how to manage your customer invoices in the <b>Customers/"
+"Invoices</b> menu\n"
 "        </span>"
 msgstr ""
+"<span><strong><b>Tuyệt vời!</b> Bạn đã hoàn thành tour này.</strong>\n"
+"            <br>Xem cách quản lý hóa đơn mua hàng của bạn trong menu "
+"<b>Khách hàng/Hoá đơn</b>\n"
+"        </span>"
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_account_change_lock_date
 msgid "<span>Exception</span>"
-msgstr ""
-
-#. module: account_accountant
-#. odoo-javascript
-#: code:addons/account_accountant/static/src/js/tours/account_accountant.js:0
-msgid ""
-"<strong><b>Good job!</b> You went through all steps of this tour.</strong>"
-msgstr ""
-"<strong><b>Tốt lắm!</b> Bạn đã xem qua tất cả các bước của tour hướng dẫn "
-"này.</strong>"
+msgstr "<span>Ngoại lệ</span>"
 
 #. module: account_accountant
 #. odoo-javascript
@@ -256,17 +303,12 @@ msgstr "Công cụ đối chiếu tài khoản"
 #. module: account_accountant
 #: model:ir.model.fields,help:account_accountant.field_res_config_settings__deferred_expense_account_id
 msgid "Account used for deferred expenses"
-msgstr "Tài khoản sử dụng cho chi phí hoãn lại"
+msgstr "Tài khoản sử dụng cho chi phí chờ kết chuyển"
 
 #. module: account_accountant
 #: model:ir.model.fields,help:account_accountant.field_res_config_settings__deferred_revenue_account_id
 msgid "Account used for deferred revenues"
 msgstr "Tài khoản sử dụng cho doanh thu chưa thực hiện"
-
-#. module: account_accountant
-#: model_terms:ir.ui.view,arch_db:account_accountant.res_partner_view_form
-msgid "Accounting"
-msgstr "Kế toán"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_auto_reconcile_wizard__account_ids
@@ -302,8 +344,8 @@ msgid ""
 "After the data extraction, check and validate the bill. If no vendor has "
 "been found, add one before validating."
 msgstr ""
-"Sau khi trích xuất dữ liệu, kiểm tra và xác nhận hóa đơn. Nếu không tìm thấy"
-" nhà cung cấp nào, hãy thêm một nhà cung cấp trước khi xác thực."
+"Sau khi trích xuất dữ liệu, kiểm tra và xác nhận hóa đơn. Nếu không tìm thấy "
+"nhà cung cấp nào, hãy thêm một nhà cung cấp trước khi xác thực."
 
 #. module: account_accountant
 #. odoo-javascript
@@ -335,18 +377,6 @@ msgstr "Cho phép xác định năm tài chính trên hoặc dưới một năm"
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_account_reconcile_wizard
 msgid "Amount"
 msgstr "Số tiền"
-
-#. module: account_accountant
-#. odoo-javascript
-#: code:addons/account_accountant/static/src/components/bank_reconciliation/bank_rec_form.xml:0
-msgid "Amount (Company Currency)"
-msgstr "Số tiền (đơn vị tiền tệ của công ty)"
-
-#. module: account_accountant
-#. odoo-javascript
-#: code:addons/account_accountant/static/src/components/bank_reconciliation/bank_rec_form.xml:0
-msgid "Amount (Foreign Currency)"
-msgstr "Số tiền (ngoại tệ)"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_bank_rec_widget_line__amount_currency
@@ -381,8 +411,8 @@ msgstr "Số tiền theo loại tiền tệ của công ty"
 msgid ""
 "An entry will transfer %(amount)s from %(from_account)s to %(to_account)s."
 msgstr ""
-"Một bút toán sẽ luân chuyển %(amount)s từ %(from_account)s sang "
-"%(to_account)s."
+"Một bút toán sẽ luân chuyển %(amount)s từ %(from_account)s sang %"
+"(to_account)s."
 
 #. module: account_accountant
 #. odoo-javascript
@@ -405,6 +435,56 @@ msgstr "Độ chính xác phân tích"
 #: model:ir.model.fields,field_description:account_accountant.field_res_config_settings__use_anglo_saxon
 msgid "Anglo-Saxon Accounting"
 msgstr "Kế toán Anglo-Saxon"
+
+#. module: account_accountant
+#: model:ir.model.fields,help:account_accountant.field_account_change_lock_date__current_hard_lock_date
+#: model:ir.model.fields,help:account_accountant.field_account_change_lock_date__hard_lock_date
+msgid ""
+"Any entry up to and including that date will be postponed to a later time, "
+"in accordance with its journal sequence. This lock date is irreversible and "
+"does not allow any exception."
+msgstr ""
+"Bất kỳ bút toán nào cho đến và bao gồm ngày đó sẽ được hoãn lại đến một thời "
+"gian sau, theo trình tự nhật ký của bút toán đó. Ngày khóa sổ này không thể "
+"đảo ngược và không cho phép bất kỳ ngoại lệ nào."
+
+#. module: account_accountant
+#: model:ir.model.fields,help:account_accountant.field_account_change_lock_date__fiscalyear_lock_date
+msgid ""
+"Any entry up to and including that date will be postponed to a later time, "
+"in accordance with its journal's sequence."
+msgstr ""
+"Bất kỳ bút toán nào cho đến và bao gồm ngày đó sẽ được hoãn lại đến một thời "
+"gian sau, theo trình tự sổ nhật ký của bút toán đó."
+
+#. module: account_accountant
+#: model:ir.model.fields,help:account_accountant.field_account_change_lock_date__tax_lock_date
+msgid ""
+"Any entry with taxes up to and including that date will be postponed to a "
+"later time, in accordance with its journal's sequence. The tax lock date is "
+"automatically set when the tax closing entry is posted."
+msgstr ""
+"Bất kỳ bút toán nào có thuế cho đến và bao gồm ngày đó sẽ được hoãn lại đến "
+"một thời gian sau, theo trình tự sổ nhật ký của bút toán đó. Ngày khóa thuế "
+"được tự động thiết lập khi bút toán kết chuyển thuế cuối kỳ được ghi sổ."
+
+#. module: account_accountant
+#: model:ir.model.fields,help:account_accountant.field_account_change_lock_date__purchase_lock_date
+msgid ""
+"Any purchase entry prior to and including this date will be postponed to a "
+"later date, in accordance with its journal's sequence."
+msgstr ""
+"Bất kỳ bút toán mua hàng nào trước và tính cả ngày này sẽ được hoãn lại đến "
+"một thời gian sau, theo trình tự sổ nhật ký của bút toán đó."
+
+#. module: account_accountant
+#: model:ir.model.fields,help:account_accountant.field_account_change_lock_date__sale_lock_date
+msgid ""
+"Any sales entry prior to and including this date will be postponed to a "
+"later date, in accordance with its journal's sequence."
+msgstr ""
+"Bất kỳ bút toán bán hàng nào trước và tính cả ngày này sẽ được hoãn lại đến "
+"một thời gian sau, theo trình tự sổ nhật ký của bút toán đó."
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_bank_statement__message_attachment_count
@@ -517,8 +597,7 @@ msgstr "Đổi ngày khoá sổ"
 
 #. module: account_accountant
 #: model:ir.model.fields,help:account_accountant.field_account_reconcile_wizard__to_check
-msgid ""
-"Check if you are not certain of all the information of the counterpart."
+msgid "Check if you are not certain of all the information of the counterpart."
 msgstr ""
 "Chọn nếu bạn không chắc chắn về tất cả thông tin của tài khoản đối ứng."
 
@@ -536,7 +615,7 @@ msgstr "Chọn một dòng để xem trước tệp đính kèm."
 #. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__account_auto_reconcile_wizard__search_mode__zero_balance
 msgid "Clear Account"
-msgstr ""
+msgstr "Xoá tài khoản"
 
 #. module: account_accountant
 #: model_terms:ir.actions.act_window,help:account_accountant.actions_account_fiscal_year
@@ -586,6 +665,12 @@ msgstr "Cài đặt cấu hình"
 
 #. module: account_accountant
 #. odoo-javascript
+#: code:addons/account_accountant/static/src/js/tours/account_accountant.js:0
+msgid "Confirm the transaction."
+msgstr "Xác nhận giao dịch."
+
+#. module: account_accountant
+#. odoo-javascript
 #: code:addons/account_accountant/static/src/components/bank_reconciliation/rainbowman_content.xml:0
 msgid "Congrats, you're all done!"
 msgstr "Chúc mừng, bạn đã hoàn tất!"
@@ -617,6 +702,12 @@ msgstr "Tạo sao kê"
 #: model_terms:ir.actions.act_window,help:account_accountant.action_account_group_tree
 msgid "Create a new account group"
 msgstr "Tạo nhóm tài khoản mới"
+
+#. module: account_accountant
+#. odoo-javascript
+#: code:addons/account_accountant/static/src/js/tours/account_accountant.js:0
+msgid "Create a new transaction."
+msgstr "Tạo một giao dịch mới."
 
 #. module: account_accountant
 #. odoo-javascript
@@ -678,7 +769,7 @@ msgstr "Tiền tệ dùng cho đối chiếu"
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_change_lock_date__current_hard_lock_date
 msgid "Current Hard Lock"
-msgstr ""
+msgstr "Khoá sổ kế toán hiện tại"
 
 #. module: account_accountant
 #. odoo-python
@@ -701,12 +792,12 @@ msgstr "Ngày"
 #. module: account_accountant
 #: model:ir.model.fields,help:account_accountant.field_account_move_line__deferred_end_date
 msgid "Date at which the deferred expense/revenue ends"
-msgstr "Ngày chi phí/doanh thu chưa thực hiện kết thúc"
+msgstr "Ngày chi phí chờ kết chuyển/doanh thu chưa thực hiện kết thúc"
 
 #. module: account_accountant
 #: model:ir.model.fields,help:account_accountant.field_account_move_line__deferred_start_date
 msgid "Date at which the deferred expense/revenue starts"
-msgstr "Ngày chi phí/doanh thu chưa thực hiện bắt đầu"
+msgstr "Ngày chi phí chờ kết chuyển/doanh thu chưa thực hiện bắt đầu"
 
 #. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__res_company__deferred_expense_amount_computation_method__day
@@ -750,25 +841,25 @@ msgstr "Loại bút toán hoãn lại"
 #. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__account_move__deferred_entry_type__expense
 msgid "Deferred Expense"
-msgstr "Chi phí hoãn lại"
+msgstr "Chi phí chờ kết chuyển"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_res_company__deferred_expense_account_id
 #: model:ir.model.fields,field_description:account_accountant.field_res_config_settings__deferred_expense_account_id
 msgid "Deferred Expense Account"
-msgstr "Tài khoản chi phí trả trước"
+msgstr "Tài khoản chi phí chờ kết chuyển"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_res_company__deferred_expense_amount_computation_method
 #: model:ir.model.fields,field_description:account_accountant.field_res_config_settings__deferred_expense_amount_computation_method
 msgid "Deferred Expense Based on"
-msgstr "Chi phí hoãn lại dựa trên"
+msgstr "Chi phí chờ kết chuyển dựa trên"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_res_company__deferred_expense_journal_id
 #: model:ir.model.fields,field_description:account_accountant.field_res_config_settings__deferred_expense_journal_id
 msgid "Deferred Expense Journal"
-msgstr "Nhật ký chi phí hoãn lại"
+msgstr "Sổ nhật ký chi phí chờ kết chuyển"
 
 #. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__account_move__deferred_entry_type__revenue
@@ -796,12 +887,12 @@ msgstr "Nhật ký doanh thu chưa thực hiện"
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.res_config_settings_view_form
 msgid "Deferred expense"
-msgstr "Chi phí trả trước"
+msgstr "Chi phí chờ kết chuyển"
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.res_config_settings_view_form
 msgid "Deferred expense entries:"
-msgstr ""
+msgstr "Bút toán chi phí chờ kết chuyển:"
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.res_config_settings_view_form
@@ -811,7 +902,7 @@ msgstr "Doanh thu chưa thực hiện"
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.res_config_settings_view_form
 msgid "Deferred revenue entries:"
-msgstr ""
+msgstr "Bút toán doanh thu chưa thực hiện:"
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.res_config_settings_view_form
@@ -884,7 +975,7 @@ msgstr "Hiển thị trường ký tên trên hoá đơn"
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_bank_rec_widget_line__distribution_analytic_account_ids
 msgid "Distribution Analytic Account"
-msgstr ""
+msgstr "Tài khoản phân tích phân phối"
 
 #. module: account_accountant
 #. odoo-python
@@ -940,8 +1031,8 @@ msgstr "Ngày kết thúc, nằm trong năm tài chính."
 #: model:ir.model.fields,help:account_accountant.field_res_company__invoicing_switch_threshold
 #: model:ir.model.fields,help:account_accountant.field_res_config_settings__invoicing_switch_threshold
 msgid ""
-"Every payment and invoice before this date will receive the 'From Invoicing'"
-" status, hiding all the accounting entries related to it. Use this option "
+"Every payment and invoice before this date will receive the 'From Invoicing' "
+"status, hiding all the accounting entries related to it. Use this option "
 "after installing Accounting if you were using only Invoicing before, before "
 "importing all your actual accounting data in to Odoo."
 msgstr ""
@@ -953,22 +1044,27 @@ msgstr ""
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_change_lock_date__exception_duration
 msgid "Exception Duration"
-msgstr ""
+msgstr "Thời hạn ngoại lệ"
+
+#. module: account_accountant
+#: model:ir.model.fields,field_description:account_accountant.field_account_change_lock_date__exception_needed_fields
+msgid "Exception Needed Fields"
+msgstr "Exception Needed Fields"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_change_lock_date__exception_reason
 msgid "Exception Reason"
-msgstr ""
+msgstr "Lý do ngoại lệ"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_change_lock_date__exception_applies_to
 msgid "Exception applies"
-msgstr ""
+msgstr "Ngoại lệ áp dụng cho"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_change_lock_date__exception_needed
 msgid "Exception needed"
-msgstr ""
+msgstr "Ngoại lệ cần thiết"
 
 #. module: account_accountant
 #. odoo-python
@@ -1023,12 +1119,12 @@ msgstr "Người theo dõi (Đối tác)"
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_account_change_lock_date
 msgid "For everyone:"
-msgstr ""
+msgstr "Đối với mọi người:"
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_account_change_lock_date
 msgid "For me:"
-msgstr ""
+msgstr "Đối với tôi:"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_reconcile_wizard__force_partials
@@ -1088,7 +1184,7 @@ msgstr "Tháng đầy đủ"
 #: model:ir.model.fields,field_description:account_accountant.field_res_company__generate_deferred_expense_entries_method
 #: model:ir.model.fields,field_description:account_accountant.field_res_config_settings__generate_deferred_expense_entries_method
 msgid "Generate Deferred Expense Entries"
-msgstr "Tạo bút toán chi phí hoãn lại"
+msgstr "Tạo bút toán chi phí chờ kết chuyển"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_res_company__generate_deferred_revenue_entries_method
@@ -1114,7 +1210,12 @@ msgstr "Nhóm thuế"
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_change_lock_date__hard_lock_date
 msgid "Hard Lock"
-msgstr ""
+msgstr "Khoá sổ kế toán"
+
+#. module: account_accountant
+#: model:ir.model.fields,field_description:account_accountant.field_account_move_line__has_abnormal_deferred_dates
+msgid "Has Abnormal Deferred Dates"
+msgstr "Có ngày hoãn lại bất thường"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_move_line__has_deferred_moves
@@ -1151,14 +1252,29 @@ msgstr "Nếu chọn, một số tin nhắn sẽ có lỗi gửi."
 #: model:ir.model.fields,help:account_accountant.field_bank_rec_widget__st_line_checked
 msgid ""
 "If this checkbox is not ticked, it means that the user was not sure of all "
-"the related information at the time of the creation of the move and that the"
-" move needs to be checked again."
+"the related information at the time of the creation of the move and that the "
+"move needs to be checked again."
 msgstr ""
+"Nếu hộp kiểm này không được đánh dấu, điều đó có nghĩa là người dùng không "
+"chắc chắn về tất cả thông tin liên quan tại thời điểm tạo bút toán này và "
+"bút toán cần được kiểm tra lại."
+
+#. module: account_accountant
+#. odoo-javascript
+#: code:addons/account_accountant/static/src/components/bank_reconciliation/bank_rec_form.xml:0
+msgid "In Company Currency"
+msgstr "Bằng tiền tệ của công ty"
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_move_line_reconcile_tree
 msgid "In Currency"
-msgstr ""
+msgstr "Theo tiền tệ"
+
+#. module: account_accountant
+#. odoo-javascript
+#: code:addons/account_accountant/static/src/components/bank_reconciliation/bank_rec_form.xml:0
+msgid "In Foreign Currency"
+msgstr "Bằng ngoại tệ"
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_account_move_line_search_bank_rec_widget
@@ -1169,16 +1285,22 @@ msgstr "Vào"
 #. odoo-python
 #: code:addons/account_accountant/models/res_config_settings.py:0
 msgid ""
-"Incorrect fiscal year date: day is out of range for month. Month: %(month)s;"
-" Day: %(day)s"
+"Incorrect fiscal year date: day is out of range for month. Month: %(month)s; "
+"Day: %(day)s"
 msgstr ""
-"Năm tài chính không chính xác: ngày này không có trong tháng. Tháng: "
-"%(month)s; Ngày: %(day)s"
+"Năm tài chính không chính xác: ngày này không có trong tháng. Tháng: %"
+"(month)s; Ngày: %(day)s"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_bank_rec_widget_line__index
 msgid "Index"
 msgstr "Chỉ số"
+
+#. module: account_accountant
+#. odoo-python
+#: code:addons/account_accountant/demo/account_accountant_demo.py:0
+msgid "Insurance 12 months"
+msgstr "Bảo hiểm 12 tháng"
 
 #. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__bank_rec_widget__state__invalid
@@ -1193,11 +1315,14 @@ msgstr "Sao kê không hợp lệ"
 #. module: account_accountant
 #: model:ir.model.fields,help:account_accountant.field_bank_rec_widget__state
 msgid ""
-"Invalid: The bank transaction can't be validate since the suspense account is still involved\n"
+"Invalid: The bank transaction can't be validate since the suspense account "
+"is still involved\n"
 "Valid: The bank transaction can be validated.\n"
-"Reconciled: The bank transaction has already been processed. Nothing left to do."
+"Reconciled: The bank transaction has already been processed. Nothing left to "
+"do."
 msgstr ""
-"Không hợp lệ: Không thể xác thực giao dịch ngân hàng vì tài khoản tạm thời vẫn còn liên quan\n"
+"Không hợp lệ: Không thể xác thực giao dịch ngân hàng vì tài khoản tạm thời "
+"vẫn còn liên quan\n"
 "Hợp lệ: Giao dịch ngân hàng có thể được xác thực.\n"
 "Đã đối chiếu: Giao dịch ngân hàng đã được xử lý. Không còn việc gì để làm."
 
@@ -1209,6 +1334,11 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_move_line_reconcile_tree
 msgid "Invoice Date"
 msgstr "Ngày lập hóa đơn"
+
+#. module: account_accountant
+#: model:res.groups,name:account_accountant.group_account_basic
+msgid "Invoicing & Banks"
+msgstr ""
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_res_company__invoicing_switch_threshold
@@ -1260,7 +1390,7 @@ msgstr "Ngày vi phạm ngày khoá sổ của bút toán"
 #. odoo-python
 #: code:addons/account_accountant/wizard/account_change_lock_date.py:0
 msgid "It is not possible to decrease or remove the Hard Lock Date."
-msgstr ""
+msgstr "Không thể giảm hoặc gỡ bỏ Ngày khoá sổ kế toán."
 
 #. module: account_accountant
 #: model:ir.model,name:account_accountant.model_account_journal
@@ -1312,9 +1442,9 @@ msgstr "Hạng mục bút toán không có số đối chiếu"
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_account_move_line_reconcile_search
 msgid ""
-"Journal items where the account allows reconciliation no matter the residual"
-" amount"
-msgstr ""
+"Journal items where the account allows reconciliation no matter the residual "
+"amount"
+msgstr "Các bút toán mà tài khoản cho phép đối chiếu bất kể số tiền còn lại"
 
 #. module: account_accountant
 #: model:ir.model.fields,help:account_accountant.field_res_config_settings__deferred_expense_journal_id
@@ -1374,17 +1504,7 @@ msgstr "Người ký tên hợp pháp"
 #. odoo-javascript
 #: code:addons/account_accountant/static/src/js/tours/account_accountant.js:0
 msgid "Let’s go back to the dashboard."
-msgstr "Hãy quay lại trang chủ."
-
-#. module: account_accountant
-#: model:ir.model.fields,help:account_accountant.field_account_change_lock_date__hard_lock_date
-msgid "Like the \"Everyone Lock\", but no exceptions are possible."
-msgstr ""
-
-#. module: account_accountant
-#: model:ir.model.fields,help:account_accountant.field_account_change_lock_date__current_hard_lock_date
-msgid "Like the \"Global Lock Date\", but no exceptions are possible."
-msgstr "Tương tự như \"Ngày khóa sổ chung\", nhưng không có bất kỳ ngoại lệ nào."
+msgstr "Hãy quay lại bảng điều khiển."
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_auto_reconcile_wizard__line_ids
@@ -1404,68 +1524,68 @@ msgstr "Ngày khóa sổ"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_change_lock_date__fiscalyear_lock_date
-msgid "Lock Everyone"
-msgstr ""
+msgid "Lock Everything"
+msgstr "Khoá tất cả"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_change_lock_date__fiscalyear_lock_date_for_everyone
-msgid "Lock Everyone For Everyone"
-msgstr ""
+msgid "Lock Everything For Everyone"
+msgstr "Khoá tất cả đối với mọi người"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_change_lock_date__fiscalyear_lock_date_for_me
-msgid "Lock Everyone For Me"
-msgstr ""
+msgid "Lock Everything For Me"
+msgstr "Khoá tất cả đối với tôi"
 
 #. module: account_accountant
 #: model:ir.actions.act_window,name:account_accountant.action_view_account_change_lock_date
 msgid "Lock Journal Entries"
-msgstr ""
+msgstr "Khoá sổ bút toán"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_change_lock_date__purchase_lock_date
 msgid "Lock Purchases"
-msgstr ""
+msgstr "Khoá sổ mua hàng"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_change_lock_date__purchase_lock_date_for_everyone
 msgid "Lock Purchases For Everyone"
-msgstr ""
+msgstr "Khoá sổ mua hàng đối với mọi người"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_change_lock_date__purchase_lock_date_for_me
 msgid "Lock Purchases For Me"
-msgstr ""
+msgstr "Khoá sổ mua hàng đối với tôi"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_change_lock_date__sale_lock_date
 msgid "Lock Sales"
-msgstr ""
+msgstr "Khóa sổ bán hàng"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_change_lock_date__sale_lock_date_for_everyone
 msgid "Lock Sales For Everyone"
-msgstr ""
+msgstr "Khoá sổ bán hàng đối với mọi người"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_change_lock_date__sale_lock_date_for_me
 msgid "Lock Sales For Me"
-msgstr ""
+msgstr "Khoá sổ bán hàng đối với tôi"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_change_lock_date__tax_lock_date
 msgid "Lock Tax Return"
-msgstr ""
+msgstr "Khoá tờ khai thuế"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_change_lock_date__tax_lock_date_for_everyone
 msgid "Lock Tax Return For Everyone"
-msgstr ""
+msgstr "Khoá tờ khai thuế đối với mọi người"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_change_lock_date__tax_lock_date_for_me
 msgid "Lock Tax Return For Me"
-msgstr ""
+msgstr "Khoá tờ khai thuế đối với tôi"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_bank_statement__message_main_attachment_id
@@ -1558,48 +1678,53 @@ msgstr "Phương pháp dùng để tạo bút toán hoãn lại"
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_change_lock_date__min_fiscalyear_lock_date_exception_for_everyone_id
 msgid "Min Fiscalyear Lock Date Exception For Everyone"
-msgstr ""
+msgstr "Ngoại lệ ngày khoá sổ năm tài chính tối thiểu đối với mọi người"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_change_lock_date__min_fiscalyear_lock_date_exception_for_me_id
 msgid "Min Fiscalyear Lock Date Exception For Me"
-msgstr ""
+msgstr "Ngoại lệ ngày khoá sổ năm tài chính tối thiểu đối với tôi"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_change_lock_date__min_purchase_lock_date_exception_for_everyone_id
 msgid "Min Purchase Lock Date Exception For Everyone"
-msgstr ""
+msgstr "Ngoại lệ ngày khoá sổ mua hàng tối thiểu đối với mọi người"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_change_lock_date__min_purchase_lock_date_exception_for_me_id
 msgid "Min Purchase Lock Date Exception For Me"
-msgstr ""
+msgstr "Ngoại lệ ngày khoá sổ mua hàng tối thiểu đối với tôi"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_change_lock_date__min_sale_lock_date_exception_for_everyone_id
 msgid "Min Sale Lock Date Exception For Everyone"
-msgstr ""
+msgstr "Ngoại lệ ngày khoá sổ bán hàng tối thiểu đối với mọi người"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_change_lock_date__min_sale_lock_date_exception_for_me_id
 msgid "Min Sale Lock Date Exception For Me"
-msgstr ""
+msgstr "Ngoại lệ ngày khoá sổ bán hàng tối thiểu đối với tôi"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_change_lock_date__min_tax_lock_date_exception_for_everyone_id
 msgid "Min Tax Lock Date Exception For Everyone"
-msgstr ""
+msgstr "Ngoại lệ ngày khoá thuế tối thiểu đối với mọi người"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_change_lock_date__min_tax_lock_date_exception_for_me_id
 msgid "Min Tax Lock Date Exception For Me"
-msgstr ""
+msgstr "Ngoại lệ ngày khoá thuế tối thiểu đối với tôi"
 
 #. module: account_accountant
 #. odoo-python
 #: code:addons/account_accountant/models/bank_rec_widget.py:0
 msgid "Misc"
 msgstr "Thông tin khác"
+
+#. module: account_accountant
+#: model:ir.model,name:account_accountant.model_ir_model
+msgid "Models"
+msgstr "Mô hình"
 
 #. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__res_company__deferred_expense_amount_computation_method__month
@@ -1633,6 +1758,13 @@ msgstr "Tên"
 #: model:ir.model.fields,field_description:account_accountant.field_bank_rec_widget_line__narration
 msgid "Narration"
 msgstr "Narration"
+
+#. module: account_accountant
+#: model_terms:ir.ui.view,arch_db:account_accountant.view_account_change_lock_date
+msgid "Need an irreversible lock to ensure inalterability, for all users?"
+msgstr ""
+"Bạn cần một khóa không thể đảo ngược để đảm bảo tính không thể thay đổi đối "
+"với tất cả người dùng?"
 
 #. module: account_accountant
 #. odoo-javascript
@@ -1672,7 +1804,7 @@ msgstr "Không khớp"
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_account_change_lock_date
 msgid "Not locked"
-msgstr ""
+msgstr "Không được khoá"
 
 #. module: account_accountant
 #. odoo-javascript
@@ -1739,13 +1871,13 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/account_accountant/static/src/components/move_line_list/move_line_list.xml:0
 msgid "Open attachment in pop out"
-msgstr ""
+msgstr "Mở tệp đính kèm trong cửa sổ bật lên"
 
 #. module: account_accountant
 #. odoo-python
 #: code:addons/account_accountant/models/bank_rec_widget.py:0
 msgid "Open balance of %(amount)s"
-msgstr ""
+msgstr "Số dư mở là %(amount)s"
 
 #. module: account_accountant
 #. odoo-python
@@ -1853,7 +1985,7 @@ msgstr "Khớp thanh toán"
 #. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__account_auto_reconcile_wizard__search_mode__one_to_one
 msgid "Perfect Match"
-msgstr ""
+msgstr "Khớp hoàn toàn"
 
 #. module: account_accountant
 #. odoo-python
@@ -1885,42 +2017,6 @@ msgid ""
 msgstr ""
 "Thiết lập trước để tạo các bút toán trong quá trình khớp hóa đơn và thanh "
 "toán"
-
-#. module: account_accountant
-#: model:ir.model.fields,help:account_accountant.field_account_change_lock_date__fiscalyear_lock_date
-msgid ""
-"Prevents Journal Entry creation or modification up to the defined date "
-"inclusive for all users. As a closed period, all accounting operations are "
-"prohibited."
-msgstr ""
-"Ngăn chặn việc tạo hoặc sửa đổi bút toán cho đến hết ngày được xác định cho "
-"tất cả người dùng. Là giai đoạn khoá sổ, nên mọi nghiệp vụ kế toán đều bị "
-"cấm."
-
-#. module: account_accountant
-#: model:ir.model.fields,help:account_accountant.field_account_change_lock_date__tax_lock_date
-msgid ""
-"Prevents Tax Returns modification up to the defined date inclusive (Journal "
-"Entries involving taxes). The Tax Return Lock Date is automatically set when"
-" the corresponding Journal Entry is posted."
-msgstr ""
-"Ngăn chặn việc sửa đổi Tờ khai thuế cho đến hết ngày được xác định (Các bút "
-"toán liên quan đến thuế). Ngày chốt tờ khai thuế được tự động thiết lập khi "
-"bút toán tương ứng được ghi sổ."
-
-#. module: account_accountant
-#: model:ir.model.fields,help:account_accountant.field_account_change_lock_date__purchase_lock_date
-msgid ""
-"Prevents creation and modification of entries in purchase journals up to the"
-" defined date inclusive"
-msgstr ""
-
-#. module: account_accountant
-#: model:ir.model.fields,help:account_accountant.field_account_change_lock_date__sale_lock_date
-msgid ""
-"Prevents creation and modification of entries in sales journals up to the "
-"defined date inclusive"
-msgstr ""
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_bank_statement__rating_ids
@@ -1973,7 +2069,7 @@ msgstr "Mẫu đối chiếu"
 #: model:ir.actions.act_window,name:account_accountant.action_open_auto_reconcile_wizard
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_account_auto_reconcile_wizard
 msgid "Reconcile automatically"
-msgstr ""
+msgstr "Đối chiếu tự động"
 
 #. module: account_accountant
 #: model:ir.model.fields,help:account_accountant.field_account_auto_reconcile_wizard__search_mode
@@ -1981,6 +2077,8 @@ msgid ""
 "Reconcile journal items with opposite balance or clear accounts with a zero "
 "balance"
 msgstr ""
+"Đối chiếu các hạng mục bút toán có số dư đối lập hoặc xóa những tài khoản có "
+"số dư bằng không"
 
 #. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__bank_rec_widget__state__reconciled
@@ -2006,7 +2104,7 @@ msgstr "Tham chiếu"
 #. odoo-javascript
 #: code:addons/account_accountant/static/src/components/bank_reconciliation/bank_rec_form.xml:0
 msgid "Reference"
-msgstr "Mã tham chiếu"
+msgstr "Tham chiếu"
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_move_form_inherit
@@ -2042,7 +2140,7 @@ msgstr "Hoàn lệnh việc phải làm"
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_account_change_lock_date
 msgid "Review"
-msgstr "Xem trước"
+msgstr "Rà soát"
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_account_change_lock_date
@@ -2100,20 +2198,37 @@ msgstr "Mẫu đối chiếu đã chọn"
 
 #. module: account_accountant
 #. odoo-javascript
+#: code:addons/account_accountant/static/src/js/tours/account_accountant.js:0
+msgid "Set an amount."
+msgstr "Đặt số tiền."
+
+#. module: account_accountant
+#. odoo-javascript
 #: code:addons/account_accountant/static/src/components/bank_reconciliation/bank_rec_form.xml:0
 msgid "Set as Checked"
 msgstr "Đặt là đã kiểm tra"
 
 #. module: account_accountant
+#. odoo-javascript
+#: code:addons/account_accountant/static/src/js/tours/account_accountant.js:0
+msgid "Set the payment reference."
+msgstr "Đặt tham chiếu thanh toán."
+
+#. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_change_lock_date__show_draft_entries_warning
 msgid "Show Draft Entries Warning"
-msgstr ""
+msgstr "Hiển thị cảnh báo bút toán nháp"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_bank_statement_line__show_signature_area
 #: model:ir.model.fields,field_description:account_accountant.field_account_move__show_signature_area
 msgid "Show Signature Area"
 msgstr "Hiện phần chữ ký"
+
+#. module: account_accountant
+#: model:ir.model.fields,field_description:account_accountant.field_res_config_settings__module_sign
+msgid "Sign"
+msgstr "Ký tên"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_bank_statement_line__signature
@@ -2178,6 +2293,11 @@ msgid "Source Debit"
 msgstr "Nợ gốc"
 
 #. module: account_accountant
+#: model:ir.model.fields,field_description:account_accountant.field_bank_rec_widget_line__source_rate
+msgid "Source Rate"
+msgstr "Tỷ lệ gốc"
+
+#. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_bank_rec_widget__st_line_id
 msgid "St Line"
 msgstr "Dòng sao kê"
@@ -2216,6 +2336,12 @@ msgid "Statement Line"
 msgstr "Dòng sao kê"
 
 #. module: account_accountant
+#. odoo-python
+#: code:addons/account_accountant/demo/account_accountant_demo.py:0
+msgid "Subscription 12 months"
+msgstr "Đăng ký 12 tháng"
+
+#. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_bank_rec_widget_line__suggestion_amount_currency
 msgid "Suggestion Amount Currency"
 msgstr "Tiền tệ số tiền gợi ý"
@@ -2236,6 +2362,7 @@ msgid "Suggestions"
 msgstr "Gợi ý"
 
 #. module: account_accountant
+#: model:ir.model,name:account_accountant.model_account_tax
 #: model:ir.model.fields,field_description:account_accountant.field_account_reconcile_wizard__tax_id
 #: model:ir.model.fields,field_description:account_accountant.field_bank_rec_widget_line__tax_ids
 msgid "Tax"
@@ -2287,8 +2414,8 @@ msgstr ""
 #. module: account_accountant
 #: model:ir.model.fields,help:account_accountant.field_bank_rec_widget_line__amount_transaction_currency
 msgid ""
-"The amount expressed in an optional other currency if it is a multi-currency"
-" entry."
+"The amount expressed in an optional other currency if it is a multi-currency "
+"entry."
 msgstr ""
 "Số tiền được biểu thị bằng đơn vị tiền tệ tùy chọn khác nếu nó là một bút "
 "toán đa tiền tệ."
@@ -2322,8 +2449,8 @@ msgid ""
 "The date you set violates the lock date of one of your entry. It will be "
 "overriden by the following date : %(replacement_date)s"
 msgstr ""
-"Ngày bạn thiết lập vi phạm ngày khóa sổ của một trong các bút toán. Ngày này"
-" sẽ được ghi đè bằng ngày: %(replacement_date)s"
+"Ngày bạn thiết lập vi phạm ngày khóa sổ của một trong các bút toán. Ngày này "
+"sẽ được ghi đè bằng ngày: %(replacement_date)s"
 
 #. module: account_accountant
 #: model:ir.model.fields,help:account_accountant.field_account_bank_statement_line__deferred_move_ids
@@ -2354,15 +2481,15 @@ msgid ""
 "The invoice %(display_name_html)s with an open amount of %(open_amount)s "
 "will be reduced by %(amount)s."
 msgstr ""
-"Hóa đơn %(display_name_html)s với số tiền mở là %(open_amount)s sẽ được giảm"
-" %(amount)s."
+"Hóa đơn %(display_name_html)s với số tiền mở là %(open_amount)s sẽ được giảm "
+"%(amount)s."
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.res_config_settings_view_form
 msgid ""
-"The invoices up to this date will not be taken into account as accounting "
+"The invoices before this date will not be taken into account as accounting "
 "entries"
-msgstr "Các hóa đơn tính đến ngày này sẽ không được tính là bút toán kế toán."
+msgstr "Các hóa đơn trước ngày này sẽ không được tính là bút toán kế toán."
 
 #. module: account_accountant
 #: model:ir.model.fields,help:account_accountant.field_bank_rec_widget_line__transaction_currency_id
@@ -2378,8 +2505,8 @@ msgstr "Hóa đơn gốc đã tạo ra bút toán hoãn lại"
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.res_config_settings_view_form
 msgid ""
-"The system will try to predict the product on vendor bill lines based on the"
-" label of the line"
+"The system will try to predict the product on vendor bill lines based on the "
+"label of the line"
 msgstr ""
 "Hệ thống sẽ cố gắng dự đoán sản phẩm trên dòng hóa đơn mua hàng dựa trên "
 "nhãn của dòng"
@@ -2390,6 +2517,8 @@ msgid ""
 "There are still draft entries in the period you want to lock.\n"
 "                                You should either post or delete them."
 msgstr ""
+"Vẫn còn bút toán nháp trong kỳ mà bạn muốn khoá sổ.\n"
+"Bạn nên vào sổ hoặc xóa chúng."
 
 #. module: account_accountant
 #. odoo-python
@@ -2398,8 +2527,18 @@ msgid ""
 "This bank transaction has been automatically validated using the "
 "reconciliation model '%s'."
 msgstr ""
-"Giao dịch ngân hàng này đã được xác thực tự động bằng mô hình đối chiếu "
-"'%s'."
+"Giao dịch ngân hàng này đã được xác thực tự động bằng mô hình đối chiếu '%s'."
+
+#. module: account_accountant
+#. odoo-python
+#: code:addons/account_accountant/models/bank_rec_widget.py:0
+msgid ""
+"This bank transaction is locked up tighter than a squirrel in a nut factory! "
+"You can't hit the reset button on it. So, do you want to \"unreconcile\" it "
+"instead?"
+msgstr ""
+"Giao dịch ngân hàng này bị khóa chặt như nêm! Bạn không thể nhấn nút đặt lại "
+"trên giao dịch đó, vậy bạn có muốn \"hủy đối chiếu\" nó không?"
 
 #. module: account_accountant
 #. odoo-python
@@ -2414,8 +2553,8 @@ msgid ""
 "This reconciliation model can't be used in the manual reconciliation widget "
 "because its configuration is not adapted"
 msgstr ""
-"Không thể sử dụng mẫu đối chiếu này trong tiện ích đối chiếu thủ công vì cấu"
-" hình của nó không thích hợp"
+"Không thể sử dụng mẫu đối chiếu này trong tiện ích đối chiếu thủ công vì cấu "
+"hình của nó không thích hợp"
 
 #. module: account_accountant
 #: model:digest.tip,name:account_accountant.digest_tip_account_accountant_0
@@ -2550,6 +2689,12 @@ msgid "View"
 msgstr "Chế độ xem"
 
 #. module: account_accountant
+#. odoo-python
+#: code:addons/account_accountant/models/bank_rec_widget.py:0
+msgid "View Reconciled Entries"
+msgstr "Xem bút toán đã đối chiếu"
+
+#. module: account_accountant
 #. odoo-javascript
 #: code:addons/account_accountant/static/src/components/bank_reconciliation/bank_rec_form.xml:0
 msgid "View models"
@@ -2568,7 +2713,7 @@ msgstr "Lịch sử trao đổi qua trang web"
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_account_move_line_reconcile_search
 msgid "With residual"
-msgstr ""
+msgstr "Có số tiền còn lại"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_bank_rec_widget_line__wizard_id
@@ -2612,10 +2757,16 @@ msgstr ""
 
 #. module: account_accountant
 #. odoo-python
+#: code:addons/account_accountant/models/bank_rec_widget.py:0
+msgid "You can't hit the reset button on a secured bank transaction."
+msgstr "Bạn không thể nhấn nút đặt lại trên giao dịch ngân hàng được bảo mật."
+
+#. module: account_accountant
+#. odoo-python
 #: code:addons/account_accountant/models/account_move.py:0
 msgid ""
-"You cannot change the account for a deferred line in %(move_name)s if it has"
-" already been deferred."
+"You cannot change the account for a deferred line in %(move_name)s if it has "
+"already been deferred."
 msgstr ""
 "Bạn không thể thay đổi tài khoản cho dòng hoãn lại trong %(move_name)s nếu "
 "nó đã được hoãn lại."
@@ -2625,23 +2776,21 @@ msgstr ""
 #: code:addons/account_accountant/models/account_move.py:0
 msgid "You cannot create a deferred entry with a start date but no end date."
 msgstr ""
-"Bạn không thể tạo một bút toán hoãn lại có ngày bắt đầu mà không có ngày kết"
-" thúc."
+"Bạn không thể tạo một bút toán hoãn lại có ngày bắt đầu mà không có ngày kết "
+"thúc."
 
 #. module: account_accountant
 #. odoo-python
 #: code:addons/account_accountant/models/account_move.py:0
 msgid ""
-"You cannot create a deferred entry with a start date later than the end "
-"date."
+"You cannot create a deferred entry with a start date later than the end date."
 msgstr ""
 "Bạn không thể tạo một bút toán hoãn lại có ngày bắt đầu sau ngày kết thúc."
 
 #. module: account_accountant
 #. odoo-python
 #: code:addons/account_accountant/models/account_move.py:0
-msgid ""
-"You cannot generate deferred entries for a miscellaneous journal entry."
+msgid "You cannot generate deferred entries for a miscellaneous journal entry."
 msgstr "Bạn không thể tạo bút toán hoãn lại cho bút toán về hoạt động khác."
 
 #. module: account_accountant
@@ -2664,13 +2813,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_accountant/wizard/account_change_lock_date.py:0
 msgid "You cannot set a Lock Date in the future."
-msgstr ""
+msgstr "Bạn không thể đặt Ngày khóa sổ trong tương lai."
 
 #. module: account_accountant
 #. odoo-python
 #: code:addons/account_accountant/models/bank_rec_widget_line.py:0
-msgid ""
-"You might want to %(btn_start)sfully reconcile%(btn_end)s the document."
+msgid "You might want to %(btn_start)sfully reconcile%(btn_end)s the document."
 msgstr "Bạn nên %(btn_start)s đối chiếu toàn bộ %(btn_end)s chứng từ."
 
 #. module: account_accountant
@@ -2679,8 +2827,7 @@ msgstr "Bạn nên %(btn_start)s đối chiếu toàn bộ %(btn_end)s chứng t
 msgid ""
 "You might want to make a %(btn_start)spartial reconciliation%(btn_end)s "
 "instead."
-msgstr ""
-"Thay vào đó, bạn nên tạo %(btn_start)s đối chiếu một phần %(btn_end)s."
+msgstr "Thay vào đó, bạn nên tạo %(btn_start)s đối chiếu một phần %(btn_end)s."
 
 #. module: account_accountant
 #. odoo-python
@@ -2694,20 +2841,19 @@ msgstr ""
 #: code:addons/account_accountant/models/bank_rec_widget_line.py:0
 msgid ""
 "You might want to set the invoice as %(btn_start)sfully paid%(btn_end)s."
-msgstr ""
-"Bạn nên đặt hoá đơn thành %(btn_start)s đã thanh toán hết %(btn_end)s."
+msgstr "Bạn nên đặt hoá đơn thành %(btn_start)s đã thanh toán hết %(btn_end)s."
 
 #. module: account_accountant
 #. odoo-python
 #: code:addons/account_accountant/wizard/account_change_lock_date.py:0
 msgid "You need to select a duration for the exception."
-msgstr ""
+msgstr "Bạn cần chọn thời hạn cho ngoại lệ."
 
 #. module: account_accountant
 #. odoo-python
 #: code:addons/account_accountant/wizard/account_change_lock_date.py:0
 msgid "You need to select who the exception applies to."
-msgstr ""
+msgstr "Bạn cần chọn người mà ngoại lệ này sẽ áp dụng cho."
 
 #. module: account_accountant
 #. odoo-javascript
@@ -2743,32 +2889,32 @@ msgstr "exchange_diff"
 #. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__account_change_lock_date__exception_duration__1h
 msgid "for 1 hour"
-msgstr ""
+msgstr "trong 1 giờ"
 
 #. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__account_change_lock_date__exception_duration__15min
 msgid "for 15 minutes"
-msgstr ""
+msgstr "trong 15 phút"
 
 #. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__account_change_lock_date__exception_duration__24h
 msgid "for 24 hours"
-msgstr ""
+msgstr "trong 24 giờ"
 
 #. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__account_change_lock_date__exception_duration__5min
 msgid "for 5 minutes"
-msgstr ""
+msgstr "trong 5 phút"
 
 #. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__account_change_lock_date__exception_applies_to__everyone
 msgid "for everyone"
-msgstr ""
+msgstr "đối với mọi người"
 
 #. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__account_change_lock_date__exception_applies_to__me
 msgid "for me"
-msgstr ""
+msgstr "đối với tôi"
 
 #. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__account_change_lock_date__exception_duration__forever

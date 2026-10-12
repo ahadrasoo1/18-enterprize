@@ -3,8 +3,9 @@
 from unittest.mock import patch
 
 import odoo
-from odoo import Command
+from odoo import Command, http
 from odoo.tests import Form, tagged
+from odoo.addons.stock_barcode.controllers.stock_barcode import StockBarcodeController
 from odoo.addons.stock_barcode.tests.test_barcode_client_action import TestBarcodeClientAction
 
 
@@ -118,19 +119,26 @@ class TestPickingBarcodeClientAction(TestBarcodeClientAction):
         the products (product1 and product2), scans a existing empty package to
         assign it as the result package, and finally scans the destination (shelf2).
         Checks the dest location is correctly set on the lines.
+
+        Additionally check that the package and owner are prefilled if unique.
         """
         self.clean_access_rights()
         grp_pack = self.env.ref('stock.group_tracking_lot')
+        grp_owner = self.env.ref('stock.group_tracking_owner')
         grp_multi_loc = self.env.ref('stock.group_stock_multi_locations')
-        self.env.user.write({'groups_id': [(4, grp_multi_loc.id, 0), (4, grp_pack.id, 0)]})
+        self.env.user.write({'groups_id': [(4, grp_multi_loc.id, 0), (4, grp_pack.id, 0), (4, grp_owner.id, 0)]})
         self.picking_type_internal.active = True
         # Creates a new package and add some quants.
         package2 = self.env['stock.quant.package'].create({'name': 'P00002'})
-        self.env['stock.quant']._update_available_quantity(self.product1, self.stock_location, 1, package_id=package2)
-        self.env['stock.quant']._update_available_quantity(self.product2, self.stock_location, 2, package_id=package2)
-        self.assertEqual(package2.location_id.id, self.stock_location.id)
+        self.env['stock.quant']._update_available_quantity(self.product1, self.stock_location, 2, package_id=package2)
+        self.env['stock.quant']._update_available_quantity(self.product2, self.stock_location, 3, package_id=package2)
+        self.assertEqual(package2.location_id, self.stock_location)
+        (self.product_tln_gtn8 | self.productlot1).tracking = 'none'
+        self.env['stock.quant']._update_available_quantity(self.product_tln_gtn8, self.stock_location, 2, owner_id=self.owner)
+        self.env['stock.quant']._update_available_quantity(self.productlot1, self.stock_location, 1, owner_id=self.owner)
+        self.env['stock.quant']._update_available_quantity(self.productlot1, self.stock_location, 2, owner_id=self.owner.copy())
 
-        self.start_tour("/odoo/barcode", 'test_internal_picking_from_scratch_with_package', login='admin', timeout=1800000)
+        self.start_tour("/odoo/barcode", 'test_internal_picking_from_scratch_with_package', login='admin')
 
         self.assertEqual(len(self.package.quant_ids), 2)
         self.assertEqual(self.package.location_id.id, self.shelf2.id)
@@ -143,6 +151,43 @@ class TestPickingBarcodeClientAction(TestBarcodeClientAction):
         self.assertRecordValues(package2.quant_ids, [
             {'product_id': self.product1.id, 'quantity': 1, 'location_id': self.shelf2.id},
             {'product_id': self.product2.id, 'quantity': 2, 'location_id': self.shelf2.id},
+        ])
+
+        self.assertRecordValues(self.product_tln_gtn8.stock_quant_ids, [
+            {'quantity': 1.0, 'location_id': self.stock_location.id, 'owner_id': self.owner.id},
+            {'quantity': 1.0, 'location_id': self.shelf2.id, 'owner_id': self.owner.id},
+        ])
+
+    def test_internal_pack_in_same_package(self):
+        """ Ensure we can reuse existing package with content as the result
+        package if this package is located in the destination location and
+        in another location than the source location."""
+        self.clean_access_rights()
+        grp_multi_loc = self.env.ref('stock.group_stock_multi_locations')
+        grp_pack = self.env.ref('stock.group_tracking_lot')
+        self.env.user.write({'groups_id': [Command.link(grp_multi_loc.id), Command.link(grp_pack.id)]})
+        # Enable 2-steps receiption so the receipt source location and
+        # destination location aren't the same.
+        warehouse = self.env.ref('stock.warehouse0')
+        warehouse.reception_steps = 'two_steps'
+        warehouse.int_type_id.active = True
+        # Adapt internal picking type to store from WH/Input to WH/Stock by default.
+        warehouse.int_type_id.default_location_src_id = warehouse.wh_input_stock_loc_id
+        # Create three packages and add quantity in the two first ones.
+        pack1, pack2, pack3 = self.env['stock.quant.package'].create([
+            {'name': f'pack{i}'} for i in (1, 2, 3)
+        ])
+        for (product, pack) in ((self.product1, pack1), (self.product2, pack2)):
+            self.env['stock.quant']._update_available_quantity(
+                product,
+                warehouse.wh_input_stock_loc_id,
+                1,
+                package_id=pack)
+
+        self.start_tour('/odoo/barcode', 'test_internal_pack_in_same_package', login='admin')
+        self.assertRecordValues(pack3.quant_ids.sorted(lambda q: q.product_id.id), [
+            {'product_id': self.product1.id, 'quantity': 1},
+            {'product_id': self.product2.id, 'quantity': 1},
         ])
 
     def test_internal_picking_reserved_1(self):
@@ -712,6 +757,21 @@ class TestPickingBarcodeClientAction(TestBarcodeClientAction):
         self.assertRecordValues(move.move_line_ids, [
             {'lot_id': sn.id, 'product_id': self.productlot1.id, 'quantity': 1, 'package_id': package2.id, 'result_package_id': False},
         ])
+
+    def test_delivery_pack_from_different_location(self):
+        """ Ensures that when lines from different source location are packed,
+        their source location is unchanged."""
+        self.clean_access_rights()
+        group_multi_loc = self.env.ref('stock.group_stock_multi_locations')
+        group_pack = self.env.ref('stock.group_tracking_lot')
+        self.env.user.write({'groups_id': [Command.link(group_multi_loc.id)]})
+        self.env.user.write({'groups_id': [Command.link(group_pack.id)]})
+        self.picking_type_out.restrict_scan_source_location = 'mandatory'
+        # Create an empty package (will be scanned during the tour.)
+        self.env['stock.quant.package'].create({
+            'name': 'pack-test',
+        })
+        self.start_tour('/odoo/barcode', 'test_delivery_pack_from_different_location', login='admin')
 
     def test_delivery_reserved_1(self):
         self.clean_access_rights()
@@ -1575,6 +1635,34 @@ class TestPickingBarcodeClientAction(TestBarcodeClientAction):
         self.start_tour(url, 'test_pack_multiple_location_03', login='admin', timeout=180)
         self.assertFalse(delivery_picking.move_line_ids.package_id)
 
+    def test_pack_source_location(self):
+        """ Put a package in shelf4. Then this test will scan
+        this package, the source location of line should be the same location of the package.
+        """
+        self.clean_access_rights()
+        grp_pack = self.env.ref('stock.group_tracking_lot')
+        grp_multi_loc = self.env.ref('stock.group_stock_multi_locations')
+        self.env.user.write({'groups_id': [Command.link(grp_pack.id), Command.link(grp_multi_loc.id)]})
+        self.picking_type_internal.active = True
+        self.picking_type_internal.show_entire_packs = False
+        action_id = self.env.ref('stock_barcode.stock_barcode_action_main_menu')
+        url = "/web#action=" + str(action_id.id)
+        # Creates a package with a quant in it.
+        pack1 = self.env['stock.quant.package'].create({
+            'name': 'PACK123666',
+        })
+        self.env['stock.quant']._update_available_quantity(
+            product_id=self.product1,
+            location_id=self.shelf4,
+            quantity=5,
+            package_id=pack1,
+        )
+
+        self.assertEqual(self.env['stock.quant']._get_available_quantity(self.product1, self.shelf4, package_id=pack1), 5)
+        self.start_tour(url, 'test_pack_source_location', login='admin', timeout=180)
+        self.assertEqual(self.env['stock.quant']._get_available_quantity(self.product1, self.shelf4, package_id=pack1), 0)
+        self.assertEqual(self.env['stock.quant']._get_available_quantity(self.product1, self.stock_location, package_id=pack1), 5)
+
     def test_put_in_pack_from_multiple_pages(self):
         """ In an internal picking where prod1 and prod2 are reserved in shelf1 and shelf2, processing
         all these products and then hitting put in pack should move them all in the new pack.
@@ -1928,45 +2016,54 @@ class TestPickingBarcodeClientAction(TestBarcodeClientAction):
         self.assertEqual(self.package.quant_ids.available_quantity, 2)
 
     def test_highlight_packs(self):
+        """ Ensures the right line is selected regarding the last scanned package. Also check a
+        barcode line is correctly unselected when a package line is selected and vice versa."""
         self.clean_access_rights()
-        grp_pack = self.env.ref('stock.group_tracking_lot')
-        self.env.user.write({'groups_id': [(4, grp_pack.id, 0)]})
+        self.env.user.write({'groups_id': [Command.link(self.ref('stock.group_tracking_lot'))]})
+        self.picking_type_out.show_entire_packs = True
 
-        pack1 = self.env['stock.quant.package'].create({
-            'name': 'PACK001',
+        pack1, pack2 = self.env['stock.quant.package'].create([{
+            'name': f'PACK00{i}',
+        } for i in (1, 2)])
+        product3 = self.env['product.product'].create({
+            'name': 'product3',
+            'is_storable': True,
+            'barcode': 'product3',
         })
-        pack2 = self.env['stock.quant.package'].create({
-            'name': 'PACK002',
-        })
-
+        self.env['stock.quant']._update_available_quantity(product3, self.stock_location, 1)
         self.env['stock.quant']._update_available_quantity(self.product1, self.stock_location, 4, package_id=pack1)
         self.env['stock.quant']._update_available_quantity(self.product2, self.stock_location, 4, package_id=pack1)
         self.env['stock.quant']._update_available_quantity(self.product1, self.stock_location, 2, package_id=pack2)
         self.env['stock.quant']._update_available_quantity(self.product2, self.stock_location, 2, package_id=pack2)
 
         out_picking = self.env['stock.picking'].create({
+            'name': 'Full Package Delivery',
             'location_id': self.stock_location.id,
             'location_dest_id': self.customer_location.id,
             'picking_type_id': self.picking_type_out.id,
             'state': 'draft',
-        })
-
-        self.picking_type_out.show_entire_packs = True
-
-        self.env['stock.package_level'].create({
-            'location_id': self.stock_location.id,
-            'location_dest_id': self.customer_location.id,
-            'package_id': pack1.id,
-            'is_done': False,
-            'picking_id': out_picking.id,
-            'company_id': self.env.company.id,
+            'move_ids': [Command.create({
+                'name': product3.name,
+                'location_id': self.stock_location.id,
+                'location_dest_id': self.customer_location.id,
+                'product_id': product3.id,
+                'product_uom': product3.uom_id.id,
+                'product_uom_qty': 1,
+            })],
+            'package_level_ids': [Command.create({
+                'location_id': self.stock_location.id,
+                'location_dest_id': self.customer_location.id,
+                'package_id': pack1.id,
+                'is_done': False,
+                'company_id': self.env.company.id,
+            })]
         })
 
         url = self._get_client_action_url(out_picking.id)
         out_picking.action_confirm()
         out_picking.action_assign()
 
-        self.start_tour(url, 'test_highlight_packs', login='admin', timeout=180)
+        self.start_tour(url, 'test_highlight_packs', login='admin')
 
     def test_picking_owner_scan_package(self):
         grp_owner = self.env.ref('stock.group_tracking_owner')
@@ -2064,6 +2161,7 @@ class TestPickingBarcodeClientAction(TestBarcodeClientAction):
         self.env.user.write({'groups_id': [(4, grp_lot.id, 0)]})
         grp_pack = self.env.ref('stock.group_tracking_lot')
         self.env.user.write({'groups_id': [(4, grp_pack.id, 0)]})
+        self.picking_type_in.barcode_validation_after_dest_location = True
         # Creates a product without barcode to check it will count even if not
         # scanned but processed through the button.
         product_without_barcode = self.env['product.product'].create({
@@ -2418,6 +2516,48 @@ class TestPickingBarcodeClientAction(TestBarcodeClientAction):
         # Opens the barcode main menu to be able to open the pickings by scanning their name.
         self.start_tour("/odoo/barcode", "test_scrap", login="admin", timeout=180)
 
+    def test_scrap_change_source_location(self):
+        self.clean_access_rights()
+        self.env.user.groups_id += self.env.ref('stock.group_stock_multi_locations')
+        self.product1.tracking = 'lot'
+        lot1 = self.env['stock.lot'].create({
+            'name': 'Lot1',
+            'product_id': self.product1.id,
+        })
+        self.env['stock.quant']._update_available_quantity(self.product1, self.shelf1, 25, lot_id=lot1)
+        picking = self.env['stock.picking'].create({
+            'name': self.product1.name,
+            'location_id': self.stock_location.id,
+            'location_dest_id': self.env.ref('stock.stock_location_output').id,
+            'picking_type_id': self.picking_type_internal.id,
+        })
+        self.env['stock.move'].create({
+            'name': self.product1.name,
+            'product_id': self.product1.id,
+            'lot_ids': [Command.set([lot1.id])],
+            'product_uom_qty': 10.00,
+            'quantity': 10.00,
+            'picking_id': picking.id,
+            'location_id': self.stock_location.id,
+            'location_dest_id': self.env.ref('stock.stock_location_output').id,
+        })
+        picking.action_confirm()
+        self.assertEqual(picking.move_ids.lot_ids, lot1)
+        url = self._get_client_action_url(picking.id)
+        self.start_tour(url, 'test_scrap_change_source_location', login='admin')
+        scrap_location = self.env['stock.location'].search([
+            ('scrap_location', '=', 'True'),
+            ('company_id', '=', self.env.company.id),
+        ])
+        self.assertRecordValues(
+            lot1.quant_ids,
+            [
+                {'location_id': self.shelf1.id, 'quantity': 0},
+                {'location_id': scrap_location.id, 'quantity': 15},
+                {'location_id': self.ref('stock.stock_location_output'), 'quantity': 10},
+            ]
+        )
+
     def test_show_entire_package(self):
         """ Enables 'Move Entire Packages' for delivery and then creates two deliveries:
           - One where we use package level;
@@ -2563,6 +2703,66 @@ class TestPickingBarcodeClientAction(TestBarcodeClientAction):
         delivery.action_confirm()
         delivery.action_assign()
         self.start_tour("/odoo/barcode", 'test_setting_barcode_allow_extra_product', login='admin', timeout=180)
+
+    def test_setting_barcode_allow_extra_product_with_packages(self):
+        """
+        Check that with allow extra products disabled, package scans containing extra
+        products are ignored, while scans of valid packages are still processed.
+
+        The test is performed with two deliveries: one in move entire package the other not.
+        """
+        self.clean_access_rights()
+        grp_pack = self.env.ref('stock.group_tracking_lot')
+        self.env.user.write({'groups_id': [Command.link(grp_pack.id)]})
+        # Disable "Allow Extra Products" setting
+        self.picking_type_out.barcode_allow_extra_product = False
+        picking_type_out_move_entire_package = self.picking_type_out.copy({'show_entire_packs': True})
+        self.env['stock.quant']._update_available_quantity(self.product1, self.stock_location, 10)
+        # PACK01-03: 10 x product1
+        # PACK04: 10 x product1 and 5 x product2
+        pack01, pack02, pack03, pack04 = self.env['stock.quant.package'].create([
+            {'name': f"PACK0{i + 1}"} for i in range(4)
+        ])
+        self.env['stock.quant']._update_available_quantity(self.product1, self.stock_location, 10, package_id=pack01)
+        self.env['stock.quant']._update_available_quantity(self.product1, self.stock_location, 10, package_id=pack02)
+        self.env['stock.quant']._update_available_quantity(self.product1, self.stock_location, 10, package_id=pack03)
+        self.env['stock.quant']._update_available_quantity(self.product1, self.stock_location, 10, package_id=pack04)
+        self.env['stock.quant']._update_available_quantity(self.product2, self.stock_location, 5, package_id=pack04)
+
+        deliveries = self.env['stock.picking'].create([
+            {
+                'name': 'SBAEPWP',
+                'location_id': self.stock_location.id,
+                'location_dest_id': self.customer_location.id,
+                'picking_type_id': self.picking_type_out.id,
+                'move_ids': [
+                    Command.create({
+                        'name': 'test_move',
+                        'location_id': self.stock_location.id,
+                        'location_dest_id': self.customer_location.id,
+                        'product_id': self.product1.id,
+                        'product_uom_qty': 5,
+                    }),
+                ],
+            },
+            {
+                'name': 'SBAEPWMEP',
+                'location_id': self.stock_location.id,
+                'location_dest_id': self.customer_location.id,
+                'picking_type_id': picking_type_out_move_entire_package.id,
+                'package_level_ids': [
+                    Command.create({
+                        'location_id': self.stock_location.id,
+                        'location_dest_id': self.customer_location.id,
+                        'package_id': pack02.id,
+                        'company_id': self.env.company.id,
+                    }),
+                ],
+            },
+        ])
+        deliveries.action_confirm()
+
+        self.start_tour('/odoo/barcode', 'test_setting_barcode_allow_extra_product_with_packages', login='admin')
 
     def test_split_line_reservation(self):
         """ Tests new lines created when a line is split to take
@@ -2736,12 +2936,92 @@ class TestPickingBarcodeClientAction(TestBarcodeClientAction):
         # - product1 line should not be split (completed line)
         # - product2 line should be split in two (2 qty picked, 2 qty left)
         # - product3 line should not be split (not picked at all)
-        self.assertEqual(len(delivery.move_ids), 4)
         self.assertRecordValues(delivery.move_ids, [
+            {'product_id': self.product1.id, 'quantity': 4, 'picked': True},
+            {'product_id': self.product2.id, 'quantity': 4, 'picked': True},
+            {'product_id': product3.id, 'quantity': 2, 'picked': False},
+        ])
+        self.assertRecordValues(delivery.move_line_ids, [
             {'product_id': self.product1.id, 'quantity': 4, 'picked': True},
             {'product_id': self.product2.id, 'quantity': 2, 'picked': True},
             {'product_id': product3.id, 'quantity': 2, 'picked': False},
             {'product_id': self.product2.id, 'quantity': 2, 'picked': False},
+        ])
+
+    def test_split_line_on_exit_for_delivery_with_lot(self):
+        """ Ensures that the total quantity handled by the splitted moves does
+        not exceed the initial demand in case another lot than the initially
+        reserved one is scanned from the barcode."""
+        self.clean_access_rights()
+
+        group_pack = self.env.ref('stock.group_production_lot')
+        self.env.user.write({'groups_id': [(4, group_pack.id, 0)]})
+        lots = self.env['stock.lot'].create([
+            {'name': 'LOT001', 'product_id': self.productlot1.id},
+            {'name': 'LOT002', 'product_id': self.productlot1.id},
+        ])
+        for lot in lots:
+            self.env['stock.quant']._update_available_quantity(self.productlot1, self.stock_location, 5, lot_id=lot)
+        # Creates a delivery for 3 x productlot1 initially reserved with LOT001
+        delivery = self.env['stock.picking'].create({
+            'name': "delivery_split_move_on_exit",
+            'location_id': self.stock_location.id,
+            'location_dest_id': self.customer_location.id,
+            'picking_type_id': self.picking_type_out.id,
+            'move_ids': [Command.create({
+                'location_id': self.stock_location.id,
+                'location_dest_id': self.customer_location.id,
+                'name': "productlot1 x3",
+                'product_id': self.productlot1.id,
+                'product_uom_qty': 3,
+            })]
+        })
+        delivery.action_confirm()
+        self.assertRecordValues(delivery.move_ids, [
+            {'product_uom_qty': 3.0, 'quantity': 3.0, 'picked': False, 'lot_ids': lots[0].ids }
+        ])
+        self.assertRecordValues(delivery.move_line_ids, [
+            {'quantity': 3.0, 'picked': False, 'lot_id': lots[0].id }
+        ])
+
+        action = self.env.ref('stock_barcode.stock_barcode_action_main_menu')
+        url = f"/web#action={action.id}"
+        self.start_tour(url, 'test_split_line_on_exit_for_delivery_with_lot', login='admin')
+        # Checks receipt moves values.
+        self.assertRecordValues(delivery.move_line_ids.sorted('quantity'), [
+            {'quantity': 1, 'picked': True, 'lot_id': lots[0].id},
+            {'quantity': 2, 'picked': True, 'lot_id': lots[1].id},
+        ])
+
+    def test_split_line_on_exit_for_receipt_with_grouped_lot(self):
+        """ Ensures that the total quantity handled by the splitted moves does
+        not exceed the initial demand in case the barcode lot lines are grouped.
+        """
+        self.clean_access_rights()
+        grouped_lot_group = self.env.ref('stock.group_production_lot')
+        self.env.user.write({'groups_id': [Command.link(grouped_lot_group.id)]})
+        # Creates a receipt for 3 x productlot1
+        receipt = self.env['stock.picking'].create({
+            'name': "SPLOEFRWGL",
+            'location_id': self.stock_location.id,
+            'location_dest_id': self.supplier_location.id,
+            'picking_type_id': self.picking_type_in.id,
+            'move_ids': [Command.create({
+                'location_id': self.supplier_location.id,
+                'location_dest_id': self.stock_location.id,
+                'name': "productlot1 x3",
+                'product_id': self.productlot1.id,
+                'product_uom_qty': 3,
+            })]
+        })
+        receipt.action_confirm()
+        self.assertRecordValues(receipt.move_ids, [
+            {'product_uom_qty': 3.0, 'quantity': 3.0, 'picked': False}
+        ])
+        self.start_tour('/odoo/barcode', 'test_split_line_on_exit_for_receipt_with_grouped_lot', login='admin')
+        # Checks receipt moves values.
+        self.assertRecordValues(receipt.move_ids, [
+            {'product_uom_qty': 3.0, 'quantity': 3.0, 'picked': True},
         ])
 
     def test_split_line_on_exit_for_receipt(self):
@@ -2783,9 +3063,14 @@ class TestPickingBarcodeClientAction(TestBarcodeClientAction):
         self.start_tour("odoo/barcode/", 'test_split_line_on_exit_for_receipt', login='admin')
         # Checks receipt moves values.
         self.assertRecordValues(receipt.move_ids, [
-            {'product_id': self.product1.id, 'quantity': 3, 'picked': True},
-            {'product_id': self.product2.id, 'quantity': 1, 'picked': True},
+            {'product_id': self.product1.id, 'quantity': 4, 'picked': True},
+            {'product_id': self.product2.id, 'quantity': 4, 'picked': True},
+        ])
+        self.assertRecordValues(receipt.move_ids.move_line_ids, [
+            {'product_id': self.product1.id, 'quantity': 2, 'picked': True},
             {'product_id': self.product1.id, 'quantity': 1, 'picked': False},
+            {'product_id': self.product1.id, 'quantity': 1, 'picked': True},
+            {'product_id': self.product2.id, 'quantity': 1, 'picked': True},
             {'product_id': self.product2.id, 'quantity': 3, 'picked': False},
         ])
 
@@ -2997,6 +3282,7 @@ class TestPickingBarcodeClientAction(TestBarcodeClientAction):
         This test ensures that products of the same lot can be
         packed in different packages.
         """
+        self.env.ref('base.group_user').implied_ids += self.env.ref('stock.group_production_lot')
         self.clean_access_rights()
         group_tracking = self.env.ref('stock.group_tracking_lot')
         self.env.user.write({'groups_id': [Command.link(group_tracking.id)]})
@@ -3048,6 +3334,398 @@ class TestPickingBarcodeClientAction(TestBarcodeClientAction):
             {'quantity': 1.0, 'lot_id': lot_2.id},
         ])
         self.assertEqual(len(delivery.move_line_ids.result_package_id), 4)
+
+    def test_barcode_picking_return(self):
+        """ create a return from a done picking """
+        self.clean_access_rights()
+
+        self.env['stock.quant']._update_available_quantity(self.product2, self.stock_location, 5)
+
+        delivery_form = Form(self.env['stock.picking'])
+        delivery_form.picking_type_id = self.picking_type_out
+        with delivery_form.move_ids_without_package.new() as move:
+            move.product_id = self.product2
+            move.product_uom_qty = 5
+        delivery = delivery_form.save()
+        delivery.action_confirm()
+        delivery.action_assign()
+        delivery.button_validate()
+
+        url = self._get_client_action_url(delivery.id)
+        self.start_tour(url, 'test_barcode_picking_return', login='admin', timeout=180)
+
+    def test_scan_location_destination_for_internal_transfers(self):
+        """
+        This test ensures that destination location scan is taken into
+        account when proposed by the UI.
+        """
+        self.clean_access_rights()
+        grp_multi_loc = self.env.ref('stock.group_stock_multi_locations')
+        self.env.user.write({'groups_id': [Command.link(grp_multi_loc.id)]})
+        self.picking_type_internal.active = True
+
+        # Create a sibling stock location to use a destination
+        location_dest = self.env['stock.location'].create({
+            'name': "Lovely Location",
+            'location_id': self.stock_location.location_id.id,
+            'barcode': 'WH-LOVE',
+        })
+        self.product1.name = "Lovely Product"
+        action_id = self.env.ref('stock_barcode.stock_barcode_action_main_menu')
+        url = "/web#action=" + str(action_id.id)
+        self.start_tour(url, 'test_scan_location_destination_for_internal_transfers', login='admin', timeout=180)
+        internal_transfer = self.env['stock.picking'].search([('picking_type_id', '=', self.picking_type_internal.id)], limit=1)
+        self.assertRecordValues(internal_transfer.move_ids.move_line_ids, [{
+            "product_id": self.product1.id,
+            "location_dest_id": location_dest.id,
+        }])
+
+    def test_scan_product_when_in_form_view(self):
+        """ Ensure nothing happens when in `stock.move.line` for view."""
+        self.clean_access_rights()
+        grp_multi_loc = self.env.ref('stock.group_stock_multi_locations')
+        self.env.user.write({'groups_id': [Command.link(grp_multi_loc.id)]})
+        self.picking_type_internal.active = True
+        self.start_tour('/odoo/barcode', 'test_scan_product_when_in_form_view', login='admin')
+
+    def test_split_uncomplete_moves_on_exit(self):
+        """
+        Check that the uncompleted moves are splitted in the backend when you exit
+        the barcode, so that the demand of the picking is correctly displayed the
+        next time you open the record.
+
+        The flow slightly change with mto moves: both mts and mto procure methods are tested here
+        """
+        self.clean_access_rights()
+        grp_multi_loc = self.env.ref('stock.group_stock_multi_locations')
+        self.env.user.write({'groups_id': [Command.link(grp_multi_loc.id)]})
+        procurement_group = self.env['procurement.group'].create({
+            'name': 'custom procurement',
+        })
+        warehouse = self.picking_type_out.warehouse_id
+        mto_product = self.product1
+        self.env['stock.quant']._update_available_quantity(mto_product, warehouse.lot_stock_id, 4)
+        warehouse.delivery_steps = 'pick_ship'
+        final_destination = self.env.ref('stock.stock_location_customers')
+        origin = 'custom origin'
+        self.env['procurement.group'].run([
+            self.env['procurement.group'].Procurement(mto_product, 4.0, mto_product.uom_id, final_destination, mto_product.name, origin,
+                self.picking_type_out.company_id, {'warehouse_id': warehouse, 'group_id': procurement_group})
+        ])
+        pick = self.env['stock.picking'].search([('group_id', '=', procurement_group.id)], limit=1)
+        pick.button_validate()
+        ship = self.env['stock.picking'].search([('group_id', '=', procurement_group.id)], limit=2) - pick
+        mts_product = self.product2
+        self.env['stock.quant']._update_available_quantity(mts_product, ship.location_id, 5)
+        self.env['stock.move'].create({
+            'name': mts_product.name,
+            'product_id': mts_product.id,
+            'product_uom_qty': 5,
+            'product_uom': mts_product.uom_id.id,
+            'picking_id': ship.id,
+            'location_id': ship.location_id.id,
+            'location_dest_id': ship.location_dest_id.id,
+        })
+        ship.action_assign()
+        self.assertRecordValues(ship.move_ids.sorted('quantity'), [
+            {'quantity': 4.0, 'picked': False, 'procure_method': 'make_to_order'},
+            {'quantity': 5.0, 'picked': False, 'procure_method': 'make_to_stock'},
+            ])
+        url = self._get_client_action_url(ship.id)
+        self.start_tour(url, 'test_split_uncomplete_moves_on_exit', login='admin', timeout=180)
+        self.assertRecordValues(ship.move_ids.sorted('quantity'), [
+            {"product_id": mto_product.id, "quantity": 4.0, "picked": True},
+            {"product_id": mts_product.id, "quantity": 5.0, "picked": True},
+        ])
+        self.assertRecordValues(ship.move_line_ids.filtered(lambda m: m.product_id == mto_product).sorted('quantity'), [
+            {"quantity": 1.0, "picked": True},
+            {"quantity": 3.0, "picked": False},
+        ])
+        self.assertRecordValues(ship.move_line_ids.filtered(lambda m: m.product_id == mts_product).sorted('quantity'), [
+            {"quantity": 1.0, "picked": True},
+            {"quantity": 4.0, "picked": False},
+        ])
+
+    def test_split_uncomplete_manually_assigned_moves_on_exit(self):
+        """
+        Check that the uncompleted moves are splitted in the backend when you exit
+        the barcode, so that the demand of the picking is correctly displayed the
+        next time you open the record.
+        """
+        self.clean_access_rights()
+        grp_multi_loc = self.env.ref('stock.group_stock_multi_locations')
+        self.env.user.write({'groups_id': [Command.link(grp_multi_loc.id)]})
+        # Avoid picking reservation at confirm
+        self.picking_type_out.write({
+            'reservation_method': 'manual',
+            'restrict_scan_source_location': 'no',
+        })
+        self.env['stock.quant']._update_available_quantity(self.product1, self.stock_location, 5)
+        delivery = self.env['stock.picking'].create({
+            'name': "SUMAMOE",
+            'location_id': self.stock_location.id,
+            'location_dest_id': self.customer_location.id,
+            'picking_type_id': self.picking_type_out.id,
+            'move_ids': [Command.create({
+                'name': 'Lovely move',
+                'location_id': self.stock_location.id,
+                'location_dest_id': self.customer_location.id,
+                'product_id': self.product1.id,
+                'product_uom': self.product1.uom_id.id,
+                'product_uom_qty': 3,
+            })],
+        })
+        delivery.action_confirm()
+        delivery.action_assign()
+        url = self._get_client_action_url(delivery.id)
+        self.start_tour(url, 'test_split_uncomplete_manually_assigned_moves_on_exit', login='admin')
+        self.assertRecordValues(delivery.move_ids, [
+            {"quantity": 3.0, "picked": True},
+        ])
+        self.assertRecordValues(delivery.move_line_ids.sorted('quantity'), [
+            {"quantity": 1.0, "picked": True},
+            {"quantity": 2.0, "picked": False},
+        ])
+
+    def test_split_uncomplete_moves_on_exit_with_neutral_changes(self):
+        """
+        Check that the post barcode process does change the state of the record if
+        neutral actions were performed such as adding and removing products to the
+        delivery.
+        """
+
+        self.clean_access_rights()
+        self.env.user.write({'groups_id': [Command.link(self.ref('stock.group_production_lot'))]})
+        self.picking_type_out.show_reserved_sns = True
+
+        lots = self.env['stock.lot'].create([
+            {'name': 'LN001', 'product_id': self.productlot1.id},
+            {'name': 'LN002', 'product_id': self.productlot1.id},
+        ])
+        for lot in lots:
+            self.env['stock.quant']._update_available_quantity(self.productlot1, self.stock_location, 2, lot_id=lot)
+        # Creates a delivery for 2 x productlot1 initially reserved with SN001 and SN002
+        delivery = self.env['stock.picking'].create({
+            'name': "SUMOEWNC",
+            'location_id': self.stock_location.id,
+            'location_dest_id': self.customer_location.id,
+            'picking_type_id': self.picking_type_out.id,
+            'move_ids': [Command.create({
+                'location_id': self.stock_location.id,
+                'location_dest_id': self.customer_location.id,
+                'name': "productlot1 x2",
+                'product_id': self.productlot1.id,
+                'product_uom_qty': 4,
+            })]
+        })
+        delivery.action_confirm()
+        self.assertRecordValues(delivery.move_ids, [
+            {'product_uom_qty': 4.0, 'quantity': 4.0, 'picked': False, 'lot_ids': lots.ids},
+        ])
+        self.assertRecordValues(delivery.move_line_ids, [
+            {'quantity': 2.0, 'picked': False, 'lot_id': lots[0].id},
+            {'quantity': 2.0, 'picked': False, 'lot_id': lots[1].id},
+        ])
+
+        action = self.env.ref('stock_barcode.stock_barcode_action_main_menu')
+        url = f"/web#action={action.id}"
+        self.start_tour(url, 'test_split_uncomplete_moves_on_exit_with_neutral_changes', login='admin')
+        # Checks the reservation state is equivalent
+        self.assertRecordValues(delivery.move_ids, [
+            {'product_uom_qty': 4.0, 'quantity': 4.0, 'picked': False, 'lot_ids': lots.ids},
+        ])
+        self.assertRecordValues(delivery.move_line_ids, [
+            {'quantity': 2.0, 'picked': False, 'lot_id': lots[1].id},
+            {'quantity': 2.0, 'picked': False, 'lot_id': lots[0].id},
+        ])
+
+    def test_barcode_create_serials_in_batch_with_single_scan(self):
+        """ Check that it is possible to generate 1000 serial numbers with a signle scan."""
+        self.env.ref('base.group_user').implied_ids += self.env.ref('stock.group_production_lot')
+        self.clean_access_rights()
+        group_tracking = self.env.ref('stock.group_tracking_lot')
+        self.env.user.write({'groups_id': [Command.link(group_tracking.id)]})
+        # Enable "Show reserved lots/SN"
+        self.picking_type_out.write({
+            'show_reserved_sns': True,
+            'restrict_scan_source_location': 'no',
+            'use_create_lots': True,
+        })
+
+        # Patch controller method to be able to count amount of calls.
+        self1 = self
+        get_specific_barcode_data_orig = StockBarcodeController.get_specific_barcode_data
+        @http.route('/stock_barcode/get_specific_barcode_data', type='json', auth='user')
+        def mocked_data_batch_method(self, **kwargs):
+            if self1.call_count == 0:
+                self1.assertTrue('barcodes_by_model' in kwargs)
+                self1.assertFalse('barcodes' in kwargs)
+            elif self1.call_count == 1:
+                self1.assertFalse('barcodes_by_model' in kwargs)
+                self1.assertTrue('barcodes' in kwargs)
+            self1.call_count += 1
+            return get_specific_barcode_data_orig(self, **kwargs)
+
+        self.env['stock.quant']._update_available_quantity(self.productlot1, self.stock_location, 1500)
+        delivery = self.env['stock.picking'].create({
+            'name': "Lovely delivery",
+            'location_id': self.stock_location.id,
+            'location_dest_id': self.customer_location.id,
+            'picking_type_id': self.picking_type_out.id,
+            'move_ids': [Command.create({
+                'name': 'Lovely move',
+                'location_id': self.stock_location.id,
+                'location_dest_id': self.customer_location.id,
+                'product_id': self.productlot1.id,
+                'product_uom': self.productlot1.uom_id.id,
+                'product_uom_qty': 1000,
+            })],
+        })
+        delivery.action_confirm()
+        self.assertFalse(delivery.move_line_ids.lot_id)
+        url = self._get_client_action_url(delivery.id)
+        with patch.object(
+            StockBarcodeController,
+            'get_specific_barcode_data',
+            mocked_data_batch_method
+        ):
+            self.start_tour(url, 'test_barcode_create_serials_in_batch_with_single_scan', login='admin')
+            self.assertEqual(self.call_count, 2)
+
+    def test_barcode_lazy_cache_scan_two_lots(self):
+        """ Checks that you can scan 2 lots without the OWL error 'quantsByLocation is not iterable' """
+        group_tracking = self.env.ref('stock.group_tracking_owner')
+        self.env.user.write({'groups_id': [Command.link(group_tracking.id)]})
+        self.picking_type_in.write({'use_existing_lots': True})
+
+        sn1, _ = self.env['stock.lot'].create([
+            {'name': 'SN-001', 'product_id': self.productlot1.id},
+            {'name': 'SN-002', 'product_id': self.productlot1.id},
+        ])
+        self.env['stock.quant']._update_available_quantity(self.productlot1, self.stock_location, 1, lot_id=sn1)
+
+        receipt = self.env['stock.picking'].create({
+            'name': "Lovely Receipt",
+            'location_id': self.supplier_location.id,
+            'location_dest_id': self.stock_location.id,
+            'picking_type_id': self.picking_type_in.id,
+            'move_ids': [Command.create({
+                'name': 'Lovely move',
+                'location_id': self.supplier_location.id,
+                'location_dest_id': self.stock_location.id,
+                'product_id': self.productlot1.id,
+                'product_uom': self.productlot1.uom_id.id,
+                'product_uom_qty': 10,
+            })],
+        })
+        receipt.action_confirm()
+        url = self._get_client_action_url(receipt.id)
+        self.start_tour(url, 'test_barcode_lazy_cache_scan_two_lots', login='admin')
+
+    def test_fetch_archived_records_in_lazy_barcode_cache(self):
+        """
+        Check that a picking related to archived records can be processed in barcode
+        in the same way as it can be in backend.
+        """
+        self.clean_access_rights()
+        grp_multi_loc = self.env.ref('stock.group_stock_multi_locations')
+        self.env.user.write({'groups_id': [Command.link(grp_multi_loc.id)]})
+        warehouse = self.shelf2.warehouse_id
+        self.env['stock.quant']._update_available_quantity(self.product1, self.shelf1, 10)
+        floor_location = self.env['stock.location'].create({
+            'name': 'floor1',
+            'usage': 'internal',
+            'location_id': self.shelf2.id,
+        })
+        transfer = self.env['stock.picking'].create({
+            'name': 'Lovely Transfer',
+            'location_id': self.shelf1.id,
+            'location_dest_id': self.shelf2.id,
+            'picking_type_id': warehouse.int_type_id.id,
+            'move_ids': [Command.create({
+                'name': 'Lovely move',
+                'location_id': self.shelf1.id,
+                'location_dest_id': floor_location.id,
+                'product_id': self.product1.id,
+                'product_uom_qty': 3,
+            })],
+        })
+        transfer.action_confirm()
+        self.shelf2.toggle_active()
+        self.assertFalse(self.shelf2.active)
+        url = self._get_client_action_url(transfer.id)
+        self.start_tour(url, 'test_fetch_archived_records_in_lazy_barcode_cache', login='admin')
+        self.assertEqual(transfer.state, 'done')
+
+    def test_validate_uncomplete_return(self):
+        """ Ensures we can validate a return created in the Barcode app without any issue.
+        """
+        self.clean_access_rights()
+        self.env['stock.picking'].create({
+            'name': 'TEST/IN/0001',
+            'location_id': self.supplier_location.id,
+            'location_dest_id': self.stock_location.id,
+            'picking_type_id': self.picking_type_in.id,
+            'move_ids': [Command.create({
+                'name': 'test_receipt_1',
+                'location_id': self.supplier_location.id,
+                'location_dest_id': self.stock_location.id,
+                'product_id': self.product1.id,
+                'product_uom': self.product1.uom_id.id,
+                'product_uom_qty': 2,
+            })]
+        }).action_confirm()
+        self.start_tour('/odoo/barcode', 'test_validate_uncomplete_return', login='admin')
+
+    def test_remove_sublines_and_scan_serial_again(self):
+        self.clean_access_rights()
+        grp_lot = self.env.ref('stock.group_production_lot')
+        self.env.user.write({'groups_id': [Command.link(grp_lot.id)]})
+        picking = self.env['stock.picking'].create({
+            'picking_type_id': self.picking_type_in.id,
+            'move_ids': [
+                Command.create({
+                    'name': '/',
+                    'product_id': self.productserial1.id,
+                    'product_uom_qty': 3,
+                })
+            ],
+        })
+        picking.action_assign()
+        url = self._get_client_action_url(picking.id)
+        self.start_tour(url, 'test_remove_sublines_and_scan_serial_again', login='admin')
+
+    def test_split_line_preserve_package(self):
+        """
+        This test ensures that move lines, when assigned a new destination
+        while scanning, properly preserve package source info after scanning
+        a package destination when the move line moves partial quantity
+        """
+        self.clean_access_rights()
+        grp_pack = self.env.ref('stock.group_tracking_lot')
+        grp_multi_loc = self.env.ref('stock.group_stock_multi_locations')
+        self.env.user.write({'groups_id': [Command.link(grp_pack.id), Command.link(grp_multi_loc.id)]})
+        self.picking_type_out.restrict_scan_source_location = 'no'
+
+        # Create two empty packs
+        pack1, pack2 = self.env['stock.quant.package'].create({
+            'name': name,
+        } for name in ['THEPACK1', 'THEPACK2'])
+
+        self.env['stock.quant']._update_available_quantity(self.product1, self.stock_location, quantity=100, package_id=pack1)
+        delivery_form = Form(self.env['stock.picking'])
+        delivery_form.picking_type_id = self.picking_type_out
+        with delivery_form.move_ids_without_package.new() as move:
+            move.product_id = self.product1
+            move.product_uom_qty = 50
+        delivery_with_move = delivery_form.save()
+        delivery_with_move.action_confirm()
+        delivery_with_move.action_assign()
+        url = self._get_client_action_url(delivery_with_move.id)
+        self.start_tour(url, 'test_split_line_preserve_package', login='admin')
+        self.assertEqual(delivery_with_move.move_line_ids[0].package_id, pack1)
+        self.assertEqual(delivery_with_move.move_line_ids[1].result_package_id, pack2)
+        self.assertEqual(delivery_with_move.move_line_ids[1].package_id, pack1)
 
     # === GS1 TESTS ===#
     def test_gs1_delivery_ambiguous_lot_number(self):
@@ -3534,6 +4212,24 @@ class TestPickingBarcodeClientAction(TestBarcodeClientAction):
             {'quantity': 6, 'lot_id': lot.id, 'location_id': self.stock_location.id, 'location_dest_id': self.customer_location.id},
         ])
 
+    def test_gs1_multi_company_setup(self):
+        """
+        Check that the nomenclature used on the barcode main menu is the nomenclature
+        of the contextually selected company rather than the user company.
+        """
+        self.clean_access_rights()
+        self.env.user.groups_id += self.env.ref('stock.group_stock_multi_locations')
+        company = self.env['res.company'].create({
+            'name': 'Lovely Company',
+            'nomenclature_id': self.ref('barcodes_gs1_nomenclature.default_gs1_nomenclature'),
+        })
+        warehouse = self.env['stock.warehouse'].search([('company_id', '=', company.id)])
+        warehouse.reception_steps = 'two_steps'
+        warehouse.wh_input_stock_loc_id.barcode = '3033710074365'
+        self.product1.barcode = '36939282410106'
+        self.env['stock.quant'].with_company(company.id)._update_available_quantity(self.product1, warehouse.lot_stock_id, 3.0)
+        self.start_tour('/odoo', 'test_gs1_multi_company_setup', login='admin')
+
     def test_serial_product_packaging(self):
         """ This test ensures that correct packaging lines generated
         for serial product in operations.
@@ -3631,6 +4327,30 @@ class TestPickingBarcodeClientAction(TestBarcodeClientAction):
             {'product_id': self.product2.id, 'quantity': 3, 'location_id': self.shelf4.id},
         ])
 
+    def test_scan_package_with_decimal(self):
+        """This is a test to avoid the rounding issue on javascript when scanning a package
+        that has more quantity than the required quantity on line"""
+        self.clean_access_rights()
+        grp_pack = self.env.ref('stock.group_tracking_lot')
+        self.env.user.write({'groups_id': [Command.link(grp_pack.id)]})
+        self.product1.uom_id = self.env.ref('uom.product_uom_kgm')
+        self.picking_type_out.restrict_scan_source_location = 'no'
+        self.env['stock.quant']._update_available_quantity(self.product1, self.stock_location, 275.84, package_id=self.package)
+        delivery_form = Form(self.env['stock.picking'])
+        delivery_form.picking_type_id = self.picking_type_out
+        with delivery_form.move_ids_without_package.new() as move:
+            move.product_id = self.product1
+            move.product_uom_qty = 3.6
+        delivery_picking = delivery_form.save()
+        delivery_picking.action_confirm()
+        delivery_picking.action_assign()
+        url = self._get_client_action_url(delivery_picking.id)
+        self.start_tour(url, 'test_scan_package_with_decimal', login='admin', timeout=180)
+        self.assertRecordValues(delivery_picking.move_line_ids, [
+            {"product_id": self.product1.id, "quantity": 3.6, "location_dest_id": delivery_picking.location_dest_id.id, "picked": True},
+            {"product_id": self.product1.id, "quantity": 272.24, "location_dest_id": delivery_picking.location_dest_id.id, "picked": True}
+        ])
+
     def test_barcode_signature_flow(self):
         """
         1. Create two new delivery pickings to test two different signing flows
@@ -3679,3 +4399,303 @@ class TestPickingBarcodeClientAction(TestBarcodeClientAction):
         self.assertTrue(delivery2.signature)
         self.assertEqual(delivery1.state, 'done')
         self.assertEqual(delivery2.state, 'done')
+
+    def test_select_with_same_product_and_lot(self):
+        self.clean_access_rights()
+        grp_lot = self.env.ref('stock.group_production_lot')
+        self.env.user.write({'groups_id': [Command.link(grp_lot.id)]})
+        pg = self.env['procurement.group'].create({'name': 'ProcurementGroup'})
+        lot_xyz = self.env['stock.lot'].create({'name': 'lot_xyz', 'product_id': self.productlot1.id, 'company_id': self.env.company.id})
+        self.env['stock.quant']._update_available_quantity(self.productlot1, self.stock_location, 4, lot_id=lot_xyz)
+        self.picking_type_out.show_reserved_sns = True
+        delivery_picking = self.env['stock.picking'].create({
+            'location_id': self.stock_location.id,
+            'location_dest_id': self.customer_location.id,
+            'picking_type_id': self.picking_type_out.id,
+            'group_id': pg.id,
+        })
+        self.env['stock.move'].create({
+            'name': 'test_delivery_lot_xyz_1',
+            'location_id': self.stock_location.id,
+            'location_dest_id': self.customer_location.id,
+            'product_id': self.productlot1.id,
+            'product_uom': self.uom_unit.id,
+            'product_uom_qty': 2,
+            'picking_id': delivery_picking.id,
+            'group_id': pg.id,
+        })
+        delivery_picking.action_confirm()
+        second_move = self.env['stock.move'].create({
+            'name': 'test_delivery_lot_xyz_2',
+            'location_id': self.stock_location.id,
+            'location_dest_id': self.customer_location.id,
+            'product_id': self.productlot1.id,
+            'product_uom': self.uom_unit.id,
+            'quantity': 2,
+            'picking_id': delivery_picking.id,
+            'group_id': pg.id,
+        })
+        second_move.move_line_ids.lot_id = lot_xyz
+        self.assertEqual(len(delivery_picking.move_ids), 2)
+        url = self._get_client_action_url(delivery_picking.id)
+        self.start_tour(url, 'test_select_with_same_product_and_lot', login='admin', timeout=180)
+
+    def test_description_picking_tour(self):
+        """ Test that when creating a receipt or internal transfer using the barcode app, the
+        description_picking field of the move_line is not empty
+        """
+        self.clean_access_rights()
+        product = self.env['product.product'].create({
+            'name': 'test_product',
+            'description_pickingin': 'receipt',
+            'barcode': 'test_product',
+        })
+        action_id = self.env.ref('stock_barcode.stock_barcode_action_main_menu')
+        url = "/web#action=" + str(action_id.id)
+        self.start_tour(url, 'test_description_picking_tour', login='admin', timeout=180)
+        picking = self.env['stock.picking'].search([('move_ids.product_id.id', '=', product.id), ('state', '=', 'done')])
+
+        self.assertEqual(picking.move_ids.description_picking, 'receipt')
+
+    def test_qty_after_uom_update_picking_tour(self):
+        """Test that when creating a receipt and updting the uom using the barcode app, the
+        quantity demand of the move_line is correctly updated according to the uom.
+        """
+        self.env.user.groups_id += self.env.ref('uom.group_uom')
+        product = self.env['product.product'].create({
+            'name': 'test_product_uom_update',
+            'barcode': 'test_product_uom_update',
+        })
+        partner = self.env['res.partner'].create({'name': 'test_product_uom_partner'})
+        receipt = self.env['stock.picking'].create({
+            'partner_id': partner.id,
+            'location_id': self.customer_location.id,
+            'location_dest_id': self.stock_location.id,
+            'picking_type_id': self.picking_type_in.id,
+        })
+        self.env['stock.move'].create({
+            'name': product.name,
+            'product_id': product.id,
+            'product_uom_qty': 120,
+            'product_uom': product.uom_id.id,
+            'picking_id': receipt.id,
+            'location_id': self.customer_location.id,
+            'location_dest_id': self.stock_location.id,
+        })
+        receipt.action_confirm()
+        action_id = self.env.ref('stock_barcode.stock_barcode_action_main_menu')
+        url = "/web#action=" + str(action_id.id)
+        self.start_tour(url, 'test_uom_update_picking_tour', login='admin', timeout=180)
+
+    def test_no_validate_no_dest_package(self):
+        """Ensures that the user can't validate an operation if scanning a destination
+        is mandatory for each scanned product and no destination was scanned."""
+        self.clean_access_rights()
+        grp_multi_loc = self.env.ref('stock.group_stock_multi_locations')
+        grp_pack = self.env.ref('stock.group_tracking_lot')
+        self.env.user.groups_id += grp_pack | grp_multi_loc
+        self.picking_type_internal.write({
+            'restrict_scan_source_location': 'mandatory',
+            'restrict_scan_dest_location': 'mandatory',
+            'active': True,
+        })
+        pack1 = self.env['stock.quant.package'].create({
+            'name': 'Pack1',
+        })
+        self.env['stock.quant']._update_available_quantity(self.product2, self.stock_location, 5, package_id=pack1)
+        self.start_tour('/odoo/barcode', 'test_no_validate_no_dest_package', login='admin')
+
+    def test_scan_package_with_different_uom(self):
+        self.clean_access_rights()
+        grp_pack = self.env.ref('stock.group_tracking_lot')
+        self.env.user.write({'groups_id': [(4, grp_pack.id, 0)]})
+        self.product1.uom_id = self.env.ref('uom.product_uom_kgm')
+        package1 = self.env['stock.quant.package'].create({'name': 'package001'})
+        self.env['stock.quant']._update_available_quantity(self.product1, self.stock_location, 10, package_id=package1)
+        picking = self.env['stock.picking'].create({
+            'name': 'test picking',
+            'picking_type_id': self.picking_type_internal.id,
+            'location_id': self.stock_location.id,
+            'location_dest_id': self.stock_location.id,
+            'move_ids': [Command.create({
+                'name': 'test move name',
+                'product_id': self.product1.id,
+                'product_uom': self.env.ref('uom.product_uom_gram').id,
+                'product_uom_qty': 10000,
+                'location_id': self.stock_location.id,
+                'location_dest_id': self.stock_location.id,
+            })],
+        })
+        picking.action_confirm()
+        picking.action_assign()
+        url = self._get_client_action_url(picking.id)
+        self.start_tour(url, 'test_scan_package_with_different_uom', login='admin', timeout=180)
+
+    def test_stock_quant_ids_computed_by_product_update(self):
+        """
+        Verify that the computed field `product_stock_quant_ids` on `move_line_ids`
+        is correctly updated when product_id is set
+        """
+        self.env['stock.quant'].create({
+            'product_id': self.product1.id,
+            'location_id': self.stock_location.id,
+            'quantity': 10
+        })
+        internal_picking = self.env['stock.picking'].create({
+            'location_id': self.stock_location.id,
+            'location_dest_id': self.stock_location.id,
+            'picking_type_id': self.picking_type_internal.id,
+            'move_ids': [Command.create({
+                'name': 'internal_move',
+                'location_id': self.stock_location.id,
+                'product_id': self.product1.id,
+                'location_dest_id': self.stock_location.id,
+                'product_uom': self.uom_unit.id,
+                'product_uom_qty': 1,
+            })]
+        })
+        internal_picking.action_confirm()
+        self.assertEqual(internal_picking.move_ids.move_line_ids.product_stock_quant_ids.quantity, 10.0)
+
+    def test_quantity_distribution_sublines_same_lot(self):
+        """Test that when two lines with the same lot are grouped in barcode,
+        the quantities are split correctly between the lines when scanning two
+        times the lot.
+        """
+        self.clean_access_rights()
+        grp_lot = self.env.ref('stock.group_production_lot')
+        self.env.user.write({'groups_id': [(4, grp_lot.id, 0)]})
+        lot_1 = self.env['stock.lot'].create({'name': 'lot 1', 'product_id': self.productlot1.id, 'company_id': self.env.company.id})
+        self.env['stock.quant'].create([
+            {
+                'product_id': self.productlot1.id,
+                'inventory_quantity': 2,
+                'lot_id': lot_1.id,
+                'location_id': self.stock_location.id,
+            },
+        ]).action_apply_inventory()
+
+        delivery_picking = self.env['stock.picking'].create({
+            'location_id': self.stock_location.id,
+            'location_dest_id': self.customer_location.id,
+            'picking_type_id': self.picking_type_out.id,
+            'move_ids': [Command.create({
+                'name':  f"move {i}",
+                'product_id': self.productlot1.id,
+                'product_uom_qty': 1,
+                'price_unit': i,  # Different price unit so moves won't be merged.
+                'product_uom': self.productlot1.uom_id.id,
+                'location_id': self.stock_location.id,
+                'location_dest_id': self.customer_location.id,
+            }) for i in (1, 3)],
+        })
+        delivery_picking.action_confirm()
+        delivery_picking.action_assign()
+        url = self._get_client_action_url(delivery_picking.id)
+        self.start_tour(url, 'test_quantity_distribution_sublines_same_lot', login='admin')
+        self.assertEqual(len(delivery_picking.backorder_ids), 0)
+        self.assertRecordValues(delivery_picking.move_ids, [
+            {'quantity': 1.0, 'product_uom_qty': 1.0, 'lot_ids': [lot_1.id], 'picked': True},
+            {'quantity': 1.0, 'product_uom_qty': 1.0, 'lot_ids': [lot_1.id], 'picked': True},
+        ])
+
+    def test_rental_partial_reception(self):
+        """ Checks that processing a partial receipt for a rental order triggers the backorder dialog.
+        """
+        if not self.env['ir.module.module'].search([('name', '=', 'sale_stock_renting'), ('state', '=', 'installed')]):
+            self.skipTest("sale_stock_renting is not installed, so there is no rental orders to test")
+
+        # Enable rental pickings
+        self.env['res.config.settings'].create({'group_rental_stock_picking': True}).execute()
+
+        product = self.env['product.product'].create({
+            'name': 'Rental',
+            'rent_ok': True,
+            'is_storable': True,
+            'barcode': 'RNT01'
+        })
+        self.env['stock.quant']._update_available_quantity(product, self.stock_location, 4)
+        rental = self.env['sale.order'].with_context(in_rental_app=True).create({
+            'partner_id': self.owner.id,
+            'order_line': [Command.create({
+                'product_id': product.id,
+                'product_uom_qty': 4,
+            })]
+        })
+        rental.action_confirm()
+        delivery = rental.picking_ids.filtered(lambda p: p.picking_type_id == rental.warehouse_id.out_type_id)
+        receipt = rental.picking_ids - delivery
+        delivery.button_validate()
+
+        url = self._get_client_action_url(receipt.id)
+        self.start_tour(url, 'test_rental_partial_reception', login='admin', timeout=180)
+
+        self.assertTrue(receipt.backorder_ids)
+        self.assertEqual(receipt.backorder_ids.move_ids.product_uom_qty, 3.0)
+
+    def test_no_validate_multiple_times(self):
+        self.clean_access_rights()
+        grp_multi_loc = self.env.ref('stock.group_stock_multi_locations')
+        self.env.user.write({'groups_id': [Command.link(grp_multi_loc.id)]})
+        self.picking_type_internal.action_unarchive()
+
+        self.env['stock.quant']._update_available_quantity(self.product2, self.stock_location, 1)
+
+        action_id = self.env.ref('stock_barcode.stock_barcode_action_main_menu')
+        url = "/web#action=" + str(action_id.id)
+        self.start_tour(url, 'test_no_validate_multiple_times', login='admin')
+
+        quant = self.env['stock.quant'].search([('product_id', '=', self.product2.id), ('location_id', '=', self.shelf1.id)])
+        self.assertEqual(quant.quantity, 1)
+
+    def test_gs1_receipt_multiple_extra_items(self):
+        """
+        This test ensures that when multiple extra items are added during the processing
+        of a picking, all the selected items are correctly added to the picking.
+        """
+        self.product1.barcode = '12345678900005'
+        self.product2.barcode = '12345678900012'
+        self.productserial1.barcode = '12345678900029'
+        self.productlot1.barcode = '12345678900036'
+
+        group_lot = self.env.ref('stock.group_production_lot')
+        group_uom = self.env.ref('uom.group_uom')
+        self.env.user.write({'groups_id': [Command.link(group_lot.id), Command.link(group_uom.id)]})
+        self.env.company.nomenclature_id = self.env.ref('barcodes_gs1_nomenclature.default_gs1_nomenclature')
+
+        receipt_with_move = self.env['stock.picking'].create({
+            'name': "In Picking for multiple extra items",
+            'location_id': self.supplier_location.id,
+            'location_dest_id': self.stock_location.id,
+            'picking_type_id': self.picking_type_in.id,
+            'move_ids': [Command.create({
+                'name': 'Move for product1',
+                'location_id': self.supplier_location.id,
+                'location_dest_id': self.stock_location.id,
+                'product_id': self.product1.id,
+                'product_uom': self.uom_unit.id,
+                'product_uom_qty': 2
+            })],
+        })
+        receipt_with_move.action_confirm()
+        receipt_with_move.action_assign()
+
+        url = self._get_client_action_url(receipt_with_move.id)
+        self.start_tour(url, 'test_gs1_receipt_multiple_extra_items', login='admin')
+
+    def test_quantity_updates_on_exit_spam(self):
+        """
+        Test that spamming the barcode back button multiple times
+        triggers the related updates only once.
+        """
+        self.clean_access_rights()
+        delivery = self.env['stock.picking'].create({
+            'name': 'Lovely Delivery',
+            'location_id': self.stock_location.id,
+            'location_dest_id': self.customer_location.id,
+            'picking_type_id': self.picking_type_out.id,
+        })
+        self.start_tour('/odoo/barcode', 'test_quantity_updates_on_exit_spam', login='admin')
+        self.assertRecordValues(delivery.move_line_ids, [{
+            'product_id': self.product1.id, 'quantity': 1.0,
+        }])

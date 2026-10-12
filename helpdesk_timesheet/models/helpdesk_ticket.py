@@ -7,6 +7,14 @@ class HelpdeskTicket(models.Model):
     _name = 'helpdesk.ticket'
     _inherit = ['helpdesk.ticket', 'timer.mixin']
 
+    def _default_team_id(self):
+        if project_id := self.env.context.get('default_project_id'):
+            if team_id := self.env['helpdesk.team'].search([('project_id', '=', project_id)], limit=1).id:
+                return team_id
+
+        return super()._default_team_id()
+
+    team_id = fields.Many2one(domain="[('use_helpdesk_timesheet', '=', True)] if context.get('default_project_id') else []")
     project_id = fields.Many2one(
         "project.project", related="team_id.project_id", readonly=True, store=True)
     timesheet_ids = fields.One2many('account.analytic.line', 'helpdesk_ticket_id', 'Timesheets',
@@ -65,7 +73,7 @@ class HelpdeskTicket(models.Model):
     def _compute_total_hours_spent(self):
         if not any(self._ids):
             for ticket in self:
-                ticket.total_hours_spent = round(sum(ticket.timesheet_ids.mapped('unit_amount')), 2)
+                ticket.total_hours_spent = sum(ticket.timesheet_ids.mapped('unit_amount'))
             return
         timesheet_read_group = self.env['account.analytic.line']._read_group(
             [('helpdesk_ticket_id', 'in', self.ids)],
@@ -74,7 +82,7 @@ class HelpdeskTicket(models.Model):
         )
         timesheets_per_ticket = {helpdesk_ticket.id: unit_amount_sum for helpdesk_ticket, unit_amount_sum in timesheet_read_group}
         for ticket in self:
-            ticket.total_hours_spent = round(timesheets_per_ticket.get(ticket.id, 0.0), 2)
+            ticket.total_hours_spent = timesheets_per_ticket.get(ticket.id, 0.0)
 
     @api.onchange('team_id')
     def _onchange_team_id(self):
@@ -92,6 +100,18 @@ class HelpdeskTicket(models.Model):
                     'type': "notification",
                 },
             }
+
+    @api.model_create_multi
+    def create(self, list_value):
+        default_project_id = self._context.get('default_project_id')
+        for vals in list_value:
+            project_id = vals.get('project_id') or default_project_id
+            if not vals.get('team_id') and project_id:
+                project = self.env['project.project'].browse(project_id)
+                if project.helpdesk_team:
+                    vals['team_id'] = project.helpdesk_team[0].id
+        tickets = super().create(list_value)
+        return tickets
 
     @api.depends('project_id')
     def _compute_analytic_account_id(self):

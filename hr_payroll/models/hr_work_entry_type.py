@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import fields, models
+from odoo import api, fields, models, SUPERUSER_ID, _
+from odoo.exceptions import UserError
 
 
 class HrWorkEntryType(models.Model):
@@ -29,3 +29,13 @@ class HrWorkEntryType(models.Model):
         'hr.payroll.structure', 'hr_payroll_structure_hr_work_entry_type_rel',
         string="Unpaid in Structures Types",
         help="The work entry won’t grant any money to employee in payslip.")
+    current_companies_country_codes = fields.Char(string="country codes", compute='_compute_current_companies_country_codes')
+
+    @api.depends_context('allowed_company_ids')
+    def _compute_current_companies_country_codes(self):
+        self.current_companies_country_codes = self.env.companies.mapped('country_id.code')
+
+    @api.ondelete(at_uninstall=False)
+    def _unlink_except_work_entry_type(self):
+        if self and self.env.uid != SUPERUSER_ID:
+            raise UserError(_("You cannot delete work entry type(s). Instead archive it."))

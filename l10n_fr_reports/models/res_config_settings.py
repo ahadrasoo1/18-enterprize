@@ -19,3 +19,6 @@ class ResConfigSettings(models.TransientModel):
         string="Tax Rounding Profit Account",
         help="Account used for profits from rounding the lines of French tax reports",
     )
+
+    def _get_country_codes_with_another_tax_closing_start_date(self):
+        return super()._get_country_codes_with_another_tax_closing_start_date() | {'FR'}

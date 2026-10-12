@@ -13,6 +13,7 @@ class OSSTaxReportTest(TestAccountReportsCommon):
     def setUpClass(cls):
         super().setUpClass()
 
+        cls.env.company.country_id = cls.env.ref('base.be')
         cls.env.company.account_fiscal_country_id = cls.env.ref('base.be')
         cls.env.company.vat = 'BE0477472701'
         cls.env.company.currency_id = cls.env.ref('base.EUR')
@@ -20,12 +21,16 @@ class OSSTaxReportTest(TestAccountReportsCommon):
         account_payable = cls.env['account.account'].create({
             'name': "VAT Payable: VAT Current Account (C/A)",
             'code': "4512",
-            'account_type': 'liability_current',
+            'account_type': 'liability_payable',
+            'reconcile': True,
+            'non_trade': True,
         })
         account_receivable = cls.env['account.account'].create({
             'name': "VAT Recoverable: VAT Current Account (C/A)",
             'code': "4112",
-            'account_type': 'asset_current',
+            'account_type': 'asset_receivable',
+            'reconcile': True,
+            'non_trade': True,
         })
 
         tax_group = cls.env['account.tax.group'].create({
@@ -115,24 +120,43 @@ class OSSTaxReportTest(TestAccountReportsCommon):
             #   Name                        Net               Tax
             [   0,                            1,                2],
             [
-                ("Sales",                    '',               85),
+                ("Sales",                    '',               90),
                 ("France",                   '',              200),
                 ("20.0% FR VAT (20.0%)",   1000,              200),
                 ("Total France",             '',              200),
                 ("Greece",                   '',             -240),
                 ("24.0% GR VAT (24.0%)",  -1000,             -240),
                 ("Total Greece",             '',             -240),
-                ("Luxembourg",               '',              125),
-                ("16.0% LU VAT (16.0%)",   1000,              160),
-                ("7.0% LU VAT (7.0%)",     -500,              -35),
-                ("Total Luxembourg",         '',              125),
+                ("Luxembourg",               '',              130),
+                ("17.0% LU VAT (17.0%)",   1000,              170),
+                ("8.0% LU VAT (8.0%)",     -500,              -40),
+                ("Total Luxembourg",         '',              130),
                 ("Netherlands",              '',              0.0),
                 ("21.0% NL VAT (21.0%)",    0.0,              0.0),
                 ("Total Netherlands",        '',              0.0),
-                ("Total Sales",              '',               85),
+                ("Total Sales",              '',               90),
             ],
             options,
         )
+
+    def test_tax_closing_entries_isolation_sales_and_imports(self):
+        """
+        Check that Sales and Imports OSS reports generate separate tax closing journal entries
+        """
+        sales_report = self.env.ref('l10n_eu_oss_reports.oss_sales_report')
+        options = self._generate_options(sales_report, '2021-04-01', '2021-06-30')
+        sales_closing_entries = self.env[sales_report.custom_handler_model_name]._generate_tax_closing_entries(sales_report, options)
+        self.assertEqual(len(sales_closing_entries), 1)
+
+        imports_report = self.env.ref('l10n_eu_oss_reports.oss_imports_report')
+        options = self._generate_options(imports_report, '2021-06-01', '2021-06-30')
+        imports_closing_entries = self.env[imports_report.custom_handler_model_name]._generate_tax_closing_entries(imports_report, options)
+        self.assertEqual(len(imports_closing_entries), 1)
+
+        self.assertRecordValues(sales_closing_entries + imports_closing_entries, [
+            {'ref': 'OSS Sales: Q2 2021', 'tax_closing_report_id': sales_report.id},
+            {'ref': 'OSS Imports: June 2021', 'tax_closing_report_id': imports_report.id},
+        ])
 
     def test_tax_report_oss_closing(self):
         report = self.env.ref('l10n_eu_oss_reports.oss_sales_report')
@@ -145,11 +169,33 @@ class OSSTaxReportTest(TestAccountReportsCommon):
             [
                 {'account_id.code':     '251002',        'debit': 200,       'credit': 0},
                 {'account_id.code':     '251002',        'debit': 0,         'credit': 0},
-                {'account_id.code':     '251002',        'debit': 0,         'credit': 35},
                 {'account_id.code':     '251002',        'debit': 0,         'credit': 240},
-                {'account_id.code':     '251002',        'debit': 160,       'credit': 0},
-                {'account_id.code':     '252000',        'debit': 0,         'credit': 85},
+                {'account_id.code':     '251002',        'debit': 170,       'credit': 0},
+                {'account_id.code':     '251002',        'debit': 0,         'credit': 40},
+                {'account_id.code':     '252000',        'debit': 0,         'credit': 90},
             ]
+        )
+
+    def test_oss_import_report(self):
+        self.product_1.account_tag_ids += self.env.ref('l10n_eu_oss.tag_eu_import')
+        self.init_invoice('out_invoice', partner=self.partner_fr, products=self.product_1, invoice_date='2021-04-01', post=True)
+
+        report = self.env.ref('l10n_eu_oss_reports.oss_imports_report')
+        options = self._generate_options(report, '2021-04-01', '2021-06-30')
+
+        self.assertLinesValues(
+            # pylint: disable=C0326
+            report._get_lines(options),
+            #   Name                        Net               Tax
+            [   0,                            1,                2],
+            [
+                ("Sales",                    '',              200),
+                ("France",                   '',              200),
+                ("20.0% FR VAT (20.0%)",   1000,              200),
+                ("Total France",             '',              200),
+                ("Total Sales",              '',              200),
+            ],
+            options,
         )
 
     def test_generate_oss_xml_be(self):
@@ -174,9 +220,6 @@ class OSSTaxReportTest(TestAccountReportsCommon):
                   <ns2:MemberStateOfConsumption>FR</ns2:MemberStateOfConsumption>
                   <ns2:OSSDeclarationRows SequenceNumber="1">
                     <ns2:SupplyType>GOODS</ns2:SupplyType>
-                    <ns2:FixedEstablishment>
-                        <ns2:VATIdentificationNumber issuedBy="BE">0477472701</ns2:VATIdentificationNumber>
-                    </ns2:FixedEstablishment>
                     <ns2:VatRateType type="STANDARD">20.00</ns2:VatRateType>
                     <ns2:VatAmount currency="EUR">200.0</ns2:VatAmount>
                     <ns2:TaxableAmount currency="EUR">1000.0</ns2:TaxableAmount>
@@ -196,11 +239,8 @@ class OSSTaxReportTest(TestAccountReportsCommon):
                   <ns2:MemberStateOfConsumption>LU</ns2:MemberStateOfConsumption>
                   <ns2:OSSDeclarationRows SequenceNumber="1">
                     <ns2:SupplyType>GOODS</ns2:SupplyType>
-                    <ns2:FixedEstablishment>
-                        <ns2:VATIdentificationNumber issuedBy="BE">0477472701</ns2:VATIdentificationNumber>
-                    </ns2:FixedEstablishment>
-                    <ns2:VatRateType type="REDUCED">16.00</ns2:VatRateType>
-                    <ns2:VatAmount currency="EUR">160.0</ns2:VatAmount>
+                    <ns2:VatRateType type="STANDARD">17.00</ns2:VatRateType>
+                    <ns2:VatAmount currency="EUR">170.0</ns2:VatAmount>
                     <ns2:TaxableAmount currency="EUR">1000.0</ns2:TaxableAmount>
                   </ns2:OSSDeclarationRows>
                   <ns2:CorrectionsInfo>
@@ -208,7 +248,7 @@ class OSSTaxReportTest(TestAccountReportsCommon):
                       <ns2:Year>2021</ns2:Year>
                       <ns2:Quarter>2</ns2:Quarter>
                     </ns2:Period>
-                    <ns2:TotalVATAmountCorrection currency="EUR">-35.0</ns2:TotalVATAmountCorrection>
+                    <ns2:TotalVATAmountCorrection currency="EUR">-40.0</ns2:TotalVATAmountCorrection>
                   </ns2:CorrectionsInfo>
                 </ns0:OSSDeclarationInfo>
               </ns0:OSSDeclaration>
@@ -219,6 +259,7 @@ class OSSTaxReportTest(TestAccountReportsCommon):
             self.get_xml_tree_from_string(self.env[report.custom_handler_model_name].export_to_xml(options)['file_content']),
             self.get_xml_tree_from_string(expected_xml)
         )
+
 
 @tagged('post_install_l10n', 'post_install', '-at_install')
 class TestTaxReportOSSNoMapping(TestAccountReportsCommon):
@@ -242,8 +283,8 @@ class TestTaxReportOSSNoMapping(TestAccountReportsCommon):
         cls.env['account.tax.group'].create({
             'name': 'tax_group',
             'country_id': cls.company_data['company'].account_fiscal_country_id.id,
-            'tax_payable_account_id': cls.company_data['default_account_expense'].id,
-            'tax_receivable_account_id': cls.company_data['default_account_revenue'].id,
+            'tax_payable_account_id': cls.company_data['default_tax_account_payable'].id,
+            'tax_receivable_account_id': cls.company_data['default_tax_account_receivable'].id,
         })
         oss_tag = cls.env.ref('l10n_eu_oss.tag_oss')
         cls.oss_tax = cls.env['account.tax'].create({

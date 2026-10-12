@@ -1,23 +1,25 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* hr_contract_sign
-# 
+#
 # Translators:
+# Manon Rondou, 2024
 # Wil Odoo, 2024
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:27+0000\n"
+"POT-Creation-Date: 2025-12-29 18:47+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
 "Last-Translator: Wil Odoo, 2024\n"
 "Language-Team: French (https://app.transifex.com/odoo/teams/41243/fr/)\n"
+"Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: fr\n"
-"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % "
+"1000000 == 0 ? 1 : 2;\n"
 
 #. module: hr_contract_sign
 #. odoo-python
@@ -72,6 +74,11 @@ msgid "Attachment"
 msgstr "Pièce jointe"
 
 #. module: hr_contract_sign
+#: model:sign.template,redirect_url_text:hr_contract_sign.template_sign_termination
+msgid "Close"
+msgstr "Fermer"
+
+#. module: hr_contract_sign
 #: model:ir.model.fields,field_description:hr_contract_sign.field_hr_contract_sign_document_wizard__contract_id
 msgid "Contract"
 msgstr "Contrat"
@@ -124,12 +131,18 @@ msgstr "Documents à signer"
 #. module: hr_contract_sign
 #: model:ir.model.fields,help:hr_contract_sign.field_hr_contract_sign_document_wizard__sign_template_ids
 msgid ""
-"Documents to sign. Only documents with 1 or 2 different responsible are selectable.\n"
-"        Documents with 1 responsible will only have to be signed by the employee while documents with 2 different responsible will have to be signed by both the employee and the responsible.\n"
+"Documents to sign. Only documents with 1 or 2 different responsible are "
+"selectable.\n"
+"        Documents with 1 responsible will only have to be signed by the "
+"employee while documents with 2 different responsible will have to be signed "
+"by both the employee and the responsible.\n"
 "        "
 msgstr ""
-"Documents à signer. Seuls les documents avec 1 ou 2 responsables différents sont sélectionnables.\n"
-"Les documents avec 1 responsable ne devront être signés que par l'employé tandis que les documents avec 2 responsables différents devront être signés à la fois par l'employé et le responsable."
+"Documents à signer. Seuls les documents avec 1 ou 2 responsables différents "
+"sont sélectionnables.\n"
+"Les documents avec 1 responsable ne devront être signés que par l'employé "
+"tandis que les documents avec 2 responsables différents devront être signés "
+"à la fois par l'employé et le responsable."
 
 #. module: hr_contract_sign
 #: model:ir.model.fields,field_description:hr_contract_sign.field_hr_contract_sign_document_wizard__mail_to
@@ -142,12 +155,15 @@ msgid ""
 "Email used to send the signature request.\n"
 "                - Work takes the email defined in \"work email\"\n"
 "                - Private takes the email defined in Private Information\n"
-"                - If the selected email is not defined, the available one will be used."
+"                - If the selected email is not defined, the available one "
+"will be used."
 msgstr ""
 "E-mail utilisé pour envoyer la demande de signature.\n"
-"                - Travail prend l'e-mail défini dans \"adresse e-mail professionnelle\"\n"
+"                - Travail prend l'e-mail défini dans \"adresse e-mail "
+"professionnelle\"\n"
 "                - Privé prend l'e-mail défini dans les informations privées\n"
-"                - Si l'e-mail sélectionné n'est pas défini, l'adresse disponible sera utilisée."
+"                - Si l'e-mail sélectionné n'est pas défini, l'adresse "
+"disponible sera utilisée."
 
 #. module: hr_contract_sign
 #: model:ir.model,name:hr_contract_sign.model_hr_employee
@@ -218,7 +234,7 @@ msgstr "Mail affiché"
 #. module: hr_contract_sign
 #: model_terms:ir.ui.view,arch_db:hr_contract_sign.view_hr_contract_sign
 msgid "Mail Options"
-msgstr "Options des emails"
+msgstr "Options des e-mails"
 
 #. module: hr_contract_sign
 #: model:ir.model.fields,field_description:hr_contract_sign.field_hr_contract_sign_document_wizard__message
@@ -229,8 +245,8 @@ msgstr "Message"
 #. odoo-python
 #: code:addons/hr_contract_sign/wizard/hr_contract_sign_document_wizard.py:0
 msgid ""
-"No appropriate template could be found, please make sure you configured them"
-" properly."
+"No appropriate template could be found, please make sure you configured them "
+"properly."
 msgstr ""
 "Aucun modèle approprié n'a pu être trouvé, veuillez vous assurer de les "
 "avoir correctement configurés."
@@ -245,11 +261,6 @@ msgstr "Aucun modèle disponible"
 #: code:addons/hr_contract_sign/wizard/hr_contract_sign_document_wizard.py:0
 msgid "Only %s has to sign."
 msgstr "Seul %sdoit signer."
-
-#. module: hr_contract_sign
-#: model:sign.template,redirect_url_text:hr_contract_sign.template_sign_termination
-msgid "Open Link"
-msgstr "Ouvrir le lien"
 
 #. module: hr_contract_sign
 #: model_terms:ir.ui.view,arch_db:hr_contract_sign.view_hr_contract_sign
@@ -367,8 +378,8 @@ msgstr "Écrire un e-mail ou chercher un contact..."
 msgid ""
 "You can't delete a contract linked to a signed document, archive it instead."
 msgstr ""
-"Vous ne pouvez pas supprimer un contrat lié à un document signé, archivez-le"
-" plutôt."
+"Vous ne pouvez pas supprimer un contrat lié à un document signé, archivez-le "
+"plutôt."
 
 #. module: hr_contract_sign
 #: model_terms:ir.ui.view,arch_db:hr_contract_sign.hr_contract_history_view_form

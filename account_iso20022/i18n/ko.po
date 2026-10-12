@@ -1,24 +1,28 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* account_iso20022
-# 
+# * account_iso20022
+#
 # Translators:
-# Daye Jeong, 2024
 # Wil Odoo, 2024
-# 
+# Daye Jeong, 2024
+# Sarah Park, 2025
+#
+# "Kwanghee Park (kwpa)" <kwpa@odoo.com>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:26+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Korean (https://app.transifex.com/odoo/teams/41243/ko/)\n"
+"POT-Creation-Date: 2026-01-29 18:45+0000\n"
+"PO-Revision-Date: 2025-09-29 22:31+0000\n"
+"Last-Translator: \"Kwanghee Park (kwpa)\" <kwpa@odoo.com>\n"
+"Language-Team: Korean <https://translate.odoo.com/projects/odoo-18/"
+"account_iso20022/ko/>\n"
+"Language: ko\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: ko\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 5.12.2\n"
 
 #. module: account_iso20022
 #. odoo-python
@@ -30,7 +34,7 @@ msgstr "은행 계좌가 정의되지 않았습니다."
 #. odoo-python
 #: code:addons/account_iso20022/models/account_payment_register.py:0
 msgid "A bank account must be set on the following documents: %s(doc_name)"
-msgstr ""
+msgstr "다음 문서에 반드시 은행 계좌를 설정해야 합니다: %s(문서명) "
 
 #. module: account_iso20022
 #: model:ir.model.fields.selection,name:account_iso20022.selection__account_journal__sepa_pain_version__pain_001_001_03_austrian_004
@@ -50,7 +54,7 @@ msgstr "일괄 결제"
 #. module: account_iso20022
 #: model:ir.model.fields,field_description:account_iso20022.field_account_batch_payment__iso20022_charge_bearer
 msgid "Charge Bearer"
-msgstr ""
+msgstr "요금 부담자"
 
 #. module: account_iso20022
 #: model:ir.model,name:account_iso20022.model_res_company
@@ -66,7 +70,7 @@ msgstr "설정 구성"
 #. odoo-python
 #: code:addons/account_iso20022/models/account_batch_payment.py:0
 msgid "Configure Journal"
-msgstr ""
+msgstr "전표 설정"
 
 #. module: account_iso20022
 #: model:ir.model,name:account_iso20022.model_res_partner
@@ -84,6 +88,12 @@ msgid "Debtor"
 msgstr "채무자"
 
 #. module: account_iso20022
+#. odoo-python
+#: code:addons/account_iso20022/models/account_journal.py:0
+msgid "Employee %s has no country in their address."
+msgstr "%s 직원 주소에 국가가 없습니다."
+
+#. module: account_iso20022
 #: model:ir.model.fields,help:account_iso20022.field_res_company__iso20022_orgid_issr
 msgid ""
 "Entity that assigns the identification (eg. KBE-BCO or Finanzamt Muenchen "
@@ -99,7 +109,7 @@ msgstr "독일"
 #. odoo-python
 #: code:addons/account_iso20022/models/account_batch_payment.py:0
 msgid "Go to settings"
-msgstr ""
+msgstr "설정으로 이동"
 
 #. module: account_iso20022
 #: model:ir.model.fields,field_description:account_iso20022.field_account_journal__has_sepa_ct_payment_method
@@ -109,7 +119,7 @@ msgstr "Sepa Ct 결제 방법 사용"
 #. module: account_iso20022
 #: model:account.payment.method,name:account_iso20022.account_payment_method_iso20022
 msgid "ISO20022"
-msgstr ""
+msgstr "ISO20022"
 
 #. module: account_iso20022
 #: model:ir.model.fields,field_description:account_iso20022.field_res_company__iso20022_orgid_id
@@ -149,14 +159,6 @@ msgid "Legal Entity Identifier"
 msgstr "법인 식별 기호"
 
 #. module: account_iso20022
-#. odoo-python
-#: code:addons/account_iso20022/models/account_batch_payment.py:0
-msgid ""
-"Maximum amount is %(maximum_euro)s for payments in Euros, %(maximum_other)s "
-"for other currencies."
-msgstr "최대 금액은 유로화 결제의 경우 %(maximum_euro)s, 기타 통화의 경우 %(maximum_other)s입니다. "
-
-#. module: account_iso20022
 #: model_terms:ir.ui.view,arch_db:account_iso20022.res_partner_sepa_inherit_form
 msgid "Miscellaneous"
 msgstr "기타"
@@ -172,7 +174,7 @@ msgstr "채권자 참조 당사자의 이름 사용 규칙 : 길이는 70 자�
 #. odoo-python
 #: code:addons/account_iso20022/models/account_batch_payment.py:0
 msgid "Non-EUR Payments"
-msgstr ""
+msgstr "비 유로 결제"
 
 #. module: account_iso20022
 #. odoo-python
@@ -215,7 +217,7 @@ msgstr "SEPA를 통해 송금"
 #. odoo-python
 #: code:addons/account_iso20022/models/account_batch_payment.py:0
 msgid "Payments without IBAN"
-msgstr ""
+msgstr "IBAN 없이 결제"
 
 #. module: account_iso20022
 #: model:ir.model.fields,help:account_iso20022.field_account_batch_payment__iso20022_batch_booking
@@ -243,7 +245,7 @@ msgstr "보낼 SEPA 신용 이체"
 #. odoo-python
 #: code:addons/account_iso20022/models/account_payment.py:0
 msgid "SEPA only accepts payments in EUR."
-msgstr ""
+msgstr "SEPA는 EUR로만 결제할 수 있습니다."
 
 #. module: account_iso20022
 #. odoo-python
@@ -251,18 +253,19 @@ msgstr ""
 msgid ""
 "SEPA only accepts payments in EUR. Some payments are using another currency."
 msgstr ""
+"SEPA는 EUR로만 결제할 수 있습니다. 일부 결제의 경우 다른 통화를 사용합니다."
 
 #. module: account_iso20022
 #: model:ir.model.fields,help:account_iso20022.field_account_journal__sepa_pain_version
 #: model:ir.model.fields,help:account_iso20022.field_account_payment__sepa_pain_version
 msgid ""
 "SEPA version to use to generate Credit Transfer XML files from this journal"
-msgstr ""
+msgstr "이 전표에서 계좌 이체 XML 파일을 생성할 때 사용할 SEPA 버전"
 
 #. module: account_iso20022
 #: model:ir.model.fields.selection,name:account_iso20022.selection__account_batch_payment__iso20022_charge_bearer__slev
 msgid "Service Level"
-msgstr ""
+msgstr "서비스 수준"
 
 #. module: account_iso20022
 #: model:ir.model.fields.selection,name:account_iso20022.selection__account_batch_payment__iso20022_charge_bearer__shar
@@ -277,14 +280,6 @@ msgstr "일부 결제 항목이 허용된 최대 금액을 초과합니다."
 
 #. module: account_iso20022
 #. odoo-python
-#: code:addons/account_iso20022/models/account_journal_sepa_ct.py:0
-msgid ""
-"Some payments are missing a value for 'UETR', required for the SEPA "
-"Pain.001.001.09 format."
-msgstr "일부 결제에 SEPA Pain.001.001.09 형식에 필요한 'UETR' 값이 누락되었습니다."
-
-#. module: account_iso20022
-#. odoo-python
 #: code:addons/account_iso20022/models/account_batch_payment.py:0
 msgid "Some payments have no recipient bank account set."
 msgstr "일부 결제에 수취인 은행 계좌 정보가 설정되어 있지 않습니다."
@@ -294,30 +289,34 @@ msgstr "일부 결제에 수취인 은행 계좌 정보가 설정되어 있지 �
 msgid ""
 "Specifies which party/parties will bear the charges associated with the "
 "processing of the payment transaction."
-msgstr ""
+msgstr "결제 거래 처리와 관련된 수수료를 부담할 대상을 지정합니다."
 
 #. module: account_iso20022
 #: model:account.payment.method,name:account_iso20022.account_payment_method_iso20022_se
 msgid "Swedish ISO20022"
-msgstr ""
+msgstr "스웨덴 ISO20022"
 
 #. module: account_iso20022
 #: model:account.payment.method,name:account_iso20022.account_payment_method_iso20022_ch
 msgid "Swiss ISO20022"
-msgstr ""
+msgstr "스위스 ISO20022"
 
 #. module: account_iso20022
 #. odoo-python
 #: code:addons/account_iso20022/models/account_journal.py:0
 msgid ""
-"The BIC code '%(bic_code)s' associated to the bank '%(bank)s' of bank account '%(account)s' of partner '%(partner)s' does not respect the required convention.\n"
+"The BIC code '%(bic_code)s' associated to the bank '%(bank)s' of bank "
+"account '%(account)s' of partner '%(partner)s' does not respect the required "
+"convention.\n"
 "It must contain 8 or 11 characters and match the following structure:\n"
 "- 4 letters: institution code or bank code\n"
 "- 2 letters: country code\n"
 "- 2 letters or digits: location code\n"
 "- 3 letters or digits: branch code, optional\n"
 msgstr ""
-"BIC 코드 '%(bic_code)s'가 필수 규칙을 준수하지 않았습니다. 연결된 거래 은행 '%(bank)s'의 계좌 '%(account)s' 및 협력사 '%(partner)s'를 확인해 주시기 바랍니다.\n"
+"BIC 코드 '%(bic_code)s'가 필수 규칙을 준수하지 않았습니다. 연결된 거래 은행 "
+"'%(bank)s'의 계좌 '%(account)s' 및 협력사 '%(partner)s'를 확인해 주시기 바랍"
+"니다.\n"
 "다음 내용을 포함하여 8자에서 11자로 구성되어야 합니다:\n"
 "- 4글자: 기관 코드 또는 은행 코드\n"
 "- 2글자: 국가 코드\n"
@@ -328,7 +327,8 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_iso20022/models/res_partner.py:0
 msgid ""
-"The LEI number must contain 20 characters and match the following structure:\n"
+"The LEI number must contain 20 characters and match the following "
+"structure:\n"
 "- 18 alphanumeric characters with capital letters\n"
 "- 2 digits in the end\n"
 msgstr ""
@@ -343,22 +343,29 @@ msgid ""
 "The Name Identification and Issuer details are required to proceed. Please "
 "configure them in the settings."
 msgstr ""
+"계속하려면 이름 확인 및 발급자 세부 정보가 필요합니다. 설정에서 환경 설정을 "
+"하세요."
 
 #. module: account_iso20022
 #. odoo-python
 #: code:addons/account_iso20022/models/account_batch_payment.py:0
 msgid ""
-"The bank account %(account)s, of journal '%(journal)s', is not of type IBAN.\n"
+"The bank account %(account)s, of journal '%(journal)s', is not of type "
+"IBAN.\n"
 "A valid IBAN account is required to use SEPA features."
 msgstr ""
+"%(account)s 계정이 '%(journal)s' 분개장에 있지만 IBAN 유형이 아닙니다.\n"
+"SEPA 기능을 사용하려면 유효한 IBAN 계정이 필요합니다."
 
 #. module: account_iso20022
 #. odoo-python
 #: code:addons/account_iso20022/models/account_batch_payment.py:0
 msgid ""
-"The customer bank account set on some payments does not have an IBAN number."
-" This is required for SEPA."
+"The customer bank account set on some payments does not have an IBAN number. "
+"This is required for SEPA."
 msgstr ""
+"일부 결제 중에 설정된 고객 은행 계좌에 IBAN 번호가 없습니다. 이는 SEPA 필수 "
+"사항입니다."
 
 #. module: account_iso20022
 #. odoo-python
@@ -366,13 +373,15 @@ msgstr ""
 msgid ""
 "The journal '%s' requires a proper IBAN account to pay via SEPA. Please "
 "configure it first."
-msgstr "'%s' 분개장은 SEPA를 이용해 적절한 IBAN 계정으로 지불해야 합니다. 먼저 구성하십시오."
+msgstr ""
+"'%s' 분개장은 SEPA를 이용해 적절한 IBAN 계정으로 지불해야 합니다. 먼저 구성하"
+"십시오."
 
 #. module: account_iso20022
 #. odoo-python
 #: code:addons/account_iso20022/models/account_journal.py:0
 msgid "This journal does not have a bank account defined."
-msgstr ""
+msgstr "이 전표에는 지정된 은행 계좌가 없습니다."
 
 #. module: account_iso20022
 #. odoo-python
@@ -394,27 +403,28 @@ msgstr "고유한 엔드 투 엔드 거래 참조"
 #. odoo-python
 #: code:addons/account_iso20022/models/account_batch_payment.py:0
 msgid "View Payments"
-msgstr ""
+msgstr "결제 보기"
 
 #. module: account_iso20022
 #: model:ir.model.fields,help:account_iso20022.field_res_company__iso20022_initiating_party_name
 msgid ""
 "Will appear as the name of the party initiating the payment. Limited to 70 "
 "characters."
-msgstr ""
+msgstr "결제를 시작한 당사자의 이름이 표시됩니다. 70자로 제한됩니다."
 
 #. module: account_iso20022
 #: model:ir.model.fields,help:account_iso20022.field_res_config_settings__iso20022_orgid_issr
 msgid ""
 "Will appear in SEPA payments as the name of the party initiating the "
 "payment. Limited to 70 characters."
-msgstr "지불을 시작한 당사자의 이름으로 SEPA 지불에 표시됩니다. 70 자로 제한됩니다."
+msgstr ""
+"지불을 시작한 당사자의 이름으로 SEPA 지불에 표시됩니다. 70 자로 제한됩니다."
 
 #. module: account_iso20022
 #: model:ir.model.fields,field_description:account_iso20022.field_account_journal__sepa_pain_version
 #: model:ir.model.fields,field_description:account_iso20022.field_account_payment__sepa_pain_version
 msgid "XML Format"
-msgstr ""
+msgstr "XML 형식"
 
 #. module: account_iso20022
 #: model:ir.model.fields,field_description:account_iso20022.field_res_company__iso20022_initiating_party_name
@@ -425,9 +435,25 @@ msgstr "회사 명"
 #. module: account_iso20022
 #: model:ir.model.fields.selection,name:account_iso20022.selection__account_journal__sepa_pain_version__pain_001_001_03
 msgid "pain.001.001.03"
-msgstr ""
+msgstr "pain.001.001.03"
 
 #. module: account_iso20022
 #: model:ir.model.fields.selection,name:account_iso20022.selection__account_journal__sepa_pain_version__pain_001_001_09
 msgid "pain.001.001.09"
-msgstr ""
+msgstr "pain.001.001.09"
+
+#~ msgid ""
+#~ "Some payments are missing a value for 'UETR', required for the SEPA "
+#~ "Pain.001.001.09 format."
+#~ msgstr ""
+#~ "일부 결제에 SEPA Pain.001.001.09 형식에 필요한 'UETR' 값이 누락되었습니다."
+
+#~ msgid "Please set a bank on the journal '%(journal_name)s'."
+#~ msgstr "'%(journal_name)s' 전표에 은행을 설정하세요."
+
+#~ msgid "Please set an account number on the journal '%(journal_name)s'."
+#~ msgstr "'%(journal_name)s' 전표에 계좌 번호를 설정하세요."
+
+#~ msgid ""
+#~ "Please set the bank identifier code (BIC) on this bank: %(bank_name)s"
+#~ msgstr "다음 은행에 은행 식별 코드 (BIC)를 설정하세요: %(bank_name)s"

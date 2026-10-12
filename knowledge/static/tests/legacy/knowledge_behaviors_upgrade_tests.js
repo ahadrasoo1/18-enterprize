@@ -140,6 +140,11 @@ QUnit.module("Knowledge - Behaviors Full Upgrade from original version", (hooks)
             serverData,
             arch,
             resId: 1,
+            mockRPC(route, args) {
+                if (route === '/web/dataset/call_kw/knowledge.article/has_access') {
+                    return Promise.resolve(true);
+                }
+            }
         });
         const htmlField = await htmlFieldPromise;
         let anchor = fixture.querySelector(".o_knowledge_behavior_type_file");

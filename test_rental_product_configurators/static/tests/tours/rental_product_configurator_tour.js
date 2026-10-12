@@ -7,7 +7,6 @@ import tourUtils from "@sale/js/tours/tour_utils";
 
 registry.category("web_tour.tours").add('rental_product_configurator_tour', {
     url: '/odoo',
-    test: true,
     steps: () => [
         ...stepUtils.goToAppSteps("sale_renting.rental_menu_root", "Open the rental app"),
         {
@@ -81,6 +80,10 @@ registry.category("web_tour.tours").add('rental_product_configurator_tour', {
             content: "verify that the rental has been confirmed",
             trigger: '.o_statusbar_status button.o_arrow_button_current:contains("Sales Order")',
         },
-        ...stepUtils.discardForm(),
+        {
+            //Nothing to discard (button is not visible)
+            content: "check the form is saved",
+            trigger: ".o_form_view > div > div > .o_form_saved",
+        },
     ],
 });

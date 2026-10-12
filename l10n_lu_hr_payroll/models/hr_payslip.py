@@ -85,7 +85,7 @@ class HrPayslip(models.Model):
     @api.depends('date_from', 'date_to', 'employee_id', 'worked_days_line_ids')
     def _compute_prorated_wage(self):
         for payslip in self:
-            if payslip.company_id.country_id.code != "LU":
+            if payslip.company_id.country_id.code != "LU" and payslip.contract_id.wage_type == "hourly":
                 continue
             payslip.l10n_lu_presence_prorata = payslip._get_month_presence_prorata()
             payslip.l10n_lu_prorated_wage = payslip.contract_id.l10n_lu_indexed_wage * payslip.l10n_lu_presence_prorata
@@ -131,13 +131,6 @@ class HrPayslip(models.Model):
             if payslip.company_id.country_id.code != "LU" or payslip.state in ['paid', 'done']:
                 continue
             payslip.l10n_lu_deduction_ce_daily = payslip.employee_id.l10n_lu_deduction_ce_daily
-
-    @api.depends('employee_id.l10n_lu_deduction_ds_daily', 'state')
-    def _compute_l10n_lu_deduction_ds_daily(self):
-        for payslip in self:
-            if payslip.company_id.country_id.code != "LU" or payslip.state in ['paid', 'done']:
-                continue
-            payslip.l10n_lu_deduction_ds_daily = payslip.employee_id.l10n_lu_deduction_ds_daily
 
     @api.depends('employee_id.l10n_lu_deduction_ds_daily', 'state')
     def _compute_l10n_lu_deduction_ds_daily(self):
@@ -216,8 +209,6 @@ class HrPayslip(models.Model):
                 'data/hr_work_entry_data.xml',
                 'data/hr_payroll_structure_data.xml',
                 'data/hr_payslip_input_type_data.xml',
-                'data/hr_salary_rule_data.xml',
-                'data/hr_gratification_rule_data.xml',
                 'data/hr_holidays_data.xml',
                 'data/hr_payroll_dashboard_warning_data.xml',
             ])]
@@ -240,7 +231,7 @@ class HrPayslip(models.Model):
 
     def _get_paid_amount(self):
         self.ensure_one()
-        if self.struct_id.country_id.code == 'LU' and self.struct_id.code == 'LUX_MONTHLY':
+        if self.struct_id.country_id.code == 'LU' and self.struct_id.code == 'LUX_MONTHLY' and self.contract_id.wage_type == 'monthly':
             return self.l10n_lu_prorated_wage
         elif self.struct_id.country_id.code == 'LU' and self.struct_id.code == 'LUX_13TH_MONTH':
             return self._get_paid_amount_l10n_lu_13th_month()

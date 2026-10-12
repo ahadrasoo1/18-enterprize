@@ -1,21 +1,30 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* documents_spreadsheet
+# * documents_spreadsheet
 #
 # Translators:
+# alenafairy, 2025
+# Wil Odoo, 2025
+# Anastasiia Koroleva, 2025
+#
+# "Anastasiia Koroleva (koan)" <koan@odoo.com>, 2025.
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 17.0+e\n"
+"Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-12 10:56+0000\n"
-"PO-Revision-Date: 2024-01-30 15:14+0400\n"
-"Last-Translator: \n"
-"Language-Team: Russian (https://app.transifex.com/odoo/teams/41243/ru/)\n"
+"POT-Creation-Date: 2025-12-29 18:47+0000\n"
+"PO-Revision-Date: 2025-10-20 06:24+0000\n"
+"Last-Translator: \"Anastasiia Koroleva (koan)\" <koan@odoo.com>\n"
+"Language-Team: Russian <https://translate.odoo.com/projects/odoo-18/"
+"documents_spreadsheet/ru/>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || "
+"(n%100>=11 && n%100<=14)? 2 : 3);\n"
+"X-Generator: Weblate 5.12.2\n"
 
 #. module: documents_spreadsheet
 #. odoo-python
@@ -24,9 +33,10 @@ msgid "\"%s\" saved as template"
 msgstr "\"%s\" сохраняется как шаблон"
 
 #. module: documents_spreadsheet
-#: model_terms:ir.ui.view,arch_db:documents_spreadsheet.share_page
-msgid "#{'Download '}#{document.name}"
-msgstr "#{'Download'}#{document.name}"
+#. odoo-python
+#: code:addons/documents_spreadsheet/models/documents_document.py:0
+msgid "%(folder)s is used by %(company)s"
+msgstr "Папка %(folder)s используется компанией %(company)s"
 
 #. module: documents_spreadsheet
 #. odoo-python
@@ -46,25 +56,28 @@ msgid "A combination of the spreadsheet and the user already exist"
 msgstr "Комбинация электронной таблицы и пользователя уже существует"
 
 #. module: documents_spreadsheet
-#: model_terms:ir.ui.view,arch_db:documents_spreadsheet.save_spreadsheet_template_view_form
-msgid "Any user will be able to create a new spreadsheet based on this template."
-msgstr "Любой пользователь сможет создать новую электронную таблицу на основе этого шаблона."
-
-#. module: documents_spreadsheet
-#: model_terms:documents.folder,description:documents_spreadsheet.documents_spreadsheet_folder
-msgid "Ask an admin to configure the workspace to be accessible to the users you want."
-msgstr "Попросите администратора настроить рабочую область так, чтобы она была доступна нужным вам пользователям."
+#: model:ir.model.constraint,message:documents_spreadsheet.constraint_documents_document_frozen_spreadsheet_access_via_link_access_internal
+msgid "A frozen spreadsheet can not be editable"
+msgstr "Замороженная таблица недоступна для редактирования"
 
 #. module: documents_spreadsheet
 #. odoo-javascript
-#: code:addons/documents_spreadsheet/static/src/spreadsheet_template/template_dialog.xml:0
-msgid "Blank spreadsheet"
-msgstr "Пустая электронная таблица"
+#: code:addons/documents_spreadsheet/demo/files/pipeline_dashboard.json:0
+msgid "Actuals vs Target"
+msgstr "Фактические показатели по сравнению с целевыми"
 
 #. module: documents_spreadsheet
-#: model_terms:documents.folder,description:documents_spreadsheet.documents_spreadsheet_folder
-msgid "By default, the spreadsheets in this workspace will only be seen and updated by their <strong>creator</strong>."
-msgstr "По умолчанию электронные таблицы в этой рабочей области будут видны и обновляться только их <strong>создателем</strong>."
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/demo/files/pipeline_dashboard.json:0
+msgid "Actuals vs Target status"
+msgstr "Фактические данные по сравнению с целевыми"
+
+#. module: documents_spreadsheet
+#: model_terms:ir.ui.view,arch_db:documents_spreadsheet.save_spreadsheet_template_view_form
+msgid ""
+"Any user will be able to create a new spreadsheet based on this template."
+msgstr ""
+"Любой пользователь сможет создать новую таблицу на основе этого шаблона."
 
 #. module: documents_spreadsheet
 #: model_terms:ir.ui.view,arch_db:documents_spreadsheet.save_spreadsheet_template_view_form
@@ -98,11 +111,6 @@ msgid "Contributors"
 msgstr "Авторы"
 
 #. module: documents_spreadsheet
-#: model:ir.model,name:documents_spreadsheet.model_documents_shared_spreadsheet
-msgid "Copy of a shared spreadsheet"
-msgstr "Копия общей электронной таблицы"
-
-#. module: documents_spreadsheet
 #. odoo-javascript
 #: code:addons/documents_spreadsheet/static/src/spreadsheet_template/template_dialog.xml:0
 msgid "Create"
@@ -115,28 +123,25 @@ msgid "Create a Spreadsheet or select a Template"
 msgstr "Создайте электронную таблицу или выберите шаблон"
 
 #. module: documents_spreadsheet
-#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_shared_spreadsheet__create_uid
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_save_spreadsheet_template__create_uid
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_contributor__create_uid
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__create_uid
 msgid "Created by"
-msgstr "Создано"
+msgstr "Создано:"
 
 #. module: documents_spreadsheet
-#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_shared_spreadsheet__create_date
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_save_spreadsheet_template__create_date
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_contributor__create_date
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__create_date
 msgid "Created on"
-msgstr "Создано"
+msgstr "Дата создания:"
 
 #. module: documents_spreadsheet
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_document__current_revision_uuid
-#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_shared_spreadsheet__current_revision_uuid
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_save_spreadsheet_template__current_revision_uuid
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__current_revision_uuid
 msgid "Current Revision Uuid"
-msgstr ""
+msgstr "UUID текущей версии"
 
 #. module: documents_spreadsheet
 #. odoo-javascript
@@ -146,7 +151,6 @@ msgid "Discard"
 msgstr "Отменить"
 
 #. module: documents_spreadsheet
-#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_shared_spreadsheet__display_name
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_save_spreadsheet_template__display_name
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_contributor__display_name
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__display_name
@@ -154,22 +158,29 @@ msgid "Display Name"
 msgstr "Отображаемое имя"
 
 #. module: documents_spreadsheet
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_document__display_thumbnail
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_save_spreadsheet_template__display_thumbnail
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__display_thumbnail
+msgid "Display Thumbnail"
+msgstr "Показать миниатюру"
+
+#. module: documents_spreadsheet
 #: model:ir.model,name:documents_spreadsheet.model_documents_document
-#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_shared_spreadsheet__document_id
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_cell_thread__document_id
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_contributor__document_id
 msgid "Document"
 msgstr "Документ"
 
 #. module: documents_spreadsheet
-#: model:ir.model,name:documents_spreadsheet.model_documents_share
-msgid "Documents Share"
-msgstr "Документы Поделиться"
+#: model:ir.model,name:documents_spreadsheet.model_documents_access
+msgid "Document / Partner"
+msgstr "Документ / Партнер"
 
 #. module: documents_spreadsheet
-#: model:ir.model.fields,field_description:documents_spreadsheet.field_res_company__documents_spreadsheet_folder_id
-#: model:ir.model.fields,field_description:documents_spreadsheet.field_res_config_settings__documents_spreadsheet_folder_id
-msgid "Documents Spreadsheet Folder"
-msgstr "Папка с электронными таблицами документов"
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_res_company__document_spreadsheet_folder_id
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_res_config_settings__document_spreadsheet_folder_id
+msgid "Document Spreadsheet Folder"
+msgstr "Папка с таблицами"
 
 #. module: documents_spreadsheet
 #: model_terms:ir.ui.view,arch_db:documents_spreadsheet.spreadsheet_template_view_tree
@@ -177,14 +188,31 @@ msgid "Edit"
 msgstr "Редактировать"
 
 #. module: documents_spreadsheet
-#: model_terms:documents.folder,description:documents_spreadsheet.documents_spreadsheet_folder
-msgid "Enjoy collaborative work on your spreadsheets."
-msgstr "Наслаждайтесь совместной работой над своими электронными таблицами."
-
-#. module: documents_spreadsheet
-#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_shared_spreadsheet__excel_export
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_document__excel_export
 msgid "Excel Export"
 msgstr "Экспорт в Excel"
+
+#. module: documents_spreadsheet
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/static/src/documents_view/documents_spreadsheet_controller_mixin.js:0
+msgid "Excel file preview"
+msgstr "Предпросмотр Excel-файла"
+
+#. module: documents_spreadsheet
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/static/src/spreadsheet_clone_xlsx_dialog/spreadsheet_clone_xlsx_dialog.xml:0
+msgid ""
+"Excel files cannot be previewed or edited directly in Odoo. Opening your "
+"file with Odoo Spreadsheet will allow you to do so."
+msgstr ""
+"Файлы Excel не могут быть просмотрены или отредактированы непосредственно в "
+"Odoo. Открытие файла в модуле Таблицы позволит вам сделать это."
+
+#. module: documents_spreadsheet
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/demo/files/pipeline_dashboard.json:0
+msgid "Expected Revenue by Stage"
+msgstr "Ожидаемый доход по этапам"
 
 #. module: documents_spreadsheet
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__file_name
@@ -193,14 +221,43 @@ msgstr "Имя файла"
 
 #. module: documents_spreadsheet
 #. odoo-javascript
-#: code:addons/documents_spreadsheet/static/src/documents_view/documents_spreadsheet_controller_mixin.js:0
-msgid "Format issue"
-msgstr "Проблема с форматом"
+#: code:addons/documents_spreadsheet/static/src/bundle/actions/spreadsheet_freeze_and_share/spreadsheet_freeze_and_share.xml:0
+#: code:addons/documents_spreadsheet/static/src/documents_control_panel/documents_control_panel.xml:0
+msgid "Freeze and share"
+msgstr "Заморозить и поделиться"
 
 #. module: documents_spreadsheet
-#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_share__freezed_spreadsheet_ids
-msgid "Freezed Spreadsheet"
-msgstr "Замороженная электронная таблица"
+#: model:ir.model.fields.selection,name:documents_spreadsheet.selection__documents_document__handler__frozen_folder
+msgid "Frozen Folder"
+msgstr "Замороженная папка"
+
+#. module: documents_spreadsheet
+#: model:ir.model.fields.selection,name:documents_spreadsheet.selection__documents_document__handler__frozen_spreadsheet
+msgid "Frozen Spreadsheet"
+msgstr "Замороженная таблица"
+
+#. module: documents_spreadsheet
+#. odoo-python
+#: code:addons/documents_spreadsheet/models/documents_access.py:0
+msgid "Frozen Spreadsheets can not be editable."
+msgstr "Замороженные таблицы недоступны для редактирования."
+
+#. module: documents_spreadsheet
+#. odoo-python
+#: code:addons/documents_spreadsheet/models/documents_document.py:0
+msgid "Frozen at %(date)s: %(name)s"
+msgstr "Заморожено %(date)s: %(name)s"
+
+#. module: documents_spreadsheet
+#. odoo-python
+#: code:addons/documents_spreadsheet/models/documents_document.py:0
+msgid "Frozen spreadsheets"
+msgstr "Замороженные таблицы"
+
+#. module: documents_spreadsheet
+#: model:ir.model,name:documents_spreadsheet.model_ir_http
+msgid "HTTP Routing"
+msgstr "Маршрутизация HTTP"
 
 #. module: documents_spreadsheet
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_document__handler
@@ -208,7 +265,6 @@ msgid "Handler"
 msgstr "Handler"
 
 #. module: documents_spreadsheet
-#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_shared_spreadsheet__id
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_save_spreadsheet_template__id
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_contributor__id
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__id
@@ -216,25 +272,24 @@ msgid "ID"
 msgstr "ID"
 
 #. module: documents_spreadsheet
-#: model_terms:documents.folder,description:documents_spreadsheet.documents_spreadsheet_folder
-msgid "If you want to work together on those spreadsheets :"
-msgstr "Если вы хотите вместе работать над этими таблицами:"
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/static/src/documents_control_panel/documents_control_panel.xml:0
+msgid "Insert in spreadsheet"
+msgstr "Вставить в таблицу"
 
 #. module: documents_spreadsheet
-#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_shared_spreadsheet__write_uid
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_save_spreadsheet_template__write_uid
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_contributor__write_uid
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__write_uid
 msgid "Last Updated by"
-msgstr "Последнее обновление"
+msgstr "Последнее обновление:"
 
 #. module: documents_spreadsheet
-#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_shared_spreadsheet__write_date
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_save_spreadsheet_template__write_date
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_contributor__write_date
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__write_date
 msgid "Last Updated on"
-msgstr "Последнее обновление"
+msgstr "Дата последнего обновления:"
 
 #. module: documents_spreadsheet
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_contributor__last_update_date
@@ -242,19 +297,15 @@ msgid "Last update date"
 msgstr "Дата последнего обновления"
 
 #. module: documents_spreadsheet
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/demo/files/pipeline_dashboard.json:0
+msgid "Lost Opportunities by Stage"
+msgstr "Упущенные возможности по этапам"
+
+#. module: documents_spreadsheet
 #: model_terms:ir.ui.view,arch_db:documents_spreadsheet.spreadsheet_template_view_tree
 msgid "Make a copy"
 msgstr "Создать копию"
-
-#. module: documents_spreadsheet
-#: model_terms:documents.folder,description:documents_spreadsheet.documents_spreadsheet_folder
-msgid "Manage and work with all the <strong>spreadsheets</strong> created in other applications."
-msgstr "Управление и работа со всеми <strong>электронными таблицами</strong>, созданными в других приложениях."
-
-#. module: documents_spreadsheet
-#: model_terms:documents.folder,description:documents_spreadsheet.documents_spreadsheet_folder
-msgid "Move them to another workspace"
-msgstr "Переместите их на другое рабочее пространство"
 
 #. module: documents_spreadsheet
 #: model_terms:ir.ui.view,arch_db:documents_spreadsheet.spreadsheet_template_view_search
@@ -267,18 +318,6 @@ msgid "Name"
 msgstr "Имя"
 
 #. module: documents_spreadsheet
-#. odoo-javascript
-#: code:addons/documents_spreadsheet/static/src/documents_view/documents_spreadsheet_controller_mixin.xml:0
-msgid "New Spreadsheet"
-msgstr "Новая электронная таблица"
-
-#. module: documents_spreadsheet
-#. odoo-javascript
-#: code:addons/documents_spreadsheet/static/src/spreadsheet_template/spreadsheet_template_dialog.js:0
-msgid "New sheet saved in Documents"
-msgstr "Новый лист сохраняется в папке Документы"
-
-#. module: documents_spreadsheet
 #: model_terms:ir.ui.view,arch_db:documents_spreadsheet.spreadsheet_template_view_tree
 msgid "New spreadsheet"
 msgstr "Новая электронная таблица"
@@ -288,28 +327,40 @@ msgstr "Новая электронная таблица"
 #. odoo-python
 #: code:addons/documents_spreadsheet/models/documents_document.py:0
 #: code:addons/documents_spreadsheet/static/src/bundle/actions/spreadsheet_action.js:0
-#: code:addons/documents_spreadsheet/static/src/spreadsheet_selector_dialog/document_selector_panel.js:0
 msgid "New spreadsheet created in Documents"
 msgstr "Новая электронная таблица создана в разделе Документы"
 
 #. module: documents_spreadsheet
 #. odoo-javascript
 #. odoo-python
-#: code:addons/documents_spreadsheet/models/spreadsheet_template.py:0
+#: code:addons/documents_spreadsheet/models/documents_document.py:0
+#: code:addons/documents_spreadsheet/static/src/bundle/actions/spreadsheet_action.js:0
+msgid "New spreadsheet created in My Drive"
+msgstr "Создана новая таблица в разделе «Мой диск»"
+
+#. module: documents_spreadsheet
+#. odoo-javascript
 #: code:addons/documents_spreadsheet/static/src/bundle/actions/spreadsheet_template/spreadsheet_template_action.js:0
 msgid "New spreadsheet template created"
 msgstr "Создан новый шаблон электронной таблицы"
-
-#. module: documents_spreadsheet
-#: model:ir.model.constraint,message:documents_spreadsheet.constraint_documents_shared_spreadsheet__unique
-msgid "Only one freezed spreadsheet per document share"
-msgstr "Только одна замороженная электронная таблица в одном общем доступе к документу"
 
 #. module: documents_spreadsheet
 #. odoo-javascript
 #: code:addons/documents_spreadsheet/static/src/documents_view/documents_spreadsheet_controller_mixin.js:0
 msgid "Open with Odoo Spreadsheet"
 msgstr "Открыть с помощью Odoo Spreadsheet"
+
+#. module: documents_spreadsheet
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/demo/files/pipeline_dashboard.json:0
+msgid "Opportunities by Stage"
+msgstr "Возможности по этапам"
+
+#. module: documents_spreadsheet
+#. odoo-python
+#: code:addons/documents_spreadsheet/models/documents_document.py:0
+msgid "Portal users cannot be the owner of a spreadsheet."
+msgstr "Пользователи портала не могут быть владельцами таблицы."
 
 #. module: documents_spreadsheet
 #. odoo-javascript
@@ -330,6 +381,12 @@ msgstr "Сохранить как шаблон"
 
 #. module: documents_spreadsheet
 #. odoo-javascript
+#: code:addons/documents_spreadsheet/static/src/documents_control_panel/documents_control_panel.js:0
+msgid "Select one and only one spreadsheet"
+msgstr "Выберите только одну таблицу"
+
+#. module: documents_spreadsheet
+#. odoo-javascript
 #: code:addons/documents_spreadsheet/static/src/spreadsheet_clone_xlsx_dialog/spreadsheet_clone_xlsx_dialog.xml:0
 msgid "Send source file to trash"
 msgstr "Отправьте исходный файл в корзину"
@@ -340,14 +397,17 @@ msgid "Sequence"
 msgstr "Последовательность"
 
 #. module: documents_spreadsheet
-#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_shared_spreadsheet__share_id
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/static/src/bundle/actions/spreadsheet_share/spreadsheet_share.xml:0
 msgid "Share"
 msgstr "Поделиться"
 
 #. module: documents_spreadsheet
-#: model:documents.folder,name:documents_spreadsheet.documents_spreadsheet_folder
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/static/src/bundle/actions/spreadsheet_action.js:0
+#: code:addons/documents_spreadsheet/static/src/documents_view/documents_spreadsheet_controller_mixin.xml:0
+#: code:addons/documents_spreadsheet/static/src/spreadsheet_action_loader.js:0
 #: model:ir.model.fields.selection,name:documents_spreadsheet.selection__documents_document__handler__spreadsheet
-#: model_terms:ir.ui.view,arch_db:documents_spreadsheet.document_view_search_spreadsheet
 msgid "Spreadsheet"
 msgstr "Таблица"
 
@@ -358,11 +418,17 @@ msgstr "Составитель электронных таблиц"
 
 #. module: documents_spreadsheet
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_document__spreadsheet_data
-#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_shared_spreadsheet__spreadsheet_data
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_save_spreadsheet_template__spreadsheet_data
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__spreadsheet_data
 msgid "Spreadsheet Data"
 msgstr "Данные электронной таблицы"
+
+#. module: documents_spreadsheet
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_document__spreadsheet_file_name
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_save_spreadsheet_template__spreadsheet_file_name
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__spreadsheet_file_name
+msgid "Spreadsheet File Name"
+msgstr "Имя файла таблицы"
 
 #. module: documents_spreadsheet
 #: model_terms:ir.ui.view,arch_db:documents_spreadsheet.spreadsheet_document_view_kanban
@@ -371,7 +437,6 @@ msgstr "Предварительный просмотр электронных �
 
 #. module: documents_spreadsheet
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_document__spreadsheet_revision_ids
-#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_shared_spreadsheet__spreadsheet_revision_ids
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_save_spreadsheet_template__spreadsheet_revision_ids
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__spreadsheet_revision_ids
 msgid "Spreadsheet Revision"
@@ -379,7 +444,6 @@ msgstr "Пересмотр электронных таблиц"
 
 #. module: documents_spreadsheet
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_document__spreadsheet_snapshot
-#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_shared_spreadsheet__spreadsheet_snapshot
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_save_spreadsheet_template__spreadsheet_snapshot
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__spreadsheet_snapshot
 msgid "Spreadsheet Snapshot"
@@ -402,8 +466,12 @@ msgid "Spreadsheet Templates"
 msgstr "Шаблоны электронных таблиц"
 
 #. module: documents_spreadsheet
+#: model:ir.model,name:documents_spreadsheet.model_spreadsheet_cell_thread
+msgid "Spreadsheet discussion thread"
+msgstr "Обсуждение таблицы"
+
+#. module: documents_spreadsheet
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_document__spreadsheet_binary_data
-#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_shared_spreadsheet__spreadsheet_binary_data
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_save_spreadsheet_template__spreadsheet_binary_data
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__spreadsheet_binary_data
 msgid "Spreadsheet file"
@@ -412,29 +480,31 @@ msgstr "Файл электронной таблицы"
 #. module: documents_spreadsheet
 #. odoo-javascript
 #: code:addons/documents_spreadsheet/static/src/documents_view/documents_spreadsheet_controller_mixin.js:0
-msgid "Spreadsheet files cannot be handled from the Trash. Would you like to restore this document?"
-msgstr "Файлы электронных таблиц не могут быть обработаны из корзины. Вы хотите восстановить этот документ?"
+msgid ""
+"Spreadsheet files cannot be handled from the Trash. Would you like to "
+"restore this document?"
+msgstr ""
+"Файлы таблиц не могут быть обработаны из корзины. Хотите восстановить этот "
+"документ?"
 
 #. module: documents_spreadsheet
-#. odoo-javascript
-#: code:addons/documents_spreadsheet/static/src/spreadsheet_clone_xlsx_dialog/spreadsheet_clone_xlsx_dialog.xml:0
-msgid "Spreadsheet files cannot be previewed or edited in Odoo. Opening your file with Odoo Spreadsheet will allow you to do so."
-msgstr "Файлы электронных таблиц нельзя просматривать или редактировать в Odoo. Открытие файла в Odoo Spreadsheet позволит вам сделать это."
-
-#. module: documents_spreadsheet
+#. odoo-python
+#: code:addons/documents_spreadsheet/models/documents_document.py:0
+#: model_terms:ir.ui.view,arch_db:documents_spreadsheet.document_view_search_spreadsheet
 #: model_terms:ir.ui.view,arch_db:documents_spreadsheet.res_config_settings_view_form_inherit_documents_spreadsheet
 msgid "Spreadsheets"
 msgstr "Электронные таблицы"
 
 #. module: documents_spreadsheet
-#. odoo-javascript
-#: code:addons/documents_spreadsheet/static/src/documents_view/inspector/documents_inspector.js:0
-msgid ""
-"Spreadsheets mass download not yet supported.\n"
-" Download spreadsheets individually instead."
-msgstr ""
-"Массовая загрузка электронных таблиц пока не поддерживается.\n"
-" Вместо этого загружайте электронные таблицы по отдельности."
+#. odoo-python
+#: code:addons/documents_spreadsheet/models/documents_access.py:0
+msgid "Spreadsheets can not be shared in edit mode to non-internal users."
+msgstr "Таблицы нельзя предоставлять для редактирования внешним пользователям."
+
+#. module: documents_spreadsheet
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_cell_thread__template_id
+msgid "Template"
+msgstr "Шаблон"
 
 #. module: documents_spreadsheet
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_save_spreadsheet_template__template_name
@@ -444,14 +514,54 @@ msgstr "Название шаблона"
 #. module: documents_spreadsheet
 #. odoo-python
 #: code:addons/documents_spreadsheet/models/documents_document.py:0
+msgid ""
+"The company for a folder cannot be changed if it is already used as the "
+"spreadsheet workspace for at least one other company: %s"
+msgstr ""
+"Нельзя изменить компанию у папки, если данная папка уже используется как "
+"рабочее пространство таблиц для другой компании: %s"
+
+#. module: documents_spreadsheet
+#. odoo-python
+#: code:addons/documents_spreadsheet/models/res_company.py:0
+msgid ""
+"The company of %(folder)s should either be undefined or set to %(company)s. "
+"Otherwise, it is not possible to link the workspace to the company."
+msgstr ""
+"Компания %(folder)s должна быть либо не определена, либо установлена на %"
+"(company)s. В противном случае связать рабочее пространство с компанией "
+"невозможно."
+
+#. module: documents_spreadsheet
+#. odoo-python
+#: code:addons/documents_spreadsheet/models/documents_document.py:0
 msgid "The file is not a xlsx file"
 msgstr "Файл не является файлом xlsx"
+
+#. module: documents_spreadsheet
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/static/src/documents_permission_panel/documents_access_settings.js:0
+#: code:addons/documents_spreadsheet/static/src/documents_permission_panel/documents_member_invite.js:0
+#: code:addons/documents_spreadsheet/static/src/documents_permission_panel/documents_partner_access.js:0
+msgid "The frozen spreadsheets are readonly."
+msgstr "Замороженные таблицы доступны только для чтения."
 
 #. module: documents_spreadsheet
 #. odoo-python
 #: code:addons/documents_spreadsheet/models/documents_document.py:0
 msgid "The spreadsheet you are trying to access does not exist."
-msgstr "Электронная таблица, к которой вы пытаетесь получить доступ, не существует."
+msgstr ""
+"Электронная таблица, к которой вы пытаетесь получить доступ, не существует."
+
+#. module: documents_spreadsheet
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/static/src/documents_permission_panel/documents_access_settings.js:0
+msgid ""
+"The spreadsheets can not be shared in edit mode with a link, change Internal "
+"to give write access."
+msgstr ""
+"Нельзя предоставить доступ к редактированию таблицы по ссылке. Измените "
+"настройку «Внутренний», чтобы разрешить редактирование."
 
 #. module: documents_spreadsheet
 #. odoo-python
@@ -466,16 +576,29 @@ msgid "The xlsx file is too big"
 msgstr "Файл xlsx слишком большой"
 
 #. module: documents_spreadsheet
+#: model_terms:ir.ui.view,arch_db:documents_spreadsheet.documents_error_live_data
+msgid "This spreadsheet contains live data, only internal users can view it."
+msgstr ""
+"Эта таблица содержит данные, которые обновляются в режиме реального времени. "
+"Только внутренние пользователи могут просматривать данную таблицу."
+
+#. module: documents_spreadsheet
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_document__thumbnail
-#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_shared_spreadsheet__thumbnail
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_save_spreadsheet_template__thumbnail
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__thumbnail
 msgid "Thumbnail"
 msgstr "Миниатюра"
 
 #. module: documents_spreadsheet
+#: model:ir.model.constraint,message:documents_spreadsheet.constraint_documents_document_spreadsheet_access_via_link
+msgid "To share a spreadsheet in edit mode, add the user in the accesses"
+msgstr ""
+"Чтобы предоставить доступ к редактированию таблицы по ссылке, добавьте "
+"пользователя в список доступа"
+
+#. module: documents_spreadsheet
 #. odoo-javascript
-#: code:addons/documents_spreadsheet/static/src/bundle/components/control_panel/spreadsheet_breadcrumbs.xml:0
+#: code:addons/documents_spreadsheet/static/src/bundle/actions/spreadsheet_action.xml:0
 msgid "Toggle favorite"
 msgstr "Переключить любимое"
 
@@ -505,13 +628,38 @@ msgstr "Рабочая область"
 
 #. module: documents_spreadsheet
 #. odoo-python
-#: code:addons/documents_spreadsheet/controllers/documents.py:0
-msgid "You cannot upload spreadsheets in a shared folder"
-msgstr "Невозможно загрузить электронные таблицы в общую папку"
+#: code:addons/documents_spreadsheet/models/documents_document.py:0
+msgid "You are not allowed to freeze spreadsheets in Company"
+msgstr "У вас нет прав на заморозку таблиц в компании"
 
 #. module: documents_spreadsheet
 #. odoo-python
-#: code:addons/documents_spreadsheet/controllers/share.py:0
+#: code:addons/documents_spreadsheet/models/documents_document.py:0
+msgid "You can not edit a frozen spreadsheet"
+msgstr "Нельзя редактировать замороженную таблицу"
+
+#. module: documents_spreadsheet
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/static/src/bundle/actions/spreadsheet_action.js:0
+msgid "You can not freeze a frozen spreadsheet"
+msgstr "Нельзя повторно замораживать уже замороженную таблицу"
+
+#. module: documents_spreadsheet
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/static/src/documents_permission_panel/documents_member_invite.js:0
+#: code:addons/documents_spreadsheet/static/src/documents_permission_panel/documents_partner_access.js:0
+msgid "You can not share spreadsheet in edit mode to non-internal user."
+msgstr ""
+"Нельзя делиться таблицей в режиме редактирования с внешними пользователями."
+
+#. module: documents_spreadsheet
+#. odoo-python
 #: code:addons/documents_spreadsheet/models/documents_document.py:0
 msgid "You don't have access to this document"
 msgstr "У вас нет доступа к этому документу"
+
+#. module: documents_spreadsheet
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/demo/files/pipeline_dashboard.json:0
+msgid "of target"
+msgstr "от целевого значения"

@@ -1,8 +1,8 @@
 /** @odoo-module **/
 
 import LineComponent from '@stock_barcode/components/line';
+import { deserializeDateTime, formatDate } from "@web/core/l10n/dates";
 import { patch } from "@web/core/utils/patch";
-import { parseDateTime } from "@web/core/l10n/dates";
 
 patch(LineComponent.prototype, {
     get isUseExpirationDate() {
@@ -14,7 +14,6 @@ patch(LineComponent.prototype, {
         if (!dateTimeStrUTC) {
             return '';
         }
-        const dateTimeLocal = parseDateTime(dateTimeStrUTC).toJSDate();
-        return dateTimeLocal.toLocaleDateString();
+        return formatDate(deserializeDateTime(dateTimeStrUTC));
     },
 });

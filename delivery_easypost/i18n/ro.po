@@ -3,24 +3,23 @@
 # 	* delivery_easypost
 #
 # Translators:
-# Cozmin Candea <office@terrabit.ro>, 2022
-# Martin Trigaux, 2022
-# Foldi Robert <foldirobert@nexterp.ro>, 2022
-# Dorin Hongu <dhongu@gmail.com>, 2023
+# Wil Odoo, 2024
+# Larisa_nexterp, 2025
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server saas~15.4+e\n"
+"Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-16 16:01+0000\n"
-"PO-Revision-Date: 2022-09-22 05:46+0000\n"
-"Last-Translator: Dorin Hongu <dhongu@gmail.com>, 2023\n"
+"POT-Creation-Date: 2025-12-29 18:45+0000\n"
+"PO-Revision-Date: 2024-09-25 09:44+0000\n"
+"Last-Translator: Larisa_nexterp, 2025\n"
 "Language-Team: Romanian (https://app.transifex.com/odoo/teams/41243/ro/)\n"
 "Language: ro\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Plural-Forms: nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?2:1));\n"
+"Plural-Forms: nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?"
+"2:1));\n"
 
 #. module: delivery_easypost
 #: model_terms:ir.ui.view,arch_db:delivery_easypost.view_delivery_carrier_form_inherit_delivery_easypost
@@ -34,35 +33,42 @@ msgstr ""
 #. module: delivery_easypost
 #: model_terms:ir.ui.view,arch_db:delivery_easypost.view_delivery_carrier_form_inherit_delivery_easypost
 msgid ""
-"<b>Once your account is created, go to your Dashboard and click on the arrow next to your username to configure your carrier accounts. </b>\n"
-"                <b>You can add new carrier accounts on the right side of the same page.</b>\n"
+"<b>Once your account is created, go to your Dashboard and click on the arrow "
+"next to your username to configure your carrier accounts. </b>\n"
+"                <b>You can add new carrier accounts on the right side of the "
+"same page.</b>\n"
 "                <br/>"
 msgstr ""
-"<b>După crearea contului dvs., accesați tabloul de bord și faceți clic pe săgeata de lângă numele de utilizator pentru a configura conturile de operator. </b>\n"
-"                <b>Puteți adăuga noi conturi de operator în partea dreaptă a aceleiași pagini.</b>\n"
+"<b>După ce v-ați creat contul, accesați Tabloul de bord și faceți clic pe "
+"săgeata de lângă numele de utilizator pentru a configura conturile de "
+"transportator.</b>\n"
+"                <b>Puteți adăuga noi conturi de transportator în partea "
+"dreaptă a aceleiași pagini.</b>\n"
 "                <br/>"
 
 #. module: delivery_easypost
 #: model_terms:ir.ui.view,arch_db:delivery_easypost.view_stock_package_type_form_inherit_easypost
-msgid "<span attrs=\"{'invisible': [('package_carrier_type', '!=', 'easypost')]}\">Inches</span>"
-msgstr "<span attrs=\"{'invisible': [('package_carrier_type', '!=', 'easypost')]}\">Inci</span>"
+msgid "<span invisible=\"package_carrier_type != 'easypost'\">Inches</span>"
+msgstr "<span invisible=\"package_carrier_type != 'easypost'\">Inci</span>"
 
 #. module: delivery_easypost
 #. odoo-python
 #: code:addons/delivery_easypost/models/delivery_carrier.py:0
 msgid "A production key is required in order to load your easypost carriers."
 msgstr ""
+"Este necesară o cheie de producție pentru a încărca transportatorii Easypost."
 
 #. module: delivery_easypost
 #. odoo-python
 #: code:addons/delivery_easypost/models/delivery_carrier.py:0
 msgid "A production key is required in order to load your insurance fees."
 msgstr ""
+"Este necesară o cheie de producție pentru a încărca taxele de asigurare."
 
 #. module: delivery_easypost
 #: model_terms:ir.ui.view,arch_db:delivery_easypost.view_delivery_carrier_form_inherit_delivery_easypost
 msgid "API keys"
-msgstr "Cheie API"
+msgstr "Chei API"
 
 #. module: delivery_easypost
 #: model_terms:ir.ui.view,arch_db:delivery_easypost.view_delivery_easypost_carrier_type
@@ -78,7 +84,7 @@ msgstr "Transportator"
 #: model:ir.model.fields,field_description:delivery_easypost.field_easypost_service__easypost_carrier
 #: model:ir.model.fields,field_description:delivery_easypost.field_stock_package_type__easypost_carrier
 msgid "Carrier Prefix"
-msgstr "Prefix Transportator"
+msgstr "Prefix transportator"
 
 #. module: delivery_easypost
 #: model:ir.model,name:delivery_easypost.model_delivery_carrier_easypost
@@ -86,12 +92,12 @@ msgstr "Prefix Transportator"
 #: model_terms:ir.ui.view,arch_db:delivery_easypost.view_delivery_carrier_form_inherit_delivery_easypost
 #: model_terms:ir.ui.view,arch_db:delivery_easypost.view_delivery_easypost_carrier_type
 msgid "Carrier Type"
-msgstr "Tip Transportator"
+msgstr "Tip transportator"
 
 #. module: delivery_easypost
 #: model_terms:ir.ui.view,arch_db:delivery_easypost.view_delivery_carrier_form_inherit_delivery_easypost
 msgid "Carrier accounts"
-msgstr "Conturi Transportator"
+msgstr "Conturi transportator"
 
 #. module: delivery_easypost
 #: model:ir.model.fields,field_description:delivery_easypost.field_delivery_carrier_easypost__create_uid
@@ -103,27 +109,27 @@ msgstr "Creat de"
 #: model:ir.model.fields,field_description:delivery_easypost.field_delivery_carrier_easypost__create_date
 #: model:ir.model.fields,field_description:delivery_easypost.field_easypost_service__create_date
 msgid "Created on"
-msgstr "Creat în"
+msgstr "Creat la"
 
 #. module: delivery_easypost
 #: model_terms:ir.ui.view,arch_db:delivery_easypost.view_delivery_carrier_form_inherit_delivery_easypost
 msgid "Default Package Type"
-msgstr "Tip Pachet Implicit"
+msgstr "Tip pachet implicit"
 
 #. module: delivery_easypost
 #: model:ir.model.fields,field_description:delivery_easypost.field_delivery_carrier__easypost_default_package_type_id
 msgid "Default Package Type for Easypost"
-msgstr "Tip Pachet Implicit pentru Easypost"
+msgstr "Tip pachet implicit pentru Easypost"
 
 #. module: delivery_easypost
 #: model:ir.model.fields,field_description:delivery_easypost.field_delivery_carrier__easypost_default_service_id
 msgid "Default Service Level"
-msgstr "Nivel Prestabilit Serviciu"
+msgstr "Nivel de serviciu implicit"
 
 #. module: delivery_easypost
 #: model:ir.model.fields,field_description:delivery_easypost.field_delivery_carrier_easypost__delivery_carrier_id
 msgid "Delivery Carrier"
-msgstr "Transportator"
+msgstr "Transportator livrare"
 
 #. module: delivery_easypost
 #: model:ir.model.fields,field_description:delivery_easypost.field_delivery_carrier_easypost__display_name
@@ -133,8 +139,12 @@ msgstr "Nume afișat"
 
 #. module: delivery_easypost
 #: model_terms:ir.ui.view,arch_db:delivery_easypost.view_delivery_carrier_form_inherit_delivery_easypost
-msgid "Do not forget to load your Easypost carrier accounts for a valid configuration."
-msgstr "Nu uitați să vă încărcați conturile de transportator Easypost pentru o configurație validă."
+msgid ""
+"Do not forget to load your Easypost carrier accounts for a valid "
+"configuration."
+msgstr ""
+"Nu uitați să încărcați conturile de transportator Easypost pentru o "
+"configurare validă."
 
 #. module: delivery_easypost
 #: model:ir.model.fields.selection,name:delivery_easypost.selection__delivery_carrier__easypost_label_file_type__epl2
@@ -150,12 +160,12 @@ msgstr "Easypost"
 #. module: delivery_easypost
 #: model:ir.model.fields,field_description:delivery_easypost.field_delivery_carrier__easypost_delivery_type
 msgid "Easypost Carrier Type"
-msgstr "Tip Transportator EasyPost"
+msgstr "Tip transportator Easypost"
 
 #. module: delivery_easypost
 #: model:ir.model.fields,field_description:delivery_easypost.field_delivery_carrier__easypost_delivery_type_id
 msgid "Easypost Carrier Type ID, technical for API request"
-msgstr "Tip ID Transportator EasyPost, tehnic pentru solicitarea API"
+msgstr "ID tip transportator Easypost, tehnic pentru solicitarea API"
 
 #. module: delivery_easypost
 #: model_terms:ir.ui.view,arch_db:delivery_easypost.view_delivery_carrier_form_inherit_delivery_easypost
@@ -166,7 +176,7 @@ msgstr "Configurare Easypost"
 #. odoo-python
 #: code:addons/delivery_easypost/models/delivery_carrier.py:0
 msgid "Easypost Documents:"
-msgstr ""
+msgstr "Documente Easypost:"
 
 #. module: delivery_easypost
 #: model:ir.model.fields,field_description:delivery_easypost.field_delivery_carrier__easypost_label_file_type
@@ -176,18 +186,18 @@ msgstr "Tip fișier etichetă Easypost"
 #. module: delivery_easypost
 #: model:ir.model.fields,field_description:delivery_easypost.field_stock_picking__ep_order_ref
 msgid "Easypost Order Reference"
-msgstr "Referință Comandă Easypost"
+msgstr "Referință comandă Easypost"
 
 #. module: delivery_easypost
 #: model:ir.model,name:delivery_easypost.model_easypost_service
 msgid "Easypost Service"
-msgstr "Serviciu EasyPost"
+msgstr "Serviciu Easypost"
 
 #. module: delivery_easypost
 #: model_terms:ir.ui.view,arch_db:delivery_easypost.res_config_settings_view_form_sale
 #: model_terms:ir.ui.view,arch_db:delivery_easypost.res_config_settings_view_form_stock
 msgid "Easypost Shipping Methods"
-msgstr "Easypost Metode de expediere"
+msgstr "Metode de livrare Easypost"
 
 #. module: delivery_easypost
 #: model_terms:ir.ui.view,arch_db:delivery_easypost.view_delivery_carrier_form_inherit_delivery_easypost
@@ -203,17 +213,17 @@ msgstr "Website Easypost"
 #. odoo-python
 #: code:addons/delivery_easypost/models/easypost_request.py:0
 msgid "Easypost returned an error: %s"
-msgstr ""
+msgstr "Easypost a returnat o eroare: %s"
 
 #. module: delivery_easypost
 #: model:ir.model.fields,help:delivery_easypost.field_delivery_carrier__easypost_production_api_key
 msgid "Enter your API production key from Easypost account"
-msgstr "Introduceți cheia de producție API din contul Easypost"
+msgstr "Introduceți cheia API de producție din contul Easypost"
 
 #. module: delivery_easypost
 #: model:ir.model.fields,help:delivery_easypost.field_delivery_carrier__easypost_test_api_key
 msgid "Enter your API test key from Easypost account."
-msgstr "Introduceți cheia de testare API din contul Easypost."
+msgstr "Introduceți cheia API de test din contul Easypost."
 
 #. module: delivery_easypost
 #: model_terms:ir.ui.view,arch_db:delivery_easypost.view_delivery_carrier_form_inherit_delivery_easypost
@@ -229,45 +239,50 @@ msgstr "ID"
 #. module: delivery_easypost
 #: model:ir.model.fields,help:delivery_easypost.field_delivery_carrier__easypost_default_service_id
 msgid "If not set, the less expensive available service level will be chosen."
-msgstr "Dacă nu este setat, se va alege nivelul de servicii disponibil mai puțin scump."
+msgstr ""
+"Dacă nu este setat, va fi ales nivelul de serviciu disponibil cel mai ieftin."
 
 #. module: delivery_easypost
 #: model:ir.model.fields,field_description:delivery_easypost.field_delivery_carrier__easypost_insurance_fee_minimum
 msgid "Insurance fee minimum (USD)"
-msgstr ""
+msgstr "Taxă minimă de asigurare (USD)"
 
 #. module: delivery_easypost
 #: model:ir.model.fields,field_description:delivery_easypost.field_delivery_carrier__easypost_insurance_fee_rate
 msgid "Insurance fee rate (USD)"
-msgstr ""
+msgstr "Rată taxă de asigurare (USD)"
 
 #. module: delivery_easypost
 #. odoo-python
 #: code:addons/delivery_easypost/models/easypost_request.py:0
-msgid "It seems Easypost do not provide shipments for this order.                We advise you to try with another package type or service level."
-msgstr "Se pare că Easypost nu oferă expedieri pentru această comandă. Vă recomandăm să încercați cu un alt tip pachet sau nivel de serviciu."
+msgid ""
+"It seems Easypost do not provide shipments for this order.                We "
+"advise you to try with another package type or service level."
+msgstr ""
+"Se pare că Easypost nu oferă livrări pentru această comandă. Vă recomandăm "
+"să încercați cu un alt tip de pachet sau nivel de serviciu."
 
 #. module: delivery_easypost
 #: model_terms:ir.ui.view,arch_db:delivery_easypost.view_delivery_carrier_form_inherit_delivery_easypost
 msgid "Label Format"
-msgstr "Format Etichetă"
+msgstr "Format etichetă"
 
 #. module: delivery_easypost
 #: model:ir.model.fields,field_description:delivery_easypost.field_delivery_carrier_easypost__write_uid
 #: model:ir.model.fields,field_description:delivery_easypost.field_easypost_service__write_uid
 msgid "Last Updated by"
-msgstr "Ultima actualizare făcută de"
+msgstr "Ultima actualizare de"
 
 #. module: delivery_easypost
 #: model:ir.model.fields,field_description:delivery_easypost.field_delivery_carrier_easypost__write_date
 #: model:ir.model.fields,field_description:delivery_easypost.field_easypost_service__write_date
 msgid "Last Updated on"
-msgstr "Ultima actualizare pe"
+msgstr "Ultima actualizare la"
 
 #. module: delivery_easypost
 #: model_terms:ir.ui.view,arch_db:delivery_easypost.view_delivery_carrier_form_inherit_delivery_easypost
 msgid "Load your Easypost carrier accounts"
-msgstr "Încărcați-vă conturile de transportator Easypost"
+msgstr "Încărcați conturile de transportator Easypost"
 
 #. module: delivery_easypost
 #: model_terms:ir.ui.view,arch_db:delivery_easypost.view_delivery_carrier_form_inherit_delivery_easypost
@@ -289,6 +304,7 @@ msgstr "PNG"
 #: code:addons/delivery_easypost/models/easypost_request.py:0
 msgid "Package type used in pack %s is not configured for easypost."
 msgstr ""
+"Tipul de pachet folosit în pachetul %s nu este configurat pentru Easypost."
 
 #. module: delivery_easypost
 #. odoo-python
@@ -299,7 +315,7 @@ msgstr "Vă rugăm să furnizați cel puțin un articol pentru livrare."
 #. module: delivery_easypost
 #: model:ir.model.fields,field_description:delivery_easypost.field_delivery_carrier__easypost_production_api_key
 msgid "Production API Key"
-msgstr "Cheie API Producție"
+msgstr "Cheie API producție"
 
 #. module: delivery_easypost
 #: model:ir.model.fields,field_description:delivery_easypost.field_delivery_carrier__delivery_type
@@ -310,13 +326,13 @@ msgstr "Furnizor"
 #. odoo-python
 #: code:addons/delivery_easypost/models/delivery_carrier.py:0
 msgid "Return Label<br/>"
-msgstr ""
+msgstr "Etichetă retur<br/>"
 
 #. module: delivery_easypost
 #. odoo-python
 #: code:addons/delivery_easypost/models/easypost_request.py:0
 msgid "Sale Order/Stock Picking is missing."
-msgstr "Comanda de vânzare/Ridicare Stoc lipsește."
+msgstr "Comanda de vânzare/Preluarea stocului lipsește."
 
 #. module: delivery_easypost
 #: model_terms:ir.ui.view,arch_db:delivery_easypost.view_delivery_easypost_carrier_type
@@ -326,28 +342,28 @@ msgstr "Selectează"
 #. module: delivery_easypost
 #: model:ir.actions.act_window,name:delivery_easypost.act_delivery_easypost_carrier_type
 msgid "Select a carrier"
-msgstr "Selectare Transportator"
+msgstr "Selectează un transportator"
 
 #. module: delivery_easypost
 #: model:ir.model.fields,field_description:delivery_easypost.field_easypost_service__name
 msgid "Service Level Name"
-msgstr "Nume Nivel Serviciu"
+msgstr "Nume nivel serviciu"
 
 #. module: delivery_easypost
 #. odoo-python
 #: code:addons/delivery_easypost/models/delivery_carrier.py:0
 msgid "Shipment created into Easypost<br/><b>Tracking Numbers:</b> %s<br/>"
-msgstr "Expediere creată în Easypost<br/><b>Numere Urmărire:</b> %s<br/>"
+msgstr "Expediere creată în Easypost<br/><b>Numere de urmărire:</b> %s<br/>"
 
 #. module: delivery_easypost
 #: model:ir.model,name:delivery_easypost.model_delivery_carrier
 msgid "Shipping Methods"
-msgstr "Metode de expediere"
+msgstr "Metode de livrare"
 
 #. module: delivery_easypost
 #: model_terms:ir.ui.view,arch_db:delivery_easypost.view_delivery_carrier_form_inherit_delivery_easypost
 msgid "Sign up"
-msgstr "Înregistrare"
+msgstr "Înregistrează-te"
 
 #. module: delivery_easypost
 #: model:ir.model,name:delivery_easypost.model_stock_package_type
@@ -357,7 +373,7 @@ msgstr "Tip pachet stoc"
 #. module: delivery_easypost
 #: model:ir.model.fields,field_description:delivery_easypost.field_delivery_carrier__easypost_test_api_key
 msgid "Test API Key"
-msgstr "Testare Cheie API"
+msgstr "Cheie API test"
 
 #. module: delivery_easypost
 #. odoo-python
@@ -366,6 +382,8 @@ msgid ""
 "The %s carrier is missing (Missing field(s) :\n"
 " Default Package Type)"
 msgstr ""
+"Transportatorul %s lipsește (Câmp(uri) lipsă :\n"
+" Tip pachet implicit)"
 
 #. module: delivery_easypost
 #. odoo-python
@@ -374,8 +392,8 @@ msgid ""
 "The %s carrier is missing (Missing field(s) :\n"
 " Delivery Carrier Type)"
 msgstr ""
-" %s transportatorul lipsește (câmpuri(le) lipsă :\n"
-"  Tip Livrare Transportator)"
+"Transportatorul %s lipsește (Câmp(uri) lipsă :\n"
+" Tip transportator livrare)"
 
 #. module: delivery_easypost
 #. odoo-python
@@ -384,8 +402,8 @@ msgid ""
 "The %s carrier is missing (Missing field(s) :\n"
 " Production API Key)"
 msgstr ""
-"%s transportatorul lipsește (câmpuri(le) lipsă :\n"
-" Cheie Produs API)"
+"Transportatorul %s lipsește (Câmp(uri) lipsă :\n"
+" Cheie API producție)"
 
 #. module: delivery_easypost
 #. odoo-python
@@ -394,28 +412,39 @@ msgid ""
 "The %s carrier is missing (Missing field(s) :\n"
 " Test API Key)"
 msgstr ""
-"%s transportatorul lipsește (câmpuri(le) lipsă :\n"
-" Testare Cheie API)"
-
-#. module: delivery_easypost
-#. odoo-python
-#: code:addons/delivery_easypost/models/easypost_request.py:0
-msgid "The estimated price cannot be computed because the weight of your product is missing."
-msgstr "Prețul estimat nu poate fi calculat, deoarece greutatea produsului dvs. lipsește."
+"Transportatorul %s lipsește (Câmp(uri) lipsă :\n"
+" Cheie API test)"
 
 #. module: delivery_easypost
 #. odoo-python
 #: code:addons/delivery_easypost/models/easypost_request.py:0
 msgid ""
-"The estimated shipping price cannot be computed because the weight is missing for the following product(s): \n"
-" %s"
+"The estimated price cannot be computed because the weight of your product is "
+"missing."
 msgstr ""
+"Prețul estimat nu poate fi calculat deoarece lipsește greutatea produsului."
 
 #. module: delivery_easypost
 #. odoo-python
 #: code:addons/delivery_easypost/models/easypost_request.py:0
-msgid "There is no rate available for the selected service level for one of your package. Please choose another service level."
-msgstr "Nu există o rată disponibilă pentru nivelul de servicii selectat pentru unul dintre pachetele dvs. Vă rugăm să alegeți un alt nivel de serviciu."
+msgid ""
+"The estimated shipping price cannot be computed because the weight is "
+"missing for the following product(s): \n"
+" %s"
+msgstr ""
+"Prețul estimat al livrării nu poate fi calculat deoarece lipsește greutatea "
+"pentru următoarele produse:\n"
+" %s"
+
+#. module: delivery_easypost
+#. odoo-python
+#: code:addons/delivery_easypost/models/easypost_request.py:0
+msgid ""
+"There is no rate available for the selected service level for one of your "
+"package. Please choose another service level."
+msgstr ""
+"Nu există tarif disponibil pentru nivelul de serviciu selectat pentru unul "
+"dintre pachetele dvs. Vă rugăm să alegeți alt nivel de serviciu."
 
 #. module: delivery_easypost
 #: model:ir.model,name:delivery_easypost.model_stock_picking
@@ -426,7 +455,7 @@ msgstr "Transfer"
 #. odoo-python
 #: code:addons/delivery_easypost/models/delivery_carrier.py:0
 msgid "Unable to retrieve your default insurance rates."
-msgstr ""
+msgstr "Nu se pot prelua tarifele implicite de asigurare."
 
 #. module: delivery_easypost
 #. odoo-python
@@ -438,19 +467,24 @@ msgstr "Eroare necunoscută"
 #. odoo-python
 #: code:addons/delivery_easypost/models/easypost_request.py:0
 msgid "Unspecified field"
-msgstr ""
+msgstr "Câmp nespecificat"
 
 #. module: delivery_easypost
 #. odoo-python
 #: code:addons/delivery_easypost/models/delivery_carrier.py:0
 msgid "You can't cancel Easypost shipping."
-msgstr "Nu puteți anula expedierea Easypost."
+msgstr "Nu puteți anula livrarea Easypost."
 
 #. module: delivery_easypost
 #. odoo-python
 #: code:addons/delivery_easypost/models/easypost_request.py:0
-msgid "You have no carrier linked to your Easypost Account.                Please connect to Easypost, link your account to carriers and then retry."
-msgstr "Nu aveți niciun transportator legat de contul dvs. Easypost.                Vă rugăm să vă conectați la Easypost, să conectați contul la operatorii de transport și apoi să încercați din nou."
+msgid ""
+"You have no carrier linked to your Easypost Account.                Please "
+"connect to Easypost, link your account to carriers and then retry."
+msgstr ""
+"Nu aveți niciun transportator asociat contului dvs. Easypost. Vă rugăm să vă "
+"conectați la Easypost, să asociați contul cu transportatorii și apoi să "
+"încercați din nou."
 
 #. module: delivery_easypost
 #: model:ir.model.fields.selection,name:delivery_easypost.selection__delivery_carrier__easypost_label_file_type__zpl

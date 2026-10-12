@@ -92,7 +92,7 @@ class EasypostRequest():
         if order:
             if not order.order_line:
                 raise UserError(_("Please provide at least one item to ship."))
-            error_lines = order.order_line.filtered(lambda line: not line.product_id.weight and line.product_qty != 0 and not line.is_delivery and line.product_id.type != 'service' and not line.display_type)
+            error_lines = order.order_line._get_invalid_delivery_weight_lines()
             if error_lines:
                 return _("The estimated shipping price cannot be computed because the weight is missing for the following product(s): \n %s", ", ".join(error_lines.product_id.mapped('name')))
 
@@ -163,7 +163,9 @@ class EasypostRequest():
         shipment = {
             'order[shipments][%d][parcel][weight]' % shipment_id: carrier._easypost_convert_weight(delivery_package.weight),
             'order[shipments][%d][options][label_format]' % shipment_id: label_format,
-            'order[shipments][%d][options][label_date]' % shipment_id: datetime.datetime.now().isoformat()
+            'order[shipments][%d][options][label_date]' % shipment_id: datetime.datetime.now().isoformat(),
+            'order[shipments][%d][options][print_custom_1]' % shipment_id:
+                delivery_package.picking_id.display_name if delivery_package.picking_id else delivery_package.order_id.display_name,
         }
         # If this is not an EasyPost predefined package, then we give the dimensions.
         packages = carrier._easypost_get_services_and_package_types()[0]
@@ -358,7 +360,9 @@ class EasypostRequest():
         # explicitly check response for any messages
         messages = response.get('messages', [])
         message_type = messages[0].get('type') if messages else None
-        if message_type and message_type not in NON_BLOCKING_MESSAGES:
+        message_carrier = messages[0].get('carrier') if messages else None
+        # LoomisExpress is an exception when validating multi-package
+        if message_type and message_type not in NON_BLOCKING_MESSAGES and (message_carrier != 'LoomisExpress' or message_type != 'rate_error'):
             raise UserError('\n'.join([x['carrier'] + ': ' + x['type'] + ' -- ' + x['message'] for x in response['messages']]))
 
         # get tracking code and lable file url
@@ -385,7 +389,9 @@ class EasypostRequest():
         endpoint = "orders/%s" % order_id
         response = self._make_api_request(endpoint)
         for shipment in response.get('shipments'):
-            tracking_public_urls.append([shipment['tracking_code'], shipment['tracker']['public_url']])
+            public_url = (shipment.get('tracker') or {}).get('public_url')
+            if public_url:
+                tracking_public_urls.append([shipment['tracking_code'], public_url])
         return tracking_public_urls
 
     def get_tracking_link_from_code(self, code):

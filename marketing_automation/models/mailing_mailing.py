@@ -44,9 +44,6 @@ class MassMailing(models.Model):
         return res
 
     def _get_link_tracker_values(self):
-        # We don't want to create link trackers for tests
-        if self.env.context.get('active_model') == 'marketing.campaign.test':
-            return {}
         res = super(MassMailing, self)._get_link_tracker_values()
         if self.env.context.get('default_marketing_activity_id'):
             activity = self.env['marketing.activity'].browse(self.env.context['default_marketing_activity_id'])
@@ -66,3 +63,15 @@ class MassMailing(models.Model):
                   mailing_names=", ".join(protected.mapped("name"))
                 )
             )
+
+    def action_retry_failed(self):
+        """
+        Prevent retrying mailings tied to marketing automation.
+        Retrying bypasses the automation filters and targets the entire model.
+        """
+        if self.filtered('use_in_marketing_automation'):
+            raise UserError(_(
+                "Oops! You can't retry sending emails from inside a Marketing Automation campaign."
+            ))
+
+        return super().action_retry_failed()

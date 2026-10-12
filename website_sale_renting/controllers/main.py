@@ -13,13 +13,16 @@ class WebsiteSaleRenting(WebsiteSale):
     def cart_update_renting(self, start_date=None, end_date=None):
         """Route to check the cart availability when changing the dates on the cart.
         """
+        try:
+            start_date = fields.Datetime.to_datetime(start_date)
+            end_date = fields.Datetime.to_datetime(end_date)
+        except ValueError:
+            start_date = end_date = None
         if not start_date or not end_date:
-            return
+            return {}
         order_sudo = request.website.sale_get_order()
         if not order_sudo:
-            return
-        start_date = fields.Datetime.to_datetime(start_date)
-        end_date = fields.Datetime.to_datetime(end_date)
+            return {}
         order_sudo._cart_update_renting_period(start_date, end_date)
 
         values = {}

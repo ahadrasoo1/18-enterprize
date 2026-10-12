@@ -1,23 +1,27 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* marketing_automation_sms
-# 
+# * marketing_automation_sms
+#
 # Translators:
-# Wil Odoo, 2024
-# 
+# Wil Odoo, 2025
+# Tony Ng, 2025
+#
+# "Tony Ng (ngto)" <ngto@odoo.com>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:27+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Chinese (Taiwan) (https://app.transifex.com/odoo/teams/41243/zh_TW/)\n"
+"POT-Creation-Date: 2025-12-29 18:47+0000\n"
+"PO-Revision-Date: 2025-09-15 11:38+0000\n"
+"Last-Translator: \"Tony Ng (ngto)\" <ngto@odoo.com>\n"
+"Language-Team: Chinese (Traditional Han script) <https://translate.odoo.com/"
+"projects/odoo-18/marketing_automation_sms/zh_Hant/>\n"
+"Language: zh_TW\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: zh_TW\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 5.12.2\n"
 
 #. module: marketing_automation_sms
 #: model_terms:ir.ui.view,arch_db:marketing_automation_sms.marketing_activity_summary_template_sms
@@ -57,13 +61,25 @@ msgstr "<i class=\"fa fa-pie-chart\"/> 詳情"
 #. module: marketing_automation_sms
 #: model_terms:ir.ui.view,arch_db:marketing_automation_sms.marketing_campaign_view_form
 msgid ""
-"<i data-trigger-type=\"sms_click\" class=\"fa fa-hand-pointer-o o_ma_text_processed o_add_child_activity text-success\" title=\"Clicked\" role=\"img\" aria-label=\"Clicked\"/>\n"
-"                    <i data-trigger-type=\"sms_not_click\" class=\"fa fa-hand-pointer-o o_ma_text_rejected o_add_child_activity text-danger\" title=\"Not Clicked\" role=\"img\" aria-label=\"Not Clicked\"/>\n"
-"                    <i data-trigger-type=\"sms_bounce\" class=\"fa fa fa-exclamation-circle o_ma_text_rejected o_add_child_activity text-danger\" title=\"Bounced\" role=\"img\" aria-label=\"Bounced\"/>"
+"<i data-trigger-type=\"sms_click\" class=\"fa fa-hand-pointer-o "
+"o_ma_text_processed o_add_child_activity text-success\" title=\"Clicked\" "
+"role=\"img\" aria-label=\"Clicked\"/>\n"
+"                    <i data-trigger-type=\"sms_not_click\" class=\"fa fa-"
+"hand-pointer-o o_ma_text_rejected o_add_child_activity text-danger\" "
+"title=\"Not Clicked\" role=\"img\" aria-label=\"Not Clicked\"/>\n"
+"                    <i data-trigger-type=\"sms_bounce\" class=\"fa fa fa-"
+"exclamation-circle o_ma_text_rejected o_add_child_activity text-danger\" "
+"title=\"Bounced\" role=\"img\" aria-label=\"Bounced\"/>"
 msgstr ""
-"<i data-trigger-type=\"sms_click\" class=\"fa fa-hand-pointer-o o_ma_text_processed o_add_child_activity text-success\" title=\"已點擊開啟\" role=\"img\" aria-label=\"已點擊開啟\"/>\n"
-"                    <i data-trigger-type=\"sms_not_click\" class=\"fa fa-hand-pointer-o o_ma_text_rejected o_add_child_activity text-danger\" title=\"未有點擊開啟\" role=\"img\" aria-label=\"未有點擊開啟\"/>\n"
-"                    <i data-trigger-type=\"sms_bounce\" class=\"fa fa fa-exclamation-circle o_ma_text_rejected o_add_child_activity text-danger\" title=\"彈回\" role=\"img\" aria-label=\"彈回\"/>"
+"<i data-trigger-type=\"sms_click\" class=\"fa fa-hand-pointer-o "
+"o_ma_text_processed o_add_child_activity text-success\" title=\"已點擊開啟\" "
+"role=\"img\" aria-label=\"已點擊開啟\"/>\n"
+"                    <i data-trigger-type=\"sms_not_click\" class=\"fa fa-"
+"hand-pointer-o o_ma_text_rejected o_add_child_activity text-danger\" "
+"title=\"未有點擊開啟\" role=\"img\" aria-label=\"未有點擊開啟\"/>\n"
+"                    <i data-trigger-type=\"sms_bounce\" class=\"fa fa fa-"
+"exclamation-circle o_ma_text_rejected o_add_child_activity text-danger\" "
+"title=\"彈回\" role=\"img\" aria-label=\"彈回\"/>"
 
 #. module: marketing_automation_sms
 #: model:ir.model.fields,field_description:marketing_automation_sms.field_marketing_activity__activity_type
@@ -82,6 +98,11 @@ msgid "Exception in SMS Marketing: %s"
 msgstr "短訊推廣遇到例外情況：%s"
 
 #. module: marketing_automation_sms
+#: model:ir.model,name:marketing_automation_sms.model_sms_tracker
+msgid "Link SMS to mailing/sms tracking models"
+msgstr "將短訊與郵件/短訊追蹤模型連結"
+
+#. module: marketing_automation_sms
 #: model:ir.model,name:marketing_automation_sms.model_mailing_trace
 msgid "Mailing Statistics"
 msgstr "簡訊統計"
@@ -95,7 +116,7 @@ msgstr "簡訊類型"
 #: model:ir.model,name:marketing_automation_sms.model_marketing_activity
 #: model:ir.model.fields,field_description:marketing_automation_sms.field_sms_composer__marketing_activity_id
 msgid "Marketing Activity"
-msgstr "市場行銷活動"
+msgstr "推廣活動"
 
 #. module: marketing_automation_sms
 #: model:ir.actions.act_window,name:marketing_automation_sms.mail_mass_mailing_action_marketing_automation_sms
@@ -105,12 +126,12 @@ msgstr "自動化推廣短訊"
 #. module: marketing_automation_sms
 #: model:ir.model,name:marketing_automation_sms.model_marketing_campaign
 msgid "Marketing Campaign"
-msgstr "市場行銷"
+msgstr "推廣計劃"
 
 #. module: marketing_automation_sms
 #: model:ir.model,name:marketing_automation_sms.model_marketing_trace
 msgid "Marketing Trace"
-msgstr "市場行銷痕跡"
+msgstr "推廣追蹤"
 
 #. module: marketing_automation_sms
 #: model:ir.model,name:marketing_automation_sms.model_mailing_mailing
@@ -195,7 +216,7 @@ msgstr "短訊：未點擊"
 #. module: marketing_automation_sms
 #: model:ir.model,name:marketing_automation_sms.model_sms_composer
 msgid "Send SMS Wizard"
-msgstr "傳送簡訊嚮導"
+msgstr "傳送短訊精靈"
 
 #. module: marketing_automation_sms
 #: model_terms:ir.ui.view,arch_db:marketing_automation_sms.marketing_campaign_view_form
@@ -231,7 +252,8 @@ msgid ""
 "after the Participant <strong>clicked</strong>,<br/>on any link included in "
 "the <strong>SMS text message</strong> sent by the Activity \""
 msgstr ""
-"在參加者<strong>按下</strong><br/>活動傳送的<strong>SMS 文字訊息</strong>內含的任何連結之後。活動：「"
+"在參加者<strong>按下</strong><br/>活動傳送的<strong>SMS 文字訊息</strong>內含"
+"的任何連結之後。活動：「"
 
 #. module: marketing_automation_sms
 #: model_terms:ir.ui.view,arch_db:marketing_automation_sms.marketing_activity_summary_template_sms

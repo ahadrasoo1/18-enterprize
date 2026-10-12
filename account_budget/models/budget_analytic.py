@@ -50,7 +50,7 @@ class BudgetAnalytic(models.Model):
         copy=False,
     )
     budget_line_ids = fields.One2many('budget.line', 'budget_analytic_id', 'Budget Lines', copy=True)
-    company_id = fields.Many2one('res.company', 'Company', required=True, default=lambda self: self.env.company)
+    company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company)
 
     @api.constrains('parent_id')
     def _check_parent_id(self):

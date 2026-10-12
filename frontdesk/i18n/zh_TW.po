@@ -1,22 +1,24 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* frontdesk
-# 
+#
 # Translators:
-# Wil Odoo, 2024
-# 
+# Wil Odoo, 2025
+# Tony Ng, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:24+0000\n"
+"POT-Creation-Date: 2025-12-29 18:45+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Chinese (Taiwan) (https://app.transifex.com/odoo/teams/41243/zh_TW/)\n"
+"Last-Translator: Tony Ng, 2025\n"
+"Language-Team: Chinese (Taiwan) (https://app.transifex.com/odoo/teams/41243/"
+"zh_TW/)\n"
+"Language: zh_TW\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: zh_TW\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. module: frontdesk
@@ -29,13 +31,13 @@ msgstr "%(name)s 剛剛簽到。要求飲品：%(drink)s。"
 #. odoo-python
 #: code:addons/frontdesk/models/frontdesk_visitor.py:0
 msgid "%(station)s Check-In: %(visitor)s"
-msgstr ""
+msgstr "%(station)s 簽到：%(visitor)s"
 
 #. module: frontdesk
 #. odoo-python
 #: code:addons/frontdesk/models/frontdesk_visitor.py:0
 msgid "%(station)s Check-In: %(visitor)s to meet %(host)s"
-msgstr ""
+msgstr "%(station)s 簽到：%(visitor)s 與 %(host)s 會面"
 
 #. module: frontdesk
 #. odoo-python
@@ -51,19 +53,28 @@ msgstr "'識別證 - %s' % (object.name).replace('/', '')"
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.print_visitor_badge
 msgid "22 Oct 24 14:20:10"
-msgstr ""
+msgstr "2024 年 10 月 22 日 14:20:10"
 
 #. module: frontdesk
 #: model:mail.template,body_html:frontdesk.frontdesk_mail_template
 msgid ""
 "<div>\n"
-"                    <p>Hello <t t-if=\"ctx.get('host_name')\"><t t-out=\"ctx.get('host_name')\"></t>, </t><b><t t-out=\"object.name\"></t></b> <t t-if=\"object.phone\">(<t t-out=\"object.phone\"></t>)</t><t t-if=\"object.company\">, coming from <t t-out=\"object.company\"></t></t> is asking to meet you at <t t-out=\"object.station_id.name\"></t>. Please let them know you'll be there shortly.\n"
+"                    <p>Hello <t t-if=\"ctx.get('host_name')\"><t t-"
+"out=\"ctx.get('host_name')\"/>, </t><b><t t-out=\"object.name\"/></b> <t t-"
+"if=\"object.phone\">(<t t-out=\"object.phone\"/>)</t><t t-"
+"if=\"object.company\">, coming from <t t-out=\"object.company\"/></t> is "
+"asking to meet you at <t t-out=\"object.station_id.name\"/>. Please let them "
+"know you'll be there shortly.\n"
 "                    </p>\n"
 "                </div>\n"
 "            "
 msgstr ""
 "<div>\n"
-"                    <p>你好 <t t-if=\"ctx.get('host_name')\"><t t-out=\"ctx.get('host_name')\"></t>！ </t><b><t t-out=\"object.name\"></t></b> <t t-if=\"object.phone\">(<t t-out=\"object.phone\"></t>)</t><t t-if=\"object.company\">（來自公司:<t t-out=\"object.company\"></t>）</t>要求與你在 <t t-out=\"object.station_id.name\"></t> 見面。請讓他們知道你很快就會到達。\n"
+"                    <p>你好 <t t-if=\"ctx.get('host_name')\"><t t-"
+"out=\"ctx.get('host_name')\"/>！ </t><b><t t-out=\"object.name\"/></b> <t t-"
+"if=\"object.phone\">(<t t-out=\"object.phone\"/>)</t><t t-"
+"if=\"object.company\">（來自公司:<t t-out=\"object.company\"/>）</t>要求與你"
+"在 <t t-out=\"object.station_id.name\"/> 見面。請讓他們知道你很快就會到達。\n"
 "                    </p>\n"
 "                </div>\n"
 "            "
@@ -74,11 +85,13 @@ msgid ""
 "<span><b>Congratulations!!!</b> You have created your first visitor.\n"
 "        </span>"
 msgstr ""
+"<span><b>恭喜！</b>你已建立第一名訪客。\n"
+"        </span>"
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.print_visitor_badge
 msgid "<strong>Visiting:</strong>"
-msgstr ""
+msgstr "<strong>到訪：</strong>"
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_drink__active
@@ -423,18 +436,18 @@ msgstr "在場賓客"
 #: model:sms.template,body:frontdesk.frontdesk_sms_template
 msgid ""
 "Hello, Your visitor {{ object.name }} {{ '(%s)' % object.phone if "
-"object.phone else '' }} {{ '(%s)' % object.company if object.company else ''"
-" }} wants to meet you at {{ object.station_id.name }}. Please let them know "
-"you'll be there shortly."
+"object.phone else '' }} {{ '(%s)' % object.company if object.company else "
+"'' }} wants to meet you at {{ object.station_id.name }}. Please let them "
+"know you'll be there shortly."
 msgstr ""
-"你好！你的訪客 {{ object.name }} {{ '(%s)' % object.phone if object.phone else '' "
-"}} {{ '(%s)' % object.company if object.company else '' }} 希望與你在 {{ "
-"object.station_id.name }} 見面。請讓他們知道您很快就會到達。"
+"你好！你的訪客 {{ object.name }} {{ '(%s)' % object.phone if object.phone "
+"else '' }} {{ '(%s)' % object.company if object.company else '' }} 希望與你"
+"在 {{ object.station_id.name }} 見面。請讓他們知道您很快就會到達。"
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.print_visitor_badge
 msgid "Henry"
-msgstr ""
+msgstr "小亨"
 
 #. module: frontdesk
 #. odoo-javascript
@@ -477,6 +490,11 @@ msgid "Image"
 msgstr "圖片"
 
 #. module: frontdesk
+#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_kanban
+msgid "Install"
+msgstr "安裝"
+
+#. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__is_favorite
 msgid "Is Favorite"
 msgstr "為最愛"
@@ -484,12 +502,12 @@ msgstr "為最愛"
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.print_visitor_badge
 msgid "Karen"
-msgstr ""
+msgstr "嘉欣"
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_kanban
 msgid "Kiosk"
-msgstr "自助考勤終端"
+msgstr "自助服務機"
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__kiosk_url
@@ -536,7 +554,7 @@ msgstr "讓我們新增一位新訪客。"
 #. module: frontdesk
 #: model:ir.model.fields.selection,name:frontdesk.selection__frontdesk_frontdesk__theme__light
 msgid "Light"
-msgstr "Light"
+msgstr "淺色"
 
 #. module: frontdesk
 #. odoo-javascript
@@ -557,7 +575,7 @@ msgstr ""
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.print_visitor_badge
 msgid "MY PVT LTD"
-msgstr ""
+msgstr "我的私人有限公司"
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__message
@@ -730,7 +748,7 @@ msgstr "列印識別證"
 #. module: frontdesk
 #: model:ir.actions.report,name:frontdesk.frontdesk_visitor_print_badge
 msgid "Print Visitor Badge"
-msgstr ""
+msgstr "列印訪客識別證"
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__visitor_properties
@@ -908,7 +926,7 @@ msgstr "使用者"
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_search
 #: model_terms:ir.ui.view,arch_db:frontdesk.print_visitor_badge
 msgid "Visitor"
-msgstr "訪問者"
+msgstr "訪客"
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__company
@@ -939,8 +957,8 @@ msgstr "訪客"
 #. module: frontdesk
 #. odoo-javascript
 #: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
-msgid "Welcome"
-msgstr "歡迎"
+msgid "Welcome to"
+msgstr "歡迎來到"
 
 #. module: frontdesk
 #. odoo-javascript
@@ -1034,12 +1052,6 @@ msgstr "例： john@company.com"
 #: code:addons/frontdesk/static/src/end_page/end_page.xml:0
 msgid "has been informed."
 msgstr "已獲悉。"
-
-#. module: frontdesk
-#. odoo-javascript
-#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
-msgid "to"
-msgstr "到"
 
 #. module: frontdesk
 #. odoo-javascript

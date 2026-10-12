@@ -1,48 +1,84 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* documents_hr
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Aleš Fiala <f.ales1@seznam.cz>, 2024
+# Stanislav Kurinec, 2025
+# Radim Bílý, 2025
+# Marta Wacławek, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-26 09:15+0000\n"
+"POT-Creation-Date: 2026-02-27 18:47+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
+"Last-Translator: Marta Wacławek, 2025\n"
 "Language-Team: Czech (https://app.transifex.com/odoo/teams/41243/cs/)\n"
+"Language: cs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: cs\n"
-"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
+"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n "
+"<= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
 
 #. module: documents_hr
 #: model_terms:ir.ui.view,arch_db:documents_hr.documents_hr_portal_view
 msgid "<i class=\"fa fa-download fa-fw\"/> Download file"
-msgstr ""
+msgstr "<i class=\"fa fa-download fa-fw\"/> Stáhnout soubor"
 
 #. module: documents_hr
 #: model:mail.template,body_html:documents_hr.mail_template_document_folder_link
 msgid ""
-"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"width:100%; margin:0px auto;\"><tbody>\n"
-"        <tr><td valign=\"top\" style=\"text-align: left; font-size: 14px;\">\n"
-"            Dear <t t-esc=\"object.name\"></t>, your personal documents access link is available for you.<br><br>\n"
-"            You'll find all your personal HR documents in this folder.<br><br>\n"
-"            Please keep this link secure.<br><br>\n"
-"            <div style=\"text-align: center; padding: 16px 0px 16px 0px; font-size: 14px;\">\n"
-"                <a t-attf-href=\"{{ object.sudo().documents_link_url }}\" target=\"_blank\" style=\"background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;\">\n"
+"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"width:100%; "
+"margin:0px auto;\"><tbody>\n"
+"        <tr><td valign=\"top\" style=\"text-align: left; font-size: 14px;"
+"\">\n"
+"            Dear <t t-esc=\"object.name\"/>, your personal documents access "
+"link is available for you.<br/><br/>\n"
+"            You'll find all your personal HR documents in this folder.<br/"
+"><br/>\n"
+"            Please keep this link secure.<br/><br/>\n"
+"            <div style=\"text-align: center; padding: 16px 0px 16px 0px; "
+"font-size: 14px;\">\n"
+"                <a t-attf-href=\"{{ object._get_documents_link_url() }}\" "
+"target=\"_blank\" style=\"background-color: #875A7B; padding: 8px 16px 8px "
+"16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;"
+"\">\n"
 "                    Your Documents\n"
 "                </a>\n"
 "            </div>\n"
-"            Have a nice day,<br>\n"
+"            Have a nice day,<br/>\n"
 "            The HR Team\n"
 "        </td></tr>\n"
 "    </tbody></table>\n"
 "                "
 msgstr ""
+"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"width:100%; "
+"margin:0px auto;\"><tbody>\n"
+"        <tr><td valign=\"top\" style=\"text-align: left; font-size: 14px;"
+"\">\n"
+"            Dobrý den <t t-esc=\"object.name\"/>, máte k dispozici odkaz na "
+"přístup k vašim osobním dokumentům.<br/><br/>\n"
+"            V této složce najdete všechny své osobní HR dokumenty.<br/><br/"
+">\n"
+"            Prosím, uchovejte tento odkaz v bezpečí.<br/><br/>\n"
+"            <div style=\"text-align: center; padding: 16px 0px 16px 0px; "
+"font-size: 14px;\">\n"
+"                <a t-attf-href=\"{{ object._get_documents_link_url() }}\" "
+"target=\"_blank\" style=\"background-color: #875A7B; padding: 8px 16px 8px "
+"16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;"
+"\">\n"
+"                    Vaše dokumenty\n"
+"                </a>\n"
+"            </div>\n"
+"            Hezký den,<br/>\n"
+"            Tým HR\n"
+"        </td></tr>\n"
+"    </tbody></table>\n"
+"                "
 
 #. module: documents_hr
 #: model:documents.tag,name:documents_hr.documents_tag_absences
@@ -88,11 +124,9 @@ msgstr "Počet dokumentů"
 #. module: documents_hr
 #: model:ir.model,name:documents_hr.model_documents_redirect
 msgid "Document Redirect"
-msgstr ""
+msgstr "Přesměrování dokumentu"
 
 #. module: documents_hr
-#. odoo-python
-#: code:addons/documents_hr/models/res_users.py:0
 #: model:ir.model.fields,field_description:documents_hr.field_res_users__document_count
 #: model_terms:ir.ui.view,arch_db:documents_hr.hr_employee_view_form
 #: model_terms:ir.ui.view,arch_db:documents_hr.res_users_view_form
@@ -107,7 +141,7 @@ msgstr "Nastavení dokumentů Hr"
 #. module: documents_hr
 #: model_terms:ir.ui.view,arch_db:documents_hr.documents_hr_portal_view
 msgid "Download file"
-msgstr ""
+msgstr "Stáhnout soubor"
 
 #. module: documents_hr
 #: model:ir.model,name:documents_hr.model_hr_employee
@@ -119,7 +153,7 @@ msgstr "Zaměstnanec"
 #. odoo-python
 #: code:addons/documents_hr/models/hr_employee.py:0
 msgid ""
-"Employee's related user and private email must be set to use \"Send Access Link\" function:\n"
+"Employee's private email must be set to use \"Send Access Link\" function:\n"
 "%s"
 msgstr ""
 
@@ -161,8 +195,8 @@ msgstr "Odeslat odkaz na přístup k dokumentům HR"
 #. module: documents_hr
 #: model:ir.model.fields,help:documents_hr.field_hr_departure_wizard__send_hr_documents_access_link
 msgid ""
-"Send a share link to the private email of the employee with all the HR files"
-" he owns in Documents app"
+"Send a share link to the private email of the employee with all the HR files "
+"he owns in Documents app"
 msgstr ""
 
 #. module: documents_hr
@@ -221,3 +255,12 @@ msgid "{{ object.name }}, your personal documents access link is available"
 msgstr ""
 "{{ object.name }}, je k dispozici odkaz pro přístup k vašim osobním "
 "dokumentům"
+
+#~ msgid ""
+#~ "Employee's related user and private email must be set to use \"Send "
+#~ "Access Link\" function:\n"
+#~ "%s"
+#~ msgstr ""
+#~ "Uživatelský a soukromý e-mail zaměstnance musí být nastaven pro použití "
+#~ "funkce \"Odeslat přístupový odkaz\":\n"
+#~ "%s"

@@ -20,5 +20,28 @@
                 </list>
             </field>
         </record>
+        <record model="ir.ui.view" id="view_product_uom_categ_form_ke">
+            <field name="name">view.uom.categ.ke.form</field>
+            <field name="model">uom.category</field>
+            <field name="inherit_id" ref="uom.product_uom_categ_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='uom_type']" position="after">
+                    <field name="l10n_ke_quantity_unit_id"/>
+                </xpath>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_product_uom_categ_form_ke">
+            <field name="name">view.uom.categ.ke.form</field>
+            <field name="model">uom.category</field>
+            <field name="inherit_id" ref="uom.product_uom_categ_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='name']" position="before">
+                    <field name="fiscal_country_codes" invisible="1"/>"
+                </xpath>
+                <xpath expr="//field[@name='uom_type']" position="after">
+                    <field name="l10n_ke_quantity_unit_id" column_invisible="'KE' not in parent.fiscal_country_codes"/>
+                </xpath>
+            </field>
+        </record>
     </data>
 </odoo>

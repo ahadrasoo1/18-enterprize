@@ -1,32 +1,33 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* currency_rate_live
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Rasareeyar Lappiam, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:26+0000\n"
+"POT-Creation-Date: 2026-02-27 18:47+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
+"Last-Translator: Rasareeyar Lappiam, 2025\n"
 "Language-Team: Thai (https://app.transifex.com/odoo/teams/41243/th/)\n"
+"Language: th\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: th\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. module: currency_rate_live
 #: model_terms:ir.ui.view,arch_db:currency_rate_live.res_config_settings_view_form
 msgid ""
-"<i title=\"Update now\" role=\"img\" aria-label=\"Update now\" class=\"fa "
-"fa-fw fa-refresh\"/>"
+"<i title=\"Update now\" role=\"img\" aria-label=\"Update now\" class=\"fa fa-"
+"fw fa-refresh\"/>"
 msgstr ""
-"<i title=\"อัปเดตตอนนี้\" role=\"img\" aria-label=\"Update now\" class=\"fa "
-"fa-fw fa-refresh\"/>"
+"<i title=\"อัปเดตตอนนี้\" role=\"img\" aria-label=\"Update now\" class=\"fa fa-"
+"fw fa-refresh\"/>"
 
 #. module: currency_rate_live
 #: model:ir.model,name:currency_rate_live.model_res_company
@@ -52,7 +53,7 @@ msgstr "รายวัน"
 #. odoo-python
 #: code:addons/currency_rate_live/models/res_config_settings.py:0
 msgid "Error updating the currency rates from the BCU: %s."
-msgstr ""
+msgstr "เกิดข้อผิดพลาดในการอัปเดตอัตราแลกเปลี่ยนจาก BCU:%s"
 
 #. module: currency_rate_live
 #: model:ir.model.fields.selection,name:currency_rate_live.selection__res_company__currency_provider__ecb
@@ -95,7 +96,7 @@ msgstr "การดำเนินการครั้งต่อไป"
 #. odoo-python
 #: code:addons/currency_rate_live/models/res_config_settings.py:0
 msgid "No available currency rate could be updated from the BCU."
-msgstr ""
+msgstr "ไม่สามารถอัปเดตอัตราแลกเปลี่ยนสกุลเงินที่มีอยู่จาก BCU ได้"
 
 #. module: currency_rate_live
 #: model_terms:ir.ui.view,arch_db:currency_rate_live.res_config_settings_view_form
@@ -114,9 +115,7 @@ msgstr "ผู้ให้บริการ"
 msgid ""
 "The selected exchange rate provider requires the GTQ and USD currencies to "
 "be active."
-msgstr ""
-"ผู้ให้บริการอัตราแลกเปลี่ยนที่เลือกกำหนดให้สกุลเงิน GTQ และ USD "
-"ต้องเปิดใช้งาน"
+msgstr "ผู้ให้บริการอัตราแลกเปลี่ยนที่เลือกกำหนดให้สกุลเงิน GTQ และ USD ต้องเปิดใช้งาน"
 
 #. module: currency_rate_live
 #. odoo-python
@@ -125,8 +124,8 @@ msgid ""
 "Unable to connect to the online exchange rate platform %s. The web service "
 "may be temporarily down. Please try again in a moment."
 msgstr ""
-"ไม่สามารถเชื่อมต่อกับแพลตฟอร์มอัตราแลกเปลี่ยนออนไลน์ %s "
-"บริการเว็บอาจหยุดทำงานชั่วคราว โปรดลองอีกครั้งในอีกสักครู่"
+"ไม่สามารถเชื่อมต่อกับแพลตฟอร์มอัตราแลกเปลี่ยนออนไลน์ %s บริการเว็บอาจหยุดทำงานชั่วคราว "
+"โปรดลองอีกครั้งในอีกสักครู่"
 
 #. module: currency_rate_live
 #: model:ir.model.fields.selection,name:currency_rate_live.selection__res_company__currency_interval_unit__weekly
@@ -139,9 +138,7 @@ msgstr "รายสัปดาห์"
 msgid ""
 "Your main currency (%s) is not supported by this exchange rate provider. "
 "Please choose another one."
-msgstr ""
-"สกุลเงินหลักของคุณ (%s) ไม่รองรับโดยผู้ให้บริการอัตราแลกเปลี่ยนรายนี้ "
-"โปรดเลือกรายอื่น"
+msgstr "สกุลเงินหลักของคุณ (%s) ไม่รองรับโดยผู้ให้บริการอัตราแลกเปลี่ยนรายนี้ โปรดเลือกรายอื่น"
 
 #. module: currency_rate_live
 #: model:ir.model.fields.selection,name:currency_rate_live.selection__res_company__currency_provider__cbuae
@@ -176,6 +173,11 @@ msgstr "[CL] ธนาคารกลางแห่งประเทศชิ�
 #. module: currency_rate_live
 #: model:ir.model.fields.selection,name:currency_rate_live.selection__res_company__currency_provider__banrepco
 msgid "[CO] Bank of the Republic"
+msgstr "[CO] Bank of the Republic"
+
+#. module: currency_rate_live
+#: model:ir.model.fields.selection,name:currency_rate_live.selection__res_company__currency_provider__cu
+msgid "[CU] Central Bank of Cuba"
 msgstr ""
 
 #. module: currency_rate_live
@@ -194,9 +196,19 @@ msgid "[GT] Bank of Guatemala"
 msgstr "[GT] ธนาคารแห่งชาติประเทศกัวเตมาลา"
 
 #. module: currency_rate_live
+#: model:ir.model.fields.selection,name:currency_rate_live.selection__res_company__currency_provider__mnb
+msgid "[HU] Magyar Nemzeti Bank"
+msgstr ""
+
+#. module: currency_rate_live
 #: model:ir.model.fields.selection,name:currency_rate_live.selection__res_company__currency_provider__bi
 msgid "[ID] Bank Indonesia"
 msgstr "[ID] Bank Indonesia"
+
+#. module: currency_rate_live
+#: model:ir.model.fields.selection,name:currency_rate_live.selection__res_company__currency_provider__boi
+msgid "[IT] Bank of Italy"
+msgstr "[IT] Bank of Italy"
 
 #. module: currency_rate_live
 #: model:ir.model.fields.selection,name:currency_rate_live.selection__res_company__currency_provider__banxico
@@ -226,12 +238,22 @@ msgstr "[RO] ธนาคารแห่งชาติประเทศโร�
 #. module: currency_rate_live
 #: model:ir.model.fields.selection,name:currency_rate_live.selection__res_company__currency_provider__srb
 msgid "[SE] Sveriges Riksbank"
+msgstr "[SE] Sveriges Riksbank"
+
+#. module: currency_rate_live
+#: model:ir.model.fields.selection,name:currency_rate_live.selection__res_company__currency_provider__bsi
+msgid "[SI] Bank of Slovenia"
 msgstr ""
 
 #. module: currency_rate_live
+#: model:ir.model.fields.selection,name:currency_rate_live.selection__res_company__currency_provider__bot
+msgid "[TH] Bank of Thailand"
+msgstr "[TH] Bank of Thailand"
+
+#. module: currency_rate_live
 #: model:ir.model.fields.selection,name:currency_rate_live.selection__res_company__currency_provider__tcmb
-msgid "[TR] Central Bank of the Republic of Turkey"
-msgstr "[TR] ธนาคารกลางแห่งสาธารณรัฐตุรกี"
+msgid "[TR] Central Bank of the Republic of Türkiye"
+msgstr "[TR] Central Bank of the Republic of Türkiye"
 
 #. module: currency_rate_live
 #: model:ir.model.fields.selection,name:currency_rate_live.selection__res_company__currency_provider__hmrc
@@ -241,7 +263,7 @@ msgstr "[UK] HM สรรพากรและศุลกากร"
 #. module: currency_rate_live
 #: model:ir.model.fields.selection,name:currency_rate_live.selection__res_company__currency_provider__bcu
 msgid "[UY] Uruguayan Central Bank"
-msgstr ""
+msgstr "[UY] Uruguayan Central Bank"
 
 #. module: currency_rate_live
 #: model:ir.model.fields.selection,name:currency_rate_live.selection__res_company__currency_provider__xe_com

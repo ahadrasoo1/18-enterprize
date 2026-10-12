@@ -123,7 +123,7 @@ class AccountGenericTaxReport(models.AbstractModel):
 
         tax_group_vat_7 = self.env['account.chart.template'].ref('tax_group_vat_7')
         for index, move in enumerate(moves):
-            sign = move.reversed_entry_id.payment_state == 'partial' and -1 or 1
+            sign = move.move_type in ('out_refund', 'in_refund') and -1 or 1
             amount_total = sign * copysign(move.amount_total_signed, move.amount_total)
             amount_untaxed_signed = sign * abs(move.amount_untaxed_signed)
             # Only include tax amount from VAT 7% tax group

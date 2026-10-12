@@ -11,7 +11,7 @@ class SlpCustomHandler(models.AbstractModel):
     def _custom_options_initializer(self, report, options, previous_options):
         super()._custom_options_initializer(report, options, previous_options=previous_options)
         options.update({
-            'move_type': 'in_invoice',
+            'journal_type': 'purchase',
             # This mapping will be used to build the amount for each expression_label based on the grid names.
             'report_grids_map': {
                 'gross_amount': ['42A', '42SA', '43A', '46E', '46ZR', 'CAPA'],
@@ -32,7 +32,7 @@ class SlpCustomHandler(models.AbstractModel):
             # 44A
             options['report_grids_map']['gross_amount'].append('44A')
             options['report_grids_map']['taxable_amount'].append('44A')
-            options['report_grids_map']['capital_goods_amount'].append('44A')
+            options['report_grids_map']['non_capital_goods_amount'].append('44A')
             options['report_grids_map']['gross_taxable_amount'].append('44A')
             # 44B
             options['report_grids_map']['tax_amount'].append('44B')

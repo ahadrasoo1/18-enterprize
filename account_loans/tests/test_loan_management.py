@@ -33,13 +33,14 @@ class TestLoanManagement(AccountTestInvoicingCommon):
             ('id', '!=', cls.company.account_journal_early_pay_discount_loss_account_id.id),
         ], limit=1)
 
-    def create_loan(self, name, date, duration, amount_borrowed, interest, validate=False):
+    def create_loan(self, name, date, duration, amount_borrowed, interest, validate=False, skip_until_date=False):
         loan = self.env['account.loan'].create({
             'name': name,
             'date': date,
             'duration': duration,
             'amount_borrowed': amount_borrowed,
             'interest': interest,
+            'skip_until_date': skip_until_date,
             'journal_id': self.loan_journal.id,
             'long_term_account_id': self.long_term_account.id,
             'short_term_account_id': self.short_term_account.id,
@@ -165,6 +166,36 @@ class TestLoanManagement(AccountTestInvoicingCommon):
             'account_id': self.short_term_account.id,
         }])
 
+        # Verify that the reverse reclassification moves are correct
+        self.assertRecordValues(reclassification_reverse_moves[0] | reclassification_reverse_moves[11] | reclassification_reverse_moves[15], [{
+            'date': fields.Date.to_date('2024-02-01'),
+            'ref': "Odoomobile Loan 🚗 - Reversal reclassification LT - ST 02/2024 to 01/2025",  # offset of 1 month
+            'amount_total': 12_000,  # sum of the principals of the next 12 months
+            'generating_loan_line_id': loan.line_ids[0].id,
+        }, {
+            'date': fields.Date.to_date('2025-01-01'),
+            'ref': "Odoomobile Loan 🚗 - Reversal reclassification LT - ST 01/2025 to 12/2025",  # offset of 1 month
+            'amount_total': 12_000,  # sum of the principals between 01/25 and 12/25
+            'generating_loan_line_id': loan.line_ids[11].id,
+        }, {
+            'date': fields.Date.to_date('2025-05-01'),
+            'ref': "Odoomobile Loan 🚗 - Reversal reclassification LT - ST 05/2025 to 12/2025",  # offset of 1 month
+            'amount_total': 8_000,  # sum of the principals between 05/25 and 12/25
+            'generating_loan_line_id': loan.line_ids[15].id,
+        }])
+
+        self.assertRecordValues(reclassification_reverse_moves[0].line_ids.sorted(lambda l: l.debit), [{
+            'name': f'Odoomobile Loan 🚗 - Reversal reclassification LT - ST 02/2024 to 01/2025 (To {self.short_term_account.code})',
+            'credit': 12_000,
+            'debit': 0,
+            'account_id': self.long_term_account.id,
+        }, {
+            'name': f'Odoomobile Loan 🚗 - Reversal reclassification LT - ST 02/2024 to 01/2025 (From {self.long_term_account.code})',
+            'credit': 0,
+            'debit': 12_000,
+            'account_id': self.short_term_account.id,
+        }])
+
     @freeze_time('2024-07-31')
     def test_loan_states(self):
         """Test the flow of the loan: Draft, Running, Closed, Cancelled"""
@@ -219,6 +250,54 @@ class TestLoanManagement(AccountTestInvoicingCommon):
         with freeze_time('2024-12-31'):
             self.env.ref('account.ir_cron_auto_post_draft_entry').method_direct_trigger()
             self.assertEqual(loan2.state, 'closed')
+
+    @freeze_time('2024-06-23')
+    def test_loan_states_with_audit_trail(self):
+        """Test the flow of the loan: Draft, Running, Closed, Cancelled"""
+        self.company.check_account_audit_trail = True
+        # Create the loan
+        loan = self.create_loan('Odoomobile Loan 🚗', '2024-01-01', 12, 24_000, 2_400)
+
+        # Verify that the loan is in draft
+        self.assertEqual(loan.state, 'draft')
+        self.assertFalse(loan.line_ids.generated_move_ids)
+
+        # Verify that the loan is running
+        loan.action_confirm()
+        self.assertEqual(loan.state, 'running')
+        self.assertEqual(len(loan.line_ids.generated_move_ids.filtered(lambda m: m.state == 'posted')), 15)
+        self.assertEqual(len(loan.line_ids.generated_move_ids), 34)
+
+        # Verify that the loan is cancelled
+        loan.action_cancel()
+        self.assertEqual(loan.state, 'cancelled')
+        self.assertFalse(len(loan.line_ids.generated_move_ids.filtered(lambda m: m.state == 'posted')))
+        self.assertEqual(len(loan.line_ids.generated_move_ids), 15)
+
+        # Verify that we can reset to draft the loan
+        loan.action_set_to_draft()
+        self.assertEqual(loan.state, 'draft')
+        self.assertEqual(len(loan.line_ids.generated_move_ids), 15)
+
+        # Run it again
+        loan.action_confirm()
+        self.assertEqual(loan.state, 'running')
+        self.assertEqual(len(loan.line_ids.generated_move_ids.filtered(lambda m: m.state == 'posted')), 15)
+        self.assertEqual(len(loan.line_ids.generated_move_ids), 49)
+
+        # Close the loan, only draft entries should be removed
+        action = loan.action_close()
+        wizard = self.env[action['res_model']].browse(action['res_id'])
+        wizard.action_save()
+        self.assertEqual(loan.state, 'closed')
+        self.assertEqual(len(loan.line_ids.generated_move_ids.filtered(lambda m: m.state == 'posted')), 15)
+        self.assertEqual(len(loan.line_ids.generated_move_ids), 33)
+
+        # Reset to draft, the entries should be removed
+        loan.action_set_to_draft()
+        self.assertEqual(loan.state, 'draft')
+        self.assertFalse(len(loan.line_ids.generated_move_ids.filtered(lambda m: m.state == 'posted')))
+        self.assertEqual(len(loan.line_ids.generated_move_ids), 30)
 
     @freeze_time('2024-01-01')
     def test_loan_import_amortization_schedule(self):
@@ -321,3 +400,44 @@ class TestLoanManagement(AccountTestInvoicingCommon):
             'payment': 554.6,
             'outstanding_balance': 0,
         }])
+
+    def test_loan_zero_interest(self):
+        loan = self.env['account.loan'].create({'name': '0 interest loan', 'date': '2024-01-01', 'amount_borrowed': 24_000})
+        wizard = self.env['account.loan.compute.wizard'].browse(loan.action_open_compute_wizard()['res_id'])
+        wizard.interest_rate = 0
+        wizard.action_save()
+        self.assertEqual(len(loan.line_ids), 12)  # default loan term is 1 year = 12 months
+        self.assertTrue(all(payment == 2000 for payment in loan.line_ids.mapped('payment')))  # 24,000 / 12 months = 2,000/month
+
+    @freeze_time('2024-07-31')
+    def test_loan_skip_until_date(self):
+        """Test the skip_until_date field"""
+        loan = self.create_loan('Odoomobile Loan 🚗', '2024-01-01', 12, 24_000, 2_400, validate=True, skip_until_date='2024-05-15')
+
+        self.assertEqual(loan.state, 'running')
+        self.assertTrue(loan.line_ids.generated_move_ids)
+        # Outstanding balance should be 24_000 - 2_000 * 7 months (Jan -> July), including skipped period
+        self.assertEqual(loan.outstanding_balance, 10_000)
+
+    @freeze_time('2025-01-01')
+    def test_loan_skip_until_date_2(self):
+        """Test loan closing when skip_until_date field is set"""
+        loan = self.env['account.loan'].create({
+            'name': 'Test',
+            'date': '2024-01-01',
+            'duration': 12,
+            'amount_borrowed': 20_000,
+            'interest': 107.87,
+            'skip_until_date': '2024-10-31',
+            'journal_id': self.loan_journal.id,
+            'long_term_account_id': self.long_term_account.id,
+            'short_term_account_id': self.short_term_account.id,
+            'expense_account_id': self.expense_account.id,
+        })
+
+        wizard = self.env['account.loan.compute.wizard'].browse(loan.action_open_compute_wizard()['res_id'])
+        wizard.action_save()
+        loan.action_confirm()
+
+        self.assertTrue(loan.line_ids.generated_move_ids)
+        self.assertEqual(loan.state, 'closed')

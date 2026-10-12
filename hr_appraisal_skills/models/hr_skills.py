@@ -9,6 +9,13 @@ class HrAppraisal(models.Model):
 
     skill_ids = fields.One2many('hr.appraisal.skill', 'appraisal_id', string="Skills", domain=['|', ('skill_type_id.active', '=', True), ('appraisal_id.state', '=', 'done')])
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        appraisals = super().create(vals_list)
+        if pending_appraisals := appraisals.filtered(lambda a: a.state == 'pending'):
+            pending_appraisals._copy_skills_when_confirmed()
+        return appraisals
+
     def write(self, vals):
         if 'state' in vals and vals['state'] == 'pending':
             new_appraisals = self.filtered(lambda a: a.state == 'new')

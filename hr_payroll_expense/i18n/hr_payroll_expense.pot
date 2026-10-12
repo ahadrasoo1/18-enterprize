@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:26+0000\n"
-"PO-Revision-Date: 2024-09-25 09:26+0000\n"
+"POT-Creation-Date: 2025-12-29 18:46+0000\n"
+"PO-Revision-Date: 2025-12-29 18:46+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -31,6 +31,14 @@ msgstr ""
 #. module: hr_payroll_expense
 #: model:ir.model,name:hr_payroll_expense.model_hr_expense_sheet
 msgid "Expense Report"
+msgstr ""
+
+#. module: hr_payroll_expense
+#. odoo-python
+#: code:addons/hr_payroll_expense/models/hr_expense_sheet.py:0
+msgid ""
+"Expense reimbursement rule needs to be configured to add expenses to payslips.\n"
+"Please create one salary rule with the \"%(code)s\" code on the relevant salary structures."
 msgstr ""
 
 #. module: hr_payroll_expense
@@ -67,6 +75,17 @@ msgid "Expenses to reimburse to employee."
 msgstr ""
 
 #. module: hr_payroll_expense
+#: model:ir.model,name:hr_payroll_expense.model_hr_payslip_employees
+msgid "Generate payslips for all selected employees"
+msgstr ""
+
+#. module: hr_payroll_expense
+#. odoo-python
+#: code:addons/hr_payroll_expense/models/hr_expense_sheet.py:0
+msgid "Go to salary rules"
+msgstr ""
+
+#. module: hr_payroll_expense
 #: model:ir.model.fields,field_description:hr_payroll_expense.field_account_payment_register__is_already_paid_through_a_payslip
 msgid "Is Already Paid Through A Payslip"
 msgstr ""
@@ -82,7 +101,15 @@ msgstr ""
 msgid ""
 "No debit account found in the '%(rule_name)s' payslip salary rule. Please "
 "add a payable debit account to be able to create an accounting entry for the"
-" expense report linked to this payslip '%(expense_report_name)s'."
+" expense reports linked to this payslip."
+msgstr ""
+
+#. module: hr_payroll_expense
+#. odoo-python
+#: code:addons/hr_payroll_expense/models/hr_payslip.py:0
+msgid ""
+"No salary rule was found to handle expenses in structure "
+"'%(structure_name)s'."
 msgstr ""
 
 #. module: hr_payroll_expense

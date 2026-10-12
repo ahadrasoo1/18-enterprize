@@ -1,24 +1,26 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* web_gantt
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# Maitê Dietze, 2024
-# 
+# Maitê Dietze, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:29+0000\n"
+"POT-Creation-Date: 2026-05-22 17:59+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Maitê Dietze, 2024\n"
-"Language-Team: Portuguese (Brazil) (https://app.transifex.com/odoo/teams/41243/pt_BR/)\n"
+"Last-Translator: Maitê Dietze, 2025\n"
+"Language-Team: Portuguese (Brazil) (https://app.transifex.com/odoo/teams/"
+"41243/pt_BR/)\n"
+"Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: pt_BR\n"
-"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % "
+"1000000 == 0 ? 1 : 2;\n"
 
 #. module: web_gantt
 #. odoo-javascript
@@ -45,12 +47,14 @@ msgstr "Exibição da janela de ação"
 
 #. module: web_gantt
 #. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer_controls.js:0
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "Activate dense mode"
 msgstr "Ativar o modo denso"
 
 #. module: web_gantt
 #. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer_controls.js:0
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "Activate sparse mode"
 msgstr "Ativar o modo esparso"
@@ -92,6 +96,12 @@ msgstr "Editar"
 
 #. module: web_gantt
 #. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+msgid "Ending date cannot be before the starting date"
+msgstr "A data de término não pode ser anterior à data de início"
+
+#. module: web_gantt
+#. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "Expand rows"
 msgstr "Expandir linhas"
@@ -107,6 +117,12 @@ msgstr "Foco em Hoje"
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "From"
 msgstr "De"
+
+#. module: web_gantt
+#. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer_controls.js:0
+msgid "From: %(from_date)s to: %(to_date)s"
+msgstr "De: %(from_date)s até: %(to_date)s"
 
 #. module: web_gantt
 #: model:ir.model.fields.selection,name:web_gantt.selection__ir_actions_act_window_view__view_mode__gantt
@@ -244,6 +260,12 @@ msgstr "Iniciar"
 
 #. module: web_gantt
 #. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+msgid "Starting date cannot be after the ending date"
+msgstr "A data de início não pode ser posterior à data de término"
+
+#. module: web_gantt
+#. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_popover.xml:0
 msgid "Stop"
 msgstr "Parar"
@@ -356,9 +378,3 @@ msgstr "meses"
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "to"
 msgstr "até"
-
-#. module: web_gantt
-#. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_row_progress_bar.xml:0
-msgid "{{ props.progressBar.warning }}"
-msgstr "{{ props.progressBar.warning }}"

@@ -1,22 +1,22 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* hr_contract_sign
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:27+0000\n"
+"POT-Creation-Date: 2025-12-29 18:47+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
 "Last-Translator: Wil Odoo, 2024\n"
 "Language-Team: German (https://app.transifex.com/odoo/teams/41243/de/)\n"
+"Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: de\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #. module: hr_contract_sign
@@ -73,6 +73,11 @@ msgid "Attachment"
 msgstr "Dateianhang"
 
 #. module: hr_contract_sign
+#: model:sign.template,redirect_url_text:hr_contract_sign.template_sign_termination
+msgid "Close"
+msgstr "Schließen"
+
+#. module: hr_contract_sign
 #: model:ir.model.fields,field_description:hr_contract_sign.field_hr_contract_sign_document_wizard__contract_id
 msgid "Contract"
 msgstr "Vertrag"
@@ -125,12 +130,18 @@ msgstr "Zu unterzeichnende Dokumente"
 #. module: hr_contract_sign
 #: model:ir.model.fields,help:hr_contract_sign.field_hr_contract_sign_document_wizard__sign_template_ids
 msgid ""
-"Documents to sign. Only documents with 1 or 2 different responsible are selectable.\n"
-"        Documents with 1 responsible will only have to be signed by the employee while documents with 2 different responsible will have to be signed by both the employee and the responsible.\n"
+"Documents to sign. Only documents with 1 or 2 different responsible are "
+"selectable.\n"
+"        Documents with 1 responsible will only have to be signed by the "
+"employee while documents with 2 different responsible will have to be signed "
+"by both the employee and the responsible.\n"
 "        "
 msgstr ""
-"Zu unterzeichnende Dokumente. Es können nur Dokumente mit 1 oder 2 verschiedenen Verantwortlichen ausgewählt werden.\n"
-"Dokumente mit 1 Verantwortlichen müssen nur vom Mitarbeiter unterzeichnet werden, während Dokumente mit 2 verschiedenen Verantwortlichen sowohl vom Mitarbeiter als auch vom Verantwortlichen unterzeichnet werden müssen."
+"Zu unterzeichnende Dokumente. Es können nur Dokumente mit 1 oder 2 "
+"verschiedenen Verantwortlichen ausgewählt werden.\n"
+"Dokumente mit 1 Verantwortlichen müssen nur vom Mitarbeiter unterzeichnet "
+"werden, während Dokumente mit 2 verschiedenen Verantwortlichen sowohl vom "
+"Mitarbeiter als auch vom Verantwortlichen unterzeichnet werden müssen."
 
 #. module: hr_contract_sign
 #: model:ir.model.fields,field_description:hr_contract_sign.field_hr_contract_sign_document_wizard__mail_to
@@ -143,12 +154,16 @@ msgid ""
 "Email used to send the signature request.\n"
 "                - Work takes the email defined in \"work email\"\n"
 "                - Private takes the email defined in Private Information\n"
-"                - If the selected email is not defined, the available one will be used."
+"                - If the selected email is not defined, the available one "
+"will be used."
 msgstr ""
 "E-Mail, die verwendet wird, um die Signaturanfrage zu versenden.\n"
-"                - Arbeit nimmt die E-Mail, die unter „Arbeits-E-Mail“ hinterlegt ist.\n"
-"                - Privat nimmt die E-Mail, die in den privaten Informationen hinterlegt ist.\n"
-"                - Wenn die ausgewählte E-Mail nicht definiert ist, wird die verfügbare E-Mail verwendet."
+"                - Arbeit nimmt die E-Mail, die unter „Arbeits-E-Mail“ "
+"hinterlegt ist.\n"
+"                - Privat nimmt die E-Mail, die in den privaten Informationen "
+"hinterlegt ist.\n"
+"                - Wenn die ausgewählte E-Mail nicht definiert ist, wird die "
+"verfügbare E-Mail verwendet."
 
 #. module: hr_contract_sign
 #: model:ir.model,name:hr_contract_sign.model_hr_employee
@@ -173,8 +188,8 @@ msgid ""
 "Employee's role on the templates to sign. The same role must be present in "
 "all the templates"
 msgstr ""
-"Die Rolle des Mitarbeiters auf den zu unterzeichnenden Vorlagen. Die gleiche"
-" Rolle muss in allen Vorlagen angegeben werden"
+"Die Rolle des Mitarbeiters auf den zu unterzeichnenden Vorlagen. Die gleiche "
+"Rolle muss in allen Vorlagen angegeben werden"
 
 #. module: hr_contract_sign
 #: model:ir.model.fields,field_description:hr_contract_sign.field_hr_contract_sign_document_wizard__employee_ids
@@ -230,8 +245,8 @@ msgstr "Nachricht"
 #. odoo-python
 #: code:addons/hr_contract_sign/wizard/hr_contract_sign_document_wizard.py:0
 msgid ""
-"No appropriate template could be found, please make sure you configured them"
-" properly."
+"No appropriate template could be found, please make sure you configured them "
+"properly."
 msgstr ""
 "Es konnte keine passende Vorlage gefunden werden, bitte stellen Sie sicher, "
 "dass Sie sie richtig konfiguriert haben."
@@ -246,11 +261,6 @@ msgstr "Keine Vorlage verfügbar"
 #: code:addons/hr_contract_sign/wizard/hr_contract_sign_document_wizard.py:0
 msgid "Only %s has to sign."
 msgstr "Nur %s muss unterzeichnen."
-
-#. module: hr_contract_sign
-#: model:sign.template,redirect_url_text:hr_contract_sign.template_sign_termination
-msgid "Open Link"
-msgstr "Link öffnen"
 
 #. module: hr_contract_sign
 #: model_terms:ir.ui.view,arch_db:hr_contract_sign.view_hr_contract_sign

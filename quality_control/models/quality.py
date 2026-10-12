@@ -7,7 +7,7 @@ from datetime import datetime
 import random
 
 from odoo import api, Command, models, fields, _
-from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT, float_round, SQL
+from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT, float_compare, float_round, SQL
 from odoo.osv.expression import OR
 
 
@@ -30,7 +30,7 @@ class QualityPoint(models.Model):
         ('periodical', 'Periodically'),
         ('on_demand', 'On-demand')], string="Control Frequency",
         default='all', required=True)
-    measure_frequency_value = fields.Float('Percentage')  # TDE RENAME ?
+    measure_frequency_value = fields.Float('Percentage', help="The probability of each quality check being generated")  # TDE RENAME ?
     measure_frequency_unit_value = fields.Integer('Frequency Unit Value')  # TDE RENAME ?
     measure_frequency_unit = fields.Selection([
         ('day', 'Days'),
@@ -116,10 +116,10 @@ class QualityPoint(models.Model):
             elif self.measure_frequency_unit == 'month':
                 delta = relativedelta(months=self.measure_frequency_unit_value)
             date_previous = datetime.today() - delta
-            checks = self.env['quality.check'].search([
+            has_checks = bool(self.env['quality.check'].search_count([
                 ('point_id', '=', self.id),
-                ('create_date', '>=', date_previous.strftime(DEFAULT_SERVER_DATETIME_FORMAT))], limit=1)
-            return not(bool(checks))
+                ('create_date', '>=', date_previous.strftime(DEFAULT_SERVER_DATETIME_FORMAT))], limit=1))
+            return not has_checks
         return super(QualityPoint, self).check_execute_now()
 
     def _get_type_default_domain(self):
@@ -177,6 +177,7 @@ class QualityPoint(models.Model):
                     'measure_on': point.measure_on,
                     'team_id': point.team_id.id,
                     'product_id': product.id,
+                    'company_id': company_id,
                 })
                 quality_points_list.append(point_key)
 
@@ -231,7 +232,13 @@ class QualityCheck(models.Model):
         help="""Operation = One quality check is requested at the operation level.
                   Product = A quality check is requested per product.
                  Quantity = A quality check is requested for each new product quantity registered, with partial quantity checks also possible.""")
-    move_line_id = fields.Many2one('stock.move.line', 'Stock Move Line', check_company=True, help="In case of Quality Check by Quantity, Move Line on which the Quality Check applies")
+    move_line_id = fields.Many2one(
+        "stock.move.line",
+        "Stock Move Line",
+        check_company=True,
+        help="In case of Quality Check by Quantity, Move Line on which the Quality Check applies",
+        index="btree_not_null",
+    )
     failure_location_id = fields.Many2one('stock.location', string="Failure Location")
     lot_name = fields.Char('Lot/Serial Number Name', related='move_line_id.lot_name', store=True)
     lot_line_id = fields.Many2one('stock.lot', store=True, compute='_compute_lot_line_id')
@@ -443,21 +450,37 @@ class QualityCheck(models.Model):
             move_line = check.move_line_id
             move = move_line.move_id
             dest_location = failure_location_id or move_line.location_dest_id.id
+            # switch to mts if the failure location is not the same as the final destination location
+            if move_line.move_id.move_dest_ids.location_id.id != dest_location:
+                move_line.move_id.move_dest_ids._break_mto_link(move_line.move_id)
             if failed_qty == move_line.quantity:
                 move_line.location_dest_id = dest_location
-                if move_line.quantity == move.quantity:
+                is_failed_line_entire_move_qty = float_compare(move_line.quantity, move.quantity, precision_rounding=move.product_uom.rounding) == 0
+                is_move_demand_fully_failed = float_compare(move.product_uom_qty, move_line.quantity, precision_rounding=move.product_uom.rounding) <= 0
+                if is_failed_line_entire_move_qty and is_move_demand_fully_failed:
                     move.location_dest_id = dest_location
+                elif not is_failed_line_entire_move_qty:
+                    move.with_context(do_not_unreserve=True).product_uom_qty -= failed_qty
+                    move.copy({
+                        'location_dest_id': dest_location,
+                        'move_orig_ids': move.move_orig_ids,
+                        'product_uom_qty': failed_qty,
+                        'state': 'assigned',
+                        'move_line_ids': [Command.link(move_line.id)],
+                    })
+                check.failure_location_id = dest_location
                 return
-            move_line.quantity -= min(failed_qty, move_line.quantity)
+            move.with_context(do_not_unreserve=True).product_uom_qty -= min(failed_qty, move_line.quantity)
+            failed_demand_qty = min(failed_qty, move_line.quantity)
+            move_line.quantity -= failed_demand_qty
             failed_move_line = move_line.with_context(default_check_ids=None, no_checks=True).copy({
                 'location_dest_id': dest_location,
                 'quantity': failed_qty,
             })
             move.copy({
                 'location_dest_id': dest_location,
-                'move_dest_ids': move.move_dest_ids,
                 'move_orig_ids': move.move_orig_ids,
-                'product_uom_qty': 0,
+                'product_uom_qty': failed_demand_qty,
                 'state': 'assigned',
                 'move_line_ids': [Command.link(failed_move_line.id)],
             })
@@ -474,12 +497,29 @@ class QualityCheck(models.Model):
         self.ensure_one()
         action_name = self.title or "Quality Check"
         if self.product_id:
-            action_name += ' : %s' % self.product_id.name
+            action_name += ' : %s' % self.product_id.display_name
         if self.qty_line and self.uom_id:
             action_name += ' - %s %s' % (self.qty_line, self.uom_id.name)
         if self.lot_name or self.lot_line_id:
             action_name += ' - %s' % (self.lot_name or self.lot_line_id.name)
         return action_name
+
+    def _is_to_do(self, checkable_products, check_picked=False):
+        self.ensure_one()
+        if self.quality_state != 'none':
+            return False
+        if self.measure_on != 'operation':
+            if self.product_id not in checkable_products:
+                return False
+            if self.move_line_id:
+                if not self.move_line_id._is_checkable(check_picked):
+                    return False
+        # Only process qc related to tracked product if its lot is set
+        if self.move_line_id and self.product_id.tracking in ["serial", "lot"]:
+            if self.move_line_id.picking_type_use_create_lots or self.move_line_id.picking_type_use_existing_lots:
+                if not self.move_line_id.lot_id and not self.move_line_id.lot_name:
+                    return False
+        return True
 
 
 class QualityAlert(models.Model):
@@ -610,7 +650,7 @@ class ProductProduct(models.Model):
 
         parent_category_ids = [int(parent_id) for parent_id in self.categ_id.parent_path.split('/')[:-1]] if self.categ_id else []
         query.add_where(SQL(
-            """
+            """(
                     (
                         -- QP has at least one linked product and one is right
                         EXISTS (SELECT 1 FROM product_product_quality_point_rel rel WHERE rel.quality_point_id = quality_point.id AND rel.product_product_id = ANY(%s))
@@ -623,6 +663,7 @@ class ProductProduct(models.Model):
                         -- And QP has no linked product categories
                         AND NOT EXISTS (SELECT 1 FROM product_category_quality_point_rel rel WHERE rel.quality_point_id = quality_point.id)
                     )
+                )
             """,
             self.ids, parent_category_ids,
         ))

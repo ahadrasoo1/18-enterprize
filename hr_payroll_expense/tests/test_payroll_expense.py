@@ -84,7 +84,6 @@ class TestPayrollExpense(TestExpenseCommon, TestHrPayrollAccountCommon):
             })
         expense_payslip_journal = cls.account_journal.copy({
             'company_id': cls.company_data['company'].id,
-            'default_account_id': cls.expense_payable_account.id
         })
         cls.expense_hr_structure = cls.env['hr.payroll.structure'].create({
             'name': 'Salary Structure for Software Developer',
@@ -489,7 +488,7 @@ class TestPayrollExpense(TestExpenseCommon, TestHrPayrollAccountCommon):
         ])
 
         # Edit the total_amount on the expense move
-        sheet.account_move_ids.line_ids.filtered(lambda line: 'Expense To Delete' in line.name).unlink()
+        sheet.account_move_ids.line_ids.filtered(lambda line: 'Expense To Delete' in (line.name or '')).unlink()
         self.assertEqual(1000.0, sheet.account_move_ids.amount_total)
 
         payslip = self.create_payslip()
@@ -562,16 +561,16 @@ class TestPayrollExpense(TestExpenseCommon, TestHrPayrollAccountCommon):
 
         sheet_paid_before_payslip_creation.account_move_ids.action_post()
         self.get_new_payment(sheet_paid_before_payslip_creation, 1000.0)
-        self.assertRecordValues(sheets.sorted('payment_state'), [
+        self.assertRecordValues(sheets.sorted('state'), [
             # refund_in_payslip flag isn't reset, but we currently do not need it to be
+            {'total_amount': 1000.0, 'payment_state': 'not_paid',               'state': 'approve', 'refund_in_payslip': True, 'payslip_id': False},
+            {'total_amount': 1000.0, 'payment_state': 'not_paid',               'state': 'approve', 'refund_in_payslip': True, 'payslip_id': False},
             {'total_amount': 1000.0, 'payment_state': paid_or_in_payment_state, 'state': 'done',    'refund_in_payslip': True, 'payslip_id': False},
-            {'total_amount': 1000.0, 'payment_state': 'not_paid',               'state': 'approve', 'refund_in_payslip': True, 'payslip_id': False},
-            {'total_amount': 1000.0, 'payment_state': 'not_paid',               'state': 'approve', 'refund_in_payslip': True, 'payslip_id': False},
         ])
-        self.assertRecordValues(sheets.account_move_ids.sorted('amount_residual'), [
+        self.assertRecordValues(sheets.account_move_ids.sorted('state'), [
+            {'amount_total': 1000.0, 'amount_residual': 1000.0, 'payment_state': 'not_paid',               'state': 'draft'},
+            {'amount_total': 1000.0, 'amount_residual': 1000.0, 'payment_state': 'not_paid',               'state': 'draft'},
             {'amount_total': 1000.0, 'amount_residual': 0.0,    'payment_state': paid_or_in_payment_state, 'state': 'posted'},
-            {'amount_total': 1000.0, 'amount_residual': 1000.0, 'payment_state': 'not_paid',               'state': 'draft'},
-            {'amount_total': 1000.0, 'amount_residual': 1000.0, 'payment_state': 'not_paid',               'state': 'draft'},
         ])
         payslip = self.create_payslip()
         self.assertEqual(
@@ -600,15 +599,15 @@ class TestPayrollExpense(TestExpenseCommon, TestHrPayrollAccountCommon):
             payslip.input_line_ids.filtered(lambda rule: rule.code == 'EXPENSES').amount,
             "The 2 linked expenses total amounts should be added to the new payslip expense input line",
         )
-        self.assertRecordValues(sheets.sorted('payment_state'), [
+        self.assertRecordValues(sheets.sorted('state'), [
+            {'total_amount': 1000.0, 'payment_state': 'not_paid',               'state': 'approve', 'payslip_id': payslip.id},
             {'total_amount': 1000.0, 'payment_state': paid_or_in_payment_state, 'state': 'done',    'payslip_id': False},
             {'total_amount': 1000.0, 'payment_state': paid_or_in_payment_state, 'state': 'done',    'payslip_id': payslip.id},
-            {'total_amount': 1000.0, 'payment_state': 'not_paid',               'state': 'approve', 'payslip_id': payslip.id},
         ])
-        self.assertRecordValues(sheets.account_move_ids.sorted('amount_residual'), [
-            {'amount_total': 1000.0, 'amount_residual': 0.0,    'payment_state': paid_or_in_payment_state, 'state': 'posted'},
-            {'amount_total': 1000.0, 'amount_residual': 0.0,    'payment_state': paid_or_in_payment_state, 'state': 'posted'},
+        self.assertRecordValues(sheets.account_move_ids.sorted('state'), [
             {'amount_total': 1000.0, 'amount_residual': 1000.0, 'payment_state': 'not_paid',               'state': 'draft'},
+            {'amount_total': 1000.0, 'amount_residual': 0.0,    'payment_state': paid_or_in_payment_state, 'state': 'posted'},
+            {'amount_total': 1000.0, 'amount_residual': 0.0,    'payment_state': paid_or_in_payment_state, 'state': 'posted'},
         ])
 
         # Posting the move will result in `sheet_paid_before_payslip_move_posting` being paid twice,
@@ -657,6 +656,50 @@ class TestPayrollExpense(TestExpenseCommon, TestHrPayrollAccountCommon):
         ])
 
     @freeze_time('2024-01-01')
+    def test_no_expense_rule_means_no_linkage(self):
+        new_structure_rules = [
+            Command.link(rule.copy().id) for rule in self.expense_hr_structure.rule_ids.filtered(lambda rule: rule.code != 'EXPENSES')
+        ]
+        new_structure_rules.append(Command.create({
+            'name': 'Flat rate to ensure at least one move line',
+            'amount_select': 'code',
+            'amount_python_compute': 'result = 1000',
+            'code': 'FLAT',
+            'category_id': self.env.ref('hr_payroll.BASIC').id,
+            'sequence': 1000,
+            'account_debit': self.env['account.account'].create({
+                'name': 'random account',
+                'code': '652222',
+                'account_type': 'expense',
+                'tax_ids': [],
+                'company_ids': [Command.set(self.company_data['company'].ids)],
+            }).id,
+        }))
+        structure_without_expense_rule = self.expense_hr_structure.copy({
+            'rule_ids': new_structure_rules
+        })
+
+        sheet = self.create_expense_report()
+        sheet._do_submit()
+        sheet._do_approve()
+        sheet.action_report_in_next_payslip()
+
+        payslip = self.create_payslip({
+            'struct_id': structure_without_expense_rule.id,
+        })
+
+        # No expense linked if there are no expense rule in the structure
+        self.assertFalse(payslip.expense_sheet_ids)
+        self.payslip_run.slip_ids.compute_sheet()
+        self.payslip_run.action_validate()
+        payslip.move_id.action_post()
+
+        self.assertFalse(payslip.expense_sheet_ids)
+        self.assertRecordValues(sheet, [
+            {'state': 'approve', 'payment_state': 'not_paid', 'refund_in_payslip': True},
+        ])
+
+    @freeze_time('2024-01-01')
     def test_unlink_payslip_moves_user(self):
         """ Test Account user are able to reset to draft payslip move and unlink them """
         user = self.env['res.users'].create({
@@ -681,3 +724,11 @@ class TestPayrollExpense(TestExpenseCommon, TestHrPayrollAccountCommon):
 
         payslip.move_id.with_user(user).button_draft()
         payslip.move_id.with_user(user).unlink()
+
+    @freeze_time('2025-01-01')
+    def test_report_in_next_payslip_manager_rights(self):
+        with self.with_user(self.expense_user_manager.login):
+            sheet = self.create_expense_report({'accounting_date': '2024-01-15'})
+            sheet.action_submit_sheet()
+            sheet.action_approve_expense_sheets()
+            sheet.action_report_in_next_payslip()

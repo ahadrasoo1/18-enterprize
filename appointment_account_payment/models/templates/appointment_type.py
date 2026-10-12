@@ -62,4 +62,5 @@ class AppointmentType(models.Model):
             ],
             'resource_manage_capacity': True,
             'schedule_based_on': 'resources',
+            'staff_user_ids': [],
         }

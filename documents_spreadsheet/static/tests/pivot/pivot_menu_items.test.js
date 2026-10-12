@@ -2,8 +2,12 @@ import {
     defineDocumentSpreadsheetModels,
     defineDocumentSpreadsheetTestAction,
     DocumentsDocument,
+    getBasicServerData,
 } from "@documents_spreadsheet/../tests/helpers/data";
-import { createSpreadsheetFromPivotView } from "@documents_spreadsheet/../tests/helpers/pivot_helpers";
+import {
+    createSpreadsheetFromPivotView,
+    createSpreadsheetWithPivot,
+} from "@documents_spreadsheet/../tests/helpers/pivot_helpers";
 import { createSpreadsheet } from "@documents_spreadsheet/../tests/helpers/spreadsheet_test_utils";
 import { getHighlightsFromStore } from "@documents_spreadsheet/../tests/helpers/store_helpers";
 import { beforeEach, describe, expect, getFixture, test } from "@odoo/hoot";
@@ -16,21 +20,20 @@ import {
     setCellContent,
     setGlobalFilterValue,
 } from "@spreadsheet/../tests/helpers/commands";
-import { Partner, getBasicPivotArch, getBasicServerData } from "@spreadsheet/../tests/helpers/data";
+import { getBasicPivotArch } from "@spreadsheet/../tests/helpers/data";
 import {
     getCell,
     getCellFormula,
     getCellValue,
-    getEvaluatedCell,
     getCorrespondingCellFormula,
+    getEvaluatedCell,
 } from "@spreadsheet/../tests/helpers/getters";
 import {
-    createSpreadsheetWithPivot,
     getZoneOfInsertedDataSource,
     insertPivotInSpreadsheet,
 } from "@spreadsheet/../tests/helpers/pivot";
 import { doMenuAction } from "@spreadsheet/../tests/helpers/ui";
-import { contains } from "@web/../tests/web_test_helpers";
+import { contains, MockServer } from "@web/../tests/web_test_helpers";
 import { user } from "@web/core/user";
 import { mockActionService } from "../helpers/spreadsheet_test_utils";
 const { cellMenuRegistry, topbarMenuRegistry } = registries;
@@ -132,9 +135,8 @@ test("Reinsert a pivot in a too small sheet", async function () {
 
 test("Reinsert a pivot with new data", async function () {
     const { model, env } = await createSpreadsheetWithPivot();
-    Partner._records.push({
+    MockServer.env["partner"].create({
         active: true,
-        id: 5,
         foo: 25, // <- New value inserted
         bar: false,
         date: "2016-12-11",
@@ -157,11 +159,12 @@ test("Reinsert a pivot with an updated record", async function () {
     expect(getCellValue(model, "B1")).toBe(1);
     expect(getCellValue(model, "C1")).toBe(2);
     expect(getCellValue(model, "D1")).toBe(12);
-    Partner._records[0].foo = 99;
-    Partner._records[1].foo = 99;
+    const partnerRecords = MockServer.env["partner"];
+    partnerRecords[0].foo = 99;
+    partnerRecords[1].foo = 99;
     // updated measures
-    Partner._records[0].probability = 88;
-    Partner._records[1].probability = 77;
+    partnerRecords[0].probability = 88;
+    partnerRecords[1].probability = 77;
     selectCell(model, "A10");
     await doMenuAction(topbarMenuRegistry, reinsertDynamicPivotPath, env);
     await animationFrame();

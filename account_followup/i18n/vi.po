@@ -1,23 +1,27 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* account_followup
-# 
+# * account_followup
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Thi Huong Nguyen, 2025
+#
+# "Thi Huong Nguyen (thng)" <thng@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:26+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Vietnamese (https://app.transifex.com/odoo/teams/41243/vi/)\n"
+"POT-Creation-Date: 2026-04-10 18:48+0000\n"
+"PO-Revision-Date: 2026-01-10 09:04+0000\n"
+"Last-Translator: \"Thi Huong Nguyen (thng)\" <thng@odoo.com>\n"
+"Language-Team: Vietnamese <https://translate.odoo.com/projects/odoo-18/"
+"account_followup/vi/>\n"
+"Language: vi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: vi\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 5.14.3\n"
 
 #. module: account_followup
 #. odoo-python
@@ -34,17 +38,12 @@ msgstr "%(delay)s ngày (bản sao của %(name)s)"
 #. module: account_followup
 #: model:ir.actions.report,print_report_name:account_followup.action_report_followup
 msgid "'Follow-up ' + object.display_name"
-msgstr "'Theo dõi ' + object.display_name"
+msgstr "'Follow-up' + object.display_name"
 
 #. module: account_followup
 #: model:account_followup.followup.line,name:account_followup.demo_followup_line1
 msgid "15 Days"
 msgstr "15 Ngày"
-
-#. module: account_followup
-#: model_terms:ir.ui.view,arch_db:account_followup.followup_filter_info_template
-msgid "2023-09-06"
-msgstr "2023-09-06"
 
 #. module: account_followup
 #: model:account_followup.followup.line,name:account_followup.demo_followup_line2
@@ -71,33 +70,47 @@ msgstr "60 ngày"
 msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                    <p style=\"margin: 0px; padding: 0px;\">\n"
-"                        <t t-if=\"object.id != object.commercial_partner_id.id\">Dear <t t-out=\"object.name or ''\"></t> (<t t-out=\"object.commercial_partner_id.name or ''\"></t>),</t>\n"
-"                        <t t-else=\"\">Dear <t t-out=\"object.name or ''\"></t>,</t>\n"
-"                        <br>\n"
-"                        It has come to our attention that you have an outstanding balance of <t t-out=\"format_amount(object.total_overdue, object.currency_id) or ''\"></t>\n"
-"                        <br>\n"
-"                        We kindly request that you take necessary action to settle this amount within the next 8 days.\n"
-"                        <br>\n"
-"                        <div t-if=\"object._show_pay_now_button()\" class=\"d-flex\">\n"
-"                            <a t-att-href=\"'/my/invoices/overdue'\" class=\"btn btn-primary\">Pay now</a>\n"
+"                        <t t-if=\"object.id != "
+"object.commercial_partner_id.id\">Dear <t t-out=\"object.name or ''\"/> (<t "
+"t-out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
+"                        <t t-else=\"\">Dear <t t-out=\"object.name or ''\"/>,"
+"</t>\n"
+"                        <br/>\n"
+"                        It has come to our attention that you have&nbsp;an "
+"outstanding balance of <t t-"
+"out=\"format_amount(object.total_overdue_followup, object.currency_id) or "
+"''\"/>\n"
+"                        <br/>\n"
+"                        We kindly request that you take necessary action to "
+"settle this amount within the next 8 days.\n"
+"                        <br/>\n"
+"                        </p><div t-if=\"object._show_pay_now_button()\" "
+"class=\"d-flex\">\n"
+"                            <a t-att-href=\"'/my/invoices/overdue'\" "
+"class=\"btn btn-primary\">Pay now</a>\n"
 "                        </div>\n"
-"                        If you have already made the payment after receiving this message, please disregard it.\n"
-"                        Our accounting department is available if you require any assistance or have any questions.\n"
-"                        <br>\n"
+"                        If you have already made the payment after receiving "
+"this message, please disregard it.\n"
+"                        Our accounting department is available if you "
+"require any assistance or have any questions.\n"
+"                        <br/>\n"
 "                        Thank you for your cooperation.\n"
-"                        <br>\n"
+"                        <br/>\n"
 "                        Sincerely,\n"
-"                        <t t-if=\"not is_html_empty(object._get_followup_responsible().signature)\">\n"
-"                            <br>\n"
-"                            <t t-out=\"object._get_followup_responsible().signature\"></t>\n"
+"                        <t t-if=\"not "
+"is_html_empty(object._get_followup_responsible().signature)\">\n"
+"                            <br/>\n"
+"                            <t t-"
+"out=\"object._get_followup_responsible().signature\"/>\n"
 "                        </t>\n"
 "                        <t t-else=\"\">\n"
-"                            <br>\n"
+"                            <br/>\n"
 "                            --\n"
-"                            <br>\n"
-"                            <t t-out=\"object._get_followup_responsible().name\"></t>\n"
+"                            <br/>\n"
+"                            <t t-"
+"out=\"object._get_followup_responsible().name\"/>\n"
 "                        </t>\n"
-"                    </p>\n"
+"                    \n"
 "                </div>\n"
 "            "
 msgstr ""
@@ -107,25 +120,36 @@ msgstr ""
 msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                    <p>\n"
-"                        <t t-if=\"object.id != object.commercial_partner_id.id\">Dear <t t-out=\"object.name or ''\"></t> (<t t-out=\"object.commercial_partner_id.name or ''\"></t>),</t>\n"
-"                        <t t-else=\"\">Dear <t t-out=\"object.name or ''\"></t>,</t>\n"
-"                        <br>\n"
-"                        Despite several reminders, your account is still not settled.\n"
-"                        Unless full payment is made in next 8 days, then legal action for the recovery of the debt will be taken without further notice.\n"
-"                        I trust that this action will prove unnecessary and details of due payments is printed below.\n"
-"                        In case of any queries concerning this matter, do not hesitate to contact our accounting department.\n"
-"                        <br>\n"
+"                        <t t-if=\"object.id != "
+"object.commercial_partner_id.id\">Dear <t t-out=\"object.name or ''\"/> (<t "
+"t-out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
+"                        <t t-else=\"\">Dear <t t-out=\"object.name or ''\"/>,"
+"</t>\n"
+"                        <br/>\n"
+"                        Despite several reminders, your account is still not "
+"settled.\n"
+"                        Unless full payment is made in next 8 days, then "
+"legal action for the recovery of the debt will be taken without further "
+"notice.\n"
+"                        I trust that this action will prove unnecessary and "
+"details of due payments is printed below.\n"
+"                        In case of any queries concerning this matter, do "
+"not hesitate to contact our accounting department.\n"
+"                        <br/>\n"
 "                        Best Regards,\n"
-"                        <br>\n"
-"                        <t t-if=\"not is_html_empty(object._get_followup_responsible().signature)\">\n"
-"                            <br>\n"
-"                            <t t-out=\"object._get_followup_responsible().signature\"></t>\n"
+"                        <br/>\n"
+"                        <t t-if=\"not "
+"is_html_empty(object._get_followup_responsible().signature)\">\n"
+"                            <br/>\n"
+"                            <t t-"
+"out=\"object._get_followup_responsible().signature\"/>\n"
 "                        </t>\n"
 "                        <t t-else=\"\">\n"
-"                            <br>\n"
+"                            <br/>\n"
 "                            --\n"
-"                            <br>\n"
-"                            <t t-out=\"object._get_followup_responsible().name\"></t>\n"
+"                            <br/>\n"
+"                            <t t-"
+"out=\"object._get_followup_responsible().name\"/>\n"
 "                        </t>\n"
 "                    </p>\n"
 "                </div>\n"
@@ -133,25 +157,37 @@ msgid ""
 msgstr ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                    <p>\n"
-"                        <t t-if=\"object.id != object.commercial_partner_id.id\">Xin chào <t t-out=\"object.name or ''\"></t> (<t t-out=\"object.commercial_partner_id.name or ''\"></t>),</t>\n"
-"                        <t t-else=\"\">Xin chào <t t-out=\"object.name or ''\"></t>,</t>\n"
-"                        <br>\n"
-"                        Dù đã qua nhiều lần nhắc nhở, nhưng tài khoản của bạn vẫn chưa được thanh toán.\n"
-"                        Nếu bạn không thanh toán đầy đủ trong vòng 8 ngày tới, thì chúng tôi sẽ buộc phải thực hiện hành động pháp lý để thu hồi khoản nợ, mà không cần thông báo thêm.\n"
-"                        Dẫu vậy, chúng tôi tin rằng điều này sẽ không cần thiết phải diễn ra, và thông tin về khoản thanh toán đến hạn được in dưới đây.\n"
-"                        Trong trường hợp bạn có bất kỳ thắc mắc nào liên quan đến vấn đề này, vui lòng liên hệ với phòng kế toán của chúng tôi.\n"
-"                        <br>\n"
+"                        <t t-if=\"object.id != "
+"object.commercial_partner_id.id\">Xin chào <t t-out=\"object.name or ''\"/"
+">(<t t-out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
+"                        <t t-else=\"\">Xin chào <t t-out=\"object.name or "
+"''\"/>,</t>\n"
+"                        <br/>\n"
+"                        Dù đã qua nhiều lần nhắc nhở, nhưng tài khoản của "
+"bạn vẫn chưa được thanh toán.\n"
+"                        Nếu bạn không thanh toán đầy đủ trong vòng 8 ngày "
+"tới, thì chúng tôi sẽ buộc phải thực hiện hành động pháp lý để thu hồi khoản "
+"nợ, mà không cần thông báo thêm.\n"
+"                        Dẫu vậy, chúng tôi tin rằng điều này sẽ không cần "
+"thiết phải diễn ra, và thông tin về khoản thanh toán đến hạn được in dưới "
+"đây.\n"
+"                        Trong trường hợp bạn có bất kỳ thắc mắc nào liên "
+"quan đến vấn đề này, vui lòng liên hệ với phòng kế toán của chúng tôi.\n"
+"                        <br/>\n"
 "                        Trân trọng,\n"
-"                        <br>\n"
-"                        <t t-if=\"not is_html_empty(object._get_followup_responsible().signature)\">\n"
-"                            <br>\n"
-"                            <t t-out=\"object._get_followup_responsible().signature\"></t>\n"
+"                        <br/>\n"
+"                        <t t-if=\"not "
+"is_html_empty(object._get_followup_responsible().signature)\">\n"
+"                            <br/>\n"
+"                            <t t-"
+"out=\"object._get_followup_responsible().signature\"/>\n"
 "                        </t>\n"
 "                        <t t-else=\"\">\n"
-"                            <br>\n"
+"                            <br/>\n"
 "                            --\n"
-"                            <br>\n"
-"                            <t t-out=\"object._get_followup_responsible().name\"></t>\n"
+"                            <br/>\n"
+"                            <t t-"
+"out=\"object._get_followup_responsible().name\"/>\n"
 "                        </t>\n"
 "                    </p>\n"
 "                </div>\n"
@@ -162,27 +198,40 @@ msgstr ""
 msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                    <p>\n"
-"                        <t t-if=\"object.id != object.commercial_partner_id.id\">Dear <t t-out=\"object.name or ''\"></t> (<t t-out=\"object.commercial_partner_id.name or ''\"></t>),</t>\n"
-"                        <t t-else=\"\">Dear <t t-out=\"object.name or ''\"></t>,</t>\n"
-"                        <br>\n"
-"                        We are disappointed to see that despite sending a reminder, that your account is now seriously overdue.\n"
-"                        <br>\n"
-"                        It is essential that immediate payment is made, otherwise we will have to consider placing a stop on your account which means that we will no longer be able to supply your company with (goods/services). Please, take appropriate measures in order to carry out this payment in the next 8 days.\n"
-"                        <br>\n"
-"                        If there is a problem with paying invoice that we are not aware of, do not hesitate to contact our accounting department, so that we can resolve the matter quickly.\n"
-"                        <br>\n"
+"                        <t t-if=\"object.id != "
+"object.commercial_partner_id.id\">Dear <t t-out=\"object.name or ''\"/> (<t "
+"t-out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
+"                        <t t-else=\"\">Dear <t t-out=\"object.name or ''\"/>,"
+"</t>\n"
+"                        <br/>\n"
+"                        We are disappointed to see that despite sending a "
+"reminder, that your account is now seriously overdue.\n"
+"                        <br/>\n"
+"                        It is essential that immediate payment is made, "
+"otherwise we will have to consider placing a stop on your account which "
+"means that we will no longer be able to supply your company with (goods/"
+"services). Please, take appropriate measures in order to carry out this "
+"payment in the next 8 days.\n"
+"                        <br/>\n"
+"                        If there is a problem with paying invoice that we "
+"are not aware of, do not hesitate to contact our accounting department, so "
+"that we can resolve the matter quickly.\n"
+"                        <br/>\n"
 "                        Details of due payments is printed below.\n"
-"                        <br>\n"
+"                        <br/>\n"
 "                        Best Regards,\n"
-"                        <t t-if=\"not is_html_empty(object._get_followup_responsible().signature)\">\n"
-"                            <br>\n"
-"                            <t t-out=\"object._get_followup_responsible().signature\"></t>\n"
+"                        <t t-if=\"not "
+"is_html_empty(object._get_followup_responsible().signature)\">\n"
+"                            <br/>\n"
+"                            <t t-"
+"out=\"object._get_followup_responsible().signature\"/>\n"
 "                        </t>\n"
 "                        <t t-else=\"\">\n"
-"                            <br>\n"
+"                            <br/>\n"
 "                            --\n"
-"                            <br>\n"
-"                            <t t-out=\"object._get_followup_responsible().name\"></t>\n"
+"                            <br/>\n"
+"                            <t t-"
+"out=\"object._get_followup_responsible().name\"/>\n"
 "                        </t>\n"
 "                    </p>\n"
 "                </div>\n"
@@ -190,27 +239,42 @@ msgid ""
 msgstr ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "                    <p>\n"
-"                        <t t-if=\"object.id != object.commercial_partner_id.id\">Xin chào <t t-out=\"object.name or ''\"></t> (<t t-out=\"object.commercial_partner_id.name or ''\"></t>),</t>\n"
-"                        <t t-else=\"\">Xin chào <t t-out=\"object.name or ''\"></t>,</t>\n"
-"                        <br>\n"
-"                        Chúng tôi rất lấy làm tiếc khi thấy rằng mặc dù đã được nhắc nhở, nhưng tài khoản của bạn hiện đang trong trạng thái quá hạn nghiêm trọng.\n"
-"                        <br>\n"
-"                        Khoản thanh toán cần được thực hiện ngay lập tức, nếu không chúng tôi sẽ buộc phải xem xét đình chỉ tài khoản của bạn. Điều đó có nghĩa là chúng tôi sẽ không thể tiếp tục cung ứng (hàng hóa/dịch vụ) cho công ty bạn nữa. Vui lòng thực hiện các biện pháp thích hợp để thanh toán khoản tiền này trong vòng 8 ngày tới.\n"
-"                        <br>\n"
-"                        Nếu có vấn đề phát sinh trong việc thanh toán hóa đơn mà chúng tôi chưa nắm được, đừng ngần ngại liên hệ với phòng kế toán của chúng tôi để chúng tôi có thể nhanh chóng giải quyết.\n"
-"                        <br>\n"
-"                        Thông tin về khoản thanh toán đến hạn được in dưới đây.\n"
-"                        <br>\n"
+"                        <t t-if=\"object.id != "
+"object.commercial_partner_id.id\">Xin chào <t t-out=\"object.name or ''\"/"
+">(<t t-out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
+"                        <t t-else=\"\">Xin chào <t t-out=\"object.name or "
+"''\"/>,</t>\n"
+"                        <br/>\n"
+"                        Chúng tôi rất lấy làm tiếc khi thấy rằng mặc dù đã "
+"được nhắc nhở, nhưng tài khoản của bạn hiện đang trong trạng thái quá hạn "
+"nghiêm trọng.\n"
+"                        <br/>\n"
+"                        Khoản thanh toán cần được thực hiện ngay lập tức, "
+"nếu không chúng tôi sẽ buộc phải xem xét đình chỉ tài khoản của bạn. Điều đó "
+"có nghĩa là chúng tôi sẽ không thể tiếp tục cung ứng (hàng hóa/dịch vụ) cho "
+"công ty bạn nữa. Vui lòng thực hiện các biện pháp thích hợp để thanh toán "
+"khoản tiền này trong vòng 8 ngày tới.\n"
+"                        <br/>\n"
+"                        Nếu có vấn đề phát sinh trong việc thanh toán hóa "
+"đơn mà chúng tôi chưa nắm được, đừng ngần ngại liên hệ với phòng kế toán của "
+"chúng tôi để chúng tôi có thể nhanh chóng giải quyết.\n"
+"                        <br/>\n"
+"                        Thông tin về khoản thanh toán đến hạn được in dưới "
+"đây.\n"
+"                        <br/>\n"
 "                        Trân trọng,\n"
-"                        <t t-if=\"not is_html_empty(object._get_followup_responsible().signature)\">\n"
-"                            <br>\n"
-"                            <t t-out=\"object._get_followup_responsible().signature\"></t>\n"
+"                        <t t-if=\"not "
+"is_html_empty(object._get_followup_responsible().signature)\">\n"
+"                            <br/>\n"
+"                            <t t-"
+"out=\"object._get_followup_responsible().signature\"/>\n"
 "                        </t>\n"
 "                        <t t-else=\"\">\n"
-"                            <br>\n"
+"                            <br/>\n"
 "                            --\n"
-"                            <br>\n"
-"                            <t t-out=\"object._get_followup_responsible().name\"></t>\n"
+"                            <br/>\n"
+"                            <t t-"
+"out=\"object._get_followup_responsible().name\"/>\n"
 "                        </t>\n"
 "                    </p>\n"
 "                </div>\n"
@@ -219,7 +283,7 @@ msgstr ""
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.res_partner_view_form
 msgid "<span class=\"o_stat_text\">Customer Statement</span>"
-msgstr ""
+msgstr "<span class=\"o_stat_text\">Báo cáo khách hàng</span>"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.res_partner_view_form
@@ -227,8 +291,8 @@ msgid ""
 "<span>Preferred address for follow-up reports. Selected by default when you "
 "send reminders about overdue invoices.</span>"
 msgstr ""
-"<span>Địa chỉ ưu tiên cho các báo cáo follow-up. Được chọn theo mặc định khi"
-" bạn gửi nhắc nhở về các hoá đơn quá hạn thanh toán.</span>"
+"<span>Địa chỉ ưu tiên cho các báo cáo follow-up. Được chọn theo mặc định khi "
+"bạn gửi nhắc nhở về các hoá đơn quá hạn thanh toán.</span>"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.template_followup_report
@@ -394,7 +458,7 @@ msgstr "Tham chiếu Khách hàng:"
 #. module: account_followup
 #: model:ir.actions.client,name:account_followup.action_account_followup
 msgid "Customers Statement"
-msgstr "Sao kê giao dịch của khách hàng"
+msgstr "Báo cáo khách hàng"
 
 #. module: account_followup
 #. odoo-python
@@ -410,7 +474,7 @@ msgstr "Ngày:"
 #. module: account_followup
 #: model:ir.model.constraint,message:account_followup.constraint_account_followup_followup_line_days_uniq
 msgid "Days of the follow-up lines must be different per company"
-msgstr "Ngày của các dòng theo dõi phải khác nhau đối với mỗi công ty"
+msgstr "Ngày của các dòng follow-up phải khác nhau đối với mỗi công ty"
 
 #. module: account_followup
 #. odoo-python
@@ -419,9 +483,12 @@ msgid ""
 "Dear %s,\n"
 "\n"
 "\n"
-"Exception made if there was a mistake of ours, it seems that the following amount stays unpaid. Please, take appropriate measures in order to carry out this payment in the next 8 days.\n"
+"Exception made if there was a mistake of ours, it seems that the following "
+"amount stays unpaid. Please, take appropriate measures in order to carry out "
+"this payment in the next 8 days.\n"
 "\n"
-"Would your payment have been carried out after this mail was sent, please ignore this message. Do not hesitate to contact our accounting department.\n"
+"Would your payment have been carried out after this mail was sent, please "
+"ignore this message. Do not hesitate to contact our accounting department.\n"
 "\n"
 "Best Regards,\n"
 "\n"
@@ -429,9 +496,12 @@ msgstr ""
 "Xin chào %s,\n"
 "\n"
 "\n"
-"Trừ khi có sai sót từ phía chúng tôi, có vẻ như số tiền sau vẫn chưa được thanh toán. Vui lòng thực hiện các biện pháp thích hợp để thanh toán số tiền này trong vòng 8 ngày tới.\n"
+"Trừ khi có sai sót từ phía chúng tôi, có vẻ như số tiền sau vẫn chưa được "
+"thanh toán. Vui lòng thực hiện các biện pháp thích hợp để thanh toán số tiền "
+"này trong vòng 8 ngày tới.\n"
 "\n"
-"Nếu bạn đã thanh toán sau khi chúng tôi gửi thư này, xin vui lòng bỏ qua thư. Và, đừng ngần ngại liên hệ với phòng kế toán của chúng tôi.\n"
+"Nếu bạn đã thanh toán sau khi chúng tôi gửi thư này, xin vui lòng bỏ qua "
+"thư. Và, đừng ngần ngại liên hệ với phòng kế toán của chúng tôi.\n"
 "\n"
 "Trân trọng,\n"
 "\n"
@@ -449,8 +519,7 @@ msgstr ""
 #. module: account_followup
 #: model_terms:ir.actions.act_window,help:account_followup.action_account_followup_line_definition_form
 msgid "Define follow-up levels and their related actions"
-msgstr ""
-"Định nghĩa các mức độ theo dõi và các tác vụ tương ứng cho từng mức độ"
+msgstr "Xác định cấp độ follow-up và các tác vụ liên quan cho từng cấp độ"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.followup_filter_info_template
@@ -471,9 +540,10 @@ msgid ""
 "- Account Manager: Sales Person defined on the customer"
 msgstr ""
 "Xác định ai sẽ được chỉ định cho hoạt động:\n"
-"- Chịu trách nhiệm theo dõi (mặc định)\n"
-"- Nhân viên bán hàng: Nhân viên bán hàng được xác định trên hóa đơn\n"
-"- Quản lý tài khoản: Chuyên viên sales được xác định trên khách hàng"
+"- Người phụ trách follow-up (mặc định)\n"
+"- Nhân viên sales: Nhân viên sales được xác định trên hóa đơn\n"
+"- Chuyên viên quản lý tài khoản: Nhân viên sales được xác định trên khách "
+"hàng"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_followup_line__display_name
@@ -515,32 +585,32 @@ msgstr "Người nhận thêm"
 
 #. module: account_followup
 #. odoo-python
-#: code:addons/account_followup/models/account_followup_report.py:0
-msgid "Follow-up %(partner)s - %(date)s"
-msgstr "Follow-up %(partner)s - %(date)s"
+#: code:addons/account_followup/models/res_partner.py:0
+msgid "Follow-up %(partner)s - %(date)s.pdf"
+msgstr "Follow-up %(partner)s - %(date)s.pdf"
 
 #. module: account_followup
 #: model:ir.model.fields.selection,name:account_followup.selection__res_partner__type__followup
 msgid "Follow-up Address"
-msgstr "Địa chỉ theo dõi"
+msgstr "Địa chỉ follow-up"
 
 #. module: account_followup
 #: model:ir.model,name:account_followup.model_account_followup_followup_line
 msgid "Follow-up Criteria"
-msgstr "Tiêu chí tiếp theo"
+msgstr "Tiêu chí follow-up"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_move_line__followup_line_id
 #: model:ir.model.fields,field_description:account_followup.field_res_partner__followup_line_id
 #: model:ir.model.fields,field_description:account_followup.field_res_users__followup_line_id
 msgid "Follow-up Level"
-msgstr "Mức độ theo dõi"
+msgstr "Cấp độ follow-up"
 
 #. module: account_followup
 #: model:ir.actions.act_window,name:account_followup.action_account_followup_line_definition_form
 #: model:ir.ui.menu,name:account_followup.account_followup_menu
 msgid "Follow-up Levels"
-msgstr "Mức độ theo dõi"
+msgstr "Cấp độ follow-up"
 
 #. module: account_followup
 #: model:ir.model,name:account_followup.model_account_followup_report
@@ -550,19 +620,19 @@ msgstr "Báo cáo Follow-up"
 #. module: account_followup
 #: model:ir.model.fields.selection,name:account_followup.selection__account_followup_followup_line__activity_default_responsible_type__followup
 msgid "Follow-up Responsible"
-msgstr "Chịu trách nhiệm theo dõi"
+msgstr "Người phụ trách follow-up"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_res_partner__followup_status
 #: model:ir.model.fields,field_description:account_followup.field_res_users__followup_status
 msgid "Follow-up Status"
-msgstr "Follow-up Status"
+msgstr "Trạng thái follow-up"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.view_account_followup_followup_line_form
 #: model_terms:ir.ui.view,arch_db:account_followup.view_account_followup_followup_line_tree
 msgid "Follow-up Steps"
-msgstr "Các bước theo dõi"
+msgstr "Các bước follow-up"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.report_followup_print_all
@@ -573,7 +643,7 @@ msgstr "Thông tin follow-up"
 #. odoo-python
 #: code:addons/account_followup/models/account_followup_report.py:0
 msgid "Follow-up letter generated"
-msgstr "Thư theo dõi được tạo"
+msgstr "Thư follow-up được tạo"
 
 #. module: account_followup
 #: model:ir.model,name:account_followup.model_account_followup_missing_information_wizard
@@ -584,17 +654,26 @@ msgstr "Follow-up công cụ thông tin thiếu sót"
 #: model_terms:ir.actions.act_window,help:account_followup.action_account_followup_line_definition_form
 msgid ""
 "For each step, specify the actions to be taken and delay in days. It is\n"
-"            possible to use print and e-mail templates to send specific messages to\n"
+"            possible to use print and e-mail templates to send specific "
+"messages to\n"
 "            the customer."
 msgstr ""
-"Đối với mỗi bước, chỉ định các tác vụ được thực hiện và trì hoãn theo ngày. Nó là\n"
-"             có thể sử dụng các mẫu in và e-mail để gửi các tin nhắn cụ thể tới\n"
+"Đối với mỗi bước, chỉ định các tác vụ được thực hiện và trì hoãn theo ngày. "
+"Nó là\n"
+"             có thể sử dụng các mẫu in và e-mail để gửi các tin nhắn cụ thể "
+"tới\n"
 "             khách hàng."
 
 #. module: account_followup
 #: model:mail.template,name:account_followup.demo_followup_email_template_4
 msgid "Fourth reminder followup"
 msgstr "Theo dõi lời nhắc thứ tư"
+
+#. module: account_followup
+#: model:ir.model.fields,field_description:account_followup.field_res_partner__has_moves
+#: model:ir.model.fields,field_description:account_followup.field_res_users__has_moves
+msgid "Has Moves"
+msgstr "Có bút toán"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_followup_line__id
@@ -622,7 +701,7 @@ msgstr "Có nhu cầu thực hiện"
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.view_partner_property_form_followup
 msgid "Invoice Follow-ups"
-msgstr ""
+msgstr "Follow-up hoá đơn"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.template_followup_report
@@ -632,7 +711,7 @@ msgstr "Phân tích hóa đơn"
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_manual_reminder__is_mail_template_editor
 msgid "Is Editor"
-msgstr "Là biên tập"
+msgstr "Là trình chỉnh sửa"
 
 #. module: account_followup
 #: model:ir.model,name:account_followup.model_account_move_line
@@ -710,6 +789,18 @@ msgid "No action needed"
 msgstr "Không có gì cần làm"
 
 #. module: account_followup
+#: model:ir.model.fields,help:account_followup.field_res_partner__followup_next_action_date
+#: model:ir.model.fields,help:account_followup.field_res_users__followup_next_action_date
+msgid ""
+"No follow-up action will be taken before this date.\n"
+"                Sending a reminder will set this date depending on the "
+"levels configuration, and you can change it manually."
+msgstr ""
+"Sẽ không có tác vụ follow-up nào được thực hiện trước ngày này.\n"
+"Việc gửi nhắc nhở sẽ thiết lập ngày này tùy theo cấu hình cấp độ và bạn có "
+"thể thay đổi theo cách thủ công."
+
+#. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_followup_line__activity_note
 msgid "Note"
 msgstr "Ghi chú"
@@ -724,8 +815,8 @@ msgstr "Thông báo"
 msgid ""
 "Optional translation language (ISO code) to select when sending out an "
 "email. If not set, the english version will be used. This should usually be "
-"a placeholder expression that provides the appropriate language, e.g. {{ "
-"object.partner_id.lang }}."
+"a placeholder expression that provides the appropriate language, e.g. "
+"{{ object.partner_id.lang }}."
 msgstr ""
 "Ngôn ngữ dịch tuỳ chọn (mã ISO) để chọn khi gửi email. Nếu không đặt, phiên "
 "bản tiếng Anh sẽ được sử dụng. Đây luôn là biểu thức phần giữ chỗ cung cấp "
@@ -745,6 +836,13 @@ msgstr "Gốc"
 
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.customer_statements_search_view
+msgid "Overdue Customer Invoices"
+msgstr ""
+
+#. module: account_followup
+#. odoo-python
+#: code:addons/account_followup/models/res_partner.py:0
+#: model_terms:ir.ui.view,arch_db:account_followup.view_partner_property_form_followup
 msgid "Overdue Invoices"
 msgstr "Hóa đơn quá hạn"
 
@@ -767,12 +865,12 @@ msgstr "In"
 #. module: account_followup
 #: model:ir.actions.report,name:account_followup.action_report_followup
 msgid "Print Follow-up Letter"
-msgstr "In Thư  Follow-up"
+msgstr "In Thư follow-up"
 
 #. module: account_followup
 #: model:ir.actions.server,name:account_followup.action_account_reports_customer_statements_do_followup
-msgid "Process Automatic Follow-ups"
-msgstr "Quy trình theo dõi tự động"
+msgid "Process Follow-ups"
+msgstr "Theo dõi quá trình"
 
 #. module: account_followup
 #. odoo-python
@@ -804,7 +902,7 @@ msgstr "Báo cáo tác vụ"
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.customer_statements_search_view
 msgid "Requires Follow-up"
-msgstr ""
+msgstr "Follow-up yêu cầu"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_followup_line__activity_default_responsible_type
@@ -821,7 +919,7 @@ msgstr "SMS"
 #. module: account_followup
 #: model:ir.model.fields.selection,name:account_followup.selection__account_followup_followup_line__activity_default_responsible_type__salesperson
 msgid "Salesperson"
-msgstr "Chuyên viên sales"
+msgstr "Nhân viên sales"
 
 #. module: account_followup
 #: model:ir.model.fields,field_description:account_followup.field_account_followup_followup_line__create_activity
@@ -831,7 +929,7 @@ msgstr "Lịch làm việc"
 #. module: account_followup
 #: model_terms:ir.ui.view,arch_db:account_followup.view_account_followup_line_filter
 msgid "Search Follow-up"
-msgstr "Tìm theo dõi"
+msgstr "Tìm kiếm follow-up"
 
 #. module: account_followup
 #: model:mail.template,name:account_followup.demo_followup_email_template_2
@@ -906,26 +1004,6 @@ msgid "Table Value"
 msgstr "Giá trị của bảng"
 
 #. module: account_followup
-#: model:ir.model.fields,help:account_followup.field_res_partner__followup_next_action_date
-#: model:ir.model.fields,help:account_followup.field_res_users__followup_next_action_date
-msgid ""
-"The date before which no follow-up action should be taken.\n"
-"                You can set it manually if desired but it is automatically set when follow-ups are processed.\n"
-"                The date is computed according to the following rules (depending on the follow-up levels):\n"
-"                - default -> next date set in {next level delay - current level delay} days\n"
-"                - if no next level -> next date set in {current level delay - previous level delay} days\n"
-"                - if no next level AND no previous level -> next date set in {current level delay} days\n"
-"                - if no level defined at all -> next date never automatically set"
-msgstr ""
-"Ngày mà trước đó bạn không nên thực hiện tác vụ follow-up nào.\n"
-"                 Bạn có thể đặt thủ công, nếu muốn, nhưng nó sẽ được đặt tự động khi follow-up diễn ra.\n"
-"                 Ngày được tính theo quy tắc sau (tùy theo cấp độ follow-up):\n"
-"                 - mặc định -> ngày tiếp theo được đặt trong {độ trễ cấp độ tiếp theo - độ trễ cấp độ hiện tại} ngày\n"
-"                 - nếu không có cấp độ tiếp theo -> ngày tiếp theo được đặt trong {độ trễ cấp độ hiện tại - độ trễ cấp độ trước đó} ngày\n"
-"                 - nếu không có cấp độ tiếp theo VÀ không có cấp độ trước đó -> ngày tiếp theo được đặt trong {độ trễ cấp độ hiện tại} ngày\n"
-"                 - nếu không có cấp độ nào được xác định -> ngày tiếp theo không bao giờ được đặt tự động"
-
-#. module: account_followup
 #: model:ir.model.fields,help:account_followup.field_account_move_line__invoice_origin
 msgid "The document(s) that generated the invoice."
 msgstr "Chứng từ đã tạo hóa đơn."
@@ -937,8 +1015,8 @@ msgid ""
 "the reminder. Can be negative if you want to send the reminder before the "
 "invoice due date."
 msgstr ""
-"Số ngày sau ngày đến hạn của hóa đơn phải đợi trước khi gửi lời nhắc. Có thể"
-" là số âm nếu bạn muốn gửi lời nhắc trước ngày đến hạn của hóa đơn."
+"Số ngày sau ngày đến hạn của hóa đơn phải đợi trước khi gửi lời nhắc. Có thể "
+"là số âm nếu bạn muốn gửi lời nhắc trước ngày đến hạn của hóa đơn."
 
 #. module: account_followup
 #: model:ir.model.fields,help:account_followup.field_res_partner__followup_responsible_id
@@ -954,6 +1032,18 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:account_followup.customer_statements_tree_view
 msgid "Total"
 msgstr "Tổng"
+
+#. module: account_followup
+#: model:ir.model.fields,field_description:account_followup.field_res_partner__total_all_due
+#: model:ir.model.fields,field_description:account_followup.field_res_users__total_all_due
+msgid "Total All Due"
+msgstr "Tổng đến hạn"
+
+#. module: account_followup
+#: model:ir.model.fields,field_description:account_followup.field_res_partner__total_all_overdue
+#: model:ir.model.fields,field_description:account_followup.field_res_users__total_all_overdue
+msgid "Total All Overdue"
+msgstr "Tổng quá hạn"
 
 #. module: account_followup
 #. odoo-python
@@ -1000,8 +1090,8 @@ msgid ""
 "We were not able to process some of the automated follow-up actions due to "
 "missing information on the partners."
 msgstr ""
-"Chúng tôi không thể xử lý một số tác vụ follow-up tự động do thiếu thông tin"
-" về đối tác."
+"Chúng tôi không thể xử lý một số tác vụ follow-up tự động do thiếu thông tin "
+"về đối tác."
 
 #. module: account_followup
 #: model:ir.model.fields.selection,name:account_followup.selection__res_partner__followup_status__with_overdue_invoices
@@ -1032,8 +1122,8 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_followup/models/account_followup_report.py:0
 msgid ""
-"You are trying to send an SMS, but no follow-up contact has any mobile/phone"
-" number set for customer '%s'"
+"You are trying to send an SMS, but no follow-up contact has any mobile/phone "
+"number set for customer '%s'"
 msgstr ""
 "Bạn đang cố gắng gửi SMS, nhưng không có số điện thoại/di động nào được "
 "thiết lập cho liên hệ follow-up của khách hàng '%s'"
@@ -1059,8 +1149,105 @@ msgstr "nhắc nhở thanh toán"
 #: model:mail.template,subject:account_followup.demo_followup_email_template_4
 #: model:mail.template,subject:account_followup.email_template_followup_1
 msgid ""
-"{{ (object.company_id or object._get_followup_responsible().company_id).name"
-" }} Payment Reminder - {{ object.commercial_company_name }}"
+"{{ (object.company_id or "
+"object._get_followup_responsible().company_id).name }} Payment Reminder - "
+"{{ object.commercial_company_name }}"
 msgstr ""
-"{{ (object.company_id or object._get_followup_responsible().company_id).name"
-" }} Nhắc nhở thanh toán - {{ object.commercial_company_name }}"
+"{{ (object.company_id or "
+"object._get_followup_responsible().company_id).name }} Nhắc nhở thanh toán - "
+"{{ object.commercial_company_name }}"
+
+#~ msgid "2023-09-06"
+#~ msgstr "2023-09-06"
+
+#~ msgid ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                    <p style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                        <t t-if=\"object.id != "
+#~ "object.commercial_partner_id.id\">Dear <t t-out=\"object.name or ''\"/> "
+#~ "(<t t-out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
+#~ "                        <t t-else=\"\">Dear <t t-out=\"object.name or "
+#~ "''\"/>,</t>\n"
+#~ "                        <br/>\n"
+#~ "                        It has come to our attention that you "
+#~ "have&nbsp;an outstanding balance of <t t-"
+#~ "out=\"format_amount(object.total_overdue, object.currency_id) or ''\"/>\n"
+#~ "                        <br/>\n"
+#~ "                        We kindly request that you take necessary action "
+#~ "to settle this amount within the next 8 days.\n"
+#~ "                        <br/>\n"
+#~ "                        </p><div t-if=\"object._show_pay_now_button()\" "
+#~ "class=\"d-flex\">\n"
+#~ "                            <a t-att-href=\"'/my/invoices/overdue'\" "
+#~ "class=\"btn btn-primary\">Pay now</a>\n"
+#~ "                        </div>\n"
+#~ "                        If you have already made the payment after "
+#~ "receiving this message, please disregard it.\n"
+#~ "                        Our accounting department is available if you "
+#~ "require any assistance or have any questions.\n"
+#~ "                        <br/>\n"
+#~ "                        Thank you for your cooperation.\n"
+#~ "                        <br/>\n"
+#~ "                        Sincerely,\n"
+#~ "                        <t t-if=\"not "
+#~ "is_html_empty(object._get_followup_responsible().signature)\">\n"
+#~ "                            <br/>\n"
+#~ "                            <t t-"
+#~ "out=\"object._get_followup_responsible().signature\"/>\n"
+#~ "                        </t>\n"
+#~ "                        <t t-else=\"\">\n"
+#~ "                            <br/>\n"
+#~ "                            --\n"
+#~ "                            <br/>\n"
+#~ "                            <t t-"
+#~ "out=\"object._get_followup_responsible().name\"/>\n"
+#~ "                        </t>\n"
+#~ "                    \n"
+#~ "                </div>\n"
+#~ "            "
+#~ msgstr ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                   <p style=\"margin: 0px; padding: 0px;\"> \n"
+#~ "                        <t t-if=\"object.id != "
+#~ "object.commercial_partner_id.id\">Xin chào <t t-out=\"object.name or ''\"/"
+#~ ">(<t t-out=\"object.commercial_partner_id.name or ''\"/>),</t>\n"
+#~ "                        <t t-else=\"\">Xin chào <t t-out=\"object.name or "
+#~ "''\"/>,</t>\n"
+#~ "                        <br/>\n"
+#~ "                        Chúng tôi nhận thấy rằng bạn có số dư chưa thanh "
+#~ "toán là <t t-out=\"format_amount(object.total_overdue, "
+#~ "object.currency_id) or ''\"/>\n"
+#~ "                        <br/>\n"
+#~ "                        Mong bạn sẽ thực hiện các biện pháp thích hợp để "
+#~ "thanh toán khoản tiền này trong vòng 8 ngày tới.\n"
+#~ "                        <br/>\n"
+#~ "                        </p><div t-if=\"object._show_pay_now_button()\" "
+#~ "class=\"d-flex\">\n"
+#~ "                           <a t-att-href=\"'/my/invoices/overdue'\" "
+#~ "class=\"btn btn-primary\">Thanh toán ngay</a>\n"
+#~ "                       </div> \n"
+#~ "                        Nếu bạn đã thanh toán sau khi nhận được thông báo "
+#~ "này, xin vui lòng bỏ qua.\n"
+#~ "                        Đừng ngần ngại liên hệ với phòng kế toán của "
+#~ "chúng tôi nếu bạn cần trợ giúp hay có bất kỳ thắc mắc nào liên quan đến "
+#~ "trường hợp này.\n"
+#~ "                        <br/>\n"
+#~ "                        Cảm ơn sự hợp tác từ bạn!\n"
+#~ "                        <br/>\n"
+#~ "                        Trân trọng,\n"
+#~ "                        <t t-if=\"not "
+#~ "is_html_empty(object._get_followup_responsible().signature)\">\n"
+#~ "                            <br/>\n"
+#~ "                            <t t-"
+#~ "out=\"object._get_followup_responsible().signature\"/>\n"
+#~ "                        </t>\n"
+#~ "                       <t t-else=\"\"> \n"
+#~ "                            <br/>\n"
+#~ "                            --\n"
+#~ "                            <br/>\n"
+#~ "                            <t t-"
+#~ "out=\"object._get_followup_responsible().name\"/>\n"
+#~ "                       </t> \n"
+#~ "                    \n"
+#~ "                </div>\n"
+#~ "            "

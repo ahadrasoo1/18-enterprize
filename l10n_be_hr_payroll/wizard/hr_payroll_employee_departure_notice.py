@@ -21,7 +21,7 @@ class HrPayslipEmployeeDepartureNotice(models.TransientModel):
             raise UserError(_('You must be logged in a Belgian company to use this feature'))
         return super().default_get(field_list)
 
-    employee_id = fields.Many2one('hr.employee', string='Employee', default=lambda self: self.env.context.get('active_id'))
+    employee_id = fields.Many2one('hr.employee', string='Employee', default=lambda self: self.env.context.get('active_id'), domain="[('company_id', 'in', allowed_company_ids)]")
     departure_date = fields.Date(string='Departure Date', default=fields.Date.context_today, required=True)
     leaving_type_id = fields.Many2one('hr.departure.reason', string='Departure Reason', required=True)
     departure_reason_code = fields.Integer(related='leaving_type_id.reason_code')
@@ -63,9 +63,11 @@ class HrPayslipEmployeeDepartureNotice(models.TransientModel):
     def _compute_oldest_contract_id(self):
         """ get the oldest contract """
         for notice in self:
+            pfi = self.env.ref('l10n_be_hr_payroll.l10n_be_contract_type_pfi')
             notice.oldest_contract_id = self.env['hr.contract'].search([
                 ('employee_id', '=', notice.employee_id.id),
-                ('state', '!=', 'cancel')
+                ('state', '!=', 'cancel'),
+                ('contract_type_id', '!=', pfi.id)
             ], order='date_start asc', limit=1)
             notice.first_contract = notice.oldest_contract_id.date_start
 
@@ -84,11 +86,11 @@ class HrPayslipEmployeeDepartureNotice(models.TransientModel):
             else:
                 notice.seniority_description = _('%(years)s years and %(months)s months', months=difference.months, years=difference.years)
 
-    @api.depends('departure_date', 'notice_respect', 'departure_reason_code')
+    @api.depends('departure_date', 'notice_respect', 'departure_reason_code', 'oldest_contract_id')
     def _compute_start_notice_period(self):
         public_holiday_type = self.env.ref('l10n_be_hr_payroll.work_entry_type_bank_holiday')
         for notice in self:
-            if notice.notice_respect == 'without':
+            if not notice.oldest_contract_id or notice.notice_respect == 'without' or notice.departure_reason_code in (350, 351):
                 notice.start_notice_period = notice.departure_date
             elif notice.departure_reason_code == 342:
                 # We can only take the next monday that has at least 3 calendar days (Monday to Saturday except public
@@ -106,10 +108,10 @@ class HrPayslipEmployeeDepartureNotice(models.TransientModel):
             else:
                 notice.start_notice_period = notice.departure_date + relativedelta(days=7 - notice.departure_date.weekday())
 
-    @api.depends('notice_duration_month_before_2014', 'notice_duration_week_after_2014', 'start_notice_period', 'notice_respect', 'departure_date', 'departure_reason_code')
+    @api.depends('notice_duration_month_before_2014', 'notice_duration_week_after_2014', 'start_notice_period', 'notice_respect', 'departure_date', 'departure_reason_code', 'oldest_contract_id')
     def _compute_end_notice_period(self):
         for notice in self:
-            if notice.notice_respect == 'without':
+            if not notice.oldest_contract_id or notice.notice_respect == 'without':
                 notice.end_notice_period = notice.departure_date
             elif notice.start_notice_period:
                 if notice.departure_reason_code in [350, 351]:
@@ -118,11 +120,16 @@ class HrPayslipEmployeeDepartureNotice(models.TransientModel):
                     months_to_weeks = notice.notice_duration_month_before_2014 / 3.0 * 13
                     notice.end_notice_period = notice.start_notice_period + timedelta(weeks=months_to_weeks + notice.notice_duration_week_after_2014, days=-1)
 
-    @api.depends('first_contract', 'leaving_type_id', 'salary_december_2013', 'start_notice_period')
+    @api.depends('first_contract', 'leaving_type_id', 'salary_december_2013', 'start_notice_period', 'oldest_contract_id')
     def _notice_duration(self):
         first_2014 = datetime(2014, 1, 1)
         departure_reasons = self.env['hr.departure.reason']._get_default_departure_reasons()
         for notice in self:
+            if not notice.oldest_contract_id:
+                notice.salary_visibility = False
+                notice.notice_duration_month_before_2014 = 0
+                notice.notice_duration_week_after_2014 = 0
+                continue
             if notice._get_years(relativedelta(first_2014, notice.first_contract)) < 0:
                 first_day_since_2014 = notice.first_contract
             else:

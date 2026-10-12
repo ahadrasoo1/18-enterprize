@@ -259,7 +259,7 @@ QUnit.module("View Editors", (hooks) => {
         'indicate that regular stored field(except date/datetime) can not be dropped in "Filters" section',
         async function (assert) {
             serverData.models.coucou.fields = {
-                name: { type: "char", store: true },
+                name: { type: "char", store: true, groupable: true },
             };
             await createViewEditor({
                 serverData,
@@ -379,7 +379,7 @@ QUnit.module("View Editors", (hooks) => {
             </search>`;
         serverData.models.coucou = {
             fields: {
-                m2m: { type: "many2many", string: "M2M", store: true },
+                m2m: { type: "many2many", string: "M2M", store: true, groupable: true },
             },
         };
 
@@ -583,8 +583,9 @@ QUnit.module("View Editors", (hooks) => {
                     ["3", "High"],
                 ],
                 store: true,
+                groupable: true,
             },
-            start: { string: "Start Date", type: "datetime", store: true },
+            start: { string: "Start Date", type: "datetime", store: true, groupable: true },
         };
 
         await createViewEditor({
@@ -668,6 +669,7 @@ QUnit.module("View Editors", (hooks) => {
             __last_update: {
                 type: "datetime",
                 store: true,
+                groupable: true,
                 string: "Last Updated on",
             },
         };

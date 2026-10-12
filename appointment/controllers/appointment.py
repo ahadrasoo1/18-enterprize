@@ -10,7 +10,7 @@ from babel.dates import format_datetime, format_date, format_time
 from datetime import datetime, date
 from dateutil.relativedelta import relativedelta
 from markupsafe import Markup
-from urllib.parse import unquote_plus
+from urllib.parse import quote, unquote_plus
 from werkzeug.exceptions import Forbidden, NotFound
 from werkzeug.urls import url_encode
 
@@ -108,7 +108,8 @@ class AppointmentController(http.Controller):
                 filter_appointment_type_ids=kwargs.get('filter_appointment_type_ids'),
                 search=kwargs.get('search'),
                 invite_token=kwargs.get('invite_token'),
-                additional_domain=kwargs.get('domain')
+                additional_domain=kwargs.get('domain'),
+                filter_countries=True,
             )
         )
         appointment_types = appointment_types.sorted('is_published', reverse=True)
@@ -121,7 +122,7 @@ class AppointmentController(http.Controller):
         }
 
     @classmethod
-    def _appointments_base_domain(cls, filter_appointment_type_ids, search=False, invite_token=False, additional_domain=None):
+    def _appointments_base_domain(cls, filter_appointment_type_ids, search=False, invite_token=False, additional_domain=None, filter_countries=False):
         """
         Generate a domain for appointment filtering.
         This method constructs a domain to filter appointment records based on various criteria.
@@ -141,7 +142,8 @@ class AppointmentController(http.Controller):
             filter_appointment_type_ids = unquote_plus(filter_appointment_type_ids)
             domain = expression.AND([domain, [('id', 'in', json.loads(filter_appointment_type_ids))]])
 
-        if not invite_token:
+        # Exclude country only if it's not an invite and it was specified
+        if not invite_token and filter_countries:
             country = cls._get_customer_country()
             if country:
                 country_domain = ['|', ('country_ids', '=', False), ('country_ids', 'in', [country.id])]
@@ -319,8 +321,8 @@ class AppointmentController(http.Controller):
             - hide_select_dropdown: True if the user select dropdown should be hidden. (e.g. an operator has been selected before)
             Even if hidden, it can still be in the view and used to update availabilities according to the selected user in the js.
         """
-        filter_staff_user_ids = json.loads(kwargs.get('filter_staff_user_ids') or '[]')
-        filter_resource_ids = json.loads(kwargs.get('filter_resource_ids') or '[]')
+        filter_staff_user_ids = json.loads(unquote_plus(kwargs.get('filter_staff_user_ids') or '[]'))
+        filter_resource_ids = json.loads(unquote_plus(kwargs.get('filter_resource_ids') or '[]'))
         users_possible = self._get_possible_staff_users(appointment_type, filter_staff_user_ids)
         resources_possible = self._get_possible_resources(appointment_type, filter_resource_ids)
         user_default = user_selected = request.env['res.users']
@@ -340,8 +342,11 @@ class AppointmentController(http.Controller):
                 resource_selected = request.env['appointment.resource'].sudo().browse(resource_selected_id)
             elif appointment_type.assign_method == 'resource_time':
                 resource_default = resources_possible[0]
-        possible_combinations = (resource_selected or resource_default or resources_possible)._get_filtered_possible_capacity_combinations(1, {})
-        max_capacity_possible = possible_combinations[-1][1] if possible_combinations else 1
+        max_capacity_possible = self._get_max_capacity_possible(
+            resources_possible,
+            resource_selected_id=(resource_selected or resource_default).id,
+        )
+        allowed_max_capacity = int(request.env['ir.config_parameter'].sudo().get_param('appointment.resource_max_capacity_allowed', default=12))
 
         return {
             'asked_capacity': int(kwargs['asked_capacity']) if kwargs.get('asked_capacity') else False,
@@ -351,7 +356,7 @@ class AppointmentController(http.Controller):
             'filter_resource_ids': kwargs.get('filter_resource_ids'),
             'hide_select_dropdown': len(users_possible if appointment_type.schedule_based_on == 'users' else resources_possible) <= 1,
             'invite_token': kwargs.get('invite_token'),
-            'max_capacity': min(12, max_capacity_possible),
+            'max_capacity': min(allowed_max_capacity, max_capacity_possible),
             'resource_default': resource_default,
             'resource_selected': resource_selected,
             'resources_possible': resources_possible,
@@ -545,6 +550,7 @@ class AppointmentController(http.Controller):
             'users_possible': users_possible,
             'resources_possible': resources_possible,
             'available_resource_ids': available_resource_ids,
+            'login_with_redirect_url': f'/web/login?redirect={quote(request.httprequest.full_path)}',
         })
 
     def _check_appointment_is_valid_slot(self, appointment_type, staff_user_id, resource_selected_id, available_resource_ids, start_dt, duration, asked_capacity, **kwargs):
@@ -679,20 +685,22 @@ class AppointmentController(http.Controller):
 
         customer = self._get_customer_partner()
 
-        # considering phone and email are mandatory
-        new_customer = not (customer.email) or not (customer.phone)
+        # email is mandatory
+        new_customer = not customer.email
         if not new_customer and customer.email != email and customer.email_normalized != email_normalize(email):
             new_customer = True
-        if not new_customer and not customer.phone:
-            new_customer = True
         if not new_customer:
-            customer_phone_fmt = customer._phone_format(fname="phone")
-            input_country = self._get_customer_country()
-            input_phone_fmt = phone_validation.phone_format(phone, input_country.code, input_country.phone_code, force_format="E164", raise_exception=False)
-            new_customer = customer.phone != phone and customer_phone_fmt != input_phone_fmt
+            # phone is mandatory
+            if not customer.phone:
+                customer.phone = customer._phone_format(number=phone) or phone
+            else:
+                customer_phone_fmt = customer._phone_format(fname="phone")
+                input_country = self._get_customer_country()
+                input_phone_fmt = phone_validation.phone_format(phone, input_country.code, input_country.phone_code, force_format="E164", raise_exception=False)
+                new_customer = customer.phone != phone and customer_phone_fmt != input_phone_fmt
 
         if new_customer:
-            customer = customer.create({
+            customer = customer.sudo().create({
                 'name': name,
                 'phone': customer._phone_format(number=phone, country=self._get_customer_country()) or phone,
                 'email': email,
@@ -829,6 +837,24 @@ class AppointmentController(http.Controller):
             return cookie
         return appointment_type.appointment_tz
 
+    def _get_max_capacity_possible(self, resources, resource_selected_id=False):
+        """
+            Returns the maximum capacity possible considering the resources given.
+            We consider all the combinations of linked resources and their capacities.
+
+            :param resources: an appointment.resource recordset
+            :param resource_selected_id: id of the selected resource
+            :return: int, the maximum capacity possible with the resources given
+        """
+        if not resources:
+            return 1
+        possible_combinations = resources._get_filtered_possible_capacity_combinations(1, {})
+        capacity_to_resources = {
+            resource_ids: capacity for resource_ids, capacity in possible_combinations
+            if not resource_selected_id or int(resource_selected_id) in resource_ids
+        }
+        return max(capacity_to_resources.values()) if capacity_to_resources else 1
+
     # ------------------------------------------------------------
     # APPOINTMENT TYPE JSON DATA
     # ------------------------------------------------------------
@@ -930,6 +956,10 @@ class AppointmentController(http.Controller):
         month_before_update = kwargs.get('month_before_update')
         month_kept_from_update = next((month['id'] for month in slots if month['month'] == month_before_update), False) if month_before_update else False
         formated_days = _formated_weekdays(get_lang(request.env).code)
+        if appointment_type.schedule_based_on != 'resources' or not appointment_type.resource_manage_capacity:
+            max_possible_capacity = 1
+        else:
+            max_possible_capacity = self._get_max_capacity_possible(filter_resources, resource_selected_id)
 
         return request.env['ir.qweb']._render('appointment.appointment_calendar', {
             'appointment_type': appointment_type,
@@ -940,4 +970,5 @@ class AppointmentController(http.Controller):
             'slots': slots,
             'month_kept_from_update': month_kept_from_update,
             'month_first_available': month_first_available,
+            'max_resource_capacity': max_possible_capacity,
         })

@@ -272,12 +272,13 @@ export class SignTemplateIframe extends EditablePDFIframeMixin(PDFIframe) {
     renderLine(data){
         const canvas = this.getCanvas();
         const ctx = canvas.getContext('2d');
-        ctx.lineWidth = 3;
-        ctx.setLineDash([15, 7]);
+        const scale = this.getCanvasScale();
+        ctx.lineWidth = 3 / scale;
+        ctx.setLineDash([15 / scale, 7 / scale]);
         ctx.strokeStyle = "orange";
         ctx.beginPath();
-        ctx.moveTo(data.start.x, data.start.y);
-        ctx.lineTo(data.end.x, data.end.y);
+        ctx.moveTo(data.start.x / scale, data.start.y / scale);
+        ctx.lineTo(data.end.x / scale, data.end.y / scale);
         ctx.stroke();
     }
 
@@ -286,8 +287,10 @@ export class SignTemplateIframe extends EditablePDFIframeMixin(PDFIframe) {
      */
     renderAllConnectingLines() {
         const canvas = this.getCanvas();
-        const ctx = canvas.getContext('2d');
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if (canvas) {
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
 
         for (const radio_set_id in this.radioSets) {
             this.radioSets[radio_set_id].radio_item_ids = this.radioSets[radio_set_id].radio_item_ids.sort((id1, id2) => {
@@ -324,7 +327,7 @@ export class SignTemplateIframe extends EditablePDFIframeMixin(PDFIframe) {
             if (signItem.data.id in this.negativeIds) {
                 await this.negativeIds[signItem.data.id];
             }
-            const header_title = signItem.data.type == "radio" ? "Radio Button" : signItem.data.placeholder;
+            const header_title = signItem.data.type === "radio" ? "Radio Button" : signItem.data.type_id?.[1] || signItem.data.name;
             const closeFn = this.popover.add(
                 signItem.el,
                 SignItemCustomPopover,
@@ -549,7 +552,7 @@ export class SignTemplateIframe extends EditablePDFIframeMixin(PDFIframe) {
     }
 
     insertRotatePDFButton() {
-        const printButton = this.root.querySelector("#print");
+        const printButton = this.root.querySelector("#printButton");
         const button = this.root.createElement("button");
         button.setAttribute("id", "pageRotateCw");
         button.className = "toolbarButton o_sign_rotate rotateCw";

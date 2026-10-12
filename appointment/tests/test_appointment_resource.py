@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+import psycopg2.errors
 from datetime import datetime, timedelta
 from freezegun import freeze_time
 
@@ -8,6 +9,7 @@ from odoo import Command
 from odoo.addons.appointment.tests.common import AppointmentCommon
 from odoo.exceptions import ValidationError
 from odoo.tests import Form, tagged, users, warmup
+from odoo.tools import mute_logger
 
 
 @tagged('appointment_resources', 'post_install', '-at_install')
@@ -57,6 +59,36 @@ class AppointmentResource(AppointmentCommon):
             'capacity': 1,
             'name': 'Resource 3',
         }])
+
+    @users('apt_manager')
+    def test_appointment_capacity_used_updated_on_cancel(self):
+        start = datetime(2026, 2, 14, 15, 0, 0)
+        booking = self._create_meetings(
+            self.env.user,
+            [(start, start + timedelta(hours=1), False)],
+            self.appointment_manage_capacity.id,
+            meeting_values={
+                'booking_line_ids': [(0, 0, {
+                    'appointment_resource_id': self.resource_1.id,
+                    'capacity_reserved': 3,
+                })],
+            }
+        )[0]
+        booking_line = booking.booking_line_ids
+
+        with mute_logger('odoo.sql_db'), self.assertRaises(psycopg2.errors.CheckViolation):
+            self.resource_1.capacity = 2
+        self.assertEqual(booking_line.capacity_used, 3, "The capacity used should be 3, the full resource capacity, for active bookings")
+        self.assertEqual(booking_line.capacity_reserved, 3, "The capacity reserved should be 3 for active bookings")
+
+        booking.action_archive()
+
+        self.assertEqual(booking_line.capacity_used, 3, "The capacity used should match the capacity reserved for archived bookings")
+        self.assertEqual(booking_line.capacity_reserved, 3, "The capacity reserved should be kept for archived bookings")
+        # check we can now reduce it past the previously reserved capacity.
+        self.resource_1.capacity = 2
+
+        self.assertEqual(booking_line.capacity_used, booking_line.capacity_reserved, "Capacity used and reserved should be equal for archived bookings")
 
     @users('apt_manager')
     def test_appointment_resource_default_appointment_type(self):
@@ -256,6 +288,25 @@ class AppointmentResource(AppointmentCommon):
             {'total_remaining_capacity': 0},
             'No result should give dict with correct accumulated values.')
 
+    @users('apt_user')
+    def test_appointment_user_can_create_booking_with_resources_from_gantt(self):
+        """ Test if a user (with user rights) can create a booking from the calendar gantt view. """
+
+        gantt_context = {
+            'booking_gantt_create_record': True,
+            'default_appointment_type_id': self.appointment_manage_capacity.id,
+            'default_resource_ids': [self.resource_1.id],
+        }
+
+        booking_form = Form(self.env['calendar.event'].with_context(gantt_context))
+        booking_form.name = 'Gommage'
+        booking = booking_form.save()
+
+        self.assertEqual(booking.name, 'Gommage')
+        self.assertEqual(booking.appointment_type_id, self.appointment_manage_capacity)
+        self.assertEqual(len(booking.resource_ids), 1)
+        self.assertEqual(booking.appointment_resource_ids, self.resource_1)
+
 
 @tagged('appointment_resources', 'post_install', '-at_install')
 class AppointmentResourceBookingTest(AppointmentCommon):
@@ -292,6 +343,26 @@ class AppointmentResourceBookingTest(AppointmentCommon):
         with freeze_time(self.reference_now):
             with self.assertQueryCount(default=10):
                 appointment._get_appointment_slots('UTC')
+
+    def test_appointment_resources_check_organizer_validation_conditions(self):
+        appointment_vals_list = [{
+            'appointment_type_id': self.apt_type_resource.id,
+            'name': 'Booking',
+            'start': datetime(2022, 2, 15, 14, 0, 0),
+            'stop': datetime(2022, 2, 15, 15, 0, 0),
+        }, {
+            'appointment_type_id': self.apt_type_bxls_2days.id,
+            'name': 'Booking',
+            'start': datetime(2022, 2, 15, 10, 0, 0),
+            'stop': datetime(2022, 2, 15, 11, 0, 0),
+        }, {
+            'appointment_type_id': False,
+            'name': 'Booking',
+            'start': datetime(2022, 2, 15, 10, 0, 0),
+            'stop': datetime(2022, 2, 15, 11, 0, 0),
+        }]
+
+        self.assertEqual(self.env['calendar.event']._check_organizer_validation_conditions(appointment_vals_list), [False, True, True])
 
     @users('apt_manager')
     def test_appointment_resources_combinable(self):
@@ -989,6 +1060,62 @@ class AppointmentResourceBookingTest(AppointmentCommon):
 
         self.assertEqual(len(resource_slots), 0, "Once a resource is booked on a slot, it should not be available anymore to other appointment types.")
 
+    def test_appointment_resources_dont_skip_mail_user_not_attendee(self):
+        # Resource is booked on its slot on appointment_type_resource
+        event = self.env['calendar.event'].with_context(self._test_context).create({
+            'appointment_type_id': self.apt_type_resource.id,
+            'name': 'Booking 1',
+            'start': datetime(2022, 2, 14, 15, 0, 0),
+            'stop': datetime(2022, 2, 14, 15, 0, 0) + timedelta(hours=1),
+        })
+
+        self.assertFalse(event._skip_send_mail_status_update())
+
+    @users('apt_manager')
+    def test_appointment_resources_multi_edit_capacity(self):
+        """Check that the capacity reserved is correctly updated in multi-edit"""
+        resource_1, resource_2 = self.env['appointment.resource'].create([
+            {
+                'appointment_type_ids': self.apt_type_resource.ids,
+                'capacity': 4,
+                'name': 'Table of 4',
+            },
+            {
+                'appointment_type_ids': self.apt_type_resource.ids,
+                'capacity': 3,
+                'name': 'Table of 3',
+            }
+        ])
+        resource_1.linked_resource_ids = resource_2
+        start = datetime(2022, 2, 14, 15, 0, 0)
+        end = start + timedelta(hours=1)
+        apt_1, apt_2 = self.env['calendar.event'].with_context(self._test_context).create([{
+            'appointment_type_id': self.apt_type_resource.id,
+            'booking_line_ids': [
+                (0, 0, {'appointment_resource_id': resource_1.id, 'capacity_reserved': 4, 'capacity_used': 4}),
+                (0, 0, {'appointment_resource_id': resource_2.id, 'capacity_reserved': 1, 'capacity_used': 3}),
+            ],
+            'name': 'Booking 1',
+            'start': start,
+            'stop': end,
+        }, {
+            'appointment_type_id': self.apt_type_resource.id,
+            'booking_line_ids': [
+                (0, 0, {'appointment_resource_id': resource_1.id, 'capacity_reserved': 4, 'capacity_used': 2}),
+                (0, 0, {'appointment_resource_id': resource_2.id, 'capacity_reserved': 2, 'capacity_used': 3}),
+            ],
+            'name': 'Booking 1',
+            'start': start + timedelta(hours=2),
+            'stop': end + timedelta(hours=2),
+        }])
+        self.assertEqual(apt_1.resource_total_capacity_reserved, 5)
+        self.assertEqual(apt_2.resource_total_capacity_reserved, 6)
+
+        (apt_1 + apt_2).write({'resource_total_capacity_reserved': 7})
+        # Every appointment should be updated with the new value
+        self.assertEqual(apt_1.resource_total_capacity_reserved, 7)
+        self.assertEqual(apt_2.resource_total_capacity_reserved, 7)
+
     @users('apt_manager')
     def test_appointment_resources_with_resource_calendar(self):
         """Check that the slots correctly take into account the default resource calendar"""
@@ -1014,6 +1141,45 @@ class AppointmentResourceBookingTest(AppointmentCommon):
              'slots_startdate': self.reference_monday.date(),  # first Monday after reference_now
              'slots_enddate': self.reference_monday.date(),  # only test that day
              }
+        )
+
+    @users('apt_manager')
+    def test_appointment_resources_duplicate(self):
+        """ Check that we can correctly duplicate resource bookings """
+        table, other_table = self.env["appointment.resource"].create([{
+            'appointment_type_ids': self.apt_type_resource.ids,
+            'capacity': 3,
+            'name': 'Table for 3',
+            'sequence': 1,
+        }, {
+            'appointment_type_ids': self.apt_type_resource.ids,
+            'capacity': 4,
+            'name': 'Table for 4',
+            'sequence': 2,
+        }])
+
+        start = datetime(2022, 2, 14, 15, 0, 0)
+        end = start + timedelta(hours=1)
+        booking = self.env['calendar.event'].with_context(self._test_context).create({
+            'appointment_type_id': self.apt_type_resource.id,
+            'booking_line_ids': [
+                (0, 0, {'appointment_resource_id': table.id, 'capacity_reserved': 2, 'capacity_used': 3}),
+                (0, 0, {'appointment_resource_id': other_table.id, 'capacity_reserved': 3, 'capacity_used': 4}),
+            ],
+            'name': 'Resource booking',
+            'start': start,
+            'stop': end,
+        })
+
+        duplicate = booking.copy()
+        self.assertEqual(booking.name, duplicate.name, "Resource booking should have duplicated correctly")
+        self.assertListEqual(booking.resource_ids.ids, duplicate.resource_ids.ids, "Resources should be the same")
+        self.assertEqual(booking.resource_total_capacity_used, duplicate.resource_total_capacity_used, "Capacity used should be the same")
+        self.assertEqual(booking.resource_total_capacity_reserved, duplicate.resource_total_capacity_reserved, "Capacity reserved should be the same")
+        self.assertListEqual(
+            [bl.capacity_reserved for bl in booking.booking_line_ids],
+            [bl.capacity_reserved for bl in duplicate.booking_line_ids],
+            "Capacity reserved should be the same for each booking line",
         )
 
     @users('apt_manager')
@@ -1068,3 +1234,41 @@ class AppointmentResourceBookingTest(AppointmentCommon):
         available_resources = [resource['id'] for resource in resource_slots[0]['available_resources']]
         self.assertListEqual(available_resources, resource_2.ids,
             "The first resource should now be unavailable and the second one is chosen")
+
+    @users('apt_manager')
+    def test_generate_slots_until_midnight_resources(self):
+        """ Check end of day slot, e.g. 23:00-00:00 for a 1h duration """
+
+        self.apt_type_resource.appointment_duration = 1
+        self.apt_type_resource.max_schedule_days = 1
+        # 22:00-23:00 range in UTC will correspond to 23:00-00:00 in UTC+1.
+        # So, this matches the attendance ending at midnight in the resource calendar.
+        # The corresponding interval bound ends up as 22.59.999999 in UTC unavailabilities.
+        self.env.ref('appointment.appointment_default_resource_calendar').sudo().tz = "Europe/Brussels"
+        self.apt_type_resource.slot_ids.write({
+            'start_hour': 22,
+            'end_hour': 23,
+        })
+
+        self.env['appointment.resource'].create({
+            'appointment_type_ids': self.apt_type_resource.ids,
+            'name': 'Resource',
+            'resource_calendar_id': self.env.ref('appointment.appointment_default_resource_calendar').id,
+        })
+
+        with freeze_time(self.reference_now):
+            slots = self.apt_type_resource._get_appointment_slots('UTC')
+        self.assertSlots(
+            slots,
+            [{'name_formated': 'February 2022',
+              'month_date': datetime(2022, 2, 1),
+              'weeks_count': 5,  # 31/01 -> 28/02 (06/03)
+              }
+             ],
+            {'enddate': self.global_slots_enddate,
+             'startdate': self.reference_now_monthweekstart,
+             'slots_start_hours': [22],
+             'slots_startdate': self.reference_monday.date(),
+             'slots_enddate': self.reference_monday.date(),
+             }
+        )

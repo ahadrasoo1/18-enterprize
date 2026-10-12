@@ -1,24 +1,27 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* industry_fsm
-# 
+# * industry_fsm
+#
 # Translators:
-# Wil Odoo, 2024
-# Abe Manyo, 2024
-# 
+# Wil Odoo, 2025
+# Abe Manyo, 2025
+#
+# "Nurul Aini Akrima Sabila (nuaas)" <nuaas@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Abe Manyo, 2024\n"
-"Language-Team: Indonesian (https://app.transifex.com/odoo/teams/41243/id/)\n"
+"POT-Creation-Date: 2026-04-10 18:47+0000\n"
+"PO-Revision-Date: 2026-05-07 10:20+0000\n"
+"Last-Translator: \"Nurul Aini Akrima Sabila (nuaas)\" <nuaas@odoo.com>\n"
+"Language-Team: Indonesian <https://translate.odoo.com/projects/odoo-18/"
+"industry_fsm/id/>\n"
+"Language: id\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: id\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 5.17\n"
 
 #. module: industry_fsm
 #: model:ir.model.fields,field_description:industry_fsm.field_report_project_task_user_fsm__nbr
@@ -45,16 +48,6 @@ msgstr "10 hari"
 
 #. module: industry_fsm
 #: model_terms:ir.ui.view,arch_db:industry_fsm.worksheet_custom_page
-msgid "10:00"
-msgstr "10:00"
-
-#. module: industry_fsm
-#: model_terms:ir.ui.view,arch_db:industry_fsm.worksheet_custom_page
-msgid "2023-01-01"
-msgstr "2023-01-01"
-
-#. module: industry_fsm
-#: model_terms:ir.ui.view,arch_db:industry_fsm.worksheet_custom_page
 msgid "5 days"
 msgstr "5 hari"
 
@@ -62,43 +55,59 @@ msgstr "5 hari"
 #: model:mail.template,body_html:industry_fsm.mail_template_data_intervention_details
 msgid ""
 "<div>\n"
-"    <t t-set=\"date_begin\" t-value=\"format_datetime(object.planned_date_begin, tz=object.partner_id.tz, lang_code=object.partner_id.lang)\"></t>\n"
+"    <t t-set=\"date_begin\" t-"
+"value=\"format_datetime(object.planned_date_begin, tz=object.partner_id.tz, "
+"lang_code=object.partner_id.lang)\"/>\n"
 "\n"
-"    <t t-set=\"date_end\" t-value=\"format_datetime(object.date_deadline, tz=object.partner_id.tz, lang_code=object.partner_id.lang)\"></t>\n"
+"    <t t-set=\"date_end\" t-value=\"format_datetime(object.date_deadline, "
+"tz=object.partner_id.tz, lang_code=object.partner_id.lang)\"/>\n"
 "\n"
-"    Dear <t t-out=\"object.partner_id.name or 'customer'\">customer</t>,<br><br>\n"
+"    Dear <t t-out=\"object.partner_id.name or 'customer'\">customer</t>,<br/"
+"><br/>\n"
 "    <t t-if=\"date_begin and date_end\">\n"
-"        Your <t t-out=\"object.name or ''\">Boiler maintenance</t> intervention is scheduled from the <t t-out=\"date_begin or ''\">05/31/2021 12:30:00</t> to the <t t-out=\"date_end or ''\">05/31/2021 14:30:00</t>.\n"
+"        Your <t t-out=\"object.name or ''\">Boiler maintenance</t> "
+"intervention is scheduled from the <t t-out=\"date_begin or ''\">05/31/2021 "
+"12:30:00</t> to the <t t-out=\"date_end or ''\">05/31/2021 14:30:00</t>.\n"
 "    </t>\n"
 "    <t t-else=\"\">\n"
-"        Your <t t-out=\"object.name or ''\">Boiler maintenance</t> intervention is scheduled.\n"
+"        Your <t t-out=\"object.name or ''\">Boiler maintenance</t> "
+"intervention is scheduled.\n"
 "    </t>\n"
-"    <br><br>\n"
+"    <br/><br/>\n"
 "    Best regards,\n"
-"    <t t-if=\"user.signature\">\n"
-"        <br>\n"
-"        <t t-out=\"user.signature or ''\">--<br>Mitchell Admin</t>\n"
+"    <t t-if=\"user.signature\" data-o-mail-quote-container=\"1\">\n"
+"        <br/>\n"
+"        <t t-out=\"user.signature or ''\" data-o-mail-quote=\"1\">--<br data-"
+"o-mail-quote=\"1\"/>Mitchell Admin</t>\n"
 "    </t>\n"
 "</div>\n"
 "        "
 msgstr ""
 "<div>\n"
-"    <t t-set=\"date_begin\" t-value=\"format_datetime(object.planned_date_begin, tz=object.partner_id.tz, lang_code=object.partner_id.lang)\"></t>\n"
+"    <t t-set=\"date_begin\" t-"
+"value=\"format_datetime(object.planned_date_begin, tz=object.partner_id.tz, "
+"lang_code=object.partner_id.lang)\"/>\n"
 "\n"
-"    <t t-set=\"date_end\" t-value=\"format_datetime(object.date_deadline, tz=object.partner_id.tz, lang_code=object.partner_id.lang)\"></t>\n"
+"    <t t-set=\"date_end\" t-value=\"format_datetime(object.date_deadline, "
+"tz=object.partner_id.tz, lang_code=object.partner_id.lang)\"/>\n"
 "\n"
-"    Yth <t t-out=\"object.partner_id.name or 'customer'\">pelanggan</t>,<br><br>\n"
+"    Kepada <t t-out=\"object.partner_id.name or 'customer'\">pelanggan</t>,"
+"<br/><br/>\n"
 "    <t t-if=\"date_begin and date_end\">\n"
-"        Intervensi <t t-out=\"object.name or ''\">maintenance Boiler</t> Anda dijadawalkan dari <t t-out=\"date_begin or ''\">05/31/2021 12:30:00</t> sampai <t t-out=\"date_end or ''\">05/31/2021 14:30:00</t>.\n"
+"        Intervensi <t t-out=\"object.name or ''\">maintenance boiler</t> "
+"Anda dijadwalkan dari <t t-out=\"date_begin or ''\">05/31/2021 12:30:00</t> "
+"sampai dengan <t t-out=\"date_end or ''\">05/31/2021 14:30:00</t>.\n"
 "    </t>\n"
 "    <t t-else=\"\">\n"
-"        Intervensi <t t-out=\"object.name or ''\">maintenance Boiler</t> Anda dijadwalkan.\n"
+"        Intervensi <t t-out=\"object.name or ''\">maintenance boiler</t> "
+"Anda dijadwalkan.\n"
 "    </t>\n"
-"    <br><br>\n"
+"    <br/><br/>\n"
 "    Salam hormat,\n"
-"    <t t-if=\"user.signature\">\n"
-"        <br>\n"
-"        <t t-out=\"user.signature or ''\">--<br>Mitchell Admin</t>\n"
+"    <t t-if=\"user.signature\" data-o-mail-quote-container=\"1\">\n"
+"        <br/>\n"
+"        <t t-out=\"user.signature or ''\" data-o-mail-quote=\"1\">--<br data-"
+"o-mail-quote=\"1\"/>Mitchell Admin</t>\n"
 "    </t>\n"
 "</div>\n"
 "        "
@@ -112,18 +121,24 @@ msgstr "<i class=\"fa fa-check me-1\"/>Tandatangani Laporan"
 #: model:mail.template,body_html:industry_fsm.mail_template_data_task_report
 msgid ""
 "<p>\n"
-"                Dear <t t-out=\"object.partner_id.name or 'Customer'\">Customer</t>,<br><br>\n"
-"                Please find attached the field service report for our onsite operation. <br><br>\n"
-"                Feel free to contact us if you have any questions.<br><br>\n"
-"                Best regards,<br><br>\n"
+"                Dear <t t-out=\"object.partner_id.name or "
+"'Customer'\">Customer</t>,<br/><br/>\n"
+"                Please find attached the field service report for our onsite "
+"operation. <br/><br/>\n"
+"                Feel free to contact us if you have any questions.<br/><br/"
+">\n"
+"                Best regards,<br/><br/>\n"
 "            </p>\n"
 "        "
 msgstr ""
 "<p>\n"
-"                Yth <t t-out=\"object.partner_id.name or 'Customer'\">Pelanggan</t>,<br><br>\n"
-"                Silakan temuakan terlampit laporan layanan lapangan untuk pengoperasian onsite kami. <br><br>\n"
-"                Silakan hubungi kami bila Anda memiliki pertanyaan apapun.<br><br>\n"
-"                Salam hormat,<br><br>\n"
+"                Kepada <t t-out=\"object.partner_id.name or "
+"'Customer'\">Pelanggan</t>,<br/><br/>\n"
+"                Silakan temukan terlampir laporan layanan lapangan untuk "
+"operasi onsite kami. <br/><br/>\n"
+"                Silakan hubungi kami bila Anda memiliki pertanyaan apa pun."
+"<br/><br/>\n"
+"                Salam hormat,<br/><br/>\n"
 "            </p>\n"
 "        "
 
@@ -141,11 +156,29 @@ msgstr ""
 #. module: industry_fsm
 #: model_terms:ir.ui.view,arch_db:industry_fsm.worksheet_custom_page
 msgid ""
-"<span style=\"                             font-size: 10px;                             color: #fff;                             text-transform: uppercase;                             text-align: center;                             font-weight: bold; line-height: 20px;                             transform: rotate(45deg);                             width: 100px; height: auto; display: block;                             background: green;                             position: absolute;                             top: 19px; right: -21px; left: auto;                             padding: 0;\">\n"
+"<span style=\"                             font-size: "
+"10px;                             color: #fff;                             "
+"text-transform: uppercase;                             text-align: "
+"center;                             font-weight: bold; line-height: "
+"20px;                             transform: "
+"rotate(45deg);                             width: 100px; height: auto; "
+"display: block;                             background: "
+"green;                             position: "
+"absolute;                             top: 19px; right: -21px; left: "
+"auto;                             padding: 0;\">\n"
 "                            Signed\n"
 "                        </span>"
 msgstr ""
-"<span style=\"                             font-size: 10px;                             color: #fff;                             text-transform: uppercase;                             text-align: center;                             font-weight: bold; line-height: 20px;                             transform: rotate(45deg);                             width: 100px; height: auto; display: block;                             background: green;                             position: absolute;                             top: 19px; right: -21px; left: auto;                             padding: 0;\">\n"
+"<span style=\"                             font-size: "
+"10px;                             color: #fff;                             "
+"text-transform: uppercase;                             text-align: "
+"center;                             font-weight: bold; line-height: "
+"20px;                             transform: "
+"rotate(45deg);                             width: 100px; height: auto; "
+"display: block;                             background: "
+"green;                             position: "
+"absolute;                             top: 19px; right: -21px; left: "
+"auto;                             padding: 0;\">\n"
 "                            Ditandatangani\n"
 "                        </span>"
 
@@ -210,7 +243,7 @@ msgstr "Semua Task"
 #. module: industry_fsm
 #: model:ir.actions.server,name:industry_fsm.project_task_all_fsm_server_action
 msgid "All Tasks Server Action"
-msgstr ""
+msgstr "Server Action Semua Task"
 
 #. module: industry_fsm
 #: model:ir.model.fields,field_description:industry_fsm.field_report_project_task_user_fsm__allocated_hours
@@ -219,8 +252,7 @@ msgstr "Waktu yang Dialokasikan"
 
 #. module: industry_fsm
 #: model_terms:ir.actions.act_window,help:industry_fsm.project_task_user_action_report_fsm
-msgid ""
-"Analyze the progress of your tasks and the performance of your workers."
+msgid "Analyze the progress of your tasks and the performance of your workers."
 msgstr "Analisis progress task Anda dan performa pekerja Anda."
 
 #. module: industry_fsm
@@ -241,7 +273,7 @@ msgstr "Rating Rata-Rata (1-5)"
 #. module: industry_fsm
 #: model:ir.model.fields,field_description:industry_fsm.field_report_project_task_user_fsm__dependent_ids
 msgid "Block"
-msgstr "Blokir"
+msgstr "Blok"
 
 #. module: industry_fsm
 #: model:ir.ui.menu,name:industry_fsm.project_task_menu_planning_by_location_fsm
@@ -251,7 +283,7 @@ msgstr "Berdasarkan Lokasi"
 #. module: industry_fsm
 #: model:ir.ui.menu,name:industry_fsm.project_task_menu_planning_by_project_fsm
 msgid "By Project"
-msgstr "Oleh Proyek"
+msgstr "Oleh Project"
 
 #. module: industry_fsm
 #: model:ir.ui.menu,name:industry_fsm.project_task_menu_planning_by_user_fsm
@@ -345,7 +377,7 @@ msgstr "Buat Timesheet dari task"
 #. module: industry_fsm
 #: model:ir.actions.act_window,name:industry_fsm.open_create_project_fsm
 msgid "Create a Project"
-msgstr "Buat Proyek"
+msgstr "Buat Project"
 
 #. module: industry_fsm
 #: model:res.groups,name:industry_fsm.group_fsm_quotation_from_task
@@ -428,6 +460,8 @@ msgid ""
 "Design tailored worksheet templates for various interventions, and analyze "
 "collected intervention data."
 msgstr ""
+"Rancang templat worksheet yang dibuat khusus untuk beragam intervensi, dan "
+"menganalisis data intervensi yang dikumpulkan."
 
 #. module: industry_fsm
 #: model_terms:ir.ui.view,arch_db:industry_fsm.project_project_view_form_simplified_footer_fsm
@@ -550,6 +584,11 @@ msgstr ""
 "installation, dsb.).</i>"
 
 #. module: industry_fsm
+#: model:ir.model.fields,field_description:industry_fsm.field_report_project_task_user_fsm__total_hours_spent
+msgid "Hours By Task (Including Subtasks)"
+msgstr "Jam-Jam Berdasarkan Task (Termasuk Subtask)"
+
+#. module: industry_fsm
 #: model:ir.model.fields,field_description:industry_fsm.field_project_task_stop_timers_wizard__id
 #: model:ir.model.fields,field_description:industry_fsm.field_project_task_stop_timers_wizard_line__id
 #: model:ir.model.fields,field_description:industry_fsm.field_report_project_task_user_fsm__id
@@ -622,7 +661,7 @@ msgstr "Terakhir Diperbarui pada"
 #. module: industry_fsm
 #: model_terms:ir.ui.view,arch_db:industry_fsm.project_task_view_search_fsm
 msgid "Late Activities"
-msgstr "Aktifitas terakhir"
+msgstr "Aktivitas terakhir"
 
 #. module: industry_fsm
 #. odoo-javascript
@@ -672,7 +711,7 @@ msgstr "Peta"
 #. module: industry_fsm
 #: model:ir.actions.server,name:industry_fsm.project_task_fsm_map_server_action
 msgid "Map Server Action"
-msgstr ""
+msgstr "Peta Server Action"
 
 #. module: industry_fsm
 #: model_terms:ir.ui.view,arch_db:industry_fsm.worksheet_custom_page
@@ -703,7 +742,7 @@ msgstr "Milestone"
 #. odoo-python
 #: code:addons/industry_fsm/controllers/webmanifest.py:0
 msgid "My Calendar"
-msgstr ""
+msgstr "Kalender Saya"
 
 #. module: industry_fsm
 #. odoo-python
@@ -717,12 +756,12 @@ msgstr " Kegiatanku"
 #. module: industry_fsm
 #: model:ir.actions.server,name:industry_fsm.project_task_fsm_server_action
 msgid "My Tasks Server Action"
-msgstr ""
+msgstr "Server Action Task Saya"
 
 #. module: industry_fsm
 #: model:ir.actions.server,name:industry_fsm.project_task_fsm_mobile_server_action
 msgid "My Tasks in mobile Server Action"
-msgstr ""
+msgstr "Task Saya di Server Action mobile"
 
 #. module: industry_fsm
 #: model_terms:ir.ui.view,arch_db:industry_fsm.view_partner_address_form_industry_fsm
@@ -733,7 +772,7 @@ msgstr "Navigasi Ke"
 #. odoo-python
 #: code:addons/industry_fsm/controllers/webmanifest.py:0
 msgid "New task"
-msgstr ""
+msgstr "Task baru"
 
 #. module: industry_fsm
 #: model_terms:ir.actions.act_window,help:industry_fsm.project_task_user_action_report_fsm
@@ -770,6 +809,11 @@ msgid "No tasks found. Let's create one!"
 msgstr "Tidak ada task yang ditemukan. Ayo buat baru!"
 
 #. module: industry_fsm
+#: model:ir.model.fields,field_description:industry_fsm.field_report_project_task_user_fsm__overtime
+msgid "Overtime"
+msgstr "Jam Lembur"
+
+#. module: industry_fsm
 #: model:ir.model.fields,field_description:industry_fsm.field_report_project_task_user_fsm__parent_id
 msgid "Parent Task"
 msgstr "Task Induk"
@@ -803,7 +847,7 @@ msgstr "Rencana berdasarkan Lokasi"
 #. module: industry_fsm
 #: model:ir.actions.server,name:industry_fsm.project_task_fsm_planning_groupby_location_server_action
 msgid "Planning by Location Server Action"
-msgstr ""
+msgstr "Perencanaan berdasarkan Action Server Lokasi"
 
 #. module: industry_fsm
 #: model:ir.actions.act_window,name:industry_fsm.project_task_action_fsm_planning_groupby_project
@@ -814,7 +858,7 @@ msgstr "Planning berdasarkan Project"
 #. module: industry_fsm
 #: model:ir.actions.server,name:industry_fsm.project_task_fsm_planning_groupby_project_server_action
 msgid "Planning by Project Server Action"
-msgstr ""
+msgstr "Perencanaan berdasarkan Server Action Project"
 
 #. module: industry_fsm
 #: model:ir.actions.act_window,name:industry_fsm.project_task_action_fsm_planning_groupby_user
@@ -825,7 +869,7 @@ msgstr "Planning berdasarkan User"
 #. module: industry_fsm
 #: model:ir.actions.server,name:industry_fsm.project_task_fsm_planning_groupby_user_server_action
 msgid "Planning by User Action"
-msgstr ""
+msgstr "Perencanaan berdasarkan Action User"
 
 #. module: industry_fsm
 #: model:ir.model.fields,field_description:industry_fsm.field_report_project_task_user_fsm__priority
@@ -841,13 +885,13 @@ msgstr "Kemajuan"
 #: model:ir.model,name:industry_fsm.model_project_project
 #: model:ir.model.fields,field_description:industry_fsm.field_report_project_task_user_fsm__project_id
 msgid "Project"
-msgstr "Proyek"
+msgstr "Project"
 
 #. module: industry_fsm
 #: model:ir.actions.act_window,name:industry_fsm.project_project_action_only_fsm
 #: model:ir.ui.menu,name:industry_fsm.fsm_menu_settings_project
 msgid "Projects"
-msgstr "Proyek"
+msgstr "Project"
 
 #. module: industry_fsm
 #: model_terms:ir.ui.view,arch_db:industry_fsm.project_task_view_search_fsm
@@ -861,8 +905,8 @@ msgid ""
 "Ready to <b>manage your onsite interventions</b>? <i>Click Field Service to "
 "start.</i>"
 msgstr ""
-"Siap untuk <b>mengelola intervensi di lapangan</b>? <i>Klik Layanan Lapangan"
-" untuk memulai.</i>"
+"Siap untuk <b>mengelola intervensi di lapangan</b>? <i>Klik Layanan Lapangan "
+"untuk memulai.</i>"
 
 #. module: industry_fsm
 #: model:ir.model,name:industry_fsm.model_ir_actions_report
@@ -965,11 +1009,11 @@ msgstr "Kemampuan"
 #. module: industry_fsm
 #: model_terms:ir.ui.view,arch_db:industry_fsm.view_task_stop_timer_wizard_form
 msgid ""
-"Some employees are still running their timer for this task. Are you sure you"
-" want to continue?"
+"Some employees are still running their timer for this task. Are you sure you "
+"want to continue?"
 msgstr ""
-"Beberapa karyawan masih menjalankan timer mereka untuk task ini. Apakah Anda"
-" yakin ingin melanjutkan?"
+"Beberapa karyawan masih menjalankan timer mereka untuk task ini. Apakah Anda "
+"yakin ingin melanjutkan?"
 
 #. module: industry_fsm
 #: model:ir.model.fields,field_description:industry_fsm.field_report_project_task_user_fsm__stage_id
@@ -1190,7 +1234,7 @@ msgstr "Untuk Dijadwalkan"
 #. module: industry_fsm
 #: model:ir.actions.server,name:industry_fsm.project_task_to_schedule_fsm_server_action
 msgid "To Schedule Server Action"
-msgstr ""
+msgstr "Untuk Menjadwalkan Action Server"
 
 #. module: industry_fsm
 #: model_terms:ir.ui.view,arch_db:industry_fsm.project_task_view_search_fsm
@@ -1202,10 +1246,12 @@ msgstr "Untuk Dijadwalkan/Ditugaskan"
 #: model_terms:ir.actions.act_window,help:industry_fsm.project_task_action_all_fsm2
 msgid ""
 "To get things done, plan activities and use the task status.<br>\n"
-"                Collaborate efficiently by chatting in real-time or via email."
+"                Collaborate efficiently by chatting in real-time or via "
+"email."
 msgstr ""
 "Agar kerjaan selesai, rencanakan kegiatan dan gunakan status task.<br>\n"
-"                Kolaborasi efisien dengan mengobrol secara real-time atau melalui email."
+"                Kolaborasi efisien dengan mengobrol secara real-time atau "
+"melalui email."
 
 #. module: industry_fsm
 #: model_terms:ir.actions.act_window,help:industry_fsm.project_tasks_action_fsm
@@ -1214,7 +1260,8 @@ msgid ""
 "                Chat in real-time or by email to collaborate efficiently."
 msgstr ""
 "Untuk menyelesaikan tugas, gunakan kegiatan dan status pada task.<br>\n"
-"                Chat secara real-time atau melalui email untuk berkolaborasi dengan efisien."
+"                Chat secara real-time atau melalui email untuk berkolaborasi "
+"dengan efisien."
 
 #. module: industry_fsm
 #: model_terms:ir.ui.view,arch_db:industry_fsm.project_task_view_search_fsm
@@ -1225,11 +1272,6 @@ msgstr "Hari Ini"
 #: model_terms:ir.ui.view,arch_db:industry_fsm.project_task_view_search_fsm
 msgid "Today Activities"
 msgstr "Aktivitas Hari ini"
-
-#. module: industry_fsm
-#: model:ir.model.fields,field_description:industry_fsm.field_report_project_task_user_fsm__total_hours_spent
-msgid "Total Time Spent"
-msgstr "Total Waktu yang Digunakan"
 
 #. module: industry_fsm
 #: model_terms:ir.actions.act_window,help:industry_fsm.project_task_type_action_fsm
@@ -1323,3 +1365,9 @@ msgstr "apakah FSM?"
 #: model:ir.actions.server,name:industry_fsm.fsm_customer_ratings_server_action
 msgid "project.project.fsm"
 msgstr "project.project.fsm"
+
+#~ msgid "10:00"
+#~ msgstr "10:00"
+
+#~ msgid "2023-01-01"
+#~ msgstr "2023-01-01"

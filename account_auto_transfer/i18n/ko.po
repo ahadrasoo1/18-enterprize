@@ -1,23 +1,27 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* account_auto_transfer
-# 
+# * account_auto_transfer
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Daye Jeong, 2024
+#
+# "Kwanghee Park (kwpa)" <kwpa@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:26+0000\n"
-"PO-Revision-Date: 2024-09-25 09:43+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Korean (https://app.transifex.com/odoo/teams/41243/ko/)\n"
+"POT-Creation-Date: 2025-12-29 18:46+0000\n"
+"PO-Revision-Date: 2026-02-14 09:02+0000\n"
+"Last-Translator: \"Kwanghee Park (kwpa)\" <kwpa@odoo.com>\n"
+"Language-Team: Korean <https://translate.odoo.com/projects/odoo-18/"
+"account_auto_transfer/ko/>\n"
+"Language: ko\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: ko\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 5.14.3\n"
 
 #. module: account_auto_transfer
 #: model_terms:ir.ui.view,arch_db:account_auto_transfer.view_transfer_model_form
@@ -59,14 +63,18 @@ msgstr "활성화"
 msgid ""
 "Adds a condition to only transfer the sum of the lines from the origin "
 "accounts that match these analytic accounts to the destination account"
-msgstr "해당 분석 계정과 일치하는 원래 계정 항목의 합계만을 대상 계정으로 이동시키는 조건을 추가합니다"
+msgstr ""
+"해당 분석 계정과 일치하는 원래 계정 항목의 합계만을 대상 계정으로 이동시키는 "
+"조건을 추가합니다"
 
 #. module: account_auto_transfer
 #: model:ir.model.fields,help:account_auto_transfer.field_account_transfer_model_line__partner_ids
 msgid ""
 "Adds a condition to only transfer the sum of the lines from the origin "
 "accounts that match these partners to the destination account"
-msgstr "해당 파트너와 일치하는 원래 계정 항목의 합계만을 대상 계정으로 이동시키는 조건을 추가합니다"
+msgstr ""
+"해당 파트너와 일치하는 원래 계정 항목의 합계만을 대상 계정으로 이동시키는 조"
+"건을 추가합니다"
 
 #. module: account_auto_transfer
 #: model:ir.model.fields,field_description:account_auto_transfer.field_account_transfer_model_line__analytic_account_ids
@@ -102,7 +110,9 @@ msgstr "자동 이체 (-%s%%)"
 msgid ""
 "Automatic Transfer (entries with analytic account(s): %(analytic_accounts)s "
 "and partner(s): %(partners)s)"
-msgstr " 자동이체 (분석계정이 있는 항목: %(analytic_accounts)s 및 협력사: %(partners)s)"
+msgstr ""
+" 자동이체 (분석계정이 있는 항목: %(analytic_accounts)s 및 협력사: %"
+"(partners)s)"
 
 #. module: account_auto_transfer
 #. odoo-python
@@ -123,8 +133,8 @@ msgid ""
 "Automatic Transfer (from account %(origin_account)s with analytic "
 "account(s): %(analytic_accounts)s and partner(s): %(partners)s)"
 msgstr ""
-"자동이체 (분석계정이 있는 %(origin_account)s  계정: %(analytic_accounts)s 및 협력사: "
-"%(partners)s)"
+"자동이체 (분석계정이 있는 %(origin_account)s  계정: %(analytic_accounts)s 및 "
+"협력사: %(partners)s)"
 
 #. module: account_auto_transfer
 #. odoo-python
@@ -132,14 +142,15 @@ msgstr ""
 msgid ""
 "Automatic Transfer (from account %(origin_account)s with analytic "
 "account(s): %(analytic_accounts)s)"
-msgstr "자동이체 (분석계정이 있는 %(origin_account)s 계정: %(analytic_accounts)s)"
+msgstr ""
+"자동이체 (분석계정이 있는 %(origin_account)s 계정: %(analytic_accounts)s)"
 
 #. module: account_auto_transfer
 #. odoo-python
 #: code:addons/account_auto_transfer/models/transfer_model.py:0
 msgid ""
-"Automatic Transfer (from account %(origin_account)s with partner(s): "
-"%(partners)s)"
+"Automatic Transfer (from account %(origin_account)s with partner(s): %"
+"(partners)s)"
 msgstr "자동이체 (%(origin_account)s 계정이 있는 협력사: %(partners)s)"
 
 #. module: account_auto_transfer
@@ -247,7 +258,7 @@ msgstr "IFRS 자동 이체"
 #. odoo-python
 #: code:addons/account_auto_transfer/demo/account_demo.py:0
 msgid "IFRS rent expense transfer"
-msgstr ""
+msgstr "IFRS 임대 비용 이전"
 
 #. module: account_auto_transfer
 #: model:ir.model,name:account_auto_transfer.model_account_journal
@@ -359,7 +370,7 @@ msgstr "분기별"
 #. module: account_auto_transfer
 #: model:ir.model.fields.selection,name:account_auto_transfer.selection__account_transfer_model__state__in_progress
 msgid "Running"
-msgstr "실행 중"
+msgstr "진행 중"
 
 #. module: account_auto_transfer
 #: model:ir.model.fields,field_description:account_auto_transfer.field_account_transfer_model_line__sequence
@@ -393,7 +404,9 @@ msgstr "분석 필터 %s가 복사되었습니다"
 msgid ""
 "The partner filter %(partner_filter)s in combination with the analytic "
 "filter %(analytic_filter)s is duplicated"
-msgstr "협력사 필터 %(partner_filter)s와 분석 필터 %(analytic_filter)s의 조합이 중복되었습니다."
+msgstr ""
+"협력사 필터 %(partner_filter)s와 분석 필터 %(analytic_filter)s의 조합이 중복"
+"되었습니다."
 
 #. module: account_auto_transfer
 #. odoo-python
@@ -441,7 +454,8 @@ msgid ""
 "You cannot delete an automatic transfer that has draft moves attached "
 "('%s'). Please delete them before deleting this transfer."
 msgstr ""
-"초안 이체 ('%s'). 가 첨부된 자동 이체는 삭제할 수 없습니다. 자동 이체를 삭제하기 전에 초안 이체를 먼저 삭제하세요."
+"초안 이체 ('%s'). 가 첨부된 자동 이체는 삭제할 수 없습니다. 자동 이체를 삭제"
+"하기 전에 초안 이체를 먼저 삭제하세요."
 
 #. module: account_auto_transfer
 #. odoo-python

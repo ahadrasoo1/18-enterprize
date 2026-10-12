@@ -28,6 +28,8 @@ class HrPayslip(models.Model):
             Generate the accounting entries related to the selected payslips
             A move is created for each journal and for each month.
         """
+        if any(slip.state == 'paid' for slip in self):
+            raise ValidationError(_("You can't create a journal entry for a paid payslip."))
         res = super().action_payslip_done()
         self._action_create_account_move()
         return res
@@ -35,23 +37,18 @@ class HrPayslip(models.Model):
     def _action_create_account_move(self):
         precision = self.env['decimal.precision'].precision_get('Payroll')
 
-        # Add payslip without run
-        payslips_to_post = self.filtered(lambda slip: not slip.payslip_run_id)
-
-        # Adding pay slips from a batch and deleting pay slips with a batch that is not ready for validation.
-        payslip_runs = (self - payslips_to_post).payslip_run_id
-        for run in payslip_runs:
+        all_payslips = self
+        # Adding pay slips from a batch.
+        for run in self.payslip_run_id:
             if run._are_payslips_ready():
-                payslips_to_post |= run.slip_ids
+                all_payslips |= run.slip_ids
 
         # A payslip need to have a done state and not an accounting move.
-        payslips_to_post = payslips_to_post.filtered(lambda slip: slip.state == 'done' and not slip.move_id)
+        payslips_to_post = all_payslips.filtered(lambda slip: slip.state == 'done' and not slip.move_id and slip.struct_id.journal_id)
 
         # Check that a journal exists on all the structures
         if any(not payslip.struct_id for payslip in payslips_to_post):
             raise ValidationError(_('One of the contract for these payslips has no structure type.'))
-        if any(not structure.journal_id for structure in payslips_to_post.mapped('struct_id')):
-            raise ValidationError(_('One of the payroll structures has no account journal defined on it.'))
 
         # Map all payslips by structure journal and pay slips month.
         # Case 1: Batch all the payslips together -> {'journal_id': {'month': slips}}
@@ -68,9 +65,11 @@ class HrPayslip(models.Model):
                 }
             } for slip in payslips_to_post]
 
+        account_move_vals = []
+        slips_date_tuples = []
         for slip_mapped_data in all_slip_mapped_data:
-            for journal_id in slip_mapped_data: # For each journal_id.
-                for slip_date in slip_mapped_data[journal_id]: # For each month.
+            for journal_id in slip_mapped_data:  # For each journal_id.
+                for slip_date in slip_mapped_data[journal_id]:  # For each month.
                     line_ids = []
                     debit_sum = 0.0
                     credit_sum = 0.0
@@ -100,11 +99,13 @@ class HrPayslip(models.Model):
 
                     # Add accounting lines in the move
                     move_dict['line_ids'] = [(0, 0, line_vals) for line_vals in line_ids]
-                    move = slip._create_account_move(move_dict)
-                    for slip in slip_mapped_data[journal_id][slip_date]:
-                        slip.write({'move_id': move.id, 'date': date})
-                    if self.company_id.batch_payroll_move_lines:
-                        slip.payslip_run_id.write({'move_id': move.id})
+                    account_move_vals.append(move_dict)
+                    slips_date_tuples.append((slip_mapped_data[journal_id][slip_date], date))
+        moves = self._create_account_move(account_move_vals)
+        for move, (slips, date) in zip(moves, slips_date_tuples):
+            slips.write({'move_id': move.id, 'date': date})
+            if slips.company_id.batch_payroll_move_lines:
+                slips.payslip_run_id.write({'move_id': move.id})
         return True
 
     def _prepare_line_values(self, line, account_id, date, debit, credit):
@@ -240,9 +241,14 @@ class HrPayslip(models.Model):
             raise UserError(_('The employee bank account is untrusted'))
         if any(m.state != 'posted' for m in self.move_id):
             raise UserError(_("You can only register payment for posted journal entries."))
+
         return self.move_id.line_ids.action_register_payment(
-            ctx={"default_partner_id": self.employee_id.work_contact_id.id,
-                 "default_partner_bank_id": bank_account.id})
+            ctx={
+                "default_partner_id": self.employee_id.work_contact_id.id,
+                "default_partner_bank_id": self.employee_id.bank_account_id.id,
+                "default_company_id": self.company_id.id,
+                "payment_consider_partner": True,
+            })
 
     def action_open_move(self):
         return {

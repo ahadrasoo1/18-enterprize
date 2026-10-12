@@ -1,33 +1,39 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* hr_payroll_expense
-# 
+# * hr_payroll_expense
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Malaz Abuidris <msea@odoo.com>, 2025
+# Weblate <noreply-mt-weblate@weblate.org>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:26+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Arabic (https://app.transifex.com/odoo/teams/41243/ar/)\n"
+"POT-Creation-Date: 2025-12-29 18:46+0000\n"
+"PO-Revision-Date: 2025-11-17 14:13+0000\n"
+"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"Language-Team: Arabic <https://translate.odoo.com/projects/odoo-18/"
+"hr_payroll_expense/ar/>\n"
+"Language: ar\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: ar\n"
-"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
+"&& n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
+"X-Generator: Weblate 5.12.2\n"
 
 #. module: hr_payroll_expense
 #: model_terms:ir.ui.view,arch_db:hr_payroll_expense.view_account_payment_register_form_inherit_hr_payroll_expense
 msgid ""
 "<span class=\"fw-bold\">\n"
-"                            The expenses will already be reimbursed in a payslip. Make sure this payment is intended.\n"
+"                            The expenses will already be reimbursed in a "
+"payslip. Make sure this payment is intended.\n"
 "                        </span>"
 msgstr ""
 "<span class=\"fw-bold\">\n"
-"                            ستكون النفقات معوضة بالفعل في إيصال الدفع. تأكد من أن عملية الدفع هذه مقصودة.\n"
+"                            ستكون النفقات معوضة بالفعل في إيصال الدفع. تأكد "
+"من أن عملية الدفع هذه مقصودة.\n"
 "                        </span>"
 
 #. module: hr_payroll_expense
@@ -39,6 +45,19 @@ msgstr "<span class=\"o_stat_text\">إيصال الدفع</span> "
 #: model:ir.model,name:hr_payroll_expense.model_hr_expense_sheet
 msgid "Expense Report"
 msgstr "تقرير النفقات "
+
+#. module: hr_payroll_expense
+#. odoo-python
+#: code:addons/hr_payroll_expense/models/hr_expense_sheet.py:0
+msgid ""
+"Expense reimbursement rule needs to be configured to add expenses to "
+"payslips.\n"
+"Please create one salary rule with the \"%(code)s\" code on the relevant "
+"salary structures."
+msgstr ""
+"يجب تهيئة قاعدة تعويض النفقات بحيث يتم إضافة النفقات إلى كشوف المرتبات.\n"
+"يرجى إنشاء قاعدة مرتبات واحدة برمز \"%(code)s\" على هياكل المرتبات ذات "
+"الصلة. "
 
 #. module: hr_payroll_expense
 #. odoo-python
@@ -74,6 +93,17 @@ msgid "Expenses to reimburse to employee."
 msgstr "النفقات بانتظار رد قيمتها للموظف. "
 
 #. module: hr_payroll_expense
+#: model:ir.model,name:hr_payroll_expense.model_hr_payslip_employees
+msgid "Generate payslips for all selected employees"
+msgstr "إنشاء إيصالات دفع لكافة الموظفين المحددين"
+
+#. module: hr_payroll_expense
+#. odoo-python
+#: code:addons/hr_payroll_expense/models/hr_expense_sheet.py:0
+msgid "Go to salary rules"
+msgstr "الذهاب إلى قاعدة المرتبات "
+
+#. module: hr_payroll_expense
 #: model:ir.model.fields,field_description:hr_payroll_expense.field_account_payment_register__is_already_paid_through_a_payslip
 msgid "Is Already Paid Through A Payslip"
 msgstr "تم دفعها بالفعل في إيصال الدفع "
@@ -88,12 +118,22 @@ msgstr "قيد اليومية"
 #: code:addons/hr_payroll_expense/models/hr_payroll_structure.py:0
 msgid ""
 "No debit account found in the '%(rule_name)s' payslip salary rule. Please "
-"add a payable debit account to be able to create an accounting entry for the"
-" expense report linked to this payslip '%(expense_report_name)s'."
+"add a payable debit account to be able to create an accounting entry for the "
+"expense reports linked to this payslip."
 msgstr ""
 "لم يتم العثور على حساب خصم في قاعدة راتب إيصال الدفع '%(rule_name)s'. يُرجى "
-"إضافة حساب خصم مستحق حتى تتمكن من إنشاء قيد محاسبي لتقرير النفقات المرتبط "
-"بإيصال الدفع هذا '%(expense_report_name)s'. "
+"إضافة حساب خصم مستحق حتى تتمكن من إنشاء قيد محاسبي لتقارير النفقات المرتبط "
+"بإيصال الدفع هذا. "
+
+#. module: hr_payroll_expense
+#. odoo-python
+#: code:addons/hr_payroll_expense/models/hr_payslip.py:0
+msgid ""
+"No salary rule was found to handle expenses in structure '%"
+"(structure_name)s'."
+msgstr ""
+"لم يتم العثور على قاعدة مرتبات للتعامل مع النفقات في الهيكل '%"
+"(structure_name)s'. "
 
 #. module: hr_payroll_expense
 #. odoo-python
@@ -190,7 +230,8 @@ msgstr "لم يتم تحديد أوراق نفقات صالحة. "
 #. odoo-python
 #: code:addons/hr_payroll_expense/models/hr_expense_sheet.py:0
 msgid ""
-"You cannot remove an expense from a payslip that has already been validated.\n"
+"You cannot remove an expense from a payslip that has already been "
+"validated.\n"
 "Expenses can only be removed from draft or canceled payslips."
 msgstr ""
 "لا يمكنك إزالة نفقة من إيصال دفع قد تم تصديقه بالفعل. \n"
@@ -200,8 +241,8 @@ msgstr ""
 #. odoo-python
 #: code:addons/hr_payroll_expense/models/hr_payslip.py:0
 msgid ""
-"You don't have the access rights to link an expense report to a payslip. You"
-" need to be a payroll officer to do that."
+"You don't have the access rights to link an expense report to a payslip. You "
+"need to be a payroll officer to do that."
 msgstr ""
 "لا تملك صلاحيات الوصول المطلوبة لربط تقرير نفقات بإيصال دفع. تحتاج إلى أن "
 "تكون مسؤول كشوف المرتبات حتى تتمكن من القيام بذلك. "

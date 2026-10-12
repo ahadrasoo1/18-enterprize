@@ -3,7 +3,6 @@
 import { registry } from "@web/core/registry";
 
 registry.category("web_tour.tours").add("approvals_tour", {
-    test: true,
     url: "/odoo",
     steps: () => [
         {
@@ -87,7 +86,7 @@ registry.category("web_tour.tours").add("approvals_tour", {
             run: "click",
         },
         {
-            trigger: 'button[aria-label="Current state"][data-value="refused"]',
+            trigger: 'button[aria-checked="true"][data-value="refused"]',
             content: "wait the request status compute",
         },
         {

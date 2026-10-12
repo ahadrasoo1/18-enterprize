@@ -1,23 +1,26 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* helpdesk_fsm
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Marianna Ciofani, 2025
+# Sergio Zanchetta <primes2h@gmail.com>, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:27+0000\n"
+"POT-Creation-Date: 2025-12-29 18:47+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
+"Last-Translator: Sergio Zanchetta <primes2h@gmail.com>, 2025\n"
 "Language-Team: Italian (https://app.transifex.com/odoo/teams/41243/it/)\n"
+"Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: it\n"
-"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? "
+"1 : 2;\n"
 
 #. module: helpdesk_fsm
 #: model:ir.model,name:helpdesk_fsm.model_helpdesk_ticket_convert_wizard
@@ -27,7 +30,7 @@ msgstr "Convertire i ticket dell'helpdesk in lavori"
 #. module: helpdesk_fsm
 #: model_terms:ir.ui.view,arch_db:helpdesk_fsm.create_fsm_task_view_form
 msgid "Create & View Task"
-msgstr "Crea e vedi lavori"
+msgstr "Crea e visualizza lavoro"
 
 #. module: helpdesk_fsm
 #: model_terms:ir.ui.view,arch_db:helpdesk_fsm.create_fsm_task_view_form
@@ -74,12 +77,12 @@ msgstr "Progetto FSM"
 #. module: helpdesk_fsm
 #: model:ir.model,name:helpdesk_fsm.model_helpdesk_team
 msgid "Helpdesk Team"
-msgstr "Gruppo Helpdesk"
+msgstr "Team assistenza clienti"
 
 #. module: helpdesk_fsm
 #: model:ir.model,name:helpdesk_fsm.model_helpdesk_ticket
 msgid "Helpdesk Ticket"
-msgstr "Ticket helpdesk"
+msgstr "Ticket assistenza clienti"
 
 #. module: helpdesk_fsm
 #: model:ir.model.fields,field_description:helpdesk_fsm.field_helpdesk_create_fsm_task__id
@@ -107,6 +110,12 @@ msgid "Plan Intervention"
 msgstr "Pianifica intervento"
 
 #. module: helpdesk_fsm
+#. odoo-python
+#: code:addons/helpdesk_fsm/models/project_task.py:0
+msgid "Portal Ticket"
+msgstr "Ticket portale"
+
+#. module: helpdesk_fsm
 #: model:ir.model.fields,field_description:helpdesk_fsm.field_helpdesk_create_fsm_task__project_id
 #: model_terms:ir.ui.view,arch_db:helpdesk_fsm.helpdesk_team_view_form
 msgid "Project"
@@ -120,7 +129,7 @@ msgstr "Progetto nel quale creare il lavoro"
 #. module: helpdesk_fsm
 #: model:ir.model.fields,field_description:helpdesk_fsm.field_helpdesk_create_fsm_task__helpdesk_ticket_id
 msgid "Related ticket"
-msgstr "Segnalazione correlata"
+msgstr "Ticket correlato"
 
 #. module: helpdesk_fsm
 #. odoo-python
@@ -147,7 +156,7 @@ msgstr "Lavoro completato"
 #. odoo-python
 #: code:addons/helpdesk_fsm/wizard/create_task.py:0
 msgid "Task created"
-msgstr "Attività creata"
+msgstr "Lavoro creato"
 
 #. module: helpdesk_fsm
 #. odoo-python
@@ -162,12 +171,12 @@ msgstr "Lavori"
 #. odoo-python
 #: code:addons/helpdesk_fsm/wizard/create_task.py:0
 msgid "Tasks from Tickets"
-msgstr "Lavori da segnalazioni"
+msgstr "Lavori dai ticket"
 
 #. module: helpdesk_fsm
 #: model:ir.model.fields,help:helpdesk_fsm.field_helpdesk_ticket__fsm_task_ids
 msgid "Tasks generated from this ticket"
-msgstr "Lavori generati dalla segnalazione"
+msgstr "Lavori generati dal ticket"
 
 #. module: helpdesk_fsm
 #. odoo-python
@@ -179,12 +188,12 @@ msgstr "Ticket"
 #. module: helpdesk_fsm
 #: model_terms:ir.ui.view,arch_db:helpdesk_fsm.project_sharing_inherit_project_task_view_form
 msgid "Ticket from this task"
-msgstr "Segnalazione dal lavoro"
+msgstr "Ticket dal lavoro"
 
 #. module: helpdesk_fsm
 #: model:ir.model.fields,help:helpdesk_fsm.field_helpdesk_create_fsm_task__partner_id
 msgid "Ticket's customer, will be linked to the task"
-msgstr "Cliente della segnalazione, viene collegato al lavoro"
+msgstr "Cliente del ticket, viene collegato al lavoro"
 
 #. module: helpdesk_fsm
 #: model:ir.model.fields,field_description:helpdesk_fsm.field_helpdesk_create_fsm_task__name

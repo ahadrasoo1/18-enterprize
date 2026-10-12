@@ -1,28 +1,39 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* helpdesk_timesheet
-# 
+# * helpdesk_timesheet
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Sergio Zanchetta <primes2h@gmail.com>, 2025
+# "Marianna Ciofani (cima)" <cima@odoo.com>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:27+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Italian (https://app.transifex.com/odoo/teams/41243/it/)\n"
+"POT-Creation-Date: 2025-12-29 18:47+0000\n"
+"PO-Revision-Date: 2025-10-02 22:31+0000\n"
+"Last-Translator: \"Marianna Ciofani (cima)\" <cima@odoo.com>\n"
+"Language-Team: Italian <https://translate.odoo.com/projects/odoo-18/"
+"helpdesk_timesheet/it/>\n"
+"Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: it\n"
-"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=(n == 1) ? 0 : ((n != 0 && n % 1000000 == "
+"0) ? 1 : 2);\n"
+"X-Generator: Weblate 5.12.2\n"
 
 #. module: helpdesk_timesheet
 #: model:ir.model.fields,field_description:helpdesk_timesheet.field_project_project__ticket_count
 msgid "# Tickets"
-msgstr "# Biglietti"
+msgstr "N. ticket"
+
+#. module: helpdesk_timesheet
+#. odoo-python
+#: code:addons/helpdesk_timesheet/wizard/timesheet_merge_wizard.py:0
+msgid "All timesheets must be linked to the same helpdesk ticket."
+msgstr ""
+"Tutti i fogli ore devono essere collegati allo stesso ticket dell'helpdesk."
 
 #. module: helpdesk_timesheet
 #: model:ir.model.fields,field_description:helpdesk_timesheet.field_helpdesk_ticket__analytic_account_id
@@ -53,7 +64,7 @@ msgstr "Convertire i lavori di un progetto in ticket"
 #. module: helpdesk_timesheet
 #: model:ir.model,name:helpdesk_timesheet.model_helpdesk_ticket_create_timesheet
 msgid "Create Timesheet from ticket"
-msgstr "Crea foglio ore da ticket"
+msgstr "Creazione foglio ore da ticket"
 
 #. module: helpdesk_timesheet
 #: model:ir.model.fields,field_description:helpdesk_timesheet.field_helpdesk_ticket_create_timesheet__create_uid
@@ -109,16 +120,17 @@ msgstr "Dipendente"
 
 #. module: helpdesk_timesheet
 #: model:ir.model,name:helpdesk_timesheet.model_helpdesk_team
+#: model:ir.model.fields,field_description:helpdesk_timesheet.field_helpdesk_ticket__team_id
 #: model:ir.model.fields,field_description:helpdesk_timesheet.field_project_project__helpdesk_team
 msgid "Helpdesk Team"
-msgstr "Gruppo Helpdesk"
+msgstr "Team assistenza clienti"
 
 #. module: helpdesk_timesheet
 #: model:ir.model,name:helpdesk_timesheet.model_helpdesk_ticket
 #: model:ir.model.fields,field_description:helpdesk_timesheet.field_account_analytic_line__helpdesk_ticket_id
 #: model:ir.model.fields,field_description:helpdesk_timesheet.field_timesheets_analysis_report__helpdesk_ticket_id
 msgid "Helpdesk Ticket"
-msgstr "Ticket helpdesk"
+msgstr "Ticket assistenza clienti"
 
 #. module: helpdesk_timesheet
 #: model:ir.model.fields,field_description:helpdesk_timesheet.field_helpdesk_sla_report_analysis__total_hours_spent
@@ -158,6 +170,11 @@ msgid "Manager"
 msgstr "Supervisore"
 
 #. module: helpdesk_timesheet
+#: model:ir.model,name:helpdesk_timesheet.model_hr_timesheet_merge_wizard
+msgid "Merge Timesheets"
+msgstr "Unisci fogli ore"
+
+#. module: helpdesk_timesheet
 #. odoo-python
 #: code:addons/helpdesk_timesheet/models/helpdesk_ticket.py:0
 msgid ""
@@ -185,7 +202,7 @@ msgstr "Operazione non supportata"
 #. module: helpdesk_timesheet
 #: model_terms:ir.ui.view,arch_db:helpdesk_timesheet.helpdesk_ticket_view_form_inherit_helpdesk_timesheet
 msgid "Pause"
-msgstr "Metti in pausa"
+msgstr "Sospendi"
 
 #. module: helpdesk_timesheet
 #: model:ir.model,name:helpdesk_timesheet.model_project_project
@@ -265,7 +282,7 @@ msgstr "Lavori"
 #: model_terms:ir.ui.view,arch_db:helpdesk_timesheet.timesheet_table
 #: model_terms:ir.ui.view,arch_db:helpdesk_timesheet.timesheet_view_form_inherit
 msgid "Ticket"
-msgstr "Segnalazione"
+msgstr "Ticket"
 
 #. module: helpdesk_timesheet
 #: model:ir.model,name:helpdesk_timesheet.model_helpdesk_ticket_report_analysis
@@ -275,7 +292,7 @@ msgstr "Analisi ticket"
 #. module: helpdesk_timesheet
 #: model:ir.model.fields,help:helpdesk_timesheet.field_helpdesk_ticket_create_timesheet__ticket_id
 msgid "Ticket for which we are creating a sales order"
-msgstr "Segnalazione per la quale viene creato l'ordine di vendita"
+msgstr "Ticket per il quale viene creato l'ordine di vendita"
 
 #. module: helpdesk_timesheet
 #: model_terms:ir.ui.view,arch_db:helpdesk_timesheet.report_timesheet_ticket
@@ -311,11 +328,15 @@ msgstr "Tempo speso (Fogli ore)"
 #. module: helpdesk_timesheet
 #: model:ir.model.fields,help:helpdesk_timesheet.field_helpdesk_ticket__timesheet_ids
 msgid ""
-"Time spent on this ticket. By default, your timesheets will be linked to the sales order item of your ticket.\n"
+"Time spent on this ticket. By default, your timesheets will be linked to the "
+"sales order item of your ticket.\n"
 "Remove the sales order item to make your timesheet entries non billable."
 msgstr ""
-"Tempo impiegato per il ticket. Per impostazione predefinita, i tuoi fogli ore saranno collegati all'articolo dell'ordine di vendita presente nel tuo ticket.\n"
-"Elimina l'articolo dell'ordine di vendita per far si che le voci del tuo foglio ore non siano fatturabili."
+"Tempo impiegato per il ticket. Per impostazione predefinita, i tuoi fogli "
+"ore saranno collegati all'articolo dell'ordine di vendita presente nel tuo "
+"ticket.\n"
+"Elimina l'articolo dell'ordine di vendita per far si che le voci del tuo "
+"foglio ore non siano fatturabili."
 
 #. module: helpdesk_timesheet
 #: model_terms:ir.ui.view,arch_db:helpdesk_timesheet.helpdesk_ticket_view_form_inherit_helpdesk_timesheet
@@ -325,7 +346,7 @@ msgstr "Attività foglio ore"
 #. module: helpdesk_timesheet
 #: model:ir.model.fields,field_description:helpdesk_timesheet.field_helpdesk_ticket__use_helpdesk_timesheet
 msgid "Timesheet activated on Team"
-msgstr "Folgio ore attivato sul team"
+msgstr "Foglio ore attivato sul team"
 
 #. module: helpdesk_timesheet
 #: model:ir.actions.act_window,name:helpdesk_timesheet.act_hr_timesheet_line_helpdesk
@@ -350,8 +371,8 @@ msgstr "Totale"
 #. module: helpdesk_timesheet
 #: model_terms:ir.actions.act_window,help:helpdesk_timesheet.act_hr_timesheet_line_helpdesk
 msgid ""
-"Track your working hours by projects every day and invoice this time to your"
-" customers."
+"Track your working hours by projects every day and invoice this time to your "
+"customers."
 msgstr ""
 "Tieni traccia delle ore lavorative giornaliere per progetto e fatturale ai "
 "clienti."

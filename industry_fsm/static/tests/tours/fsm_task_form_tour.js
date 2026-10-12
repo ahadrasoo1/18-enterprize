@@ -7,7 +7,6 @@ registry.category("web_tour.tours").add(
     "fsm_task_form_tour",
     {
         url: '/odoo',
-        test: true,
         steps: () => [
             ...stepUtils.goToAppSteps("industry_fsm.fsm_menu_root", "Open app Field Service"),
             {
@@ -33,11 +32,11 @@ registry.category("web_tour.tours").add(
             }, {
                 content: 'Add a customer to the parent task',
                 trigger: 'div[name="partner_id"] input.o_input',
-                run: "edit Azure Interior",
+                run: "edit Admin && click",
             }, {
                 id: "validate_customer",
                 content: 'Validate Customer',
-                trigger: '.ui-menu-item a:contains("Azure Interior")',
+                trigger: '.ui-menu-item a:contains("Admin")',
                 run: "click",
             }, {
                 content: 'Open Menu All Tasks',

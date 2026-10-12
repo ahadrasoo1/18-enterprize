@@ -37,6 +37,40 @@ class TestAccountReconcileWizard(AccountTestInvoicingCommon):
         cls.foreign_currency = cls.setup_other_currency('EUR')
         cls.foreign_currency_2 = cls.setup_other_currency('XAF', rates=[('2016-01-01', 6.0), ('2017-01-01', 4.0)])
 
+        cls.tax_recover_account_id = cls.env['account.account'].create({
+            'name': 'Tax Account Test',
+            'account_type': 'liability_current',
+            'code': 'TAX.TEST',
+            'reconcile': False
+        })
+        cls.base_tag = cls.env['account.account.tag'].create({
+            'applicability': 'taxes',
+            'name': 'base_tax_tag',
+            'country_id': cls.company_data['company'].country_id.id,
+        })
+        cls.tax_tag = cls.env['account.account.tag'].create({
+            'applicability': 'taxes',
+            'name': 'tax_tax_tag',
+            'country_id': cls.company_data['company'].country_id.id,
+        })
+        cls.tax_id = cls.env['account.tax'].create({
+            'name': 'tax_test',
+            'amount_type': 'percent',
+            'amount': 25.0,
+            'type_tax_use': 'sale',
+            'company_id': cls.company_data['company'].id,
+            'invoice_repartition_line_ids': [
+                Command.create({'factor_percent': 100, 'repartition_type': 'base', 'tag_ids': [Command.set(cls.base_tag.ids)]}),
+                Command.create({'factor_percent': 100, 'account_id': cls.tax_recover_account_id.id,
+                                'tag_ids': [Command.set(cls.tax_tag.ids)]}),
+            ],
+            'refund_repartition_line_ids': [
+                Command.create({'factor_percent': 100, 'repartition_type': 'base', 'tag_ids': [Command.set(cls.base_tag.ids)]}),
+                Command.create({'factor_percent': 100, 'account_id': cls.tax_recover_account_id.id,
+                                'tag_ids': [Command.set(cls.tax_tag.ids)]}),
+            ],
+        })
+
     # -------------------------------------------------------------------------
     # HELPERS
     # -------------------------------------------------------------------------
@@ -173,6 +207,67 @@ class TestAccountReconcileWizard(AccountTestInvoicingCommon):
         ]
         self.assertWizardReconcileValues(line_1 + line_2, wizard_input_values, expected_values)
 
+    def test_write_off_one_foreign_currency_rounding(self):
+        """ Reconciliation of two lines with one of the two using foreign currency should reconcile in foreign currency."""
+        foreign_currency = self.setup_other_currency('CAD', rounding=0.01, rates=[('2016-01-01', 0.052972554919), ('2017-01-01', 4.0)])
+
+        # Check that the reconciliation works independently of
+        # - whether the foreign amount is debit or credit
+        # - the account type (payable / receivable)
+        self.assertFalse(self.payable_account_2.account_type in ('asset_receivable', 'liability_payable'))
+        self.assertTrue(self.receivable_account.account_type in ('asset_receivable', 'liability_payable'))
+        for foreign_amount_sign, account in [
+            (-1, self.payable_account_2),
+            (1, self.payable_account_2),
+            (-1, self.receivable_account),
+            (1, self.receivable_account),
+        ]:
+            with self.subTest(sub_test_name=f'sign: {foreign_amount_sign}, account: {account.name}'):
+                line_1 = self.create_line_for_reconciliation(
+                    -foreign_amount_sign * 372239.38, -foreign_amount_sign * 372239.38, self.company_currency,
+                    '2016-01-01', account_1=account,
+                )
+                line_2 = self.create_line_for_reconciliation(
+                    foreign_amount_sign * 377554.0, foreign_amount_sign * 20000.0, foreign_currency,
+                    '2016-01-01', account_1=account,
+                )
+                lines = line_1 + line_2
+
+                # Test the opening of the wizard without input values
+                wizard = self.env['account.reconcile.wizard'].with_context(
+                    active_model='account.move.line',
+                    active_ids=lines.ids,
+                ).new()
+                self.assertRecordValues(wizard, [{
+                    'is_write_off_required': True,
+                    'amount': foreign_amount_sign * 5314.62,
+                    'amount_currency': foreign_amount_sign * 281.53,
+                    'reco_currency_id': foreign_currency.id,
+                }])
+
+                # Check the created write-off move and that there is no residual
+                wizard_input_values = {
+                    'journal_id': self.misc_journal.id,
+                    'account_id': self.write_off_account.id,
+                    'label': 'Write-Off Test Label',
+                    'allow_partials': False,
+                    'date': self.test_date,
+                }
+                # We sort the expected values the same way as `assertWizardReconcileValues` sorts the lines
+                expected_values = sorted([
+                    {'account_id': account.id, 'name': 'Write-Off Test Label',
+                     'balance': -foreign_amount_sign * 5314.62,
+                     'amount_currency': -foreign_amount_sign * 281.53, 'currency_id': foreign_currency.id},
+                    {'account_id': self.write_off_account.id, 'name': 'Write-Off Test Label',
+                     'balance': foreign_amount_sign * 5314.62,
+                     'amount_currency': foreign_amount_sign * 281.53, 'currency_id': foreign_currency.id},
+                ], key=lambda vals: vals['balance'])
+                self.assertWizardReconcileValues(lines, wizard_input_values, expected_values)
+
+                full_reconcile = lines.full_reconcile_id
+                self.assertTrue(full_reconcile)
+                self.assertFalse(full_reconcile.exchange_move_id)
+
     def test_write_off_mixed_foreign_currencies(self):
         """ Write off with multiple currencies should reconcile in company currency."""
         line_1 = self.create_line_for_reconciliation(1000.0, 1000.0, self.company_currency, '2016-01-01')
@@ -232,6 +327,30 @@ class TestAccountReconcileWizard(AccountTestInvoicingCommon):
              'balance': -100.0, 'amount_currency': -100.0, 'currency_id': self.company_currency.id},
             {'account_id': self.write_off_account.id, 'name': 'Write-Off Test Label',
              'balance': 100.0, 'amount_currency': 100.0, 'currency_id': self.company_currency.id},
+        ]
+        self.assertWizardReconcileValues(line_1 + line_2 + line_3, wizard_input_values, expected_values)
+
+    def test_write_off_both_same_foreign_currency_ensure_no_exchange_diff(self):
+        """ Test that if both AMLs have the same foreign currency and rate, the amount in company currency
+            is computed on the write-off in such a way that no exchange diff is created.
+        """
+        foreign_currency = self.setup_other_currency('CAD', rounding=0.01, rates=[('2016-01-01', 1 / 0.225)])
+        new_date = fields.Date.from_string('2017-02-01')
+        line_1 = self.create_line_for_reconciliation(21.38, 95.0, foreign_currency, '2016-01-01')
+        line_2 = self.create_line_for_reconciliation(1.13, 5.0, foreign_currency, '2016-01-01')
+        line_3 = self.create_line_for_reconciliation(1.13, 5.0, foreign_currency, '2016-01-01')
+        wizard_input_values = {
+            'journal_id': self.misc_journal.id,
+            'account_id': self.write_off_account.id,
+            'label': 'Write-Off Test Label',
+            'allow_partials': False,
+            'date': new_date,
+        }
+        expected_values = [
+            {'account_id': self.receivable_account.id, 'name': 'Write-Off Test Label',
+             'balance': -23.64, 'amount_currency': -105.0, 'currency_id': foreign_currency.id},
+            {'account_id': self.write_off_account.id, 'name': 'Write-Off Test Label',
+             'balance': 23.64, 'amount_currency': 105.0, 'currency_id': foreign_currency.id},
         ]
         self.assertWizardReconcileValues(line_1 + line_2 + line_3, wizard_input_values, expected_values)
 
@@ -324,51 +443,65 @@ class TestAccountReconcileWizard(AccountTestInvoicingCommon):
         """ Tests write-off with a tax set on the wizard. """
         line_1 = self.create_line_for_reconciliation(1000.0, 1000.0, self.company_currency, '2016-01-01')
         line_2 = self.create_line_for_reconciliation(-500.0, -500.0, self.company_currency, '2016-01-01')
-        tax_recover_account_id = self.env['account.account'].create({
-            'name': 'Tax Account Test',
-            'account_type': 'liability_current',
-            'code': 'TAX.TEST',
-            'reconcile': False
-        })
-        base_tag = self.env['account.account.tag'].create({
-            'applicability': 'taxes',
-            'name': 'base_tax_tag',
-            'country_id': self.company_data['company'].country_id.id,
-        })
-        tax_tag = self.env['account.account.tag'].create({
-            'applicability': 'taxes',
-            'name': 'tax_tax_tag',
-            'country_id': self.company_data['company'].country_id.id,
-        })
-        tax_id = self.env['account.tax'].create({
-            'name': 'tax_test',
-            'amount_type': 'percent',
-            'amount': 25.0,
-            'type_tax_use': 'sale',
-            'company_id': self.company_data['company'].id,
-            'invoice_repartition_line_ids': [
-                Command.create({'factor_percent': 100, 'repartition_type': 'base', 'tag_ids': [Command.set(base_tag.ids)]}),
-                Command.create({'factor_percent': 100, 'account_id': tax_recover_account_id.id, 'tag_ids': [Command.set(tax_tag.ids)]}),
-            ],
-            'refund_repartition_line_ids': [
-                Command.create({'factor_percent': 100, 'repartition_type': 'base', 'tag_ids': [Command.set(base_tag.ids)]}),
-                Command.create({'factor_percent': 100, 'account_id': tax_recover_account_id.id, 'tag_ids': [Command.set(tax_tag.ids)]}),
-            ],
-        })
         wizard_input_values = {
             'journal_id': self.misc_journal.id,
             'account_id': self.write_off_account.id,
             'label': 'Write-Off Test Label',
-            'tax_id': tax_id.id,
+            'tax_id': self.tax_id.id,
             'allow_partials': False,
             'date': self.test_date,
         }
         write_off_expected_values = [
             {'account_id': self.receivable_account.id, 'name': 'Write-Off Test Label', 'balance': -500.0},
-            {'account_id': tax_recover_account_id.id, 'name': f'{tax_id.name}', 'balance': 100.0},
+            {'account_id': self.tax_recover_account_id.id, 'name': f'{self.tax_id.name}', 'balance': 100.0},
             {'account_id': self.write_off_account.id, 'name': 'Write-Off Test Label', 'balance': 400.0},
         ]
         self.assertWizardReconcileValues(line_1 + line_2, wizard_input_values, write_off_expected_values)
+
+    def test_write_off_tax_tag_invert(self):
+        """Tests that write off set the invert tag correctly"""
+        line_1 = self.create_line_for_reconciliation(-100.0, -100.0, self.company_currency, '2025-01-01')
+        account = self.company_data['default_account_expense']
+        wizard_input_values = {
+            'journal_id': self.misc_journal.id,
+            'account_id': account.id,
+            'label': 'Write-Off Test Label',
+            'tax_id': self.tax_id.id,
+            'allow_partials': False,
+            'date': self.test_date,
+        }
+        write_off_expected_values = [
+            {'account_id': account.id, 'balance': -80.0, 'tax_tag_invert': True},
+            {'account_id': self.tax_recover_account_id.id, 'balance': -20.0, 'tax_tag_invert': True},
+            {'account_id': self.receivable_account.id, 'balance': 100, 'tax_tag_invert': False},
+        ]
+        self.assertWizardReconcileValues(line_1, wizard_input_values, write_off_expected_values)
+
+    def test_write_off_tax_reverse_charge(self):
+        """
+        With revert charges, we should consider the price as excluded when reconciling
+        """
+        self.tax_id.write({
+            'invoice_repartition_line_ids': [Command.create({'factor_percent': -100, 'account_id': self.tax_recover_account_id.id})],
+            'refund_repartition_line_ids': [Command.create({'factor_percent': -100, 'account_id': self.tax_recover_account_id.id})],
+        })
+        line_1 = self.create_line_for_reconciliation(100.0, 100.0, self.company_currency, '2025-01-01')
+        account = self.company_data['default_account_expense']
+        wizard_input_values = {
+            'journal_id': self.misc_journal.id,
+            'account_id': account.id,
+            'label': 'Write-Off Test Label',
+            'tax_id': self.tax_id.id,
+            'allow_partials': False,
+            'date': self.test_date,
+        }
+        write_off_expected_values = [
+            {'account_id': self.receivable_account.id, 'balance': -100.0},
+            {'account_id': self.tax_recover_account_id.id, 'balance': -25.0},
+            {'account_id': self.tax_recover_account_id.id, 'balance': 25.0},
+            {'account_id': account.id, 'balance': 100},
+        ]
+        self.assertWizardReconcileValues(line_1, wizard_input_values, write_off_expected_values)
 
     def test_reconcile_partials_allowed(self):
         line_1 = self.create_line_for_reconciliation(1000.0, 1000.0, self.company_currency, '2016-01-01')
@@ -739,3 +872,33 @@ class TestAccountReconcileWizard(AccountTestInvoicingCommon):
              'balance': 250.0, 'amount_currency': 250.0, 'currency_id': self.company_currency.id},
         ]
         self.assertWizardReconcileValues(line_1 + line_2, wizard_input_values, expected_values, expected_transfer_values=expected_transfer_values)
+
+    def test_reconcile_transfer_with_different_partners(self):
+        """ When balance is 0, and we need a transfer, we do the transfer+reconcile silently. """
+        partner_a = self.env['res.partner'].create({'name': 'Test Partner A'})
+        partner_b = self.env['res.partner'].create({'name': 'Test Partner B'})
+        partner_c = self.env['res.partner'].create({'name': 'Test Partner C'})
+        # when reconciling journal items on 2 different accounts from 2 different partners that balance themselves,
+        # all journal items should be fully reconciled together
+        line_a1 = self.create_line_for_reconciliation(1000.0, 1000.0, self.company_currency, '2016-01-01', account_1=self.receivable_account, partner=partner_a)
+        line_b1 = self.create_line_for_reconciliation(-1000.0, -1000.0, self.company_currency, '2016-01-01', account_1=self.payable_account, partner=partner_b)
+        lines = line_a1 + line_b1
+        lines.action_reconcile()
+        transfer_lines = lines.full_reconcile_id.reconciled_line_ids.filtered(lambda line: line.id not in lines.ids)
+        self.assertRecordValues(transfer_lines, [
+            {'balance': -1000.0, 'account_id': self.receivable_account.id, 'partner_id': partner_a.id},
+            {'balance': 1000.0, 'account_id': self.payable_account.id, 'partner_id': partner_b.id},
+        ])
+        # even if the journal items on one of the accounts are for several different partners,
+        # the journal items should be fully reconciled together
+        line_a2 = self.create_line_for_reconciliation(1000.0, 1000.0, self.company_currency, '2016-01-01', account_1=self.receivable_account, partner=partner_a)
+        line_b2 = self.create_line_for_reconciliation(-600.0, -600.0, self.company_currency, '2016-01-01', account_1=self.payable_account, partner=partner_b)
+        line_c2 = self.create_line_for_reconciliation(-400.0, -400.0, self.company_currency, '2016-01-01', account_1=self.payable_account, partner=partner_c)
+        lines = line_a2 + line_b2 + line_c2
+        lines.action_reconcile()
+        transfer_lines = lines.full_reconcile_id.reconciled_line_ids.filtered(lambda line: line.id not in lines.ids)
+        self.assertRecordValues(transfer_lines, [
+            {'balance': -1000.0, 'account_id': self.receivable_account.id, 'partner_id': partner_a.id},
+            {'balance': 600.0, 'account_id': self.payable_account.id, 'partner_id': partner_b.id},
+            {'balance': 400.0, 'account_id': self.payable_account.id, 'partner_id': partner_c.id},
+        ])

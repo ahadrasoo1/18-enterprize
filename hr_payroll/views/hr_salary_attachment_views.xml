@@ -75,7 +75,7 @@
                     <field name="has_done_payslip" invisible="1"/>
                     <group>
                         <group>
-                            <field name="employee_ids" widget="many2many_avatar_employee" readonly="has_done_payslip"/>
+                            <field name="employee_ids" widget="many2many_avatar_employee" readonly="has_done_payslip" domain="[('active', '=', True)]"/>
                             <field name="description" readonly="has_done_payslip"/>
                             <field name="other_input_type_id" readonly="has_done_payslip" context="{'default_available_in_attachments': True}"/>
                             <field name="date_start" readonly="has_done_payslip"/>

@@ -1,6 +1,5 @@
 import { expect, test } from "@odoo/hoot";
-import { animationFrame } from "@odoo/hoot-mock";
-import { queryAll } from "@odoo/hoot-dom";
+import { animationFrame, queryAll, waitFor } from "@odoo/hoot-dom";
 import { Component, onMounted, xml } from "@odoo/owl";
 
 import {
@@ -12,14 +11,11 @@ import {
     patchWithCleanup,
 } from "@web/../tests/web_test_helpers";
 import { registry } from "@web/core/registry";
-import { ImageField } from "@web/views/fields/image/image_field";
 import { charField } from "@web/views/fields/char/char_field";
+import { ImageField } from "@web/views/fields/image/image_field";
 import { COMPUTED_DISPLAY_OPTIONS } from "@web_studio/client_action/view_editor/interactive_editor/properties/type_widget_properties/type_specific_and_computed_properties";
 
-import {
-    mountViewEditor,
-    createMockViewResult,
-} from "@web_studio/../tests/view_editor_tests_utils";
+import { editView, mountViewEditor } from "@web_studio/../tests/view_editor_tests_utils";
 import { formEditor } from "@web_studio/client_action/view_editor/editors/form/form_editor";
 
 class Coucou extends models.Model {
@@ -78,7 +74,8 @@ test("empty form editor", async () => {
     expect(".o_web_studio_form_view_editor .o_web_studio_hook").toHaveCount(0);
 });
 
-test.tags("desktop")("Form editor view buttons can be set to invisible", async () => {
+test.tags("desktop");
+test("Form editor view buttons can be set to invisible", async () => {
     onRpc("/web_studio/edit_view", async (request) => {
         const { params } = await request.json();
         expect(params.operations[0].target.xpath_info).toEqual([
@@ -118,39 +115,38 @@ test.tags("desktop")("Form editor view buttons can be set to invisible", async (
     expect.verifySteps(["edit_view"]);
 });
 
-test.tags("desktop")(
-    "Form editor view buttons label and class are editable from the sidebar",
-    async () => {
-        let count = 0;
+test.tags("desktop");
+test("Form editor view buttons label and class are editable from the sidebar", async () => {
+    let count = 0;
 
-        onRpc("/web_studio/edit_view", async (request) => {
-            const { params } = await request.json();
-            expect(params.operations[0].target.xpath_info).toEqual([
-                {
-                    tag: "form",
-                    indice: 1,
-                },
-                {
-                    tag: "header",
-                    indice: 1,
-                },
-                {
-                    tag: "button",
-                    indice: 1,
-                },
-            ]);
-            if (count === 0) {
-                expect(params.operations[0].new_attrs).toEqual({ string: "MyLabel" });
-            } else {
-                expect(params.operations[1].new_attrs).toEqual({ class: "btn-secondary" });
-            }
-            count++;
-            expect.step("edit_view");
-        });
-        await mountViewEditor({
-            type: "form",
-            resModel: "coucou",
-            arch: `<form>
+    onRpc("/web_studio/edit_view", async (request) => {
+        const { params } = await request.json();
+        expect(params.operations[0].target.xpath_info).toEqual([
+            {
+                tag: "form",
+                indice: 1,
+            },
+            {
+                tag: "header",
+                indice: 1,
+            },
+            {
+                tag: "button",
+                indice: 1,
+            },
+        ]);
+        if (count === 0) {
+            expect(params.operations[0].new_attrs).toEqual({ string: "MyLabel" });
+        } else {
+            expect(params.operations[1].new_attrs).toEqual({ class: "btn-secondary" });
+        }
+        count++;
+        expect.step("edit_view");
+    });
+    await mountViewEditor({
+        type: "form",
+        resModel: "coucou",
+        arch: `<form>
             <header>
                 <button string="Test" type="object" class="oe_highlight"/>
             </header>
@@ -159,18 +155,17 @@ test.tags("desktop")(
             </sheet>
         </form>
         `,
-        });
-        expect(".o_web_studio_editor_manager .o_web_studio_view_renderer").toHaveCount(1);
-        expect(".o_web_studio_editor_manager .o_web_studio_sidebar").toHaveCount(1);
-        await contains(".o_form_renderer .o_statusbar_buttons > button").click();
-        expect("input[name=string]").toHaveValue("Test");
-        await contains("input[name=string]").edit("MyLabel");
-        expect.verifySteps(["edit_view"]);
-        expect("input[name=class]").toHaveValue("oe_highlight");
-        await contains("input[name=class]").edit("btn-secondary");
-        expect.verifySteps(["edit_view"]);
-    }
-);
+    });
+    expect(".o_web_studio_editor_manager .o_web_studio_view_renderer").toHaveCount(1);
+    expect(".o_web_studio_editor_manager .o_web_studio_sidebar").toHaveCount(1);
+    await contains(".o_form_renderer .o_statusbar_buttons > button").click();
+    expect("input[name=string]").toHaveValue("Test");
+    await contains("input[name=string]").edit("MyLabel");
+    expect.verifySteps(["edit_view"]);
+    expect("input[name=class]").toHaveValue("oe_highlight");
+    await contains("input[name=class]").edit("btn-secondary");
+    expect.verifySteps(["edit_view"]);
+});
 
 test("optional field not in form editor", async () => {
     await mountViewEditor({
@@ -188,9 +183,7 @@ test("optional field not in form editor", async () => {
 });
 
 test("many2one field edition", async () => {
-    onRpc("/web_studio/get_studio_view_arch", () => {
-        return { studio_view_arch: "" };
-    });
+    onRpc("/web_studio/get_studio_view_arch", () => ({ studio_view_arch: "" }));
     onRpc("get_formview_action", () => {
         throw new Error("The many2one form view should not be opened");
     });
@@ -236,7 +229,7 @@ test("image field is the placeholder when record is empty", async () => {
 });
 
 test("image field edition (change size)", async () => {
-    onRpc("/web_studio/edit_view", () => {
+    onRpc("/web_studio/edit_view", (request) => {
         const newArch = `
                 <form>
                     <sheet>
@@ -244,7 +237,7 @@ test("image field edition (change size)", async () => {
                     </sheet>
                 </form>
             `;
-        return createMockViewResult("form", newArch, Partner);
+        return editView(request, "form", newArch);
     });
 
     patchWithCleanup(ImageField.prototype, {
@@ -287,7 +280,7 @@ test("image field edition (change size)", async () => {
 test("image size can be unset from the selection", async () => {
     let editViewCount = 0;
 
-    onRpc("/web_studio/edit_view", () => {
+    onRpc("/web_studio/edit_view", (request) => {
         editViewCount++;
         let newArch;
         if (editViewCount === 1) {
@@ -300,7 +293,7 @@ test("image size can be unset from the selection", async () => {
                 </sheet>
             </form>`;
         }
-        return createMockViewResult("form", newArch, Partner);
+        return editView(request, "form", newArch);
     });
 
     await mountViewEditor({
@@ -347,7 +340,7 @@ test("signature field edition (change full_name)", async () => {
             Coucou._fields[newFieldName] = fields.Binary({
                 string: "Signature",
             });
-            return createMockViewResult("form", newArch, Coucou);
+            return editView(params, "form", newArch);
         } else if (editViewCount === 2) {
             expect(params.operations[1].new_attrs.options).toBe('{"full_name":"display_name"}', {
                 message: "correct options for 'signature' widget should be passed",
@@ -375,7 +368,7 @@ test("signature field edition (change full_name)", async () => {
                 </form>
                 `;
         }
-        return createMockViewResult("form", newArch, Coucou);
+        return editView(params, "form", newArch);
     });
     await mountViewEditor({
         type: "form",
@@ -428,6 +421,37 @@ test("integer field should come with 0 as default value", async () => {
         ".o_web_studio_hook[data-position=before]"
     );
     expect.verifySteps(["edit_view"]);
+});
+
+test("daterange field should validate {start,end}_date_field", async () => {
+    Partner._fields.datetime_start = fields.Datetime({ string: "Start date" });
+    Partner._fields.datetime_end = fields.Datetime({ string: "End date" });
+    Partner._fields.datetime_other = fields.Datetime({ string: "Other date" });
+
+    const { env } = await mountViewEditor({
+        type: "form",
+        resModel: "partner",
+        arch: `
+            <form>
+                <group>
+                    <field name="datetime_start" widget="daterange" options="{'end_date_field': 'datetime_end'}"/>
+                </group>
+            </form>`,
+    });
+
+    patchWithCleanup(env.services.dialog, {
+        add(component, props) {
+            expect(props.body).toBe(
+                "You can't select the 'Start date field' and 'End date field' at the same time"
+            );
+            expect.step("error-dialog");
+        },
+    });
+
+    await contains(".o_form_label").click();
+    await contains(".o_web_studio_property_start_date_field .o_select_menu_toggler").click();
+    await contains(".o_popover .o_select_menu_item_label:contains('Other date')").click();
+    expect.verifySteps(["error-dialog"]);
 });
 
 test("supports multiple occurences of field", async () => {
@@ -519,20 +543,20 @@ test("options with computed display to have a dynamic sidebar list of options", 
     const arch = `<form><group>
         <field name="display_name"/>
     </group></form>`;
-    onRpc("/web_studio/edit_view", async () => {
+    onRpc("/web_studio/edit_view", (request) => {
         editCount++;
         if (editCount === 1) {
             const newArch =
                 "<form><group><field name='display_name' options='{\"fake_super_option\":True}'/></group></form>";
-            return createMockViewResult("form", newArch, Coucou);
+            return editView(request, "form", newArch);
         }
         if (editCount === 2) {
             const newArch = `<form><group><field name='display_name' options="{'fake_super_option':True,'suboption_a':'Nice'}"/></group></form>`;
-            return createMockViewResult("form", newArch, Coucou);
+            return editView(request, "form", newArch);
         }
         if (editCount === 3) {
             const newArch = `<form><group><field name='display_name' options="{'fake_super_option':True,'suboption_a':'Nice','suboption_b':True}"/></group></form>`;
-            return createMockViewResult("form", newArch, Coucou);
+            return editView(request, "form", newArch);
         }
     });
     await mountViewEditor({
@@ -591,12 +615,12 @@ test("field selection when editing a suboption", async () => {
     const arch = `<form><group>
         <field name="display_name"/>
     </group></form>`;
-    onRpc("/web_studio/edit_view", async () => {
+    onRpc("/web_studio/edit_view", (request) => {
         editCount++;
         if (editCount === 1) {
             const newArch =
                 "<form><group><field name='display_name' options='{\"fake_super_option\":True}'/></group></form>";
-            return createMockViewResult("form", newArch, Coucou);
+            return editView(request, "form", newArch);
         }
     });
     await mountViewEditor({
@@ -612,7 +636,47 @@ test("field selection when editing a suboption", async () => {
     expect(".o_web_studio_property_suboption .o_select_menu").toHaveCount(1);
 });
 
-test.tags("desktop")("'class' attribute is editable in the sidebar with a tooltip", async () => {
+test("option of type 'string' are correctly saved and displayed", async () => {
+    patchWithCleanup(charField, {
+        supportedOptions: [
+            {
+                label: "Suboption A",
+                name: "suboption_a",
+                type: "string",
+            },
+        ],
+    });
+
+    onRpc("/web_studio/edit_view", async (request) => {
+        const { params } = await request.json();
+        expect(params.operations[0].type).toBe("attributes");
+        expect(params.operations[0].new_attrs).toEqual({
+            options: JSON.stringify({ suboption_a: "overriden" }),
+        });
+
+        const newArch =
+            "<form><group><field name='display_name' options='{\"suboption_a\": \"Noice\"}'/></group></form>";
+        return editView(request, "form", newArch);
+    });
+
+    const arch = `<form><group>
+        <field name="display_name" options='{\"suboption_a\": \"cool cool\"}'/>
+    </group></form>`;
+    await mountViewEditor({
+        type: "form",
+        resModel: "coucou",
+        arch,
+    });
+    await contains('.o_cell:has([name="display_name"])').click();
+    await waitFor("input[id=suboption_a]:value(cool cool)");
+    expect("input[id=suboption_a]").toHaveValue("cool cool");
+    await contains("input[id=suboption_a]").edit("overriden"); // value overriden in route to make the assert relevant
+    await waitFor("input[id=suboption_a]:value(Noice)");
+    expect("input[id=suboption_a]").toHaveValue("Noice");
+});
+
+test.tags("desktop");
+test("'class' attribute is editable in the sidebar with a tooltip", async () => {
     const arch = `<form>
         <header>
             <button string="Test" type="object" class="oe_highlight"/>
@@ -625,7 +689,7 @@ test.tags("desktop")("'class' attribute is editable in the sidebar with a toolti
     onRpc("/web_studio/edit_view", async (request) => {
         const { params } = await request.json();
         expect(params.operations[0].new_attrs).toEqual({ class: "new_class" });
-        return createMockViewResult("form", arch, Coucou);
+        return editView(params, "form", arch);
     });
     await mountViewEditor({
         type: "form",
@@ -651,7 +715,8 @@ test.tags("desktop")("'class' attribute is editable in the sidebar with a toolti
     );
 });
 
-test.tags("desktop")("the name of the selected element is displayed in the sidebar", async () => {
+test.tags("desktop");
+test("the name of the selected element is displayed in the sidebar", async () => {
     await mountViewEditor({
         type: "form",
         resModel: "coucou",
@@ -695,12 +760,10 @@ test("edit options and attributes on a widget node", async () => {
     }
     registry.category("view_widgets").add("test_widget", {
         component: MyTestWidget,
-        extractProps: ({ attrs, options }) => {
-            return {
-                width: attrs.width,
-                color: options.color,
-            };
-        },
+        extractProps: ({ attrs, options }) => ({
+            width: attrs.width,
+            color: options.color,
+        }),
         supportedAttributes: [
             {
                 label: "Width",
@@ -728,14 +791,14 @@ test("edit options and attributes on a widget node", async () => {
                 <widget name="test_widget" width="30"/>
             </group></form>`;
             expect(params.operations[0].new_attrs).toEqual({ width: "30" });
-            return createMockViewResult("form", newArch, Coucou);
+            return editView(params, "form", newArch);
         }
         if (editCount === 2) {
             expect(params.operations[1].new_attrs).toEqual({ options: '{"color":"primary"}' });
             const newArch = `<form><group>
                 <widget name="test_widget" width="30" options="{'color': 'primary'}"/>
             </group></form>`;
-            return createMockViewResult("form", newArch, Coucou);
+            return editView(params, "form", newArch);
         }
     });
     await mountViewEditor({
@@ -761,17 +824,17 @@ test("never save record -- hiding tab", async () => {
     patchWithCleanup(formEditor, {
         props() {
             const props = super.props(...arguments);
-            class TestModel extends props.Model {};
+            class TestModel extends props.Model {}
             TestModel.Record = class extends TestModel.Record {
                 _save() {
                     steps.push("_save");
                     return super._save(...arguments);
                 }
-            }
+            };
             props.Model = TestModel;
             return props;
-        }
-    })
+        },
+    });
     const arch = `<form><field name="display_name"/></form>`;
     await mountViewEditor({
         type: "form",
@@ -779,7 +842,10 @@ test("never save record -- hiding tab", async () => {
         arch,
     });
 
-    const visibilityStateProp = Object.getOwnPropertyDescriptor(Document.prototype, "visibilityState");
+    const visibilityStateProp = Object.getOwnPropertyDescriptor(
+        Document.prototype,
+        "visibilityState"
+    );
     const prevVisibilitySate = document.visibilityState;
     Object.defineProperty(document, "visibilityState", {
         value: "hidden",
@@ -789,7 +855,63 @@ test("never save record -- hiding tab", async () => {
 
     document.dispatchEvent(new Event("visibilitychange"));
     await animationFrame();
-    expect(steps).toEqual(["_save"]) ;
+    expect(steps).toEqual(["_save"]);
     Object.defineProperty(document, "visibilityState", visibilityStateProp);
     expect(document.visibilityState).toBe(prevVisibilitySate);
+});
+
+test("CharField can edit its placeholder_field option", async () => {
+    await mountViewEditor({
+        type: "form",
+        resModel: "coucou",
+        arch: `<form>
+        <header>
+            <button string="Test" type="object" class="oe_highlight"/>
+        </header>
+        <sheet>
+            <group>
+                <field name="display_name" class="studio"/>
+            </group>
+        </sheet>
+    </form>
+    `,
+    });
+    await contains(".o_cell[data-field-name=display_name]").click();
+    expect(".o_web_studio_property[name=placeholder_field]").toHaveCount(1);
+    expect(".o_web_studio_property label[for=placeholder_field]").toHaveText(
+        "Dynamic Placeholder?",
+        {
+            message: "the option is title Dynamic Placeholder and has a tooltip",
+        }
+    );
+    expect(".o_web_studio_property[name=dynamic_placeholder]").toHaveCount(0, {
+        message:
+            "this options is not documented, because it does not make sense to edit this from studio",
+    });
+    expect(".o_web_studio_property[name=dynamic_placeholder_model_reference_field]").toHaveCount(
+        0,
+        {
+            message:
+                "this options is not documented, because it does not make sense to edit this from studio",
+        }
+    );
+});
+
+test("always invisible fields are flagged as not present in arch", async () => {
+    await mountViewEditor({
+        type: "form",
+        resModel: "coucou",
+        arch: `<form>
+            <field name="display_name" />
+            <field name="m2o" invisible="True" />
+            <field name="char_field" invisible="1" />
+        </form>
+    `,
+    });
+
+    expect(".o_web_studio_view_renderer .o_field_widget").toHaveCount(1);
+    await contains(".o_web_studio_sidebar .o_web_studio_existing_fields_header").click();
+    expect(".o_web_studio_sidebar .o_web_studio_existing_fields").toHaveText(
+        "Product\nChar field\nId\nLast Modified on\nCreated on"
+    );
 });

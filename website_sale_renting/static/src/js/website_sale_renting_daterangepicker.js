@@ -1,7 +1,7 @@
 /** @odoo-module **/
 
 import publicWidget from '@web/legacy/js/public/public_widget';
-import { msecPerUnit, RentingMixin } from '@website_sale_renting/js/renting_mixin';
+import { unitMapping, RentingMixin } from '@website_sale_renting/js/renting_mixin';
 import { deserializeDateTime } from "@web/core/l10n/dates";
 import { rpc } from "@web/core/network/rpc";
 
@@ -151,16 +151,15 @@ publicWidget.registry.WebsiteSaleDaterangePicker = publicWidget.Widget.extend(Re
         }
         if (this.startDate) {
             // that means that the start date is already set
-            const rentingDurationMs = this.rentingMinimalTime.duration * msecPerUnit[this.rentingMinimalTime.unit];
-            const defaultRentingDurationMs = msecPerUnit['day']; // default duration is 1 day
-            let endDate = this.startDate.plus(
-                Math.max(rentingDurationMs, defaultRentingDurationMs), 'ms'
-            );
+            const { duration, unit } = this.rentingMinimalTime;
+            const minEndDate = this.startDate.plus({ [unitMapping[unit]]: duration });
+            const defaultEndDate = this.startDate.plus({ days: 1 });
+            const endDate = DateTime.max(minEndDate, defaultEndDate);
             return this._getFirstAvailableDate(endDate);
         }
         // that means that the date is not in the url and not in the hidden input
         // get the first available date based on this.rentingUnavailabilityDays
-        let date = DateTime.now().plus({days: 1});
+        const date = DateTime.now().plus({ days: 1, hours: 1 }).set({minutes: 0, seconds: 0 });
         return this._getFirstAvailableDate(date);
     },
 
@@ -208,11 +207,10 @@ publicWidget.registry.WebsiteSaleDaterangePicker = publicWidget.Widget.extend(Re
         if (message) {
             this.el.parentElement.querySelector('span[name=renting_warning_message]').innerText = message;
             this.el.parentElement.querySelector('.o_renting_warning').classList.add('d-block');
-            // only disable when there is a message. Hence, it doesn't override other disabling.
-            $('.oe_website_sale').trigger('toggle_disable', [this._getParentElement(), !message]);
         } else {
             this.el.parentElement.querySelector('.o_renting_warning').classList.remove('d-block');
         }
+        $('.oe_website_sale').trigger('toggle_disable', [this._getParentElement(), !message]);
         this.el.dispatchEvent(new CustomEvent('toggle_search_btn', { bubbles: true, detail: message }));
         return !message;
     },

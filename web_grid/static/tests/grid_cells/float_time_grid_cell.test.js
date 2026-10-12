@@ -40,7 +40,8 @@ class Foo extends models.Model {
 
 defineModels([Grid, Foo]);
 
-test.tags("desktop")("FloatTimeGridCell in grid view", async () => {
+test.tags("desktop");
+test("FloatTimeGridCell in grid view", async () => {
     mockDate("2023-03-20 00:00:00");
     onRpc("grid_unavailability", () => {
         return {};
@@ -67,6 +68,7 @@ test.tags("desktop")("FloatTimeGridCell in grid view", async () => {
     expect(".o_grid_cell input").toHaveCount(1, {
         message: "The component should be in edit mode.",
     });
+    expect(".o_grid_cell input").toHaveAttribute("inputmode", "text");
     expect(".o_grid_cell span").toHaveCount(0, {
         message: "The component should no longer be in readonly mode.",
     });
@@ -74,4 +76,5 @@ test.tags("desktop")("FloatTimeGridCell in grid view", async () => {
     expect(".o_grid_cell_readonly").toHaveText("9:30", {
         message: "The edition should be taken into account.",
     });
+    expect(".o_grid_component[name='foo_id'] .o_form_uri").toHaveAttribute("href", "/odoo/m-foo/1");
 });

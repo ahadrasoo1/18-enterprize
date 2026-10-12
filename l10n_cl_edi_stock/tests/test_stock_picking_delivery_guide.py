@@ -280,3 +280,139 @@ class TestL10nClEdiStock(TestL10nClEdiStockCommon):
         self.assertEqual(line_amounts[move_b]['price_unit'], 30.0)
         self.assertEqual(line_amounts[move_c]['total_amount'], 150.0)
         self.assertEqual(line_amounts[move_c]['price_unit'], 50.0)
+
+    @freeze_time('2019-10-24T20:00:00', tz_offset=3)
+    def test_l10n_cl_edi_delivery_guide_report_pdf_withholding_taxes(self):
+        """ Test withholding taxes are correctly collected in pdf values
+        """
+        tax_19 = self.env['account.tax'].search([
+            ('name', '=', 'IVA 19% Venta'),
+            ('company_id', '=', self.env.company.id)])
+        tax_wh = self.env['account.tax'].search([
+            ('name', '=', 'Beb. Analc. 10% (Ventas)'),
+            ('company_id', '=', self.env.company.id)])
+
+        uom_unit = self.env.ref('uom.product_uom_unit')
+        product_a = self.env['product.product'].create({
+            'name': 'Product A',
+            'uom_id': uom_unit.id,
+            'is_storable': True,
+            'list_price': 100.0,
+            'taxes_id': [Command.set((tax_19 | tax_wh).ids)],
+        })
+
+        picking = self.env['stock.picking'].create({
+            'name': 'Test Delivery Guide',
+            'partner_id': self.chilean_partner_a.id,
+            'location_id': self.stock_location,
+            'location_dest_id': self.customer_location,
+            'picking_type_id': self.warehouse.out_type_id.id,
+        })
+        self.env['stock.move'].create({
+            'name': product_a.name,
+            'product_id': product_a.id,
+            'product_uom_qty': 10.00,
+            'quantity': 10.00,
+            'procure_method': 'make_to_stock',
+            'picking_id': picking.id,
+            'location_id': self.stock_location,
+            'location_dest_id': self.customer_location,
+        })
+
+        pdf_values = picking._prepare_pdf_values()
+        expected_values = [{'tax_code': 27, 'tax_percent': 10.0, 'tax_name': 'ILA', 'tax_amount': 100.0}]
+        self.assertEqual(pdf_values['withholdings'], expected_values)
+
+    @freeze_time('2019-10-24T20:00:00', tz_offset=3)
+    def test_delivery_guide_qtyitem_matches_move_quantity(self):
+        """
+        Ensure that the generated XML for a delivery guide includes the correct
+        quantity (`QtyItem`) taken from the stock move.
+        """
+        picking = self.env['stock.picking'].create({
+            'name': 'Test Delivery Guide',
+            'partner_id': self.chilean_partner_a.id,
+            'location_id': self.stock_location,
+            'location_dest_id': self.customer_location,
+            'picking_type_id': self.warehouse.out_type_id.id,
+        })
+        self.env['stock.move'].create({
+            'name': self.product_with_taxes_a.name,
+            'product_id': self.product_with_taxes_a.id,
+            'product_uom': self.product_with_taxes_a.uom_id.id,
+            'product_uom_qty': 10.00,
+            'quantity': 8.00,
+            'procure_method': 'make_to_stock',
+            'picking_id': picking.id,
+            'location_id': self.stock_location,
+            'location_dest_id': self.customer_location,
+            'company_id': self.env.company.id
+        })
+
+        picking.button_validate()
+        picking.create_delivery_guide()
+        picking.l10n_latam_document_number = 100
+        picking.l10n_cl_confirm_draft_delivery_guide()
+
+        xml_bytes = base64.b64decode(picking.l10n_cl_sii_send_file.with_context(bin_size=False).datas)
+        root = etree.fromstring(xml_bytes)
+        qty = root.find(".//sii:QtyItem", namespaces={"sii": "http://www.sii.cl/SiiDte"})
+
+        self.assertIsNotNone(qty, "QtyItem tag should exist in XML")
+        self.assertEqual(qty.text, "8.000000")
+
+    def test_l10n_cl_delivery_guide_kit_component_uom(self):
+        # A kit component in kg must be priced from its own product, not by
+        # converting its qty into the kit's Units UoM
+        kg = self.env.ref('uom.product_uom_kgm')
+        kit_product = self.env['product.product'].create({
+            'name': 'A kit',
+            'type': 'consu',
+            'uom_id': self.env.ref('uom.product_uom_unit').id,
+            'list_price': 500.0,
+        })
+        kit_component = self.env['product.product'].create({
+            'name': 'A component of the kit',
+            'type': 'consu',
+            'uom_id': kg.id,
+            'list_price': 100.0,
+        })
+        sale_order = self.env['sale.order'].create({
+            'partner_id': self.chilean_partner_a.id,
+            'order_line': [Command.create({
+                'product_id': kit_product.id,
+                'product_uom_qty': 1.0,
+                'price_unit': 700.0,
+            })],
+        })
+        group = self.env['procurement.group'].create({
+            'name': sale_order.name,
+            'sale_id': sale_order.id,
+        })
+        # component move linked to the kit's sale line, as a kit BoM would produce
+        picking = self.env['stock.picking'].create({
+            'partner_id': self.chilean_partner_a.id,
+            'picking_type_id': self.warehouse.out_type_id.id,
+            'location_id': self.stock_location,
+            'location_dest_id': self.customer_location,
+            'move_ids': [Command.create({
+                'name': kit_component.name,
+                'product_id': kit_component.id,
+                'product_uom': kit_component.uom_id.id,
+                'product_uom_qty': 0.6,
+                'quantity': 0.6,
+                'sale_line_id': sale_order.order_line.id,
+                'group_id': group.id,
+                'location_id': self.stock_location,
+                'location_dest_id': self.customer_location,
+            })],
+        })
+        component_move = picking.move_ids
+        self.assertEqual(picking.sale_id, sale_order)
+        self.assertEqual(self.chilean_partner_a.l10n_cl_delivery_guide_price, 'sale_order')
+
+        _totals, _retentions, line_amounts = picking._l10n_cl_get_tax_amounts()
+        amounts = line_amounts[component_move]
+        # 0.6 kg at the component's own price of 100/kg = 60, not the kit price scaled by the kg factor
+        self.assertEqual(amounts['price_unit'], self.env.company.currency_id.round(100.0))
+        self.assertEqual(amounts['total_amount'], self.env.company.currency_id.round(60.0))

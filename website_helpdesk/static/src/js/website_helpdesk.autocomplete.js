@@ -28,6 +28,7 @@ publicWidget.registry.knowledgeBaseAutocomplete = publicWidget.Widget.extend({
     start: function () {
         this.inputEl = this.el.querySelector(".search-query");
         this.url = this.el.dataset.acUrl;
+        this.searchGroupEl = this.el.querySelector(".input-group");
         this.enabled = parseInt(this.el.dataset.autocomplete);
 
         return this._super.apply(this, arguments);
@@ -58,7 +59,11 @@ publicWidget.registry.knowledgeBaseAutocomplete = publicWidget.Widget.extend({
                 showMore: res.showMore,
                 term: search,
             });
+            this.searchGroupEl.dataset.bsToggle = "dropdown";
             this.el.append(this.menuEl);
+        } else {
+            // Avoid error with empty dropdown
+            this.searchGroupEl.dataset.bsToggle = null;
         }
         if (prevMenuEl) {
             prevMenuEl.remove();

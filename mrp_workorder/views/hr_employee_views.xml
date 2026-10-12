@@ -7,7 +7,7 @@
             <field name="inherit_id" ref="hr.view_employee_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//group[@name='identification_group']" position='attributes'>
-                    <attribute name="string" add="Manufacturing" separator="/"/>
+                    <attribute name="string">Attendance/Point of Sale/Manufacturing</attribute>
                 </xpath>
             </field>
         </record>
@@ -18,7 +18,7 @@
             <field name="arch" type="xml">
                 <list multi_edit="0" create="0" js_class="mrp_employee_tree">
                     <field name="id" column_invisible="1"/>
-                    <field name="avatar_128" widget="image" class="o_avatar o_m2o_avatar"/>
+                    <field name="avatar_128" widget="image" class="o_avatar o_m2o_avatar" groups="hr.group_hr_user"/>
                     <field name="name" readonly="1"/>
                 </list>
             </field>

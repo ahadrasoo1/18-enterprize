@@ -89,16 +89,17 @@ class LuxembourgishFinancialReportCustomHandler(models.AbstractModel):
         lu_template_values = self.get_electronic_report_values(options)
 
         # Add comparison filter to get data from last year
-        options = report.get_options({**options, 'comparison': {
+        report_options = report.get_options({**options, 'comparison': {
             'filter': 'same_last_year',
             'number_period': 1,
         }})
-
-        lines = report._get_lines(options)
+        if options['date'].get('filter') == 'custom' and options['date'].get('mode') == 'range':
+            report_options['date']['date_from'] = options['date'].get('date_from')
+        lines = report._get_lines(report_options)
 
         report_line = self.env['account.report.line']
-        date_from = fields.Date.from_string(options['date'].get('date_from'))
-        date_to = fields.Date.from_string(options['date'].get('date_to'))
+        date_from = fields.Date.from_string(report_options['date'].get('date_from'))
+        date_to = fields.Date.from_string(report_options['date'].get('date_to'))
         values.update({
             '01': {'value': date_from.strftime("%d/%m/%Y"), 'field_type': 'char'},
             '02': {'value': date_to.strftime("%d/%m/%Y"), 'field_type': 'char'},
@@ -173,24 +174,47 @@ class LuxembourgishFinancialReportCustomHandler(models.AbstractModel):
             This returns the annotations on all financial reports, linked to the corresponding report reference field.
             These will be used as references in the report.
             """
-            references = {}
-            names = {}
-            notes = self.env['account.report.manager'].search([
-                ('company_id', '=', self.env.company.id),
-                ('report_id', '=', report.id)
-            ]).annotations_ids
-            for note in notes:
-                # for annotations on accounts on financial reports, the line field will be:
-                # 'financial_report_group_xxx_yyy', with xxx the line id and yyy the account id
-                split = note.line.split('_')
-                if len(split) > 1 and split[-2].isnumeric() and split[-1].isnumeric():
-                    line = self.env['account.report.line'].search([('id', '=', split[-2])], limit=1)
-                    code = re.search(r'\d+', str(line.code))
-                    if code:
+            annotations = self.env['account.report.annotation'].search([
+                ('report_id', '=', report.id),
+            ])
+            if not annotations:
+                return {}, {}
+
+            mapping = []
+            line_ids = set()
+            account_ids = set()
+            for annotation in annotations:
+                report_line_ids, account_id = [], None
+                parsed = report._parse_line_id(annotation.line_id)
+                for _markup, model, value in parsed:
+                    if model == 'account.report.line':
+                        report_line_ids.append(value)
+                    elif model == 'account.account':
+                        account_id = value
+                if report_line_ids and account_id:
+                    line_ids.update(report_line_ids)
+                    account_ids.add(account_id)
+                    mapping.append((annotation, report_line_ids, account_id))
+
+            if not mapping:
+                return {}, {}
+
+            lines = {l.id: l for l in self.env['account.report.line'].browse(line_ids)}
+            accounts = {a.id: a for a in self.env['account.account'].browse(account_ids)}
+
+            references, names = {}, {}
+            digit_pattern = re.compile(r'\d+')
+            for annotation, report_line_ids, account_id in mapping:
+                for report_line_id in report_line_ids:
+                    line = lines.get(report_line_id)
+                    if not line:
+                        continue
+                    if match := digit_pattern.search(str(line.code)):
                         # References in the eCDF report have codes equal to the report code of the referred account + 1000
-                        code = str(int(code.group()) + 1000)
-                        references[code] = {'value': note.text, 'field_type': 'char'}
-                        names[code] = self.env['account.account'].search([("id", "=", split[-1])]).mapped('code')[0]
+                        code = str(int(match.group()) + 1000)
+                        references[code] = {'value': annotation.text, 'field_type': 'char'}
+                        if account := accounts[account_id]:
+                            names[code] = account.code
             return references, names
 
         report = self.env['account.report'].browse(options['report_id'])

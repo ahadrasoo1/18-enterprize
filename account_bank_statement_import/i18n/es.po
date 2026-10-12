@@ -1,23 +1,25 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* account_bank_statement_import
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Larissa Manderfeld, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:26+0000\n"
+"POT-Creation-Date: 2025-12-29 18:46+0000\n"
 "PO-Revision-Date: 2024-09-25 09:43+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
+"Last-Translator: Larissa Manderfeld, 2025\n"
 "Language-Team: Spanish (https://app.transifex.com/odoo/teams/41243/es/)\n"
+"Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: es\n"
-"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? "
+"1 : 2;\n"
 
 #. module: account_bank_statement_import
 #. odoo-python
@@ -51,8 +53,8 @@ msgstr "Configuración manual de datos bancarios"
 #. odoo-python
 #: code:addons/account_bank_statement_import/models/account_journal.py:0
 msgid ""
-"Cannot find in which journal import this statement. Please manually select a"
-" journal."
+"Cannot find in which journal import this statement. Please manually select a "
+"journal."
 msgstr ""
 "No se encontró un diario al cual importar el extracto bancario. Seleccione "
 "uno manualmente."
@@ -77,7 +79,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_bank_statement_import/models/account_journal.py:0
 msgid "Go to Apps"
-msgstr "Ir a aplicaciones"
+msgstr "Ir a Aplicaciones"
 
 #. module: account_bank_statement_import
 #: model_terms:ir.ui.view,arch_db:account_bank_statement_import.journal_dashboard_view_inherit
@@ -134,11 +136,11 @@ msgstr "¡Nada que hacer aquí!"
 #. odoo-python
 #: code:addons/account_bank_statement_import/models/account_journal.py:0
 msgid ""
-"The account of this statement (%(account)s) is not the same as the journal "
-"(%(journal)s)."
+"The account of this statement (%(account)s) is not the same as the journal (%"
+"(journal)s)."
 msgstr ""
-"La cuenta de este extracto de cuenta (%(account)s) no es la misma que la del"
-" diario (%(journal)s)."
+"La cuenta de este extracto de cuenta (%(account)s) no es la misma que la del "
+"diario (%(journal)s)."
 
 #. module: account_bank_statement_import
 #. odoo-python
@@ -147,8 +149,8 @@ msgid ""
 "The currency of the bank statement (%(code)s) is not the same as the "
 "currency of the journal (%(journal)s)."
 msgstr ""
-"La moneda del extracto de cuenta (%s) no es la misma moneda que la de los "
-"diarios (%s)."
+"La moneda del extracto de cuenta (%(code)s) no es la misma moneda que la de "
+"los diarios (%(journal)s)."
 
 #. module: account_bank_statement_import
 #. odoo-python
@@ -161,16 +163,24 @@ msgstr "No se pueden importar los siguientes archivos:\n"
 #: code:addons/account_bank_statement_import/models/account_journal.py:0
 msgid ""
 "This file doesn't contain any statement for account %s.\n"
-"If it contains transactions for more than one account, it must be imported on each of them."
+"If it contains transactions for more than one account, it must be imported "
+"on each of them."
 msgstr ""
+"Este archivo no contiene ningún extracto para la cuenta %s.\n"
+"Si contiene transacciones para más de una cuenta, debe importar cada una de "
+"ellas."
 
 #. module: account_bank_statement_import
 #. odoo-python
 #: code:addons/account_bank_statement_import/models/account_journal.py:0
 msgid ""
 "This file doesn't contain any transaction for account %s.\n"
-"If it contains transactions for more than one account, it must be imported on each of them."
+"If it contains transactions for more than one account, it must be imported "
+"on each of them."
 msgstr ""
+"Este archivo no contiene ninguna transacción para la cuenta %s.\n"
+"Si contiene transacciones para más de una cuenta, debe importarse en cada "
+"una de ellas."
 
 #. module: account_bank_statement_import
 #. odoo-python

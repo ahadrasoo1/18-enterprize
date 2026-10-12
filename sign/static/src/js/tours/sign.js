@@ -3,8 +3,24 @@
 import { _t } from "@web/core/l10n/translation";
 import { registry } from "@web/core/registry";
 import { stepUtils } from "@web_tour/tour_service/tour_utils";
+import tourUtils from "@sign/js/tours/tour_utils";
 
 import { markup } from "@odoo/owl";
+
+function dragAndDropSignature(isActive) {
+    return {
+        isActive: [isActive],
+        trigger: ":iframe .o_sign_field_type_button:contains(" + _t("Signature") + ")",
+        content: markup(_t('<b>Drag & drop "Signature"</b> into the bottom of the document.')),
+        tooltipPosition: "bottom",
+        run:
+            isActive == "manual"
+                ? "drag_and_drop :iframe #viewer"
+                : function () {
+                      tourUtils.dragAndDropSignItemAtHeight(this.anchor, 0.5, 0.25);
+                  },
+    };
+}
 
 registry.category("web_tour.tours").add("sign_tour", {
     url: "/odoo",
@@ -23,14 +39,12 @@ registry.category("web_tour.tours").add("sign_tour", {
             run: "click",
         },
         {
-            trigger:
-                ':iframe .o_sign_field_type_toolbar .o_sign_field_type_button:contains("' +
-                _t("Signature") +
-                '")',
-            content: markup(_t("<b>Drag & drop “Signature”</b> into the bottom of the document.")),
-            tooltipPosition: "bottom",
-            run: "drag_and_drop",
+            content: "Wait for page to be loaded",
+            trigger: ":iframe .page[data-page-number='1'] .textLayer",
+            timeout: 30000, // In view mode, pdf loading can take a long time
         },
+        dragAndDropSignature("manual"),
+        dragAndDropSignature("auto"),
         {
             trigger: ".o_control_panel .o_sign_template_send",
             content: markup(
@@ -85,13 +99,16 @@ registry.category("web_tour.tours").add("sign_tour", {
             run: "click",
         },
         {
+            // Click Sign All button of the Signature Dialog.
+            // if auto_value is set, the dialog does not show.
+            // In such case, we need to skip this step.
+            isActive: ["body:not(:has(input[data-item_type='signature'][data-auto_value]))"],
             trigger: "footer.modal-footer button.btn-primary:enabled",
             content: _t("Nearly there, keep going!"),
             tooltipPosition: "bottom",
             run: "click",
         },
         {
-            isActive: ["auto"],
             trigger: ":iframe body:not(:has(footer.modal-footer button.btn-primary))",
         },
         {
@@ -101,6 +118,7 @@ registry.category("web_tour.tours").add("sign_tour", {
             run: "click",
         },
         {
+            isActive: ["manual"], // Previous step takes long time, resulting in time out in auto mode
             trigger: '.modal-dialog button:contains("' + _t("Close") + '")',
             content: markup(
                 _t(

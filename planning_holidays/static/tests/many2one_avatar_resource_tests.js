@@ -21,6 +21,7 @@ QUnit.module("M2OAvatarResourceWidgetTests", {
         */
 
         const pyEnv = await startServer();
+        this.pyEnv = pyEnv;
         this.data = {};
 
         // Users
@@ -130,6 +131,24 @@ QUnit.module("M2OAvatarResourceWidgetTests", {
     },
 }, () => {
     QUnit.test("many2one_avatar_resource widget in list view with time-off idle", async function (assert) {
+        const mockRPC = (route, args) => {
+            if (route === "/web/dataset/call_kw/resource.resource/get_avatar_card_data") {
+                // const resourceIdArray = params.args[0];
+                const resourceId = args.args[0];
+                const resources = this.pyEnv['resource.resource'].search_read([['id', '=', resourceId[0]]]);
+
+                const result = resources.map(resource => ({
+                    name: resource.name,
+                    employee_id: resource.employee_id,
+                    user_id: resource.user_id,
+                    show_hr_icon_display: resource.show_hr_icon_display,
+                    hr_icon_display: resource.hr_icon_display,
+                    im_status: resource.im_status,
+                }));
+                return result;
+            }
+        };
+
         this.serverData.views = {
             "planning.slot,false,list": `
                     <list>
@@ -137,7 +156,7 @@ QUnit.module("M2OAvatarResourceWidgetTests", {
                         <field name="resource_id" widget="many2one_avatar_resource"/>
                     </list>`,
         };
-        const { openView } = await start({ serverData: this.serverData });
+        const { openView } = await start({ serverData: this.serverData, mockRPC });
         await openView({
             res_model: "planning.slot",
             views: [[false, "list"]],

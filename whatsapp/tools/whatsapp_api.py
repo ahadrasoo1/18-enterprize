@@ -11,7 +11,8 @@ from odoo.addons.whatsapp.tools.whatsapp_exception import WhatsAppError
 
 _logger = logging.getLogger(__name__)
 
-DEFAULT_ENDPOINT = "https://graph.facebook.com/v17.0"
+DEFAULT_ENDPOINT = "https://graph.facebook.com/v23.0"
+MAX_RESPONSE_SIZE = 10 * 1024 * 1024  # 10MB
 
 class WhatsAppApi:
     def __init__(self, wa_account_id):
@@ -37,9 +38,15 @@ class WhatsAppApi:
         call_url = (DEFAULT_ENDPOINT + url) if not endpoint_include else url
 
         try:
-            res = requests.request(request_type, call_url, params=params, headers=headers, data=data, files=files, timeout=10)
+            res = requests.request(request_type, call_url, params=params, headers=headers, data=data, files=files, timeout=(10, 30))
         except requests.exceptions.RequestException:
             raise WhatsAppError(failure_type='network')
+
+        content_length = res.headers.get('Content-Length')
+        if content_length and int(content_length) > MAX_RESPONSE_SIZE:
+            if not res.ok:
+                raise WhatsAppError(failure_type='network')
+            return res
 
         # raise if json-parseable and 'error' in json
         try:
@@ -176,6 +183,9 @@ class WhatsAppApi:
         raise WhatsAppError(*self._prepare_error_response(response_json))
 
     def _send_whatsapp(self, number, message_type, send_vals, parent_message_id=False):
+        return self._send_whatsapp_to_identifier(None, number, message_type, send_vals, parent_message_id=parent_message_id)['msg_uid']
+
+    def _send_whatsapp_to_identifier(self, bsuid, number, message_type, send_vals, parent_message_id=False):
         """ Send WA messages for all message type using WhatsApp Business Account
 
         API Documentation:
@@ -185,8 +195,11 @@ class WhatsAppApi:
         data = {
             'messaging_product': 'whatsapp',
             'recipient_type': 'individual',
-            'to': number
         }
+        if number:
+            data['to'] = number
+        else:
+            data['recipient'] = bsuid
         # if there is parent_message_id then we send message as reply
         if parent_message_id:
             data.update({
@@ -194,7 +207,7 @@ class WhatsAppApi:
                     'message_id': parent_message_id
                 },
             })
-        if message_type in ('template', 'text', 'document', 'image', 'audio', 'video'):
+        if message_type in ('template', 'text', 'document', 'image', 'audio', 'video', 'reaction'):
             data.update({
                 'type': message_type,
                 message_type: send_vals
@@ -211,7 +224,8 @@ class WhatsAppApi:
         response_json = response.json()
         if response_json.get('messages'):
             msg_uid = response_json['messages'][0]['id']
-            return msg_uid
+            recipient_wa_id = response_json['contacts'][0].get('wa_id')
+            return {'msg_uid': msg_uid, 'wa_id': recipient_wa_id}
         raise WhatsAppError(*self._prepare_error_response(response_json))
 
     def _get_header_data_from_handle(self, url):

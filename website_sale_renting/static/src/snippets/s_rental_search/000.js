@@ -1,5 +1,6 @@
 /** @odoo-module **/
 
+import { redirect } from '@web/core/utils/urls';
 import publicWidget from '@web/legacy/js/public/public_widget';
 import { serializeDateTime, parseDateTime, parseDate } from "@web/core/l10n/dates";
 import { RentingMixin } from '@website_sale_renting/js/renting_mixin';
@@ -42,9 +43,9 @@ publicWidget.registry.RentalSearchSnippet = publicWidget.Widget.extend(RentingMi
 
         const productAttributeValueId = this.el.querySelector('.s_rental_search_select').value;
         if (productAttributeValueId) {
-            searchParams.append('attrib', `${productAttributeId}-${productAttributeValueId}`);
+            searchParams.append('attribute_value', `${productAttributeId}-${productAttributeValueId}`);
         }
-        window.location = `/shop?${searchParams.toString()}`;
+        redirect(`/shop?${searchParams.toString()}`);
     },
 });
 

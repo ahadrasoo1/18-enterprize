@@ -77,24 +77,31 @@ class Document(models.Model):
                 vals.update(folder_id_values[folder_id])
         return vals_list
 
-    def _add_missing_default_values(self, values):
-        values = super()._add_missing_default_values(values)
-        if self.env.context.get('documents_project') and not values.get('folder_id'):
-            access_internal = values['access_internal'] or (
-                'edit' if self.env.context.get('privacy_visibility') != 'followers' else 'none')
-            values['folder_id'] = self.env.ref('documents_project.document_project_folder').id
-            values['access_internal'] = access_internal
-            values["children_ids"] = [Command.create({
-                "access_internal": access_internal,
-                "name": f'{values.get("name")} - {_("Shared")}',
-                "type": 'folder',
-            })]
-        return values
-
     @api.depends('res_id', 'res_model')
     def _compute_task_id(self):
         for record in self:
             record.task_id = record.res_model == 'project.task' and self.env['project.task'].browse(record.res_id)
+
+    def write(self, vals):
+        if (project_or_task_id := vals.get('res_id')) and 'access_internal' not in vals:
+            res_model = vals.get('res_model')
+            if res_model is None:
+                res_models = set(self.mapped('res_model'))
+                if len(res_models) == 1:
+                    res_model = self[0].res_model
+                elif res_models & {'project.project', 'project.task'}:
+                    raise UserError(_(
+                        "Impossible to update write `res_id` without `access_internal` for records "
+                        "with different `res_models` when some are linked to projects or tasks."))
+
+            if res_model in {'project.project', 'project.task'}:
+                project_or_task = self.env[res_model].browse(project_or_task_id)
+                project = project_or_task if res_model == 'project.project' else project_or_task.project_id
+                vals['access_internal'] = 'none' if project.privacy_visibility == 'followers' else 'edit'
+        project_folder = self.env.ref('documents_project.document_project_folder')
+        if not vals.get('active', True) and self._project_folder_in_self_or_ancestors(project_folder):
+            raise UserError(_('The "%s" workspace is required by the Project application and cannot be archived.', project_folder.name))
+        return super().write(vals)
 
     @api.model
     def _search_task_id(self, operator, value):
@@ -135,11 +142,35 @@ class Document(models.Model):
             ])
         return domain
 
+    def _project_folder_in_self_or_ancestors(self, project_folder):
+        project_folder_ancestors = {int(ancestor_id) for ancestor_id in project_folder.sudo().parent_path.split('/')[:-1]}
+        return project_folder_ancestors & set(self.ids)
+
     @api.ondelete(at_uninstall=False)
     def unlink_except_project_folder(self):
         project_folder = self.env.ref('documents_project.document_project_folder')
-        if project_folder in self:
-            raise UserError(_('The "%s" folder is required by the Project application and cannot be deleted.', project_folder.name))
+        if self._project_folder_in_self_or_ancestors(project_folder):
+            raise UserError(_('The "%s" workspace is required by the Project application and cannot be deleted.', project_folder.name))
+        projects_with_folder = self.env['project.project'].search([('use_documents', '=', True), ('documents_folder_id', 'child_of', self.ids)])
+        if projects_with_folder:
+            raise UserError(_(
+                "This action can't be performed, as it would remove the workspaces used by the following projects:\n%(projects)s\nTo continue, choose different workspaces or turn off the Documents feature for these projects.",
+                projects="\n".join(f"- {project.name}" for project in projects_with_folder),
+            ))
+
+    @api.model
+    def _get_gc_clear_bin_domain(self):
+        # Skip folders tied to a project: unlinking one would null the
+        # project's documents_folder_id reference. A ('project_ids', '=', False)
+        # leaf keeps active_test=True on the subquery, so an archived project
+        # stops protecting its folder. Search the folder ids directly, with
+        # active_test=False, to cover archived projects too.
+        project_folders = self.env['project.project'].with_context(
+            active_test=False).search([]).documents_folder_id
+        return expression.AND([
+            super()._get_gc_clear_bin_domain(),
+            [('id', 'not in', project_folders.ids)],
+        ])
 
     @api.constrains('company_id')
     def _check_no_company_on_projects_folder(self):
@@ -234,6 +265,7 @@ class Document(models.Model):
                     'res_model': 'project.project',
                     'res_id': project.id,
                 })
+                project = project.sudo()
                 if project.partner_id and not self.partner_id.id:
                     values['partner_id'] = project.partner_id.id
         return values

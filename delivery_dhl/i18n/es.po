@@ -1,23 +1,28 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* delivery_dhl
-# 
+# * delivery_dhl
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Larissa Manderfeld, 2025
+#
+# "Noemi Pla Garcia (nopl)" <nopl@odoo.com>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Spanish (https://app.transifex.com/odoo/teams/41243/es/)\n"
+"POT-Creation-Date: 2025-12-29 18:50+0000\n"
+"PO-Revision-Date: 2025-10-17 13:51+0000\n"
+"Last-Translator: \"Noemi Pla Garcia (nopl)\" <nopl@odoo.com>\n"
+"Language-Team: Spanish <https://translate.odoo.com/projects/odoo-18/"
+"delivery_dhl/es/>\n"
+"Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: es\n"
-"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=(n == 1) ? 0 : ((n != 0 && n % 1000000 == "
+"0) ? 1 : 2);\n"
+"X-Generator: Weblate 5.12.2\n"
 
 #. module: delivery_dhl
 #: model_terms:ir.ui.view,arch_db:delivery_dhl.view_delivery_carrier_form_with_provider_dhl
@@ -162,7 +167,7 @@ msgstr "Centímetros"
 #. module: delivery_dhl
 #: model:ir.model.fields,help:delivery_dhl.field_delivery_carrier__dhl_dutiable
 msgid "Check this if your package is dutiable."
-msgstr "Compruébelo si su paquete es imponible."
+msgstr "Marca esta opción si tu paquete está sujeto a derechos de aduana."
 
 #. module: delivery_dhl
 #: model_terms:ir.ui.view,arch_db:delivery_dhl.view_delivery_carrier_form_with_provider_dhl
@@ -182,8 +187,8 @@ msgstr "D - Express Worldwide"
 #. module: delivery_dhl
 #: model:ir.model.fields.selection,name:delivery_dhl.selection__delivery_carrier__delivery_type__dhl
 #: model:ir.model.fields.selection,name:delivery_dhl.selection__stock_package_type__package_carrier_type__dhl
-msgid "DHL"
-msgstr "DHL"
+msgid "DHL (Legacy)"
+msgstr "DHL (heredado)"
 
 #. module: delivery_dhl
 #: model:ir.model.fields,field_description:delivery_dhl.field_delivery_carrier__dhl_account_number
@@ -214,11 +219,6 @@ msgid "DHL EU -> International"
 msgstr "DHL UE -> Internacional"
 
 #. module: delivery_dhl
-#: model:ir.model.fields,field_description:delivery_dhl.field_delivery_carrier__dhl_default_package_type_id
-msgid "DHL Package Type"
-msgstr "Tipo de paquete de DHL"
-
-#. module: delivery_dhl
 #: model:ir.model.fields,field_description:delivery_dhl.field_delivery_carrier__dhl_password
 msgid "DHL Password"
 msgstr "Contraseña de DHL"
@@ -227,12 +227,6 @@ msgstr "Contraseña de DHL"
 #: model:ir.model.fields,field_description:delivery_dhl.field_delivery_carrier__dhl_product_code
 msgid "DHL Product"
 msgstr "Producto de DHL"
-
-#. module: delivery_dhl
-#: model_terms:ir.ui.view,arch_db:delivery_dhl.res_config_settings_view_form_sale
-#: model_terms:ir.ui.view,arch_db:delivery_dhl.res_config_settings_view_form_stock
-msgid "DHL Shipping Methods"
-msgstr "Métodos de envío DHL"
 
 #. module: delivery_dhl
 #. odoo-python
@@ -282,6 +276,11 @@ msgstr ""
 "Falta su contraseña de DHL, modifique los ajustes de su método de envío."
 
 #. module: delivery_dhl
+#: model:ir.model.fields,field_description:delivery_dhl.field_delivery_carrier__dhl_default_package_type_id
+msgid "DHLxw Package Type"
+msgstr "Tipo de paquete de DHLxw"
+
+#. module: delivery_dhl
 #: model:ir.model.fields,field_description:delivery_dhl.field_delivery_carrier__dhl_duty_payment
 msgid "Dhl Duty Payment"
 msgstr "Pago de impuestos DHL"
@@ -289,7 +288,7 @@ msgstr "Pago de impuestos DHL"
 #. module: delivery_dhl
 #: model:ir.model.fields,field_description:delivery_dhl.field_delivery_carrier__dhl_dutiable
 msgid "Dutiable Material"
-msgstr "Material imponible"
+msgstr "Material sujeto a derechos de aduana"
 
 #. module: delivery_dhl
 #: model_terms:ir.ui.view,arch_db:delivery_dhl.view_delivery_carrier_form_with_provider_dhl
@@ -330,7 +329,9 @@ msgstr "H - Economy Select"
 #. odoo-python
 #: code:addons/delivery_dhl/models/delivery_dhl.py:0
 msgid "Hint: The destination may not require the dutiable option."
-msgstr "Consejo: puede que el destino no necesite la opción imponible."
+msgstr ""
+"Sugerencia: es posible que el destino no requiera la opción de mercancía "
+"sujeta a derechos."
 
 #. module: delivery_dhl
 #: model:ir.model.fields.selection,name:delivery_dhl.selection__delivery_carrier__dhl_product_code__i
@@ -514,31 +515,37 @@ msgstr ""
 #. odoo-python
 #: code:addons/delivery_dhl/models/dhl_request.py:0
 msgid ""
-"The address of your company warehouse is missing or wrong (Missing field(s) :\n"
+"The address of your company warehouse is missing or wrong (Missing "
+"field(s) :\n"
 " %s)"
 msgstr ""
-"No se encontró la dirección del almacén de su empresa o no es la correcta (Campos faltantes:\n"
+"No se encontró la dirección del almacén de su empresa o no es la correcta "
+"(Campos faltantes:\n"
 "%s)"
 
 #. module: delivery_dhl
 #: model:ir.model.fields,help:delivery_dhl.field_delivery_carrier__dhl_custom_data_request
 msgid ""
 "The custom data in DHL is organized like the inside of a json file.\n"
-"        There are 3 possible keys: 'rate', 'ship', 'return', to which you can add your custom data.\n"
+"        There are 3 possible keys: 'rate', 'ship', 'return', to which you "
+"can add your custom data.\n"
 "        More info on https://xmlportal.dhl.com/"
 msgstr ""
 "Los datos personalizados en DHL se organiza como en un archivo json.\n"
-"        Hay 3 claves posibles: 'tarifa', 'envío', 'devolución' que puede agregar a sus datos personalizados.\n"
+"        Hay 3 claves posibles: 'tarifa', 'envío', 'devolución' que puede "
+"añadir a sus datos personalizados.\n"
 "        Puede consultar más información en https://xmlportal.dhl.com/"
 
 #. module: delivery_dhl
 #. odoo-python
 #: code:addons/delivery_dhl/models/dhl_request.py:0
 msgid ""
-"The estimated shipping price cannot be computed because the weight is missing for the following product(s): \n"
+"The estimated shipping price cannot be computed because the weight is "
+"missing for the following product(s): \n"
 " %s"
 msgstr ""
-"El precio estimado de envío no se puede calcular porque falta el peso para los siguientes productos: \n"
+"El precio estimado de envío no se puede calcular porque falta el peso para "
+"los siguientes productos: \n"
 " %s"
 
 #. module: delivery_dhl
@@ -548,8 +555,7 @@ msgid ""
 "There is no price available for this shipping, you should rather try with "
 "the DHL product %s"
 msgstr ""
-"No se puede mostrar el precio de este envío, inténtelo con el producto DHL "
-"%s"
+"No se puede mostrar el precio de este envío, inténtelo con el producto DHL %s"
 
 #. module: delivery_dhl
 #: model:ir.model.fields.selection,name:delivery_dhl.selection__delivery_carrier__dhl_product_code__u

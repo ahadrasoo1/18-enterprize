@@ -15,11 +15,9 @@ WebsiteSaleDaterangePicker.include({
      *
      * @override
      */
-    willStart: function () {
-        return Promise.all([
-            this._super.apply(this, arguments),
-            this._updateRentingProductAvailabilities(),
-        ]);
+    async start() {
+        await this._super(...arguments);
+        await this._updateRentingProductAvailabilities();
     },
 
     // ------------------------------------------
@@ -89,8 +87,8 @@ WebsiteSaleDaterangePicker.include({
     _isCustomDate(date) {
         const result = this._super.apply(this, arguments);
         const productId = this._getProductId();
-        if (!productId) {
-            return [];
+        if (!productId || !this.rentingAvailabilities[productId]) {
+            return result;
         }
         const dateStart = date.startOf('day');
         for (const interval of this.rentingAvailabilities[productId]) {
@@ -111,15 +109,13 @@ WebsiteSaleDaterangePicker.include({
     _getProductId() {
         // cache this id a little bit ?
         this._super.apply(this, arguments);
-        if (!this.productId) {
-            const productSelector = [
-                'input[type="hidden"][name="product_id"]',
-                'input[type="radio"][name="product_id"]:checked'
-            ];
-            const form = this.el.closest('form');
-            const productInput = form && form.querySelector(productSelector.join(', '));
-            this.productId = productInput && parseInt(productInput.value);
-        }
+        const productSelector = [
+            'input[type="hidden"][name="product_id"]',
+            'input[type="radio"][name="product_id"]:checked'
+        ];
+        const form = this.el.closest('form');
+        const productInput = form && form.querySelector(productSelector.join(', '));
+        this.productId = productInput && parseInt(productInput.value);
         return this.productId;
     },
 });

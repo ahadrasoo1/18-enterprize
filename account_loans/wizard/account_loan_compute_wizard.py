@@ -25,6 +25,8 @@ class AccountLoanComputeWizard(models.TransientModel):
         string='Interest Rate',
         default=1.0,
         required=True,
+        digits=(12, 10),
+        min_display_digits=2,
     )
     loan_term = fields.Integer(
         string='Loan Term',
@@ -76,12 +78,12 @@ class AccountLoanComputeWizard(models.TransientModel):
             raise ValidationError(_("Interest Rate must be between 0 and 100"))
         if self.loan_term < 0:
             raise ValidationError(_("Loan Term must be positive"))
-        if self.first_payment_date and self.start_date + relativedelta(years=self.loan_term) < self.first_payment_date:
+        if self.first_payment_date and self.start_date and self.start_date + relativedelta(years=self.loan_term) < self.first_payment_date:
             raise ValidationError(_("The First Payment Date must be before the end of the loan."))
 
     @api.onchange('start_date')
     def _onchange_start_date(self):
-        self.first_payment_date = self.start_date.replace(day=1) + relativedelta(months=1)  # first day of next month
+        self.first_payment_date = self.start_date and self.start_date.replace(day=1) + relativedelta(months=1)  # first day of next month
 
     # Compute
     def _get_loan_payment_schedule(self):
@@ -94,6 +96,7 @@ class AccountLoanComputeWizard(models.TransientModel):
             first_payment_date=format_date(self.env, self.first_payment_date, date_format='yyyy-MM-dd') if self.first_payment_date and self.payment_end_of_month == 'at_anniversary' else None,
             payment_end_of_month=self.payment_end_of_month == 'end_of_month',
             compounding_method=self.compounding_method,
+            loan_type='annuity' if self.interest_rate else 'linear',
         )
         if schedule := loan.get_payment_schedule():
             return schedule[1:]  # Skip first line which is always 0 (simply the start of the loan)
@@ -110,7 +113,7 @@ class AccountLoanComputeWizard(models.TransientModel):
                 f"{wizard.currency_id.format(float(payment.loan_balance_amount)):>15}\n"
             )
         for wizard in self:
-            if wizard.loan_amount and wizard.interest_rate and wizard.loan_term and wizard.start_date:
+            if wizard.loan_amount and wizard.loan_term and wizard.start_date:
                 schedule = self._get_loan_payment_schedule()
                 if not schedule:
                     wizard.preview = ''

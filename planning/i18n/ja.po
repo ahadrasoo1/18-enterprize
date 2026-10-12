@@ -1,23 +1,28 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* planning
-# 
+# * planning
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Junko Augias, 2025
+#
+# "Junko Augias (juau)" <juau@odoo.com>, 2025, 2026.
+# Weblate <noreply-mt-weblate@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Japanese (https://app.transifex.com/odoo/teams/41243/ja/)\n"
+"POT-Creation-Date: 2026-06-12 17:46+0000\n"
+"PO-Revision-Date: 2026-05-06 21:38+0000\n"
+"Last-Translator: \"Junko Augias (juau)\" <juau@odoo.com>\n"
+"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-18/"
+"planning/ja/>\n"
+"Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: ja\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 5.17\n"
 
 #. module: planning
 #. odoo-python
@@ -58,16 +63,6 @@ msgid "01/01/2023 9:00 AM"
 msgstr "01/01/2023 9:00 AM"
 
 #. module: planning
-#: model_terms:ir.actions.act_window,help:planning.planning_action_roles
-msgid "04:00"
-msgstr "04:00"
-
-#. module: planning
-#: model_terms:ir.actions.act_window,help:planning.planning_action_roles
-msgid "08:00"
-msgstr "08:00"
-
-#. module: planning
 #: model_terms:hr.job,job_details:planning.job_maintenance_technician
 #: model_terms:hr.job,job_details:planning.job_quality_control
 msgid "1 Onsite Interview"
@@ -78,36 +73,6 @@ msgstr "1 オンサイト面接"
 #: model_terms:hr.job,job_details:planning.job_quality_control
 msgid "1 Phone Call"
 msgstr "1 通話"
-
-#. module: planning
-#: model_terms:ir.ui.view,arch_db:planning.resource_planning
-msgid "100"
-msgstr "100"
-
-#. module: planning
-#: model_terms:ir.actions.act_window,help:planning.planning_action_roles
-msgid "12:00"
-msgstr "12:00"
-
-#. module: planning
-#: model_terms:ir.actions.act_window,help:planning.planning_action_roles
-msgid "13"
-msgstr "13"
-
-#. module: planning
-#: model_terms:ir.actions.act_window,help:planning.planning_action_roles
-msgid "14"
-msgstr "14"
-
-#. module: planning
-#: model_terms:ir.actions.act_window,help:planning.planning_action_roles
-msgid "15"
-msgstr "15"
-
-#. module: planning
-#: model_terms:ir.actions.act_window,help:planning.planning_action_roles
-msgid "16:00"
-msgstr "16:00"
 
 #. module: planning
 #: model_terms:hr.job,job_details:planning.job_maintenance_technician
@@ -138,7 +103,7 @@ msgstr ""
 #. module: planning
 #: model_terms:digest.tip,tip_description:planning.digest_tip_planning_0
 msgid "<b class=\"tip_title\">Tip: Record your planning faster</b>"
-msgstr "<b class=\"tip_title\">ヒント：計画をより早く記録する</b>"
+msgstr "<b class=\"tip_title\">ヒント: 計画をより迅速に記録する</b>"
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.planning_shift_ics_description
@@ -149,12 +114,13 @@ msgstr "<b>割当済時間:</b>"
 #. odoo-javascript
 #: code:addons/planning/static/src/js/tours/planning.js:0
 msgid ""
-"<b>Drag & drop</b> your shift to reschedule it. <i>Tip: hit CTRL (or Cmd) to"
-" duplicate it instead.</i> <b>Adjust the size</b> of the shift to modify its"
-" period."
+"<b>Drag & drop</b> your shift to reschedule it. <i>Tip: hit CTRL (or Cmd) to "
+"duplicate it instead.</i> <b>Adjust the size</b> of the shift to modify its "
+"period."
 msgstr ""
-"シフトを<b>ドラッグ&ドロップ</b>してリスケジュールしましょう。 <i>ヒント: CTRL (または "
-"Cmd)キーを押して、代わりにそれを複製します。</i> シフト<b>サイズを調整</b>してその期間を修正します。"
+"シフトを<b>ドラッグ&ドロップ</b>してリスケジュールしましょう。 <i>ヒント: "
+"CTRL (または Cmd)キーを押して、代わりにそれを複製します。</i> シフト<b>サイズ"
+"を調整</b>してその期間を修正します。"
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.planning_shift_ics_description
@@ -176,85 +142,187 @@ msgstr "<b>役割:</b>"
 #: model:mail.template,body_html:planning.email_template_shift_switch_email
 msgid ""
 "<div>\n"
-"                    <p t-if=\"ctx.get('old_assignee_name')\">Dear <t t-out=\"ctx['old_assignee_name']\">Anita Oliver</t>,</p>\n"
+"                    <p t-if=\"ctx.get('old_assignee_name')\">Dear <t t-"
+"out=\"ctx['old_assignee_name']\">Anita Oliver</t>,</p>\n"
 "                    <p t-else=\"\">Hello,</p>\n"
-"                    <br>\n"
+"                    <br/>\n"
 "                    <p>\n"
-"                        The following shift that you requested to switch has been re-assigned\n"
-"                        <t t-if=\"ctx.get('new_assignee_name')\"> to <t t-out=\"ctx['new_assignee_name']\">Marc Demo</t></t>.\n"
+"                        The following shift that you requested to switch has "
+"been re-assigned\n"
+"                        <t t-if=\"ctx.get('new_assignee_name')\"> to <t t-"
+"out=\"ctx['new_assignee_name']\">Marc Demo</t></t>.\n"
 "                    </p>\n"
 "                    <table style=\"margin-left: 30px;\">\n"
-"                        <tr t-if=\"(ctx.get('start_datetime') and ctx.get('end_datetime'))                                   or ctx.get('allocated_hours')                                   or ctx.get('allocated_percentage')\">\n"
-"                            <th style=\"padding: 5px; text-align: left;\">Date</th>\n"
+"                        <tr t-if=\"(ctx.get('start_datetime') and "
+"ctx.get('end_datetime'))                                   or "
+"ctx.get('allocated_hours')                                   or "
+"ctx.get('allocated_percentage')\">\n"
+"                            <th style=\"padding: 5px; text-align: left;"
+"\">Date</th>\n"
 "                            <td style=\"padding: 5px;\">\n"
-"                                <span t-if=\"ctx.get('start_datetime') and ctx.get('end_datetime')\" t-out=\"'%s ⟶ %s' % (                                     ctx['start_datetime'],                                     ctx['end_datetime'],                                 )\">\n"
-"                                    05/31/2021, 8:00 AM ⟶ 05/31/2021, 4:00 PM\n"
+"                                <span t-if=\"ctx.get('start_datetime') and "
+"ctx.get('end_datetime')\" t-out=\"'%s ⟶ %s' % "
+"(                                     ctx['start_datetime'],                                     "
+"ctx['end_datetime'],                                 )\">\n"
+"                                    05/31/2021, 8:00 AM ⟶ 05/31/2021, 4:00 "
+"PM\n"
 "                                </span>\n"
-"                                <span t-if=\"ctx.get('allocated_hours')\" style=\"opacity: 0.5;\">\n"
-"                                    (<t t-out=\"ctx['allocated_hours']\">4:00</t>h)\n"
+"                                <span t-if=\"ctx.get('allocated_hours')\" "
+"style=\"opacity: 0.5;\">\n"
+"                                    (<t t-out=\"ctx['allocated_hours']"
+"\">4:00</t>h)\n"
 "                                </span>\n"
-"                                <span t-if=\"ctx.get('allocated_percentage') and ctx['allocated_percentage'] != '100'\" style=\"opacity: 0.5;\">\n"
-"                                    (<t t-out=\"ctx['allocated_percentage']\">50</t>%)\n"
+"                                <span t-if=\"ctx.get('allocated_percentage') "
+"and ctx['allocated_percentage'] != '100'\" style=\"opacity: 0.5;\">\n"
+"                                    (<t t-out=\"ctx['allocated_percentage']"
+"\">50</t>%)\n"
 "                                </span>\n"
 "                            </td>\n"
 "                        </tr>\n"
 "                        <tr t-if=\"object.role_id\">\n"
-"                            <th style=\"padding: 5px; text-align: left;\">Role</th>\n"
-"                            <td style=\"padding: 5px;\" t-out=\"object.role_id.name or ''\">Bartender</td>\n"
+"                            <th style=\"padding: 5px; text-align: left;"
+"\">Role</th>\n"
+"                            <td style=\"padding: 5px;\" t-"
+"out=\"object.role_id.name or ''\">Bartender</td>\n"
 "                        </tr>\n"
-"                        <tr t-if=\"hasattr(object, 'project_id') and object.project_id\">\n"
-"                            <th style=\"padding: 5px; text-align: left;\">Project</th>\n"
-"                            <td style=\"padding: 5px;\" t-out=\"object.sudo().project_id.name or ''\">Gathering</td>\n"
+"                        <tr t-if=\"hasattr(object, 'project_id') and "
+"object.project_id\">\n"
+"                            <th style=\"padding: 5px; text-align: left;"
+"\">Project</th>\n"
+"                            <td style=\"padding: 5px;\" t-"
+"out=\"object.sudo().project_id.name or ''\">Gathering</td>\n"
 "                        </tr>\n"
-"                        <tr t-if=\"hasattr(object, 'sale_line_id') and object.sale_line_id\">\n"
-"                            <th style=\"padding: 5px; text-align: left;\">Sales Order Item</th>\n"
-"                            <td style=\"padding: 5px;\" t-out=\"object.sudo().sale_line_id.name or ''\">Coffee</td>\n"
+"                        <tr t-if=\"hasattr(object, 'sale_line_id') and "
+"object.sale_line_id\">\n"
+"                            <th style=\"padding: 5px; text-align: left;"
+"\">Sales Order Item</th>\n"
+"                            <td style=\"padding: 5px;\" t-"
+"out=\"object.sudo().sale_line_id.name or ''\">Coffee</td>\n"
 "                        </tr>\n"
-"                        <tr t-if=\"hasattr(object, 'name') and object.name\">\n"
-"                            <th style=\"padding: 5px; text-align: left;\">Note</th>\n"
-"                            <td style=\"padding: 5px;\" t-out=\"object.name or ''\">/</td>\n"
+"                        <tr t-if=\"hasattr(object, 'name') and "
+"object.name\">\n"
+"                            <th style=\"padding: 5px; text-align: left;"
+"\">Note</th>\n"
+"                            <td style=\"padding: 5px;\" t-out=\"object.name "
+"or ''\">/</td>\n"
 "                        </tr>\n"
 "                    </table>\n"
-"                    <br>\n"
+"                    <br/>\n"
 "                </div>\n"
 "            "
 msgstr ""
+"<div>\n"
+"                    <p t-if=\"ctx.get('old_assignee_name')\"><t t-"
+"out=\"ctx['old_assignee_name']\">Anita Oliver</t>様、</p>\n"
+"                    <p t-else=\"\">こんにちは</p>\n"
+"                    <br/>\n"
+"                    <p>\n"
+"                        交代を依頼していた以下のシフトは\n"
+"                        <t t-if=\"ctx.get('new_assignee_name')\"> <t t-"
+"out=\"ctx['new_assignee_name']\">Marc Demo</t></t>に割当られました。\n"
+"                    </p>\n"
+"                    <table style=\"margin-left: 30px;\">\n"
+"                        <tr t-if=\"(ctx.get('start_datetime') and "
+"ctx.get('end_datetime'))                                   or "
+"ctx.get('allocated_hours')                                   or "
+"ctx.get('allocated_percentage')\">\n"
+"                            <th style=\"padding: 5px; text-align: left;\">日"
+"付</th>\n"
+"                            <td style=\"padding: 5px;\">\n"
+"                                <span t-if=\"ctx.get('start_datetime') and "
+"ctx.get('end_datetime')\" t-out=\"'%s ⟶ %s' % "
+"(                                     ctx['start_datetime'],                                     "
+"ctx['end_datetime'],                                 )\">\n"
+"                                    05/31/2021, 8:00 AM ⟶ 05/31/2021, 4:00 "
+"PM\n"
+"                                </span>\n"
+"                                <span t-if=\"ctx.get('allocated_hours')\" "
+"style=\"opacity: 0.5;\">\n"
+"                                    (<t t-out=\"ctx['allocated_hours']"
+"\">4:00</t>h)\n"
+"                                </span>\n"
+"                                <span t-if=\"ctx.get('allocated_percentage') "
+"and ctx['allocated_percentage'] != '100'\" style=\"opacity: 0.5;\">\n"
+"                                    (<t t-out=\"ctx['allocated_percentage']"
+"\">50</t>%)\n"
+"                                </span>\n"
+"                            </td>\n"
+"                        </tr>\n"
+"                        <tr t-if=\"object.role_id\">\n"
+"                            <th style=\"padding: 5px; text-align: left;\">任"
+"務</th>\n"
+"                            <td style=\"padding: 5px;\" t-"
+"out=\"object.role_id.name or ''\">バーテンダー</td>\n"
+"                        </tr>\n"
+"                        <tr t-if=\"hasattr(object, 'project_id') and "
+"object.project_id\">\n"
+"                            <th style=\"padding: 5px; text-align: left;\">プ"
+"ロジェクト</th>\n"
+"                            <td style=\"padding: 5px;\" t-"
+"out=\"object.sudo().project_id.name or ''\">集まり</td>\n"
+"                        </tr>\n"
+"                        <tr t-if=\"hasattr(object, 'sale_line_id') and "
+"object.sale_line_id\">\n"
+"                            <th style=\"padding: 5px; text-align: left;\">販"
+"売オーダアイテム</th>\n"
+"                            <td style=\"padding: 5px;\" t-"
+"out=\"object.sudo().sale_line_id.name or ''\">コーヒー</td>\n"
+"                        </tr>\n"
+"                        <tr t-if=\"hasattr(object, 'name') and "
+"object.name\">\n"
+"                            <th style=\"padding: 5px; text-align: left;\">メ"
+"モ</th>\n"
+"                            <td style=\"padding: 5px;\" t-out=\"object.name "
+"or ''\">/</td>\n"
+"                        </tr>\n"
+"                    </table>\n"
+"                    <br/>\n"
+"                </div>\n"
+"            "
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.planning_shift_notification
 msgid ""
-"<i class=\"fa fa-check-circle text-success\"/>\n"
-"                        You have successfully requested to switch your shift. You will be notified when another employee takes over your shift."
+"<i class=\"fa fa-check-circle\"/>\n"
+"                        You have successfully requested to switch your "
+"shift. You will be notified when another employee takes over your shift."
 msgstr ""
-"<i class=\"fa fa-check-circle text-success\"/>\n"
-"                        シフト変更の申請が完了しました。他の従業員があなたのシフトを引き継ぐ際に通知されます。"
+"<i class=\"fa fa-check-circle\"/>\n"
+"                        シフト変更のリクエストが完了しました。別の従業員があ"
+"なたのシフトを引き継ぐ際に通知が届きます。"
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.planning_shift_notification
 msgid ""
-"<i class=\"fa fa-check-circle text-success\"/> Request to switch shift "
-"cancelled successfully."
-msgstr "<i class=\"fa fa-check-circle text-success\"/>シフト交換の要求が正常に取消されました。 "
-
-#. module: planning
-#: model_terms:ir.ui.view,arch_db:planning.planning_shift_notification
-msgid ""
-"<i class=\"fa fa-check-circle text-success\"/> This shift is no longer "
-"assigned to you."
-msgstr "<i class=\"fa fa-check-circle text-success\"/> このシフトは、もはやあなたに割り当てられていません。"
-
-#. module: planning
-#: model_terms:ir.ui.view,arch_db:planning.planning_shift_notification
-msgid ""
-"<i class=\"fa fa-check-circle text-success\"/> You were successfully "
-"assigned this open shift."
+"<i class=\"fa fa-check-circle\"/> Request to switch shift cancelled "
+"successfully."
 msgstr ""
-"<i class=\"fa fa-check-circle text-success\"/> あなたは、このオープンなシフトに無事に割り当てられました。"
+"<i class=\"fa fa-check-circle\"/> シフト交換の要求が正常に取消されました。 "
+
+#. module: planning
+#: model_terms:ir.ui.view,arch_db:planning.planning_shift_notification
+msgid ""
+"<i class=\"fa fa-check-circle\"/> This shift is no longer assigned to you."
+msgstr ""
+"<i class=\"fa fa-check-circle\"/> このシフトは、あなたの割り当てから外れまし"
+"た。"
+
+#. module: planning
+#: model_terms:ir.ui.view,arch_db:planning.planning_shift_notification
+msgid ""
+"<i class=\"fa fa-check-circle\"/> You were successfully assigned this open "
+"shift."
+msgstr ""
+"<i class=\"fa fa-check-circle\"/> このオープンシフトに割り当てられました。"
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.planning_slot_template_view_kanban
-msgid "<i class=\"fa fa-clock-o\" role=\"img\" aria-label=\"Hours\" title=\"Hours\"/>"
-msgstr "<i class=\"fa fa-clock-o\" role=\"img\" aria-label=\"Hours\" title=\"Hours\"/>"
+msgid ""
+"<i class=\"fa fa-clock-o\" role=\"img\" aria-label=\"Hours\" title=\"Hours\"/"
+">"
+msgstr ""
+"<i class=\"fa fa-clock-o\" role=\"img\" aria-label=\"Hours\" title=\"Hours\"/"
+">"
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.planning_assignee_contact_popover
@@ -268,19 +336,20 @@ msgstr ""
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.planning_shift_notification
 msgid ""
-"<i class=\"fa fa-exclamation-circle text-warning\"/> This shift is already "
-"assigned to another employee."
+"<i class=\"fa fa-exclamation-circle\"/> This shift is already assigned to "
+"another employee."
 msgstr ""
-"<i class=\"fa fa-exclamation-circle text-warning\"/> "
-"このシフトはすでに他の従業員に割り当てられています。"
+"<i class=\"fa fa-exclamation-circle\"/>このシフトはすでに他の従業員に割り当て"
+"られています。"
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.planning_shift_notification
 msgid ""
-"<i class=\"fa fa-exclamation-circle text-warning\"/> You can no longer "
-"unassign yourself from this shift."
+"<i class=\"fa fa-exclamation-circle\"/> You can no longer unassign yourself "
+"from this shift."
 msgstr ""
-"<i class=\"fa fa-exclamation-circle text-warning\"/> このシフトから自分を外すことはもうできません。"
+"<i class=\"fa fa-exclamation-circle\"/> このシフトから自分を外すことはできま"
+"せん。"
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.planning_slot_template_view_form
@@ -293,8 +362,12 @@ msgstr ""
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.open_slots_list_template
-msgid "<i class=\"fa fa-long-arrow-right\" aria-label=\"Arrow icon\" title=\"Arrow\"/>"
-msgstr "<i class=\"fa fa-long-arrow-right\" aria-label=\"Arrow icon\" title=\"Arrow\"/>"
+msgid ""
+"<i class=\"fa fa-long-arrow-right\" aria-label=\"Arrow icon\" "
+"title=\"Arrow\"/>"
+msgstr ""
+"<i class=\"fa fa-long-arrow-right\" aria-label=\"Arrow icon\" "
+"title=\"Arrow\"/>"
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.planning_view_gantt
@@ -303,13 +376,21 @@ msgstr "<i class=\"fa fa-long-arrow-right\" title=\"Arrow\"/>"
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.planning_assignee_contact_popover
-msgid "<i class=\"fa fa-phone\" title=\"Phone\" role=\"img\" style=\"padding-right: 2px\"/>"
-msgstr "<i class=\"fa fa-phone\" title=\"Phone\" role=\"img\" style=\"padding-right: 2px\"/>"
+msgid ""
+"<i class=\"fa fa-phone\" title=\"Phone\" role=\"img\" style=\"padding-right: "
+"2px\"/>"
+msgstr ""
+"<i class=\"fa fa-phone\" title=\"Phone\" role=\"img\" style=\"padding-right: "
+"2px\"/>"
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.planning_view_kanban
-msgid "<i class=\"me-1 mt-1 fa fa-clock-o\" role=\"img\" aria-label=\"Date\" title=\"Date\"/>"
+msgid ""
+"<i class=\"mt-1 fa fa-clock-o\" role=\"img\" aria-label=\"Date\" "
+"title=\"Date\"/>"
 msgstr ""
+"<i class=\"mt-1 fa fa-clock-o\" role=\"img\" aria-label=\"Date\" "
+"title=\"Date\"/>"
 
 #. module: planning
 #: model_terms:ir.actions.act_window,help:planning.planning_action_roles
@@ -364,57 +445,59 @@ msgstr ""
 #. module: planning
 #: model_terms:ir.actions.act_window,help:planning.planning_action_roles
 msgid ""
-"<span class=\"o_gantt_pill_title bg-view text-truncate px-1 "
-"z-1\">04:00</span>"
+"<span class=\"o_gantt_pill_title bg-view text-truncate px-1 z-1\">04:00</"
+"span>"
 msgstr ""
-"<span class=\"o_gantt_pill_title bg-view text-truncate px-1 "
-"z-1\">04:00</span>"
+"<span class=\"o_gantt_pill_title bg-view text-truncate px-1 z-1\">04:00</"
+"span>"
 
 #. module: planning
 #: model_terms:ir.actions.act_window,help:planning.planning_action_roles
 msgid ""
-"<span class=\"o_gantt_pill_title bg-view text-truncate px-1 "
-"z-1\">08:00</span>"
+"<span class=\"o_gantt_pill_title bg-view text-truncate px-1 z-1\">08:00</"
+"span>"
 msgstr ""
-"<span class=\"o_gantt_pill_title bg-view text-truncate px-1 "
-"z-1\">08:00</span>"
+"<span class=\"o_gantt_pill_title bg-view text-truncate px-1 z-1\">08:00</"
+"span>"
 
 #. module: planning
 #: model_terms:ir.actions.act_window,help:planning.planning_action_roles
 msgid ""
-"<span class=\"o_gantt_pill_title bg-view text-truncate px-1 "
-"z-1\">12:00</span>"
+"<span class=\"o_gantt_pill_title bg-view text-truncate px-1 z-1\">12:00</"
+"span>"
 msgstr ""
-"<span class=\"o_gantt_pill_title bg-view text-truncate px-1 "
-"z-1\">12:00</span>"
+"<span class=\"o_gantt_pill_title bg-view text-truncate px-1 z-1\">12:00</"
+"span>"
 
 #. module: planning
 #: model_terms:ir.actions.act_window,help:planning.planning_action_roles
 msgid ""
-"<span class=\"o_gantt_pill_title text-truncate mx-1\">1:00 PM - 5:00 "
-"PM</span>"
+"<span class=\"o_gantt_pill_title text-truncate mx-1\">1:00 PM - 5:00 PM</"
+"span>"
 msgstr ""
-"<span class=\"o_gantt_pill_title text-truncate mx-1\">1:00 PM - 5:00 "
-"PM</span>"
+"<span class=\"o_gantt_pill_title text-truncate mx-1\">1:00 PM - 5:00 PM</"
+"span>"
 
 #. module: planning
 #: model_terms:ir.actions.act_window,help:planning.planning_action_roles
 msgid ""
-"<span class=\"o_gantt_pill_title text-truncate mx-1\">8:00 AM - 12:00 "
-"PM</span>"
+"<span class=\"o_gantt_pill_title text-truncate mx-1\">8:00 AM - 12:00 PM</"
+"span>"
 msgstr ""
-"<span class=\"o_gantt_pill_title text-truncate mx-1\">8:00 AM - 12:00 "
-"PM</span>"
+"<span class=\"o_gantt_pill_title text-truncate mx-1\">8:00 AM - 12:00 PM</"
+"span>"
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.period_report_template
 msgid ""
 "<span class=\"o_start_date\"/>\n"
-"                                    <i class=\"mx-1 fa fa-long-arrow-right\" aria-label=\"Arrow icon\" title=\"Arrow\"/>\n"
+"                                    <i class=\"mx-1 fa fa-long-arrow-right\" "
+"aria-label=\"Arrow icon\" title=\"Arrow\"/>\n"
 "                                    <span class=\"o_end_date\"/>"
 msgstr ""
 "<span class=\"o_start_date\"/>\n"
-"                                    <i class=\"mx-1 fa fa-long-arrow-right\" aria-label=\"Arrow icon\" title=\"Arrow\"/>\n"
+"                                    <i class=\"mx-1 fa fa-long-arrow-right\" "
+"aria-label=\"Arrow icon\" title=\"Arrow\"/>\n"
 "                                    <span class=\"o_end_date\"/>"
 
 #. module: planning
@@ -444,7 +527,8 @@ msgstr "<span class=\"text-muted small\">回答までの時間</span>"
 #: model_terms:ir.actions.act_window,help:planning.planning_action_roles
 msgid ""
 "<span class=\"text-truncate w-0 flex-grow-1 text-start\">Open Shifts</span>"
-msgstr "<span class=\"text-truncate w-0 flex-grow-1 text-start\">空きシフト</span>"
+msgstr ""
+"<span class=\"text-truncate w-0 flex-grow-1 text-start\">空きシフト</span>"
 
 #. module: planning
 #: model_terms:ir.actions.act_window,help:planning.planning_action_roles
@@ -479,6 +563,8 @@ msgid ""
 "<span><b>Congratulations!</b> You are now a master of planning.\n"
 "        </span>"
 msgstr ""
+"<span><b>おめでとうございます!</b> あなたは今や、プランニングの達人です。\n"
+"        </span>"
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.res_config_settings_view_form
@@ -489,8 +575,8 @@ msgstr "<span>従業員に以下を許可する:</span>"
 #: model_terms:ir.ui.view,arch_db:planning.planning_view_form
 #: model_terms:ir.ui.view,arch_db:planning.planning_view_gantt
 msgid ""
-"<span>The employee assigned would like to switch shifts with someone "
-"else.</span>"
+"<span>The employee assigned would like to switch shifts with someone else.</"
+"span>"
 msgstr "<span>割当された従業員は他の人とシフトの交換を希望しています。</span>"
 
 #. module: planning
@@ -531,56 +617,204 @@ msgid ""
 "                        margin: 20px 15px 0px 15px;\n"
 "                    }\n"
 "                </style>\n"
-"                <div>\n"
-"                    <p t-if=\"ctx.get('employee_name')\">Dear <t t-out=\"ctx['employee_name']\">Anita Oliver</t>,</p>\n"
+"                <body><div>\n"
+"                    <p t-if=\"ctx.get('employee_name')\">Dear <t t-"
+"out=\"ctx['employee_name']\">Anita Oliver</t>,</p>\n"
 "                    <p t-else=\"\">Hello,</p>\n"
-"                    <br>\n"
-"                    <p t-if=\"ctx.get('open_shift_available')\">We have a new shift opening:</p>\n"
-"                    <p t-else=\"\">You have been assigned the following shift:</p>\n"
+"                    <br/>\n"
+"                    <p t-if=\"ctx.get('open_shift_available')\">We have a "
+"new shift opening:</p>\n"
+"                    <p t-else=\"\">You have been assigned the following "
+"shift:</p>\n"
 "                    <table style=\"margin-left: 30px;\">\n"
-"                        <tr t-if=\"(ctx.get('start_datetime') and ctx.get('end_datetime'))                                   or ctx.get('allocated_hours')                                   or ctx.get('allocated_percentage')\">\n"
-"                            <th style=\"padding: 5px; text-align: left;\">Date</th>\n"
+"                        <tr t-if=\"(ctx.get('start_datetime') and "
+"ctx.get('end_datetime'))                                   or "
+"ctx.get('allocated_hours')                                   or "
+"ctx.get('allocated_percentage')\">\n"
+"                            <th style=\"padding: 5px; text-align: left;"
+"\">Date</th>\n"
 "                            <td style=\"padding: 5px;\">\n"
-"                                <span t-if=\"ctx.get('start_datetime') and ctx.get('end_datetime')\" t-out=\"'%s ⟶ %s' % (                                     ctx['start_datetime'],                                     ctx['end_datetime'],                                 )\">\n"
-"                                    05/31/2021, 8:00 AM ⟶ 05/31/2021, 4:00 PM\n"
+"                                <span t-if=\"ctx.get('start_datetime') and "
+"ctx.get('end_datetime')\" t-out=\"'%s ⟶ %s' % "
+"(                                     ctx['start_datetime'],                                     "
+"ctx['end_datetime'],                                 )\">\n"
+"                                    05/31/2021, 8:00 AM ⟶ 05/31/2021, 4:00 "
+"PM\n"
 "                                </span>\n"
-"                                <span t-if=\"ctx.get('allocated_hours')\" style=\"opacity: 0.5;\">\n"
-"                                    (<t t-out=\"ctx['allocated_hours']\">4:00</t>h)\n"
+"                                <span t-if=\"ctx.get('allocated_hours')\" "
+"style=\"opacity: 0.5;\">\n"
+"                                    (<t t-out=\"ctx['allocated_hours']"
+"\">4:00</t>h)\n"
 "                                </span>\n"
-"                                <span t-if=\"ctx.get('allocated_percentage') and ctx['allocated_percentage'] != '100'\" style=\"opacity: 0.5;\">\n"
-"                                    (<t t-out=\"ctx['allocated_percentage']\">50</t>%)\n"
+"                                <span t-if=\"ctx.get('allocated_percentage') "
+"and ctx['allocated_percentage'] != '100'\" style=\"opacity: 0.5;\">\n"
+"                                    (<t t-out=\"ctx['allocated_percentage']"
+"\">50</t>%)\n"
 "                                </span>\n"
 "                            </td>\n"
 "                        </tr>\n"
 "                        <tr t-if=\"object.role_id\">\n"
-"                            <th style=\"padding: 5px; text-align: left;\">Role</th>\n"
-"                            <td style=\"padding: 5px;\" t-out=\"object.role_id.name or ''\">Bartender</td>\n"
+"                            <th style=\"padding: 5px; text-align: left;"
+"\">Role</th>\n"
+"                            <td style=\"padding: 5px;\" t-"
+"out=\"object.role_id.name or ''\">Bartender</td>\n"
 "                        </tr>\n"
-"                        <tr t-if=\"hasattr(object, 'project_id') and object.project_id\">\n"
-"                            <th style=\"padding: 5px; text-align: left;\">Project</th>\n"
-"                            <td style=\"padding: 5px;\" t-out=\"object.sudo().project_id.name or ''\">Gathering</td>\n"
+"                        <tr t-if=\"hasattr(object, 'project_id') and "
+"object.project_id\">\n"
+"                            <th style=\"padding: 5px; text-align: left;"
+"\">Project</th>\n"
+"                            <td style=\"padding: 5px;\" t-"
+"out=\"object.sudo().project_id.name or ''\">Gathering</td>\n"
 "                        </tr>\n"
-"                        <tr t-if=\"hasattr(object, 'sale_line_id') and object.sale_line_id\">\n"
-"                            <th style=\"padding: 5px; text-align: left;\">Sales Order Item</th>\n"
-"                            <td style=\"padding: 5px;\" t-out=\"object.sudo().sale_line_id.name or ''\">Coffee</td>\n"
+"                        <tr t-if=\"hasattr(object, 'sale_line_id') and "
+"object.sale_line_id\">\n"
+"                            <th style=\"padding: 5px; text-align: left;"
+"\">Sales Order Item</th>\n"
+"                            <td style=\"padding: 5px;\" t-"
+"out=\"object.sudo().sale_line_id.name or ''\">Coffee</td>\n"
 "                        </tr>\n"
-"                        <tr t-if=\"hasattr(object, 'name') and object.name\">\n"
-"                            <th style=\"padding: 5px; text-align: left;\">Note</th>\n"
-"                            <td style=\"padding: 5px;\" t-out=\"object.name or ''\">/</td>\n"
+"                        <tr t-if=\"hasattr(object, 'name') and "
+"object.name\">\n"
+"                            <th style=\"padding: 5px; text-align: left;"
+"\">Note</th>\n"
+"                            <td style=\"padding: 5px;\" t-out=\"object.name "
+"or ''\">/</td>\n"
 "                        </tr>\n"
 "                    </table>\n"
 "                    <div class=\"button_box\">\n"
-"                        <a t-if=\"ctx.get('available_link')\" t-att-href=\"ctx['available_link']\" target=\"_blank\" class=\"planning_mail_template_button top_button\">Assign me this shift</a>\n"
-"                        <a t-if=\"ctx.get('unavailable_link')\" t-att-href=\"ctx['unavailable_link']\" target=\"_blank\" class=\"planning_mail_template_button top_button\">I am unavailable</a>\n"
-"                        <a t-if=\"ctx.get('google_url')\" t-att-href=\"ctx['google_url']\" target=\"_blank\" class=\"planning_mail_template_button\">Add to Google Calendar</a>\n"
-"                        <a t-if=\"ctx.get('iCal_url')\" t-att-href=\"ctx['iCal_url']\" target=\"_blank\" class=\"planning_mail_template_button\">Add to iCal/Outlook</a>\n"
+"                        <a t-if=\"ctx.get('available_link')\" t-att-"
+"href=\"ctx['available_link']\" target=\"_blank\" "
+"class=\"planning_mail_template_button top_button\">Assign me this shift</a>\n"
+"                        <a t-if=\"ctx.get('unavailable_link')\" t-att-"
+"href=\"ctx['unavailable_link']\" target=\"_blank\" "
+"class=\"planning_mail_template_button top_button\">I am unavailable</a>\n"
+"                        <a t-if=\"ctx.get('google_url')\" t-att-"
+"href=\"ctx['google_url']\" target=\"_blank\" "
+"class=\"planning_mail_template_button\">Add to Google Calendar</a>\n"
+"                        <a t-if=\"ctx.get('iCal_url')\" t-att-"
+"href=\"ctx['iCal_url']\" target=\"_blank\" "
+"class=\"planning_mail_template_button\">Add to iCal/Outlook</a>\n"
 "                    </div>\n"
-"                    <br>\n"
-"                    <p t-if=\"ctx.get('open_shift_available')\">If you are interested and available, please assign yourself this open shift.</p>\n"
-"                    <p t-else=\"\">In case the current shift doesn't suit you, we encourage you to reach out to your colleagues and request to switch shifts. They might be interested in exchanging shifts with you.</p>\n"
+"                    <br/>\n"
+"                    <p t-if=\"ctx.get('open_shift_available')\">If you are "
+"interested and available, please assign yourself this open shift.</p>\n"
+"                    <p t-else=\"\">In case the current shift doesn't suit "
+"you, we encourage you to reach out to your colleagues and request to switch "
+"shifts. They might be interested in exchanging shifts with you.</p>\n"
 "                </div>\n"
-"            "
+"            </body>"
 msgstr ""
+"<style>\n"
+"                    .planning_mail_template_button {\n"
+"                        padding: 5px 10px;\n"
+"                        text-decoration: none;\n"
+"                        border: 1px;\n"
+"                        border-radius: 3px;\n"
+"                        text-align: center;\n"
+"                        color: #374151;\n"
+"                        background-color: #E7E9ED;\n"
+"                        border: solid #E7E9ED;\n"
+"                        flex: 1 1 40%;\n"
+"                    }\n"
+"                    .top_button {\n"
+"                        color: #FFFFFF;\n"
+"                        background-color: #714B67;\n"
+"                        border: solid #714B67;\n"
+"                        flex: 1 1 60%;\n"
+"                    }\n"
+"                    .button_box {\n"
+"                        display: flex;\n"
+"                        flex-wrap: wrap;\n"
+"                        gap: 10px;\n"
+"                        margin: 20px 15px 0px 15px;\n"
+"                    }\n"
+"                </style>\n"
+"                <body><div>\n"
+"                    <p t-if=\"ctx.get('employee_name')\"><t t-"
+"out=\"ctx['employee_name']\">Anita Oliver</t>様、</p>\n"
+"                    <p t-else=\"\">こんにちは。</p>\n"
+"                    <br/>\n"
+"                    <p t-if=\"ctx.get('open_shift_available')\">新規空きシフ"
+"トがあります:</p>\n"
+"                    <p t-else=\"\">以下のシフトを割当られました:</p>\n"
+"                    <table style=\"margin-left: 30px;\">\n"
+"                        <tr t-if=\"(ctx.get('start_datetime') and "
+"ctx.get('end_datetime'))                                   or "
+"ctx.get('allocated_hours')                                   or "
+"ctx.get('allocated_percentage')\">\n"
+"                            <th style=\"padding: 5px; text-align: left;\">日"
+"付</th>\n"
+"                            <td style=\"padding: 5px;\">\n"
+"                                <span t-if=\"ctx.get('start_datetime') and "
+"ctx.get('end_datetime')\" t-out=\"'%s ⟶ %s' % "
+"(                                     ctx['start_datetime'],                                     "
+"ctx['end_datetime'],                                 )\">\n"
+"                                    05/31/2021, 8:00 AM ⟶ 05/31/2021, 4:00 "
+"PM\n"
+"                                </span>\n"
+"                                <span t-if=\"ctx.get('allocated_hours')\" "
+"style=\"opacity: 0.5;\">\n"
+"                                    (<t t-out=\"ctx['allocated_hours']"
+"\">4:00</t>h)\n"
+"                                </span>\n"
+"                                <span t-if=\"ctx.get('allocated_percentage') "
+"and ctx['allocated_percentage'] != '100'\" style=\"opacity: 0.5;\">\n"
+"                                    (<t t-out=\"ctx['allocated_percentage']"
+"\">50</t>%)\n"
+"                                </span>\n"
+"                            </td>\n"
+"                        </tr>\n"
+"                        <tr t-if=\"object.role_id\">\n"
+"                            <th style=\"padding: 5px; text-align: left;\">役"
+"割</th>\n"
+"                            <td style=\"padding: 5px;\" t-"
+"out=\"object.role_id.name or ''\">バーテンダー</td>\n"
+"                        </tr>\n"
+"                        <tr t-if=\"hasattr(object, 'project_id') and "
+"object.project_id\">\n"
+"                            <th style=\"padding: 5px; text-align: left;\">プ"
+"ロジェクト</th>\n"
+"                            <td style=\"padding: 5px;\" t-"
+"out=\"object.sudo().project_id.name or ''\">集まり</td>\n"
+"                        </tr>\n"
+"                        <tr t-if=\"hasattr(object, 'sale_line_id') and "
+"object.sale_line_id\">\n"
+"                            <th style=\"padding: 5px; text-align: left;\">販"
+"売オーダアイテム</th>\n"
+"                            <td style=\"padding: 5px;\" t-"
+"out=\"object.sudo().sale_line_id.name or ''\">コーヒー</td>\n"
+"                        </tr>\n"
+"                        <tr t-if=\"hasattr(object, 'name') and "
+"object.name\">\n"
+"                            <th style=\"padding: 5px; text-align: left;\">メ"
+"モ</th>\n"
+"                            <td style=\"padding: 5px;\" t-out=\"object.name "
+"or ''\">/</td>\n"
+"                        </tr>\n"
+"                    </table>\n"
+"                    <div class=\"button_box\">\n"
+"                        <a t-if=\"ctx.get('available_link')\" t-att-"
+"href=\"ctx['available_link']\" target=\"_blank\" "
+"class=\"planning_mail_template_button top_button\">自分にこのシフトを割当てる"
+"</a>\n"
+"                        <a t-if=\"ctx.get('unavailable_link')\" t-att-"
+"href=\"ctx['unavailable_link']\" target=\"_blank\" "
+"class=\"planning_mail_template_button top_button\">空いていません</a>\n"
+"                        <a t-if=\"ctx.get('google_url')\" t-att-"
+"href=\"ctx['google_url']\" target=\"_blank\" "
+"class=\"planning_mail_template_button\">Googleカレンダに追加</a>\n"
+"                        <a t-if=\"ctx.get('iCal_url')\" t-att-"
+"href=\"ctx['iCal_url']\" target=\"_blank\" "
+"class=\"planning_mail_template_button\">iCal/Outlookに追加</a>\n"
+"                    </div>\n"
+"                    <br/>\n"
+"                    <p t-if=\"ctx.get('open_shift_available')\">もし希望し、"
+"空いている場合は、この空きのあるシフトに自分を割当して下さい。</p>\n"
+"                    <p t-else=\"\">現在のシフトが合わない場合は、同僚にシフト"
+"変更を依頼することをお勧めします。同僚もシフト交換を希望している場合がありま"
+"す。</p>\n"
+"                </div>\n"
+"            </body>"
 
 #. module: planning
 #: model:mail.template,body_html:planning.email_template_planning_planning
@@ -596,36 +830,116 @@ msgid ""
 "                    text-align: center;\n"
 "                }\n"
 "                </style>\n"
-"                <div>\n"
-"                    <p t-if=\"ctx.get('employee')\">Dear <t t-out=\"ctx['employee'].name or ''\">Anita Oliver</t>,</p>\n"
+"                <body><div>\n"
+"                    <p t-if=\"ctx.get('employee')\">Dear <t t-"
+"out=\"ctx['employee'].name or ''\">Anita Oliver</t>,</p>\n"
 "                    <p t-else=\"\">Hello,</p>\n"
-"                    <br>\n"
-"                    <p t-if=\"ctx.get('start_datetime') and ctx.get('end_datetime')\">\n"
-"                        Your upcoming shifts from <t t-out=\"format_date(ctx['start_datetime'])\">05-05-2021</t>\n"
-"                        to <t t-out=\"format_date(ctx['end_datetime'])\">05-11-2021</t> have been published.\n"
+"                    <br/>\n"
+"                    <p t-if=\"ctx.get('start_datetime') and "
+"ctx.get('end_datetime')\">\n"
+"                        Your upcoming shifts from <t t-"
+"out=\"format_date(ctx['start_datetime'])\">05-05-2021</t>\n"
+"                        to <t t-out=\"format_date(ctx['end_datetime'])"
+"\">05-11-2021</t> have been published.\n"
 "                    </p>\n"
 "                    <div style=\"display: flex; margin: 15px;\">\n"
-"                        <div t-if=\"ctx.get('planning_url')\" style=\"margin-right: 15px;\">\n"
-"                            <a t-att-href=\"ctx['planning_url']\" target=\"_blank\" class=\"planning_mail_template_button\" style=\"color: #FFFFFF; background-color: #875A7B; border: solid #875A7B;\">View Your Planning</a>\n"
+"                        <div t-if=\"ctx.get('planning_url')\" style=\"margin-"
+"right: 15px;\">\n"
+"                            <a t-att-href=\"ctx['planning_url']\" "
+"target=\"_blank\" class=\"planning_mail_template_button\" style=\"color: "
+"#FFFFFF; background-color: #875A7B; border: solid #875A7B;\">View Your "
+"Planning</a>\n"
 "                        </div>\n"
 "                        <div t-if=\"ctx.get('planning_url_ics')\">\n"
-"                            <a t-att-href=\"ctx['planning_url_ics']\" target=\"_blank\" class=\"planning_mail_template_button\" style=\"color: #374151; background-color: #E7E9ED; border: solid #E7E9ED;\">Add to Calendar</a>\n"
+"                            <a t-att-href=\"ctx['planning_url_ics']\" "
+"target=\"_blank\" class=\"planning_mail_template_button\" style=\"color: "
+"#374151; background-color: #E7E9ED; border: solid #E7E9ED;\">Add to "
+"Calendar</a>\n"
 "                        </div>\n"
 "                    </div>\n"
-"                    <br>\n"
-"                    <p t-if=\"ctx.get('slot_unassigned') or (object.allow_self_unassign and object.self_unassign_days_before)\">\n"
+"                    <br/>\n"
+"                    <p t-if=\"ctx.get('slot_unassigned') or "
+"(object.allow_self_unassign and object.self_unassign_days_before)\">\n"
 "                        <t t-if=\"ctx.get('slot_unassigned')\">\n"
-"                            We would also like to remind you that there are some open shifts available, and if you are interested and available, please assign yourself to those shifts.\n"
+"                            We would also like to remind you that there are "
+"some open shifts available, and if you are interested and available, please "
+"assign yourself to those shifts.\n"
 "                        </t>\n"
-"                        <t t-if=\"object.allow_self_unassign and object.self_unassign_days_before\">\n"
-"                            If you are unable to work a shift that has been assigned to you, please unassign yourself within <t t-out=\"object.self_unassign_days_before or ''\">5</t> day(s) before the start of the shift.\n"
+"                        <t t-if=\"object.allow_self_unassign and "
+"object.self_unassign_days_before\">\n"
+"                            If you are unable to work a shift that has been "
+"assigned to you, please unassign yourself within <t t-"
+"out=\"object.self_unassign_days_before or ''\">5</t> day(s) before the start "
+"of the shift.\n"
 "                        </t>\n"
 "                    </p>\n"
-"                    <p t-if=\"ctx.get('message')\" t-out=\"ctx['message']\"></p>\n"
-"                    <p t-if=\"object.allow_self_unassign\">In case your current schedule doesn't suit you, we encourage you to reach out to your colleagues and request to switch shifts. They might be interested in exchanging shifts with you.</p>\n"
+"                    <p t-if=\"ctx.get('message')\" t-out=\"ctx['message']\"/"
+">\n"
+"                    <p t-if=\"object.allow_self_unassign\">In case your "
+"current schedule doesn't suit you, we encourage you to reach out to your "
+"colleagues and request to switch shifts. They might be interested in "
+"exchanging shifts with you.</p>\n"
 "                </div>\n"
-"            "
+"            </body>"
 msgstr ""
+"<style>\n"
+"                .planning_mail_template_button {\n"
+"                    padding: 5px 10px;\n"
+"                    text-decoration: none;\n"
+"                    border: 1px;\n"
+"                    border-radius: 3px;\n"
+"                    display: inline-block; \n"
+"                    width: 190px;\n"
+"                    text-align: center;\n"
+"                }\n"
+"                </style>\n"
+"                <body><div>\n"
+"                    <p t-if=\"ctx.get('employee')\"><t t-"
+"out=\"ctx['employee'].name or ''\">Anita Oliver</t>様、</p>\n"
+"                    <p t-else=\"\">こんにちは。</p>\n"
+"                    <br/>\n"
+"                    <p t-if=\"ctx.get('start_datetime') and "
+"ctx.get('end_datetime')\">\n"
+"                        新規シフト <t t-"
+"out=\"format_date(ctx['start_datetime'])\">05-05-2021</t>\n"
+"                        から <t t-out=\"format_date(ctx['end_datetime'])"
+"\">05-11-2021</t> が公開されました。\n"
+"                    </p>\n"
+"                    <div style=\"display: flex; margin: 15px;\">\n"
+"                        <div t-if=\"ctx.get('planning_url')\" style=\"margin-"
+"right: 15px;\">\n"
+"                            <a t-att-href=\"ctx['planning_url']\" "
+"target=\"_blank\" class=\"planning_mail_template_button\" style=\"color: "
+"#FFFFFF; background-color: #875A7B; border: solid #875A7B;\">計画を見る</a>\n"
+"                        </div>\n"
+"                        <div t-if=\"ctx.get('planning_url_ics')\">\n"
+"                            <a t-att-href=\"ctx['planning_url_ics']\" "
+"target=\"_blank\" class=\"planning_mail_template_button\" style=\"color: "
+"#374151; background-color: #E7E9ED; border: solid #E7E9ED;\">カレンダに追加す"
+"る</a>\n"
+"                        </div>\n"
+"                    </div>\n"
+"                    <br/>\n"
+"                    <p t-if=\"ctx.get('slot_unassigned') or "
+"(object.allow_self_unassign and object.self_unassign_days_before)\">\n"
+"                        <t t-if=\"ctx.get('slot_unassigned')\">\n"
+"                            空いているシフトがあり、あなたが勤務可能であれ"
+"ば、ご自分で割当て下さい。\n"
+"                        </t>\n"
+"                        <t t-if=\"object.allow_self_unassign and "
+"object.self_unassign_days_before\">\n"
+"                            もし勤務できない場合 <t t-"
+"out=\"object.self_unassign_days_before or ''\">5</t> 日前までに自分で割当を解"
+"除することができます。\n"
+"                        </t>\n"
+"                    </p>\n"
+"                    <p t-if=\"ctx.get('message')\" t-out=\"ctx['message']\"/"
+">\n"
+"                    <p t-if=\"object.allow_self_unassign\">現在のシフトが合わ"
+"ない場合は、同僚にシフト変更を依頼することをお勧めします。同僚もシフト交換を"
+"希望している場合があります。</p>\n"
+"                </div>\n"
+"            </body>"
 
 #. module: planning
 #: model:ir.model.constraint,message:planning.constraint_planning_recurrency_check_until_limit
@@ -643,7 +957,7 @@ msgstr "シフトは繰返しと同じ会社でなければなりません。"
 #: model:ir.model.fields,field_description:planning.field_planning_role__active
 #: model:ir.model.fields,field_description:planning.field_planning_slot_template__active
 msgid "Active"
-msgstr "有効化"
+msgstr "有効"
 
 #. module: planning
 #. odoo-javascript
@@ -677,7 +991,9 @@ msgstr "管理者"
 msgid ""
 "All open shifts have already been assigned, or there are no resources "
 "available to take them at this time."
-msgstr "すべてのオープンシフトと販売オーダは既に割当てられているか、または現時点でそれらを担当するのに利用可能なリソースがありません。"
+msgstr ""
+"すべてのオープンシフトと販売オーダは既に割当てられているか、または現時点でそ"
+"れらを担当するのに利用可能なリソースがありません。"
 
 #. module: planning
 #. odoo-javascript
@@ -739,7 +1055,9 @@ msgstr "割当タイプ"
 msgid ""
 "Analyze the allocation of your resources across roles, projects, and sales "
 "orders, and estimate future needs."
-msgstr "役割、プロジェクト、販売オーダにまたがるリソースの割当を分析し、将来のニーズを予測します。"
+msgstr ""
+"役割、プロジェクト、販売オーダにまたがるリソースの割当を分析し、将来のニーズ"
+"を予測します。"
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.planning_role_view_form
@@ -756,11 +1074,14 @@ msgstr "アーカイブ済"
 msgid ""
 "Archiving this resource will transform all of its future shifts into open "
 "shifts. Are you sure you want to continue?"
-msgstr "このリソースをアーカイブすることで、今後の全シフトがオープンシフトに変わります。本当に続けますか？"
+msgstr ""
+"このリソースをアーカイブすることで、今後の全シフトがオープンシフトに変わりま"
+"す。本当に続けますか？"
 
 #. module: planning
 #. odoo-javascript
 #: code:addons/planning/static/src/views/planning_form/planning_form_view.js:0
+#: code:addons/planning/static/src/views/planning_gantt/planning_gantt_renderer.js:0
 msgid "Are you sure you want to delete this shift?"
 msgstr "本当にこのシフトを削除しますか？"
 
@@ -796,8 +1117,9 @@ msgid ""
 "open shifts for the roles you will be needing to complete a mission. Then, "
 "assign those open shifts to the resources that are available.</i>"
 msgstr ""
-"<b>リソース</b>を割当するか、今のところオープンにしておきましょう。 <i>ヒント: "
-"任務完了するために必要な役割用に、オープンシフトを作成します。そして、それらのオープンシフトを、利用可能なリソースに割当てます。</i>"
+"<b>リソース</b>を割当するか、今のところオープンにしておきましょう。 <i>ヒン"
+"ト: 任務完了するために必要な役割用に、オープンシフトを作成します。そして、そ"
+"れらのオープンシフトを、利用可能なリソースに割当てます。</i>"
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.unwanted_slots_list_template
@@ -894,7 +1216,9 @@ msgstr "会社"
 msgid ""
 "Company linked to the material resource. Leave empty for the resource to be "
 "available in every company."
-msgstr "材料リソースにリンクされている会社。全ての会社でリソースが利用可能な場合は空のままにします。"
+msgstr ""
+"材料リソースにリンクされている会社。全ての会社でリソースが利用可能な場合は空"
+"のままにします。"
 
 #. module: planning
 #: model:ir.model,name:planning.model_res_config_settings
@@ -910,7 +1234,7 @@ msgstr "設定"
 #. odoo-javascript
 #: code:addons/planning/static/src/views/planning_calendar/planning_ask_recurrence_update/planning_ask_recurrence_update_dialog.xml:0
 msgid "Confirm"
-msgstr "確認"
+msgstr "確定"
 
 #. module: planning
 #. odoo-javascript
@@ -1007,9 +1331,11 @@ msgstr "デフォルト役割"
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.employee_no_email_list_wizard
 msgid ""
-"Define a work email address for the following employees so they will receive"
-" the planning."
-msgstr "以下の従業員に業務用のEメールアドレスを定義し、予定を受取れるようにして下さい。"
+"Define a work email address for the following employees so they will receive "
+"the planning."
+msgstr ""
+"以下の従業員に業務用のEメールアドレスを定義し、予定を受取れるようにして下さ"
+"い。"
 
 #. module: planning
 #: model:ir.model.fields,help:planning.field_planning_slot__role_id
@@ -1018,7 +1344,9 @@ msgid ""
 "Create open shifts for the roles you need to complete a mission. Then, "
 "assign those open shifts to the resources that are available."
 msgstr ""
-"リソースが果たす役割を定義します(例：シェフ、バーテンダー、ウェイター...)ミッションを完了するために必要な役割のオープンシフトを作成します。次に、これらのオープンシフトを利用可能なリソースに割当てます。"
+"リソースが果たす役割を定義します(例：シェフ、バーテンダー、ウェイター...)ミッ"
+"ションを完了するために必要な役割のオープンシフトを作成します。次に、これらの"
+"オープンシフトを利用可能なリソースに割当てます。"
 
 #. module: planning
 #: model_terms:ir.actions.act_window,help:planning.planning_action_roles
@@ -1027,11 +1355,14 @@ msgid ""
 "Create open shifts for the roles you will be needing to complete a mission. "
 "Then, assign those open shifts to the resources that are available."
 msgstr ""
-"リソースが果たす役割を定義します(例：シェフ、バーテンダー、ウェイター...)ミッションを完了するために必要となる役割のオープンシフトを作成します。次に、これらのオープンシフトを利用可能なリソースに割当てます。"
+"リソースが果たす役割を定義します(例：シェフ、バーテンダー、ウェイター...)ミッ"
+"ションを完了するために必要となる役割のオープンシフトを作成します。次に、これ"
+"らのオープンシフトを利用可能なリソースに割当てます。"
 
 #. module: planning
 #. odoo-javascript
 #: code:addons/planning/static/src/views/planning_form/planning_form_view.js:0
+#: code:addons/planning/static/src/views/planning_gantt/planning_gantt_renderer.js:0
 #: model_terms:ir.ui.view,arch_db:planning.planning_role_view_kanban
 #: model_terms:ir.ui.view,arch_db:planning.planning_view_gantt
 #: model_terms:ir.ui.view,arch_db:planning.planning_view_kanban
@@ -1082,7 +1413,9 @@ msgstr "表示名"
 #. module: planning
 #: model_terms:ir.actions.act_window,help:planning.planning_action_resources
 msgid "Distribute your material resources across projects and sales orders."
-msgstr "プロジェクトおよび販売オーダにまたがって物的リソースのスケジュールを分配することができます。"
+msgstr ""
+"プロジェクトおよび販売オーダにまたがって物的リソースのスケジュールを分配する"
+"ことができます。"
 
 #. module: planning
 #: model_terms:ir.actions.act_window,help:planning.planning_action_roles
@@ -1102,10 +1435,11 @@ msgstr "ドラフト"
 #: model_terms:digest.tip,tip_description:planning.digest_tip_planning_0
 msgid ""
 "Drag a shift to another day to reschedule it, or to another row to reassign "
-"the shift. Press CTRL (or Cmd on Mac) while dragging a shift to duplicate "
-"it."
+"the shift. Press CTRL (or Cmd on Mac) while dragging a shift to duplicate it."
 msgstr ""
-"シフトを別の日にドラッグしてスケジュールを変更したり、別の行にドラッグしてシフトを割り当て直したりできます。シフトをドラッグしながらCTRL(Macの場合はCmd)を押すと、シフトが複製されます。"
+"シフトを別の日にドラッグしてスケジュールを変更したり、別の行にドラッグしてシ"
+"フトを割り当て直したりできます。シフトをドラッグしながらCTRL(Macの場合はCmd)"
+"を押すと、シフトが複製されます。"
 
 #. module: planning
 #: model:ir.model.fields,field_description:planning.field_planning_slot__duration
@@ -1127,7 +1461,7 @@ msgstr "編集"
 #. odoo-javascript
 #: code:addons/planning/static/src/views/planning_calendar/planning_ask_recurrence_update/planning_ask_recurrence_update_dialog.xml:0
 msgid "Edit Recurrent Shift"
-msgstr ""
+msgstr "定期シフトを編集"
 
 #. module: planning
 #: model_terms:ir.actions.act_window,help:planning.planning_action_roles
@@ -1137,10 +1471,12 @@ msgstr "Eli Lambert (ウェイター)"
 #. module: planning
 #: model:mail.template,description:planning.email_template_shift_switch_email
 msgid ""
-"Email sent automatically when an employee self-assigns to the unwanted shift"
-" of another employee, notifying the person who requested to switch that the "
+"Email sent automatically when an employee self-assigns to the unwanted shift "
+"of another employee, notifying the person who requested to switch that the "
 "shift has been taken"
 msgstr ""
+"従業員が他の従業員の都合がつかないシフトに自ら割当てた場合に自動的に送信され"
+"るEメール。シフトが割当てられたことを変更を依頼した人に通知します。"
 
 #. module: planning
 #: model:mail.template,description:planning.email_template_slot_single
@@ -1149,8 +1485,7 @@ msgstr "シフト公開時に自動的に送信されるEメール"
 
 #. module: planning
 #: model:mail.template,description:planning.email_template_planning_planning
-msgid ""
-"Email sent automatically when publishing the schedule of your employees"
+msgid "Email sent automatically when publishing the schedule of your employees"
 msgstr "従業員のスケジュールが公開された時に自動的に送信されるEメール"
 
 #. module: planning
@@ -1223,7 +1558,9 @@ msgstr "エクストラメッセージ"
 msgid ""
 "Find here your planning. Assign yourself open shifts that match your roles, "
 "or indicate your unavailability."
-msgstr "あなたの計画をこちらで見つけてください。自分の役割に合ったオープンシフトを割り当てたり、稼働できないことを表示したりします。"
+msgstr ""
+"あなたの計画をこちらで見つけてください。自分の役割に合ったオープンシフトを割"
+"り当てたり、稼働できないことを表示したりします。"
 
 #. module: planning
 #. odoo-python
@@ -1346,7 +1683,9 @@ msgstr "ID"
 msgid ""
 "If checked, it means that the shift contains has changed since its last "
 "publish."
-msgstr "チェックした場合、それはその最後の公開以降に変更されたシフトが含まれていることを意味します。"
+msgstr ""
+"チェックした場合、それはその最後の公開以降に変更されたシフトが含まれているこ"
+"とを意味します。"
 
 #. module: planning
 #. odoo-javascript
@@ -1421,22 +1760,23 @@ msgstr "従業員が同僚とシフトを入れ替えたり、シフトを解除
 #. odoo-javascript
 #: code:addons/planning/static/src/js/tours/planning.js:0
 msgid ""
-"Let's check out the Gantt view for cool features. Get ready to <b>share your"
-" schedule</b> and easily plan your shifts with just one click by <em>copying"
-" the previous week's schedule</em>."
+"Let's check out the Gantt view for cool features. Get ready to <b>share your "
+"schedule</b> and easily plan your shifts with just one click by <em>copying "
+"the previous week's schedule</em>."
 msgstr ""
-"ガントビューの優れた機能をチェックしてみましょう。 <b>スケジュールをシェア</b>し、 "
-"<em>先週のスケジュールをコピー</em>してワンクリックだけでシフトを計画できます。"
+"ガントビューの優れた機能をチェックしてみましょう。 <b>スケジュールをシェア</"
+"b>し、 <em>先週のスケジュールをコピー</em>してワンクリックだけでシフトを計画"
+"できます。"
 
 #. module: planning
 #. odoo-javascript
 #: code:addons/planning/static/src/js/tours/planning.js:0
 msgid ""
-"Let's create your first <b>shift</b>. <i>Tip: use the (+) shortcut available"
-" on each cell of the Gantt view to save time.</i>"
+"Let's create your first <b>shift</b>. <i>Tip: use the (+) shortcut available "
+"on each cell of the Gantt view to save time.</i>"
 msgstr ""
-"最初の<b>シフト</b>を作成しましょう。 <i>ヒント: ガントビューの各セルで使用できる (+) "
-"ショートカットを使用し時間を節約しましょう。</i>"
+"最初の<b>シフト</b>を作成しましょう。 <i>ヒント: ガントビューの各セルで使用で"
+"きる (+) ショートカットを使用し時間を節約しましょう。</i>"
 
 #. module: planning
 #. odoo-javascript
@@ -1490,7 +1830,7 @@ msgstr "Marc Demo"
 #: code:addons/planning/static/src/views/fields/many2many_avatar_resource/many2many_avatar_resource_field.js:0
 #: model:ir.model.fields.selection,name:planning.selection__planning_analysis_report__resource_type__material
 msgid "Material"
-msgstr "製品"
+msgstr "材料"
 
 #. module: planning
 #: model:ir.actions.act_window,name:planning.planning_action_resources
@@ -1613,7 +1953,8 @@ msgstr "役割が見つかりません。役割を作成しましょう。"
 #. module: planning
 #: model_terms:ir.actions.act_window,help:planning.planning_action_shift_template
 msgid "No shift templates found. Let's create one!"
-msgstr "シフトテンプレートが見つかりません。シフトテンプレートを作成しましょう。"
+msgstr ""
+"シフトテンプレートが見つかりません。シフトテンプレートを作成しましょう。"
 
 #. module: planning
 #: model_terms:ir.actions.act_window,help:planning.planning_action_my_calendar
@@ -1640,9 +1981,10 @@ msgstr "メモ："
 #. odoo-javascript
 #: code:addons/planning/static/src/js/tours/planning.js:0
 msgid ""
-"Now that this week is ready, let's get started on <b>next week's "
-"schedule</b>."
-msgstr "今週の用意が完了しました。では、<b>来週のスケジュール</b>を始めましょう。"
+"Now that this week is ready, let's get started on <b>next week's schedule</"
+"b>."
+msgstr ""
+"今週の用意が完了しました。では、<b>来週のスケジュール</b>を始めましょう。"
 
 #. module: planning
 #: model:ir.model.fields.selection,name:planning.selection__planning_slot__repeat_type__x_times
@@ -1679,13 +2021,13 @@ msgstr "利用可能なオープンシフト"
 #. odoo-javascript
 #: code:addons/planning/static/src/views/planning_hooks.js:0
 msgid "Open shifts assigned"
-msgstr ""
+msgstr "オープンシフトが割当られました"
 
 #. module: planning
 #. odoo-javascript
 #: code:addons/planning/static/src/views/planning_hooks.js:0
 msgid "Open shifts unscheduled"
-msgstr ""
+msgstr "オープンシフトがスケジュール解除されました"
 
 #. module: planning
 #. odoo-javascript
@@ -1699,7 +2041,9 @@ msgstr "オープン: %s"
 msgid ""
 "Operation not supported, you should always compare overlap_slot_count to 0 "
 "value with = or > operator."
-msgstr "サポートされていない作業です。overlap_slot_count を常に0の値がオペレータと=または >と比較する必要があります。"
+msgstr ""
+"サポートされていない作業です。overlap_slot_count を常に0の値がオペレータと=ま"
+"たは >と比較する必要があります。"
 
 #. module: planning
 #: model:ir.model.fields,field_description:planning.field_planning_send__start_datetime
@@ -1720,7 +2064,8 @@ msgstr "プロジェクト全体のリソース配分を計画し、納期をよ
 msgid ""
 "Plan your shifts in one click by <b>copying the schedule from the previous "
 "week</b>."
-msgstr "<b>前週のスケジュールをコピー</b>して、ワンクリックでシフトを計画します。"
+msgstr ""
+"<b>前週のスケジュールをコピー</b>して、ワンクリックでシフトを計画します。"
 
 #. module: planning
 #. odoo-javascript
@@ -1728,7 +2073,9 @@ msgstr "<b>前週のスケジュールをコピー</b>して、ワンクリッ�
 msgid ""
 "Plan your shifts in one click by <b>copying the schedule from the previous "
 "week</b>. Open the menu to access this option."
-msgstr "<b>前週のスケジュールをコピー</b>して、ワンクリックでシフトを計画。メニューを開いてこのオプションにアクセスします。"
+msgstr ""
+"<b>前週のスケジュールをコピー</b>して、ワンクリックでシフトを計画。メニューを"
+"開いてこのオプションにアクセスします。"
 
 #. module: planning
 #: model:ir.model.fields,field_description:planning.field_planning_slot_template__start_time
@@ -1848,6 +2195,8 @@ msgid ""
 "Please add a work email for the following employee so that they can receive "
 "their planning:"
 msgstr ""
+"以下の従業員に業務用のEメールアドレスを追加し、予定を受取れるようにして下さ"
+"い:"
 
 #. module: planning
 #. odoo-javascript
@@ -1873,6 +2222,7 @@ msgstr "プロジェクター"
 
 #. module: planning
 #: model:ir.model.fields,field_description:planning.field_planning_slot__slot_properties
+#: model_terms:ir.ui.view,arch_db:planning.planning_view_search
 msgid "Properties"
 msgstr "属性"
 
@@ -1937,7 +2287,7 @@ msgstr "繰返しシフト"
 #. odoo-javascript
 #: code:addons/planning/static/src/views/planning_form/planning_form_view.js:0
 msgid "Recurring shifts created"
-msgstr ""
+msgstr "定期シフトが作成されました"
 
 #. module: planning
 #: model:ir.model.fields,field_description:planning.field_planning_recurrency__slot_ids
@@ -2043,8 +2393,10 @@ msgstr "役割"
 #. module: planning
 #: model:ir.model.fields,help:planning.field_hr_employee__default_planning_role_id
 msgid ""
-"Role that will be selected by default when creating a shift for this employee.\n"
-"This role will also have precedence over the other roles of the employee when planning orders."
+"Role that will be selected by default when creating a shift for this "
+"employee.\n"
+"This role will also have precedence over the other roles of the employee "
+"when planning orders."
 msgstr ""
 "この従業員のシフトを作成する際にデフォルトで選択される役割。\n"
 "この役割は、オーダを計画する際、従業員の他の役割よりも優先されます。"
@@ -2052,8 +2404,10 @@ msgstr ""
 #. module: planning
 #: model:ir.model.fields,help:planning.field_resource_resource__default_role_id
 msgid ""
-"Role that will be selected by default when creating a shift for this resource.\n"
-"This role will also have precedence over the other roles of the resource when planning shifts."
+"Role that will be selected by default when creating a shift for this "
+"resource.\n"
+"This role will also have precedence over the other roles of the resource "
+"when planning shifts."
 msgstr ""
 "このリソースのシフトを作成する際にデフォルトで選択される役割。\n"
 "この役割は、シフトを計画する際、リソースの他の役割よりも優先されます。"
@@ -2079,14 +2433,20 @@ msgstr "役割"
 #. module: planning
 #: model:ir.model.fields,help:planning.field_hr_employee__planning_role_ids
 msgid ""
-"Roles that the employee can fill in. When creating a shift for this employee, only the shift templates for these roles will be displayed.\n"
-"Similarly, only the open shifts available for these roles will be sent to the employee when the schedule is published.\n"
-"Additionally, the employee will only be assigned orders for these roles (with the default planning role having precedence over the other ones).\n"
+"Roles that the employee can fill in. When creating a shift for this "
+"employee, only the shift templates for these roles will be displayed.\n"
+"Similarly, only the open shifts available for these roles will be sent to "
+"the employee when the schedule is published.\n"
+"Additionally, the employee will only be assigned orders for these roles "
+"(with the default planning role having precedence over the other ones).\n"
 "Leave empty for the employee to be assigned shifts regardless of the role."
 msgstr ""
-"従業員が記入できる役割。この従業員のシフトを作成する場合、これらの役割のシフトテンプレートのみが表示されます。\n"
-"同様に、スケジュールが公開されると、これらの役割で利用可能なオープンシフトのみが従業員に送信されます。\n"
-"さらに、従業員にはこれらの役割のオーダのみが割当てられます(デフォルトの計画役割が他の役割よりも優先されます)\n"
+"従業員が記入できる役割。この従業員のシフトを作成する場合、これらの役割のシフ"
+"トテンプレートのみが表示されます。\n"
+"同様に、スケジュールが公開されると、これらの役割で利用可能なオープンシフトの"
+"みが従業員に送信されます。\n"
+"さらに、従業員にはこれらの役割のオーダのみが割当てられます(デフォルトの計画役"
+"割が他の役割よりも優先されます)\n"
 "役割に関係なくシフトを割当てる従業員用には、空のままにします。"
 
 #. module: planning
@@ -2141,7 +2501,7 @@ msgstr "役割別スケジュール"
 #. odoo-python
 #: code:addons/planning/wizard/planning_send.py:0
 msgid "Schedule sent to your employees"
-msgstr ""
+msgstr "従業員にスケジュールが送信されました"
 
 #. module: planning
 #: model_terms:ir.actions.act_window,help:planning.planning_action_schedule_by_resource
@@ -2149,7 +2509,9 @@ msgstr ""
 msgid ""
 "Schedule your human and material resources across roles, projects and sales "
 "orders."
-msgstr "役割、プロジェクト、販売オーダにまたがる人的・物的リソースのスケジュールを立てることができます。"
+msgstr ""
+"役割、プロジェクト、販売オーダにまたがる人的・物的リソースのスケジュールを立"
+"てることができます。"
 
 #. module: planning
 #. odoo-python
@@ -2198,7 +2560,9 @@ msgstr "管理設定"
 msgid ""
 "Share the schedule with your team by publishing and sending it. Open the "
 "menu to access this option."
-msgstr "スケジュールを公開・送信してチームと共有しましょう。このオプションにアクセスするにはメニューを開いて下さい。"
+msgstr ""
+"スケジュールを公開・送信してチームと共有しましょう。このオプションにアクセス"
+"するにはメニューを開いて下さい。"
 
 #. module: planning
 #. odoo-python
@@ -2238,13 +2602,13 @@ msgstr "シフト・テンプレート"
 #. odoo-javascript
 #: code:addons/planning/static/src/views/planning_form/planning_form_view.js:0
 msgid "Shift saved as template"
-msgstr ""
+msgstr "シフトがテンプレートとして保存されました"
 
 #. module: planning
 #. odoo-python
 #: code:addons/planning/models/planning.py:0
 msgid "Shift sent"
-msgstr ""
+msgstr "シフトが送信されました"
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.planning_view_search_base
@@ -2275,9 +2639,17 @@ msgstr "あなたのチームメンバーのシフト"
 
 #. module: planning
 #. odoo-python
+#: code:addons/planning/wizard/planning_send.py:0
+msgid "Shifts published — employees without a work email were skipped"
+msgstr ""
+"シフトを公開しました — 業務用メールアドレスを持たない従業員はスキップされまし"
+"た"
+
+#. module: planning
+#. odoo-python
 #: code:addons/planning/models/planning.py:0
 msgid "Shifts reset to draft"
-msgstr ""
+msgstr "シフトがドラフトにリセットされました"
 
 #. module: planning
 #: model:planning.role,name:planning.planning_shipping_associate
@@ -2416,13 +2788,7 @@ msgstr "開始時間は負にすることはできません。"
 #. odoo-python
 #: code:addons/planning/models/planning_template.py:0
 msgid ""
-"The start hour cannot be before the end hour for a one-day shift template."
-msgstr "1日シフトテンプレートでは開始時間 は終了時間 の前にすることはできません。"
-
-#. module: planning
-#. odoo-python
-#: code:addons/planning/wizard/planning_send.py:0
-msgid "The work email is missing for the following employees:"
+"The start hour cannot be after the end hour for a one-day shift template."
 msgstr ""
 
 #. module: planning
@@ -2435,8 +2801,8 @@ msgstr "このオープンシフトに使用可能なリソースがありませ
 #. odoo-javascript
 #: code:addons/planning/static/src/views/planning_hooks.js:0
 msgid ""
-"There are no shifts planned for the previous week, or they have already been"
-" copied."
+"There are no shifts planned for the previous week, or they have already been "
+"copied."
 msgstr "前週にシフトの予定がないか、すでにコピーされています。"
 
 #. module: planning
@@ -2449,7 +2815,7 @@ msgstr "公開または送付するシフトがありません。"
 #. odoo-python
 #: code:addons/planning/models/planning.py:0
 msgid "There are no shifts to reset to draft."
-msgstr "ドラフトにリセットするシフトがありません。"
+msgstr "ドラフトに戻すシフトがありません。"
 
 #. module: planning
 #. odoo-python
@@ -2480,20 +2846,24 @@ msgstr "このシフトとこれ以降のシフト"
 msgid ""
 "This employee is not expected to work during this period, either because "
 "they do not have a current contract or because they are on leave."
-msgstr "この従業員は、現在の契約がないため、または休職中のため、この期間働く予定はありません。"
+msgstr ""
+"この従業員は、現在の契約がないため、または休職中のため、この期間働く予定はあ"
+"りません。"
 
 #. module: planning
 #. odoo-python
 #: code:addons/planning/models/planning.py:0
 msgid "This method must take two slots in argument."
-msgstr ""
+msgstr "この方法では引数に2つのスロットを指定する必要があります。"
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.period_report_template
 msgid ""
 "This open shift is no longer available, or the planning has been updated in "
 "the meantime. Please contact your manager for further information."
-msgstr "このオープンシフトは終了しているか、または計画が更新されました。詳しくは担当者にお問い合わせください。"
+msgstr ""
+"このオープンシフトは終了しているか、または計画が更新されました。詳しくは担当"
+"者にお問い合わせください。"
 
 #. module: planning
 #. odoo-javascript
@@ -2511,7 +2881,7 @@ msgstr "このシフトは繰返しです。削除: "
 #. module: planning
 #: model:digest.tip,name:planning.digest_tip_planning_0
 msgid "Tip: Record your planning faster"
-msgstr "ヒント：より速く、あなたの計画を記録"
+msgstr "ヒント: 計画をより迅速に記録する"
 
 #. module: planning
 #: model:ir.model.fields,help:planning.field_planning_slot__repeat
@@ -2521,7 +2891,10 @@ msgid ""
 "passes by in order to always get shifts 6 months ahead. This value can be "
 "modified from the settings of Planning, in debug mode."
 msgstr ""
-"データベースとパフォーマンス問題を損なうことを避けるために、シフトは今後6か月間のみ作成されます。その後、常に6か月先のシフトを取得するために時間が経つにつれて徐々に作成されます。この値は、デバッグモードで、計画の設定から変更することができます。"
+"データベースとパフォーマンス問題を損なうことを避けるために、シフトは今後6か月"
+"間のみ作成されます。その後、常に6か月先のシフトを取得するために時間が経つにつ"
+"れて徐々に作成されます。この値は、デバッグモードで、計画の設定から変更するこ"
+"とができます。"
 
 #. module: planning
 #. odoo-javascript
@@ -2573,7 +2946,7 @@ msgstr "ユーザ"
 #. odoo-python
 #: code:addons/planning/models/hr.py:0
 msgid "View Planning"
-msgstr "計画を参照"
+msgstr "計画を表示"
 
 #. module: planning
 #: model_terms:ir.actions.act_window,help:planning.planning_action_roles
@@ -2617,8 +2990,10 @@ msgid ""
 "needing to complete a mission. Then, assign those open shifts to the "
 "resources that are available.</i>"
 msgstr ""
-"従業員の行う<b>役割</b> (<i>例:  シェフ、バーテンダー、ウェイターなど</i>)を書きましょう。 <i>ヒント: "
-"ミッションを完了するために必要となる役割のオープンシフトを作成します。次に、これらのオープンシフトを利用可能なリソースに割当てます。</i>"
+"従業員の行う<b>役割</b> (<i>例:  シェフ、バーテンダー、ウェイターなど</i>)を"
+"書きましょう。 <i>ヒント: ミッションを完了するために必要となる役割のオープン"
+"シフトを作成します。次に、これらのオープンシフトを利用可能なリソースに割当て"
+"ます。</i>"
 
 #. module: planning
 #: model:ir.model.fields.selection,name:planning.selection__planning_recurrency__repeat_unit__year
@@ -2630,7 +3005,7 @@ msgstr "年"
 #. odoo-python
 #: code:addons/planning/models/planning.py:0
 msgid "You are not allowed to reset shifts to draft."
-msgstr ""
+msgstr "シフトをドラフトにリセットする権利がありません。"
 
 #. module: planning
 #. odoo-python
@@ -2643,6 +3018,12 @@ msgstr "既に割り当てられたシフトに自分を割り当てることは
 #: code:addons/planning/models/planning.py:0
 msgid "You can not unassign another employee than yourself."
 msgstr "自分以外の従業員の割り当てを解除することはできません。"
+
+#. module: planning
+#. odoo-python
+#: code:addons/planning/models/planning.py:0
+msgid "You cannot assign yourself to a shift in the past."
+msgstr "過去のシフトに自分で割当てを行うことはできません。"
 
 #. module: planning
 #. odoo-python
@@ -2669,6 +3050,12 @@ msgid "You cannot switch a shift that is in the past."
 msgstr "過去のシフトを交代することはできません。"
 
 #. module: planning
+#. odoo-python
+#: code:addons/planning/models/planning.py:0
+msgid "You cannot unassign yourself from a shift in the past."
+msgstr "過去のシフトから自分自身を外すことはできません。"
+
+#. module: planning
 #. odoo-javascript
 #: code:addons/planning/static/src/js/planning_calendar_front.js:0
 msgid "You don't have any shifts planned yet."
@@ -2680,7 +3067,8 @@ msgstr "まだ予定されたシフトがありません。"
 msgid ""
 "You don't have any shifts planned yet. You can assign yourself some of the "
 "available open shifts."
-msgstr "まだ予定されたシフトがありません。空きシフトに自分を割当てることができます。"
+msgstr ""
+"まだ予定されたシフトがありません。空きシフトに自分を割当てることができます。"
 
 #. module: planning
 #. odoo-python
@@ -2713,26 +3101,20 @@ msgstr "計画"
 #. module: planning
 #: model:mail.template,subject:planning.email_template_planning_planning
 msgid ""
-"Your planning from {{ format_date(ctx.get('start_datetime')) }} to {{ "
-"format_date(ctx.get('end_datetime')) }}"
+"Your planning from {{ format_date(ctx.get('start_datetime')) }} to "
+"{{ format_date(ctx.get('end_datetime')) }}"
 msgstr ""
-"{{ format_date(ctx.get('start_datetime')) }} から {{ "
-"format_date(ctx.get('end_datetime')) }}までの計画"
+"{{ format_date(ctx.get('start_datetime')) }} から "
+"{{ format_date(ctx.get('end_datetime')) }}までの計画"
 
 #. module: planning
 #: model:mail.template,subject:planning.email_template_shift_switch_email
 msgid ""
-"Your shift on {{ ctx.get('start_datetime') }} was re-assigned to {{ "
-"ctx.get('new_assignee_name', 'Marc Demo') }}"
+"Your shift on {{ ctx.get('start_datetime') }} was re-assigned to "
+"{{ ctx.get('new_assignee_name', 'Marc Demo') }}"
 msgstr ""
-" {{ ctx.get('start_datetime') }} のあなたのシフトは {{ ctx.get('new_assignee_name', "
-"'Marc Demo') }}に再割当されました"
-
-#. module: planning
-#. odoo-javascript
-#: code:addons/planning/static/src/components/address_recurrency_confirmation_dialog/address_recurrency_confirmation_dialog.xml:0
-msgid "all"
-msgstr "全て"
+" {{ ctx.get('start_datetime') }} のあなたのシフトは "
+"{{ ctx.get('new_assignee_name', 'Marc Demo') }}に再割当されました"
 
 #. module: planning
 #. odoo-javascript
@@ -2782,18 +3164,6 @@ msgstr "競合している他のシフト(s)。"
 #. module: planning
 #. odoo-javascript
 #: code:addons/planning/static/src/components/address_recurrency_confirmation_dialog/address_recurrency_confirmation_dialog.xml:0
-msgid "subsequent"
-msgstr "枝番"
-
-#. module: planning
-#. odoo-javascript
-#: code:addons/planning/static/src/components/address_recurrency_confirmation_dialog/address_recurrency_confirmation_dialog.xml:0
-msgid "this"
-msgstr "この"
-
-#. module: planning
-#. odoo-javascript
-#: code:addons/planning/static/src/components/address_recurrency_confirmation_dialog/address_recurrency_confirmation_dialog.xml:0
 msgid "this and following shifts"
 msgstr "このシフトとこれ以降のシフト"
 
@@ -2806,10 +3176,41 @@ msgstr "このシフト"
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.period_report_template
 msgid "to"
-msgstr "to"
+msgstr "~"
 
 #. module: planning
 #: model:mail.template,subject:planning.email_template_slot_single
 msgid "{{ ctx.get('mail_subject', '') }} {{ ctx.get('start_datetime' , '') }}"
-msgstr ""
-"{{ ctx.get('mail_subject', '') }} {{ ctx.get('start_datetime' , '') }}"
+msgstr "{{ ctx.get('mail_subject', '') }} {{ ctx.get('start_datetime' , '') }}"
+
+#~ msgid ""
+#~ "The start hour cannot be before the end hour for a one-day shift template."
+#~ msgstr ""
+#~ "1日シフトテンプレートでは開始時間 は終了時間 の前にすることはできません。"
+
+#~ msgid "04:00"
+#~ msgstr "04:00"
+
+#~ msgid "08:00"
+#~ msgstr "08:00"
+
+#~ msgid "100"
+#~ msgstr "100"
+
+#~ msgid "12:00"
+#~ msgstr "12:00"
+
+#~ msgid "13"
+#~ msgstr "13"
+
+#~ msgid "14"
+#~ msgstr "14"
+
+#~ msgid "15"
+#~ msgstr "15"
+
+#~ msgid "16:00"
+#~ msgstr "16:00"
+
+#~ msgid "The work email is missing for the following employees:"
+#~ msgstr "以下の従業員の業務用Eメールアドレスが不明です:"

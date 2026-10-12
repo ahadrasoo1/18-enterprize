@@ -2,7 +2,7 @@ import io
 import xlsxwriter
 
 from odoo import models, _, api
-from odoo.exceptions import UserError
+from odoo.exceptions import RedirectWarning, UserError
 from odoo.tools import get_quarter_number, format_date
 from collections import defaultdict
 
@@ -39,6 +39,8 @@ SURCHARGE_TAX_EQUIVALENT = {
     0.62: (5,),
     0.5: (5, 4),
     0: (0,),
+    0.26: (2,),
+    1: (7.5,),
 }
 
 
@@ -122,11 +124,22 @@ class GenericTaxReportCustomHandler(models.AbstractModel):
             fill_header(sheet_val, 'Inmueble', ('Situación', 'Referencia Catastral'))
             fill_header(sheet_val, 'Referencia Externa')
 
+    def _l10n_es_libros_get_operation_code(self, line):
+        taxes = line.move_id.invoice_line_ids.tax_ids.flatten_taxes_hierarchy()
+        if line.move_id.is_sale_document(include_receipts=True):
+            return taxes._l10n_es_get_regime_code()
+        mod_303_10 = self.env.ref('l10n_es.mod_303_casilla_10_balance')._get_matching_tags()
+        mod_303_11 = self.env.ref('l10n_es.mod_303_casilla_11_balance')._get_matching_tags()
+        if taxes.repartition_line_ids.tag_ids & (mod_303_10 + mod_303_11):
+            return '09'
+        return '01'
+
     def _l10n_es_libros_get_common_line_vals(self, line, tax):
         iae_group = self.env.company.l10n_es_reports_iae_group
         partner = line.partner_id
-        exempt_reason = line.move_id.invoice_line_ids.tax_ids.filtered(lambda t: t.l10n_es_exempt_reason == 'E2')
         sign = -1 if line.move_id.is_sale_document(include_receipts=True) else 1
+
+        delivery_date = line.move_id.delivery_date
 
         common_line_vals = {
             'year': line.date.year,
@@ -142,11 +155,11 @@ class GenericTaxReportCustomHandler(models.AbstractModel):
                 'in_receipt': 'F5' if tax.l10n_es_type == 'dua' else 'F1',
                 'in_refund': 'R4',
             }[line.move_type],
-            'date_expedition': format_date(self.env, line.date.isoformat(), date_format='MM/dd/yyyy'),
-            'date_transaction': format_date(self.env, line.invoice_date.isoformat(),
-                                            date_format='MM/dd/yyyy') if line.date != line.invoice_date else '',
+            'date_expedition': format_date(self.env, line.invoice_date, date_format='dd/MM/yyyy'),
+            'date_transaction': format_date(self.env, delivery_date,
+                                            date_format='dd/MM/yyyy') if delivery_date and delivery_date != line.invoice_date else '',
             'partner_name': partner.name,
-            'operation_code': '02' if exempt_reason else '01',
+            'operation_code': self._l10n_es_libros_get_operation_code(line),
             'total_amount': line.balance * sign,
             'base_amount': line.balance * sign,
             'tax_rate': 0,
@@ -195,8 +208,9 @@ class GenericTaxReportCustomHandler(models.AbstractModel):
         line_vals.update({
             'expense_concept': expense_concept,
             'expense_deductible': line.balance,
-            'expense_series_number': line.move_id.name,
-            'date_reception': format_date(self.env, line.date.isoformat(), date_format='MM/dd/yyyy'),
+            'expense_series_number': line.move_id.ref or '',
+            'reception_number': line.move_id.name,
+            'date_reception': format_date(self.env, line.date.isoformat(), date_format='dd/MM/yyyy'),
             'investment_good': 'S' if (tax.l10n_es_bien_inversion and
                                        line_vals['operation_code'] != '02') else 'N',
             'isp_taxable': 'S' if tax.l10n_es_type == 'sujeto_isp' else 'N',
@@ -224,13 +238,13 @@ class GenericTaxReportCustomHandler(models.AbstractModel):
             line_vals.update({
                 'total_amount': line_vals['total_amount'] + tax_amount,
                 'surcharge_type': abs(tax.amount),
-                'surcharge_fee': tax_amount,
+                'surcharge_fee': line_vals['surcharge_fee'] + tax_amount,
             })
         elif tax.l10n_es_type == 'retencion':
             line_vals.update({
                 'total_amount': line_vals['total_amount'] + tax_amount,
                 'withholding_type': abs(tax.amount),
-                'withholding_amount': -tax_amount,
+                'withholding_amount': line_vals['withholding_amount'] - tax_amount,
             })
         elif tax.l10n_es_type == 'ignore':
             return
@@ -307,6 +321,8 @@ class GenericTaxReportCustomHandler(models.AbstractModel):
         tax_lines = (line for line in lines if line.tax_line_id)
         for line in tax_lines:
             is_income = line.move_id.is_sale_document(include_receipts=True)
+            if not is_income and line.tax_repartition_line_id.factor_percent < 0:
+                continue
             sheet_line_vals = inc_line_vals if is_income else exp_line_vals
             move, tax = line.move_id, line.tax_line_id
             sign = -1 if is_income else 1
@@ -349,6 +365,12 @@ class GenericTaxReportCustomHandler(models.AbstractModel):
                     sheet_vals['row_idx'] += 1
 
     def export_libros_de_iva(self, options):
+        if not self.env.company.l10n_es_reports_iae_group:
+            raise RedirectWarning(
+                _("Please configure the \"IAE Group or Heading\" of your company."),
+                self.env.ref('base.action_res_company_form').id,
+                _("Go to Company"),
+            )
         report = self.env['account.report'].browse(options['report_id'])
         output = io.BytesIO()
         workbook = xlsxwriter.Workbook(output, {'in_memory': True, 'strings_to_formulas': False})

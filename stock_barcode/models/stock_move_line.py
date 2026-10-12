@@ -16,8 +16,8 @@ class StockMoveLine(models.Model):
     product_stock_quant_ids = fields.One2many('stock.quant', compute='_compute_product_stock_quant_ids')
     product_packaging_id = fields.Many2one(related='move_id.product_packaging_id')
     product_packaging_uom_qty = fields.Float('Packaging Quantity', compute='_compute_product_packaging_uom_qty', help="Quantity of the Packaging in the UoM of the Stock Move Line.")
-    hide_lot_name = fields.Boolean(compute='_compute_hide_lot_name')
-    hide_lot = fields.Boolean(compute='_compute_hide_lot_name')
+    hide_lot_name = fields.Boolean(compute='_compute_hide_lot_name', default=True)
+    hide_lot = fields.Boolean(compute='_compute_hide_lot_name', default=True)
     image_1920 = fields.Image(related="product_id.image_1920")
     product_reference_code = fields.Char(related="product_id.code", string="Product Reference Code")
     qty_done = fields.Float(compute='_compute_qty_done', inverse='_inverse_qty_done', digits='Product Unit of Measure')  # Dummy field
@@ -25,7 +25,7 @@ class StockMoveLine(models.Model):
     @api.depends('tracking', 'picking_type_use_existing_lots', 'picking_type_use_create_lots', 'lot_name')
     def _compute_hide_lot_name(self):
         for line in self:
-            if line.tracking == 'none':
+            if line.tracking not in ('lot', 'serial'):
                 line.hide_lot_name = True
                 line.hide_lot = True
                 continue
@@ -38,9 +38,17 @@ class StockMoveLine(models.Model):
             line.parent_location_id = line.picking_id.location_id
             line.parent_location_dest_id = line.picking_id.location_dest_id
 
+    @api.depends('product_id')
     def _compute_product_stock_quant_ids(self):
+        domain = [
+            ('product_id', 'in', self.product_id.ids),
+            ('company_id', 'in', self.env.companies.ids),
+            ('location_id.usage', '=', 'internal'),
+            ('quantity', '>', '0'),
+        ]
+        quant_ids = dict(self.env['stock.quant']._read_group(domain, groupby=['product_id'], aggregates=['id:recordset']))
         for line in self:
-            line.product_stock_quant_ids = line.product_id.stock_quant_ids.filtered(lambda q: q.company_id in self.env.companies and q.location_id.usage == 'internal')
+            line.product_stock_quant_ids = quant_ids.get(line.product_id, self.env['stock.quant'])
 
     def _compute_dummy_id(self):
         self.dummy_id = ''
@@ -62,9 +70,10 @@ class StockMoveLine(models.Model):
         pass
 
     def _inverse_qty_done(self):
-        for line in self:
+        for line in self.with_context({'preserve_state': True}):
             line.quantity = line.qty_done
-            line.picked = line.quantity > 0
+            if line.qty_done:
+                line.picked = True
 
     @api.model_create_multi
     def create(self, vals_list):

@@ -12,7 +12,7 @@
                         <t t-if="props.article.name" t-out="props.article.name"/>
                         <t t-else="">Untitled</t>
                     </a>
-                    <a t-if="props.article.user_can_write" role="button"
+                    <a t-if="canCreateArticle and props.article.user_can_write" role="button"
                         class="o_article_create p-1 opacity-75 opacity-100-hover"
                         t-on-click="createChild">
                         <i class="fa fa-fw fa-plus" title="Create a nested article"/>

@@ -1,22 +1,23 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* delivery_fedex
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Rasareeyar Lappiam, 2024
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
+"POT-Creation-Date: 2025-12-29 18:50+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
+"Last-Translator: Rasareeyar Lappiam, 2024\n"
 "Language-Team: Thai (https://app.transifex.com/odoo/teams/41243/th/)\n"
+"Language: th\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: th\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. module: delivery_fedex
@@ -40,10 +41,12 @@ msgstr "<span class=\"o_form_label\">หน่วยความยาวบร�
 #: model_terms:ir.ui.view,arch_db:delivery_fedex.view_delivery_carrier_form_with_provider_fedex
 msgid ""
 "<span invisible=\"fedex_weight_unit != 'KG'\">CM</span>\n"
-"                                <span invisible=\"fedex_weight_unit != 'LB'\">IN</span>"
+"                                <span invisible=\"fedex_weight_unit != "
+"'LB'\">IN</span>"
 msgstr ""
 "<span invisible=\"fedex_weight_unit != 'KG'\">ซม.</span>\n"
-"                                <span invisible=\"fedex_weight_unit != 'LB'\">นิ้ว</span>"
+"                                <span invisible=\"fedex_weight_unit != "
+"'LB'\">นิ้ว</span>"
 
 #. module: delivery_fedex
 #: model_terms:ir.ui.view,arch_db:delivery_fedex.view_delivery_carrier_form_with_provider_fedex
@@ -117,18 +120,18 @@ msgstr "ข้อมูลพิเศษ"
 
 #. module: delivery_fedex
 #: model:ir.model.fields,field_description:delivery_fedex.field_delivery_carrier__fedex_extra_data_rate_request
-msgid "Extra data for rate"
-msgstr "ข้อมูลเพิ่มเติมสำหรับอัตรา"
+msgid "Extra data for rate (legacy)"
+msgstr ""
 
 #. module: delivery_fedex
 #: model:ir.model.fields,field_description:delivery_fedex.field_delivery_carrier__fedex_extra_data_return_request
-msgid "Extra data for return"
-msgstr "ข้อมูลเพิ่มเติมสำหรับการส่งคืนสินค้า"
+msgid "Extra data for return (legacy)"
+msgstr ""
 
 #. module: delivery_fedex
 #: model:ir.model.fields,field_description:delivery_fedex.field_delivery_carrier__fedex_extra_data_ship_request
-msgid "Extra data for ship"
-msgstr "ข้อมูลเพิ่มเติมสำหรับการจัดส่ง"
+msgid "Extra data for ship (legacy)"
+msgstr ""
 
 #. module: delivery_fedex
 #: model:ir.model.fields,field_description:delivery_fedex.field_delivery_carrier__fedex_label_file_type
@@ -173,7 +176,7 @@ msgstr "FEDEX_GROUND"
 #. module: delivery_fedex
 #: model:ir.model.fields.selection,name:delivery_fedex.selection__delivery_carrier__fedex_service_type__fedex_international_connect_plus
 msgid "FEDEX_INTERNATIONAL_CONNECT_PLUS"
-msgstr ""
+msgstr "FEDEX_INTERNATIONAL_CONNECT_PLUS"
 
 #. module: delivery_fedex
 #: model:ir.model.fields.selection,name:delivery_fedex.selection__delivery_carrier__fedex_service_type__fedex_international_priority
@@ -238,24 +241,18 @@ msgstr "FIRST_OVERNIGHT"
 #. module: delivery_fedex
 #: model:ir.model.fields.selection,name:delivery_fedex.selection__delivery_carrier__delivery_type__fedex
 #: model:ir.model.fields.selection,name:delivery_fedex.selection__stock_package_type__package_carrier_type__fedex
-msgid "FedEx"
-msgstr "FedEx"
+msgid "FedEx (Legacy)"
+msgstr ""
 
 #. module: delivery_fedex
 #: model:ir.model.fields,field_description:delivery_fedex.field_delivery_carrier__fedex_account_number
-msgid "FedEx Account Number"
-msgstr "หมายเลขบัญชี FedEx"
+msgid "FedEx Legacy Account Number"
+msgstr ""
 
 #. module: delivery_fedex
 #: model:ir.model.fields,field_description:delivery_fedex.field_delivery_carrier__fedex_saturday_delivery
 msgid "FedEx Saturday Delivery"
 msgstr "จัดส่ง FedEx วันเสาร์"
-
-#. module: delivery_fedex
-#: model_terms:ir.ui.view,arch_db:delivery_fedex.res_config_settings_view_form_sale
-#: model_terms:ir.ui.view,arch_db:delivery_fedex.res_config_settings_view_form_stock
-msgid "FedEx Shipping Methods"
-msgstr "วิธีการการจัดส่ง FedEx "
 
 #. module: delivery_fedex
 #: model_terms:ir.ui.view,arch_db:delivery_fedex.view_delivery_carrier_form_with_provider_fedex
@@ -558,11 +555,11 @@ msgstr "การจัดส่ง #%s ถูกยกเลิก"
 #. odoo-python
 #: code:addons/delivery_fedex/models/delivery_fedex.py:0
 msgid ""
-"Shipment created into Fedex<br/><b>Tracking Numbers:</b> "
-"%(tracking_numbers)s<br/><b>Packages:</b> %(packages)s"
+"Shipment created into Fedex<br/><b>Tracking Numbers:</b> %"
+"(tracking_numbers)s<br/><b>Packages:</b> %(packages)s"
 msgstr ""
-"การจัดส่งที่สร้างขึ้นใน Fedex<br/><b>หมายเลขติดตาม:</b> "
-"%(tracking_numbers)s<br/><b>แพ็คเกต:</b> %(packages)s"
+"การจัดส่งที่สร้างขึ้นใน Fedex<br/><b>หมายเลขติดตาม:</b> %(tracking_numbers)s<br/"
+"><b>แพ็คเกต:</b> %(packages)s"
 
 #. module: delivery_fedex
 #: model:ir.model,name:delivery_fedex.model_delivery_carrier
@@ -606,14 +603,18 @@ msgstr "ประเภทของสต็อกบรรจุภัณฑ์
 #: model:ir.model.fields,help:delivery_fedex.field_delivery_carrier__fedex_extra_data_ship_request
 msgid ""
 "The extra data in FedEx is organized like the inside of a json file.\n"
-"This functionality is advanced/technical and should only be used if you know what you are doing.\n"
+"This functionality is advanced/technical and should only be used if you know "
+"what you are doing.\n"
 "\n"
 "Example of valid value: ```\n"
-"\"ShipmentDetails\": {\"Pieces\": {\"Piece\": {\"AdditionalInformation\": \"extra info\"}}}\n"
+"\"ShipmentDetails\": {\"Pieces\": {\"Piece\": {\"AdditionalInformation\": "
+"\"extra info\"}}}\n"
 "```\n"
 "\n"
-"With the above example, the AdditionalInformation of each piece will be updated.\n"
-"More info on https://www.fedex.com/en-us/developer/web-services/process.html#documentation"
+"With the above example, the AdditionalInformation of each piece will be "
+"updated.\n"
+"More info on https://www.fedex.com/en-us/developer/web-services/"
+"process.html#documentation"
 msgstr ""
 "ข้อมูลเพิ่มเติมใน FedEx ได้รับการจัดระเบียบเหมือนกับภายในไฟล์ json\n"
 "ฟังก์ชันนี้เป็นฟังก์ชันขั้นสูง/ทางเทคนิค และควรใช้เฉพาะเมื่อคุณมีความรู้ทางเทคนิค\n"
@@ -623,7 +624,8 @@ msgstr ""
 "```\n"
 "\n"
 "จากตัวอย่างข้างต้น ข้อมูลเพิ่มเติมของแต่ละชิ้นจะได้รับการอัปเดต\n"
-"ข้อมูลเพิ่มเติมเกี่ยวกับ https://www.fedex.com/en-us/developer/web-services/process.html#documentation"
+"ข้อมูลเพิ่มเติมเกี่ยวกับ https://www.fedex.com/en-us/developer/web-services/"
+"process.html#documentation"
 
 #. module: delivery_fedex
 #: model_terms:ir.ui.view,arch_db:delivery_fedex.view_delivery_carrier_form_with_provider_fedex
@@ -633,8 +635,8 @@ msgstr "ขั้นตอนสุดท้ายคือ"
 #. module: delivery_fedex
 #: model_terms:ir.ui.view,arch_db:delivery_fedex.view_delivery_carrier_form_with_provider_fedex
 msgid ""
-"These certifications usually require that you contact the FedEx support team"
-" by email."
+"These certifications usually require that you contact the FedEx support team "
+"by email."
 msgstr "การรับรองเหล่านี้มักกำหนดให้คุณติดต่อทีมสนับสนุนของ FedEx ทางอีเมล"
 
 #. module: delivery_fedex

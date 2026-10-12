@@ -17,6 +17,7 @@ class Starshipit:
         self.logger = logger
         self.session = requests.Session()
         self.session.headers = {
+            'Platform': 'Odoo',
             'Content-Type': 'application/json',
             'StarShipIT-Api-Key': api_key,
             'Ocp-Apim-Subscription-Key': subscription_key,
@@ -48,7 +49,7 @@ class Starshipit:
                 message = res['errors'][0]['details']
             elif res.get('message'):
                 message = res['message']
-            raise UserError(_('Starshipit returned an error: %(message)s', message=message))
+            raise UserError('Starshipit returned an error: %(message)s' % {'message': message})
 
         return res
 
@@ -66,14 +67,14 @@ class Starshipit:
             currency_id = picking.sale_id.currency_id or picking.company_id.currency_id
         payload = {
             'sender': {
-                'street': warehouse_partner.street,
+                'street': ' '.join(filter(None, [warehouse_partner.street, warehouse_partner.street2])),
                 'city': warehouse_partner.city,
                 'state': warehouse_partner.state_id.code,
                 'post_code': warehouse_partner.zip,
                 'country_code': warehouse_partner.country_id.code,
             },
             'destination': {
-                'street': destination_partner.street,
+                'street': ' '.join(filter(None, [destination_partner.street, destination_partner.street2])),
                 'city': destination_partner.city,
                 'state': destination_partner.state_id.code,
                 'post_code': destination_partner.zip,
@@ -93,10 +94,21 @@ class Starshipit:
         """ Creates the orders in starshipit using the provided pickings. One order will be created for each picking.
         Orders are returned as a dict with the order_number being the keys.
         """
-        orders = []
+        orders_to_import = []
+        existing_orders = {}
 
         for picking in pickings:
             starshipit_picking_number = self._get_starshipit_order_number(picking)
+
+            try:
+                existing_order_result = self._get_created_order(starshipit_picking_number)
+            except UserError:
+                existing_order_result = None
+
+            if existing_order_result and existing_order_result.get('order'):
+                existing_orders[starshipit_picking_number] = existing_order_result['order']
+                continue
+
             if len(starshipit_picking_number) > 50:  # Very unlikely to happen, simply a security measure.
                 raise UserError(_("The picking %(picking_name)s sequence is too long for Starshipit. "
                                   "Please update your pickings sequence in order to use at most 50 characters.",
@@ -128,14 +140,19 @@ class Starshipit:
                 'items': items,
                 'packages': shipping_packages,
             }
-            orders.append(order)
+            orders_to_import.append(order)
 
-        result = self._send_request('orders/import', method='POST', data={
-            'orders': orders
-        })
+        newly_created_orders = {}
+        if orders_to_import:
+            result = self._import_order(orders_to_import)
+            newly_created_orders = {order['order_number']: order for order in result['orders']}
+
+        all_orders = existing_orders
+        all_orders.update(newly_created_orders)
+
         return {
-            'success': result['success'],
-            'orders': {order['order_number']: order for order in result['orders']},
+            'success': len(all_orders) == len(pickings),
+            'orders': all_orders,
         }
 
     @staticmethod
@@ -146,7 +163,7 @@ class Starshipit:
             'email': partner.email,
             'phone': partner.phone or partner.mobile,
             'company': partner.commercial_company_name or partner.name,
-            'street': partner.street,
+            'street': ' '.join(filter(None, [partner.street, partner.street2])),
             'city': partner.city,
             'state': partner.state_id.code,
             'post_code': partner.zip,
@@ -167,6 +184,15 @@ class Starshipit:
             method='POST',
             data={
                 'order_id': order_id,
+            }
+        )
+
+    def _import_order(self, orders_to_import):
+        return self._send_request(
+            'orders/import',
+            method='POST',
+            data={
+                'orders': orders_to_import,
             }
         )
 
@@ -196,6 +222,14 @@ class Starshipit:
                 'order_id': order_id,
             })
 
+    def _get_created_order(self, order_number):
+        return self._send_request(
+            'orders',
+            method='GET',
+            params={
+                'order_number': order_number,
+            })
+
     def _manifest_orders(self, order_ids):
         return self._send_request(
             'orders/manifest',
@@ -216,11 +250,37 @@ class Starshipit:
     def _get_delivery_services(self, origin_partner):
         self._validate_partner_fields(origin_partner)
         return self._send_request('deliveryservices', method='POST', data={
-            'street': origin_partner.street,
+            'street': ' '.join(filter(None, [origin_partner.street, origin_partner.street2])),
+            'city': origin_partner.city,
             'post_code': origin_partner.zip,
             'country_code': origin_partner.country_code,
             'packages': [{}],
         })
+
+    def _get_delivery_services_with_destination(self, origin_partner, destination_partner, total_weight=None):
+        """
+        Fetch delivery services between an origin and a destination.
+        """
+        self._validate_partner_fields(origin_partner)
+        self._validate_partner_fields(destination_partner)
+        details = {
+            'sender': {
+                'street': ' '.join(filter(None, [origin_partner.street, origin_partner.street2])),
+                'city': origin_partner.city,
+                'state': origin_partner.state_id.code,
+                'post_code': origin_partner.zip,
+                'country_code': origin_partner.country_id.code,
+            },
+            'destination': {
+                'street': ' '.join(filter(None, [destination_partner.street, destination_partner.street2])),
+                'city': destination_partner.city,
+                'state': destination_partner.state_id.code,
+                'post_code': destination_partner.zip,
+                'country_code': destination_partner.country_id.code,
+            },
+            'packages': [{"weight": total_weight}] if total_weight else [{}],
+        }
+        return self._send_request('deliveryservices', method='POST', data=details)
 
     def _clone_order(self, order_id):
         return self._send_request('orders/shipment/clone', data={

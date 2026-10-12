@@ -19,6 +19,7 @@
         <field name="company_id" ref="base.demo_company_be"/>
         <field name="image_1920" type="base64" file="hr_contract_salary/static/img/hr_employee_max_durand.jpg"/>
         <field name="gender">male</field>
+        <field name="resource_calendar_id" ref="resource.resource_calendar_std_38h"/>
     </record>
 
     <record id="res_partner_laurie_poiret" model="res.partner">
@@ -219,7 +220,7 @@
         <field name="contract_update_template_id" ref="hr_contract_salary.sign_template_cdi_developer"/>
         <field name="company_id" ref="base.demo_company_be"/>
         <field name="date_start" eval="(DateTime.today() + relativedelta(years=-1, month=1, day=1, days=-1))"/>
-        <field name="resource_calendar_id" ref="resource.resource_calendar_std"/>
+        <field name="resource_calendar_id" ref="resource.resource_calendar_std_38h"/>
         <field name="rd_percentage">100</field>
     </record>
 

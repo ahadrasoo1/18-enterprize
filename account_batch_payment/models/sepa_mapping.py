@@ -1,13 +1,35 @@
 import re
 from xml.sax.saxutils import escape
 
+
+def sanitize_communication(communication, size=140):
+    """ Returns a sanitized version of the communication given in parameter,
+        so that:
+            - it contains only latin characters
+            - it does not contain any //
+            - it does not start or end with /
+            - it is maximum 140 characters long
+        (these are the SEPA compliance criteria)
+    """
+    # This function must be called before replacing the '/', as the
+    # character replacement could result in a non-compliant string.
+    communication = _replace_characters_SEPA(communication, size)
+    while '//' in communication:
+        communication = communication.replace('//', '/')
+    if communication.startswith('/'):
+        communication = communication[1:]
+    if communication.endswith('/'):
+        communication = communication[:-1]
+    return communication
+
+
 def _replace_characters_SEPA(string, size=None):
     """
     Replace non-latin characters according to the official SEPA mapping.
     See https://www.europeanpaymentscouncil.eu/document-library/guidance-documents/sepa-requirements-extended-character-set-unicode-subset-best
     """
     string_array = [character for character in string]
-    for match in re.finditer('[^-A-Za-z0-9/?:().,\'&<>+ ]', string):
+    for match in re.finditer(r"[^-A-Za-z0-9/?:().,\'&<>+ ]", string):
         match_index = match.start()
         string_array[match_index] = sepa_mapping.get(string_array[match_index], '')
     string = ''.join(string_array)

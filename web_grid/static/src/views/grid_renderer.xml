@@ -3,7 +3,7 @@
     <t t-name="web_grid.Renderer">
         <div class="o_grid_renderer position-relative z-0" t-ref="renderer">
             <div class="o_grid_grid d-grid gap-0 border-bottom bg-100"
-                 t-attf-style="grid-template-rows: {{ isMobile ? 'auto' : gridTemplateRows }}; grid-template-columns: {{ gridTemplateColumns }}"
+                 t-attf-style="grid-template-rows: {{ gridTemplateRows }}; grid-template-columns: {{ gridTemplateColumns }}"
                  t-on-mouseover.stop="onMouseOver"
                  t-on-mouseout.stop="onMouseOut"
             >
@@ -68,7 +68,7 @@
         <t t-set="section" t-value="row"/>
         <t t-set="rowPosition" t-value="getRowPosition(section)"/>
         <t name="section" t-if="!section.isFake and (props.sections.length &gt; 1 or section.value)">
-            <div class="o_grid_section o_grid_section_title o_grid_highlightable d-flex align-items-center ps-3 border-top bg-200 fw-bold"
+            <div class="o_grid_section o_grid_section_title o_grid_highlightable d-flex align-items-center ps-3 border-top bg-200 fw-bold position-relative"
                  t-att-class="{
                     'position-md-sticky start-0': !props.model.useSampleModel,
                  }"
@@ -101,7 +101,7 @@
                        'o_grid_cell_overlay_today bg-info bg-opacity-25' : column.isToday,
                        'o_grid_cell_overlay bg-700' : !column.isToday,
                     }"
-                    t-attf-class="{{getUnavailableClass(column)}}"
+                    t-attf-class="{{getUnavailableClass(column, { section })}}"
                 />
                 <div class="o_grid_cell_readonly position-relative d-flex justify-content-center align-items-center w-100 h-100">
                     <span class="z-1" t-att-class="getSectionCellsClasses(column, section)"
@@ -134,7 +134,6 @@
                 'bg-view': isEven,
                 'bg-100': !isEven,
                 'fst-italic': row.isAdditionalRow,
-                'text-opacity-25' : getUnavailableClass(row) === 'o_grid_unavailable'
              }"
              t-att-data-grid-row="rowPosition"
              t-att-data-grid-column="columnsGap"
@@ -177,7 +176,7 @@
                     'o_grid_cell_overlay_today bg-info bg-opacity-25' : column.isToday,
                     'o_grid_cell_overlay bg-700' : !column.isToday,
                  }"
-                 t-attf-class="{{getUnavailableClass(column)}}"
+                 t-attf-class="{{getUnavailableClass(column, { section: row.section })}}"
             />
             <div class="o_grid_cell_readonly position-relative d-flex justify-content-center align-items-center w-100 h-100">
                 <span t-att-class="{

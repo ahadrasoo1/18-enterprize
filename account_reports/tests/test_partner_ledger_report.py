@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # pylint: disable=C0326
 from .common import TestAccountReportsCommon
 
@@ -77,9 +76,6 @@ class TestPartnerLedgerReport(TestAccountReportsCommon):
         })
         cls.move_2017_2.action_post()
 
-        # Deactive all currencies to ensure group_multi_currency is disabled.
-        cls.env['res.currency'].search([('name', '!=', 'USD')]).with_context(force_deactivate=True).active = False
-
         cls.report = cls.env.ref('account_reports.partner_ledger_report')
 
     def test_partner_ledger_unfold(self):
@@ -109,11 +105,11 @@ class TestPartnerLedgerReport(TestAccountReportsCommon):
             [
                 ('partner_a',                           20150.0,        0.0,            20150.0),
                 ('Initial Balance',                     150.0,          0.0,            150.0),
-                ('MISC/2017/01/0001 - 2017_1_2',        2000.0,         0.0,            2150.0),
-                ('MISC/2017/01/0001 - 2017_1_3',        3000.0,         0.0,            5150.0),
-                ('MISC/2017/01/0001 - 2017_1_4',        4000.0,         0.0,            9150.0),
-                ('MISC/2017/01/0001 - 2017_1_5',        5000.0,         0.0,            14150.0),
-                ('MISC/2017/01/0001 - 2017_1_6',        6000.0,         0.0,            20150.0),
+                ('MISC/2017/01/0001 2017_1_2',        2000.0,         0.0,            2150.0),
+                ('MISC/2017/01/0001 2017_1_3',        3000.0,         0.0,            5150.0),
+                ('MISC/2017/01/0001 2017_1_4',        4000.0,         0.0,            9150.0),
+                ('MISC/2017/01/0001 2017_1_5',        5000.0,         0.0,            14150.0),
+                ('MISC/2017/01/0001 2017_1_6',        6000.0,         0.0,            20150.0),
                 ('Total partner_a',                     20150.0,        0.0,            20150.0),
                 ('partner_b',                           1200.0,         0.0,            1200.0),
                 ('partner_c',                           0.0,            21350.0,        -21350.0),
@@ -139,8 +135,8 @@ class TestPartnerLedgerReport(TestAccountReportsCommon):
             [
                 ('partner_a',                           20150.0,        0.0,            20150.0),
                 ('Initial Balance',                     150.0,          0.0,            150.0),
-                ('MISC/2017/01/0001 - 2017_1_2',        2000.0,         0.0,            2150.0),
-                ('MISC/2017/01/0001 - 2017_1_3',        3000.0,         0.0,            5150.0),
+                ('MISC/2017/01/0001 2017_1_2',        2000.0,         0.0,            2150.0),
+                ('MISC/2017/01/0001 2017_1_3',        3000.0,         0.0,            5150.0),
                 ('Load more...',                        '',             '',             ''),
                 ('Total partner_a',                     20150.0,        0.0,            20150.0),
                 ('partner_b',                           1200.0,         0.0,            1200.0),
@@ -166,8 +162,8 @@ class TestPartnerLedgerReport(TestAccountReportsCommon):
             #   Name                                    Debit           Credit          Balance
             [   0,                                      6,              7,              9],
             [
-                ('MISC/2017/01/0001 - 2017_1_4',          4000.0,         0.0,            9150.0),
-                ('MISC/2017/01/0001 - 2017_1_5',          5000.0,         0.0,            14150.0),
+                ('MISC/2017/01/0001 2017_1_4',          4000.0,         0.0,            9150.0),
+                ('MISC/2017/01/0001 2017_1_5',          5000.0,         0.0,            14150.0),
                 ('Load more...',                        '',             '',             ''),
             ],
             options,
@@ -188,7 +184,7 @@ class TestPartnerLedgerReport(TestAccountReportsCommon):
             #   Name                                    Debit           Credit          Balance
             [   0,                                      6,              7,              9],
             [
-                ('MISC/2017/01/0001 - 2017_1_6',          6000.0,         0.0,            20150.0),
+                ('MISC/2017/01/0001 2017_1_6',          6000.0,         0.0,            20150.0),
             ],
             options,
         )
@@ -207,9 +203,9 @@ class TestPartnerLedgerReport(TestAccountReportsCommon):
             [   0,                                      6,              7,              9],
             [
                 ('partner_a',                           15000.0,        0.0,            15000.0),
-                ('MISC/2017/01/0001 - 2017_1_4',        4000.0,         0.0,            4000.0),
-                ('MISC/2017/01/0001 - 2017_1_5',        5000.0,         0.0,            9000.0),
-                ('MISC/2017/01/0001 - 2017_1_6',        6000.0,         0.0,            15000.0),
+                ('MISC/2017/01/0001 2017_1_4',          4000.0,         0.0,            4000.0),
+                ('MISC/2017/01/0001 2017_1_5',          5000.0,         0.0,            9000.0),
+                ('MISC/2017/01/0001 2017_1_6',          6000.0,         0.0,            15000.0),
                 ('Total partner_a',                     15000.0,        0.0,            15000.0),
                 ('partner_c',                           0.0,            21350.0,        -21350.0),
                 ('Unknown Partner',                     200.0,          200.0,          0.0),
@@ -309,11 +305,11 @@ class TestPartnerLedgerReport(TestAccountReportsCommon):
             [
                 ('partner_a',                           20150.0,        1000.0,         19150.0),
                 ('Initial Balance',                     150.0,          0.0,            150.0),
-                ('MISC/2017/01/0001 - 2017_1_2',        2000.0,         0.0,            2150.0),
-                ('MISC/2017/01/0001 - 2017_1_3',        3000.0,         0.0,            5150.0),
-                ('MISC/2017/01/0001 - 2017_1_4',        4000.0,         0.0,            9150.0),
-                ('MISC/2017/01/0001 - 2017_1_5',        5000.0,         0.0,            14150.0),
-                ('MISC/2017/01/0001 - 2017_1_6',        6000.0,         0.0,            20150.0),
+                ('MISC/2017/01/0001 2017_1_2',        2000.0,         0.0,            2150.0),
+                ('MISC/2017/01/0001 2017_1_3',        3000.0,         0.0,            5150.0),
+                ('MISC/2017/01/0001 2017_1_4',        4000.0,         0.0,            9150.0),
+                ('MISC/2017/01/0001 2017_1_5',        5000.0,         0.0,            14150.0),
+                ('MISC/2017/01/0001 2017_1_6',        6000.0,         0.0,            20150.0),
                 ('MISC/2017/03/0001',                   0.0,            1000.0,         19150.0),
                 ('Total partner_a',                     20150.0,        1000.0,         19150.0),
                 ('partner_b',                           1200.0,         0.0,            1200.0),
@@ -337,8 +333,8 @@ class TestPartnerLedgerReport(TestAccountReportsCommon):
                 ('partner_c',                           0.0,            21350.0,        -21350.0),
                 ('Unknown Partner',                     1200.0,         1200.0,         0.0),
                 ('MISC/2017/03/0001',                   0.0,            1000.0,         -1000.0),
-                ('MISC/2017/06/0001 - 2017_2_1',        200.0,          0.0,            -800.0),
-                ('MISC/2017/06/0001 - 2017_2_2',        0.0,            200.0,          -1000.0),
+                ('MISC/2017/06/0001 2017_2_1',        200.0,          0.0,            -800.0),
+                ('MISC/2017/06/0001 2017_2_2',        0.0,            200.0,          -1000.0),
                 ('MISC/2017/03/0001',                   1000.0,         0.0,            0.0),
                 ('Total Unknown Partner',               1200.0,         1200.0,         0.0),
                 ('Total',                               22550.0,        23550.0,        -1000.0),
@@ -375,6 +371,25 @@ class TestPartnerLedgerReport(TestAccountReportsCommon):
                 ('partner_c',                           0.0,            21350.0,        -21350.0),
                 ('Unknown Partner',                     1000.0,         1000.0,         0.0),
                 ('Total',                               22350.0,        23350.0,        -1000.0),
+            ],
+            options,
+        )
+
+        # Unfold 'partner_a' to check the initial balance line is correct
+        options['unfolded_lines'] = [self.report._get_generic_line_id('res.partner', self.partner_a.id)]
+
+        self.assertLinesValues(
+            self.report._get_lines(options),
+            #   Name                                    Debit           Credit          Balance
+            [   0,                                      6,              7,              9],
+            [
+                ('partner_a',                           20150.00,       1000.0,         19150.00),
+                ('Initial Balance',                     20150.00,       1000.0,         19150.00),
+                ('Total partner_a',                     20150.00,       1000.0,         19150.00),
+                ('partner_b',                           1200.0,         0.0,            1200.0),
+                ('partner_c',                           0.0,            21350.00,       -21350.00),
+                ('Unknown Partner',                     1000.0,         1000.0,         0.0),
+                ('Total',                               22350.00,       23350.00,       -1000.0),
             ],
             options,
         )
@@ -535,3 +550,165 @@ class TestPartnerLedgerReport(TestAccountReportsCommon):
             })
         lines = self.report._get_lines(options)
         self.assertFalse(partner.name in [line['name'] for line in lines])
+
+    def test_partner_ledger_search_with_unknown_partner(self):
+        ''' Test that the lines with no partners are included in the report when searching for "Unknown Partner" '''
+        options = self._generate_options(self.report, '2019-02-01', '2019-02-28', default_options={
+                'filter_search_bar': 'un',
+                'export_mode': 'print',
+            })
+
+        self.assertLinesValues(
+            self.report._get_lines(options),
+            #   Name                                    Debit           Credit          Balance
+            [   0,                                      6,              7,              9],
+            [
+                ('Unknown Partner',                     200.0,          200.0,          0.0),
+                ('Total',                               200.0,          200.0,          0.0),
+            ],
+            options,
+        )
+
+        partner = self.env['res.partner'].create({'name': 'Unexpected Customer'})
+        self.init_invoice('out_invoice', partner=partner, invoice_date='2019-02-14', amounts=[1000.0], taxes=[], post=True)
+
+        self.assertLinesValues(
+            self.report._get_lines(options),
+            #   Name                                    Debit           Credit          Balance
+            [   0,                                      6,              7,              9],
+            [
+                ('Unexpected Customer',                 1000.0,         0.0,            1000.0),
+                ('Unknown Partner',                     200.0,          200.0,          0.0),
+                ('Total',                               1200.0,         200.0,          1000.0),
+            ],
+            options,
+        )
+
+    def test_no_amount_currency_col_in_single_currency(self):
+        # In multi-currency, we get the amount_currency column
+        self.assertGreater(len(self.env['res.currency'].search([])), 1)
+        options = self._generate_options(self.report, fields.Date.from_string('2023-01-01'), fields.Date.from_string('2023-12-31'))
+        self.assertTrue(any(col['expression_label'] == 'amount_currency' for col in options['columns']))
+
+        # Not in single-currency
+        self.env['res.currency'].search([('name', '!=', 'USD')]).with_context(force_deactivate=True).active = False
+        self.assertEqual(len(self.env['res.currency'].search([])), 1)
+        options = self._generate_options(self.report, fields.Date.from_string('2023-01-01'), fields.Date.from_string('2023-12-31'))
+        self.assertFalse(any(col['expression_label'] == 'amount_currency' for col in options['columns']))
+
+    def test_partner_ledger_fully_reconcile_previous_year(self):
+        """
+        Verify the report's behavior when a partner is fully reconciled and has a zero balance.
+        If the partner's balance is zero:
+            If the partner has any unreconciled items, display the partner's information in the report.
+            If the partner has no unreconciled items but has an initial balance > 0, show the partner.
+            If the partner has no unreconciled items and has an initial balance = 0, hide the partner.
+        """
+        new_partner = self.env['res.partner'].create({'name': 'Anakin Skywalker'})
+        move = self.env['account.move'].create({
+            'move_type': 'out_invoice',
+            'invoice_date': '2019-01-01',
+            'partner_id': new_partner.id,
+            'invoice_line_ids': [Command.create({
+                'quantity': 1,
+                'price_unit': 500.0,
+                'tax_ids': [],
+            })]
+        })
+        move.action_post()
+
+        payment_1 = self.env['account.move'].create({
+            'move_type': 'entry',
+            'date': '2019-01-01',
+            'journal_id': self.company_data['default_journal_misc'].id,
+            'partner_id': new_partner.id,
+            'line_ids': [
+                Command.create({'debit': 0.0,       'credit': 500.0,    'account_id': self.company_data['default_account_receivable'].id}),
+                Command.create({'debit': 500.0,     'credit': 0.0,      'account_id': self.company_data['default_journal_bank'].default_account_id.id}),
+            ],
+        })
+        payment_1.action_post()
+
+        options = self._generate_options(self.report, '2020-01-01', '2020-12-31', default_options={'partner_ids': new_partner.ids})
+        # Balance is 0 but there are unreconciled entries, so we show the line
+        self.assertLinesValues(
+            self.report._get_lines(options),
+            #                   Name                          Debit              Credit           Balance
+            [                     0,                             6,                  7,                9],
+            [
+                ('Anakin Skywalker',                         500.0,              500.0,              0.0),
+                ('Total',                                    500.0,              500.0,              0.0),
+            ],
+            options,
+        )
+
+        (payment_1 + move).line_ids.filtered(
+            lambda line: line.account_id == self.company_data['default_account_receivable']
+        ).reconcile()
+
+        # Balance is still 0 and there is no more unreconciled entries, the partner is hide from the report
+        self.assertLinesValues(
+            self.report._get_lines(options),
+            #        Name                                     Debit              Credit           Balance
+            [          0,                                        6,                  7,                9],
+            [
+                ('Total',                                      0.0,                0.0,              0.0),
+            ],
+            options,
+        )
+
+    def test_partner_ledger_fully_reconcile_current_year(self):
+        new_partner = self.env['res.partner'].create({'name': 'Darth Vader'})
+        move = self.env['account.move'].create({
+            'move_type': 'out_invoice',
+            'invoice_date': '2019-01-01',
+            'partner_id': new_partner.id,
+            'invoice_line_ids': [Command.create({
+                'quantity': 1,
+                'price_unit': 500.0,
+                'tax_ids': [],
+            })]
+        })
+        move.action_post()
+
+        payment_1 = self.env['account.move'].create({
+            'move_type': 'entry',
+            'date': '2019-01-01',
+            'journal_id': self.company_data['default_journal_misc'].id,
+            'partner_id': new_partner.id,
+            'line_ids': [
+                Command.create({'debit': 0.0,       'credit': 500.0,    'account_id': self.company_data['default_account_receivable'].id}),
+                Command.create({'debit': 500.0,     'credit': 0.0,      'account_id': self.company_data['default_journal_bank'].default_account_id.id}),
+            ],
+        })
+        payment_1.action_post()
+
+        options = self._generate_options(self.report, '2019-01-01', '2019-12-31', default_options={'partner_ids': new_partner.ids})
+        # Balance is 0 but there are unreconciled entries, so we show the line
+        self.assertLinesValues(
+            self.report._get_lines(options),
+            #              Name                              Debit              Credit            Balance
+            [                0,                                  6,                  7,                9],
+            [
+                ('Darth Vader',                              500.0,              500.0,              0.0),
+                ('Total',                                    500.0,              500.0,              0.0),
+            ],
+            options,
+        )
+
+        (payment_1 + move).line_ids.filtered(
+            lambda line: line.account_id == self.company_data['default_account_receivable']
+        ).reconcile()
+
+        # Balance is still 0 and there is no more unreconciled entries, but the moves is in the current report period,
+        # so we still show the partner in the report
+        self.assertLinesValues(
+            self.report._get_lines(options),
+            #             Name                               Debit              Credit            Balance
+            [                0,                                  6,                  7,                9],
+            [
+                ('Darth Vader',                              500.0,              500.0,              0.0),
+                ('Total',                                    500.0,              500.0,              0.0),
+            ],
+            options,
+        )

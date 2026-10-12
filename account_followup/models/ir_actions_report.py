@@ -25,20 +25,20 @@ class IrActionsReport(models.Model):
         for partner_id in res_ids:
             partner = self.env['res.partner'].browse(partner_id)
             join_invoices = options.get('join_invoices', partner.followup_line_id.join_invoices)
-            if not join_invoices:
+            if not join_invoices and not options.get('report_attachment_id'):
                 continue
 
             if options.get('attachment_ids'):
                 attachments = self.env['ir.attachment'].browse(options.get('attachment_ids'))
             else:
                 invoices = partner._get_invoices_to_print(options)
-                attachments = invoices.message_main_attachment_id  # existence guaranteed by _get_invoices_to_print
+                attachments = invoices.invoice_pdf_report_id  # existence guaranteed by _get_invoices_to_print
 
             writer = OdooPdfFileWriter()
 
             # Fill writer with the followup report followed by the invoices
             followup_stream = res[partner_id]['stream']
-            input_streams = [followup_stream] + [to_pdf_stream(attachment) for attachment in attachments
+            input_streams = [followup_stream] + [to_pdf_stream(attachment) for attachment in self._prepare_local_attachments(attachments)
                                                  if attachment.mimetype == 'application/pdf']
             for stream in input_streams:
                 reader = OdooPdfFileReader(stream, strict=False)

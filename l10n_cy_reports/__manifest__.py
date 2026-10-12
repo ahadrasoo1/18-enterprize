@@ -1,6 +1,5 @@
 {
     "name": "Cyprus - Accounting Reports",
-    "countries": ['cy'],
     "version": "1.0",
     "category": "Accounting/Localizations/Reporting",
     "description": """
@@ -16,6 +15,7 @@ Cyprus accounting reports
     "data": [
         'data/balance_sheet.xml',
         'data/profit_loss.xml',
+        'data/account_report_ec_sales_list_report.xml',
     ],
     "installable": True,
     "auto_install": [

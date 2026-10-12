@@ -16,16 +16,12 @@ class FollowupManualReminder(models.TransientModel):
         partner.ensure_one()
         followup_line = partner.followup_line_id
         if followup_line:
-            defaults.update(
-                email=followup_line.send_email,
-                sms=followup_line.send_sms,
-                template_id=followup_line.mail_template_id.id,
-                sms_template_id=followup_line.sms_template_id.id,
-                join_invoices=followup_line.join_invoices,
-            )
+            defaults.update(self._get_defaults_from_followup_line(followup_line))
         defaults.update(
             partner_id=partner.id,
-            attachment_ids=[Command.set(partner.unreconciled_aml_ids.move_id.message_main_attachment_id.ids)],
+            attachment_ids=[Command.set(
+                partner._get_attachments_ids().ids
+            )],
             render_model='res.partner'
         )
         return defaults
@@ -53,6 +49,15 @@ class FollowupManualReminder(models.TransientModel):
     def _compute_render_model(self):
         # OVERRIDES mail.renderer.mixin
         self.render_model = 'res.partner'
+
+    def _get_defaults_from_followup_line(self, followup_line):
+        return {
+            'email': followup_line.send_email,
+            'sms': followup_line.send_sms,
+            'template_id': followup_line.mail_template_id.id,
+            'sms_template_id': followup_line.sms_template_id.id,
+            'join_invoices': followup_line.join_invoices,
+        }
 
     @api.depends('template_id')
     def _compute_subject(self):
@@ -113,6 +118,7 @@ class FollowupManualReminder(models.TransientModel):
             'print': self.print,
             'join_invoices': self.join_invoices,
             'manual_followup': True,
+            'template_id': self.template_id,
         }
 
     def process_followup(self):

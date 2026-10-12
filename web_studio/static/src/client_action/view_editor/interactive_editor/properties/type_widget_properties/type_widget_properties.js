@@ -11,6 +11,8 @@ import {
     FIELD_TYPE_ATTRIBUTES,
     COMPUTED_DISPLAY_OPTIONS,
 } from "@web_studio/client_action/view_editor/interactive_editor/properties/type_widget_properties/type_specific_and_computed_properties";
+import { AlertDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
+import { _t } from "@web/core/l10n/translation";
 
 export class TypeWidgetProperties extends Component {
     static template =
@@ -23,6 +25,7 @@ export class TypeWidgetProperties extends Component {
 
     setup() {
         this.orm = useService("orm");
+        this.dialog = useService("dialog");
         this.attributes = useState({
             field: [],
             selection: [],
@@ -70,6 +73,12 @@ export class TypeWidgetProperties extends Component {
             await Promise.all(
                 fieldAttributes.map(async (attribute) => {
                     const choices = await this.getFieldChoices(attribute, fields);
+                    if (
+                        this.props.node.field?.type === "monetary" &&
+                        attribute.name === "currency_field"
+                    ) {
+                        attribute.isRequired = true;
+                    }
                     attribute.choices = choices;
                     this.getOptionObj(attribute.name).choices = choices;
                 })
@@ -169,6 +178,15 @@ export class TypeWidgetProperties extends Component {
         return this.attributesForCurrentTypeAndWidget.find((o) => o.name === optionName);
     }
 
+    isAttributeReadonly(attribute) {
+        if ("isReadonly" in attribute) {
+            return attribute.isReadonly;
+        }
+        if (this.props.node.field?.type === "monetary" && attribute.name === "currency_field") {
+            return !this.props.node.field.manual;
+        }
+    }
+
     /**
      * @param {string} type of the attribute (eg. "string", "boolean" )
      * @returns only the given type of attributes for the current field node
@@ -255,8 +273,11 @@ export class TypeWidgetProperties extends Component {
             }
         }
         value = props.node.attrs.options?.[property.name];
-        if (property.type === "string") {
+        if (property.type === "string" && value && typeof value !== "string") {
             value = JSON.stringify(value);
+        }
+        if (property.type === "boolean" && value !== undefined) {
+            value = !!value;
         }
         if (value === undefined && property.default) {
             value = property.default;
@@ -276,31 +297,34 @@ export class TypeWidgetProperties extends Component {
 
     async onChangeCurrency(value) {
         const proms = [];
-        proms.push(
-            rpc("/web_studio/set_currency", {
-                model_name: this.env.viewEditorModel.resModel,
-                field_name: this.props.node.field.name,
-                value,
-            })
-        );
-        this.env.viewEditorModel.fields[this.props.node.field.name]["currency_field"] = value;
+        if (this.props.node.field.manual) {
+            proms.push(
+                rpc("/web_studio/set_currency", {
+                    model_name: this.env.viewEditorModel.resModel,
+                    field_name: this.props.node.field.name,
+                    value,
+                })
+            );
+        } else {
+            proms.push(Promise.resolve(false));
+        }
 
         if (this.env.viewEditorModel.fieldsInArch.includes(value)) {
-            // is the new currency in the view ?
-            await Promise.all(proms).then((results) => {
-                if (results[0] === true) {
-                    this.env.viewEditorModel.fields[this.props.node.field.name]["currency_field"] =
-                        value;
-                }
-            });
-            // alter the value of the currently selected currency manually to trigger a re-render of the SelectMenu
-            // with the correct value since we don't pass through doOperations from the ViewEditorModel
-            this.attributes.field = this.attributes.field.map((e) => {
-                if (e.name === "currency_field") {
-                    e.value = value;
-                }
-                return e;
-            });
+            // If the currency field is in the view, just alter the
+            // reactives and return.
+            const [currencyChanged] = await Promise.all(proms);
+            if (currencyChanged) {
+                this.env.viewEditorModel.fields[this.props.node.field.name]["currency_field"] =
+                    value;
+                // alter the value of the currently selected currency manually to trigger a re-render of the SelectMenu
+                // with the correct value since we don't pass through doOperations from the ViewEditorModel
+                this.attributes.field = this.attributes.field.map((e) => {
+                    if (e.name === "currency_field") {
+                        e.value = value;
+                    }
+                    return e;
+                });
+            }
             return;
         }
 
@@ -319,12 +343,10 @@ export class TypeWidgetProperties extends Component {
         };
 
         proms.push(this.env.viewEditorModel.doOperation(operation));
-        await Promise.all(proms).then((results) => {
-            if (results[0] === true) {
-                this.env.viewEditorModel.fields[this.props.node.field.name]["currency_field"] =
-                    value;
-            }
-        });
+        const [currencyChanged] = await Promise.all(proms);
+        if (currencyChanged) {
+            this.env.viewEditorModel.fields[this.props.node.field.name]["currency_field"] = value;
+        }
     }
 
     onChangeWidget(value) {
@@ -347,11 +369,25 @@ export class TypeWidgetProperties extends Component {
             value = ""; // the currency_field arch option will be deleted
         }
 
+        const options = { ...this.props.node.attrs.options };
+        const isDateRange = this.props.node.attrs.widget === "daterange";
+        if (
+            isDateRange &&
+            value &&
+            ((name === "start_date_field" && options["end_date_field"]) ||
+                (name === "end_date_field" && options["start_date_field"]))
+        ) {
+            return this.dialog.add(AlertDialog, {
+                body: _t(
+                    "You can't select the 'Start date field' and 'End date field' at the same time"
+                ),
+            });
+        }
+
         const currentProperty = this.getOptionObj(name);
         if (currentProperty.isAttribute) {
             return this.props.onChangeAttribute(value, name);
         }
-        const options = { ...this.props.node.attrs.options };
         if (value || currentProperty.type === "boolean") {
             if (currentProperty.type === "digits") {
                 // The digits options is composed of two integers.

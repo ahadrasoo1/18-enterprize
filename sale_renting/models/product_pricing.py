@@ -3,6 +3,7 @@
 from collections import defaultdict
 import math
 from dateutil.relativedelta import relativedelta
+from pytz import timezone
 
 from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
@@ -110,11 +111,14 @@ class ProductPricing(models.Model):
         :param datetime end_date: end of the duration.
         :return dict: duration length in different units.
         """
-        duration = end_date - start_date
+        tz = self._get_tz()
+        localized_start_date = start_date.astimezone(timezone(tz))
+        localized_end_date = end_date.astimezone(timezone(tz))
+        duration = localized_end_date - localized_start_date
         vals = dict(hour=(duration.days * 24 + duration.seconds / 3600))
         vals['day'] = math.ceil(vals['hour'] / 24)
         vals['week'] = math.ceil(vals['day'] / 7)
-        duration_diff = relativedelta(end_date, start_date)
+        duration_diff = relativedelta(localized_end_date, localized_start_date)
         months = 1 if duration_diff.days or duration_diff.hours or duration_diff.minutes else 0
         months += duration_diff.months
         months += duration_diff.years * 12
@@ -179,3 +183,6 @@ class ProductPricing(models.Model):
                 available_pricings |= pricing
 
         return available_pricings
+
+    def _get_tz(self):
+        return self.env.user.tz or 'UTC'

@@ -369,6 +369,12 @@
                     <filter string="Control Point" name="groupby_point_id" context="{'group_by': 'point_id'}"/>
                     <filter string="Team" name="groupby_team_id" context="{'group_by': 'team_id'}"/>
                 </group>
+                <filter invisible="1" string="Late Activities" name="activities_overdue"
+                    domain="[('my_activity_date_deadline', '&lt;', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter invisible="1" string="Today Activities" name="activities_today"
+                    domain="[('my_activity_date_deadline', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter invisible="1" string="Future Activities" name="activities_upcoming"
+                    domain="[('my_activity_date_deadline', '&gt;', context_today().strftime('%Y-%m-%d'))]"/>
             </search>
         </field>
     </record>
@@ -417,8 +423,6 @@
         <field name="res_model">quality.check</field>
         <field name="view_mode">list,form</field>
         <field name="context">{
-            'search_default_lot_id': [active_id],
-            'default_lot_id': active_id,
             'create': 0}
         </field>
     </record>
@@ -768,6 +772,7 @@
                         <div>Control per: <field name="measure_on"/></div>
                         <div>Team: <field name="team_id"/></div>
                         <footer>
+                            <field name="company_id" invisible="1"/> <!-- required for the domain of `check_company' in `user-id' -->
                             <field class="ms-auto" name="user_id" widget="many2one_avatar_user"/>
                         </footer>
                     </t>
@@ -809,10 +814,8 @@
                 <field name="measure_frequency_type" string="Control Frequency"/>
                 <label for="measure_frequency_value" string="" invisible="measure_frequency_type in ('all', 'on_demand')"/>
                 <div class="o_row" invisible="measure_frequency_type in ('all', 'on_demand')">
-                    <span invisible="measure_frequency_type in ('all', 'on_demand')">Every </span>
                     <field name="measure_frequency_value" nolabel="1" invisible="measure_frequency_type != 'random'"/>
-                    <label for="measure_frequency_value" string="% of Operations" invisible="measure_on == 'move_line' or measure_frequency_type != 'random'"/>
-                    <label for="measure_frequency_value" string="% of Transfers" invisible="measure_on != 'move_line' or measure_frequency_type != 'random'"/>
+                    <label for="measure_frequency_value" string="% of the time" invisible="measure_frequency_type != 'random'"/>
                     <field name="measure_frequency_unit_value" string="Frequency" nolabel="1" invisible="measure_frequency_type != 'periodical'"/>
                     <field name="measure_frequency_unit" invisible="measure_frequency_type != 'periodical'" required="measure_frequency_type == 'periodical'"/>
                 </div>

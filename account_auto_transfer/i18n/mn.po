@@ -3,22 +3,22 @@
 # 	* account_auto_transfer
 #
 # Translators:
-# Cheemee Bumtsend <cheemeesun@gmail.com>, 2022
-# hish, 2022
-# Батболд <batbold.ts@gmail.com>, 2022
-# tserendavaa tsogtoo <tseegii011929@gmail.com>, 2022
-# tumenjargal hadbaatar <tumenjargal7903@gmail.com>, 2022
-# Батмөнх Ганбат <batmunkh2522@gmail.com>, 2022
-# Martin Trigaux, 2022
-# Baskhuu Lodoikhuu <baskhuujacara@gmail.com>, 2022
+# Батболд <batbold.ts@gmail.com>, 2024
+# Bayarkhuu Bataa, 2024
+# Cheemee Bumtsend <cheemeesun@gmail.com>, 2024
+# tumenjargal hadbaatar <tumenjargal7903@gmail.com>, 2024
+# Martin Trigaux, 2024
+# hish, 2024
+# Batmunkh Ganbat <batmunkh2522@gmail.com>, 2024
+# Baskhuu Lodoikhuu <baskhuujacara@gmail.com>, 2025
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 16.0+e\n"
+"Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-16 16:02+0000\n"
-"PO-Revision-Date: 2022-09-22 05:45+0000\n"
-"Last-Translator: Baskhuu Lodoikhuu <baskhuujacara@gmail.com>, 2022\n"
+"POT-Creation-Date: 2025-12-29 18:46+0000\n"
+"PO-Revision-Date: 2024-09-25 09:43+0000\n"
+"Last-Translator: Baskhuu Lodoikhuu <baskhuujacara@gmail.com>, 2025\n"
 "Language-Team: Mongolian (https://app.transifex.com/odoo/teams/41243/mn/)\n"
 "Language: mn\n"
 "MIME-Version: 1.0\n"
@@ -34,7 +34,7 @@ msgstr "<span> очих </span>"
 #. module: account_auto_transfer
 #: model:ir.model,name:account_auto_transfer.model_account_chart_template
 msgid "Account Chart Template"
-msgstr ""
+msgstr "Дансны модны загвар"
 
 #. module: account_auto_transfer
 #: model:ir.model,name:account_auto_transfer.model_account_transfer_model
@@ -57,19 +57,38 @@ msgid "Activate"
 msgstr "Идэвхижүүлэх"
 
 #. module: account_auto_transfer
+#: model:ir.model.fields,field_description:account_auto_transfer.field_account_transfer_model__active
+msgid "Active"
+msgstr "Идэвхтэй"
+
+#. module: account_auto_transfer
 #: model:ir.model.fields,help:account_auto_transfer.field_account_transfer_model_line__analytic_account_ids
-msgid "Adds a condition to only transfer the sum of the lines from the origin accounts that match these analytic accounts to the destination account"
-msgstr "Анхдагч дансанд хийгдсэн гүйлгээний дүнгээс энд сонгосон шинжилгээний дансаар шүүж ялгасан дүнгийн нийлбэрийг очих данс руу шилжүүлнэ"
+msgid ""
+"Adds a condition to only transfer the sum of the lines from the origin "
+"accounts that match these analytic accounts to the destination account"
+msgstr ""
+"Анхдагч дансанд хийгдсэн гүйлгээний дүнгээс энд сонгосон шинжилгээний "
+"дансаар шүүж ялгасан дүнгийн нийлбэрийг очих данс руу шилжүүлнэ"
 
 #. module: account_auto_transfer
 #: model:ir.model.fields,help:account_auto_transfer.field_account_transfer_model_line__partner_ids
-msgid "Adds a condition to only transfer the sum of the lines from the origin accounts that match these partners to the destination account"
-msgstr "Анхдагч дансанд хийгдсэн гүйлгээний дүнгээс энд сонгосон харицлагчаар шүүж ялгасан дүнгийн нийлбэрийг очих данс руу шилжүүлнэ"
+msgid ""
+"Adds a condition to only transfer the sum of the lines from the origin "
+"accounts that match these partners to the destination account"
+msgstr ""
+"Анхдагч дансанд хийгдсэн гүйлгээний дүнгээс энд сонгосон харицлагчаар шүүж "
+"ялгасан дүнгийн нийлбэрийг очих данс руу шилжүүлнэ"
 
 #. module: account_auto_transfer
 #: model:ir.model.fields,field_description:account_auto_transfer.field_account_transfer_model_line__analytic_account_ids
 msgid "Analytic Filter"
 msgstr "Шинжилгээний шүүлтүүр"
+
+#. module: account_auto_transfer
+#: model_terms:ir.ui.view,arch_db:account_auto_transfer.view_transfer_model_form
+#: model_terms:ir.ui.view,arch_db:account_auto_transfer.view_transfer_model_search
+msgid "Archived"
+msgstr "Архивласан"
 
 #. module: account_auto_transfer
 #: model_terms:ir.ui.view,arch_db:account_auto_transfer.view_transfer_model_form
@@ -79,8 +98,9 @@ msgstr "Автомат гүйлгээ"
 #. module: account_auto_transfer
 #. odoo-python
 #: code:addons/account_auto_transfer/models/transfer_model.py:0
-msgid "Automatic Transfer (%s%% from account %s)"
-msgstr "Автомат гүйлгээ (%s%% дүнгээр %sданснаас татав)"
+msgid "Automatic Transfer (%(percent)s%% from account %(origin_account)s)"
+msgstr ""
+"Автомат гүйлгээ (%(percent)s%% дүнгээр %(origin_account)sданснаас татав)"
 
 #. module: account_auto_transfer
 #. odoo-python
@@ -91,8 +111,12 @@ msgstr "Автомат гүйлгээ (-%s%%)"
 #. module: account_auto_transfer
 #. odoo-python
 #: code:addons/account_auto_transfer/models/transfer_model.py:0
-msgid "Automatic Transfer (entries with analytic account(s): %s and partner(s): %s)"
-msgstr "Автомат гүйлгээ (шинжилгээний данс(ууд): %s болон харилцагч(ид): %s)"
+msgid ""
+"Automatic Transfer (entries with analytic account(s): %(analytic_accounts)s "
+"and partner(s): %(partners)s)"
+msgstr ""
+"Автомат гүйлгээ (шинжилгээний данс(ууд): %(analytic_accounts)s болон "
+"харилцагч(ид): %(partners)s)"
 
 #. module: account_auto_transfer
 #. odoo-python
@@ -109,20 +133,31 @@ msgstr "Автомат гүйлгээ (харилцагч(ид): %s)"
 #. module: account_auto_transfer
 #. odoo-python
 #: code:addons/account_auto_transfer/models/transfer_model.py:0
-msgid "Automatic Transfer (from account %s with analytic account(s): %s and partner(s): %s)"
-msgstr "Автомат гүйлгээ (%s данснаас шинжилгээний данс(ууд): %s болон харилцагч(ид): %s)"
+msgid ""
+"Automatic Transfer (from account %(origin_account)s with analytic "
+"account(s): %(analytic_accounts)s and partner(s): %(partners)s)"
+msgstr ""
+"Автомат гүйлгээ (%(origin_account)s данснаас шинжилгээний данс(ууд): %"
+"(analytic_accounts)s болон харилцагч(ид): %(partners)s)"
 
 #. module: account_auto_transfer
 #. odoo-python
 #: code:addons/account_auto_transfer/models/transfer_model.py:0
-msgid "Automatic Transfer (from account %s with analytic account(s): %s)"
-msgstr "Автомат гүйлгээ (%s данснаас шинжилгээний данс(ууд): %s)"
+msgid ""
+"Automatic Transfer (from account %(origin_account)s with analytic "
+"account(s): %(analytic_accounts)s)"
+msgstr ""
+"Автомат гүйлгээ (%(origin_account)s данснаас шинжилгээний данс(ууд): %"
+"(analytic_accounts)s)"
 
 #. module: account_auto_transfer
 #. odoo-python
 #: code:addons/account_auto_transfer/models/transfer_model.py:0
-msgid "Automatic Transfer (from account %s with partner(s): %s)"
-msgstr "Автомат гүйлгээ (%s данснаас харилцагч(ид): %s)"
+msgid ""
+"Automatic Transfer (from account %(origin_account)s with partner(s): %"
+"(partners)s)"
+msgstr ""
+"Автомат гүйлгээ (%(origin_account)s данснаас харилцагч(ид): %(partners)s)"
 
 #. module: account_auto_transfer
 #. odoo-python
@@ -132,7 +167,6 @@ msgstr "Автомат гүйлгээ (%s руу)"
 
 #. module: account_auto_transfer
 #: model:ir.actions.act_window,name:account_auto_transfer.transfer_model_action
-#: model:ir.ui.menu,name:account_auto_transfer.menu_auto_transfer
 msgid "Automatic Transfers"
 msgstr "Автомат гүйлгээ"
 
@@ -227,6 +261,13 @@ msgid "IFRS Automatic Transfers"
 msgstr ""
 
 #. module: account_auto_transfer
+#. odoo-python
+#: code:addons/account_auto_transfer/demo/account_demo.py:0
+msgid "IFRS rent expense transfer"
+msgstr ""
+
+#. module: account_auto_transfer
+#: model:ir.model,name:account_auto_transfer.model_account_journal
 #: model_terms:ir.ui.view,arch_db:account_auto_transfer.view_transfer_model_form
 msgid "Journal"
 msgstr "Журнал"
@@ -235,6 +276,11 @@ msgstr "Журнал"
 #: model:ir.model,name:account_auto_transfer.model_account_move
 msgid "Journal Entry"
 msgstr "Ажил гүйлгээ"
+
+#. module: account_auto_transfer
+#: model:ir.model,name:account_auto_transfer.model_account_move_line
+msgid "Journal Item"
+msgstr "Журналын бичилт"
 
 #. module: account_auto_transfer
 #: model:ir.model.fields,field_description:account_auto_transfer.field_account_transfer_model__write_uid
@@ -252,12 +298,6 @@ msgstr "Сүүлд зассан огноо"
 #: model:ir.model.fields.selection,name:account_auto_transfer.selection__account_transfer_model__frequency__month
 msgid "Monthly"
 msgstr "Сар бүр"
-
-#. module: account_auto_transfer
-#. odoo-python
-#: code:addons/account_auto_transfer/demo/account_demo.py:0
-msgid "Monthly IFRS rent expense transfer"
-msgstr ""
 
 #. module: account_auto_transfer
 #: model:ir.model.fields,field_description:account_auto_transfer.field_account_transfer_model__move_ids_count
@@ -293,7 +333,6 @@ msgstr "Анхдагч дансууд"
 #. module: account_auto_transfer
 #: model:ir.model.fields,field_description:account_auto_transfer.field_account_bank_statement_line__transfer_model_id
 #: model:ir.model.fields,field_description:account_auto_transfer.field_account_move__transfer_model_id
-#: model:ir.model.fields,field_description:account_auto_transfer.field_account_payment__transfer_model_id
 msgid "Originating Model"
 msgstr "Эх загвар"
 
@@ -319,8 +358,12 @@ msgstr "Хувь засагдахгүй"
 
 #. module: account_auto_transfer
 #: model:ir.model.fields,help:account_auto_transfer.field_account_transfer_model_line__percent
-msgid "Percentage of the sum of lines from the origin accounts will be transferred to the destination account"
-msgstr "Анхдагч дансны мөрүүдийн гүйлгээний дүнгээс хувьчлан тооцож очих данс рүү гүйлгээ хийгдэнэ"
+msgid ""
+"Percentage of the sum of lines from the origin accounts will be transferred "
+"to the destination account"
+msgstr ""
+"Анхдагч дансны мөрүүдийн гүйлгээний дүнгээс хувьчлан тооцож очих данс рүү "
+"гүйлгээ хийгдэнэ"
 
 #. module: account_auto_transfer
 #: model_terms:ir.ui.view,arch_db:account_auto_transfer.view_transfer_model_form
@@ -335,7 +378,7 @@ msgstr "Улирлаар"
 #. module: account_auto_transfer
 #: model:ir.model.fields.selection,name:account_auto_transfer.selection__account_transfer_model__state__in_progress
 msgid "Running"
-msgstr "Ажиллаж байгаа"
+msgstr "Ашиглаж буй"
 
 #. module: account_auto_transfer
 #: model:ir.model.fields,field_description:account_auto_transfer.field_account_transfer_model_line__sequence
@@ -366,8 +409,12 @@ msgstr "Шинжилгээний шүүлтүүр %s нь давхардаж б�
 #. module: account_auto_transfer
 #. odoo-python
 #: code:addons/account_auto_transfer/models/transfer_model.py:0
-msgid "The partner filter %s in combination with the analytic filter %s is duplicated"
-msgstr "Харилцагчийн шүүлтүүр %s болон шинжилгээний шүүлтүүр %s бүхий хослол нь давхардаж байна"
+msgid ""
+"The partner filter %(partner_filter)s in combination with the analytic "
+"filter %(analytic_filter)s is duplicated"
+msgstr ""
+"Харилцагчийн шүүлтүүр %(partner_filter)s болон шинжилгээний шүүлтүүр %"
+"(analytic_filter)s бүхий хослол нь давхардаж байна"
 
 #. module: account_auto_transfer
 #. odoo-python
@@ -392,6 +439,7 @@ msgid "Transfer Model"
 msgstr "Гүйлгээний загвар"
 
 #. module: account_auto_transfer
+#: model:ir.ui.menu,name:account_auto_transfer.menu_auto_transfer
 #: model_terms:ir.ui.view,arch_db:account_auto_transfer.view_transfer_model_form
 msgid "Transfers"
 msgstr "Гүйлгээ"
@@ -405,6 +453,28 @@ msgstr "Жил бүр"
 #. odoo-python
 #: code:addons/account_auto_transfer/demo/account_demo.py:0
 msgid "Yearly liabilites auto transfers"
+msgstr ""
+
+#. module: account_auto_transfer
+#. odoo-python
+#: code:addons/account_auto_transfer/models/transfer_model.py:0
+msgid ""
+"You cannot delete an automatic transfer that has draft moves attached "
+"('%s'). Please delete them before deleting this transfer."
+msgstr ""
+
+#. module: account_auto_transfer
+#. odoo-python
+#: code:addons/account_auto_transfer/models/transfer_model.py:0
+msgid ""
+"You cannot delete an automatic transfer that has posted moves attached "
+"('%s')."
+msgstr ""
+
+#. module: account_auto_transfer
+#. odoo-python
+#: code:addons/account_auto_transfer/models/account_move_line.py:0
+msgid "You cannot set Tax on Automatic Transfer's entries."
 msgstr ""
 
 #. module: account_auto_transfer

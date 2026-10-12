@@ -1,23 +1,30 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* whatsapp_event
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Manon Rondou, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:29+0000\n"
+"POT-Creation-Date: 2025-12-29 18:50+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
+"Last-Translator: Manon Rondou, 2025\n"
 "Language-Team: French (https://app.transifex.com/odoo/teams/41243/fr/)\n"
+"Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: fr\n"
-"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % "
+"1000000 == 0 ? 1 : 2;\n"
+
+#. module: whatsapp_event
+#: model:ir.model.fields,field_description:whatsapp_event.field_event_registration__date_tz
+msgid "Display Timezone"
+msgstr "Afficher le fuseau horaire"
 
 #. module: whatsapp_event
 #: model:ir.model,name:whatsapp_event.model_event_mail
@@ -30,14 +37,23 @@ msgid "Event Registration"
 msgstr "Inscription à l'événement"
 
 #. module: whatsapp_event
+#: model:ir.model.fields,help:whatsapp_event.field_event_registration__date_tz
+msgid ""
+"Indicates the timezone in which the event dates/times will be displayed on "
+"the website."
+msgstr ""
+"Indique le fuseau horaire dans lequel les dates/horaires des événements "
+"seront affichés sur le site web."
+
+#. module: whatsapp_event
 #: model:ir.model,name:whatsapp_event.model_event_type_mail
 msgid "Mail Scheduling on Event Category"
-msgstr "Planification d'emails sur la catégorie d'événement"
+msgstr "Planification d'e-mails sur la catégorie d'événement"
 
 #. module: whatsapp_event
 #: model:ir.model,name:whatsapp_event.model_event_mail_registration
 msgid "Registration Mail Scheduler"
-msgstr "Planificateur d'email d'inscription"
+msgstr "Planificateur d'e-mail d'inscription"
 
 #. module: whatsapp_event
 #: model:ir.model.fields,field_description:whatsapp_event.field_event_mail__notification_type
@@ -50,11 +66,6 @@ msgstr "Envoyer"
 #: model:ir.model.fields,field_description:whatsapp_event.field_event_type_mail__template_ref
 msgid "Template"
 msgstr "Modèle"
-
-#. module: whatsapp_event
-#: model:ir.model.fields,field_description:whatsapp_event.field_event_registration__date_tz
-msgid "Timezone"
-msgstr "Fuseau horaire"
 
 #. module: whatsapp_event
 #: model:ir.model.fields.selection,name:whatsapp_event.selection__event_mail__notification_type__whatsapp
@@ -74,5 +85,4 @@ msgstr "Modèle WhatsApp"
 #: code:addons/whatsapp_event/models/event_mail.py:0
 msgid "Whatsapp Templates in Events must have a phone field set."
 msgstr ""
-"Les modèles WhatsApp dans Événements doivent avoir un champ téléphone "
-"défini."
+"Les modèles WhatsApp dans Événements doivent avoir un champ téléphone défini."

@@ -1,22 +1,23 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* website_helpdesk_livechat
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Thi Huong Nguyen, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
+"POT-Creation-Date: 2025-12-29 18:46+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
+"Last-Translator: Thi Huong Nguyen, 2025\n"
 "Language-Team: Vietnamese (https://app.transifex.com/odoo/teams/41243/vi/)\n"
+"Language: vi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: vi\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. module: website_helpdesk_livechat
@@ -68,7 +69,7 @@ msgstr "Cấu hình chatbot"
 #. module: website_helpdesk_livechat
 #: model_terms:ir.ui.view,arch_db:website_helpdesk_livechat.helpdesk_team_view_form_inherit_website_helpdesk_livechat
 msgid "Configure Live Chat Channel"
-msgstr "Tạo Kênh livechat"
+msgstr "Tạo Kênh trò chuyện trực tiếp"
 
 #. module: website_helpdesk_livechat
 #: model:ir.model.fields.selection,name:website_helpdesk_livechat.selection__chatbot_script_step__step_type__create_ticket
@@ -85,9 +86,11 @@ msgstr "Tạo một phiếu hỗ trợ mới (/ticket tiêu đề phiếu hỗ t
 #. odoo-python
 #: code:addons/website_helpdesk_livechat/models/helpdesk.py:0
 msgid ""
-"Create a new helpdesk ticket by typing: %(pre_start)s%(ticket_command)s "
-"%(i_start)sticket title%(i_end)s%(pre_end)s"
+"Create a new helpdesk ticket by typing: %(pre_start)s%(ticket_command)s %"
+"(i_start)sticket title%(i_end)s%(pre_end)s"
 msgstr ""
+"Tạo một phiếu hỗ trợ mới bằng cách nhập: %(pre_start)s%(ticket_command)s %"
+"(i_start)stiêu đề phiếu hỗ trợ%(i_end)s%(pre_end)s"
 
 #. module: website_helpdesk_livechat
 #. odoo-python
@@ -149,7 +152,7 @@ msgstr "Một điều cuối cùng, bạn có thể cung cấp email của mình
 #. module: website_helpdesk_livechat
 #: model:ir.model.fields,field_description:website_helpdesk_livechat.field_helpdesk_team__use_website_helpdesk_livechat
 msgid "Live Chat"
-msgstr "Livechat"
+msgstr "Trò chuyện trực tiếp"
 
 #. module: website_helpdesk_livechat
 #. odoo-python
@@ -167,9 +170,12 @@ msgstr "Không"
 #: code:addons/website_helpdesk_livechat/models/helpdesk.py:0
 msgid ""
 "No tickets found for %(b_start)s%(keywords)s%(b_end)s.%(br)sMake sure you "
-"are using the right format: %(pre_start)s%(search_tickets_command)s "
-"%(i_start)skeywords%(i_end)s%(pre_end)s"
+"are using the right format: %(pre_start)s%(search_tickets_command)s %"
+"(i_start)skeywords%(i_end)s%(pre_end)s"
 msgstr ""
+"Không tìm thấy phiếu hỗ trợ cho %(b_start)s%(keywords)s%(b_end)s.%(br)sĐảm "
+"bảo rằng bạn đã sử dụng đúng định dạng: %(pre_start)s%"
+"(search_tickets_command)s %(i_start)stừ khoá%(i_end)s%(pre_end)s"
 
 #. module: website_helpdesk_livechat
 #: model:chatbot.script.step,message:website_helpdesk_livechat.chatbot_script_helpdesk_step_ticket
@@ -177,8 +183,8 @@ msgid ""
 "OK, I just created a ticket for you. You should receive an email "
 "confirmation very soon."
 msgstr ""
-"Được rồi! Tôi vừa tạo một phiếu hỗ trợ cho bạn và bạn sẽ sớm nhận được email"
-" xác nhận."
+"Được rồi! Tôi vừa tạo một phiếu hỗ trợ cho bạn và bạn sẽ sớm nhận được email "
+"xác nhận."
 
 #. module: website_helpdesk_livechat
 #: model:chatbot.script.step,message:website_helpdesk_livechat.chatbot_script_helpdesk_step_technical_serial
@@ -200,9 +206,11 @@ msgstr "Tìm kiếm phiếu hỗ trợ (/search_tickets từ khoá)"
 #. odoo-python
 #: code:addons/website_helpdesk_livechat/models/helpdesk.py:0
 msgid ""
-"Search helpdesk tickets by typing: %(pre_start)s%(search_tickets_command)s "
-"%(i_start)skeywords%(i_end)s%(pre_end)s"
+"Search helpdesk tickets by typing: %(pre_start)s%(search_tickets_command)s %"
+"(i_start)skeywords%(i_end)s%(pre_end)s"
 msgstr ""
+"Tìm kiếm phiếu hỗ trợ bằng cách nhập: %(pre_start)s%"
+"(search_tickets_command)s %(i_start)stừ khoá%(i_end)s%(pre_end)s"
 
 #. module: website_helpdesk_livechat
 #. odoo-python
@@ -237,9 +245,11 @@ msgstr "Phiếu hỗ trợ"
 #. odoo-python
 #: code:addons/website_helpdesk_livechat/models/helpdesk.py:0
 msgid ""
-"Tickets search results for %(b_start)s%(keywords)s%(b_end)s: "
-"%(br)s%(tickets)s"
+"Tickets search results for %(b_start)s%(keywords)s%(b_end)s: %(br)s%"
+"(tickets)s"
 msgstr ""
+"Kết quả tìm kiếm phiếu hỗ trợ cho %(b_start)s%(keywords)s%(b_end)s: %(br)s%"
+"(tickets)s"
 
 #. module: website_helpdesk_livechat
 #: model:chatbot.script.step,message:website_helpdesk_livechat.chatbot_script_helpdesk_step_administrative_customer_ref
@@ -253,7 +263,7 @@ msgstr ""
 #. module: website_helpdesk_livechat
 #: model:res.groups,name:website_helpdesk_livechat.group_use_website_helpdesk_livechat
 msgid "Use Live Chat"
-msgstr "Sử dụng Livechat"
+msgstr "Sử dụng Trò chuyện trực tiếp"
 
 #. module: website_helpdesk_livechat
 #: model:ir.model,name:website_helpdesk_livechat.model_res_users

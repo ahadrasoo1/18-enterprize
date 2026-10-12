@@ -12,9 +12,6 @@ class HrEmployee(models.Model):
 
     document_count = fields.Integer(compute='_compute_document_count', groups="hr.group_hr_user")
 
-    def _get_document_access_ids(self):
-        return [(self.work_contact_id, ('view', False))]
-
     def _get_document_folder(self):
         return self.company_id.documents_hr_folder if self.company_id.documents_hr_settings else False
 
@@ -26,7 +23,11 @@ class HrEmployee(models.Model):
 
     def _get_employee_document_domain(self):
         self.ensure_one()
+        hr_folder = self._get_document_folder()
         user_domain = [('partner_id', '=', self.work_contact_id.id)]
+
+        if hr_folder:
+            user_domain = expression.AND([user_domain, [('folder_id', 'child_of', hr_folder.id)]])
         return user_domain
 
     def _compute_document_count(self):
@@ -62,9 +63,9 @@ class HrEmployee(models.Model):
     def action_send_documents_share_link(self):
         if not self.env.user.has_group('hr.group_hr_user'):
             raise UserError(_('You can not send the documents link to the employee.'))
-        invalid_employees = self.filtered(lambda e: not (e.private_email and e.user_id))
+        invalid_employees = self.filtered(lambda e: not e.private_email)
         if invalid_employees:
-            raise UserError(_('Employee\'s related user and private email must be set to use \"Send Access Link\" function:\n%s', '\n'.join(invalid_employees.mapped('name'))))
+            raise UserError(_('Employee\'s private email must be set to use \"Send Access Link\" function:\n%s', '\n'.join(invalid_employees.mapped('name'))))
         template = self.env.ref('documents_hr.mail_template_document_folder_link', raise_if_not_found=False)
         for employee in self:
             if template:

@@ -77,10 +77,7 @@ result_rate = -payslip._rule_parameter('l10n_lt_pit_rate_high')
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
 result = payslip._get_l10n_lt_taxable_amount(localdict)
-if contract.l10n_lt_pension:
-    result_rate = -payslip._rule_parameter('l10n_lt_ssc_rate_high')
-else:
-    result_rate = -payslip._rule_parameter('l10n_lt_ssc_rate')
+result_rate = -payslip._rule_parameter('l10n_lt_ssc_rate')
         </field>
         <field name="appears_on_payroll_report" eval="True"/>
         <field name="struct_id" ref="l10n_lt_hr_payroll.hr_payroll_structure_lt_employee_salary"/>

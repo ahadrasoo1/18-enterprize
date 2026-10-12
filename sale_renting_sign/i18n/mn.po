@@ -3,19 +3,19 @@
 # 	* sale_renting_sign
 #
 # Translators:
-# Minj P <pminj322@gmail.com>, 2022
-# Батмөнх Ганбат <batmunkh2522@gmail.com>, 2022
-# Baskhuu Lodoikhuu <baskhuujacara@gmail.com>, 2022
-# Batmunkh Ganbat <batmunkh.g@bumanit.mn>, 2022
-# Martin Trigaux, 2022
+# Baskhuu Lodoikhuu <baskhuujacara@gmail.com>, 2024
+# Batmunkh Ganbat <batmunkh2522@gmail.com>, 2024
+# Minj P <pminj322@gmail.com>, 2024
+# Batmunkh Ganbat <batmunkh.g@bumanit.mn>, 2024
+# Martin Trigaux, 2024
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 16.0beta+e\n"
+"Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-16 16:03+0000\n"
-"PO-Revision-Date: 2022-09-22 05:48+0000\n"
-"Last-Translator: Martin Trigaux, 2022\n"
+"POT-Creation-Date: 2025-12-29 18:49+0000\n"
+"PO-Revision-Date: 2024-09-25 09:44+0000\n"
+"Last-Translator: Martin Trigaux, 2024\n"
 "Language-Team: Mongolian (https://app.transifex.com/odoo/teams/41243/mn/)\n"
 "Language: mn\n"
 "MIME-Version: 1.0\n"
@@ -29,14 +29,14 @@ msgid "# of Signature Requests"
 msgstr ""
 
 #. module: sale_renting_sign
-#: model_terms:ir.ui.view,arch_db:sale_renting_sign.message_signature_link
-msgid "A document has been signed and a copy attached to this order:"
-msgstr ""
-
-#. module: sale_renting_sign
 #: model_terms:ir.ui.view,arch_db:sale_renting_sign.rental_sign_wizard_view_form
 msgid "Cancel"
 msgstr "Цуцлах"
+
+#. module: sale_renting_sign
+#: model:sign.template,redirect_url_text:sale_renting_sign.template_rental_sign
+msgid "Close"
+msgstr "Хаах"
 
 #. module: sale_renting_sign
 #: model:ir.model,name:sale_renting_sign.model_res_company
@@ -99,14 +99,8 @@ msgid "Last Updated on"
 msgstr "Сүүлд зассан огноо"
 
 #. module: sale_renting_sign
-#: model:sign.template,redirect_url_text:sale_renting_sign.template_rental_sign
-msgid "Open Link"
-msgstr ""
-
-#. module: sale_renting_sign
 #: model:ir.model,name:sale_renting_sign.model_sale_order
 #: model:ir.model.fields,field_description:sale_renting_sign.field_rental_sign_wizard__order_id
-#: model:ir.model.fields,field_description:sale_renting_sign.field_sign_request__sale_order_id
 #: model:ir.model.fields,field_description:sale_renting_sign.field_sign_send_request__sale_order_id
 msgid "Sales Order"
 msgstr "Борлуулалтын захиалга"
@@ -150,7 +144,10 @@ msgstr "Гарын үсгийн хүсэлтүүд"
 
 #. module: sale_renting_sign
 #: model:ir.model.fields,help:sale_renting_sign.field_res_company__rental_sign_tmpl_id
-msgid "This document template will be selected by default when signing documents from a rental order. You should select a template accessible to all Sign users."
+msgid ""
+"This document template will be selected by default when signing documents "
+"from a rental order. You should select a template accessible to all Sign "
+"users."
 msgstr ""
 
 #. module: sale_renting_sign

@@ -1,16 +1,19 @@
 /** @odoo-module **/
 
 import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
+import { PromoteStudioAutomationDialog } from "@web_enterprise/webclient/promote_studio_dialog/promote_studio_dialog";
 import { _t } from "@web/core/l10n/translation";
 import { user } from "@web/core/user";
 import { useBus, useService } from "@web/core/utils/hooks";
 import { escape } from "@web/core/utils/strings";
-import { memoize } from "@web/core/utils/functions";
 import { useSetupAction } from "@web/search/action_hook";
-import { formatFloat } from "@web/views/fields/formatters";
 import { DocumentsPermissionPanel } from "@documents/components/documents_permission_panel/documents_permission_panel";
 import { PdfManager } from "@documents/owl/components/pdf_manager/pdf_manager";
 import { EventBus, onMounted, onWillStart, markup, useComponent, useEnv, useRef, useSubEnv } from "@odoo/owl";
+
+// TODO: clean in master
+import { loadMaxUploadSize as loadMaxUploadSizeDocumentService } from "@documents/core/document_service";
+export const loadMaxUploadSize = loadMaxUploadSizeDocumentService;
 
 /**
  * Controller/View hooks
@@ -54,8 +57,6 @@ export async function toggleArchive(model, resModel, resIds, doArchive) {
     if (action && Object.keys(action).length !== 0) {
         model.action.doAction(action);
     }
-    await model.load();
-    await model.notify();
     if (doArchive) {
         await model.env.documentsView.bus.trigger("documents-close-preview");
     }
@@ -68,11 +69,6 @@ export function preSuperSetupFolder() {
         component._deletionDelay = await orm.call("documents.document", "get_deletion_delay", [[]]);
     });
 }
-
-// Small hack, memoize uses the first argument as cache key, but we need the orm which will not be the same.
-const loadMaxUploadSize = memoize((_null, orm) =>
-    orm.call("documents.document", "get_document_max_upload_limit")
-);
 
 /**
  * To be executed before calling super.setup in view controllers.
@@ -128,6 +124,41 @@ export function useDocumentView(helpers) {
         });
     };
 
+    // Open Automation rules
+    const _openAutomations = async ({ folderId, folderDisplayName }) => {
+        const checkBaseAutomation = await orm.searchCount("ir.module.module", [
+            ["name", "=", "base_automation"],
+            ["state", "=", "installed"],
+        ]);
+        if (!checkBaseAutomation > 0) {
+            return dialogService.add(PromoteStudioAutomationDialog, {
+                title: _t("Odoo Studio - Customize workflows in minutes"),
+            });
+        }
+        const userHasAccessRight = await user.checkAccessRight("base.automation", "create");
+        if (!userHasAccessRight) {
+            return notification.add(_t("Contact your Administrator to get access if needed."), {
+                title: _t("Access to Automations"),
+                type: "info",
+            });
+        }
+        const documentsModelId = await orm.search(
+            "ir.model",
+            [["model", "=", "documents.document"]],
+            { limit: 1 }
+        );
+        return await action.doAction("base_automation.base_automation_act", {
+            additionalContext: {
+                active_test: false,
+                default_model_id: documentsModelId[0],
+                search_default_model_id: documentsModelId[0],
+                default_name: _t("Put in %s", folderDisplayName),
+                default_filter_domain: [["folder_id", "in", [folderId]]],
+                default_trigger: "on_create_or_write",
+            },
+        });
+    };
+
     // Keep selection between views
     useSetupAction({
         rootRef: root,
@@ -140,15 +171,11 @@ export function useDocumentView(helpers) {
         _openShareDialog(ev.detail);
     });
 
-    let maxUploadSize;
-    Object.defineProperty(component, "maxUploadSize", {
-        get: () => maxUploadSize,
-        set: (newVal) => {
-            maxUploadSize = newVal;
-        },
+    useBus(bus, "documents-open-automations", (ev) => {
+        _openAutomations(ev.detail);
     });
+
     onWillStart(async () => {
-        component.maxUploadSize = await loadMaxUploadSize(null, orm);
         component.isDocumentsManager = await user.hasGroup("documents.group_documents_manager");
     });
 
@@ -178,6 +205,7 @@ export function useDocumentView(helpers) {
             return typeof folder.id !== "number" && !selectedRecords;
         },
         userIsInternal: documentService.userIsInternal,
+        userIsDocumentManager: documentService.userIsDocumentManager,
         // Listeners
         onClickDocumentsRequest: () => {
             action.doAction("documents.action_request_form", {
@@ -198,6 +226,7 @@ export function useDocumentView(helpers) {
             });
         },
         onClickDocumentsAddUrl: () => {
+            const folderId = env.searchModel.getSelectedFolderId();
             action.doAction("documents.action_url_form", {
                 additionalContext: {
                     default_type: "url",
@@ -205,6 +234,9 @@ export function useDocumentView(helpers) {
                     default_folder_id: env.searchModel.getSelectedFolderId(),
                     default_res_id: props.context.default_res_id || false,
                     default_res_model: props.context.default_res_model || false,
+                    ...(folderId === "COMPANY"
+                        ? { default_owner_id: documentService.store.odoobot.userId }
+                        : {}),
                 },
                 fullscreen: env.isSmall,
                 onClose: async () => {
@@ -220,7 +252,12 @@ export function useDocumentView(helpers) {
                 additionalContext: {
                     default_type: "folder",
                     default_folder_id: currentFolder || false,
-                    ...(currentFolder === "COMPANY" ? { default_access_internal: "edit" } : {}),
+                    ...(currentFolder === "COMPANY"
+                        ? {
+                              default_access_internal: "edit",
+                              default_owner_id: documentService.store.odoobot.userId,
+                          }
+                        : {}),
                 },
                 fullscreen: env.isSmall,
                 onClose: async () => {
@@ -284,13 +321,18 @@ function useDocumentsViewFilePreviewer({
                 {
                     documents: documents.map((doc) => doc.data),
                     embeddedActions,
-                    onProcessDocuments: ({ documentIds, actionId, exit, isForcingDelete }) => {
+                    onProcessDocuments: async ({
+                        documentIds,
+                        actionId,
+                        exit,
+                        isForcingDelete,
+                    }) => {
                         forceDelete = isForcingDelete;
                         if (documentIds && documentIds.length) {
                             newDocumentIds = [...new Set(newDocumentIds.concat(documentIds))];
                         }
                         if (actionId) {
-                            component.embeddedAction(documentIds, actionId, !exit);
+                            await component.embeddedAction(documentIds, actionId, !exit);
                         }
                     },
                 },
@@ -300,12 +342,15 @@ function useDocumentsViewFilePreviewer({
                             return;
                         }
                         await component.model.load();
-                        let count = 0;
                         for (const record of documents) {
                             if (!newDocumentIds.includes(record.resId)) {
-                                record.model.root.deleteRecords(record);
-                                continue;
+                                await record.model.root.deleteRecords(record);
                             }
+                        }
+                        let count = 0;
+                        for (const record of env.model.root.records.filter((r) =>
+                            newDocumentIds.includes(r.resId),
+                        )) {
                             record.onRecordClick(null, {
                                 isKeepSelection: count++ !== 0,
                                 isRangeSelection: false,
@@ -328,8 +373,10 @@ function useDocumentsViewFilePreviewer({
                 const getRecordAttachment = (rec) => {
                     rec = rec.shortcutTarget;
                     return {
-                        id: rec.data.attachment_id[0],
-                        name: rec.data.attachment_id[1],
+                        // A negative ID prevents a reload from resolving to a real record, ensuring that the document name
+                        // is always shown instead of the potentially non renamed attachment name.
+                        id: -rec.resId,
+                        name: rec.data.name,
                         mimetype: rec.data.mimetype,
                         url: rec.data.url,
                         documentId: rec.resId,
@@ -365,7 +412,7 @@ function useDocumentsViewFilePreviewer({
                 if (elements.length) {
                     elements[0].focus();
                 }
-                if (component.root.el) {
+                if (component.root?.el) {
                     component.root.el
                         .querySelector(".o_documents_view")
                         .classList.remove("overflow-hidden");
@@ -393,7 +440,7 @@ function useDocumentsViewFilePreviewer({
     });
     useBus(bus, "documents-close-preview", () => {
         documentService.setPreviewedDocument(null);
-        setPreviewStore({});
+        documentService.documentList?.onDeleteCallback();
     });
 
     return {
@@ -452,10 +499,12 @@ function useDocumentsViewFileUpload() {
         const { upload } = ev.detail;
         const xhr = upload.xhr;
         if (xhr.status !== 200) {
-            handleUploadError(_t("status code: %(status)s, message: %(message)s", {
-                status: xhr.status,
-                message: xhr.response,
-            }));
+            handleUploadError({
+                error: _t("status code: %(status)s, message: %(message)s", {
+                    status: xhr.status,
+                    message: xhr.response,
+                })
+            });
             return
         }
         // Depending on the controller called, the response is different:
@@ -486,37 +535,26 @@ function useDocumentsViewFileUpload() {
      * the document's attachment by the given single file (binary accessToken).
      */
     const uploadFiles = async ({ files, accessToken, context }) => {
-        const validFiles = [...files].filter((file) => file.size <= component.maxUploadSize);
-        if (validFiles.length !== 0) {
-            await fileUpload.upload(`/documents/upload/${accessToken || ""}`, validFiles, {
-                buildFormData: (formData) => {
-                    if (context) {
-                        for (const key of [
-                            "default_owner_id",
-                            "default_partner_id",
-                            "default_res_id",
-                            "default_res_model",
-                        ]) {
-                            if (context[key]) {
-                                formData.append(key.replace("default_", ""), context[key]);
-                            }
-                        }
-                    }
-                },
-                displayErrorNotification: false,
-            });
+        if (env.searchModel.getSelectedFolderId() === "COMPANY") {
+            // to upload in the COMPANY folder, we need to set Odoobot as owner
+            context.default_owner_id = documentService.store.odoobot.userId;
+        } else if (!accessToken && context.documents_unique_folder_id) {
+            const folder = env.searchModel.getFolderById(context.documents_unique_folder_id);
+            if (folder) {
+                accessToken = folder.access_token;
+            }
         }
-        if (validFiles.length < files.length) {
-            const message = _t(
-                "Some files could not be uploaded (max size: %s).",
-                formatFloat(component.maxUploadSize, { humanReadable: true })
-            );
-            return notification.add(message, { type: "danger" });
-        }
+        await documentService.uploadDocument(files, accessToken, context);
     };
 
     useBus(bus, "documents-upload-files", (ev) => {
-        component.uploadFiles({ context: component.props.context, ...ev.detail });
+        component.uploadFiles({
+            ...ev.detail,
+            context: {
+                ...component.props.context,
+                ...ev.detail.context,
+            },
+        });
     });
 
     return {

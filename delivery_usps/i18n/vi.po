@@ -1,22 +1,23 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* delivery_usps
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Thi Huong Nguyen, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
+"POT-Creation-Date: 2025-12-29 18:50+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
+"Last-Translator: Thi Huong Nguyen, 2025\n"
 "Language-Team: Vietnamese (https://app.transifex.com/odoo/teams/41243/vi/)\n"
+"Language: vi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: vi\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. module: delivery_usps
@@ -139,7 +140,7 @@ msgstr "Khung giá cho thùng hàng lớn"
 #: model:ir.model.fields.selection,name:delivery_usps.selection__delivery_carrier__usps_domestic_regular_container__legal_flat_rate_envelope
 #: model:ir.model.fields.selection,name:delivery_usps.selection__delivery_carrier__usps_international_regular_container__legalflatrateenv
 msgid "Legal Flat Rate Envelope"
-msgstr "Khung giá hợp pháp cho gói hàng"
+msgstr "Phong bì khổ lớn giá cố định"
 
 #. module: delivery_usps
 #: model:ir.model.fields.selection,name:delivery_usps.selection__delivery_carrier__usps_first_class_mail_type__letter
@@ -225,8 +226,7 @@ msgstr "Từng bưu kiện"
 
 #. module: delivery_usps
 #: model:ir.model.fields,help:delivery_usps.field_delivery_carrier__usps_machinable
-msgid ""
-"Please check on USPS website to ensure that your package is machinable."
+msgid "Please check on USPS website to ensure that your package is machinable."
 msgstr ""
 "Vui lòng kiểm tra trên trang web USPS để đảm bảo rằng gói bưu kiện của bạn "
 "có thể gia công được."
@@ -383,10 +383,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/delivery_usps/models/usps_request.py:0
 msgid ""
-"The estimated shipping price cannot be computed because the weight is missing for the following product(s): \n"
+"The estimated shipping price cannot be computed because the weight is "
+"missing for the following product(s): \n"
 " %s"
 msgstr ""
-"Không thể tính giá vận chuyển ước tính vì thiếu khối lượng của (các) sản phẩm sau: \n"
+"Không thể tính giá vận chuyển ước tính vì thiếu khối lượng của (các) sản "
+"phẩm sau: \n"
 " %s"
 
 #. module: delivery_usps
@@ -429,8 +431,13 @@ msgstr "Loại container"
 
 #. module: delivery_usps
 #: model:ir.model.fields.selection,name:delivery_usps.selection__delivery_carrier__delivery_type__usps
-msgid "USPS"
-msgstr "USPS"
+msgid "USPS (Legacy)"
+msgstr "USPS (Cũ)"
+
+#. module: delivery_usps
+#: model:ir.model.fields,field_description:delivery_usps.field_delivery_carrier__usps_label_file_type
+msgid "USPS (Legacy) Label File Type"
+msgstr "Loại tệp nhãn USPS (Cũ)"
 
 #. module: delivery_usps
 #: model_terms:ir.ui.view,arch_db:delivery_usps.view_delivery_carrier_form_with_provider_usps
@@ -475,11 +482,6 @@ msgstr ""
 "đổi phương thức giao hàng thành USPS nội địa."
 
 #. module: delivery_usps
-#: model:ir.model.fields,field_description:delivery_usps.field_delivery_carrier__usps_label_file_type
-msgid "USPS Label File Type"
-msgstr "Loại tệp nhãn USPS"
-
-#. module: delivery_usps
 #: model:ir.model.fields,field_description:delivery_usps.field_delivery_carrier__usps_mail_type
 msgid "USPS Mail Type"
 msgstr "Loại mail USPS"
@@ -488,12 +490,6 @@ msgstr "Loại mail USPS"
 #: model:ir.model.fields,field_description:delivery_usps.field_delivery_carrier__usps_service
 msgid "USPS Service"
 msgstr "Dịch vụ USPS"
-
-#. module: delivery_usps
-#: model_terms:ir.ui.view,arch_db:delivery_usps.res_config_settings_view_form_sale
-#: model_terms:ir.ui.view,arch_db:delivery_usps.res_config_settings_view_form_stock
-msgid "USPS Shipping Methods"
-msgstr "Phương thức vận chuyển USPS"
 
 #. module: delivery_usps
 #: model:ir.model.fields,field_description:delivery_usps.field_delivery_carrier__usps_username

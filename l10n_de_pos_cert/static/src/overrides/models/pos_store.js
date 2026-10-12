@@ -4,7 +4,6 @@ import { AlertDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 import { ask } from "@point_of_sale/app/store/make_awaitable_dialog";
 import { _t } from "@web/core/l10n/translation";
 import { uuidv4 } from "@point_of_sale/utils";
-import { TaxError } from "@l10n_de_pos_cert/app/errors";
 import { roundCurrency } from "@point_of_sale/app/models/utils/currency";
 
 const RATE_ID_MAPPING = {
@@ -24,25 +23,15 @@ patch(PosStore.prototype, {
     },
     // @Override
     async _onBeforeDeleteOrder(order) {
-        try {
-            if (this.isCountryGermanyAndFiskaly() && order.isTransactionStarted()) {
-                await this.cancelTransaction(order);
-            }
-            return super._onBeforeDeleteOrder(...arguments);
-        } catch (error) {
-            const message = {
-                noInternet: _t(
-                    "Check the internet connection then try to validate or cancel the order. " +
-                        "Do not delete your browsing, cookies and cache data in the meantime!"
-                ),
-                unknown: _t(
-                    "An unknown error has occurred! Try to validate this order or cancel it again. " +
-                        "Please contact Odoo for more information."
-                ),
-            };
-            this.fiskalyError(error, message);
-            return false;
+        const canBeDeleted = super._onBeforeDeleteOrder(...arguments);
+        if (canBeDeleted) {
+            await this.handleFiskalyCancellation(order);
         }
+        return canBeDeleted;
+    },
+    disallowLineQuantityChange() {
+        const result = super.disallowLineQuantityChange(...arguments);
+        return this.isCountryGermanyAndFiskaly() || result;
     },
     //@Override
     async afterProcessServerData() {
@@ -60,33 +49,20 @@ patch(PosStore.prototype, {
         }
         return super.afterProcessServerData(...arguments);
     },
-    async addLineToCurrentOrder(vals, opt = {}, configure = true) {
-        if (this.isCountryGermanyAndFiskaly()) {
-            const product = vals.product_id;
-            for (const tax of product.taxes_id) {
-                if (!(tax.amount in this.vatRateMapping)) {
-                    throw new TaxError(product);
-                }
-            }
-            if (!product.taxes_id.length) {
-                throw new TaxError(product);
-            }
-        }
-        return await super.addLineToCurrentOrder(vals, opt, configure);
-    },
     _authenticate() {
         const data = {
             api_key: this.company.l10n_de_fiskaly_api_key,
             api_secret: this.company.l10n_de_fiskaly_api_secret,
         };
 
-        return $.ajax({
-            url: this.getApiUrl() + "/auth",
+        return fetch(this.getApiUrl() + "/auth", {
             method: "POST",
-            data: JSON.stringify(data),
-            contentType: "application/json",
-            timeout: 5000,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
         })
+            .then((response) => response.json())
             .then((data) => {
                 this.setApiToken(data.access_token);
             })
@@ -95,150 +71,256 @@ patch(PosStore.prototype, {
                 return Promise.reject(error);
             });
     },
-    async createTransaction(order) {
-        if (!this.getApiToken()) {
-            await this._authenticate(); //  If there's an error, a promise is created with a rejected value
-        }
 
-        const transactionUuid = uuidv4();
-        const data = {
-            state: "ACTIVE",
+    // Fiskaly Receipt API calls payload helpers
+    getTransactionPayload(order, state, receiptType = "RECEIPT") {
+        return {
+            state: state,
             client_id: this.getClientId(),
+            schema: {
+                standard_v1: {
+                    receipt: {
+                        receipt_type: receiptType,
+                        amounts_per_vat_rate:
+                            order && state != "ACTIVE"
+                                ? this._createAmountPerVatRateArray(order)
+                                : [],
+                        amounts_per_payment_type:
+                            order && state != "ACTIVE"
+                                ? order._createAmountPerPaymentTypeArray()
+                                : [],
+                    },
+                },
+            },
+            metadata: {
+                pos_config_id: order.config_id.id,
+                pos_order_uuid: order.uuid,
+            },
         };
-
-        return $.ajax({
-            url: `${this.getApiUrl()}/tss/${this.getTssId()}/tx/${transactionUuid}${
-                this.isUsingApiV2() ? "?tx_revision=1" : ""
-            }`,
-            method: "PUT",
-            headers: { Authorization: `Bearer ${this.getApiToken()}` },
-            data: JSON.stringify(data),
-            contentType: "application/json",
-            timeout: 5000,
-        })
-            .then((data) => {
-                order.l10n_de_fiskaly_transaction_uuid = transactionUuid;
-                order.transactionStarted();
-            })
-            .catch(async (error) => {
-                if (error.status === 401) {
-                    // Need to update the token
-                    await this._authenticate();
-                    return this.createTransaction(order);
-                }
-                // Return a Promise with rejected value for errors that are not handled here
-                return Promise.reject(error);
-            });
     },
     _createAmountPerVatRateArray(order) {
-        const rateIds = {
-            NORMAL: [],
-            REDUCED_1: [],
-            SPECIAL_RATE_1: [],
-            SPECIAL_RATE_2: [],
-            NULL: [],
-        };
-        order.get_tax_details().forEach((detail) => {
-            rateIds[this.vatRateMapping[detail.tax_percentage]].push(detail.id);
+        const orderSign = order.taxTotals.order_sign;
+        const expectedBase = order.taxTotals.base_amount;
+        let baseAmountSum = 0;
+        const result = order.taxTotals.subtotals[0].tax_groups.map((group) => {
+            const amount = parseFloat((group.tax_amount + group.base_amount) * orderSign);
+            baseAmountSum += group.base_amount;
+            const tax_id = Object.values(group.involved_tax_ids)[0];
+            let tax_amount = 0;
+            if (tax_id) {
+                tax_amount = this.data.models["account.tax"].get(tax_id).amount;
+            }
+            return {
+                vat_rate: roundCurrency(tax_amount, this.currency).toString(),
+                amount: amount.toFixed(5),
+            };
         });
-        const amountPerVatRate = {
-            NORMAL: 0,
-            REDUCED_1: 0,
-            SPECIAL_RATE_1: 0,
-            SPECIAL_RATE_2: 0,
-            NULL: 0,
-        };
-        for (var rate in rateIds) {
-            rateIds[rate].forEach((id) => {
-                amountPerVatRate[rate] += order.get_total_for_taxes(id);
-            });
+
+        // Adjustments (e.g., gift cards, tips) may lack tax info, default it to 0% to avoid mismatches.
+        const difference = parseFloat(
+            (expectedBase + order.requiredSettlementAmount() - baseAmountSum) * orderSign
+        );
+        if (difference) {
+            const existingNullEntry = result.find((item) => item.vat_rate === "0");
+            if (existingNullEntry) {
+                existingNullEntry.amount = roundCurrency(
+                    parseFloat(existingNullEntry.amount) + difference,
+                    this.currency
+                ).toFixed(2);
+            } else {
+                result.push({
+                    vat_rate: "0",
+                    amount: roundCurrency(difference, this.currency).toFixed(2),
+                });
+            }
         }
-        return Object.keys(amountPerVatRate)
-            .filter((rate) => !!amountPerVatRate[rate])
-            .map((rate) => ({
-                vat_rate: rate,
-                amount: roundCurrency(amountPerVatRate[rate], this.currency).toFixed(2),
-            }));
+        return result;
+    },
+
+    // Fiskaly Receipt API Calls
+    async createTransaction(order) {
+        const transactionUuid = uuidv4();
+        const data = this.getTransactionPayload(order, "ACTIVE");
+        const payload = `${transactionUuid}?tx_revision=1`;
+        await this.transactionCall(payload, data, order, 0, true);
+        order.l10n_de_fiskaly_transaction_uuid = transactionUuid;
+        order.receiptStarted();
     },
     async finishShortTransaction(order) {
-        if (!this.getApiToken()) {
-            await this._authenticate();
+        const result = await this.finalizeReceiptTransaction(order, "FINISHED");
+        if (!order.fiskalyServerError && result) {
+            order.receiptFinished();
+            // Update TSS here for retail; restaurants update it on order transaction finish.
+            if (this.isCountryGermanyAndFiskaly() && !order.config.module_pos_restaurant) {
+                order._updateTssInfo(result);
+            }
         }
-
-        const amountPerVatRateArray = this._createAmountPerVatRateArray(order);
-        const amountPerPaymentTypeArray = order._createAmountPerPaymentTypeArray();
-        const data = {
-            state: "FINISHED",
-            client_id: this.getClientId(),
-            schema: {
-                standard_v1: {
-                    receipt: {
-                        receipt_type: "RECEIPT",
-                        amounts_per_vat_rate: amountPerVatRateArray,
-                        amounts_per_payment_type: amountPerPaymentTypeArray,
-                    },
-                },
-            },
-        };
-        return $.ajax({
-            headers: { Authorization: `Bearer ${this.getApiToken()}` },
-            url: `${this.getApiUrl()}/tss/${this.getTssId()}/tx/${
-                order.l10n_de_fiskaly_transaction_uuid
-            }?${this.isUsingApiV2() ? "tx_revision=2" : "last_revision=1"}`,
-            method: "PUT",
-            data: JSON.stringify(data),
-            contentType: "application/json",
-            timeout: 5000,
-        })
-            .then((data) => {
-                order._updateTssInfo(data);
-            })
-            .catch(async (error) => {
-                if (error.status === 401) {
-                    // Need to update the token
-                    await this._authenticate();
-                    return this.finishShortTransaction(order);
-                }
-                // Return a Promise with rejected value for errors that are not handled here
-                return Promise.reject(error);
-            });
+        return result;
     },
     async cancelTransaction(order) {
-        if (!this.getApiToken()) {
-            await this._authenticate();
-        }
+        const result = await this.finalizeReceiptTransaction(order, "CANCELLED");
+        order.l10n_de_fiskaly_transaction_uuid = "";
+        order.uiState.receiptState = "inactive";
+        return result;
+    },
+    async finalizeReceiptTransaction(order, state) {
+        const receiptType = state == "CANCELLED" ? "CANCELLATION" : "RECEIPT";
+        const data = this.getTransactionPayload(order, state, receiptType);
+        const payload = `${order.l10n_de_fiskaly_transaction_uuid}?tx_revision=2`;
+        return await this.transactionCall(payload, data, order, 0, true);
+    },
 
-        const data = {
-            state: "CANCELLED",
-            client_id: this.getClientId(),
-            schema: {
-                standard_v1: {
-                    receipt: {
-                        receipt_type: "CANCELLATION",
-                        amounts_per_vat_rate: [],
-                    },
-                },
-            },
-        };
-
-        return $.ajax({
-            url: `${this.getApiUrl()}/tss/${this.getTssId()}/tx/${
-                this.l10n_de_fiskaly_transaction_uuid
-            }?${this.isUsingApiV2() ? "tx_revision=2" : "last_revision=1"}`,
-            method: "PUT",
-            headers: { Authorization: `Bearer ${this.getApiToken()}` },
-            data: JSON.stringify(data),
-            contentType: "application/json",
-            timeout: 5000,
-        }).catch(async (error) => {
-            if (error.status === 401) {
-                // Need to update the token
+    async transactionCall(payload, data, order, retryCount = 0, isReceiptTxn = false) {
+        let token = this.getApiToken();
+        try {
+            if (!token) {
                 await this._authenticate();
-                return this.cancelTransaction(order);
+                token = this.getApiToken();
             }
-            // Return a Promise with rejected value for errors that are not handled here
+            const response = await fetch(
+                `${this.getApiUrl()}/tss/${this.getTssId()}/tx/${payload}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                    method: "PUT",
+                    body: JSON.stringify(data),
+                }
+            );
+            const result = await response.json();
+            if (!response.ok) {
+                const errorCode = await this.handleRequestError(result, order, retryCount);
+                // Most commonly useful for restaurants as there are update order txns but kept here for generic error handling
+                if (errorCode === "revision_mismatch" && order) {
+                    const newPayload = payload.replace(
+                        /tx_revision=\d+/,
+                        `tx_revision=${order.uiState.tx_revision}`
+                    );
+                    return await this.transactionCall(newPayload, data, order, retryCount + 1);
+                }
+                if (errorCode === "retry") {
+                    return await this.transactionCall(payload, data, order, retryCount + 1);
+                }
+            }
+
+            if (order && !isReceiptTxn) {
+                order.uiState.tx_revision += 1;
+            }
+            return result;
+        } catch (error) {
+            // Need to reject to keep track of rejected orders in syncAllOrders
+            // don't show popup for single order failures, it should be handled later in syncAllOrders
             return Promise.reject(error);
-        });
+        }
+    },
+    async handleRequestError(result, order, retryCount) {
+        if (result.code === "E_TX_UPSERT" && order && !retryCount) {
+            // The local tx_revision is out of sync (e.g. order was started on another
+            // device). Fetch the real revision from Fiskaly; transactionCall will then
+            // rebuild the payload and retry.
+            if (order) {
+                await this.fetchTransaction(order);
+            }
+            return "revision_mismatch";
+        } else if (result.status_code === 401) {
+            if (!retryCount) {
+                await this._authenticate();
+                return "retry";
+            }
+        } else if (result.status_code >= 500 && result.status_code <= 599) {
+            if (retryCount < 2) {
+                const delay = (retryCount + 1) * 1000;
+                await new Promise((resolve) => setTimeout(resolve, delay));
+                return "retry";
+            } else {
+                // while closing remained active orders on fiskaly no orders will be available in odoo
+                if (order) {
+                    order.fiskalyServerError = true; // server unreachable after retries
+                }
+                return;
+            }
+        }
+        // Need for keeping track of rejected orders in syncAllOrders
+        return Promise.reject(result);
+    },
+    async addLineToCurrentOrder(vals, opts = {}, configure = true) {
+        if (!this.isCountryGermanyAndFiskaly() || this.config.module_pos_restaurant) {
+            return await super.addLineToCurrentOrder(vals, opts, configure);
+        }
+        // If same product added multiple times it will be better to check before adding line if there was an empty order or not
+        const order = this.get_order();
+        const isEmptyOrder = order.is_empty();
+        const newLine = await super.addLineToCurrentOrder(vals, opts, configure);
+        // This call initiates the receipt transaction when the first item is added to the cart.
+        // for restaurants we need to initialize them at the time of first payment line addition
+        if (isEmptyOrder && order.isReceiptInactive) {
+            try {
+                await this.createTransaction(order);
+            } catch (error) {
+                this.fiskalyError(error);
+                return false;
+            }
+        }
+        return newLine;
+    },
+    async handleFiskalyCancellation(order) {
+        try {
+            this.env.services.ui.block();
+            if (this.isCountryGermanyAndFiskaly()) {
+                if (order.isReceiptStarted) {
+                    await this.cancelTransaction(order);
+                }
+            }
+        } catch (error) {
+            this.fiskalyError(error);
+            return false;
+        } finally {
+            this.env.services.ui.unblock();
+        }
+    },
+    async cancelActiveTransactions(retryCount = 0) {
+        let token = this.getApiToken();
+        try {
+            if (!token) {
+                await this._authenticate();
+                token = this.getApiToken();
+            }
+            // fetch active transactions for this client only
+            const url = new URL(`${this.getApiUrl()}/tss/${this.getTssId()}/tx`);
+            url.searchParams.append("states[]", "ACTIVE");
+            url.searchParams.append("client_id", this.getClientId());
+            const response = await fetch(url.toString(), {
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+            });
+            const result = await response.json();
+            if (!response.ok) {
+                return await this.handleRequestError(result, false, retryCount);
+            }
+
+            // cancel all active transactions
+            const ownTransactions = result.data.filter((tx) => tx.client_id === this.getClientId());
+            if (ownTransactions.length) {
+                for (const transaction of ownTransactions) {
+                    // raw structure common for order & transaction both
+                    const data = {
+                        state: "CANCELLED",
+                        client_id: this.getClientId(),
+                        schema: transaction.schema,
+                    };
+                    const payload = `${transaction._id}?tx_revision=${transaction.revision + 1}`;
+                    await this.transactionCall(payload, data, false);
+                }
+            }
+        } catch (error) {
+            // Need to reject to keep track of rejected orders in syncAllOrders
+            // don't show popup for single order failures, it should be handled later in syncAllOrders
+            this.fiskalyError(error);
+        }
     },
     getApiToken() {
         return this.token;
@@ -278,39 +360,71 @@ patch(PosStore.prototype, {
             api_secret: this.getApiSecret(),
         };
 
-        return $.ajax({
-            url: url + "/auth",
+        return fetch(url + "/auth", {
             method: "POST",
-            data: JSON.stringify(data),
-            contentType: "application/json",
-            timeout: 5000,
-        }).then((data) => {
-            const token = data.access_token;
-            return $.ajax({
-                url: url + "/vat_definitions",
-                method: "GET",
-                headers: { Authorization: `Bearer ${token}` },
-                timeout: 5000,
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(_t("Auth request failed"));
+                }
+                return response.json();
             })
-                .then((vat_data) => {
-                    vat_data.data.forEach((vat_definition) => {
-                        if (!(vat_definition.percentage in this.vatRateMapping)) {
-                            this.vatRateMapping[vat_definition.percentage] =
-                                RATE_ID_MAPPING[vat_definition.vat_definition_export_id];
-                        }
-                    });
+            .then((data) =>
+                fetch(url + "/vat_definitions", {
+                    headers: { Authorization: `Bearer ${data.access_token}` },
                 })
-                .catch((error) => {
-                    // This is a fallback where we hardcode the taxes hoping that they didn't change ...
-                    this.vatRateMapping = {
-                        19: "NORMAL",
-                        7: "REDUCED_1",
-                        10.7: "SPECIAL_RATE_1",
-                        5.5: "SPECIAL_RATE_2",
-                        0: "NULL",
-                    };
+            )
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(_t("VAT definitions request failed"));
+                }
+                return response.json();
+            })
+            .then((vat_data) => {
+                vat_data.data.forEach((vat_definition) => {
+                    if (!(vat_definition.percentage in this.vatRateMapping)) {
+                        this.vatRateMapping[vat_definition.percentage] =
+                            RATE_ID_MAPPING[vat_definition.vat_definition_export_id];
+                    }
                 });
-        });
+            })
+            .catch((error) => {
+                console.info("Error fetching VAT data:", error);
+                // This is a fallback where we hardcode the taxes hoping that they didn't change ...
+                this.vatRateMapping = {
+                    19: "NORMAL",
+                    7: "REDUCED_1",
+                    10.7: "SPECIAL_RATE_1",
+                    5.5: "SPECIAL_RATE_2",
+                    0: "NULL",
+                };
+            });
+    },
+    async handleOrderTransaction(order, orderObject) {
+        // receipt transaction are common for retail & restaurants containing payment info
+        // we need to do the transaction calls if the order is paid and still they are not properly fulfilled
+        let updated = false;
+        if (this.isCountryGermanyAndFiskaly() && order.state == "paid") {
+            if (orderObject.isReceiptInactive) {
+                await this.createTransaction(order);
+                updated = true;
+            }
+            // when restaurant is installed we want to finalize at last only
+            if (orderObject.isReceiptStarted) {
+                await this.finishShortTransaction(order);
+                updated = true;
+            }
+        }
+        return updated;
+    },
+    shouldSyncOrder(orderObject) {
+        return (
+            !orderObject.isReceiptInactive ||
+            orderObject.fiskalyServerError ||
+            orderObject.networkError
+        );
     },
     //@Override
     /**
@@ -327,14 +441,14 @@ patch(PosStore.prototype, {
         const { orderToCreate, orderToUpdate } = this.getPendingOrder();
         const orders = [...orderToCreate, ...orderToUpdate];
 
-        if (orders.length === 0) {
-            return [];
+        if (!orders.length || this.data.network.offline) {
+            orders.forEach((order) => {
+                order.networkError = true;
+            });
+            return super.syncAllOrders(options);
         }
 
-        const orderObjectMap = {};
-        for (const order of orders) {
-            orderObjectMap[order.id] = order;
-        }
+        const orderObjectMap = Object.fromEntries(orders.map((order) => [order.id, order]));
 
         let fiskalyError;
         const sentToFiskaly = [];
@@ -343,17 +457,13 @@ patch(PosStore.prototype, {
         for (const order of orders) {
             try {
                 const orderObject = orderObjectMap[order.id];
-                if (!fiskalyError) {
-                    if (orderObject.isTransactionInactive()) {
-                        await this.createTransaction(orderObject);
-                        ordersToUpdate[order.id] = true;
-                    }
-                    if (orderObject.isTransactionStarted()) {
-                        await this.finishShortTransaction(order);
+                if (!fiskalyError && !orderObject.fiskalyServerError && !orderObject.networkError) {
+                    const updated = await this.handleOrderTransaction(order, orderObject);
+                    if (updated) {
                         ordersToUpdate[order.id] = true;
                     }
                 }
-                if (orderObject.isTransactionFinished()) {
+                if (this.shouldSyncOrder(orderObject)) {
                     sentToFiskaly.push(order);
                 } else {
                     fiskalyFailure.push(order);
@@ -391,31 +501,40 @@ patch(PosStore.prototype, {
             throw odooError || fiskalyError;
         }
     },
-    async fiskalyError(error, message) {
-        if (error.status === 0) {
+    async fiskalyError(error, message = {}) {
+        if (error.status === 0 || this.data.network.offline) {
             const title = _t("No internet");
-            const body = message.noInternet;
+            const body = _t(
+                "Check the internet connection then try to validate(sync) or cancel the order. " +
+                    "Do not delete your browsing, cookies and cache data in the meantime!"
+            );
             this.dialog.add(AlertDialog, { title, body });
-        } else if (error.status === 401 && error.source === "authenticate") {
+        } else if (error.status_code === 401) {
             await this._showUnauthorizedPopup();
         } else if (
-            (error.status === 400 && error.responseJSON.message.includes("tss_id")) ||
-            (error.status === 404 && error.responseJSON.code === "E_TSS_NOT_FOUND")
+            (error.status_code === 400 && error.message?.includes("tss_id")) ||
+            (error.status_code === 404 && error.code === "E_TSS_NOT_FOUND")
         ) {
             await this._showBadRequestPopup("TSS ID");
         } else if (
-            (error.status === 400 && error.responseJSON.message.includes("client_id")) ||
-            (error.status === 400 && error.responseJSON.code === "E_CLIENT_NOT_FOUND")
+            (error.status_code === 400 && error.message?.includes("client_id")) ||
+            (error.status_code === 400 && error.code === "E_CLIENT_NOT_FOUND")
         ) {
             // the api is actually sending an 400 error for a "Not found" error
             await this._showBadRequestPopup("Client ID");
         } else {
-            const title = _t("Unknown error");
-            const body = message.unknown;
+            const title = error.error || _t("Unknown error");
+            const body =
+                error.message ||
+                _t(
+                    "An unknown error has occurred! Try to validate this order or cancel it again. " +
+                        "Please contact Odoo for more information."
+                );
             this.dialog.add(AlertDialog, { title, body });
         }
     },
     async showFiskalyNoInternetConfirmPopup(event) {
+        // This function is not used anymore
         const confirmed = await ask(this.dialog, {
             title: _t("Problem with internet"),
             body: _t(
@@ -440,6 +559,7 @@ patch(PosStore.prototype, {
         this.dialog.add(AlertDialog, { title, body });
     },
     async _showTaxError() {
+        // This function is not used anymore
         const rates = Object.keys(this.vatRateMapping);
         const title = _t("Tax error");
         let body;

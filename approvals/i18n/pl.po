@@ -1,44 +1,40 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* approvals
-# 
+# * approvals
+#
 # Translators:
 # Paweł Wodyński <pw@myodoo.pl>, 2024
-# Wil Odoo, 2024
-# 
+# Marta Wacławek, 2025
+# Wil Odoo, 2025
+# "Marta (wacm)" <wacm@odoo.com>, 2025, 2026.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Polish (https://app.transifex.com/odoo/teams/41243/pl/)\n"
+"POT-Creation-Date: 2026-04-10 18:47+0000\n"
+"PO-Revision-Date: 2026-04-15 13:13+0000\n"
+"Last-Translator: \"Marta (wacm)\" <wacm@odoo.com>\n"
+"Language-Team: Polish <https://translate.odoo.com/projects/odoo-18/approvals/"
+"pl/>\n"
+"Language: pl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: pl\n"
-"Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
+"Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && "
+"(n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && "
+"n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
+"X-Generator: Weblate 5.16.2\n"
 
 #. module: approvals
 #: model:ir.actions.report,print_report_name:approvals.action_report_approval_request
 msgid "'Approval - %s' % object.name"
-msgstr ""
+msgstr "'Zatwierdzenie- %s' % object.name"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
-msgid "07/07/2023 10:00:00"
-msgstr ""
-
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
-msgid "07/08/2023 10:00:00"
-msgstr ""
-
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
-msgid "1200"
-msgstr ""
+msgid "<span class=\"col-2 fw-bold\">Description:</span>"
+msgstr "<span class=\"col-2 fw-bold\">Opis:</span>"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form
@@ -47,13 +43,8 @@ msgstr "<span class=\"fa fa-warning\" title=\"Invalid minimum approvals\"/>"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
-msgid "<span class=\"fw-bold\">Description:</span>"
-msgstr ""
-
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
 msgid "<span class=\"fw-bold\">To</span>"
-msgstr ""
+msgstr "<span class=\"fw-bold\">Do</span>"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__message_needaction
@@ -83,7 +74,12 @@ msgstr "Dekoracja wyjątku aktywności"
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__activity_state
 msgid "Activity State"
-msgstr "Stan aktywności"
+msgstr "Stan czynności"
+
+#. module: approvals
+#: model:ir.model,name:approvals.model_mail_activity_type
+msgid "Activity Type"
+msgstr "Typ aktywności"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__activity_type_icon
@@ -105,7 +101,7 @@ msgstr "Administrator"
 #: model:ir.actions.act_window,name:approvals.approval_request_action_all
 #: model:ir.ui.menu,name:approvals.approvals_approval_menu_all
 msgid "All Approvals"
-msgstr "Wszystkie zaakceptowane"
+msgstr "Wszystkie zatwierdzenia"
 
 #. module: approvals
 #: model:ir.model.fields,help:approvals.field_approval_category__approval_type
@@ -161,7 +157,7 @@ msgstr "Wniosek o zatwierdzenie"
 #: model:mail.message.subtype,description:approvals.mt_approval_request_status
 #: model:mail.message.subtype,name:approvals.mt_approval_request_status
 msgid "Approval Status Change"
-msgstr ""
+msgstr "Zmiana statusu zatwierdzenia"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__name
@@ -179,12 +175,12 @@ msgstr "Typ zatwierdzenia"
 #. module: approvals
 #: model:ir.model,name:approvals.model_approval_category_approver
 msgid "Approval Type Approver"
-msgstr "Zatwierdzenie Typ Zatwierdzający"
+msgstr "Osoba zatwierdzająca typ zatwierdzenia"
 
 #. module: approvals
 #: model:ir.ui.menu,name:approvals.approvals_menu_root
 msgid "Approvals"
-msgstr "Akceptacje"
+msgstr "Zatwierdzenia"
 
 #. module: approvals
 #: model:ir.actions.act_window,name:approvals.approval_category_action
@@ -218,7 +214,7 @@ msgstr "Akceptuj"
 #: model_terms:ir.ui.view,arch_db:approvals.approval_search_view_search
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
 msgid "Approved"
-msgstr "Zaaprobowane"
+msgstr "Zaakceptowane"
 
 #. module: approvals
 #: model:ir.model,name:approvals.model_approval_approver
@@ -262,7 +258,7 @@ msgstr "Sekwencja zatwierdzających?"
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
 msgid "Approvers:"
-msgstr ""
+msgstr "Zatwierdzający:"
 
 #. module: approvals
 #. odoo-javascript
@@ -313,7 +309,7 @@ msgstr "Zautomatyzowana sekwencja?"
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
 msgid "Back To Draft"
-msgstr "Powrót do projektu"
+msgstr "Powrót do wersji roboczej"
 
 #. module: approvals
 #: model:approval.category,name:approvals.approval_category_data_borrow_items
@@ -343,7 +339,7 @@ msgstr "Może edytować"
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_approver__can_edit_user_id
 msgid "Can Edit User"
-msgstr ""
+msgstr "Może edytować użytkownika"
 
 #. module: approvals
 #: model:ir.model.fields.selection,name:approvals.selection__approval_approver__status__cancel
@@ -373,7 +369,7 @@ msgstr "Kategoria"
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_approver__category_approver
 msgid "Category Approver"
-msgstr "Zatwierdzacz kategorii"
+msgstr "Zatwierdzający kategorię"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_category__sequence_code
@@ -397,7 +393,7 @@ msgstr "Konfiguracja"
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_tree
 msgid "Confirm Date"
-msgstr ""
+msgstr "Potwierdź datę"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__partner_id
@@ -413,7 +409,7 @@ msgstr "Kontakt:"
 #. module: approvals
 #: model:approval.category,name:approvals.approval_category_data_contract_approval
 msgid "Contract Approval"
-msgstr "Zatwierdzacz umowy"
+msgstr "Zatwierdzający umowę"
 
 #. module: approvals
 #: model:ir.model.fields,help:approvals.field_approval_product_line__product_uom_category_id
@@ -436,7 +432,7 @@ msgstr "Utwórz nowy wariant produktu"
 #: model:ir.model.fields,field_description:approvals.field_approval_product_line__create_uid
 #: model:ir.model.fields,field_description:approvals.field_approval_request__create_uid
 msgid "Created by"
-msgstr "Utworzył(a)"
+msgstr "Utworzono przez"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_approver__create_date
@@ -473,7 +469,7 @@ msgstr "Data zakończenia"
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__date_start
 msgid "Date start"
-msgstr "Data początkowa"
+msgstr "Data rozpoczęcia"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
@@ -486,6 +482,8 @@ msgid ""
 "Define the components and finished products you wish to use in\n"
 "            bill of materials and manufacturing orders."
 msgstr ""
+"Zdefiniuj komponenty i gotowe produkty, których chcesz użyć w\n"
+"            zestawieniach materiałów i zleceniach produkcyjnych."
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_kanban
@@ -524,7 +522,7 @@ msgstr "Dokumenty"
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
 msgid "Documents:"
-msgstr ""
+msgstr "Dokumenty:"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
@@ -564,12 +562,12 @@ msgstr "Pola"
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__message_follower_ids
 msgid "Followers"
-msgstr "Obserwatorzy"
+msgstr "Obserwujący"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__message_partner_ids
 msgid "Followers (Partners)"
-msgstr "Obserwatorzy (partnerzy)"
+msgstr "Obserwujący (partnerzy)"
 
 #. module: approvals
 #: model:ir.model.fields,help:approvals.field_approval_request__activity_type_icon
@@ -580,6 +578,11 @@ msgstr "Ikona Font awesome np. fa-tasks"
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
 msgid "From:"
 msgstr "Od:"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_search_view_search
+msgid "Future Activities"
+msgstr "Przyszłe aktywności"
 
 #. module: approvals
 #: model:approval.category,name:approvals.approval_category_data_general_approval
@@ -641,13 +644,13 @@ msgstr "Ma okres"
 #: model:ir.model.fields,field_description:approvals.field_approval_category__has_product
 #: model:ir.model.fields,field_description:approvals.field_approval_request__has_product
 msgid "Has Product"
-msgstr "Ma Produkt"
+msgstr "Ma produkt"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_category__has_quantity
 #: model:ir.model.fields,field_description:approvals.field_approval_request__has_quantity
 msgid "Has Quantity"
-msgstr "Ma Ilość"
+msgstr "Ma ilość"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_category__has_reference
@@ -662,7 +665,8 @@ msgid ""
 "\n"
 "        Empty: do nothing\n"
 "        Is Approver: the employee's manager will be in the approver list\n"
-"        Is Required Approver: the employee's manager will be required to approve the request.\n"
+"        Is Required Approver: the employee's manager will be required to "
+"approve the request.\n"
 "    "
 msgstr ""
 "W jaki sposób przełożony pracownika reaguje na ten rodzaj zatwierdzenia.\n"
@@ -709,17 +713,20 @@ msgid ""
 "If checked, the Approval Requests will have an automated generated name "
 "based on the given code."
 msgstr ""
-"W przypadku zaznaczenia tej opcji, wnioski o zatwierdzenie będą miały "
-"automatycznie wygenerowaną nazwę na podstawie podanego kodu."
+"Jeśli zaznaczone, wnioski o zatwierdzenie będą miały automatycznie "
+"wygenerowaną nazwę na podstawie podanego kodu."
 
 #. module: approvals
 #: model:ir.model.fields,help:approvals.field_approval_category__approver_sequence
 #: model:ir.model.fields,help:approvals.field_approval_request__approver_sequence
 msgid ""
-"If checked, the approvers have to approve in sequence (one after the other)."
-" If Employee's Manager is selected as approver, they will be the first in "
+"If checked, the approvers have to approve in sequence (one after the other). "
+"If Employee's Manager is selected as approver, they will be the first in "
 "line."
 msgstr ""
+"Jeśli zaznaczone, zatwierdzający muszą zaakceptować w sekwencji (jedna po "
+"drugiej). Jeśli menadżer pracownika jest wybrany jako zatwierdzający, będzie "
+"pierwszy w kolejności."
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_category__image
@@ -755,7 +762,7 @@ msgstr "Jest wymaganym zatwierdzającym"
 #. module: approvals
 #: model:approval.category,name:approvals.approval_category_data_job_referral_award
 msgid "Job Referral Award"
-msgstr "Nagroda za polecenie pracy"
+msgstr "Nagroda za polecenie pracownika"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_approver__write_uid
@@ -776,6 +783,11 @@ msgid "Last Updated on"
 msgstr "Data ostatniej aktualizacji"
 
 #. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_search_view_search
+msgid "Late Activities"
+msgstr "Czynności zaległe"
+
+#. module: approvals
 #: model_terms:ir.actions.act_window,help:approvals.approval_request_action
 #: model_terms:ir.actions.act_window,help:approvals.approval_request_action_all
 msgid "Let's go to the"
@@ -786,7 +798,7 @@ msgstr "Przejdźmy do"
 #: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_tree
 msgid "Location"
-msgstr "Miejsce"
+msgstr "Lokalizacja"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
@@ -799,6 +811,8 @@ msgid ""
 "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod "
 "tempor incididunt ut labore et dolore magna aliqua."
 msgstr ""
+"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod "
+"tempor incididunt ut labore et dolore magna aliqua."
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__message_main_attachment_id
@@ -930,7 +944,7 @@ msgstr "Brak nowych zatwierdzeń do przeglądu"
 #. module: approvals
 #: model_terms:ir.actions.act_window,help:approvals.product_template_action
 msgid "No product found. Let's create one!"
-msgstr "Nie znaleziono żadnego produktu. Stwórzmy jeden!"
+msgstr "Nie znaleziono żadnego produktu. Stwórzmy jakiś!"
 
 #. module: approvals
 #: model:ir.model.fields.selection,name:approvals.selection__approval_category__has_amount__no
@@ -953,7 +967,7 @@ msgstr "Liczba akcji"
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__attachment_number
 msgid "Number of Attachments"
-msgstr "Ilość załączników"
+msgstr "Liczba załączników"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__message_has_error_counter
@@ -978,12 +992,12 @@ msgstr "Liczba żądań walidacji"
 #. module: approvals
 #: model:res.groups,name:approvals.group_approval_user
 msgid "Officer: Approve all requests"
-msgstr ""
+msgstr "Dysponent: Zatwierdź wszystkie wnioski"
 
 #. module: approvals
 #: model:ir.actions.server,name:approvals.action_open_approval_category
 msgid "Open Approval Category"
-msgstr ""
+msgstr "Otwarta kategoria zatwierdzeń"
 
 #. module: approvals
 #: model:ir.model.fields.selection,name:approvals.selection__approval_category__has_amount__optional
@@ -1023,7 +1037,7 @@ msgstr "Okres"
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
 msgid "Period:"
-msgstr ""
+msgstr "Okres:"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
@@ -1129,7 +1143,7 @@ msgstr "Wniosek o zatwierdzenie"
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
 msgid "Request By:"
-msgstr ""
+msgstr "Wniosek od:"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__request_owner_id
@@ -1140,7 +1154,7 @@ msgstr "Właściciel wniosku"
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_tree
 msgid "Request Start"
-msgstr ""
+msgstr "Start wniosku"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__request_status
@@ -1189,7 +1203,7 @@ msgstr "Sekwencja"
 #. odoo-python
 #: code:addons/approvals/models/approval_category.py:0
 msgid "Sequence %(code)s"
-msgstr ""
+msgstr "Sekwencja %(code)s"
 
 #. module: approvals
 #: model:ir.model.fields,help:approvals.field_approval_approver__can_edit_user_id
@@ -1197,6 +1211,8 @@ msgid ""
 "Simple users should not be able to remove themselves as approvers because "
 "they will lose access to the record if they misclick."
 msgstr ""
+"Podstawowi użytkownicy nie powinni móc usuwać sami siebie jako "
+"zatwierdzających, ponieważ utracą dostęp do rekordu, jeśli źle klikną."
 
 #. module: approvals
 #. odoo-python
@@ -1217,10 +1233,10 @@ msgid ""
 "Today: Activity date is today\n"
 "Planned: Future activities."
 msgstr ""
-"Status na podstawie czynności\n"
+"Status na podstawie aktywności\n"
 "Zaległe: Termin już minął\n"
-"Dzisiaj: Data czynności przypada na dzisiaj\n"
-"Zaplanowane: Przyszłe czynności."
+"Dzisiaj: Data aktywności przypada na dzisiaj\n"
+"Zaplanowane: Przyszłe aktywności."
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
@@ -1240,34 +1256,34 @@ msgstr "Wysłane"
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
 msgid "Test Category"
-msgstr ""
+msgstr "Kategoria testowa"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
 msgid "Test Document"
-msgstr ""
+msgstr "Dokument testowy"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
 msgid "Test Product"
-msgstr ""
+msgstr "Produkt testowy"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
 msgid "Test Reference"
-msgstr ""
+msgstr "Odnośnik testowy"
 
 #. module: approvals
 #. odoo-python
 #: code:addons/approvals/models/approval_request.py:0
 msgid "The request %(request_name)s for %(request_owner)s has been accepted"
-msgstr ""
+msgstr "Wniosek %(request_name)s dla %(request_owner)s został zaakceptowany"
 
 #. module: approvals
 #. odoo-python
 #: code:addons/approvals/models/approval_request.py:0
 msgid "The request %(request_name)s for %(request_owner)s has been refused"
-msgstr ""
+msgstr "Wniosek %(request_name)s dla %(request_owner)s został odrzucony"
 
 #. module: approvals
 #. odoo-python
@@ -1276,14 +1292,17 @@ msgid ""
 "The request created on %(create_date)s by %(request_owner)s has been "
 "accepted."
 msgstr ""
+"Wniosek utworzony dnia %(create_date)s przez %(request_owner)s został "
+"zaakceptowany."
 
 #. module: approvals
 #. odoo-python
 #: code:addons/approvals/models/approval_request.py:0
 msgid ""
-"The request created on %(create_date)s by %(request_owner)s has been "
-"refused."
+"The request created on %(create_date)s by %(request_owner)s has been refused."
 msgstr ""
+"Wniosek utworzony dnia %(create_date)s przez %(request_owner)s został "
+"odrzucony."
 
 #. module: approvals
 #: model:res.groups,comment:approvals.group_approval_user
@@ -1344,6 +1363,11 @@ msgstr "Do sprawdzenia:"
 #: model:ir.model.fields.selection,name:approvals.selection__approval_request__request_status__new
 msgid "To Submit"
 msgstr "Do wysłania"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_search_view_search
+msgid "Today Activities"
+msgstr "Dzisiejsze aktywności"
 
 #. module: approvals
 #: model:ir.model.fields,help:approvals.field_approval_request__activity_exception_decoration
@@ -1417,9 +1441,20 @@ msgstr "Nie można zatwierdzić przed poprzednim zatwierdzającym."
 #. module: approvals
 #. odoo-python
 #: code:addons/approvals/models/approval_request.py:0
-msgid ""
-"You cannot assign the same approver multiple times on the same request."
+msgid "You cannot assign the same approver multiple times on the same request."
 msgstr "Nie można zatwierdzić przed poprzednim zatwierdzającym."
+
+#. module: approvals
+#. odoo-python
+#: code:addons/approvals/models/approval_request.py:0
+msgid "You cannot change approval request."
+msgstr "Nie możesz zmienić żądania o zatwierdzenie."
+
+#. module: approvals
+#. odoo-python
+#: code:addons/approvals/models/approval_request.py:0
+msgid "You cannot duplicate an approver."
+msgstr "Nie możesz powielić zatwierdzającego."
 
 #. module: approvals
 #. odoo-python
@@ -1442,7 +1477,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/approvals/models/approval_request.py:0
 msgid "You have to attach at least one document."
-msgstr ""
+msgstr "Musisz załączyć przynajmniej jeden dokument."
 
 #. module: approvals
 #: model_terms:ir.actions.act_window,help:approvals.product_product_action
@@ -1451,7 +1486,8 @@ msgid ""
 "            whether it's a storable product, a consumable or a service."
 msgstr ""
 "Musisz zdefiniować produkt dla wszystkiego, co sprzedajesz lub kupujesz,\n"
-"niezależnie od tego, czy jest to produkt do przechowywania, materiał eksploatacyjny czy usługa."
+"niezależnie od tego, czy jest to produkt do przechowywania, materiał "
+"eksploatacyjny czy usługa."
 
 #. module: approvals
 #. odoo-python
@@ -1486,3 +1522,15 @@ msgstr "nowy wniosek"
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
 msgid "to:"
 msgstr "do:"
+
+#~ msgid "07/07/2023 10:00:00"
+#~ msgstr "07/07/2023 10:00:00"
+
+#~ msgid "07/08/2023 10:00:00"
+#~ msgstr "07/08/2023 10:00:00"
+
+#~ msgid "1200"
+#~ msgstr "1200"
+
+#~ msgid "<span class=\"fw-bold\">Description:</span>"
+#~ msgstr "<span class=\"fw-bold\">Opis:</span>"

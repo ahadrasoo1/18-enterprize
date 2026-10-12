@@ -10,7 +10,7 @@ patch(ControlButtons.prototype, {
             const sequence = await this.pos.get_profo_order_sequence_number();
             order.sequence_number = sequence;
 
-            await this.pos.push_single_order(order);
+            await this.pos.pushSingleOrder(order);
             order.receipt_type = false;
         }
         await super.clickPrintBill(...arguments);

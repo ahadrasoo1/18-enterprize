@@ -1,22 +1,23 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* web_gantt
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Larissa Manderfeld, 2024
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:29+0000\n"
+"POT-Creation-Date: 2026-05-22 17:59+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
+"Last-Translator: Larissa Manderfeld, 2024\n"
 "Language-Team: German (https://app.transifex.com/odoo/teams/41243/de/)\n"
+"Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: de\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #. module: web_gantt
@@ -44,12 +45,14 @@ msgstr "Ansicht des Aktionsfensters"
 
 #. module: web_gantt
 #. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer_controls.js:0
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "Activate dense mode"
 msgstr "Dense-Modus aktivieren"
 
 #. module: web_gantt
 #. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer_controls.js:0
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "Activate sparse mode"
 msgstr "Sparse-Modus aktivieren"
@@ -91,6 +94,12 @@ msgstr "Bearbeiten"
 
 #. module: web_gantt
 #. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+msgid "Ending date cannot be before the starting date"
+msgstr "Das Enddatum darf nicht vor dem Startdatum liegen."
+
+#. module: web_gantt
+#. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "Expand rows"
 msgstr "Zeilen erweitern"
@@ -106,6 +115,12 @@ msgstr "Heute fokussieren"
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "From"
 msgstr "Von"
+
+#. module: web_gantt
+#. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer_controls.js:0
+msgid "From: %(from_date)s to: %(to_date)s"
+msgstr "Vom %(from_date)s bis %(to_date)s"
 
 #. module: web_gantt
 #: model:ir.model.fields.selection,name:web_gantt.selection__ir_actions_act_window_view__view_mode__gantt
@@ -184,8 +199,8 @@ msgid ""
 "Invalid attributes (%(invalid_attributes)s) in gantt view. Attributes must "
 "be in (%(valid_attributes)s)"
 msgstr ""
-"Ungültige Attribute (%(invalid_attributes)s) in der Gantt-Ansicht. Attribute"
-" müssen in (%(valid_attributes)s) stehen."
+"Ungültige Attribute (%(invalid_attributes)s) in der Gantt-Ansicht. Attribute "
+"müssen in (%(valid_attributes)s) stehen."
 
 #. module: web_gantt
 #. odoo-python
@@ -233,13 +248,19 @@ msgstr "Planen"
 #. odoo-python
 #: code:addons/web_gantt/models/models.py:0
 msgid "Reschedule done successfully."
-msgstr ""
+msgstr "Verschiebung erfolgreich abgeschlossen."
 
 #. module: web_gantt
 #. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_popover.xml:0
 msgid "Start"
 msgstr "Loslegen"
+
+#. module: web_gantt
+#. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+msgid "Starting date cannot be after the ending date"
+msgstr "Das Startdatum darf nicht nach dem Enddatum liegen."
 
 #. module: web_gantt
 #. odoo-javascript
@@ -330,7 +351,7 @@ msgstr "Sie können %(record)s nicht nach %(related_record)s verschieben."
 #. odoo-python
 #: code:addons/web_gantt/models/models.py:0
 msgid "You cannot reschedule %(main_record)s towards %(other_record)s."
-msgstr "Sie können %(record)s nicht nach %(related_record)s verschieben."
+msgstr "Sie können %(main_record)s nicht nach %(other_record)s verschieben."
 
 #. module: web_gantt
 #. odoo-javascript
@@ -355,9 +376,3 @@ msgstr "Monate"
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "to"
 msgstr "bis"
-
-#. module: web_gantt
-#. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_row_progress_bar.xml:0
-msgid "{{ props.progressBar.warning }}"
-msgstr "{{ props.progressBar.warning }}"

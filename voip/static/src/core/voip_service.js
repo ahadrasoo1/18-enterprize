@@ -17,6 +17,7 @@ import { escape } from "@web/core/utils/strings";
 export class Voip {
     bus = new EventBus();
     error;
+    isUnloading = false;
     /**
      * Either “demo” or “prod”. In demo mode, phone calls are simulated in the
      * interface but no RTC sessions are actually established.
@@ -60,7 +61,12 @@ export class Voip {
         this.busService.subscribe("refresh_call_activities", () => {
             this.fetchTodayCallActivities();
         });
-        document.body.addEventListener("beforeunload", this._onBeforeUnload.bind(this));
+        this.busService.subscribe("voip.call/delete", (payload) => {
+            for (const id of payload.ids) {
+                this.store.Call.get(id)?.delete();
+            }
+        });
+        window.addEventListener("beforeunload", this._onBeforeUnload.bind(this));
         return reactive(this);
     }
 

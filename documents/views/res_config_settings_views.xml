@@ -8,9 +8,7 @@
         <field name="arch" type="xml">
             <xpath expr="//form" position="inside">
                 <app data-string="Documents" string="Documents" name="documents" groups="documents.group_documents_manager" notApp="1">
-                    <!-- bt: standard block restored; documents_hr, documents_account, documents_sign... add their settings in it -->
-                    <block title="Files Centralization" id="files_centralization_section"/>
-                    <block title="Fbr Connector Configuration">
+                    <block title="Trash Management">
                         <setting id="deletion_delay" string="Deletion delay (days)" help="Set deletion delay for documents in the Trash">
                             <div class="content-group">
                                 <div class="row mt16">
@@ -19,7 +17,7 @@
                             </div>
                         </setting>
                     </block>
-                    <block title="FBR" id="E-INVOICING SECTION"/>
+                    <block title="Files Centralization" id="files_centralization_section"/>
                 </app>
             </xpath>
         </field>

@@ -250,3 +250,12 @@ class TestHrAppraisal(TransactionCase):
 
     def test_load_scenario(self):
         self.env['hr.appraisal']._load_demo_data()
+
+    def test_check_next_appraisal_date_is_unset_for_archived_employee(self):
+        """
+            Check that when an employee is archived,
+            its next_appraisal_date is unset.
+        """
+        self.hr_employee.next_appraisal_date = date.today() + relativedelta(months=6)
+        self.hr_employee.action_archive()
+        self.assertFalse(self.hr_employee.next_appraisal_date, 'next_appraisal_date should be empty for archived employee')

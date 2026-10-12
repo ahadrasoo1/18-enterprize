@@ -1,7 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import fields, models, _
-from odoo.exceptions import UserError
+from odoo.exceptions import RedirectWarning, UserError
 
 
 class HrExpenseSheet(models.Model):
@@ -19,6 +19,22 @@ class HrExpenseSheet(models.Model):
         for sheet in self:
             sheet.is_editable = sheet.is_editable and not sheet.payslip_id
 
+    def _get_countries_allowing_payslips(self):
+        """
+        Helper method to get a set of countries where at least one payroll structure contains an expense rule.
+        False can be present in the returned list, as structure's country_id is optional and we have to take it into account
+        until it is set to required.
+        :return: set of country_ids and/or False
+        :rtype: set[int, bool]
+        """
+        return {
+            country_sudo.id if country_sudo else False
+            for (country_sudo,) in self.env['hr.payroll.structure'].sudo()._read_group(
+                domain=[('rule_ids.code', '=', 'EXPENSES')],
+                groupby=['country_id'],
+            )
+        }
+
     def action_reset_expense_sheets(self):
         # EXTENDS hr_expense
         if any(slip.state in {'done', 'paid'} for slip in self.payslip_id):
@@ -26,9 +42,8 @@ class HrExpenseSheet(models.Model):
                 "You cannot remove an expense from a payslip that has already been validated.\n"
                 "Expenses can only be removed from draft or canceled payslips."
             ))
-        self.action_remove_from_payslip()
+        self.sudo().action_remove_from_payslip()
         res = super().action_reset_expense_sheets()
-        self.refund_in_payslip = False
         return res
 
     def action_report_in_next_payslip(self):
@@ -41,6 +56,22 @@ class HrExpenseSheet(models.Model):
             raise UserError(_(
                 "The state of the accounting entries linked to this expense report do not allow it to be reimbursed through a payslip."
             ))
+
+        expense_structure_country_ids = self._get_countries_allowing_payslips()
+        if False not in expense_structure_country_ids:  # Should be removed as soon as the country_id is required on the structures
+            for country_id, sheets in self.grouped(lambda sheet: sheet.company_id.country_id.id).items():
+                if country_id not in expense_structure_country_ids:
+                    msg = _(
+                        "Expense reimbursement rule needs to be configured to add expenses to payslips.\n"
+                        "Please create one salary rule with the \"%(code)s\" code on the relevant salary structures.",
+                        code="EXPENSES"  # Not translated
+                    )
+                    action = self.env.ref('hr_payroll.action_salary_rule_form', raise_if_not_found=False)
+                    HrSalaryRule = self.env['hr.salary.rule']
+                    if HrSalaryRule.check_access_rule('write') and HrSalaryRule.check_access_rights('write') and action:
+                        raise RedirectWarning(message=msg, action=action.id, button_text=_("Go to salary rules"))
+                    else:
+                        raise UserError(msg)
 
         # Do not raise if already reported, just ignore it
         to_report = self.filtered(lambda sheet: not sheet.refund_in_payslip)

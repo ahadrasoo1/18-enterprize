@@ -1,4 +1,4 @@
-from odoo import models
+from odoo import models, tools
 
 
 class SpreadsheetDummy(models.Model):
@@ -14,11 +14,8 @@ class SpreadsheetDummy(models.Model):
             }
         }
 
-    def _creation_msg(self):
-        return "test spreadsheet created"
-
     def _get_spreadsheet_selector(self):
-        if not self.env.registry.in_test_mode():
+        if not tools.config['test_enable']:
             return None
         return {
             "model": self._name,

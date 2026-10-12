@@ -16,6 +16,8 @@ class AccountMoveReversal(models.TransientModel):
     def reverse_moves(self, is_modify=False):
         action = super().reverse_moves(is_modify=is_modify)
         if self.helpdesk_ticket_id:  # checking if the wizard was created from helpdesk
+            if self.sudo().product_id and self.new_move_ids.invoice_line_ids.product_id != self.sudo().product_id:
+                self.new_move_ids.invoice_line_ids = self.new_move_ids.invoice_line_ids.filtered(lambda line: line.product_id == self.sudo().product_id)
             for line in self.new_move_ids.invoice_line_ids:  # self.new_move_ids is the reverse of the moves passed to the wizard
                 # the line could be a down payment, which has display_type == 'product'; we have to check if there is a product
                 if not line.product_id or line.display_type != 'product' or line.product_id.type != 'consu' or line.product_id != self.product_id:
@@ -26,10 +28,10 @@ class AccountMoveReversal(models.TransientModel):
 
     def _get_default_so_domain(self, ticket):
         domain = super()._get_default_so_domain(ticket)
-        if ticket.product_id:
+        if product := ticket.sudo().product_id:
             domain = expression.AND([
                 domain,
-                [('order_line.product_id', '=', ticket.product_id.id)]
+                [('order_line.product_id', '=', product.id)]
             ])
         return domain
 
@@ -53,9 +55,9 @@ class AccountMoveReversal(models.TransientModel):
 
     def _get_suitable_so_domain(self):
         domain = super()._get_suitable_so_domain()
-        if self.helpdesk_ticket_id.product_id:
+        if product := self.helpdesk_ticket_id.sudo().product_id:
             domain = expression.AND([
                 domain,
-                [('order_line.product_id', '=', self.helpdesk_ticket_id.product_id.id)]
+                [('order_line.product_id', '=', product.id)]
             ])
         return domain

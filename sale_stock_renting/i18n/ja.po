@@ -1,23 +1,28 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* sale_stock_renting
-# 
+# * sale_stock_renting
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Junko Augias, 2025
+#
+# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Junko Augias (juau)" <juau@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:28+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Japanese (https://app.transifex.com/odoo/teams/41243/ja/)\n"
+"POT-Creation-Date: 2025-12-29 18:49+0000\n"
+"PO-Revision-Date: 2026-05-06 21:39+0000\n"
+"Last-Translator: \"Junko Augias (juau)\" <juau@odoo.com>\n"
+"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-18/"
+"sale_stock_renting/ja/>\n"
+"Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: ja\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 5.17\n"
 
 #. module: sale_stock_renting
 #. odoo-python
@@ -36,12 +41,14 @@ msgstr "%(product)s （%(qty)s 項目）"
 msgid ""
 "<i class=\"fa fa-warning\"/>\n"
 "                        <span>\n"
-"                            Some products don't have the requested qty available for pickup\n"
+"                            Some products don't have the requested qty "
+"available for pickup\n"
 "                        </span>"
 msgstr ""
 "<i class=\"fa fa-warning\"/>\n"
 "                        <span>\n"
-"                            プロダクトによっては、ご希望の数量が集荷できない場合があります。\n"
+"                            プロダクトによっては、ご希望の数量が集荷できない"
+"場合があります。\n"
 "                        </span>"
 
 #. module: sale_stock_renting
@@ -51,17 +58,27 @@ msgstr "レンタルオーダに在庫配送と荷受を利用可能にする。
 
 #. module: sale_stock_renting
 #: model:ir.model.fields,help:sale_stock_renting.field_res_company__padding_time
-#: model:ir.model.fields,help:sale_stock_renting.field_res_config_settings__padding_time
 msgid ""
 "Amount of time (in hours) during which a product is considered unavailable "
 "prior to renting (preparation time)."
-msgstr "レンタル前にプロダクトが利用できない（準備期間）とみなされる時間（時間単位）。"
+msgstr ""
+"レンタル前にプロダクトが利用できない（準備期間）とみなされる時間（時間単"
+"位）。"
+
+#. module: sale_stock_renting
+#: model:ir.model.fields,help:sale_stock_renting.field_res_config_settings__padding_time
+msgid ""
+"Amount of time (in hours) during which a product is considered "
+"unavailableprior to renting (preparation time)."
+msgstr ""
+"プロダクトが利用できないとみなされる時間(レンタル前の準備時間)の時間数(時間単"
+"位)。"
 
 #. module: sale_stock_renting
 #. odoo-javascript
 #: code:addons/sale_stock_renting/static/src/widgets/qty_at_date_widget.xml:0
 msgid "Availability"
-msgstr "利用可能"
+msgstr "在庫状況"
 
 #. module: sale_stock_renting
 #: model:ir.model.fields,field_description:sale_stock_renting.field_rental_order_wizard_line__qty_available
@@ -71,7 +88,7 @@ msgstr "処理可能"
 #. module: sale_stock_renting
 #: model:ir.model.fields,field_description:sale_stock_renting.field_sale_order_line__available_reserved_lots
 msgid "Available Reserved Lots"
-msgstr ""
+msgstr "利用可能な引当ロット"
 
 #. module: sale_stock_renting
 #. odoo-javascript
@@ -108,12 +125,7 @@ msgstr "在庫が不十分なプロダクトのある明細あり"
 #. module: sale_stock_renting
 #: model:ir.model.fields,field_description:sale_stock_renting.field_rental_order_wizard__has_tracked_lines
 msgid "Has lines with tracked products"
-msgstr "追跡されたプロダクト明細あり"
-
-#. module: sale_stock_renting
-#: model:ir.model.fields,field_description:sale_stock_renting.field_res_company__rental_loc_id
-msgid "In rent"
-msgstr "レンタル中"
+msgstr "追跡対象プロダクト明細あり"
 
 #. module: sale_stock_renting
 #: model:ir.model.fields,field_description:sale_stock_renting.field_sale_rental_schedule__is_available
@@ -129,6 +141,11 @@ msgstr "プロダクトは在庫可能品か"
 #: model:ir.model,name:sale_stock_renting.model_account_move
 msgid "Journal Entry"
 msgstr "仕訳"
+
+#. module: sale_stock_renting
+#: model:ir.model,name:sale_stock_renting.model_account_move_line
+msgid "Journal Item"
+msgstr "仕訳明細"
 
 #. module: sale_stock_renting
 #: model:ir.model,name:sale_stock_renting.model_stock_lot
@@ -149,14 +166,11 @@ msgstr "2つのレンタル間の最小の間隔"
 #. odoo-python
 #: code:addons/sale_stock_renting/models/sale_order_line.py:0
 msgid ""
-"No valid quant has been found in location %(location)s for serial number "
-"%(serial_number)s!"
-msgstr "場所 %(location)s(シリアル番号%(serial_number)s用)に有効なクワントが見つかりません！"
-
-#. module: sale_stock_renting
-#: model_terms:ir.ui.view,arch_db:sale_stock_renting.rental_schedule_view_gantt_inherit_stock
-msgid "Other rental(s) in conflict."
-msgstr "他のレンタルと競合しています。"
+"No valid quant has been found in location %(location)s for serial number %"
+"(serial_number)s!"
+msgstr ""
+"場所 %(location)s(シリアル番号%(serial_number)s用)に有効なクワントが見つかり"
+"ません！"
 
 #. module: sale_stock_renting
 #: model:ir.model.fields,field_description:sale_stock_renting.field_res_config_settings__padding_time
@@ -188,13 +202,13 @@ msgstr "集荷ロット"
 #. odoo-python
 #: code:addons/sale_stock_renting/wizard/rental_processing.py:0
 msgid "Please specify the serial numbers picked up for the tracked products."
-msgstr "追跡中のプロダクトの集荷済シリアル番号をご指定下さい。"
+msgstr "追跡対象プロダクトの集荷済シリアル番号をご指定下さい。"
 
 #. module: sale_stock_renting
 #. odoo-python
 #: code:addons/sale_stock_renting/wizard/rental_processing.py:0
 msgid "Please specify the serial numbers returned for the tracked products."
-msgstr "追跡中のプロダクトの返却済シリアル番号をご指定下さい。"
+msgstr "追跡対象プロダクトの返却済シリアル番号をご指定下さい。"
 
 #. module: sale_stock_renting
 #: model:ir.model,name:sale_stock_renting.model_product_template
@@ -207,6 +221,8 @@ msgid "Product Variant"
 msgstr "プロダクトバリアント"
 
 #. module: sale_stock_renting
+#. odoo-python
+#: code:addons/sale_stock_renting/models/res_company.py:0
 #: model:stock.route,name:sale_stock_renting.route_rental
 msgid "Rental"
 msgstr "レンタル"
@@ -215,6 +231,11 @@ msgstr "レンタル"
 #: model:ir.model,name:sale_stock_renting.model_sale_rental_report
 msgid "Rental Analysis Report"
 msgstr "レンタル分析レポート"
+
+#. module: sale_stock_renting
+#: model:ir.model.fields,field_description:sale_stock_renting.field_res_company__rental_loc_id
+msgid "Rental Location"
+msgstr "レンタルロケーション"
 
 #. module: sale_stock_renting
 #: model:ir.model,name:sale_stock_renting.model_sale_rental_schedule
@@ -230,7 +251,7 @@ msgstr "レンタル転送"
 #. odoo-python
 #: code:addons/sale_stock_renting/models/sale_order_line.py:0
 msgid "Rental move: %(order)s"
-msgstr ""
+msgstr "レンタル移動: %(order)s"
 
 #. module: sale_stock_renting
 #: model:ir.model.fields,field_description:sale_stock_renting.field_res_config_settings__group_rental_stock_picking
@@ -256,7 +277,7 @@ msgstr "引当ロットは使用できません"
 #. module: sale_stock_renting
 #: model:ir.model,name:sale_stock_renting.model_stock_return_picking
 msgid "Return Picking"
-msgstr "ピッキングの戻し"
+msgstr "返品ピッキング"
 
 #. module: sale_stock_renting
 #: model:ir.model.fields,field_description:sale_stock_renting.field_rental_order_wizard_line__returnable_lot_ids
@@ -311,13 +332,20 @@ msgid "Temporarily make this product unavailable before pickup."
 msgstr "集荷前にこのプロダクトを一時的に利用不可にする"
 
 #. module: sale_stock_renting
+#: model_terms:ir.ui.view,arch_db:sale_stock_renting.rental_schedule_view_gantt_inherit_stock
+msgid "The product is not available during this period."
+msgstr "プロダクトはこの期間利用できません。"
+
+#. module: sale_stock_renting
 #: model:ir.model.fields,help:sale_stock_renting.field_res_company__rental_loc_id
 msgid ""
-"This technical location serves as stock for products currently in rentalThis"
-" location is internal because products in rentalare still considered as "
+"This technical location serves as stock for products currently in rentalThis "
+"location is internal because products in rentalare still considered as "
 "company assets."
 msgstr ""
-"この技術的ロケーションは、現在レンタル中のプロダクトの在庫として機能する。レンタル中のプロダクトも会社の資産とみなされるため、このロケーションは社内的なものです。"
+"この技術的ロケーションは、現在レンタル中のプロダクトの在庫として機能する。レ"
+"ンタル中のプロダクトも会社の資産とみなされるため、このロケーションは社内的な"
+"ものです。"
 
 #. module: sale_stock_renting
 #: model:ir.model.fields,field_description:sale_stock_renting.field_rental_order_wizard_line__tracking
@@ -334,6 +362,11 @@ msgid ""
 msgstr ""
 "ロットに追跡はレンタルプロダクトには対応していません。\n"
 "追跡モードを一意のシリアル番号に変更して下さい。"
+
+#. module: sale_stock_renting
+#: model:ir.model,name:sale_stock_renting.model_stock_picking
+msgid "Transfer"
+msgstr "転送"
 
 #. module: sale_stock_renting
 #: model:ir.model.fields,field_description:sale_stock_renting.field_sale_order_line__unavailable_lot_ids
@@ -377,4 +410,4 @@ msgstr "時間前（オーダ）"
 #. odoo-javascript
 #: code:addons/sale_stock_renting/static/src/widgets/qty_at_date_widget.xml:0
 msgid "to"
-msgstr "to"
+msgstr "~"

@@ -19,7 +19,7 @@ class YearlySalaryDetail(models.TransientModel):
         return fields.Date.today() + relativedelta(day=1, month=1)
 
     def _get_default_date_to(self):
-        return fields.Date.today()
+        return fields.Date.today() + relativedelta(day=31)
 
     def _get_employee_ids_domain(self):
         employees = self.env['hr.payslip'].search([('state', '=', 'paid')]).employee_id.filtered(lambda e: e.company_id.country_id.code == "IN").ids
@@ -48,7 +48,7 @@ class YearlySalaryDetail(models.TransientModel):
         for record in self:
             date_from = record.date_from or self._get_default_date_from()
             date_to = record.date_to or self._get_default_date_to()
-            domain = [('date_from', '>=', date_from), ('date_to', '<=', date_to), ('state', '=', 'paid')]
+            domain = [('date_from', '>=', date_from), ('date_to', '<=', date_to), ('state', '=', 'paid'), ('company_id', 'in', self.env.companies.ids)]
             if record.struct_id:
                 domain.append(('struct_id', '=', record.struct_id.id))
             payslips = record.env['hr.payslip'].search(domain)

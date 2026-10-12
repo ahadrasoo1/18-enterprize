@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 17.5alpha1+e\n"
+"Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-19 11:20+0000\n"
-"PO-Revision-Date: 2024-09-19 11:20+0000\n"
+"POT-Creation-Date: 2026-04-10 19:09+0000\n"
+"PO-Revision-Date: 2026-04-10 19:09+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -18,6 +18,13 @@ msgstr ""
 #. module: l10n_mx_edi_stock
 #: model:ir.actions.report,print_report_name:l10n_mx_edi_stock.action_report_cartaporte
 msgid "'Carta Porte - %s - %s' % (object.partner_id.name or '', object.name)"
+msgstr ""
+
+#. module: l10n_mx_edi_stock
+#: model:ir.model.fields,field_description:l10n_mx_edi_stock.field_product_product__l10n_mx_edi_hazardous_material
+#: model:ir.model.fields,field_description:l10n_mx_edi_stock.field_product_template__l10n_mx_edi_hazardous_material
+#: model:ir.model.fields,field_description:l10n_mx_edi_stock.field_product_unspsc_code__l10n_mx_edi_hazardous_material
+msgid "(MX) Is Hazardous Material"
 msgstr ""
 
 #. module: l10n_mx_edi_stock
@@ -77,12 +84,12 @@ msgstr ""
 
 #. module: l10n_mx_edi_stock
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.l10n_mx_edi_stock_report_cartaporte
-msgid "<strong class=\"row\">Autotransporte</strong>"
+msgid "<strong>Autotransporte</strong>"
 msgstr ""
 
 #. module: l10n_mx_edi_stock
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.l10n_mx_edi_stock_report_cartaporte
-msgid "<strong>Carta Porte</strong>"
+msgid "<strong>Carta Porte</strong> (CCP ID:"
 msgstr ""
 
 #. module: l10n_mx_edi_stock
@@ -96,18 +103,13 @@ msgid "<strong>Customs Number</strong>"
 msgstr ""
 
 #. module: l10n_mx_edi_stock
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.l10n_mx_edi_stock_report_cartaporte
+msgid "<strong>Destino</strong>"
+msgstr ""
+
+#. module: l10n_mx_edi_stock
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.l10n_mx_edi_cartaporte_report_delivery_document
 msgid "<strong>Distance (KM)</strong>"
-msgstr ""
-
-#. module: l10n_mx_edi_stock
-#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.l10n_mx_edi_stock_report_cartaporte
-msgid "<strong>Domicilio Destino</strong>"
-msgstr ""
-
-#. module: l10n_mx_edi_stock
-#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.l10n_mx_edi_stock_report_cartaporte
-msgid "<strong>Domicilio Origen</strong>"
 msgstr ""
 
 #. module: l10n_mx_edi_stock
@@ -118,6 +120,11 @@ msgstr ""
 #. module: l10n_mx_edi_stock
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.l10n_mx_edi_cartaporte_report_delivery_document
 msgid "<strong>Environment Policy No</strong>"
+msgstr ""
+
+#. module: l10n_mx_edi_stock
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.l10n_mx_edi_stock_report_cartaporte
+msgid "<strong>Figura Transporte</strong>"
 msgstr ""
 
 #. module: l10n_mx_edi_stock
@@ -142,12 +149,17 @@ msgstr ""
 
 #. module: l10n_mx_edi_stock
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.l10n_mx_edi_stock_report_cartaporte
-msgid "<strong>Mercancias</strong>"
+msgid "<strong>Mercancías</strong>"
 msgstr ""
 
 #. module: l10n_mx_edi_stock
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.l10n_mx_edi_cartaporte_report_delivery_document
 msgid "<strong>Model</strong>"
+msgstr ""
+
+#. module: l10n_mx_edi_stock
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.l10n_mx_edi_stock_report_cartaporte
+msgid "<strong>Origen</strong>"
 msgstr ""
 
 #. module: l10n_mx_edi_stock
@@ -183,16 +195,6 @@ msgstr ""
 #. module: l10n_mx_edi_stock
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.l10n_mx_edi_cartaporte_report_delivery_document
 msgid "<strong>UOM</strong>"
-msgstr ""
-
-#. module: l10n_mx_edi_stock
-#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.l10n_mx_edi_stock_report_cartaporte
-msgid "<strong>Ubicacion Destino</strong>"
-msgstr ""
-
-#. module: l10n_mx_edi_stock
-#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.l10n_mx_edi_stock_report_cartaporte
-msgid "<strong>Ubicacion Origen</strong>"
 msgstr ""
 
 #. module: l10n_mx_edi_stock
@@ -246,11 +248,6 @@ msgstr ""
 #. odoo-python
 #: code:addons/l10n_mx_edi_stock/models/stock_picking.py:0
 msgid "All products require a UNSPSC Code"
-msgstr ""
-
-#. module: l10n_mx_edi_stock
-#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.l10n_mx_edi_stock_report_cartaporte
-msgid "AnioModeloVM:"
 msgstr ""
 
 #. module: l10n_mx_edi_stock
@@ -327,6 +324,11 @@ msgstr ""
 msgid ""
 "Autotransporte internacional de carga especializada de materiales y residuos"
 " peligrosos de largo recorrido."
+msgstr ""
+
+#. module: l10n_mx_edi_stock
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.l10n_mx_edi_stock_report_cartaporte
+msgid "Año Modelo:"
 msgstr ""
 
 #. module: l10n_mx_edi_stock
@@ -570,6 +572,11 @@ msgid "Carta Porte"
 msgstr ""
 
 #. module: l10n_mx_edi_stock
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.l10n_mx_edi_stock_report_cartaporte
+msgid "Cartaporte Barcode"
+msgstr ""
+
+#. module: l10n_mx_edi_stock
 #: model:ir.model.fields.selection,name:l10n_mx_edi_stock.selection__l10n_mx_edi_trailer__sub_type__ctr010
 msgid "Chasis Portacontenedor"
 msgstr ""
@@ -581,11 +588,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_mx_edi_stock.field_l10n_mx_edi_part__code
 #: model:ir.model.fields,field_description:l10n_mx_edi_stock.field_stock_picking__l10n_mx_edi_customs_document_type_code
 msgid "Code"
-msgstr ""
-
-#. module: l10n_mx_edi_stock
-#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.l10n_mx_edi_stock_report_cartaporte
-msgid "Codigo Postal:"
 msgstr ""
 
 #. module: l10n_mx_edi_stock
@@ -607,7 +609,7 @@ msgstr ""
 
 #. module: l10n_mx_edi_stock
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.l10n_mx_edi_stock_report_cartaporte
-msgid "Config Vehicular:"
+msgid "Config Vehícular:"
 msgstr ""
 
 #. module: l10n_mx_edi_stock
@@ -671,6 +673,11 @@ msgstr ""
 #. module: l10n_mx_edi_stock
 #: model:ir.model.fields,field_description:l10n_mx_edi_stock.field_stock_picking__l10n_mx_edi_customs_regime_ids
 msgid "Customs Regimes"
+msgstr ""
+
+#. module: l10n_mx_edi_stock
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.l10n_mx_edi_stock_report_cartaporte
+msgid "Código Postal:"
 msgstr ""
 
 #. module: l10n_mx_edi_stock
@@ -1073,22 +1080,9 @@ msgid "Hazardous"
 msgstr ""
 
 #. module: l10n_mx_edi_stock
-#: model:ir.model.fields,field_description:l10n_mx_edi_stock.field_product_product__l10n_mx_edi_hazardous_material
-#: model:ir.model.fields,field_description:l10n_mx_edi_stock.field_product_template__l10n_mx_edi_hazardous_material
-#: model:ir.model.fields,field_description:l10n_mx_edi_stock.field_product_unspsc_code__l10n_mx_edi_hazardous_material
-msgid "Hazardous Material"
-msgstr ""
-
-#. module: l10n_mx_edi_stock
-#: model:ir.model.fields,field_description:l10n_mx_edi_stock.field_product_product__l10n_mx_edi_hazardous_material_code
-#: model:ir.model.fields,field_description:l10n_mx_edi_stock.field_product_template__l10n_mx_edi_hazardous_material_code
+#: model:ir.model.fields,field_description:l10n_mx_edi_stock.field_product_product__l10n_mx_edi_hazardous_material_code_id
+#: model:ir.model.fields,field_description:l10n_mx_edi_stock.field_product_template__l10n_mx_edi_hazardous_material_code_id
 msgid "Hazardous Material Designation Code"
-msgstr ""
-
-#. module: l10n_mx_edi_stock
-#: model:ir.model.fields,field_description:l10n_mx_edi_stock.field_product_product__l10n_mx_edi_hazard_package_type
-#: model:ir.model.fields,field_description:l10n_mx_edi_stock.field_product_template__l10n_mx_edi_hazard_package_type
-msgid "Packaging type for hazardous material"
 msgstr ""
 
 #. module: l10n_mx_edi_stock
@@ -1105,11 +1099,6 @@ msgstr ""
 #. module: l10n_mx_edi_stock
 #: model:ir.model.fields,field_description:l10n_mx_edi_stock.field_stock_picking__l10n_mx_edi_idccp
 msgid "IdCCP"
-msgstr ""
-
-#. module: l10n_mx_edi_stock
-#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.l10n_mx_edi_stock_report_cartaporte
-msgid "IdCCP:"
 msgstr ""
 
 #. module: l10n_mx_edi_stock
@@ -1157,6 +1146,11 @@ msgid "Integral"
 msgstr ""
 
 #. module: l10n_mx_edi_stock
+#: model:ir.model.fields.selection,name:l10n_mx_edi_stock.selection__l10n_mx_edi_figure__type__05
+msgid "Integrante de Coordinados"
+msgstr ""
+
+#. module: l10n_mx_edi_stock
 #: model:ir.model.fields,field_description:l10n_mx_edi_stock.field_l10n_mx_edi_vehicle__figure_ids
 msgid "Intermediaries"
 msgstr ""
@@ -1199,6 +1193,11 @@ msgstr ""
 #. module: l10n_mx_edi_stock
 #: model:ir.model.fields.selection,name:l10n_mx_edi_stock.selection__product_template__l10n_mx_edi_hazard_package_type__3h1
 msgid "Jerricanes (Porrones) de Plástico de tapa no desmontable"
+msgstr ""
+
+#. module: l10n_mx_edi_stock
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.l10n_mx_edi_stock_report_cartaporte
+msgid "Km"
 msgstr ""
 
 #. module: l10n_mx_edi_stock
@@ -1278,11 +1277,6 @@ msgstr ""
 #. module: l10n_mx_edi_stock
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.l10n_mx_edi_stock_report_cartaporte
 msgid "Llegada:"
-msgstr ""
-
-#. module: l10n_mx_edi_stock
-#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.l10n_mx_edi_stock_report_cartaporte
-msgid "Localidad:"
 msgstr ""
 
 #. module: l10n_mx_edi_stock
@@ -1402,11 +1396,6 @@ msgid "No aplica"
 msgstr ""
 
 #. module: l10n_mx_edi_stock
-#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.l10n_mx_edi_stock_report_cartaporte
-msgid "Nombre:"
-msgstr ""
-
-#. module: l10n_mx_edi_stock
 #: model:ir.model.fields.selection,name:l10n_mx_edi_stock.selection__stock_picking__l10n_mx_edi_cfdi_sat_state__not_defined
 msgid "Not Defined"
 msgstr ""
@@ -1417,28 +1406,13 @@ msgid "Not Found"
 msgstr ""
 
 #. module: l10n_mx_edi_stock
-#: model:ir.model.fields.selection,name:l10n_mx_edi_stock.selection__product_unspsc_code__l10n_mx_edi_hazardous_material__0
-msgid "Not Hazardous"
-msgstr ""
-
-#. module: l10n_mx_edi_stock
 #: model:ir.model.fields.selection,name:l10n_mx_edi_stock.selection__l10n_mx_edi_figure__type__04
 msgid "Notificado"
 msgstr ""
 
 #. module: l10n_mx_edi_stock
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.l10n_mx_edi_stock_report_cartaporte
-msgid "Num Permiso SCT:"
-msgstr ""
-
-#. module: l10n_mx_edi_stock
-#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.l10n_mx_edi_stock_report_cartaporte
-msgid "Num Total Mercancias:"
-msgstr ""
-
-#. module: l10n_mx_edi_stock
-#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.l10n_mx_edi_stock_report_cartaporte
-msgid "NumRegIdTrib:"
+msgid "Num Total Mercancías:"
 msgstr ""
 
 #. module: l10n_mx_edi_stock
@@ -1448,12 +1422,12 @@ msgstr ""
 
 #. module: l10n_mx_edi_stock
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.l10n_mx_edi_stock_report_cartaporte
-msgid "Numero Exterior:"
+msgid "Núm Permiso SCT:"
 msgstr ""
 
 #. module: l10n_mx_edi_stock
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.l10n_mx_edi_stock_report_cartaporte
-msgid "Numero Interior:"
+msgid "Núm Reg ID Trib:"
 msgstr ""
 
 #. module: l10n_mx_edi_stock
@@ -1483,13 +1457,9 @@ msgid "Otra"
 msgstr ""
 
 #. module: l10n_mx_edi_stock
-#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.l10n_mx_edi_stock_report_cartaporte
-msgid "Pais Origen Destino:"
-msgstr ""
-
-#. module: l10n_mx_edi_stock
-#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.l10n_mx_edi_stock_report_cartaporte
-msgid "Pais:"
+#: model:ir.model.fields,field_description:l10n_mx_edi_stock.field_product_product__l10n_mx_edi_hazard_package_type
+#: model:ir.model.fields,field_description:l10n_mx_edi_stock.field_product_template__l10n_mx_edi_hazard_package_type
+msgid "Packaging type for hazardous material"
 msgstr ""
 
 #. module: l10n_mx_edi_stock
@@ -1506,6 +1476,16 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_mx_edi_stock.field_l10n_mx_edi_figure__part_ids
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.l10n_mx_edi_cartaporte_report_delivery_document
 msgid "Parts"
+msgstr ""
+
+#. module: l10n_mx_edi_stock
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.l10n_mx_edi_stock_report_cartaporte
+msgid "País Origen/Destino:"
+msgstr ""
+
+#. module: l10n_mx_edi_stock
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.l10n_mx_edi_stock_report_cartaporte
+msgid "País:"
 msgstr ""
 
 #. module: l10n_mx_edi_stock
@@ -1564,7 +1544,7 @@ msgstr ""
 
 #. module: l10n_mx_edi_stock
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.l10n_mx_edi_stock_report_cartaporte
-msgid "Peso Bruto Vehicular:"
+msgid "Peso Bruto Vehícular:"
 msgstr ""
 
 #. module: l10n_mx_edi_stock
@@ -1574,7 +1554,7 @@ msgstr ""
 
 #. module: l10n_mx_edi_stock
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.l10n_mx_edi_stock_report_cartaporte
-msgid "Placa VM:"
+msgid "Placa:"
 msgstr ""
 
 #. module: l10n_mx_edi_stock
@@ -1628,16 +1608,6 @@ msgid "Please define a gross vehicle weight."
 msgstr ""
 
 #. module: l10n_mx_edi_stock
-#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.l10n_mx_edi_stock_report_cartaporte
-msgid "Poliza Med Ambiente:"
-msgstr ""
-
-#. module: l10n_mx_edi_stock
-#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.l10n_mx_edi_stock_report_cartaporte
-msgid "Poliza Resp Civil:"
-msgstr ""
-
-#. module: l10n_mx_edi_stock
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.stock_picking_form_inherit_l10n_mx_edi_stock
 msgid "Print Carta Porte"
 msgstr ""
@@ -1653,8 +1623,23 @@ msgid "Product Moves (Stock Move Line)"
 msgstr ""
 
 #. module: l10n_mx_edi_stock
+#: model:ir.model,name:l10n_mx_edi_stock.model_product_unspsc_code
+msgid "Product and UOM Codes from UNSPSC"
+msgstr ""
+
+#. module: l10n_mx_edi_stock
 #: model:ir.model.fields.selection,name:l10n_mx_edi_stock.selection__l10n_mx_edi_figure__type__02
 msgid "Propietario"
+msgstr ""
+
+#. module: l10n_mx_edi_stock
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.l10n_mx_edi_stock_report_cartaporte
+msgid "Póliza Med Ambiente:"
+msgstr ""
+
+#. module: l10n_mx_edi_stock
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.l10n_mx_edi_stock_report_cartaporte
+msgid "Póliza Resp Civil:"
 msgstr ""
 
 #. module: l10n_mx_edi_stock
@@ -1665,11 +1650,6 @@ msgstr ""
 #. module: l10n_mx_edi_stock
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.l10n_mx_edi_stock_report_cartaporte
 msgid "RFC Remitente:"
-msgstr ""
-
-#. module: l10n_mx_edi_stock
-#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.l10n_mx_edi_stock_report_cartaporte
-msgid "RFC:"
 msgstr ""
 
 #. module: l10n_mx_edi_stock
@@ -1684,7 +1664,7 @@ msgstr ""
 
 #. module: l10n_mx_edi_stock
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.l10n_mx_edi_stock_report_cartaporte
-msgid "Regimen Aduanero:"
+msgid "Regimenes Aduanero:"
 msgstr ""
 
 #. module: l10n_mx_edi_stock
@@ -1697,6 +1677,11 @@ msgstr ""
 msgid ""
 "Register the contact that is involved depending on its responsibility in the"
 " transport (Operador, Propietario, Arrendador, Notificado)"
+msgstr ""
+
+#. module: l10n_mx_edi_stock
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.l10n_mx_edi_stock_report_cartaporte
+msgid "Res Fiscal:"
 msgstr ""
 
 #. module: l10n_mx_edi_stock
@@ -1863,6 +1848,16 @@ msgstr ""
 #: model:ir.model.fields,help:l10n_mx_edi_stock.field_product_template__l10n_mx_edi_material_type
 msgid ""
 "State of the material or product when performing a foreign trade operation."
+msgstr ""
+
+#. module: l10n_mx_edi_stock
+#: model:ir.model,name:l10n_mx_edi_stock.model_stock_move
+msgid "Stock Move Ewaybill"
+msgstr ""
+
+#. module: l10n_mx_edi_stock
+#: model:ir.model,name:l10n_mx_edi_stock.model_stock_picking
+msgid "Stock Picking - Delivery Guide (Uruguay)"
 msgstr ""
 
 #. module: l10n_mx_edi_stock
@@ -2088,11 +2083,6 @@ msgid "Trailers"
 msgstr ""
 
 #. module: l10n_mx_edi_stock
-#: model:ir.model,name:l10n_mx_edi_stock.model_stock_picking
-msgid "Transfer"
-msgstr ""
-
-#. module: l10n_mx_edi_stock
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.stock_picking_form_inherit_l10n_mx_edi_stock
 msgid "Transport"
 msgstr ""
@@ -2161,11 +2151,6 @@ msgid "Unable to connect to mapbox"
 msgstr ""
 
 #. module: l10n_mx_edi_stock
-#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.l10n_mx_edi_stock_report_cartaporte
-msgid "Unidad Peso:"
-msgstr ""
-
-#. module: l10n_mx_edi_stock
 #: model:ir.model.fields,help:l10n_mx_edi_stock.field_l10n_mx_edi_vehicle__trailer_ids
 msgid "Up to 2 trailers used on this vehicle"
 msgstr ""
@@ -2225,7 +2210,7 @@ msgstr ""
 
 #. module: l10n_mx_edi_stock
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.l10n_mx_edi_stock_report_cartaporte
-msgid "Via Entrada Salida:"
+msgid "Via Entrada/Salida:"
 msgstr ""
 
 #. module: l10n_mx_edi_stock
@@ -2245,13 +2230,18 @@ msgid "You must select a transport type to generate the delivery guide"
 msgstr ""
 
 #. module: l10n_mx_edi_stock
+#: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.l10n_mx_edi_stock_report_cartaporte
+msgid "t"
+msgstr ""
+
+#. module: l10n_mx_edi_stock
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.vehicle_form_view
 msgid "vehicle Form"
 msgstr ""
 
 #. module: l10n_mx_edi_stock
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_stock.vehicle_tree_view
-msgid "vehicle Tree"
+msgid "vehicle List"
 msgstr ""
 
 #. module: l10n_mx_edi_stock

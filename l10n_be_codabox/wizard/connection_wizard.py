@@ -16,7 +16,7 @@ class L10nBeCodaBoxConnectionWizard(models.TransientModel):
         default=lambda self: self.env.company,
     )
     company_vat = fields.Char(
-        string='Company ID',
+        string='Company VAT/ID',
         compute='_compute_company_vat',
         readonly=True,
     )
@@ -26,7 +26,7 @@ class L10nBeCodaBoxConnectionWizard(models.TransientModel):
     )
     l10n_be_codabox_is_connected = fields.Boolean(related='company_id.l10n_be_codabox_is_connected')
     fidu_password = fields.Char(
-        string='Accounting Firm Password',
+        string='Password',
         help='This is the password you have received from Odoo the first time you connected to CodaBox.'
              ' Check the documentation if you have forgotten your password.',
         groups="base.group_system",
@@ -38,7 +38,7 @@ class L10nBeCodaBoxConnectionWizard(models.TransientModel):
 
     def _compute_company_vat(self):
         for wizard in self:
-            wizard.company_vat = wizard.company_id.vat or wizard.company_id.company_registry
+            wizard.company_vat = wizard.company_id.l10n_be_codabox_company_vat
 
     def _compute_show_fidu_password(self):
         for wizard in self:

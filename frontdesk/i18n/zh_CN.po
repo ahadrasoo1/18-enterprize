@@ -1,41 +1,45 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* frontdesk
-# 
+#
 # Translators:
-# Wil Odoo, 2024
-# 
+# 何彬 <vnsoft.he@gmail.com>, 2024
+# Raymond Yu <cl_yu@hotmail.com>, 2024
+# Chloe Wang, 2025
+# Wil Odoo, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:24+0000\n"
+"POT-Creation-Date: 2025-12-29 18:45+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Chinese (China) (https://app.transifex.com/odoo/teams/41243/zh_CN/)\n"
+"Last-Translator: Wil Odoo, 2025\n"
+"Language-Team: Chinese (China) (https://app.transifex.com/odoo/teams/41243/"
+"zh_CN/)\n"
+"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: zh_CN\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. module: frontdesk
 #. odoo-python
 #: code:addons/frontdesk/models/frontdesk_visitor.py:0
 msgid "%(name)s just checked-in. Requested Drink: %(drink)s."
-msgstr "%(name)s刚登记入住。要求喝: %(drink)s."
+msgstr "%(name)s刚刚签到。他要求: %(drink)s."
 
 #. module: frontdesk
 #. odoo-python
 #: code:addons/frontdesk/models/frontdesk_visitor.py:0
 msgid "%(station)s Check-In: %(visitor)s"
-msgstr ""
+msgstr "%(station)s签到: %(visitor)s"
 
 #. module: frontdesk
 #. odoo-python
 #: code:addons/frontdesk/models/frontdesk_visitor.py:0
 msgid "%(station)s Check-In: %(visitor)s to meet %(host)s"
-msgstr ""
+msgstr "%(station)s签到: %(visitor)s与%(host)s会面"
 
 #. module: frontdesk
 #. odoo-python
@@ -51,19 +55,28 @@ msgstr "'Badge - %s' % (object.name).replace('/', '')"
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.print_visitor_badge
 msgid "22 Oct 24 14:20:10"
-msgstr ""
+msgstr "2024 年 10 月 22 日 14:20:10"
 
 #. module: frontdesk
 #: model:mail.template,body_html:frontdesk.frontdesk_mail_template
 msgid ""
 "<div>\n"
-"                    <p>Hello <t t-if=\"ctx.get('host_name')\"><t t-out=\"ctx.get('host_name')\"></t>, </t><b><t t-out=\"object.name\"></t></b> <t t-if=\"object.phone\">(<t t-out=\"object.phone\"></t>)</t><t t-if=\"object.company\">, coming from <t t-out=\"object.company\"></t></t> is asking to meet you at <t t-out=\"object.station_id.name\"></t>. Please let them know you'll be there shortly.\n"
+"                    <p>Hello <t t-if=\"ctx.get('host_name')\"><t t-"
+"out=\"ctx.get('host_name')\"/>, </t><b><t t-out=\"object.name\"/></b> <t t-"
+"if=\"object.phone\">(<t t-out=\"object.phone\"/>)</t><t t-"
+"if=\"object.company\">, coming from <t t-out=\"object.company\"/></t> is "
+"asking to meet you at <t t-out=\"object.station_id.name\"/>. Please let them "
+"know you'll be there shortly.\n"
 "                    </p>\n"
 "                </div>\n"
 "            "
 msgstr ""
 "<div>\n"
-"                    <p>你好<t t-if=\"ctx.get('host_name')\"><t t-out=\"ctx.get('host_name')\"></t> 、 </t><b><t t-out=\"object.name\"></t></b><t t-if=\"object.phone\">(<t t-out=\"object.phone\"></t></t>)<t t-if=\"object.company\"> 从<t t-out=\"object.company\"></t> 来</t>，要求在<t t-out=\"object.station_id.name\"></t> 与您见面。请告诉他们您马上就到。\n"
+"                    <p>您好 <t t-if=\"ctx.get('host_name')\"><t t-"
+"out=\"ctx.get('host_name')\"/>！ </t><b><t t-out=\"object.name\"/></b><t t-"
+"if=\"object.phone\">（电话：<t t-out=\"object.phone\"/>）</t><t t-"
+"if=\"object.company\">（公司：<t t-out=\"object.company\"/>）</t>要求与您在 "
+"<t t-out=\"object.station_id.name\"/> 见面。请让他们知道您很快就会到达。\n"
 "                    </p>\n"
 "                </div>\n"
 "            "
@@ -74,18 +87,20 @@ msgid ""
 "<span><b>Congratulations!!!</b> You have created your first visitor.\n"
 "        </span>"
 msgstr ""
+"<span><b>恭喜！！！</b> 您已创建了第一位访客。\n"
+"        </span>"
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.print_visitor_badge
 msgid "<strong>Visiting:</strong>"
-msgstr ""
+msgstr "<strong>到访：</strong>"
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_drink__active
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__active
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__active
 msgid "Active"
-msgstr "启用"
+msgstr "有效"
 
 #. module: frontdesk
 #: model:ir.actions.client,name:frontdesk.frontdesk_visitor_action_configure_properties_field
@@ -115,7 +130,7 @@ msgstr "允许访客从列表中选择会议主持人"
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_form
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_visitor_view_search
 msgid "Archived"
-msgstr "已存档"
+msgstr "已归档"
 
 #. module: frontdesk
 #. odoo-javascript
@@ -423,18 +438,18 @@ msgstr "现场嘉宾"
 #: model:sms.template,body:frontdesk.frontdesk_sms_template
 msgid ""
 "Hello, Your visitor {{ object.name }} {{ '(%s)' % object.phone if "
-"object.phone else '' }} {{ '(%s)' % object.company if object.company else ''"
-" }} wants to meet you at {{ object.station_id.name }}. Please let them know "
-"you'll be there shortly."
+"object.phone else '' }} {{ '(%s)' % object.company if object.company else "
+"'' }} wants to meet you at {{ object.station_id.name }}. Please let them "
+"know you'll be there shortly."
 msgstr ""
-"您好，您的访客 {{ object.name }}{{ '(%s)'% object.phone if object.phone else '' "
-"}}{{ '(%s)'% object.company if object.company else '' }} 希望在 {{ "
-"object.station_id.name }} 与您见面。请告知他们您马上就到。"
+"您好，您的访客 {{ object.name }}{{ '(%s)'% object.phone if object.phone else "
+"'' }}{{ '(%s)'% object.company if object.company else '' }} 希望在 "
+"{{ object.station_id.name }} 与您见面。请告知他们您马上就到。"
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.print_visitor_badge
 msgid "Henry"
-msgstr ""
+msgstr "亨利"
 
 #. module: frontdesk
 #. odoo-javascript
@@ -477,6 +492,11 @@ msgid "Image"
 msgstr "图片"
 
 #. module: frontdesk
+#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_kanban
+msgid "Install"
+msgstr "安装"
+
+#. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__is_favorite
 msgid "Is Favorite"
 msgstr "已收藏"
@@ -484,7 +504,7 @@ msgstr "已收藏"
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.print_visitor_badge
 msgid "Karen"
-msgstr ""
+msgstr "凯伦"
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_kanban
@@ -557,7 +577,7 @@ msgstr ""
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.print_visitor_badge
 msgid "MY PVT LTD"
-msgstr ""
+msgstr "我的私人有限公司"
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__message
@@ -730,7 +750,7 @@ msgstr "打印徽标"
 #. module: frontdesk
 #: model:ir.actions.report,name:frontdesk.frontdesk_visitor_print_badge
 msgid "Print Visitor Badge"
-msgstr ""
+msgstr "打印访客徽标"
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__visitor_properties
@@ -770,7 +790,7 @@ msgstr "注册时索取更多信息"
 #: model:ir.model.fields.selection,name:frontdesk.selection__frontdesk_frontdesk__ask_email__required
 #: model:ir.model.fields.selection,name:frontdesk.selection__frontdesk_frontdesk__ask_phone__required
 msgid "Required"
-msgstr "必需"
+msgstr "必填"
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_search
@@ -939,7 +959,7 @@ msgstr "访客"
 #. module: frontdesk
 #. odoo-javascript
 #: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
-msgid "Welcome"
+msgid "Welcome to"
 msgstr "欢迎"
 
 #. module: frontdesk
@@ -1015,7 +1035,7 @@ msgstr "例如：可口可乐"
 #. odoo-javascript
 #: code:addons/frontdesk/static/src/visitor_form/visitor_form.xml:0
 msgid "e.g. John Doe"
-msgstr "例如 John Doe"
+msgstr "例如： John Doe"
 
 #. module: frontdesk
 #. odoo-javascript
@@ -1034,12 +1054,6 @@ msgstr "例如：john@company.com"
 #: code:addons/frontdesk/static/src/end_page/end_page.xml:0
 msgid "has been informed."
 msgstr "已获悉。"
-
-#. module: frontdesk
-#. odoo-javascript
-#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
-msgid "to"
-msgstr "到"
 
 #. module: frontdesk
 #. odoo-javascript

@@ -3,6 +3,7 @@
 import logging
 
 from odoo import _, api, fields, models
+from odoo.tools.float_utils import json_float_round
 from odoo.exceptions import UserError
 from odoo.addons.l10n_ke_edi_oscu.models.account_move import format_etims_datetime
 from odoo.tools import SQL
@@ -52,11 +53,11 @@ class ProductTemplate(models.Model):
         string="KRA Item Code",
         help="The code assigned to this product on eTIMS",
         compute='_compute_l10n_ke_item_code',
+        search='_search_l10n_ke_item_code',
     )
 
     # === Computes === #
 
-    @api.depends_context('allowed_company_ids')
     def compute_is_storable(self):
         super().compute_is_storable()
         fiscal_country_codes = self.env.companies.mapped('account_fiscal_country_id.code')
@@ -101,6 +102,10 @@ class ProductTemplate(models.Model):
     @api.depends('product_variant_ids.l10n_ke_item_code')
     def _compute_l10n_ke_item_code(self):
         self._compute_template_field_from_variant_field('l10n_ke_item_code')
+
+    @api.model
+    def _search_l10n_ke_item_code(self, operator, value):
+        return [('product_variant_ids.l10n_ke_item_code', operator, value)]
 
     # === Actions === #
 
@@ -170,7 +175,7 @@ class ProductProduct(models.Model):
 
     @api.depends('type')
     def _compute_l10n_ke_packaging_unit_id(self):
-        service_packaging = self.env.ref('l10n_ke_edi_oscu.packaging_type_ou', raise_if_not_found=False)
+        service_packaging = self.env.ref('l10n_ke_edi_oscu.code_17_OU', raise_if_not_found=False)
         for product in self.filtered(lambda p: not p.l10n_ke_packaging_unit_id):
             product.l10n_ke_packaging_unit_id = service_packaging if product.type == 'service' else None
 
@@ -202,6 +207,7 @@ class ProductProduct(models.Model):
                         or not p.l10n_ke_product_type_code
                     )
                 )
+                or not p.taxes_id
             )
         )
 
@@ -209,12 +215,12 @@ class ProductProduct(models.Model):
             if for_invoice:
                 message = _(
                     "When sending to eTIMS, the products used must have a defined Packaging Unit, "
-                    "Packaging Quantity and UNSPSC Code."
+                    "Packaging Quantity, Sales Taxes and UNSPSC Code."
                 )
             else:
                 message = _(
                     "When sending to eTIMS, the products used must have a defined Cost, Product Type, "
-                    "Origin Country, Packaging Unit, Packaging Quantity and UNSPSC Code."
+                    "Origin Country, Packaging Unit, Packaging Quantity, Sales Taxes and UNSPSC Code."
                 )
 
             messages['product_fields_missing'] = {
@@ -270,7 +276,6 @@ class ProductProduct(models.Model):
             'type': 'ir.actions.act_window',
             'res_model': 'product.product',
             'domain': [('id', 'in', self.ids)],
-            'view_mode': 'list',
             'views': [(self.env.ref('l10n_ke_edi_oscu.l10n_ke_kra_product_tree').id, 'list'), (False, 'form')],
             'context': {'create': False, 'delete': False},
         }
@@ -314,17 +319,18 @@ class ProductProduct(models.Model):
             'qtyUnitCd':   self.uom_id.l10n_ke_quantity_unit_id.code,             # Quantity unit code
             'taxTyCd':     self._l10n_ke_get_tax_type().code,                     # Tax type code
             'bcd':         self.barcode or None,                                  # Self barcode
-            'dftPrc':      self.standard_price,                                   # Standard price
+            'dftPrc':      json_float_round(self.standard_price, 2),              # Standard price
             'isrcAplcbYn': 'Y' if self.l10n_ke_is_insurance_applicable else 'N',  # Is insurance applicable
             'useYn': 'Y',
             **self.env.company._l10n_ke_get_user_dict(self.create_uid, self.write_uid),
         }
         return content
 
-    def _l10n_ke_oscu_save_item(self):
+    def _l10n_ke_oscu_save_item(self, company=None):
         """ Register a product with eTIMS. """
+        company = company or self.env.company
         content = self._l10n_ke_oscu_save_item_content()
-        error, _data, _date = self.env.company._l10n_ke_call_etims('saveItem', content)
+        error, _data, _date = company._l10n_ke_call_etims('saveItem', content)
         if not error:
             self.l10n_ke_item_code = content['itemCd']
         return error, content
@@ -336,6 +342,7 @@ class ProductProduct(models.Model):
         and stock move reporting.
         """
         validation_messages = self._l10n_ke_get_validation_messages(for_invoice=False)
+        validation_messages.update(self.uom_id._l10n_ke_get_validation_messages())
         for message in validation_messages.values():
             if message.get('blocking'):
                 raise UserError(_("Cannot register '%(name)s' on eTIMS:\n%(msg)s", name=self.name, msg=message['message']))

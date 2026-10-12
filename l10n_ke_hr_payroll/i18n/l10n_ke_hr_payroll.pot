@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 17.2alpha1+e\n"
+"Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-28 12:39+0000\n"
-"PO-Revision-Date: 2024-02-28 12:39+0000\n"
+"POT-Creation-Date: 2026-04-10 19:08+0000\n"
+"PO-Revision-Date: 2026-04-10 19:08+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -18,10 +18,11 @@ msgstr ""
 #. module: l10n_ke_hr_payroll
 #. odoo-python
 #: code:addons/l10n_ke_hr_payroll/models/l10n_ke_tax_deduction_card.py:0
-msgid "%s-tax-deduction-card-%s"
+msgid "%(employee)s-tax-deduction-card-%(year)s"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
+#: model:ir.actions.report,print_report_name:l10n_ke_hr_payroll.action_report_light_payslip_ken
 #: model:ir.actions.report,print_report_name:l10n_ke_hr_payroll.action_report_payslip_ken
 msgid "'Payslip - %s' % (object.employee_id.name)"
 msgstr ""
@@ -68,23 +69,8 @@ msgid "<span>Tax Deduction Card Year </span>"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
-#: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.report_payslip_ken
-msgid "<strong>Contract Type</strong>"
-msgstr ""
-
-#. module: l10n_ke_hr_payroll
-#: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.report_payslip_ken
-msgid "<strong>Designation</strong>"
-msgstr ""
-
-#. module: l10n_ke_hr_payroll
-#: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.report_payslip_ken
+#: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.report_light_payslip_ken
 msgid "<strong>Employee's PIN</strong>"
-msgstr ""
-
-#. module: l10n_ke_hr_payroll
-#: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.report_payslip_ken
-msgid "<strong>Employee</strong>"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
@@ -94,38 +80,23 @@ msgid ""
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
-#: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.report_payslip_ken
-msgid "<strong>Identification</strong>"
-msgstr ""
-
-#. module: l10n_ke_hr_payroll
-#: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.report_payslip_ken
+#: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.report_light_payslip_ken
 msgid "<strong>KRA PIN</strong>"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
-#: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.report_payslip_ken
+#: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.report_light_payslip_ken
 msgid "<strong>NHIF Number</strong>"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
-#: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.report_payslip_ken
+#: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.report_light_payslip_ken
 msgid "<strong>NSSF Number</strong>"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
-#: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.report_payslip_ken
-msgid "<strong>Pay Period</strong>"
-msgstr ""
-
-#. module: l10n_ke_hr_payroll
-#: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.report_payslip_ken
-msgid "<strong>Work Email</strong>"
-msgstr ""
-
-#. module: l10n_ke_hr_payroll
-#: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.report_payslip_ken
-msgid "<strong>Working Schedule</strong>"
+#: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.report_tax_deduction_card
+msgid "A"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
@@ -139,6 +110,19 @@ msgid "AHL Amount (employer)"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
+#: model:hr.salary.rule,name:l10n_ke_hr_payroll.l10n_ke_employees_ahl_relief
+msgid "AHL Relief"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/controllers/main.py:0
+msgid "AMOUNT"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/models/l10n_ke_master_report.py:0
 #: model:hr.salary.rule,name:l10n_ke_hr_payroll.l10n_ke_employees_salary_taxed_airtime_allowance
 #: model:hr.salary.rule,name:l10n_ke_hr_payroll.l10n_ke_employees_salary_untaxed_airtime_allowance
 #: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_hr_contract__l10n_ke_airtime_allowance
@@ -153,6 +137,7 @@ msgstr ""
 #. module: l10n_ke_hr_payroll
 #: model:ir.model.fields.selection,name:l10n_ke_hr_payroll.selection__l10n_ke_hr_payroll_nhif_report_wizard__reference_month__4
 #: model:ir.model.fields.selection,name:l10n_ke_hr_payroll.selection__l10n_ke_hr_payroll_nssf_report_wizard__reference_month__4
+#: model:ir.model.fields.selection,name:l10n_ke_hr_payroll.selection__l10n_ke_master_report__reference_month__4
 msgid "April"
 msgstr ""
 
@@ -164,10 +149,18 @@ msgstr ""
 #. module: l10n_ke_hr_payroll
 #: model:ir.model.fields.selection,name:l10n_ke_hr_payroll.selection__l10n_ke_hr_payroll_nhif_report_wizard__reference_month__8
 #: model:ir.model.fields.selection,name:l10n_ke_hr_payroll.selection__l10n_ke_hr_payroll_nssf_report_wizard__reference_month__8
+#: model:ir.model.fields.selection,name:l10n_ke_hr_payroll.selection__l10n_ke_master_report__reference_month__8
 msgid "August"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
+#: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.report_tax_deduction_card
+msgid "B"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/models/l10n_ke_master_report.py:0
 #: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.report_tax_deduction_card
 msgid "Basic Salary"
 msgstr ""
@@ -183,8 +176,44 @@ msgid "Benefits-Non-Cash"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/models/l10n_ke_master_report.py:0
+msgid "Bonus"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.report_tax_deduction_card
+msgid "C"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/controllers/main.py:0
+msgid ""
+"CONTRIBUTIONS \n"
+" TYPE"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/controllers/main.py:0
+msgid "CONTRIBUTIONS PERIOD"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.report_tax_deduction_card
 msgid "Chargeable Pay"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#: model:ir.model.fields,help:l10n_ke_hr_payroll.field_hr_contract__l10n_ke_is_secondary
+msgid "Check if the employee got a main contract in another company."
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/models/l10n_ke_master_report.py:0
+msgid "Commission"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
@@ -200,10 +229,17 @@ msgid "Company"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/models/l10n_ke_master_report.py:0
+msgid "Company Name"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
 #: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_hr_payroll_nhif_report_line_wizard__create_uid
 #: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_hr_payroll_nhif_report_wizard__create_uid
 #: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_hr_payroll_nssf_report_line_wizard__create_uid
 #: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_hr_payroll_nssf_report_wizard__create_uid
+#: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_master_report__create_uid
 #: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_tax_deduction_card__create_uid
 msgid "Created by"
 msgstr ""
@@ -213,8 +249,14 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_hr_payroll_nhif_report_wizard__create_date
 #: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_hr_payroll_nssf_report_line_wizard__create_date
 #: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_hr_payroll_nssf_report_wizard__create_date
+#: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_master_report__create_date
 #: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_tax_deduction_card__create_date
 msgid "Created on"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.report_tax_deduction_card
+msgid "D"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
@@ -230,6 +272,7 @@ msgstr ""
 #. module: l10n_ke_hr_payroll
 #: model:ir.model.fields.selection,name:l10n_ke_hr_payroll.selection__l10n_ke_hr_payroll_nhif_report_wizard__reference_month__12
 #: model:ir.model.fields.selection,name:l10n_ke_hr_payroll.selection__l10n_ke_hr_payroll_nssf_report_wizard__reference_month__12
+#: model:ir.model.fields.selection,name:l10n_ke_hr_payroll.selection__l10n_ke_master_report__reference_month__12
 msgid "December"
 msgstr ""
 
@@ -251,6 +294,13 @@ msgid "Defined Contribution<br/>Retirement Scheme"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/models/l10n_ke_master_report.py:0
+#: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.report_master_report
+msgid "Department"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
 #: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_tax_deduction_card__name
 msgid "Description"
 msgstr ""
@@ -266,8 +316,34 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_hr_payroll_nhif_report_wizard__display_name
 #: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_hr_payroll_nssf_report_line_wizard__display_name
 #: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_hr_payroll_nssf_report_wizard__display_name
+#: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_master_report__display_name
 #: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_tax_deduction_card__display_name
 msgid "Display Name"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_tax_deduction_card__documents_count
+msgid "Documents Count"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_tax_deduction_card__documents_enabled
+msgid "Documents Enabled"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.l10n_ke_master_report_view_form
+msgid "Download the Master Report PDF file:"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.l10n_ke_master_report_view_form
+msgid "Download the Master Report XLSX file:"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.report_tax_deduction_card
+msgid "E"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
@@ -283,6 +359,36 @@ msgstr ""
 #. module: l10n_ke_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.report_tax_deduction_card
 msgid "E3<br/>Fixed"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/controllers/main.py:0
+msgid "EMPLOYER"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/controllers/main.py:0
+msgid "EMPLOYER CODE"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/controllers/main.py:0
+msgid "EMPLOYER KRA PIN"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/controllers/main.py:0
+msgid "EMPLOYER NAME"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/controllers/main.py:0
+msgid "EMPLOYER NSSF NUMBER"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
@@ -309,12 +415,18 @@ msgid "Employee Contract"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
+#: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.report_master_report
+msgid "Employee Name"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.report_tax_deduction_card
 msgid "Employee's Names"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
 #: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_hr_employee__l10n_ke_pin
+#: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.report_payslip_ken
 #: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.report_tax_deduction_card
 msgid "Employee's PIN"
 msgstr ""
@@ -342,14 +454,36 @@ msgid "Export NSSF Report into XLSX"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
+#: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.l10n_ke_master_report_view_form
+msgid "Export PDF file"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.l10n_ke_hr_payroll_nhif_report_wizard_view_form
 #: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.l10n_ke_hr_payroll_nssf_report_wizard_view_form
 msgid "Export XLSX"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
+#: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.l10n_ke_master_report_view_form
+msgid "Export XLSX file"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.report_tax_deduction_card
+msgid "F"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/controllers/main.py:0
+msgid "FIRST NAME"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
 #: model:ir.model.fields.selection,name:l10n_ke_hr_payroll.selection__l10n_ke_hr_payroll_nhif_report_wizard__reference_month__2
 #: model:ir.model.fields.selection,name:l10n_ke_hr_payroll.selection__l10n_ke_hr_payroll_nssf_report_wizard__reference_month__2
+#: model:ir.model.fields.selection,name:l10n_ke_hr_payroll.selection__l10n_ke_master_report__reference_month__2
 msgid "February"
 msgstr ""
 
@@ -378,8 +512,29 @@ msgid ""
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
+#: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.report_master_report
+msgid "For the period of"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
 #: model:hr.salary.rule,name:l10n_ke_hr_payroll.l10n_ke_employees_fringe_benefit
 msgid "Fringe Benefit"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.report_tax_deduction_card
+msgid "G"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.l10n_ke_master_report_view_form
+msgid "Generation Complete"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/models/l10n_ke_master_report.py:0
+msgid "Gross Salary"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
@@ -388,6 +543,13 @@ msgid "Gross Taxable"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
+#: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.report_tax_deduction_card
+msgid "H"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/models/l10n_ke_master_report.py:0
 #: model:hr.salary.rule,name:l10n_ke_hr_payroll.l10n_ke_employees_helb
 msgid "HELB"
 msgstr ""
@@ -403,8 +565,25 @@ msgid "HR Tax Deduction Card Report By Employee"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
+#: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.hr_payroll_headover_view_tree
+#: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.l10n_ke_master_report_view_form
+msgid "Headover"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#: model:ir.model,name:l10n_ke_hr_payroll.model_l10n_ke_master_report
+msgid "Headover Wizard"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
 #: model:hr.salary.rule.category,name:l10n_ke_hr_payroll.HIDDEN
 msgid "Hidden Content for Calculation Purpose"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/models/l10n_ke_master_report.py:0
+msgid "Holiday Pay"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
@@ -412,8 +591,15 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_hr_payroll_nhif_report_wizard__id
 #: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_hr_payroll_nssf_report_line_wizard__id
 #: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_hr_payroll_nssf_report_wizard__id
+#: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_master_report__id
 #: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_tax_deduction_card__id
 msgid "ID"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/controllers/main.py:0
+msgid "ID NO"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
@@ -422,9 +608,30 @@ msgid "IMPORTANT"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/controllers/main.py:0
+msgid "INCOME"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/controllers/main.py:0
+msgid ""
+"INCOME \n"
+" TYPE"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
 #: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_hr_payroll_nhif_report_line_wizard__employee_identification_id
 #: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_hr_payroll_nssf_report_line_wizard__employee_identification_id
 msgid "Identification No"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#: model:ir.model.fields,help:l10n_ke_hr_payroll.field_hr_contract__l10n_ke_is_li_managed_by_employee
+msgid ""
+"If selected, Life Insurance will be paid by the employee on his own, only "
+"the life insurance relief will be deduced from payslip."
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
@@ -453,7 +660,6 @@ msgstr ""
 #. module: l10n_ke_hr_payroll
 #. odoo-python
 #: code:addons/l10n_ke_hr_payroll/controllers/main.py:0
-#: code:addons/l10n_ke_hr_payroll/controllers/main.py:0
 msgid ""
 "It seems that you either not have the rights to access the nhif reports or "
 "that you try to access it outside normal circumstances. If you think there "
@@ -461,21 +667,34 @@ msgid ""
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
+#: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.report_tax_deduction_card
+msgid "J"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
 #: model:ir.model.fields.selection,name:l10n_ke_hr_payroll.selection__l10n_ke_hr_payroll_nhif_report_wizard__reference_month__1
 #: model:ir.model.fields.selection,name:l10n_ke_hr_payroll.selection__l10n_ke_hr_payroll_nssf_report_wizard__reference_month__1
+#: model:ir.model.fields.selection,name:l10n_ke_hr_payroll.selection__l10n_ke_master_report__reference_month__1
 msgid "January"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
 #: model:ir.model.fields.selection,name:l10n_ke_hr_payroll.selection__l10n_ke_hr_payroll_nhif_report_wizard__reference_month__7
 #: model:ir.model.fields.selection,name:l10n_ke_hr_payroll.selection__l10n_ke_hr_payroll_nssf_report_wizard__reference_month__7
+#: model:ir.model.fields.selection,name:l10n_ke_hr_payroll.selection__l10n_ke_master_report__reference_month__7
 msgid "July"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
 #: model:ir.model.fields.selection,name:l10n_ke_hr_payroll.selection__l10n_ke_hr_payroll_nhif_report_wizard__reference_month__6
 #: model:ir.model.fields.selection,name:l10n_ke_hr_payroll.selection__l10n_ke_hr_payroll_nssf_report_wizard__reference_month__6
+#: model:ir.model.fields.selection,name:l10n_ke_hr_payroll.selection__l10n_ke_master_report__reference_month__6
 msgid "June"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.report_tax_deduction_card
+msgid "K"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
@@ -484,9 +703,12 @@ msgid "KRA"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/controllers/main.py:0
 #: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_hr_employee__l10n_ke_kra_pin
 #: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_hr_payroll_nssf_report_line_wizard__employee_kra_pin
 #: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_res_company__l10n_ke_kra_pin
+#: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.report_payslip_ken
 msgid "KRA PIN"
 msgstr ""
 
@@ -513,8 +735,24 @@ msgid "Kenya: Payslip"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
+#: model:ir.actions.report,name:l10n_ke_hr_payroll.action_report_light_payslip_ken
+msgid "Kenya: Payslip (Light)"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.report_tax_deduction_card
 msgid "Ksh. per month"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.report_tax_deduction_card
+msgid "L"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/controllers/main.py:0
+msgid "LAST NAME"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
@@ -522,6 +760,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_hr_payroll_nhif_report_wizard__write_uid
 #: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_hr_payroll_nssf_report_line_wizard__write_uid
 #: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_hr_payroll_nssf_report_wizard__write_uid
+#: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_master_report__write_uid
 #: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_tax_deduction_card__write_uid
 msgid "Last Updated by"
 msgstr ""
@@ -531,6 +770,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_hr_payroll_nhif_report_wizard__write_date
 #: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_hr_payroll_nssf_report_line_wizard__write_date
 #: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_hr_payroll_nssf_report_wizard__write_date
+#: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_master_report__write_date
 #: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_tax_deduction_card__write_date
 msgid "Last Updated on"
 msgstr ""
@@ -558,8 +798,20 @@ msgid "Lines Count"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/models/l10n_ke_master_report.py:0
+msgid "Loan"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.report_tax_deduction_card
 msgid "Lowest of E<br/>added to F"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/controllers/main.py:0
+msgid "MEMBER"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
@@ -568,15 +820,66 @@ msgid "MONTH"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/controllers/main.py:0
+msgid "MONTH OF CONTRIBUTION"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_hr_contract__l10n_ke_is_li_managed_by_employee
+msgid "Managed by Employee"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
 #: model:ir.model.fields.selection,name:l10n_ke_hr_payroll.selection__l10n_ke_hr_payroll_nhif_report_wizard__reference_month__3
 #: model:ir.model.fields.selection,name:l10n_ke_hr_payroll.selection__l10n_ke_hr_payroll_nssf_report_wizard__reference_month__3
+#: model:ir.model.fields.selection,name:l10n_ke_hr_payroll.selection__l10n_ke_master_report__reference_month__3
 msgid "March"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/models/l10n_ke_master_report.py:0
+#: model:ir.actions.act_window,name:l10n_ke_hr_payroll.action_open_l10n_ke_master_report
+#: model:ir.actions.report,name:l10n_ke_hr_payroll.action_report_master_report
+#: model:ir.ui.menu,name:l10n_ke_hr_payroll.menu_l10n_ke_hr_payroll_master_report
+#: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.report_master_report
+msgid "Master Report"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_master_report__pdf_file
+msgid "Master Report PDF"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_master_report__xlsx_file
+msgid "Master Report XLSX"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/models/l10n_ke_master_report.py:0
+msgid "Master_Report.pdf"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/models/l10n_ke_master_report.py:0
+msgid "Master_Report.xlsx"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
 #: model:ir.model.fields.selection,name:l10n_ke_hr_payroll.selection__l10n_ke_hr_payroll_nhif_report_wizard__reference_month__5
 #: model:ir.model.fields.selection,name:l10n_ke_hr_payroll.selection__l10n_ke_hr_payroll_nssf_report_wizard__reference_month__5
+#: model:ir.model.fields.selection,name:l10n_ke_hr_payroll.selection__l10n_ke_master_report__reference_month__5
 msgid "May"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/models/l10n_ke_master_report.py:0
+msgid "Meal Allowance"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
@@ -592,6 +895,7 @@ msgstr ""
 #. module: l10n_ke_hr_payroll
 #: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_hr_payroll_nhif_report_wizard__reference_month
 #: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_hr_payroll_nssf_report_wizard__reference_month
+#: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_master_report__reference_month
 msgid "Month"
 msgstr ""
 
@@ -608,6 +912,12 @@ msgid ""
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/models/l10n_ke_master_report.py:0
+msgid "NHIF"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
 #: model:hr.salary.rule,name:l10n_ke_hr_payroll.l10n_ke_employees_salary_nhif_amount
 #: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_hr_payroll_nhif_report_line_wizard__nhif_amount
 msgid "NHIF Amount"
@@ -619,8 +929,15 @@ msgid "NHIF Amount (Hidden)"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/controllers/main.py:0
+msgid "NHIF NO"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
 #: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_hr_employee__l10n_ke_nhif_number
 #: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_hr_payroll_nhif_report_line_wizard__nhif_number
+#: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.report_payslip_ken
 msgid "NHIF Number"
 msgstr ""
 
@@ -631,7 +948,6 @@ msgstr ""
 
 #. module: l10n_ke_hr_payroll
 #: model:ir.actions.act_window,name:l10n_ke_hr_payroll.l10n_ke_hr_payroll_nhif_report_wizard_action
-#: model:ir.ui.menu,name:l10n_ke_hr_payroll.menu_l10n_ke_hr_payroll_nhif_report_wizard
 #: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.l10n_ke_hr_payroll_nhif_report_wizard_view_form
 msgid "NHIF Report"
 msgstr ""
@@ -647,14 +963,28 @@ msgid "NHIF Report Wizard Line"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/models/l10n_ke_master_report.py:0
+msgid "NITA"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
 #: model:hr.salary.rule,name:l10n_ke_hr_payroll.l10n_ke_employer_nita
 msgid "NITA Employer Cost"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/models/l10n_ke_master_report.py:0
 #: model:hr.salary.rule.category,name:l10n_ke_hr_payroll.NSSF
 #: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.view_company_form
 msgid "NSSF"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/models/l10n_ke_master_report.py:0
+msgid "NSSF - Employer Contribution"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
@@ -673,6 +1003,12 @@ msgid "NSSF Amount Employer"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/controllers/main.py:0
+msgid "NSSF CONTRIBUTION"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
 #: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_hr_payroll_nssf_report_line_wizard__payslip_nssf_code
 msgid "NSSF Code"
 msgstr ""
@@ -683,9 +1019,16 @@ msgid "NSSF Employer Cost"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/controllers/main.py:0
+msgid "NSSF NO"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
 #: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_hr_employee__l10n_ke_nssf_number
 #: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_hr_payroll_nssf_report_line_wizard__employee_nssf_number
 #: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_res_company__l10n_ke_nssf_number
+#: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.report_payslip_ken
 msgid "NSSF Number"
 msgstr ""
 
@@ -731,9 +1074,17 @@ msgid "NSSF Tier 2 Employee Deduction"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/models/l10n_ke_master_report.py:0
 #: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_hr_payroll_nhif_report_wizard__name
 #: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_hr_payroll_nssf_report_wizard__name
 msgid "Name"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/models/l10n_ke_master_report.py:0
+msgid "Net Pay"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
@@ -744,12 +1095,20 @@ msgstr ""
 #. module: l10n_ke_hr_payroll
 #: model:ir.model.fields.selection,name:l10n_ke_hr_payroll.selection__l10n_ke_hr_payroll_nhif_report_wizard__reference_month__11
 #: model:ir.model.fields.selection,name:l10n_ke_hr_payroll.selection__l10n_ke_hr_payroll_nssf_report_wizard__reference_month__11
+#: model:ir.model.fields.selection,name:l10n_ke_hr_payroll.selection__l10n_ke_master_report__reference_month__11
 msgid "November"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/controllers/main.py:0
+msgid "OTHER NAMES"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
 #: model:ir.model.fields.selection,name:l10n_ke_hr_payroll.selection__l10n_ke_hr_payroll_nhif_report_wizard__reference_month__10
 #: model:ir.model.fields.selection,name:l10n_ke_hr_payroll.selection__l10n_ke_hr_payroll_nssf_report_wizard__reference_month__10
+#: model:ir.model.fields.selection,name:l10n_ke_hr_payroll.selection__l10n_ke_master_report__reference_month__10
 msgid "October"
 msgstr ""
 
@@ -774,13 +1133,42 @@ msgid "P.A.Y.E."
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/models/l10n_ke_master_report.py:0
+msgid "PAYE"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.report_tax_deduction_card
 msgid "PAYE Tax (J-K)"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/controllers/main.py:0
+msgid "PAYROLL NO"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
 #: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_tax_deduction_card__pdf_error
 msgid "PDF Error Message"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#: model:ir.model,name:l10n_ke_hr_payroll.model_hr_payslip
+msgid "Pay Slip"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/models/l10n_ke_master_report.py:0
+msgid "Payroll Month"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/models/l10n_ke_master_report.py:0
+msgid "Payroll Number"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
@@ -792,6 +1180,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_hr_payroll_nhif_report_line_wizard__payslip_number
 #: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_hr_payroll_nssf_report_line_wizard__payslip_number
 msgid "Payslip Number"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_master_report__pdf_file_name
+msgid "Pdf File Name"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
@@ -836,8 +1229,50 @@ msgid "Retirement Contribution &amp; Owner Occupied Interest"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
+#: model:ir.ui.menu,name:l10n_ke_hr_payroll.menu_l10n_ke_hr_payroll_nhif_report_wizard
+msgid "SHIF (NHIF) Report"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/controllers/main.py:0
+msgid "SURNAME"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/models/l10n_ke_master_report.py:0
+msgid "Salary Advance"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.l10n_ke_master_report_search
+msgid "Search Master Report"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_hr_contract__l10n_ke_is_secondary
+msgid "Secondary Contract"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#: model:ir.model.fields,help:l10n_ke_hr_payroll.field_l10n_ke_master_report__reference_month
+msgid ""
+"Select the month for which you want to see which employees have a running "
+"contract."
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#: model:ir.model.fields,help:l10n_ke_hr_payroll.field_l10n_ke_master_report__reference_year
+msgid ""
+"Select the year for which you want to see which employees have a running "
+"contract."
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
 #: model:ir.model.fields.selection,name:l10n_ke_hr_payroll.selection__l10n_ke_hr_payroll_nhif_report_wizard__reference_month__9
 #: model:ir.model.fields.selection,name:l10n_ke_hr_payroll.selection__l10n_ke_hr_payroll_nssf_report_wizard__reference_month__9
+#: model:ir.model.fields.selection,name:l10n_ke_hr_payroll.selection__l10n_ke_master_report__reference_month__9
 msgid "September"
 msgstr ""
 
@@ -848,9 +1283,45 @@ msgid "Statutory Deduction"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
+#: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.report_master_report
+msgid "Summary"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
 #. odoo-python
+#: code:addons/l10n_ke_hr_payroll/controllers/main.py:0
 #: code:addons/l10n_ke_hr_payroll/models/l10n_ke_tax_deduction_card.py:0
 msgid "TOTAL"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/controllers/main.py:0
+msgid "TOTAL CONTRIBUTIONS"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/controllers/main.py:0
+msgid "TOTAL EMPLOYER"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/controllers/main.py:0
+msgid "TOTAL INCOME"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/controllers/main.py:0
+msgid "TOTAL MEMBER"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/controllers/main.py:0
+msgid "TOTAL RECORDS"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
@@ -905,13 +1376,6 @@ msgid "The HELB deduction value cannot be below %s Ksh."
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
-#. odoo-python
-#: code:addons/l10n_ke_hr_payroll/models/hr_employee.py:0
-#: code:addons/l10n_ke_hr_payroll/models/res_company.py:0
-msgid "The NSSF number must be a nine or ten digits number."
-msgstr ""
-
-#. module: l10n_ke_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.l10n_ke_tax_deduction_card_view_form
 msgid ""
 "The files won't be posted in the employee portal if you don't have the "
@@ -925,6 +1389,7 @@ msgid "The mortgage interest cannot exceed %s Ksh yearly."
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
+#: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.report_master_report
 #: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.report_tax_deduction_card
 msgid "Total"
 msgstr ""
@@ -942,6 +1407,24 @@ msgstr ""
 #. module: l10n_ke_hr_payroll
 #: model_terms:ir.ui.view,arch_db:l10n_ke_hr_payroll.report_tax_deduction_card
 msgid "Total Gross Pay"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/models/l10n_ke_master_report.py:0
+msgid "Total Other Deductions"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/models/l10n_ke_master_report.py:0
+msgid "Total Statutory Deductions"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
+#. odoo-python
+#: code:addons/l10n_ke_hr_payroll/models/l10n_ke_master_report.py:0
+msgid "Totals"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
@@ -994,14 +1477,21 @@ msgid "Wizard"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
+#: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_master_report__xlsx_file_name
+msgid "Xlsx File Name"
+msgstr ""
+
+#. module: l10n_ke_hr_payroll
 #: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_hr_payroll_nhif_report_wizard__reference_year
 #: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_hr_payroll_nssf_report_wizard__reference_year
+#: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_master_report__reference_year
 #: model:ir.model.fields,field_description:l10n_ke_hr_payroll.field_l10n_ke_tax_deduction_card__year
 msgid "Year"
 msgstr ""
 
 #. module: l10n_ke_hr_payroll
 #. odoo-python
+#: code:addons/l10n_ke_hr_payroll/models/l10n_ke_master_report.py:0
 #: code:addons/l10n_ke_hr_payroll/wizards/l10n_ke_hr_payroll_nhif_report_wizard.py:0
 #: code:addons/l10n_ke_hr_payroll/wizards/l10n_ke_hr_payroll_nssf_report_wizard.py:0
 msgid "You must be logged in a Kenyan company to use this feature"

@@ -1,9 +1,7 @@
-/** @odoo-module */
-
 import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
 import { components, helpers, stores, hooks } from "@odoo/o-spreadsheet";
-import { Component, onWillStart, onWillUpdateProps } from "@odoo/owl";
+import { Component, onWillStart, onWillUpdateProps, useRef } from "@odoo/owl";
 import { OdooPivotLayoutConfigurator } from "./odoo_pivot_layout_configurator/odoo_pivot_layout_configurator";
 import { SidePanelDomain } from "../../components/side_panel_domain/side_panel_domain";
 
@@ -32,19 +30,36 @@ export class PivotDetailsSidePanel extends Component {
         this.notification = useService("notification");
         /**@type {PivotSidePanelStore} */
         this.store = useLocalStore(PivotSidePanelStore, this.props.pivotId);
+        this.pivotSidePanelRef = useRef("pivotSidePanel");
 
         const loadData = async () => {
             await this.pivot.load();
-            this.modelDisplayName = await this.pivot.getModelLabel();
+            this.modelDisplayName = this.isModelValid && (await this.pivot.getModelLabel());
         };
         onWillStart(loadData);
         onWillUpdateProps(loadData);
         useHighlights(this);
     }
 
+    get isModelValid() {
+        return this.pivot.isModelValid();
+    }
+
     /** @returns {import("@spreadsheet/pivot/odoo_pivot").default} */
     get pivot() {
         return this.store.pivot;
+    }
+
+    get hasValidSortedColumn() {
+        const definition = this.pivot.definition;
+        return (
+            definition?.sortedColumn &&
+            definition.measures.find((m) => m.fieldName === definition.sortedColumn.measure)
+        );
+    }
+
+    getScrollableContainerEl() {
+        return this.pivotSidePanelRef.el;
     }
 
     formatSort() {
@@ -78,6 +93,16 @@ export class PivotDetailsSidePanel extends Component {
         return _t("This pivot is not used");
     }
 
+    get invalidPivotModel() {
+        const model = this.env.model.getters.getPivotCoreDefinition(this.props.pivotId).model;
+        return _t(
+            "The model (%(model)s) of this pivot is not valid (it may have been renamed/deleted). Please re-insert a new pivot.",
+            {
+                model,
+            }
+        );
+    }
+
     get deferUpdatesLabel() {
         return _t("Defer updates");
     }
@@ -102,5 +127,9 @@ export class PivotDetailsSidePanel extends Component {
             rows: columns,
             columns: rows,
         });
+    }
+
+    delete() {
+        this.env.model.dispatch("REMOVE_PIVOT", { pivotId: this.props.pivotId });
     }
 }

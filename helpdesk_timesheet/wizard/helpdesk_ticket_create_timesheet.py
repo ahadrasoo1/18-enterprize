@@ -15,13 +15,19 @@ class HelpdeskTicketCreateTimesheet(models.TransientModel):
         help="Ticket for which we are creating a sales order",
     )
 
-    def action_generate_timesheet(self):
-        values = {
+    def _get_timesheet_values(self):
+        """
+        Hook for inheriting modules to modify values
+        """
+        return {
             'project_id': self.ticket_id.project_id.id,
             'name': self.description,
             'user_id': self.env.uid,
             'unit_amount': self.time_spent,
         }
+
+    def action_generate_timesheet(self):
+        values = self._get_timesheet_values()
 
         timesheet = self.env['account.analytic.line'].create(values)
 

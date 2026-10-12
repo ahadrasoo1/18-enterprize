@@ -1,32 +1,37 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* currency_rate_live
-# 
+# * currency_rate_live
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Marianna Ciofani, 2025
+# Sergio Zanchetta <primes2h@gmail.com>, 2025
+# "Marianna Ciofani (cima)" <cima@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:26+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Italian (https://app.transifex.com/odoo/teams/41243/it/)\n"
+"POT-Creation-Date: 2026-02-27 18:47+0000\n"
+"PO-Revision-Date: 2026-03-03 16:47+0000\n"
+"Last-Translator: \"Marianna Ciofani (cima)\" <cima@odoo.com>\n"
+"Language-Team: Italian <https://translate.odoo.com/projects/odoo-18/"
+"currency_rate_live/it/>\n"
+"Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: it\n"
-"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=(n == 1) ? 0 : ((n != 0 && n % 1000000 == "
+"0) ? 1 : 2);\n"
+"X-Generator: Weblate 5.16.1\n"
 
 #. module: currency_rate_live
 #: model_terms:ir.ui.view,arch_db:currency_rate_live.res_config_settings_view_form
 msgid ""
-"<i title=\"Update now\" role=\"img\" aria-label=\"Update now\" class=\"fa "
-"fa-fw fa-refresh\"/>"
+"<i title=\"Update now\" role=\"img\" aria-label=\"Update now\" class=\"fa fa-"
+"fw fa-refresh\"/>"
 msgstr ""
-"<i title=\"Update now\" role=\"img\" aria-label=\"Update now\" class=\"fa "
-"fa-fw fa-refresh\"/>"
+"<i title=\"Aggiorna ora\" role=\"img\" aria-label=\"Aggiorna ora\" "
+"class=\"fa fa-fw fa-refresh\"/>"
 
 #. module: currency_rate_live
 #: model:ir.model,name:currency_rate_live.model_res_company
@@ -41,12 +46,12 @@ msgstr "Impostazioni di configurazione"
 #. module: currency_rate_live
 #: model:ir.actions.server,name:currency_rate_live.ir_cron_currency_update_ir_actions_server
 msgid "Currency: rate update"
-msgstr "Valuta: aggiornamento del tasso di cambio"
+msgstr "Valuta: aggiornamento del tasso"
 
 #. module: currency_rate_live
 #: model:ir.model.fields.selection,name:currency_rate_live.selection__res_company__currency_interval_unit__daily
 msgid "Daily"
-msgstr "Giornaliera"
+msgstr "Giornaliero"
 
 #. module: currency_rate_live
 #. odoo-python
@@ -59,7 +64,7 @@ msgstr ""
 #. module: currency_rate_live
 #: model:ir.model.fields.selection,name:currency_rate_live.selection__res_company__currency_provider__ecb
 msgid "European Central Bank"
-msgstr "Banca centrale Europea"
+msgstr "Banca centrale europea"
 
 #. module: currency_rate_live
 #: model_terms:ir.ui.view,arch_db:currency_rate_live.res_config_settings_view_form
@@ -70,7 +75,7 @@ msgstr "Intervallo"
 #: model:ir.model.fields,field_description:currency_rate_live.field_res_company__currency_interval_unit
 #: model:ir.model.fields,field_description:currency_rate_live.field_res_config_settings__currency_interval_unit
 msgid "Interval Unit"
-msgstr "Unità di Intervallo"
+msgstr "Unità di intervallo"
 
 #. module: currency_rate_live
 #: model:ir.model.fields.selection,name:currency_rate_live.selection__res_company__currency_interval_unit__manually
@@ -86,7 +91,7 @@ msgstr "Mensile"
 #: model:ir.model.fields,field_description:currency_rate_live.field_res_company__currency_next_execution_date
 #: model:ir.model.fields,field_description:currency_rate_live.field_res_config_settings__currency_next_execution_date
 msgid "Next Execution Date"
-msgstr "Data Prossima Esecuzione"
+msgstr "Data prossima esecuzione"
 
 #. module: currency_rate_live
 #: model_terms:ir.ui.view,arch_db:currency_rate_live.res_config_settings_view_form
@@ -119,8 +124,8 @@ msgid ""
 "The selected exchange rate provider requires the GTQ and USD currencies to "
 "be active."
 msgstr ""
-"Il fornitore di tassi di cambio selezionato richiede le valute GTQ e USD per"
-" essere attivo."
+"Il fornitore di tassi di cambio selezionato richiede le valute GTQ e USD per "
+"essere attivo."
 
 #. module: currency_rate_live
 #. odoo-python
@@ -145,7 +150,7 @@ msgid ""
 "Your main currency (%s) is not supported by this exchange rate provider. "
 "Please choose another one."
 msgstr ""
-"La valuta principale (%s) non è supportata da questo fornitore di tasso di "
+"La valuta principale (%s) non è supportata dal fornitore del tasso di "
 "cambio. Sceglierne un'altra."
 
 #. module: currency_rate_live
@@ -181,7 +186,12 @@ msgstr "[CL] Banca Centrale del Cile via mindicador.cl"
 #. module: currency_rate_live
 #: model:ir.model.fields.selection,name:currency_rate_live.selection__res_company__currency_provider__banrepco
 msgid "[CO] Bank of the Republic"
-msgstr ""
+msgstr "[CO] Banca della Repubblica"
+
+#. module: currency_rate_live
+#: model:ir.model.fields.selection,name:currency_rate_live.selection__res_company__currency_provider__cu
+msgid "[CU] Central Bank of Cuba"
+msgstr "[CU] Banca centrale di Cuba"
 
 #. module: currency_rate_live
 #: model:ir.model.fields.selection,name:currency_rate_live.selection__res_company__currency_provider__cnb
@@ -199,9 +209,19 @@ msgid "[GT] Bank of Guatemala"
 msgstr "[GT] Banca del Guatemala"
 
 #. module: currency_rate_live
+#: model:ir.model.fields.selection,name:currency_rate_live.selection__res_company__currency_provider__mnb
+msgid "[HU] Magyar Nemzeti Bank"
+msgstr "[HU] Banca Magyar Nemzeti"
+
+#. module: currency_rate_live
 #: model:ir.model.fields.selection,name:currency_rate_live.selection__res_company__currency_provider__bi
 msgid "[ID] Bank Indonesia"
 msgstr "[ID] Banca Indonesia"
+
+#. module: currency_rate_live
+#: model:ir.model.fields.selection,name:currency_rate_live.selection__res_company__currency_provider__boi
+msgid "[IT] Bank of Italy"
+msgstr "[IT] Banca d'Italia"
 
 #. module: currency_rate_live
 #: model:ir.model.fields.selection,name:currency_rate_live.selection__res_company__currency_provider__banxico
@@ -234,8 +254,18 @@ msgid "[SE] Sveriges Riksbank"
 msgstr "[SE] Sveriges Riksbank"
 
 #. module: currency_rate_live
+#: model:ir.model.fields.selection,name:currency_rate_live.selection__res_company__currency_provider__bsi
+msgid "[SI] Bank of Slovenia"
+msgstr "[SI] Banca della Slovenia"
+
+#. module: currency_rate_live
+#: model:ir.model.fields.selection,name:currency_rate_live.selection__res_company__currency_provider__bot
+msgid "[TH] Bank of Thailand"
+msgstr "[TH] Banca della Tailandia"
+
+#. module: currency_rate_live
 #: model:ir.model.fields.selection,name:currency_rate_live.selection__res_company__currency_provider__tcmb
-msgid "[TR] Central Bank of the Republic of Turkey"
+msgid "[TR] Central Bank of the Republic of Türkiye"
 msgstr "[TR] Banca Centrale della Repubblica della Turchia"
 
 #. module: currency_rate_live

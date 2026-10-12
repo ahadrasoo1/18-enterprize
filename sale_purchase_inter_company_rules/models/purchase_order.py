@@ -60,11 +60,13 @@ class purchase_order(models.Model):
             # read it as sudo, because inter-compagny user can not have the access right on PO
             sale_order_data = rec.sudo()._prepare_sale_order_data(rec.name, company_partner, company, rec.dest_address_id.id or False)
 
-            inter_user = self.env['res.users'].sudo().browse(intercompany_uid)
             # lines are browse as sudo to access all data required to be copied on SO line (mainly for company dependent field like taxes)
             for line in rec.order_line.sudo():
                 sale_order_data['order_line'] += [(0, 0, rec._prepare_sale_order_line_data(line, company))]
-            sale_order = self.env['sale.order'].with_context(allowed_company_ids=inter_user.company_ids.ids).with_user(intercompany_uid).create(sale_order_data)
+            sale_order = self.env['sale.order'].with_context(
+                allowed_company_ids=company.ids,
+                in_rental_app=False,  # avoid creating rental orders if PO is accessed via Rental
+            ).with_user(intercompany_uid).create(sale_order_data)
             msg = _("Automatically generated from %(origin)s of company %(company)s.", origin=self.name, company=rec.company_id.name)
             sale_order.message_post(body=msg)
 
@@ -93,18 +95,18 @@ class purchase_order(models.Model):
         return {
             'name': self.env['ir.sequence'].sudo().next_by_code('sale.order') or '/',
             'company_id': company.id,
-            'team_id': self.env['crm.team'].with_context(allowed_company_ids=company.ids)._get_default_team_id(domain=[('company_id', '=', company.id)]).id,
             'client_order_ref': name,
             'partner_id': partner.id,
             'pricelist_id': partner.property_product_pricelist.id,
             'partner_invoice_id': partner_addr['invoice'],
             'date_order': self.date_order,
-            'fiscal_position_id': partner.property_account_position_id.id,
+            'fiscal_position_id': self.env['account.fiscal.position']._get_fiscal_position(partner).id,
             'payment_term_id': partner.property_payment_term_id.id,
             'user_id': False,
             'auto_generated': True,
             'auto_purchase_order_id': self.id,
             'partner_shipping_id': direct_delivery_address or partner_addr['delivery'],
+            'commitment_date': self.date_planned,
             'order_line': [],
         }
 
@@ -126,6 +128,7 @@ class purchase_order(models.Model):
             'product_id': line.product_id and line.product_id.id or False,
             'product_uom': line.product_id and line.product_id.uom_id.id or line.product_uom.id,
             'price_unit': price,
+            'discount': line.discount or 0.0,
             'company_id': company.id,
             'display_type': line.display_type,
         }

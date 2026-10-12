@@ -1,11 +1,12 @@
 /** @odoo-module **/
 
 import { preSuperSetup, useDocumentView } from "@documents/views/hooks";
+import { DocumentsControllerMixin } from "@documents/views/documents_controller_mixin";
 import { onMounted, useRef, useState } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 import { KanbanController } from "@web/views/kanban/kanban_controller";
 
-export class DocumentsKanbanController extends KanbanController {
+export class DocumentsKanbanController extends DocumentsControllerMixin(KanbanController) {
     static template = "documents.DocumentsKanbanView";
     setup() {
         preSuperSetup();
@@ -38,12 +39,22 @@ export class DocumentsKanbanController extends KanbanController {
                 }
             }
         });
-    }
 
-    get modelParams() {
-        const modelParams = super.modelParams;
-        modelParams.multiEdit = true;
-        return modelParams;
+        /**
+         * Open the trash if not open when an archived document was accessed.
+         */
+        onMounted(() => {
+            if (this.documentService.archivedDocumentRestored) {
+                if (this.env.searchModel.getSelectedFolderId() !== "TRASH") {
+                    const section = this.env.searchModel.getSections()[0];
+                    this.env.searchModel.toggleCategoryValue(section.id, "TRASH");
+                }
+                this.documentService.updateDocumentURL(undefined, [
+                    { data: this.documentService.archivedDocumentRestored },
+                ]);
+                this.documentService.archivedDocumentRestored = undefined;
+            }
+        });
     }
 
     /**
@@ -52,7 +63,7 @@ export class DocumentsKanbanController extends KanbanController {
     documentsViewHelpers() {
         return {
             getSelectedDocumentsElements: () =>
-                this.root.el.querySelectorAll(".o_kanban_record.o_record_selected"),
+                this.root?.el?.querySelectorAll(".o_kanban_record.o_record_selected") || [],
             setPreviewStore: (previewStore) => {
                 this.documentStates.previewStore = previewStore;
             },
@@ -62,5 +73,15 @@ export class DocumentsKanbanController extends KanbanController {
 
     isRecordPreviewable(record) {
         return record.isViewable();
+    }
+
+    /**
+     * Borrowed from ListController for ListView.Selection.
+     */
+    onUnselectAll() {
+        this.model.root.selection.forEach((record) => {
+            record.toggleSelection(false);
+        });
+        this.model.root.selectDomain(false);
     }
 }

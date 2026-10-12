@@ -76,8 +76,8 @@ class Picking(models.Model):
             Status of sending the DTE to the partner:
             - Not sent: the DTE has not been sent to the partner but it has sent to SII.
             - Sent: The DTE has been sent to the partner.""")
-    l10n_cl_sii_send_file = fields.Many2one('ir.attachment', string='SII Send file', copy=False)
-    l10n_cl_dte_file = fields.Many2one('ir.attachment', string='DTE file', copy=False)
+    l10n_cl_sii_send_file = fields.Many2one('ir.attachment', string='SII Send file', copy=False, index='btree_not_null')
+    l10n_cl_dte_file = fields.Many2one('ir.attachment', string='DTE file', copy=False, index='btree_not_null')
     l10n_cl_sii_send_ident = fields.Text(string='SII Send Identification(Track ID)', copy=False, tracking=True)
 
     _sql_constraints = [
@@ -191,6 +191,9 @@ class Picking(models.Model):
             raise UserError(_(
                 'There are no activity codes configured in your company. This is mandatory for electronic '
                 'delivery guide. Please go to your company and set the correct activity codes (www.sii.cl - Mi SII)'))
+        if len(self.company_id.l10n_cl_company_activity_ids) > 4:
+            raise UserError(self.env._(
+                'The maximum amount of Activities Names is 4. Please go to your company and select only 4 or less options.'))
         if not self.company_id.l10n_cl_sii_regional_office:
             raise UserError(_(
                 'There is no SII Regional Office configured in your company. This is mandatory for electronic '
@@ -267,11 +270,14 @@ class Picking(models.Model):
         move_retentions = self.env['account.tax']
         for move in self.move_ids.filtered(lambda x: x.quantity > 0):
             sale_line = move.sale_line_id
-            if guide_price == "product" or not sale_line:
+            # Kit components link to the kit's sale line, price them from their own
+            # product to avoid a cross-category UoM conversion
+            move_guide_price = "product" if sale_line and move.product_id != sale_line.product_id else guide_price
+            if move_guide_price == "product" or not sale_line:
                 taxes = move.product_id.taxes_id.filtered(lambda t: t.company_id == self.company_id)
                 price = move.product_id.lst_price
                 qty = move.quantity
-            elif guide_price == "sale_order":
+            elif move_guide_price == "sale_order":
                 taxes = sale_line.tax_id
                 qty = move.product_uom._compute_quantity(move.quantity, sale_line.product_uom)
                 price = sale_line.price_unit * (1 - (sale_line.discount or 0.0) / 100.0)
@@ -285,9 +291,8 @@ class Picking(models.Model):
             totals['total_amount'] += tax_res['total_included']
 
             no_vat_taxes = True
-            cid = move.company_id.id
-            tax_group_ila = self.env.ref(f'account.{cid}_tax_group_ila', raise_if_not_found=False)
-            tax_group_retenciones = self.env.ref(f'account.{cid}_tax_group_retenciones', raise_if_not_found=False)
+            tax_group_ila = self.env['account.chart.template'].with_company(move.company_id).ref('tax_group_ila', raise_if_not_found=False)
+            tax_group_retenciones = self.env['account.chart.template'].with_company(move.company_id).ref('tax_group_retenciones', raise_if_not_found=False)
             for tax_val in tax_res['taxes']:
                 tax = self.env['account.tax'].browse(tax_val['id'])
                 if tax.l10n_cl_sii_code == TAX19_SII_CODE:
@@ -298,8 +303,8 @@ class Picking(models.Model):
                     tax_group_ila and tax_group_ila.id,
                     tax_group_retenciones and tax_group_retenciones.id
                 ]:
-                    retentions.setdefault((tax.l10n_cl_sii_code, tax.amount), 0.0)
-                    retentions[(tax.l10n_cl_sii_code, tax.amount)] += tax_val['amount']
+                    retentions.setdefault((tax.l10n_cl_sii_code, tax.amount, tax.tax_group_id.name), 0.0)
+                    retentions[(tax.l10n_cl_sii_code, tax.amount, tax.tax_group_id.name)] += tax_val['amount']
                     move_retentions |= tax
             if no_vat_taxes:
                 totals['subtotal_amount_exempt'] += tax_res['total_excluded']
@@ -313,7 +318,7 @@ class Picking(models.Model):
                 "wh_taxes": move_retentions,
                 "exempt": not taxes and tax_res['total_excluded'] != 0.0,
             }
-            if guide_price == "sale_order" and sale_line.discount:
+            if move_guide_price == "sale_order" and sale_line.discount:
                 tax_res_disc = taxes.compute_all(
                     sale_line.price_unit,
                     currency=self.company_id.currency_id,
@@ -333,7 +338,8 @@ class Picking(models.Model):
         for key in retentions:
             retention_res.append({'tax_code': key[0],
                                   'tax_percent': key[1],
-                                  'tax_amount': retentions[key]})
+                                  'tax_name': key[2],
+                                  'tax_amount': self.company_id.currency_id.round(retentions[key])})
         return totals, retention_res, line_amounts
 
     def _prepare_pdf_values(self):
@@ -537,12 +543,20 @@ class Picking(models.Model):
                                      'it won\'t be sent to SII.'))
             self.l10n_cl_dte_status = 'accepted'
             return None
+        params = {
+            'rutSender': digital_signature_sudo.subject_serial_number[:-2],
+            'dvSender': digital_signature_sudo.subject_serial_number[-1],
+            'rutCompany': self._l10n_cl_format_vat(self.company_id.vat)[:-2],
+            'dvCompany': self._l10n_cl_format_vat(self.company_id.vat)[-1],
+            'archivo': (
+                self.l10n_cl_sii_send_file.name,
+                base64.b64decode(self.l10n_cl_sii_send_file.datas),
+                'application/xml'),
+        }
         response = self._send_xml_to_sii(
             self.company_id.l10n_cl_dte_service_provider,
             self.company_id.website,
-            self.company_id.vat,
-            self.l10n_cl_sii_send_file.name,
-            base64.b64decode(self.l10n_cl_sii_send_file.datas),
+            params,
             digital_signature_sudo
         )
         if not response:

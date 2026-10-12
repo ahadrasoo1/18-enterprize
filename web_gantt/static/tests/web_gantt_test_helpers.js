@@ -180,7 +180,7 @@ export async function selectGanttRange({ startDate, stopDate }) {
 export async function selectRange(label) {
     await click(SELECTORS.rangeMenuToggler);
     await animationFrame();
-    await click(`${SELECTORS.rangeMenu} .dropdown-item:contains(/^${label}$/)`);
+    await click(`${SELECTORS.rangeMenu} .dropdown-item:text(${label})`);
     await ganttControlsChanges();
 }
 
@@ -340,7 +340,13 @@ function getHeaders(selector) {
 export function getGridContent() {
     const columnHeaders = getHeaders(SELECTORS.columnHeader);
     const groupHeaders = getHeaders(SELECTORS.groupHeader);
-    const range = queryAllTexts(SELECTORS.rangeMenuToggler)[0] || null;
+
+    const rangeElement = queryOne(SELECTORS.rangeMenuToggler)
+    const arrow = queryFirst(".fa-long-arrow-right", { root: rangeElement });
+    const range = arrow
+        ? queryAllTexts(arrow.parentNode)[0].split("\n").join(` -> `)
+        : queryAllTexts(SELECTORS.rangeMenuToggler)[0] || null;
+
     const viewTitle = queryAllTexts(".o_gantt_title")[0] || null;
     const colsRange = queryFirst(SELECTORS.columnHeader)
         .style.getPropertyValue("grid-column")
@@ -577,4 +583,20 @@ export function getPill(text, options) {
 /** @type {PillHelper<HTMLElement>} */
 export function getPillWrapper(text, options) {
     return getPill(text, options).closest(SELECTORS.pillWrapper);
+}
+
+/**
+ * For each cell of a specific column, checks whether the cell has the class in
+ * its' classList and returns as a list of booleans.
+ *
+ * @param {string} cssClass
+ * @param {string} columnHeader
+ * @returns {boolean[]}
+ */
+export function cssClassPresencePerCellInColumn(cssClass, columnHeader) {
+    const columnIndex = findColumnFromHeader(columnHeader);
+    const cells = queryAll(`${SELECTORS.cell}[data-col='${columnIndex}']`);
+    return cells.map((el) => {
+        return el.classList.contains(cssClass);
+    });
 }

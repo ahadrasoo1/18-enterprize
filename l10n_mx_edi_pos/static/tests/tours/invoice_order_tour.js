@@ -1,9 +1,11 @@
 import { registry } from "@web/core/registry";
 import * as Dialog from "@point_of_sale/../tests/tours/utils/dialog_util";
 import * as Chrome from "@point_of_sale/../tests/tours/utils/chrome_util";
+import * as PaymentScreen from "@point_of_sale/../tests/tours/utils/payment_screen_util";
+import * as ProductScreen from "@point_of_sale/../tests/tours/utils/product_screen_util";
+import * as ReceiptScreen from "@point_of_sale/../tests/tours/utils/receipt_screen_util";
 
 registry.category("web_tour.tours").add("l10n_mx_edi_pos.tour_invoice_order", {
-    test: true,
     steps: () => [
         {
             content: "Click the POS icon",
@@ -47,7 +49,6 @@ registry.category("web_tour.tours").add("l10n_mx_edi_pos.tour_invoice_order", {
 });
 
 registry.category("web_tour.tours").add("l10n_mx_edi_pos.tour_invoice_order_default_usage", {
-    test: true,
     steps: () => [
         {
             content: "Click the POS icon",
@@ -58,8 +59,13 @@ registry.category("web_tour.tours").add("l10n_mx_edi_pos.tour_invoice_order_defa
             content: "Open POS session from backend",
             trigger: "button[name='open_ui']",
             run: "click",
+            expectUnloadPage: true,
         },
-        Dialog.confirm("Open Register"),
+        {
+            content: "Open Register",
+            trigger: ".modal .modal-footer .btn-primary:contains(open register)",
+            run: "click",
+        },
         {
             content: "Select a product",
             trigger: "div.product-content:contains('product_mx')",
@@ -92,4 +98,41 @@ registry.category("web_tour.tours").add("l10n_mx_edi_pos.tour_invoice_order_defa
         },
         Chrome.endTour(),
     ],
+});
+
+registry.category("web_tour.tours").add("tour_invoice_to_general_public", {
+    steps: () =>
+        [
+            Chrome.startPoS(),
+            Dialog.confirm("Open Register"),
+            ProductScreen.addOrderline("Whiteboard Pen"),
+            ProductScreen.clickPartnerButton(),
+            ProductScreen.clickCustomer("Arturo Garcia"),
+            ProductScreen.clickPayButton(),
+            PaymentScreen.clickPaymentMethod("Cash"),
+            PaymentScreen.remainingIs("0.0"),
+            PaymentScreen.clickInvoiceButton(),
+            {
+                content: "Set Invoice to public: 'No'",
+                trigger: "select[name='l10n_mx_edi_cfdi_to_public']",
+                run: "select 0",
+            },
+            Dialog.confirm(),
+            PaymentScreen.validateButtonIsHighlighted(true),
+            PaymentScreen.clickValidate(),
+            Dialog.is({ title: "Invalid Operation" }),
+            Dialog.confirm(),
+            PaymentScreen.clickInvoiceButton(),
+            PaymentScreen.clickInvoiceButton(),
+            {
+                content: "Set Invoice to public: 'Yes'",
+                trigger: "select[name='l10n_mx_edi_cfdi_to_public']",
+                run: "select 1",
+            },
+            Dialog.confirm(),
+            PaymentScreen.validateButtonIsHighlighted(true),
+            PaymentScreen.clickValidate(),
+            ReceiptScreen.isShown(),
+            Chrome.endTour(),
+        ].flat(),
 });

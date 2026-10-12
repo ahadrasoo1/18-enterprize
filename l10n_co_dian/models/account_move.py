@@ -5,6 +5,7 @@ from collections import defaultdict
 import re
 
 from odoo import models, fields, api, _
+from odoo.addons.l10n_co_dian import xml_utils
 from odoo.exceptions import UserError
 from odoo.fields import datetime
 
@@ -145,7 +146,11 @@ class AccountMove(models.Model):
     def _get_name_invoice_report(self):
         # EXTENDS account
         self.ensure_one()
-        if self.l10n_co_dian_state == 'invoice_accepted' and self.l10n_co_dian_attachment_id:
+        if self.env.ref('l10n_co_dian.report_vendor_document', raise_if_not_found=False) and \
+                self.l10n_co_edi_is_support_document and \
+                self.move_type in ('in_refund', 'in_invoice'):
+            return 'l10n_co_dian.report_vendor_document'
+        elif self.l10n_co_dian_state == 'invoice_accepted' and self.l10n_co_dian_attachment_id:
             return 'l10n_co_dian.report_invoice_document'
         return super()._get_name_invoice_report()
 
@@ -153,8 +158,8 @@ class AccountMove(models.Model):
     def _get_ubl_cii_builder_from_xml_tree(self, tree):
         # EXTENDS account_edi_ubl_cii
         ubl_profile = tree.findtext('{*}ProfileID')
-        if ubl_profile and ubl_profile.startswith('DIAN 2.1:'):
-            return self.env['account.edi.xml.ubl_21']
+        if ubl_profile and ubl_profile.startswith('DIAN 2.1'):
+            return self.env['account.edi.xml.ubl_dian']
         return super()._get_ubl_cii_builder_from_xml_tree(tree)
 
     @api.model
@@ -189,42 +194,7 @@ class AccountMove(models.Model):
         Otherwise, see section 11.7 ('Anexo-Tecnico-[...]-1-9.pdf').
         """
         self.ensure_one()
-        root = etree.fromstring(self.l10n_co_dian_attachment_id.raw)
-        nsmap = {k: v for k, v in root.nsmap.items() if k}  # empty namespace prefix is not supported for XPaths
-        supplier_company_id = root.findtext('./cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme/cbc:CompanyID', namespaces=nsmap)
-        customer_company_id = root.findtext('./cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cbc:CompanyID', namespaces=nsmap)
-        line_extension_amount = root.findtext('./cac:LegalMonetaryTotal/cbc:LineExtensionAmount', namespaces=nsmap)
-        tax_amount_01 = sum(float(x) for x in root.xpath('./cac:TaxTotal[.//cbc:ID/text()="01"]/cbc:TaxAmount/text()', namespaces=nsmap))
-        payable_amount = root.findtext('./cac:LegalMonetaryTotal/cbc:PayableAmount', namespaces=nsmap)
-        identifier = root.findtext('./cbc:UUID', namespaces=nsmap)
-        qr_code = root.findtext('./ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:QRCode', namespaces=nsmap)
-        vals = {
-            'NumDS': root.findtext('./cbc:ID', namespaces=nsmap),
-            'FecFD': root.findtext('./cbc:IssueDate', namespaces=nsmap),
-            'HorDS': root.findtext('./cbc:IssueTime', namespaces=nsmap),
-        }
-        if self.l10n_co_edi_is_support_document:
-            vals.update({
-                'NumSNO': supplier_company_id,
-                'DocABS': customer_company_id,
-                'ValDS': line_extension_amount,
-                'ValIva': tax_amount_01,
-                'ValTolDS': payable_amount,
-                'CUDS': identifier,
-                'QRCode': qr_code,
-            })
-        else:
-            vals.update({
-                'NitFac': supplier_company_id,
-                'DocAdq': customer_company_id,
-                'ValFac': line_extension_amount,
-                'ValIva': tax_amount_01,
-                'ValOtroIm': sum(float(x) for x in root.xpath('./cac:TaxTotal[.//cbc:ID/text()!="01"]/cbc:TaxAmount/text()', namespaces=nsmap)),
-                'ValTolFac': payable_amount,
-                'CUFE': identifier,
-                'QRCode': qr_code,
-            })
-        return "\n".join(f"{k}: {v}" for k, v in vals.items())
+        return xml_utils._get_qr_code_value(etree.fromstring(self.l10n_co_dian_attachment_id.raw), self.currency_id, self.l10n_co_edi_is_support_document)
 
     def _l10n_co_dian_get_extra_invoice_report_values(self):
         """ Get the values used to render the PDF """
@@ -283,6 +253,9 @@ class AccountMove(models.Model):
             self.with_context(no_new_invoice=True).message_post(
                 body=_(
                     "The %s was accepted by the DIAN.",
+                    dict(document.move_id._fields['move_type'].selection)[document.move_id.move_type],
+                ) if not document.move_id.company_id.l10n_co_dian_demo_mode else _(
+                    "The %s was validated locally in Demo Mode.",
                     dict(document.move_id._fields['move_type'].selection)[document.move_id.move_type],
                 ),
                 attachment_ids=document.attachment_id.copy().ids,

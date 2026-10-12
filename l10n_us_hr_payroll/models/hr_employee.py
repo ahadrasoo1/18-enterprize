@@ -1,15 +1,63 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 
+STATES = ['NY', 'CA', 'AL', 'CO', 'VT', 'IL', 'AZ', 'DC', 'NC', 'VA', 'OR', 'ID']
+
 
 class HrEmployee(models.Model):
     _inherit = "hr.employee"
 
+    @api.model
+    def _get_selection_state_filing_status(self):
+        return [
+            ('ca_status_1', 'CA: Single, Dual Income Married or Married with Multiple Employers'),
+            ('ca_status_2', 'CA: Married: One Income'),
+            ('ca_status_4', 'CA: Unmarried Head of Household'),
+            ('ny_status_1', 'NY: Single or Head of Household'),
+            ('ny_status_2', 'NY: Married (filing jointly)'),
+            ('ny_status_3', 'NY: Married, but withhold at a higher single rate'),
+            ('al_status_1', 'AL: 0: No Exemption Made (withhold at the highest rate)'),
+            ('al_status_2', 'AL: S: Single'),
+            ('al_status_3', 'AL: MS: Married filing Separately'),
+            ('al_status_4', 'AL: M: Married'),
+            ('al_status_5', 'AL: H: Head of Household'),
+            ('co_status_1', 'CO: Single or Married filing Separately'),
+            ('co_status_2', 'CO: Married filing Jointly or Qualifying Surviving Spouse'),
+            ('co_status_3', 'CO: Head of Household'),
+            ('vt_status_1', 'VT: Single'),
+            ('vt_status_2', 'VT: Married/Civil Union Filing Jointly'),
+            ('vt_status_3', 'VT: Married/Civil Union Filing Separately'),
+            ('vt_status_4', 'VT: Married, but withhold at a higher single rate'),
+            ('il_status_1', 'IL: General rate used for deductions'),
+            ('az_status_1', 'AZ: Withhold wages at 0.5%'),
+            ('az_status_2', 'AZ: Withhold wages at 1.0%'),
+            ('az_status_3', 'AZ: Withhold wages at 1.5%'),
+            ('az_status_4', 'AZ: Withhold wages at 2.0%'),
+            ('az_status_5', 'AZ: Withhold wages at 2.5%'),
+            ('az_status_6', 'AZ: Withhold wages at 3.0%'),
+            ('az_status_7', 'AZ: Withhold wages at 3.5%'),
+            ('dc_status_1', 'DC: Single'),
+            ('dc_status_2', 'DC: Married/domestic partners filing jointly/qualifying widow(er) with dependent child'),
+            ('dc_status_3', 'DC: Head of household'),
+            ('dc_status_4', 'DC: Married filing separately'),
+            ('dc_status_5', 'DC: Married/domestic partners filing separately on same return'),
+            ('nc_status_1', 'NC: Single or Married Filing Separately'),
+            ('nc_status_2', 'NC: Head of Household'),
+            ('nc_status_3', 'NC: Married Filing Jointly or Surviving Spouse'),
+            ('va_status_1', 'VA: Single'),
+            ('va_status_2', 'VA: Married, Filing a Joint Return'),
+            ('va_status_3', 'VA: Married, Filing a Separate Return'),
+            ('or_status_1', 'OR: Single'),
+            ('or_status_2', 'OR: Married'),
+            ('id_status_1', 'ID: Single'),
+            ('id_status_2', 'ID: Married'),
+            ('id_status_3', 'ID: Married, but withhold at Single rate'),
+        ]
+
     l10n_us_old_w4 = fields.Boolean(
-        string="Filled in 2019 or Before",
+        string="Filed in 2019 or Before",
         groups="hr.group_hr_user",
         tracking=True,
         help="Check only if W4 was filed before 2020.")
@@ -61,21 +109,7 @@ class HrEmployee(models.Model):
         groups="hr.group_hr_user",
         help="Filing status used for Federal income tax calculation.")
     l10n_us_state_filing_status = fields.Selection(
-        selection=[
-            ('ca_status_1', 'CA: Single, Dual Income Married or Married with Multiple Employers'),
-            ('ca_status_2', 'CA: Married: One Income'),
-            ('ca_status_4', 'CA: Unmarried Head of Household'),
-            ('ny_status_1', 'NY: Single or Head of Household'),
-            ('ny_status_2', 'NY: Married (filing jointly)'),
-            ('ny_status_3', 'NY: Married, but withhold at a higher single rate'),
-            ('al_status_1', 'AL: 0: No Exemption Made (withhold at the highest rate)'),
-            ('al_status_2', 'AL: S: Single'),
-            ('al_status_3', 'AL: MS: Married filing Separately'),
-            ('al_status_4', 'AL: M: Married'),
-            ('al_status_5', 'AL: H: Head of Household'),
-            ('co_status_1', 'CO: Single or Married filing Separately'),
-            ('co_status_2', 'CO: Married filing Jointly or Qualifying Surviving Spouse'),
-            ('co_status_3', 'CO: Head of Household')],
+        selection=_get_selection_state_filing_status,
         string="State Tax Filing Status",
         compute="_compute_l10n_us_state_filing_status",
         precompute=True,
@@ -104,9 +138,9 @@ class HrEmployee(models.Model):
             filing_status = employee.l10n_us_state_filing_status
             if not state_code:
                 continue
-            if state_code not in ['NY', 'CA', 'AL', 'CO'] and filing_status:
+            if state_code not in STATES and filing_status:
                 raise UserError(_('The employee state filing status should be empty for this working address state. (Work Address State: %s)', employee.address_id.state_id.name))
-            if state_code not in ['NY', 'CA', 'AL', 'CO']:
+            if state_code not in STATES:
                 continue
             if not filing_status:
                 raise UserError(_('The employee state filing status is empty and should match the working address state. (Work Address State: %s)', employee.address_id.state_id.name))
@@ -120,7 +154,7 @@ class HrEmployee(models.Model):
         for employee in self:
             state_code = employee.address_id.state_id.code
             filing_status = employee.l10n_us_state_filing_status
-            if not state_code or state_code not in ['NY', 'CA', 'AL', 'CO']:
+            if not state_code or state_code not in STATES:
                 employee.l10n_us_state_filing_status = False
             elif not filing_status or state_code != filing_status.split('_')[0].upper():
                 if state_code == 'NY':
@@ -131,6 +165,22 @@ class HrEmployee(models.Model):
                     employee.l10n_us_state_filing_status = 'al_status_1'
                 elif state_code == 'CO':
                     employee.l10n_us_state_filing_status = 'co_status_1'
+                elif state_code == 'VT':
+                    employee.l10n_us_state_filing_status = 'vt_status_1'
+                elif state_code == 'IL':
+                    employee.l10n_us_state_filing_status = 'il_status_1'
+                elif state_code == 'AZ':
+                    employee.l10n_us_state_filing_status = 'az_status_4'
+                elif state_code == 'DC':
+                    employee.l10n_us_state_filing_status = 'dc_status_1'
+                elif state_code == 'NC':
+                    employee.l10n_us_state_filing_status = 'nc_status_1'
+                elif state_code == 'VA':
+                    employee.l10n_us_state_filing_status = 'va_status_1'
+                elif state_code == 'OR':
+                    employee.l10n_us_state_filing_status = 'or_status_1'
+                elif state_code == 'ID':
+                    employee.l10n_us_state_filing_status = 'id_status_1'
 
     @api.constrains('ssnid')
     def _check_ssnid(self):

@@ -1,10 +1,15 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+from contextlib import contextmanager
 from datetime import datetime
+from lxml import etree
+from pprint import pformat
+from unittest import mock
 
 from odoo.addons.account_edi.tests.common import AccountEdiTestCommon
 from odoo.tests import tagged
+from odoo.tools.xml_utils import cleanup_xml_node
 from odoo import Command
 from pytz import timezone
 from freezegun import freeze_time
@@ -34,8 +39,6 @@ class TestEcEdiCommon(AccountEdiTestCommon):
             'country_id': cls.env.ref('base.ec').id,
             'l10n_ec_legal_name': "EC Test Company (official)",
         })
-
-        cls.env['account.chart.template']._l10n_ec_configure_ecuadorian_journals(cls.env.company)
 
         for journal in (cls.company_data['default_journal_sale'], cls.company_data['default_journal_purchase']):
             # Needs to be set before assigning authorization number
@@ -180,6 +183,80 @@ class TestEcEdiCommon(AccountEdiTestCommon):
         self.partner_a.l10n_ec_taxpayer_type_id.profit_withhold_tax_id = self._get_tax_by_xml_id('tax_withhold_profit_303')
         self.partner_a.l10n_ec_taxpayer_type_id.vat_goods_withhold_tax_id = self._get_tax_by_xml_id('tax_withhold_vat_10')
         self.partner_a.l10n_ec_taxpayer_type_id.vat_services_withhold_tax_id = self._get_tax_by_xml_id('tax_withhold_vat_20')
+
+    @contextmanager
+    def mock_zeep_client(self, expected_operations):
+        """ A context manager to mock the API calls made by the EDI:
+            - set `l10n_ec_production_env = True` on the active company
+            - mock zeep.Client in `l10n_ec_edi.models.account_edi_format`
+            - mock `env['account.edi.format']._l10n_ec_generate_signed_xml`
+
+        :param expected_operations: a list of expected endpoint calls, each call being a tuple
+                                    (endpoint, expected_kwargs, response) indicating the expected endpoint called,
+                                    the expected endpoint parameters and the response to serve.
+        """
+        class MockedReturnValue:
+            def __init__(self, **kwargs):
+                self.__dict = kwargs
+
+            def __getitem__(self, key):
+                return self.__dict[key]
+
+            def __getattr__(self, name):
+                return self.__dict[name]
+
+        class MockedService:
+            def __init__(self, test_case, expected_operations):
+                self.test_case = test_case
+                self.expected_operations_enum = enumerate(expected_operations, start=1)
+
+                def create_endpoint(endpoint: str):
+                    def call_endpoint(**kwargs):
+                        idx, (expected_endpoint, expected_kwargs, response) = next(self.expected_operations_enum)
+                        test_case.assertEqual(
+                            endpoint,
+                            expected_endpoint,
+                            f"Operation {idx} called `{endpoint}` but should have called `{expected_endpoint}`"
+                        )
+                        test_case.assertEqual(kwargs, expected_kwargs, f"Operation {idx}: request did not match expected")
+                        return MockedReturnValue(**response)
+
+                    return call_endpoint
+
+                self.autorizacionComprobante = create_endpoint('autorizacionComprobante')
+                self.validarComprobante = create_endpoint('validarComprobante')
+
+            def assert_all_endpoints_called(self):
+                remaining_operations = list(self.expected_operations_enum)
+
+                if remaining_operations:
+                    self.test_case.fail(f'Not all endpoint calls were made! Remaining calls:\n{pformat(remaining_operations)}')
+
+        mocked_service = MockedService(self, expected_operations)
+
+        class MockedClient:
+            def __init__(self, wsdl, timeout):
+                self.service = mocked_service
+
+        def mocked_l10n_ec_generate_signed_xml(self, company_id, xml_node_or_string):
+            return etree.tostring(cleanup_xml_node(xml_node_or_string), encoding='unicode')
+
+        # We set this to True in order to mock sending invoices to SRI
+        old_l10n_ec_production_env = self.env.company.l10n_ec_production_env
+        self.env.company.l10n_ec_production_env = True
+
+        with (
+            mock.patch('odoo.addons.l10n_ec_edi.models.account_edi_format.Client', new=MockedClient),
+            mock.patch.object(
+                self.env['account.edi.format'].__class__,
+                '_l10n_ec_generate_signed_xml',
+                new=mocked_l10n_ec_generate_signed_xml,
+            ),
+        ):
+            yield
+
+        mocked_service.assert_all_endpoints_called()
+        self.env.company.l10n_ec_production_env = old_l10n_ec_production_env
 
 
 # ===== HARD-CODED XMLS =====
@@ -499,8 +576,8 @@ L10N_EC_EDI_XML_IN_WTH = """
                     <codigo>1</codigo>
                     <codigoRetencion>312</codigoRetencion>
                     <baseImponible>400.00</baseImponible>
-                    <porcentajeRetener>1.75</porcentajeRetener>
-                    <valorRetenido>7.00</valorRetenido>
+                    <porcentajeRetener>2.00</porcentajeRetener>
+                    <valorRetenido>8.00</valorRetenido>
                 </retencion>
             </retenciones>
             <pagos>
@@ -639,8 +716,8 @@ L10N_EC_EDI_XPATH_INVOICE_IN = """
                 <codigo>1</codigo>
                 <codigoRetencion>312</codigoRetencion>
                 <baseImponible>400.00</baseImponible>
-                <porcentajeRetener>1.75</porcentajeRetener>
-                <valorRetenido>7.00</valorRetenido>
+                <porcentajeRetener>2.00</porcentajeRetener>
+                <valorRetenido>8.00</valorRetenido>
                 </retencion>
             </retenciones>
             <pagos>
@@ -672,8 +749,8 @@ L10N_EC_EDI_XPATH_INVOICE_IN = """
                 <codigo>1</codigo>
                 <codigoRetencion>312</codigoRetencion>
                 <baseImponible>500.00</baseImponible>
-                <porcentajeRetener>1.75</porcentajeRetener>
-                <valorRetenido>8.75</valorRetenido>
+                <porcentajeRetener>2.00</porcentajeRetener>
+                <valorRetenido>10.00</valorRetenido>
                 </retencion>
             </retenciones>
             <pagos>

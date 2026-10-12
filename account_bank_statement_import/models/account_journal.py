@@ -183,13 +183,27 @@ class AccountJournal(models.Model):
                 currency = False
 
         journal = self
+
+        if journal:
+            # Currency Match
+            journal_currency = journal.currency_id or journal.company_id.currency_id
+            currency_match = currency is None or journal_currency == (currency or company_currency)
+
+            # If check fails, 'self' is the wrong journal for this file
+            if not currency_match:
+                journal = self.env['account.journal']
+
         if account_number:
             # No bank account on the journal : create one from the account number of the statement
             if journal and not journal.bank_account_id:
                 journal.set_bank_account(account_number)
             # No journal passed to the wizard : try to find one using the account number of the statement
             elif not journal:
-                journal = self.search([('bank_account_id.sanitized_acc_number', '=', sanitized_account_number)])
+                domain = [
+                    ('bank_account_id.sanitized_acc_number', '=', sanitized_account_number),
+                    ('currency_id', '=', currency.id if currency else False),
+                ]
+                journal = self.search(domain, limit=1)
                 if not journal:
                     # Sometimes the bank returns only part of the full account number (e.g. local account number instead of full IBAN)
                     partial_match = self.search([('bank_account_id.sanitized_acc_number', 'ilike', sanitized_account_number)])
@@ -264,7 +278,7 @@ class AccountJournal(models.Model):
                    or not bool(BankStatementLine.sudo().search([('unique_import_id', '=', line_vals['unique_import_id'])], limit=1)))):
                     filtered_st_lines.append(line_vals)
                 else:
-                    ignored_statement_lines_import_ids.append(line_vals['unique_import_id'])
+                    ignored_statement_lines_import_ids.append(line_vals)
                     if st_vals.get('balance_start') is not None:
                         st_vals['balance_start'] += float(line_vals['amount'])
 

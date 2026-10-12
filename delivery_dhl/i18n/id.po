@@ -1,22 +1,23 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* delivery_dhl
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Abe Manyo, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
+"POT-Creation-Date: 2025-12-29 18:50+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
+"Last-Translator: Abe Manyo, 2025\n"
 "Language-Team: Indonesian (https://app.transifex.com/odoo/teams/41243/id/)\n"
+"Language: id\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: id\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. module: delivery_dhl
@@ -182,8 +183,8 @@ msgstr "D - Express Worldwide"
 #. module: delivery_dhl
 #: model:ir.model.fields.selection,name:delivery_dhl.selection__delivery_carrier__delivery_type__dhl
 #: model:ir.model.fields.selection,name:delivery_dhl.selection__stock_package_type__package_carrier_type__dhl
-msgid "DHL"
-msgstr "DHL"
+msgid "DHL (Legacy)"
+msgstr "DHL (Legacy)"
 
 #. module: delivery_dhl
 #: model:ir.model.fields,field_description:delivery_dhl.field_delivery_carrier__dhl_account_number
@@ -214,11 +215,6 @@ msgid "DHL EU -> International"
 msgstr "DHL EU -> International"
 
 #. module: delivery_dhl
-#: model:ir.model.fields,field_description:delivery_dhl.field_delivery_carrier__dhl_default_package_type_id
-msgid "DHL Package Type"
-msgstr "Tipe Paket DHL"
-
-#. module: delivery_dhl
 #: model:ir.model.fields,field_description:delivery_dhl.field_delivery_carrier__dhl_password
 msgid "DHL Password"
 msgstr "Password DHL"
@@ -227,12 +223,6 @@ msgstr "Password DHL"
 #: model:ir.model.fields,field_description:delivery_dhl.field_delivery_carrier__dhl_product_code
 msgid "DHL Product"
 msgstr "Produk DL"
-
-#. module: delivery_dhl
-#: model_terms:ir.ui.view,arch_db:delivery_dhl.res_config_settings_view_form_sale
-#: model_terms:ir.ui.view,arch_db:delivery_dhl.res_config_settings_view_form_stock
-msgid "DHL Shipping Methods"
-msgstr "Metode Pengiriman DHL"
 
 #. module: delivery_dhl
 #. odoo-python
@@ -264,8 +254,7 @@ msgstr "DHL US -> International"
 msgid ""
 "DHL account number is missing, please modify your delivery method settings."
 msgstr ""
-"Nomor akun DHL tidak ada, mohon modifikasi pengaturan metode pengiriman "
-"Anda."
+"Nomor akun DHL tidak ada, mohon modifikasi pengaturan metode pengiriman Anda."
 
 #. module: delivery_dhl
 #. odoo-python
@@ -280,6 +269,11 @@ msgstr ""
 msgid "DHL password is missing, please modify your delivery method settings."
 msgstr ""
 "Password DHL tidak ada, mohon modifikasi pengaturan metode pengiriman Anda."
+
+#. module: delivery_dhl
+#: model:ir.model.fields,field_description:delivery_dhl.field_delivery_carrier__dhl_default_package_type_id
+msgid "DHLxw Package Type"
+msgstr "Tipe Paket DHLxw"
 
 #. module: delivery_dhl
 #: model:ir.model.fields,field_description:delivery_dhl.field_delivery_carrier__dhl_duty_payment
@@ -514,7 +508,8 @@ msgstr ""
 #. odoo-python
 #: code:addons/delivery_dhl/models/dhl_request.py:0
 msgid ""
-"The address of your company warehouse is missing or wrong (Missing field(s) :\n"
+"The address of your company warehouse is missing or wrong (Missing "
+"field(s) :\n"
 " %s)"
 msgstr ""
 "Alamat gudang perusahaan Anda hilang atau salah (field yang kurang) :\n"
@@ -524,21 +519,25 @@ msgstr ""
 #: model:ir.model.fields,help:delivery_dhl.field_delivery_carrier__dhl_custom_data_request
 msgid ""
 "The custom data in DHL is organized like the inside of a json file.\n"
-"        There are 3 possible keys: 'rate', 'ship', 'return', to which you can add your custom data.\n"
+"        There are 3 possible keys: 'rate', 'ship', 'return', to which you "
+"can add your custom data.\n"
 "        More info on https://xmlportal.dhl.com/"
 msgstr ""
 "Data custom di DHL diatur seperti isi file json.\n"
-"        Ada 3 kemungkinan kunci: 'rate', 'ship', 'return', dimana Anda dapat menambahkan data custom Anda sendiri.\n"
+"        Ada 3 kemungkinan kunci: 'rate', 'ship', 'return', dimana Anda dapat "
+"menambahkan data custom Anda sendiri.\n"
 "        Informasi lebih lanjut pada https://xmlportal.dhl.com/"
 
 #. module: delivery_dhl
 #. odoo-python
 #: code:addons/delivery_dhl/models/dhl_request.py:0
 msgid ""
-"The estimated shipping price cannot be computed because the weight is missing for the following product(s): \n"
+"The estimated shipping price cannot be computed because the weight is "
+"missing for the following product(s): \n"
 " %s"
 msgstr ""
-"Estimasi harga pengiriman tidak dapat dihitung karena berat tidak ada untuk produk berikut: \n"
+"Estimasi harga pengiriman tidak dapat dihitung karena berat tidak ada untuk "
+"produk berikut: \n"
 " %s"
 
 #. module: delivery_dhl

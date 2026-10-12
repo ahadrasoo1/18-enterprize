@@ -5,7 +5,6 @@ import { SearchModel } from "@web/search/search_model";
 import { browser } from "@web/core/browser/browser";
 import { router } from "@web/core/browser/router";
 import { Domain } from "@web/core/domain";
-import { _t } from "@web/core/l10n/translation";
 import { user } from "@web/core/user";
 import { useService } from "@web/core/utils/hooks";
 
@@ -28,7 +27,26 @@ export class DocumentsSearchModel extends SearchModel {
     }
 
     async load(config) {
-        await super.load(...arguments);
+        if (this.documentService.initData.documentId || config.context.documents_init_document_id) {
+            // Make sure target document is found (if accessible).
+            config.irFilters.forEach((fil) => {
+                fil.is_default = false;
+            });
+            for (const key in config.context) {
+                // logic used in _extractSearchDefaultsFromGlobalContext, here to group with above
+                const searchDefaultMatch = /^search_default_(.*)$/.exec(key);
+                if (searchDefaultMatch) {
+                    delete config.context[key];
+                }
+                if (key === "documents_init_document_id") {
+                    this.documentService.documentIdToRestoreOnce =
+                        config.context.documents_init_document_id;
+                    delete config.context[key];
+                }
+            }
+        }
+
+        await super.load(config);
 
         let folderId = router.current.folder_id || this.getSelectedFolderId();
 
@@ -47,9 +65,15 @@ export class DocumentsSearchModel extends SearchModel {
      * @override
      */
     _createCategoryTree(sectionId, result) {
-        super._createCategoryTree(...arguments);
         const category = this.sections.get(sectionId);
-        const findRootId = (folder)=> {
+        // Clear non-permanent keys, necessary to 'forget' archived folders.
+        for (const folderId of category.values.keys()) {
+            if (typeof folderId === "number") {
+                category.values.delete(folderId);
+            }
+        }
+        super._createCategoryTree(...arguments);
+        const findRootId = (folder) => {
             if (!folder.parentId) {
                 return folder.id;
             }
@@ -64,7 +88,7 @@ export class DocumentsSearchModel extends SearchModel {
                 parent.rootId = rootId;
                 return rootId;
             }
-        }
+        };
         for (const [, folder] of category.values) {
             if (!folder.rootId) {
                 folder.rootId = findRootId(folder);
@@ -137,9 +161,6 @@ export class DocumentsSearchModel extends SearchModel {
             folders.push(folder);
             folder = folder.folder_id ? folderSection.values.get(folder.folder_id) : false;
         }
-        if (folders.length === 1 && !folders[0].id && folders[0].display_name === _t("All")) {
-            folders[0].display_name = _t("Home");
-        }
         return folders;
     }
 
@@ -178,7 +199,15 @@ export class DocumentsSearchModel extends SearchModel {
         const selectedFolder = this.getSelectedFolder();
         this.documentService.updateDocumentURL(selectedFolder);
         if (typeof valueId === "number") {
-            this.documentService.logAccess(selectedFolder.access_token);
+            if (selectedFolder.childrenIds && selectedFolder.childrenIds.length) {
+                this.documentService.logAccess(selectedFolder.access_token);
+            } else {
+                this.documentService.logAccess(selectedFolder.access_token).then((result) => {
+                    if (result && result?.reload) {
+                        this._reloadSearchModel(true);
+                    }
+                });
+            }
         }
     }
 
@@ -211,14 +240,21 @@ export class DocumentsSearchModel extends SearchModel {
     //---------------------------------------------------------------------
 
     async _reloadSearchModel(reloadCategories) {
-        // By default the categories are not reloaded.
+        // By default, categories are not reloaded.
         if (reloadCategories) {
-            await this._fetchSections(
-                this.getSections((s) => s.type === "category"),
-                []
-            );
+            await this._reloadSearchPanel(true);
         }
         await this._notify();
+    }
+
+    async _reloadSearchPanel(skipUpdate = false) {
+        await this._fetchSections(
+            this.getSections((s) => s.type === "category"),
+            []
+        );
+        if (!skipUpdate) {
+            this.trigger("update-search-panel");
+        }
     }
 
     /**
@@ -228,32 +264,32 @@ export class DocumentsSearchModel extends SearchModel {
     _getCategoryDomain() {
         const folderCategory = this.categories.find((cat) => cat.fieldName === "folder_id");
         if (folderCategory.activeValueId === "COMPANY") {
-            return Domain.and([
-                [["folder_id", "=", false]],
-                Domain.or([
-                    [["owner_id", "=", this.documentService.store.odoobot.userId]],
-                    Domain.and([
-                        [["owner_id", "!=", this.documentService.store.odoobot.userId]],
-                        [["access_internal", "!=", 'none']],
-                    ]),
-                ])
-            ]).toList();
+            return [
+                ["folder_id", "=", false],
+                ["owner_id", "=", this.documentService.store.odoobot.userId],
+            ];
         }
         if (folderCategory.activeValueId === "TRASH") {
             return [["active", "=", false]];
         }
         if (folderCategory.activeValueId === "MY") {
-            return [["folder_id", "=", false], ["owner_id", "=", user.userId]];
+            return [
+                ["folder_id", "=", false],
+                ["owner_id", "=", user.userId],
+            ];
         }
         if (folderCategory.activeValueId === "SHARED") {
             return Domain.and([
-                [["owner_id", '!=', user.userId]],
                 [["shortcut_document_id", "=", false]], // no need to show them, the target will be here (or nested)
                 Domain.or([
-                    Domain.and([[['folder_id', '=', false]], [['owner_id', '!=', this.documentService.store.odoobot.userId]]]),
+                    Domain.and([
+                        [["folder_id", "=", false]],
+                        [["owner_id", "not in", [user.userId, this.documentService.store.odoobot.userId]]],
+                    ]),
                     // a non-accessible parent would still be found with its id (not False), and using `not any` (not, !=, 'none')
-                    // is much simpler than implementing searching for 'user permission', '=', 'none'.
-                    Domain.and([[['folder_id', '!=', false]], [['folder_id', 'not any', [['user_permission', '!=', 'none']]]]]),
+                    // is much simpler than implementing searching for 'user permission', '=', 'none'
+                    // (the != 'none' will be added because of the access rules).
+                    Domain.and([[['folder_id', '!=', false]], [['folder_id', 'not any', []]]]),
                 ])
             ]).toList();
         }
@@ -261,6 +297,9 @@ export class DocumentsSearchModel extends SearchModel {
             return [['access_ids', 'any', [['partner_id', '=', user.partnerId], ['last_access_date', '!=', false]]]];
         }
         if (!folderCategory.activeValueId) {
+            if (this.context.documents_unique_folder_id) {
+                return [["id", "child_of", this.context.documents_unique_folder_id]];
+            }
             return [];
         }
         const folder = this.getSelectedFolder();
@@ -281,21 +320,24 @@ export class DocumentsSearchModel extends SearchModel {
         return result;
     }
 
+    /**
+     * @override Force specific ordering in RECENT and TRASH.
+     */
     get orderBy() {
-        const order = super.orderBy;
-        if (!order?.length && this.sections.get(1).activeValueId === "TRASH") {
+        if (this.sections.get(1).activeValueId === "TRASH") {
             return [
-                { name: "write_date", asc: false },
+                { name: "create_date", asc: false },
                 { name: "is_folder", asc: false },
             ];
         }
-        if (!order?.length && this.sections.get(1).activeValueId === "RECENT") {
+        if (this.sections.get(1).activeValueId === "RECENT") {
             return [
                 { name: "is_folder", asc: true },
                 { name: "last_access_date_group", asc: false },
+                { name: "write_date", asc: false },
             ];
         }
-        return order;
+        return super.orderBy;
     }
 
     get groupBy() {
@@ -328,7 +370,13 @@ export class DocumentsSearchModel extends SearchModel {
         ) {
             return;
         }
-
+        if (
+            !this.documentService.initData.folder_id &&
+            this.context.documents_init_folder_id !== undefined
+        ) {
+            category.activeValueId = this.context.documents_init_folder_id || false;
+            return;
+        }
         // If not set in context, or set to an unknown value, set active value
         // from localStorage
         const storageItem = browser.localStorage.getItem("searchpanel_documents_document");
@@ -359,9 +407,8 @@ export class DocumentsSearchModel extends SearchModel {
             }
             browser.localStorage.setItem("searchpanel_documents_document", category.activeValueId);
         } else {
-            // If still not a valid value, default to COMPANY for internal users
-            // or root folder for portal users
-            category.activeValueId = this.documentService.userIsInternal ? "COMPANY" : valueIds[0];
+            // If still not a valid value, default to All (id=false)
+            category.activeValueId = false;
         }
     }
 

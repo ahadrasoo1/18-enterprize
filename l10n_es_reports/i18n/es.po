@@ -1,20 +1,24 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* l10n_es_reports
+# * l10n_es_reports
 #
+# "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
+# "Noemi Pla Garcia (nopl)" <nopl@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~17.1+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-20 14:49+0000\n"
-"PO-Revision-Date: 2023-03-20 14:49+0000\n"
-"Last-Translator: \n"
-"Language-Team: \n"
-"Language: \n"
+"POT-Creation-Date: 2026-04-17 19:03+0000\n"
+"PO-Revision-Date: 2026-04-17 14:51+0000\n"
+"Last-Translator: \"Noemi Pla Garcia (nopl)\" <nopl@odoo.com>\n"
+"Language-Team: Spanish <https://translate.odoo.com/projects/odoo-18-l10n/"
+"l10n_es_reports/es/>\n"
+"Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Plural-Forms: \n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.16.2\n"
 
 #. module: l10n_es_reports
 #: model:ir.model.fields,help:l10n_es_reports.field_res_company__l10n_es_reports_iae_group
@@ -90,7 +94,7 @@ msgstr "1. Terrenos"
 #. module: l10n_es_reports
 #: model:account.report.line,name:l10n_es_reports.balance_full_line_21310
 msgid "1. Legal and statutory reserves"
-msgstr "1. Legal y estatutarias"
+msgstr "1. Reservas legales y estatutarias"
 
 #. module: l10n_es_reports
 #: model:account.report.line,name:l10n_es_reports.balance_full_line_31110
@@ -223,7 +227,7 @@ msgstr "2. Acreedores por arrendamiento financiero"
 #: model:account.report.line,name:l10n_es_reports.balance_full_line_12420
 #: model:account.report.line,name:l10n_es_reports.balance_full_line_12520
 msgid "2. Loans to companies"
-msgstr "2. Créditos a empresas"
+msgstr "2. Créditos a empresas y entidades"
 
 #. module: l10n_es_reports
 #: model:account.report.line,name:l10n_es_reports.balance_full_line_11520
@@ -254,7 +258,7 @@ msgstr "2. Accionistas (socios) por desembolsos exigidos"
 #. module: l10n_es_reports
 #: model:account.report.line,name:l10n_es_reports.balance_full_line_32520
 msgid "2. Suppliers, group companies and associates"
-msgstr "2. Proveedores, empresas del grupo y asociadas"
+msgstr "2. Proveedores, empresas y entidades del grupo y asociadas"
 
 #. module: l10n_es_reports
 #: model:account.report.line,name:l10n_es_reports.balance_full_line_11220
@@ -264,7 +268,7 @@ msgstr "2. Instalaciones técnicas y otro inmovilizado material"
 #. module: l10n_es_reports
 #: model:account.report.line,name:l10n_es_reports.balance_full_line_12320
 msgid "2. Trade receivables from group companies and associates"
-msgstr "2. Clientes empresas del grupo y asociadas"
+msgstr "2. Clientes, empresas y entidades del grupo y asociadas"
 
 #. module: l10n_es_reports
 #: model:account.report.line,name:l10n_es_reports.balance_full_line_11430
@@ -295,13 +299,13 @@ msgstr "3. Otras deudas a largo plazo"
 #. module: l10n_es_reports
 #: model:account.report.line,name:l10n_es_reports.balance_full_line_32530
 msgid "3. Other payables"
-msgstr "3. Acreedores varios"
+msgstr "3. Otros acreedores"
 
 #. module: l10n_es_reports
 #: model:account.report.line,name:l10n_es_reports.balance_full_line_12330
 #: model:account.report.line,name:l10n_es_reports.balance_pymes_line_12390
 msgid "3. Other receivables"
-msgstr "3. Deudores varios"
+msgstr "3. Otros deudores"
 
 #. module: l10n_es_reports
 #: model:account.report.line,name:l10n_es_reports.balance_full_line_11130
@@ -477,9 +481,10 @@ msgid "A - Acquisition"
 msgstr "A - Adquisición"
 
 #. module: l10n_es_reports
+#: model:account.report.line,name:l10n_es_reports.mod_347_operations_insurance_bought
 #: model:account.report.line,name:l10n_es_reports.mod_347_operations_regular_bought
-msgid "A - Purchases of goods and services greater than 3.005,06 €"
-msgstr "A - Adquisiciones de bienes y servicios superiores a 3 005,06 €"
+msgid "A - Purchases of goods and services greater than 3,005.06 €"
+msgstr ""
 
 #. module: l10n_es_reports
 #: model:account.report.line,name:l10n_es_reports.balance_assoc_line_20000
@@ -546,6 +551,18 @@ msgid "Abbreviated Balance Sheet for Associations"
 msgstr "Balance abreviado para asociaciones"
 
 #. module: l10n_es_reports
+#. odoo-python
+#: code:addons/l10n_es_reports/models/libro_diario_export.py:0
+msgid "Account Code"
+msgstr "Código de cuenta"
+
+#. module: l10n_es_reports
+#. odoo-python
+#: code:addons/l10n_es_reports/models/libro_diario_export.py:0
+msgid "Account Name"
+msgstr "Nombre de cuenta"
+
+#. module: l10n_es_reports
 #: model:ir.model,name:l10n_es_reports.model_account_report
 msgid "Accounting Report"
 msgstr "Informe contable"
@@ -553,12 +570,13 @@ msgstr "Informe contable"
 #. module: l10n_es_reports
 #: model:account.account.tag,name:l10n_es_reports.balance_sheet_31600_account
 msgid "Acreedores comerciales no corrientes"
-msgstr ""
+msgstr "Acreedores comerciales no corrientes"
 
 #. module: l10n_es_reports
 #: model:ir.model.fields.selection,name:l10n_es_reports.selection__l10n_es_reports_aeat_mod347_manual_partner_data__operation_key__a
+#: model:ir.model.fields.selection,name:l10n_es_reports.selection__l10n_es_reports_aeat_mod347_real_estates_vat__operation_key__a
 msgid "Adquisiciones de bienes y servicios"
-msgstr ""
+msgstr "Adquisiciones de bienes y servicios"
 
 #. module: l10n_es_reports
 #: model:account.report.line,name:l10n_es_reports.mod_349_statistics_refunds_total_amount
@@ -567,8 +585,9 @@ msgstr "Importe de las operaciones intracomunitarias con rectificaciones"
 
 #. module: l10n_es_reports
 #: model:ir.model.fields.selection,name:l10n_es_reports.selection__l10n_es_reports_aeat_mod347_manual_partner_data__operation_class__local_negocio
+#: model:ir.model.fields.selection,name:l10n_es_reports.selection__l10n_es_reports_aeat_mod347_real_estates_vat__operation_class__local_negocio
 msgid "Arrendamiento Local Negocio"
-msgstr ""
+msgstr "Arrendamiento Local Negocio"
 
 #. module: l10n_es_reports
 #: model:ir.model.fields,field_description:l10n_es_reports.field_account_bank_statement_line__l10n_es_reports_mod347_available
@@ -583,11 +602,10 @@ msgid "Available for Mod349"
 msgstr "Disponible para Mod349"
 
 #. module: l10n_es_reports
-#: model:account.report.line,name:l10n_es_reports.mod_347_operations_insurance_bought
+#: model:account.report.line,name:l10n_es_reports.mod_347_operations_insurance_sold
 #: model:account.report.line,name:l10n_es_reports.mod_347_operations_regular_sold
-msgid "B - Sales of goods and services greater than 3.005,06 €"
+msgid "B - Sales of goods and services greater than 3,005.06 €"
 msgstr ""
-"B - Entregas de bienes y prestaciones de servicios superiores a 3 005,06 €"
 
 #. module: l10n_es_reports
 #: model:account.report.line,name:l10n_es_reports.balance_assoc_line_12000
@@ -612,52 +630,52 @@ msgstr "B) PASIVO NO CORRIENTE"
 #. odoo-python
 #: code:addons/l10n_es_reports/models/aeat_tax_reports.py:0
 msgid "BOE"
-msgstr ""
+msgstr "BOE"
 
 #. module: l10n_es_reports
 #: model:ir.model,name:l10n_es_reports.model_l10n_es_reports_aeat_boe_export_wizard
 msgid "BOE Export Wizard"
-msgstr "Asistente para la exportación del BOE"
+msgstr "Asistente de exportación BOE"
 
 #. module: l10n_es_reports
 #: model:ir.model,name:l10n_es_reports.model_l10n_es_reports_aeat_boe_mod111_export_wizard
 msgid "BOE Export Wizard for (mod111)"
-msgstr "Asistente para la exportación del BOE para (mod111)"
+msgstr "Asistente de exportación BOE para (mod111)"
 
 #. module: l10n_es_reports
 #: model:ir.model,name:l10n_es_reports.model_l10n_es_reports_aeat_boe_mod111and115and303_export_wizard
 msgid "BOE Export Wizard for (mod111, mod115 & 303)"
-msgstr "Asistente para la exportación del BOE para (mod111, mod115 & 303)"
+msgstr "Asistente de exportación BOE para (mod111, mod115 y 303)"
 
 #. module: l10n_es_reports
 #: model:ir.model,name:l10n_es_reports.model_l10n_es_reports_aeat_boe_mod115_export_wizard
 msgid "BOE Export Wizard for (mod115)"
-msgstr "Asistente para la exportación del BOE para (mod115)"
+msgstr "Asistente de exportación BOE para (mod115)"
 
 #. module: l10n_es_reports
 #: model:ir.model,name:l10n_es_reports.model_l10n_es_reports_aeat_boe_mod303_export_wizard
 msgid "BOE Export Wizard for (mod303)"
-msgstr "Asistente para la exportación del BOE para (mod303)"
+msgstr "Asistente de exportación BOE para (mod303)"
 
 #. module: l10n_es_reports
 #: model:ir.model,name:l10n_es_reports.model_l10n_es_reports_aeat_boe_mod347and349_export_wizard
 msgid "BOE Export Wizard for (mod347 & mod349)"
-msgstr "Asistente para la exportación del BOE para (mod347 & mod349)"
+msgstr "Asistente de exportación BOE para (mod347 y mod349)"
 
 #. module: l10n_es_reports
 #: model:ir.model,name:l10n_es_reports.model_l10n_es_reports_aeat_boe_mod347_export_wizard
 msgid "BOE Export Wizard for (mod347)"
-msgstr "Asistente para la exportación del BOE para (mod347)"
+msgstr "Asistente de exportación BOE para (mod347)"
 
 #. module: l10n_es_reports
 #: model:ir.model,name:l10n_es_reports.model_l10n_es_reports_aeat_boe_mod349_export_wizard
 msgid "BOE Export Wizard for (mod349)"
-msgstr "Asistente para la exportación del BOE para (mod349)"
+msgstr "Asistente de exportación BOE para (mod349)"
 
 #. module: l10n_es_reports
 #: model:ir.model,name:l10n_es_reports.model_l10n_es_reports_aeat_boe_mod390_export_wizard
 msgid "BOE Export Wizard for (mod390)"
-msgstr "Asistente para la exportación del BOE para (mod390)"
+msgstr "Asistente de exportación BOE para (mod390)"
 
 #. module: l10n_es_reports
 #: model:account.report.column,name:l10n_es_reports.financial_report_balance_sheet_assoc_column
@@ -672,17 +690,23 @@ msgstr "Saldo"
 #. module: l10n_es_reports
 #: model:account.report,name:l10n_es_reports.financial_report_balance_sheet_pymes
 msgid "Balance Sheet - SMEs"
-msgstr "Balance - PyMEs"
+msgstr "Balance de situación- PYME"
 
 #. module: l10n_es_reports
 #: model:ir.model.fields,field_description:l10n_es_reports.field_l10n_es_reports_aeat_boe_mod390_export_wizard__special_cash_basis_beneficiary
 msgid "Beneficiary of the special cash regime"
-msgstr "Beneficiario del régimen especial de efectivo"
+msgstr "Beneficiario del régimen especial de criterio de caja"
 
 #. module: l10n_es_reports
 #: model:ir.model.fields.selection,name:l10n_es_reports.selection__l10n_es_reports_aeat_boe_mod303_export_wizard__declaration_type__c
 msgid "C - Compensation Request"
-msgstr "C - Solicitud de indemnización"
+msgstr "C - A compensar"
+
+#. module: l10n_es_reports
+#. odoo-python
+#: code:addons/l10n_es_reports/models/account_move.py:0
+msgid "C - Replacements of goods"
+msgstr "C - Sustitución de bienes"
 
 #. module: l10n_es_reports
 #: model:account.report.line,name:l10n_es_reports.balance_assoc_line_32000
@@ -695,6 +719,16 @@ msgstr "C) PASIVO CORRIENTE"
 #: model:account.report.line,name:l10n_es_reports.es_profit_and_loss_line_sum_c
 msgid "C) PROFIT/LOSS BEFORE INCOME TAX (A + B)"
 msgstr "C) RESULTADO ANTES DE IMPUESTOS (A + B)"
+
+#. module: l10n_es_reports
+#: model:account.report.line,name:l10n_es_reports.mod_349_substitutions_refunds
+msgid "C. Rectifications for replacement of goods"
+msgstr "C. Rectificaciones por sustitución de bienes"
+
+#. module: l10n_es_reports
+#: model:account.report.line,name:l10n_es_reports.mod_349_substitutions
+msgid "C. Replacements of goods"
+msgstr "C. Sustitución de bienes"
 
 #. module: l10n_es_reports
 #: model:ir.model.fields,field_description:l10n_es_reports.field_l10n_es_reports_aeat_boe_export_wizard__calling_export_wizard_id
@@ -728,7 +762,7 @@ msgstr "No se puede generar un archivo BOE para dos años diferentes"
 #. module: l10n_es_reports
 #: model:ir.model.fields,field_description:l10n_es_reports.field_l10n_es_reports_aeat_boe_mod347_export_wizard__cash_basis_mod347_data
 msgid "Cash Basis Data"
-msgstr "Datos de base de efectivo"
+msgstr "Datos de criterio de caja"
 
 #. module: l10n_es_reports
 #: model:ir.model,name:l10n_es_reports.model_res_company
@@ -756,7 +790,7 @@ msgstr "Declaración complementaria"
 #. module: l10n_es_reports
 #: model:account.report,name:l10n_es_reports.financial_report_balance_sheet_full
 msgid "Complete Balance Sheet"
-msgstr "Balance completo"
+msgstr "Balance de situación completo"
 
 #. module: l10n_es_reports
 #: model:ir.model.fields,field_description:l10n_es_reports.field_l10n_es_reports_aeat_boe_mod347_export_wizard__contact_person_name
@@ -806,6 +840,12 @@ msgid "Created on"
 msgstr "Creado el"
 
 #. module: l10n_es_reports
+#. odoo-python
+#: code:addons/l10n_es_reports/models/libro_diario_export.py:0
+msgid "Credit"
+msgstr "Crédito"
+
+#. module: l10n_es_reports
 #: model:ir.model.fields,field_description:l10n_es_reports.field_l10n_es_reports_aeat_mod347_manual_partner_data__currency_id
 msgid "Currency"
 msgstr "Moneda"
@@ -818,7 +858,7 @@ msgid ""
 "inactive. Please create or activate it."
 msgstr ""
 "La moneda %s, utilizada para un umbral en este informe, no existe o está "
-"inactiva. Por favor, créala o actívala."
+"inactiva. Créela o actívela."
 
 #. module: l10n_es_reports
 #: model:ir.model.fields,field_description:l10n_es_reports.field_l10n_es_reports_aeat_boe_mod111_export_wizard__company_id
@@ -834,9 +874,39 @@ msgid "D - Return"
 msgstr "D - Devolución"
 
 #. module: l10n_es_reports
+#. odoo-python
+#: code:addons/l10n_es_reports/models/account_move.py:0
+msgid "D - Returns of goods previously sent from the TAI"
+msgstr "D - Devoluciones de bienes previamente enviados desde el TAI"
+
+#. module: l10n_es_reports
 #: model:account.report.line,name:l10n_es_reports.es_profit_and_loss_line_sum_d
 msgid "D) PROFIT/LOSS FOR THE PERIOD (C + 18)"
 msgstr "D) RESULTADO DEL EJERCICIO (C + 18)"
+
+#. module: l10n_es_reports
+#: model:account.report.line,name:l10n_es_reports.mod_349_returns_goods_consignment_refunds
+msgid "D. Rectifications of returned goods previously sent from the TAI"
+msgstr ""
+"D. Rectificaciones de devoluciones de bienes previamente enviados desde el "
+"TAI"
+
+#. module: l10n_es_reports
+#: model:account.report.line,name:l10n_es_reports.mod_349_returns_goods_consignment
+msgid "D. Returns of goods previously sent from the TAI"
+msgstr "D. Devoluciones de bienes previamente enviados desde el TAI"
+
+#. module: l10n_es_reports
+#. odoo-python
+#: code:addons/l10n_es_reports/models/libro_diario_export.py:0
+msgid "Date"
+msgstr "Fecha"
+
+#. module: l10n_es_reports
+#. odoo-python
+#: code:addons/l10n_es_reports/models/libro_diario_export.py:0
+msgid "Debit"
+msgstr "Débito"
 
 #. module: l10n_es_reports
 #: model:ir.model.fields,field_description:l10n_es_reports.field_l10n_es_reports_aeat_boe_mod111_export_wizard__declaration_type
@@ -847,28 +917,31 @@ msgid "Declaration Type"
 msgstr "Tipo de declaración"
 
 #. module: l10n_es_reports
-#: model:account.report.line,name:l10n_es_reports.mod_347_operations_title
-msgid "Declared basis"
-msgstr "Relación de declarados"
-
-#. module: l10n_es_reports
 #: model:ir.model.fields,help:l10n_es_reports.field_account_bank_statement_line__l10n_es_reports_mod347_invoice_type
 #: model:ir.model.fields,help:l10n_es_reports.field_account_move__l10n_es_reports_mod347_invoice_type
 msgid "Defines the category into which this invoice falls for mod 347 report."
 msgstr ""
-"Define la categoría en la que se incluye esta factura para el informe mod 347"
+"Define la categoría en la que se incluye esta factura para el informe mod "
+"347."
 
 #. module: l10n_es_reports
 #: model:ir.model.fields,help:l10n_es_reports.field_account_bank_statement_line__l10n_es_reports_mod349_invoice_type
 #: model:ir.model.fields,help:l10n_es_reports.field_account_move__l10n_es_reports_mod349_invoice_type
 msgid "Defines the category into which this invoice falls for mod 349 report"
 msgstr ""
-"Define la categoría en la que se incluye esta factura para el informe mod 349"
+"Define la categoría en la que se incluye esta factura para el informe mod "
+"349."
+
+#. module: l10n_es_reports
+#. odoo-python
+#: code:addons/l10n_es_reports/models/libro_diario_export.py:0
+msgid "Description"
+msgstr "Descripción"
 
 #. module: l10n_es_reports
 #: model:account.account.tag,name:l10n_es_reports.balance_sheet_11700_account
 msgid "Deudores comerciales no corrientes"
-msgstr ""
+msgstr "Deudores comerciales no corrientes"
 
 #. module: l10n_es_reports
 #: model:ir.model.fields,field_description:l10n_es_reports.field_l10n_es_reports_aeat_boe_mod111_export_wizard__partner_bank_id
@@ -890,7 +963,13 @@ msgstr "Cuenta de domiciliación bancaria"
 #: model:ir.model.fields,field_description:l10n_es_reports.field_l10n_es_reports_aeat_boe_mod390_export_wizard__display_name
 #: model:ir.model.fields,field_description:l10n_es_reports.field_l10n_es_reports_aeat_mod347_manual_partner_data__display_name
 msgid "Display Name"
-msgstr "Nombre de pantalla"
+msgstr "Nombre mostrado"
+
+#. module: l10n_es_reports
+#. odoo-python
+#: code:addons/l10n_es_reports/models/libro_diario_export.py:0
+msgid "Document"
+msgstr "Documento"
 
 #. module: l10n_es_reports
 #. odoo-python
@@ -910,8 +989,15 @@ msgstr "E. Entregas intracomunitarias exentas"
 
 #. module: l10n_es_reports
 #: model:ir.model.fields.selection,name:l10n_es_reports.selection__l10n_es_reports_aeat_mod347_manual_partner_data__operation_key__b
+#: model:ir.model.fields.selection,name:l10n_es_reports.selection__l10n_es_reports_aeat_mod347_real_estates_vat__operation_key__b
 msgid "Entregas de bienes y prestaciones de servicios"
-msgstr ""
+msgstr "Entregas de bienes y prestaciones de servicios"
+
+#. module: l10n_es_reports
+#. odoo-python
+#: code:addons/l10n_es_reports/models/libro_diario_export.py:0
+msgid "Entry"
+msgstr "Asiento"
 
 #. module: l10n_es_reports
 #: model:ir.model.fields,field_description:l10n_es_reports.field_l10n_es_reports_aeat_boe_mod303_export_wizard__exempted_from_mod_390_available
@@ -920,8 +1006,8 @@ msgstr "Exento del Mod 390 disponible"
 
 #. module: l10n_es_reports
 #: model:ir.model.fields,field_description:l10n_es_reports.field_l10n_es_reports_aeat_boe_mod303_export_wizard__exempted_from_mod_390
-msgid "Exempted From Modelo 390"
-msgstr "Exento del Modelo 390 disponible"
+msgid "Exonerated From Modelo 390"
+msgstr ""
 
 #. module: l10n_es_reports
 #: model:ir.model,name:l10n_es_reports.model_account_reports_export_wizard_format
@@ -937,13 +1023,20 @@ msgstr "Asistente de exportación para informes contables"
 #: model:ir.model.fields.selection,name:l10n_es_reports.selection__l10n_es_reports_aeat_boe_mod111_export_wizard__declaration_type__g
 #: model:ir.model.fields.selection,name:l10n_es_reports.selection__l10n_es_reports_aeat_boe_mod111and115and303_export_wizard__declaration_type__g
 #: model:ir.model.fields.selection,name:l10n_es_reports.selection__l10n_es_reports_aeat_boe_mod115_export_wizard__declaration_type__g
+#: model:ir.model.fields.selection,name:l10n_es_reports.selection__l10n_es_reports_modelo130_aeat_boe_mod130_export_wizard__declaration_type__g
 msgid "G - Income to enter on CCT"
-msgstr "G - Ingresos a ingresar en el CCT"
+msgstr "G - Ingresos a ingresar en el sistema CCT"
 
 #. module: l10n_es_reports
 #: model:ir.model.fields.selection,name:l10n_es_reports.selection__l10n_es_reports_aeat_boe_mod303_export_wizard__declaration_type__g
 msgid "G - Tributaria Current Account - Income"
-msgstr "G - Tributaria Cuenta corriente - Ingresos"
+msgstr "G - Cuenta corriente tributaria - Ingresos"
+
+#. module: l10n_es_reports
+#. odoo-python
+#: code:addons/l10n_es_reports/models/libro_diario_export.py:0
+msgid "General Ledger - %(date_from)s_%(date_to)s"
+msgstr "Libro mayor - %(date_from)s_%(date_to)s"
 
 #. module: l10n_es_reports
 #: model_terms:ir.ui.view,arch_db:l10n_es_reports.mod111_boe_wizard
@@ -958,12 +1051,24 @@ msgstr "Generar BOE"
 #. module: l10n_es_reports
 #: model:ir.model,name:l10n_es_reports.model_account_generic_tax_report_handler
 msgid "Generic Tax Report Custom Handler"
-msgstr ""
+msgstr "Gestor personalizado de los informes genéricos de impuestos"
+
+#. module: l10n_es_reports
+#. odoo-python
+#: code:addons/l10n_es_reports/models/aeat_tax_reports.py:0
+msgid "Go to Apps"
+msgstr "Ir a Aplicaciones"
+
+#. module: l10n_es_reports
+#. odoo-python
+#: code:addons/l10n_es_reports/models/libros_export.py:0
+msgid "Go to Company"
+msgstr "Ir a compañía"
 
 #. module: l10n_es_reports
 #: model:ir.model.fields,field_description:l10n_es_reports.field_l10n_es_reports_aeat_boe_mod390_export_wizard__group_number
 msgid "Group of entities - Group Number"
-msgstr "Grupo de entidades - Número de grupo"
+msgstr "Grupo de entidades - Número del grupo"
 
 #. module: l10n_es_reports
 #. odoo-python
@@ -986,6 +1091,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:l10n_es_reports.selection__l10n_es_reports_aeat_boe_mod111and115and303_export_wizard__declaration_type__i
 #: model:ir.model.fields.selection,name:l10n_es_reports.selection__l10n_es_reports_aeat_boe_mod115_export_wizard__declaration_type__i
 #: model:ir.model.fields.selection,name:l10n_es_reports.selection__l10n_es_reports_aeat_boe_mod303_export_wizard__declaration_type__i
+#: model:ir.model.fields.selection,name:l10n_es_reports.selection__l10n_es_reports_modelo130_aeat_boe_mod130_export_wizard__declaration_type__i
 msgid "I - Income"
 msgstr "I - Ingreso"
 
@@ -1004,7 +1110,7 @@ msgstr "I. Activos financieros disponibles para la venta"
 #: model:account.report.line,name:l10n_es_reports.balance_full_line_21100
 #: model:account.report.line,name:l10n_es_reports.balance_pymes_line_21100
 msgid "I. Capital"
-msgstr ""
+msgstr "I. Capital"
 
 #. module: l10n_es_reports
 #: model:account.report.line,name:l10n_es_reports.balance_assoc_line_32100
@@ -1057,7 +1163,7 @@ msgstr "I. Provisiones a largo plazo"
 #. module: l10n_es_reports
 #: model:ir.model.fields,field_description:l10n_es_reports.field_res_company__l10n_es_reports_iae_group
 msgid "IAE Group or Heading"
-msgstr "Grupo o rúbrica IAE"
+msgstr "Grupo o epígrafe IAE"
 
 #. module: l10n_es_reports
 #: model:ir.model.fields,field_description:l10n_es_reports.field_l10n_es_reports_aeat_boe_export_wizard__id
@@ -1071,7 +1177,7 @@ msgstr "Grupo o rúbrica IAE"
 #: model:ir.model.fields,field_description:l10n_es_reports.field_l10n_es_reports_aeat_boe_mod390_export_wizard__id
 #: model:ir.model.fields,field_description:l10n_es_reports.field_l10n_es_reports_aeat_mod347_manual_partner_data__id
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #. module: l10n_es_reports
 #: model:account.report.line,name:l10n_es_reports.balance_assoc_line_32200
@@ -1137,7 +1243,8 @@ msgstr "III. (Acciones y participaciones en patrimonio propias)"
 #. module: l10n_es_reports
 #: model:account.report.line,name:l10n_es_reports.balance_pymes_line_12400
 msgid "III. Current investments in group companies and associates"
-msgstr "III. Inversiones en empresas del grupo y asociadas a corto plazo"
+msgstr ""
+"III. Inversiones en empresas y entidades del grupo y asociadas a corto plazo"
 
 #. module: l10n_es_reports
 #: model:account.report.line,name:l10n_es_reports.balance_full_line_32300
@@ -1149,7 +1256,8 @@ msgstr "III. Deudas a corto plazo"
 #: model:account.report.line,name:l10n_es_reports.balance_pymes_line_31300
 #: model:account.report.line,name:l10n_es_reports.balance_pymes_line_32400
 msgid "III. Group companies and associates, non-current liabilities"
-msgstr "III. Deudas con empresas del grupo y asociadas a largo plazo"
+msgstr ""
+"III. Deudas con empresas y entidades del grupo y asociadas a largo plazo"
 
 #. module: l10n_es_reports
 #: model:account.report.line,name:l10n_es_reports.balance_full_line_11300
@@ -1161,13 +1269,14 @@ msgstr "III. Inversiones inmobiliarias"
 #: model:account.report.line,name:l10n_es_reports.balance_full_line_22300
 msgid "III. Non-current assets and related liabilities held for sale"
 msgstr ""
-"III. Activos no corrientes y pasivos vinculados, mantenidos para la venta"
+"III. Pasivos vinculados con activos no corrientes mantenidos para la venta"
 
 #. module: l10n_es_reports
 #: model:account.report.line,name:l10n_es_reports.balance_assoc_line_31300
 #: model:account.report.line,name:l10n_es_reports.balance_assoc_line_32300
 msgid "III. Non-current debts with group companies and associates"
-msgstr "III. Deudas con entidades del grupo y asociadas a largo plazo"
+msgstr ""
+"III. Deudas con empresas y entidades del grupo y asociadas a largo plazo"
 
 #. module: l10n_es_reports
 #: model:account.report.line,name:l10n_es_reports.balance_assoc_line_11300
@@ -1211,19 +1320,21 @@ msgstr "IV. Inversiones financieras a corto plazo"
 #: model:account.report.line,name:l10n_es_reports.balance_assoc_line_12400
 #: model:account.report.line,name:l10n_es_reports.balance_full_line_12400
 msgid "IV. Current investments in group companies and associates"
-msgstr "IV. Inversiones en entidades del grupo y asociadas a corto plazo"
+msgstr ""
+"IV. Inversiones en empresas y entidades del grupo y asociadas a corto plazo"
 
 #. module: l10n_es_reports
 #: model:account.report.line,name:l10n_es_reports.balance_assoc_line_31400
 #: model:account.report.line,name:l10n_es_reports.balance_full_line_31400
 #: model:account.report.line,name:l10n_es_reports.balance_pymes_line_31400
 msgid "IV. Deferred tax liabilities"
-msgstr "IV. Pasivos por impuesto diferido"
+msgstr "IV. Pasivos por impuestos diferidos"
 
 #. module: l10n_es_reports
 #: model:account.report.line,name:l10n_es_reports.balance_full_line_32400
 msgid "IV. Group companies and associates, current liabilities"
-msgstr "IV. Deudas con empresas del grupo y asociadas a corto plazo"
+msgstr ""
+"IV. Deudas con empresas y entidades del grupo y asociadas a corto plazo"
 
 #. module: l10n_es_reports
 #: model:account.report.line,name:l10n_es_reports.balance_assoc_line_11400
@@ -1234,7 +1345,8 @@ msgstr "IV. Inversiones inmobiliarias"
 #: model:account.report.line,name:l10n_es_reports.balance_full_line_11400
 #: model:account.report.line,name:l10n_es_reports.balance_pymes_line_11400
 msgid "IV. Non-current investments in group companies and associates"
-msgstr "IV. Inversiones en empresas del grupo y asociadas a largo plazo"
+msgstr ""
+"IV. Inversiones en empresas y entidades del grupo y asociadas a largo plazo"
 
 #. module: l10n_es_reports
 #: model:account.report.line,name:l10n_es_reports.balance_assoc_line_21300
@@ -1270,6 +1382,8 @@ msgstr "Operaciones de seguros"
 #: model:account.account.tag,name:l10n_es_reports.balance_sheet_12440_account
 msgid "Inversiones en empresas del grupo y asociadas a corto plazo - Derivados"
 msgstr ""
+"Inversiones en empresas y entidades del grupo y asociadas a corto plazo - "
+"Derivados"
 
 #. module: l10n_es_reports
 #: model:account.account.tag,name:l10n_es_reports.balance_sheet_12460_account
@@ -1277,11 +1391,15 @@ msgid ""
 "Inversiones en empresas del grupo y asociadas a corto plazo - Otras "
 "inversiones"
 msgstr ""
+"Inversiones en empresas y entidades del grupo y asociadas a corto plazo - "
+"Otrasinversiones"
 
 #. module: l10n_es_reports
 #: model:account.account.tag,name:l10n_es_reports.balance_sheet_11440_account
 msgid "Inversiones en empresas del grupo y asociadas a largo plazo - Derivados"
 msgstr ""
+"Inversiones en empresas y entidades del grupo y asociadas a largo plazo - "
+"Derivados"
 
 #. module: l10n_es_reports
 #: model:account.account.tag,name:l10n_es_reports.balance_sheet_11460_account
@@ -1289,6 +1407,8 @@ msgid ""
 "Inversiones en empresas del grupo y asociadas a largo plazo - Otras "
 "inversiones"
 msgstr ""
+"Inversiones en empresas y entidades del grupo y asociadas a largo plazo - "
+"Otrasinversiones"
 
 #. module: l10n_es_reports
 #: model:account.account.tag,name:l10n_es_reports.balance_sheet_11450_account
@@ -1296,11 +1416,13 @@ msgid ""
 "Inversiones en empresas del grupo y asociadas a largo plazo - Otros activos "
 "financieros"
 msgstr ""
+"Inversiones en empresas y entidades del grupo y asociadas a largo plazo - "
+"Otros activos financieros"
 
 #. module: l10n_es_reports
 #: model:account.account.tag,name:l10n_es_reports.balance_sheet_12560_account
 msgid "Inversiones financieras a corto plazo - Otras inversiones"
-msgstr ""
+msgstr "Inversiones financieras a corto plazo - Otras inversiones"
 
 #. module: l10n_es_reports
 #: model:account.report.line,name:l10n_es_reports.mod_349_invoices_title
@@ -1357,6 +1479,18 @@ msgstr "Última actualización el"
 
 #. module: l10n_es_reports
 #. odoo-python
+#: code:addons/l10n_es_reports/models/libro_diario_export.py:0
+msgid "Libro Diario XLSX"
+msgstr "Libro diario XLSX"
+
+#. module: l10n_es_reports
+#. odoo-python
+#: code:addons/l10n_es_reports/models/libro_diario_export.py:0
+msgid "Line"
+msgstr "Línea"
+
+#. module: l10n_es_reports
+#. odoo-python
 #: code:addons/l10n_es_reports/models/account_move.py:0
 msgid "M - Supply without taxes"
 msgstr "M - Suministro sin impuestos"
@@ -1377,8 +1511,8 @@ msgid ""
 "criterion does not apply."
 msgstr ""
 "Entradas manuales que contienen los importes percibidos por los contactos "
-"con criterio de base de efectivo durante este año. Dejar vacío para los "
-"contactos a los que no se aplica este criterio."
+"con criterio de caja durante este año. Déjelo vacío para los contactos a los "
+"que no se aplica este criterio."
 
 #. module: l10n_es_reports
 #: model:ir.model,name:l10n_es_reports.model_l10n_es_reports_aeat_mod347_manual_partner_data
@@ -1388,7 +1522,7 @@ msgstr "Datos introducidos manualmente para el informe Mod 347"
 #. module: l10n_es_reports
 #: model:ir.model.fields,field_description:l10n_es_reports.field_l10n_es_reports_aeat_boe_mod390_export_wizard__monthly_return
 msgid "Monthly return record in some period of the fiscal year"
-msgstr "Registro de devolución mensual en algún periodo del año fiscal"
+msgstr "Registro de devolución mensual en algún periodo del ejercicio fiscal"
 
 #. module: l10n_es_reports
 #: model:ir.model.fields.selection,name:l10n_es_reports.selection__l10n_es_reports_aeat_boe_mod303_export_wizard__declaration_type__n
@@ -1399,6 +1533,7 @@ msgstr "N - Sin actividad / Resultado cero"
 #: model:ir.model.fields.selection,name:l10n_es_reports.selection__l10n_es_reports_aeat_boe_mod111_export_wizard__declaration_type__n
 #: model:ir.model.fields.selection,name:l10n_es_reports.selection__l10n_es_reports_aeat_boe_mod111and115and303_export_wizard__declaration_type__n
 #: model:ir.model.fields.selection,name:l10n_es_reports.selection__l10n_es_reports_aeat_boe_mod115_export_wizard__declaration_type__n
+#: model:ir.model.fields.selection,name:l10n_es_reports.selection__l10n_es_reports_modelo130_aeat_boe_mod130_export_wizard__declaration_type__n
 msgid "N - To return"
 msgstr "N - A devolver"
 
@@ -1413,15 +1548,14 @@ msgstr ""
 #. module: l10n_es_reports
 #: model:ir.model.fields,field_description:l10n_es_reports.field_l10n_es_reports_aeat_boe_mod390_export_wizard__physical_person_name
 msgid "Natural Person - Name"
-msgstr "Personal natural - Nombre"
+msgstr "Persona natural - Nombre"
 
 #. module: l10n_es_reports
 #. odoo-python
 #: code:addons/l10n_es_reports/models/aeat_tax_reports.py:0
 msgid "No TIN set for partner %(name)s (id %(id)d). Please define one."
 msgstr ""
-"No se ha definido un NIF para el partner %(name)s (id %(id)d). Por favor, "
-"defina uno."
+"No se ha definido un NIF para el partner %(name)s (id %(id)d). Defina uno."
 
 #. module: l10n_es_reports
 #: model:ir.model.fields,help:l10n_es_reports.field_l10n_es_reports_aeat_boe_mod347_export_wizard__previous_report_number
@@ -1442,8 +1576,9 @@ msgstr "Número del informe presentado anteriormente"
 
 #. module: l10n_es_reports
 #: model:ir.model.fields.selection,name:l10n_es_reports.selection__l10n_es_reports_aeat_mod347_manual_partner_data__operation_class__seguros
+#: model:ir.model.fields.selection,name:l10n_es_reports.selection__l10n_es_reports_aeat_mod347_real_estates_vat__operation_class__seguros
 msgid "Operaciones de Seguros"
-msgstr ""
+msgstr "Operaciones de seguros"
 
 #. module: l10n_es_reports
 #: model:ir.model.fields,field_description:l10n_es_reports.field_l10n_es_reports_aeat_mod347_manual_partner_data__operation_class
@@ -1469,8 +1604,8 @@ msgid ""
 "Optional field containing the report export wizard calling this BOE wizard, "
 "if there is one."
 msgstr ""
-"Campo opcional que contiene el asistente de exortación de informes que llama "
-"a este asistente BOE, si existe"
+"Campo opcional que contiene el asistente de exportación de informes que "
+"llama a este asistente BOE, si existe"
 
 #. module: l10n_es_reports
 #: model:account.report.line,name:l10n_es_reports.mod_347_operations_regular_title
@@ -1479,8 +1614,9 @@ msgstr "Otras operaciones"
 
 #. module: l10n_es_reports
 #: model:ir.model.fields.selection,name:l10n_es_reports.selection__l10n_es_reports_aeat_mod347_manual_partner_data__operation_class__otras
+#: model:ir.model.fields.selection,name:l10n_es_reports.selection__l10n_es_reports_aeat_mod347_real_estates_vat__operation_class__otras
 msgid "Otras operaciones"
-msgstr ""
+msgstr "Otras operaciones"
 
 #. module: l10n_es_reports
 #: model:ir.model.fields,field_description:l10n_es_reports.field_l10n_es_reports_aeat_mod347_manual_partner_data__parent_wizard_id
@@ -1490,7 +1626,7 @@ msgstr "Asistente principal"
 #. module: l10n_es_reports
 #: model:ir.model.fields,field_description:l10n_es_reports.field_l10n_es_reports_aeat_boe_mod390_export_wizard__is_in_tax_unit
 msgid "Part of a tax unit"
-msgstr "Parte de una unidad fiscal"
+msgstr "Parte de una unidad tributaria"
 
 #. module: l10n_es_reports
 #: model:ir.model.fields,field_description:l10n_es_reports.field_l10n_es_reports_aeat_mod347_manual_partner_data__partner_id
@@ -1504,8 +1640,8 @@ msgid ""
 "Partner %(name)s (id %(id)d) is located in Spain but does not have any "
 "province. Please set one."
 msgstr ""
-"El contacto %(name)s (id %(id)d) se encuentra en España pero no tiene "
-"ninguna provincia. Por favor, establezca una."
+"El contacto %(name)s (id %(id)d) se encuentra en España, pero no tiene "
+"ninguna provincia. Establezca una."
 
 #. module: l10n_es_reports
 #. odoo-python
@@ -1515,7 +1651,7 @@ msgid ""
 "should hence have a country code. For this, fill in its 'country' field."
 msgstr ""
 "El contacto %(name)s (id %(id)d) no está asociado a ninguna provincia "
-"española, y debería tener un código de país. Para ello, rellene su campo "
+"española y debería tener un código de país. Para ello, rellene el campo "
 "'país'."
 
 #. module: l10n_es_reports
@@ -1532,28 +1668,48 @@ msgstr "Número de teléfono de la persona de contacto"
 
 #. module: l10n_es_reports
 #. odoo-python
+#: code:addons/l10n_es_reports/models/libros_export.py:0
+msgid "Please configure the \"IAE Group or Heading\" of your company."
+msgstr "configure el \"Grupo o epígrafe IAE\" de su compañía."
+
+#. module: l10n_es_reports
+#. odoo-python
 #: code:addons/l10n_es_reports/wizard/aeat_boe_export_wizards.py:0
 msgid "Please first assign a BIC number to the bank related to this account."
-msgstr ""
-"Por favor, asigne primero un número BIC al banco relacionado con esta cuenta."
+msgstr "Asigne primero un número BIC al banco relacionado con esta cuenta."
 
 #. module: l10n_es_reports
 #. odoo-python
 #: code:addons/l10n_es_reports/wizard/aeat_boe_export_wizards.py:0
 msgid "Please first set the TIN of your company."
-msgstr "Por favor, introduzca primero el NIF de su empresa"
+msgstr "Introduzca primero el NIF de su compañía"
 
 #. module: l10n_es_reports
 #. odoo-python
 #: code:addons/l10n_es_reports/models/account_move.py:0
 msgid "Please select a Spanish invoice type for this invoice."
-msgstr "Por favor, seleccione un tipo de factura española para esta factura."
+msgstr "Seleccione un tipo de factura española para esta factura."
 
 #. module: l10n_es_reports
 #. odoo-python
 #: code:addons/l10n_es_reports/wizard/aeat_boe_export_wizards.py:0
 msgid "Please select an IBAN account."
-msgstr "Por favor, seleccione una cuenta IBAN"
+msgstr "Seleccione una cuenta IBAN."
+
+#. module: l10n_es_reports
+#. odoo-python
+#: code:addons/l10n_es_reports/models/aeat_tax_reports.py:0
+msgid ""
+"Please update the \"Spain - Accounting (PGCE 2008)\" (l10n_es) module to be "
+"able to export BOE"
+msgstr ""
+"Actualice el módulo \"España - Contabilidad (PGCE 2008)\" (l10n_es) para "
+"poder exportar el BOE."
+
+#. module: l10n_es_reports
+#: model:ir.model,name:l10n_es_reports.model_account_general_ledger_report_handler
+msgid "Polish JPK KR PD Custom Handler"
+msgstr ""
 
 #. module: l10n_es_reports
 #: model:ir.model.fields,field_description:l10n_es_reports.field_l10n_es_reports_aeat_boe_mod111_export_wizard__previous_report_number
@@ -1564,12 +1720,12 @@ msgstr "Por favor, seleccione una cuenta IBAN"
 #: model:ir.model.fields,field_description:l10n_es_reports.field_l10n_es_reports_aeat_boe_mod347and349_export_wizard__previous_report_number
 #: model:ir.model.fields,field_description:l10n_es_reports.field_l10n_es_reports_aeat_boe_mod349_export_wizard__previous_report_number
 msgid "Previous Report Number"
-msgstr "Número de informe anterior"
+msgstr "Número del informe anterior"
 
 #. module: l10n_es_reports
 #: model:ir.model.fields,field_description:l10n_es_reports.field_l10n_es_reports_aeat_boe_mod390_export_wizard__previous_decl_number
 msgid "Previous declaration no."
-msgstr "N° de declaración anterior"
+msgstr "N.° de la declaración anterior"
 
 #. module: l10n_es_reports
 #: model:ir.model.fields,field_description:l10n_es_reports.field_l10n_es_reports_aeat_boe_mod390_export_wizard__principal_activity
@@ -1600,9 +1756,33 @@ msgstr "Pérdidas y Ganancias"
 
 #. module: l10n_es_reports
 #. odoo-python
+#: code:addons/l10n_es_reports/models/account_move.py:0
+msgid "R - Transfers of goods made under consignment sales agreements"
+msgstr ""
+"R - Transferencias de bienes efectuadas en el marco de acuerdos de bienes en "
+"consigna"
+
+#. module: l10n_es_reports
+#: model:account.report.line,name:l10n_es_reports.mod_349_consignment_sales_agreements_refunds
+msgid ""
+"R. Rectifications of transfers of goods made under consignment sale "
+"contracts."
+msgstr ""
+"R. Rectificaciones de transferencias de bienes efectuadas en el marco de "
+"acuerdos de bienes en consigna"
+
+#. module: l10n_es_reports
+#: model:account.report.line,name:l10n_es_reports.mod_349_consignment_sales_agreements
+msgid "R. Transfers of goods made under consignment sales contracts."
+msgstr ""
+"R. Transferencias de bienes efectuadas en el marco de acuerdos de bienes en "
+"consigna"
+
+#. module: l10n_es_reports
+#. odoo-python
 #: code:addons/l10n_es_reports/models/aeat_tax_reports.py:0
 msgid "Reading a non-Spanish TIN as a Spanish TIN."
-msgstr "Lectura de un NIF no español como NIF español"
+msgstr "Lectura de un NIF no español como un NIF español"
 
 #. module: l10n_es_reports
 #. odoo-python
@@ -1623,6 +1803,11 @@ msgstr "Reembolsos"
 #: model:ir.model.fields.selection,name:l10n_es_reports.selection__account_move__l10n_es_reports_mod347_invoice_type__regular
 msgid "Regular operation"
 msgstr "Operación regular"
+
+#. module: l10n_es_reports
+#: model:account.report.line,name:l10n_es_reports.mod_347_operations_title
+msgid "Relación de declarados"
+msgstr "Relación de declarados"
 
 #. module: l10n_es_reports
 #: model:ir.model.fields,field_description:l10n_es_reports.field_l10n_es_reports_aeat_boe_export_wizard__report_id
@@ -1655,7 +1840,7 @@ msgstr "Representante - Notario"
 #. module: l10n_es_reports
 #: model:ir.model.fields,field_description:l10n_es_reports.field_l10n_es_reports_aeat_boe_mod390_export_wizard__judicial_person_procuration_date
 msgid "Representative - Power of Attorney Date"
-msgstr "Representante - Fecha Poder notarial"
+msgstr "Representante - Fecha del poder notarial"
 
 #. module: l10n_es_reports
 #. odoo-python
@@ -1673,47 +1858,47 @@ msgstr ""
 #. module: l10n_es_reports
 #: model:ir.model,name:l10n_es_reports.model_l10n_es_libros_registro_export_handler
 msgid "Spanish Libros Registro de IVA"
-msgstr "Libros en español Registro de IVA"
+msgstr "Libros registro de IVA de España"
 
 #. module: l10n_es_reports
 #: model:ir.model,name:l10n_es_reports.model_l10n_es_tax_report_handler
 msgid "Spanish Tax Report Custom Handler"
-msgstr "Gestor personalizado de informe de impuestos españoles"
+msgstr "Gestor personalizado de los informes de impuestos españoles"
 
 #. module: l10n_es_reports
 #: model:ir.model,name:l10n_es_reports.model_l10n_es_mod111_tax_report_handler
 msgid "Spanish Tax Report Custom Handler (Mod111)"
-msgstr "Gestor personalizado de informe de impuestos españoles (Mod111)"
+msgstr "Gestor personalizado de los informes de impuestos españoles (Mod111)"
 
 #. module: l10n_es_reports
 #: model:ir.model,name:l10n_es_reports.model_l10n_es_mod115_tax_report_handler
 msgid "Spanish Tax Report Custom Handler (Mod115)"
-msgstr "Gestor personalizado de informe de impuestos españoles (Mod115)"
+msgstr "Gestor personalizado de los informes de impuestos españoles (Mod115)"
 
 #. module: l10n_es_reports
 #: model:ir.model,name:l10n_es_reports.model_l10n_es_mod303_tax_report_handler
 msgid "Spanish Tax Report Custom Handler (Mod303)"
-msgstr "Gestor personalizado de informe de impuestos españoles (Mod303)"
+msgstr "Gestor personalizado de los informes de impuestos españoles (Mod303)"
 
 #. module: l10n_es_reports
 #: model:ir.model,name:l10n_es_reports.model_l10n_es_mod347_tax_report_handler
 msgid "Spanish Tax Report Custom Handler (Mod347)"
-msgstr "Gestor personalizado de informe de impuestos españoles (Mod347)"
+msgstr "Gestor personalizado de los informes de impuestos españoles (Mod347)"
 
 #. module: l10n_es_reports
 #: model:ir.model,name:l10n_es_reports.model_l10n_es_mod349_tax_report_handler
 msgid "Spanish Tax Report Custom Handler (Mod349)"
-msgstr "Gestor personalizado de informe de impuestos españoles (Mod349)"
+msgstr "Gestor personalizado de los informes de impuestos españoles (Mod349)"
 
 #. module: l10n_es_reports
 #: model:ir.model,name:l10n_es_reports.model_l10n_es_mod390_tax_report_handler
 msgid "Spanish Tax Report Custom Handler (Mod390)"
-msgstr "Gestor personalizado de informe de impuestos españoles (Mod390)"
+msgstr "Gestor personalizado de los informes de impuestos españoles (Mod390)"
 
 #. module: l10n_es_reports
 #: model:ir.model.fields,field_description:l10n_es_reports.field_l10n_es_reports_aeat_boe_mod390_export_wizard__special_regime_applicable_163
 msgid "Special Regime Art. 163 is applicable"
-msgstr "Régimen especial El Art. 163 es aplicable"
+msgstr "Régimen especial: El Art. 163 es aplicable"
 
 #. module: l10n_es_reports
 #: model_terms:ir.ui.view,arch_db:l10n_es_reports.mod390_boe_wizard
@@ -1723,7 +1908,7 @@ msgstr "Régimen especial"
 #. module: l10n_es_reports
 #: model:ir.model.fields,field_description:l10n_es_reports.field_l10n_es_reports_aeat_boe_mod390_export_wizard__special_cash_basis
 msgid "Special cash basis regime"
-msgstr "Régimen especial de base de efectivo"
+msgstr "Régimen especial del criterio de caja"
 
 #. module: l10n_es_reports
 #: model_terms:ir.ui.view,arch_db:l10n_es_reports.mod390_boe_wizard
@@ -1745,7 +1930,7 @@ msgstr "Declaración sustitutiva para correción de cuotas"
 #. module: l10n_es_reports
 #: model:ir.model.fields,field_description:l10n_es_reports.field_l10n_es_reports_aeat_boe_mod390_export_wizard__is_substitute_declaration
 msgid "Substitutive declaration?"
-msgstr "Declaración sustitutiva?"
+msgstr "¿Declaración sustitutiva?"
 
 #. module: l10n_es_reports
 #: model:account.report.line,name:l10n_es_reports.mod_347_summary_title
@@ -1766,8 +1951,8 @@ msgid ""
 "T. Sales to other member states exempted of intra-community taxes in case of "
 "triangular operations"
 msgstr ""
-"T. Entregas a otros estados miembros subsiguientes a adquisiciones "
-"intracomunitarias exentas en el marco de operaciones triangulares"
+"T. Ventas a clientes de otro Estado miembro subsiguientes a adquisiciones "
+"intracomunitarias exentas, efectuadas en el marco de una operación triangular"
 
 #. module: l10n_es_reports
 #: model:account.report.line,name:l10n_es_reports.balance_assoc_line_10000
@@ -1796,11 +1981,9 @@ msgstr "Informe de impuestos (Mod 349)"
 #. module: l10n_es_reports
 #: model:ir.model.fields,help:l10n_es_reports.field_l10n_es_reports_aeat_boe_mod303_export_wizard__exempted_from_mod_390_available
 msgid ""
-"Technical field used to only make exempted_from_mod_390 avilable in the last "
-"period (12 or 4T)"
+"Technical field used to only make exempted_from_mod_390 available in the "
+"last period (12 or 4T)"
 msgstr ""
-"Campo técnico utilizado para que exempted_from_mod_390 sólo esté disponible "
-"en el último periodo (12 ó 4T)"
 
 #. module: l10n_es_reports
 #: model:ir.model.fields,help:l10n_es_reports.field_l10n_es_reports_aeat_boe_mod111_export_wizard__partner_bank_id
@@ -1813,6 +1996,14 @@ msgid ""
 msgstr ""
 "El número de cuenta IBAN a utilizar para la domiciliación bancaria. Déjelo "
 "vacío si no utiliza la domiciliación bancaria."
+
+#. module: l10n_es_reports
+#. odoo-python
+#: code:addons/l10n_es_reports/models/libro_diario_export.py:0
+msgid "This report export is only available for ES companies."
+msgstr ""
+"Esta exportación de informes sólo está disponible para las empresas "
+"españolas."
 
 #. module: l10n_es_reports
 #: model:account.report.line,name:l10n_es_reports.mod_349_statistics_invoices_total_amount
@@ -1832,7 +2023,7 @@ msgstr "Número total de operadores intracomunitarios con rectificaciones"
 #. module: l10n_es_reports
 #: model:account.report.line,name:l10n_es_reports.mod_347_statistics_operations_count
 msgid "Total number of persons and entities"
-msgstr "Número total de personas y entitades"
+msgstr "Número total de personas y entidades"
 
 #. module: l10n_es_reports
 #: model:ir.model.fields,field_description:l10n_es_reports.field_l10n_es_reports_aeat_boe_mod349_export_wizard__trimester_2months_report
@@ -1847,7 +2038,7 @@ msgid ""
 "it concerns an operation from a Spanish headquarter."
 msgstr ""
 "True si y sólo si la factura PODRÍA tener que ser declarada en el mod 347, "
-"es decir, si se refiere a una operación de una sede española."
+"es decir, si se refiere a una operación desde una sede española."
 
 #. module: l10n_es_reports
 #: model:ir.model.fields,help:l10n_es_reports.field_account_bank_statement_line__l10n_es_reports_mod349_available
@@ -1880,6 +2071,7 @@ msgstr "U - Domiciliación de los ingresos en CCC"
 #: model:ir.model.fields.selection,name:l10n_es_reports.selection__l10n_es_reports_aeat_boe_mod111_export_wizard__declaration_type__u
 #: model:ir.model.fields.selection,name:l10n_es_reports.selection__l10n_es_reports_aeat_boe_mod111and115and303_export_wizard__declaration_type__u
 #: model:ir.model.fields.selection,name:l10n_es_reports.selection__l10n_es_reports_aeat_boe_mod115_export_wizard__declaration_type__u
+#: model:ir.model.fields.selection,name:l10n_es_reports.selection__l10n_es_reports_modelo130_aeat_boe_mod130_export_wizard__declaration_type__u
 msgid "U - Direct debit"
 msgstr "U - Domiciliación bancaria"
 
@@ -1892,12 +2084,12 @@ msgstr "No se ha podido encontrar el impuesto de recargo correspondiente en %s"
 #. module: l10n_es_reports
 #: model:ir.model.fields,field_description:l10n_es_reports.field_l10n_es_reports_aeat_boe_mod303_export_wizard__using_sii
 msgid "Using SII Voluntarily"
-msgstr "Uso voluntario de SII"
+msgstr "Uso voluntario del SII"
 
 #. module: l10n_es_reports
 #: model:ir.model.fields.selection,name:l10n_es_reports.selection__l10n_es_reports_aeat_boe_mod303_export_wizard__declaration_type__v
 msgid "V - Tributaria Current Account - Return"
-msgstr "V - Tributaria Cuenta corriente - Devolución"
+msgstr "V - Cuenta corriente tributaria - Devolución"
 
 #. module: l10n_es_reports
 #: model:account.report.line,name:l10n_es_reports.balance_assoc_line_12500
@@ -1921,7 +2113,8 @@ msgstr "V. Inversiones financieras a largo plazo"
 #. module: l10n_es_reports
 #: model:account.report.line,name:l10n_es_reports.balance_assoc_line_11500
 msgid "V. Non-current investments in group companies and associates"
-msgstr "V. Inversiones en entidades del grupo y asociadas a largo plazo"
+msgstr ""
+"V. Inversiones en empresas y entidades del grupo y asociadas a largo plazo"
 
 #. module: l10n_es_reports
 #: model:account.report.line,name:l10n_es_reports.balance_full_line_22500
@@ -1971,7 +2164,7 @@ msgstr "VI. Deuda con características especiales a corto plazo"
 #: model:account.report.line,name:l10n_es_reports.balance_full_line_11600
 #: model:account.report.line,name:l10n_es_reports.balance_pymes_line_11600
 msgid "VI. Deferred tax assets"
-msgstr "VI. Activos por impuesto diferido"
+msgstr "VI. Activos por impuestos diferidos"
 
 #. module: l10n_es_reports
 #: model:account.report.line,name:l10n_es_reports.balance_assoc_line_11600
@@ -2013,7 +2206,7 @@ msgstr "VII. Deuda con características especiales a corto plazo"
 #. module: l10n_es_reports
 #: model:account.report.line,name:l10n_es_reports.balance_assoc_line_11700
 msgid "VII. Deferred tax assets"
-msgstr "VII. Activos por impuesto diferido"
+msgstr "VII. Activos por impuestos diferidos"
 
 #. module: l10n_es_reports
 #: model:account.report.line,name:l10n_es_reports.balance_full_line_11700
@@ -2083,8 +2276,8 @@ msgstr ""
 msgid ""
 "Wrong report dates for BOE generation : please select a range of a year."
 msgstr ""
-"Fechas de informe erróneas para la generación de BOE: seleccione un "
-"intervalo de un año"
+"Fechas de informe erróneas para la generación de BOE: seleccione un periodo "
+"de un año"
 
 #. module: l10n_es_reports
 #. odoo-python
@@ -2093,7 +2286,7 @@ msgid ""
 "Wrong report dates for BOE generation : please select a range of one month "
 "or a trimester."
 msgstr ""
-"Fechas de informe erróneas para la generación del BOE: seleccione un rango "
+"Fechas de informe erróneas para la generación del BOE: seleccione un periodo "
 "de un mes o un trimestre."
 
 #. module: l10n_es_reports
@@ -2107,7 +2300,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/l10n_es_reports/models/libros_export.py:0
 msgid "XLSX"
-msgstr ""
+msgstr "XLSX"
 
 #. module: l10n_es_reports
 #. odoo-python
@@ -2117,7 +2310,7 @@ msgid ""
 "only one month is selected!"
 msgstr ""
 "No se puede generar un archivo BOE para los dos primeros meses de un "
-"trimestre si sólo se selecciona un mes."
+"trimestre si sólo ha seleccionado un mes."
 
 #. module: l10n_es_reports
 #. odoo-python
@@ -2126,9 +2319,9 @@ msgid ""
 "Your date range does not cover entire months, please use a start and end "
 "date matching respectively the first and last day of a month."
 msgstr ""
-"Su intervalo de fechas no cubre meses enteros, por favor utilice una fecha "
-"de inicio y finalización que coincidan respectivamente con el primer y "
-"último día de un mes."
+"Su intervalo de fechas no cubre meses enteros. Utilice una fecha de inicio y "
+"finalización que coincidan respectivamente con el primer y último día de un "
+"mes."
 
 #. module: l10n_es_reports
 #: model:account.report.line,name:l10n_es_reports.es_profit_and_loss_line_13a
@@ -2140,3 +2333,13 @@ msgstr ""
 #: model:account.report.line,name:l10n_es_reports.es_profit_and_loss_line_13b
 msgid "b) Other finance expenses"
 msgstr "b) Otros ingresos financieros"
+
+#~ msgid "Exempted From Modelo 390"
+#~ msgstr "Exento del Modelo 390"
+
+#~ msgid ""
+#~ "Technical field used to only make exempted_from_mod_390 avilable in the "
+#~ "last period (12 or 4T)"
+#~ msgstr ""
+#~ "Campo técnico utilizado para que exempted_from_mod_390 sólo esté "
+#~ "disponible en el último periodo (12 o 4T)"

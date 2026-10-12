@@ -1,23 +1,32 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* helpdesk
-# 
+# * helpdesk
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Rastislav Brencic <rastislav.brencic@azet.sk>, 2024
+# Vojtěch Olšan, 2025
+# Marta Wacławek, 2025
+# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Jakub Vera <jakub@origamis.cz>, 2026.
+# "Marta (wacm)" <wacm@odoo.com>, 2026.
+# Vojtěch Olšan <vojtech.olsan@systee.cz>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Czech (https://app.transifex.com/odoo/teams/41243/cs/)\n"
+"POT-Creation-Date: 2026-05-01 17:46+0000\n"
+"PO-Revision-Date: 2026-04-29 18:50+0000\n"
+"Last-Translator: Vojtěch Olšan <vojtech.olsan@systee.cz>\n"
+"Language-Team: Czech <https://translate.odoo.com/projects/odoo-18/helpdesk/"
+"cs/>\n"
+"Language: cs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: cs\n"
-"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
+"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n "
+"<= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
+"X-Generator: Weblate 5.17\n"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__answered_customer_message_count
@@ -114,74 +123,86 @@ msgstr ""
 #: model:mail.template,body_html:helpdesk.solved_ticket_request_email_template
 msgid ""
 "<div>\n"
-"        Dear <t t-out=\"object.sudo().partner_id.name or 'Madam/Sir'\">Madam/Sir</t>,<br><br>\n"
-"        We would like to inform you that we have closed your ticket (reference <t t-out=\"object.id or ''\">15</t>). \n"
-"        We trust that the services provided have met your expectations and that you have found a satisfactory resolution to your issue.<br><br>\n"
-"        However, if you have any further questions or comments, please do not hesitate to reply to this email to re-open your ticket. \n"
-"        Our team is always here to help you and we will be happy to assist you with any further concerns you may have.<br><br>\n"
-"        Thank you for choosing our services and for your cooperation throughout this process. We truly value your business and appreciate the opportunity to serve you.<br><br>\n"
-"        Kind regards,<br><br>\n"
+"        Dear <t t-out=\"object.sudo().partner_id.name or 'Madam/Sir'\">Madam/"
+"Sir</t>,<br/><br/>\n"
+"        We would like to inform you that we have closed your ticket "
+"(reference <t t-out=\"object.ticket_ref or ''\">15</t>).\n"
+"        We trust that the services provided have met your expectations and "
+"that you have found a satisfactory resolution to your issue.<br/><br/>\n"
+"        However, if you have any further questions or comments, please do "
+"not hesitate to reply to this email to re-open your ticket. \n"
+"        Our team is always here to help you and we will be happy to assist "
+"you with any further concerns you may have.<br/><br/>\n"
+"        Thank you for choosing our services and for your cooperation "
+"throughout this process. We truly value your business and appreciate the "
+"opportunity to serve you.<br/><br/>\n"
+"        Kind regards,<br/><br/>\n"
 "        <t t-out=\"object.team_id.name or 'Helpdesk'\">Helpdesk</t> Team.\n"
 "    </div>\n"
 "        "
 msgstr ""
-"<div>\n"
-"        Vážená/ý <t t-out=\"object.sudo().partner_id.name or 'Madam/Sir'\">Paní/Pane</t>,<br><br>\n"
-"        Rádi bychom vás informovali, že jsme uzavřeli váš ticket (reference <t t-out=\"object.id or ''\">15</t>). \n"
-"        Věříme, že poskytnuté služby splnily vaše očekávání a že jste našli uspokojivé řešení vašeho problému.<br><br>\n"
-"        Pokud však máte další dotazy nebo připomínky, neváhejte odpovědět na tento e-mail a znovu otevřít svůj lístek. \n"
-"        Náš tým je vždy připraven vám pomoci a rád vám pomůže s jakýmikoli dalšími problémy.<br><br>\n"
-"        Děkujeme vám, že jste si vybrali naše služby a že jste s námi během tohoto procesu spolupracovali. Opravdu si vážíme vaší práce a oceňujeme možnost sloužit vám.<br><br>\n"
-"        S pozdravem,<br><br>\n"
-"        <t t-out=\"object.team_id.name or 'Helpdesk'\">Helpdesk</t> Tým.\n"
-"    </div>\n"
-"        "
 
 #. module: helpdesk
 #: model:mail.template,body_html:helpdesk.rating_ticket_request_email_template
 msgid ""
 "<div>\n"
-"    <t t-set=\"access_token\" t-value=\"object._rating_get_access_token()\"></t>\n"
-"    <t t-set=\"partner\" t-value=\"object._rating_get_partner()\"></t>\n"
-"    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"width:100%; margin:0;\">\n"
+"    <t t-set=\"access_token\" t-value=\"object._rating_get_access_token()\"/"
+">\n"
+"    <t t-set=\"partner\" t-value=\"object._rating_get_partner()\"/>\n"
+"    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"style=\"width:100%; margin:0;\">\n"
 "    <tbody>\n"
 "        <tr><td valign=\"top\" style=\"font-size: 14px;\">\n"
 "            <t t-if=\"partner.name\">\n"
-"                Hello <t t-out=\"partner.name or ''\">Brandon Freeman</t>,<br><br>\n"
+"                Hello <t t-out=\"partner.name or ''\">Brandon Freeman</t>,"
+"<br/><br/>\n"
 "            </t>\n"
 "            <t t-else=\"\">\n"
-"                Hello,<br>\n"
+"                Hello,<br/>\n"
 "            </t>\n"
-"            Please take a moment to rate our services related to the ticket \"<strong t-out=\"object.name or ''\">Table legs are unbalanced</strong>\"\n"
+"            Please take a moment to rate our services related to the ticket "
+"\"<strong t-out=\"object.name or ''\">Table legs are unbalanced</strong>\"\n"
 "            <t t-if=\"object._rating_get_operator().name\">\n"
-"                assigned to <strong t-out=\"object._rating_get_operator().name or ''\">Mitchell Admin</strong>.<br>\n"
+"                assigned to <strong t-"
+"out=\"object._rating_get_operator().name or ''\">Mitchell Admin</strong>.<br/"
+">\n"
 "            </t>\n"
 "            <t t-else=\"\">\n"
-"                .<br><br>\n"
+"                .<br/><br/>\n"
 "            </t>\n"
 "        </td></tr>\n"
 "        <tr><td style=\"text-align: center;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"width:100%; margin: 32px 0px 32px 0px; display: inline-table;\">\n"
+"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"style=\"width:100%; margin: 32px 0px 32px 0px; display: inline-table;\">\n"
 "                <tr><td style=\"font-size: 14px; text-align:center;\">\n"
-"                    <strong>Tell us how you feel about our services</strong><br>\n"
-"                    <span style=\"text-color: #888888\">(click on one of these smileys)</span>\n"
+"                    <strong>Tell us how you feel about our services</"
+"strong><br/>\n"
+"                    <span style=\"text-color: #888888\">(click on one of "
+"these smileys)</span>\n"
 "                </td></tr>\n"
 "                <tr><td style=\"font-size: 14px;\">\n"
-"                    <table style=\"width:100%;text-align:center;margin-top:2rem;\">\n"
+"                    <table style=\"width:100%;text-align:center;margin-"
+"top:2rem;\">\n"
 "                        <tr>\n"
 "                            <td>\n"
-"                                <a t-attf-href=\"/rate/{{ access_token }}/5\" t-att-class=\"'pe-none' if object._rating_get_operator() else ''\">\n"
-"                                    <img alt=\"Satisfied\" src=\"/rating/static/src/img/rating_5.png\" title=\"Satisfied\">\n"
+"                                <a t-attf-href=\"/rate/{{ access_token }}/"
+"5\" t-att-class=\"'pe-none' if object._rating_get_operator() else ''\">\n"
+"                                    <img alt=\"Satisfied\" src=\"/rating/"
+"static/src/img/rating_5.png\" title=\"Satisfied\"/>\n"
 "                                </a>\n"
 "                            </td>\n"
 "                            <td>\n"
-"                                <a t-attf-href=\"/rate/{{ access_token }}/3\" t-att-class=\"'pe-none' if object._rating_get_operator() else ''\">\n"
-"                                    <img alt=\"Okay\" src=\"/rating/static/src/img/rating_3.png\" title=\"Okay\">\n"
+"                                <a t-attf-href=\"/rate/{{ access_token }}/"
+"3\" t-att-class=\"'pe-none' if object._rating_get_operator() else ''\">\n"
+"                                    <img alt=\"Okay\" src=\"/rating/static/"
+"src/img/rating_3.png\" title=\"Okay\"/>\n"
 "                                </a>\n"
 "                            </td>\n"
 "                            <td>\n"
-"                                <a t-attf-href=\"/rate/{{ access_token }}/1\" t-att-class=\"'pe-none' if object._rating_get_operator() else ''\">\n"
-"                                    <img alt=\"Dissatisfied\" src=\"/rating/static/src/img/rating_1.png\" title=\"Dissatisfied\">\n"
+"                                <a t-attf-href=\"/rate/{{ access_token }}/"
+"1\" t-att-class=\"'pe-none' if object._rating_get_operator() else ''\">\n"
+"                                    <img alt=\"Dissatisfied\" src=\"/rating/"
+"static/src/img/rating_1.png\" title=\"Dissatisfied\"/>\n"
 "                                </a>\n"
 "                            </td>\n"
 "                        </tr>\n"
@@ -191,58 +212,242 @@ msgid ""
 "        </td></tr>\n"
 "        <tr><td valign=\"top\" style=\"font-size: 14px;\">\n"
 "            We appreciate your feedback. It helps us improve continuously.\n"
-"            <br><br><span style=\"margin: 0px 0px 0px 0px; font-size: 12px; opacity: 0.5; color: #454748;\">This customer survey has been sent because your ticket has been moved to the stage <b t-out=\"object.stage_id.name or ''\">In Progress</b>.</span>\n"
+"            <br/><br/><span style=\"margin: 0px 0px 0px 0px; font-size: "
+"12px; opacity: 0.5; color: #454748;\">This customer survey has been sent "
+"because your ticket has been moved to the stage <b t-"
+"out=\"object.stage_id.name or ''\">In Progress</b>.</span>\n"
 "        </td></tr>\n"
 "    </tbody>\n"
 "    </table>\n"
 "</div>\n"
 "        "
 msgstr ""
+"<div>\n"
+"    <t t-set=\"access_token\" t-value=\"object._rating_get_access_token()\"/"
+">\n"
+"    <t t-set=\"partner\" t-value=\"object._rating_get_partner()\"/>\n"
+"    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"style=\"width:100%; margin:0;\">\n"
+"    <tbody>\n"
+"        <tr><td valign=\"top\" style=\"font-size: 14px;\">\n"
+"            <t t-if=\"partner.name\">\n"
+"                Dobrý den <t t-out=\"partner.name or ''\">Brandon Freeman</"
+"t>,<br/><br/>\n"
+"            </t>\n"
+"            <t t-else=\"\">\n"
+"                Dobrý den,<br/>\n"
+"            </t>\n"
+"            Věnujte prosím chvíli hodnocení našich služeb souvisejících s "
+"Požadavkem \"<strong t-out=\"object.name or ''\">Nohy stolu jsou nevyvážené</"
+"strong>\"\n"
+"            <t t-if=\"object._rating_get_operator().name\">\n"
+"                připsánému <strong t-"
+"out=\"object._rating_get_operator().name or ''\">Mitchell Admin</strong>.<br/"
+">\n"
+"            </t>\n"
+"            <t t-else=\"\">\n"
+"                .<br/><br/>\n"
+"            </t>\n"
+"        </td></tr>\n"
+"        <tr><td style=\"text-align: center;\">\n"
+"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"style=\"width:100%; margin: 32px 0px 32px 0px; display: inline-table;\">\n"
+"                <tr><td style=\"font-size: 14px; text-align:center;\">\n"
+"                    <strong>Řekněte nám, jak se vám naše služby líbí</"
+"strong><br/>\n"
+"                    <span style=\"text-color: #888888\">(klikněte na jednoho "
+"z těchto smajlíků)</span>\n"
+"                </td></tr>\n"
+"                <tr><td style=\"font-size: 14px;\">\n"
+"                    <table style=\"width:100%;text-align:center;margin-"
+"top:2rem;\">\n"
+"                        <tr>\n"
+"                            <td>\n"
+"                                <a t-attf-href=\"/rate/{{ access_token }}/"
+"5\" t-att-class=\"'pe-none' if object._rating_get_operator() else ''\">\n"
+"                                    <img alt=\"Satisfied\" src=\"/rating/"
+"static/src/img/rating_5.png\" title=\"Satisfied\"/>\n"
+"                                </a>\n"
+"                            </td>\n"
+"                            <td>\n"
+"                                <a t-attf-href=\"/rate/{{ access_token }}/"
+"3\" t-att-class=\"'pe-none' if object._rating_get_operator() else ''\">\n"
+"                                    <img alt=\"Okay\" src=\"/rating/static/"
+"src/img/rating_3.png\" title=\"Okay\"/>\n"
+"                                </a>\n"
+"                            </td>\n"
+"                            <td>\n"
+"                                <a t-attf-href=\"/rate/{{ access_token }}/"
+"1\" t-att-class=\"'pe-none' if object._rating_get_operator() else ''\">\n"
+"                                    <img alt=\"Dissatisfied\" src=\"/rating/"
+"static/src/img/rating_1.png\" title=\"Dissatisfied\"/>\n"
+"                                </a>\n"
+"                            </td>\n"
+"                        </tr>\n"
+"                    </table>\n"
+"                </td></tr>\n"
+"            </table>\n"
+"        </td></tr>\n"
+"        <tr><td valign=\"top\" style=\"font-size: 14px;\">\n"
+"            Vážíme si vaší zpětné vazby. Pomáhá nám neustále se zlepšovat.\n"
+"            <br/><br/><span style=\"margin: 0px 0px 0px 0px; font-size: "
+"12px; opacity: 0.5; color: #454748;\">Tento zákaznický průzkum byl odeslán, "
+"protože váš tiket byl přesunut do fáze: <b t-out=\"object.stage_id.name or "
+"''\">Probíhá</b>.</span>\n"
+"        </td></tr>\n"
+"    </tbody>\n"
+"    </table>\n"
+"</div>\n"
+"        "
 
 #. module: helpdesk
 #: model:mail.template,body_html:helpdesk.new_ticket_request_email_template
+#, fuzzy
 msgid ""
 "<div>\n"
-"    Dear <t t-out=\"object.sudo().partner_id.name or object.sudo().partner_name or 'Madam/Sir'\">Madam/Sir</t>,<br><br>\n"
+"    Dear <t t-out=\"object.sudo().partner_id.name or "
+"object.sudo().partner_name or 'Madam/Sir'\">Madam/Sir</t>,<br/><br/>\n"
 "    Your request\n"
-"    <t t-if=\"hasattr(object.team_id, 'website_id') and object.get_portal_url()\">\n"
-"        <a t-attf-href=\"{{ object.team_id.website_id.domain }}/my/ticket/{{ object.id }}/{{ object.access_token }}\" t-out=\"object.name or ''\">Table legs are unbalanced</a>\n"
+"    <t t-if=\"hasattr(object.team_id, 'website_id') and "
+"object.get_portal_url()\">\n"
+"        <a t-attf-href=\"{{ object.team_id.website_id.domain }}/my/ticket/"
+"{{ object.id }}/{{ object.access_token }}\" t-out=\"object.name or "
+"''\">Table legs are unbalanced</a>\n"
 "    </t>\n"
-"    has been received and is being reviewed by our <t t-out=\"object.team_id.name or ''\">VIP Support</t> team.<br><br>\n"
-"    The reference for your ticket is <strong><t t-out=\"object.ticket_ref or ''\">15</t></strong>.<br><br>\n"
+"    has been received and is being reviewed by our <t t-"
+"out=\"object.team_id.name or ''\">VIP Support</t> team.<br/><br/>\n"
+"    The reference for your ticket is <strong><t t-out=\"object.ticket_ref or "
+"''\">15</t></strong>.<br/><br/>\n"
 "\n"
-"    To provide any additional information, simply reply to this email.<br><br>\n"
+"    To provide any additional information, simply reply to this email.<br/"
+"><br/>\n"
 "    <t t-if=\"object.team_id.show_knowledge_base\">\n"
-"        Don't hesitate to visit our <a t-attf-href=\"{{ object.team_id.get_knowledge_base_url() }}\">Help Center</a>. You might find the answer to your question.\n"
-"        <br><br>\n"
+"        Don't hesitate to visit our <a t-attf-"
+"href=\"{{ object.team_id.get_knowledge_base_url() }}\">Help Center</a>. You "
+"might find the answer to your question.\n"
+"        <br/><br/>\n"
 "    </t>\n"
 "    <t t-if=\"object.team_id.allow_portal_ticket_closing\">\n"
-"        Feel free to close your ticket if our help is no longer needed. Thank you for your collaboration.<br><br>\n"
+"        Feel free to close your ticket if our help is no longer needed. "
+"Thank you for your collaboration.<br/><br/>\n"
 "    </t>\n"
 "\n"
 "    <div style=\"text-align: center; padding: 16px 0px 16px 0px;\">\n"
-"        <t t-if=\"hasattr(object.team_id, 'website_id') and object.team_id.use_website_helpdesk_form\">\n"
-"            <a style=\"background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size: 13px;\" t-att-href=\"'%s%s' % (object.team_id.website_id.domain or '', object.get_portal_url())\" target=\"_blank\">View Ticket</a>\n"
+"        <t t-if=\"hasattr(object.team_id, 'website_id') and "
+"object.team_id.use_website_helpdesk_form\">\n"
+"            <a class=\"btn btn-fill-primary btn-sm\" style=\"background-"
+"color: rgb(113, 75, 103); padding: 3px 8px; text-decoration: none; color: "
+"#fff; border-radius: 3px; font-size: 13px;\" t-att-href=\"'%s%s' % "
+"(object.team_id.website_id.domain or '', object.get_portal_url())\" "
+"target=\"_blank\">View Ticket</a>\n"
 "        </t>\n"
 "        <t t-else=\"\">\n"
-"            <a style=\"background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;\" t-att-href=\"object.get_portal_url()\" target=\"_blank\">View Ticket</a>\n"
+"            <a class=\"btn btn-fill-primary btn-sm\" style=\"background-"
+"color: rgb(113, 75, 103); padding: 3px 8px; text-decoration: none; color: "
+"#fff; border-radius: 3px; font-size: 13px;\" t-att-"
+"href=\"object.get_portal_url()\" target=\"_blank\">View Ticket</a>\n"
 "        </t>\n"
-"        <t t-if=\"hasattr(object.team_id, 'website_id') and object.team_id.allow_portal_ticket_closing\">\n"
-"            <a style=\"background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;\" t-att-href=\"'%s/my/ticket/close/%s/%s' % (object.team_id.website_id.domain or '', object.id, object.access_token)\" target=\"_blank\">Close Ticket</a>\n"
+"        <t t-if=\"hasattr(object.team_id, 'website_id') and "
+"object.team_id.allow_portal_ticket_closing\">\n"
+"            <a class=\"btn btn-fill-primary btn-sm\" style=\"background-"
+"color: rgb(113, 75, 103); padding: 3px 8px; text-decoration: none; color: "
+"#fff; border-radius: 3px; font-size: 13px;\" t-att-href=\"'%s/my/ticket/"
+"close/%s/%s' % (object.team_id.website_id.domain or '', object.id, "
+"object.access_token)\" target=\"_blank\">Close Ticket</a>\n"
 "        </t>\n"
 "        <t t-elif=\"object.team_id.allow_portal_ticket_closing\">\n"
-"            <a style=\"background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;\" t-att-href=\"'/my/ticket/close/%s/%s' % (object.id, object.access_token)\" target=\"_blank\">Close Ticket</a>\n"
+"            <a class=\"btn btn-fill-primary btn-sm\" style=\"background-"
+"color: rgb(113, 75, 103); padding: 3px 8px; text-decoration: none; color: "
+"#fff; border-radius: 3px; font-size: 13px;\" t-att-href=\"'/my/ticket/close/"
+"%s/%s' % (object.id, object.access_token)\" target=\"_blank\">Close Ticket</"
+"a>\n"
 "        </t>\n"
-"        <t t-if=\"object.team_id.use_website_helpdesk_forum or object.team_id.use_website_helpdesk_knowledge or object.team_id.use_website_helpdesk_slides\">\n"
-"            <a style=\"background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;\" t-att-href=\"object.team_id.feature_form_url\" target=\"_blank\">Visit Help Center</a>\n"
-"        </t><br><br>\n"
+"        <t t-if=\"object.team_id.use_website_helpdesk_forum or "
+"object.team_id.use_website_helpdesk_knowledge or "
+"object.team_id.use_website_helpdesk_slides\">\n"
+"            <a class=\"btn btn-fill-primary btn-sm\" style=\"background-"
+"color: rgb(113, 75, 103); padding: 3px 8px; text-decoration: none; color: "
+"#fff; border-radius: 3px; font-size: 13px;\" t-att-"
+"href=\"object.team_id.feature_form_url\" target=\"_blank\">Visit Help "
+"Center</a>\n"
+"        </t><br/><br/>\n"
 "    </div>\n"
 "\n"
-"    Best regards,<br><br>\n"
+"    Best regards,<br/><br/>\n"
 "    <t t-out=\"object.team_id.name or 'Helpdesk'\">Helpdesk</t> Team\n"
 "</div>\n"
 "        "
 msgstr ""
+"<div>\n"
+"    Vážená/Vážený <t t-out=\"object.sudo().partner_id.name or "
+"object.sudo().partner_name or 'Madam/Sir'\">Paní/Pane</t>,<br/><br/>\n"
+"    Váš požadavek\n"
+"    <t t-if=\"hasattr(object.team_id, 'website_id') and "
+"object.get_portal_url()\">\n"
+"        <a t-attf-href=\"{{ object.team_id.website_id.domain }}/my/ticket/"
+"{{ object.id }}/{{ object.access_token }}\" t-out=\"object.name or ''\">Nohy "
+"stolu jsou nevyvážené</a>\n"
+"    </t>\n"
+"    byl přijat a je přezkoumáván naším <t t-out=\"object.team_id.name or "
+"''\">VIP Týmem Podpory</t>.<br/><br/>\n"
+"    Referenční číslo vašeho požadavku je <strong><t t-"
+"out=\"object.ticket_ref or ''\">15</t></strong>.<br/><br/>\n"
+"\n"
+"    Chcete-li poskytnout další informace, jednoduše odpovězte na tento e-"
+"mail.<br/><br/>\n"
+"    <t t-if=\"object.team_id.show_knowledge_base\">\n"
+"        Neváhejte navštívit naše <a t-attf-"
+"href=\"{{ object.team_id.get_knowledge_base_url() }}\">Centrum nápovědy</a>. "
+"Možná najdete odpověď na svou otázku.\n"
+"        <br/><br/>\n"
+"    </t>\n"
+"    <t t-if=\"object.team_id.allow_portal_ticket_closing\">\n"
+"         Pokud již naši pomoc nepotřebujete, můžete svůj tiket zavřít.  "
+"Děkujeme vám za spolupráci..<br/><br/>\n"
+"    </t>\n"
+"\n"
+"    <div style=\"text-align: center; padding: 16px 0px 16px 0px;\">\n"
+"        <t t-if=\"hasattr(object.team_id, 'website_id') and "
+"object.team_id.use_website_helpdesk_form\">\n"
+"            <a style=\"background-color: #875A7B; padding: 8px 16px 8px "
+"16px; text-decoration: none; color: #fff; border-radius: 5px; font-size: "
+"13px;\" t-att-href=\"'%s%s' % (object.team_id.website_id.domain or '', "
+"object.get_portal_url())\" target=\"_blank\">Zobrazit požadavek</a>\n"
+"        </t>\n"
+"        <t t-else=\"\">\n"
+"            <a style=\"background-color: #875A7B; padding: 8px 16px 8px "
+"16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;"
+"\" t-att-href=\"object.get_portal_url()\" target=\"_blank\">Zobrazit "
+"požadavek</a>\n"
+"        </t>\n"
+"        <t t-if=\"hasattr(object.team_id, 'website_id') and "
+"object.team_id.allow_portal_ticket_closing\">\n"
+"            <a style=\"background-color: #875A7B; padding: 8px 16px 8px "
+"16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;"
+"\" t-att-href=\"'%s/my/ticket/close/%s/%s' % "
+"(object.team_id.website_id.domain or '', object.id, object.access_token)\" "
+"target=\"_blank\">Zavřít požadavek</a>\n"
+"        </t>\n"
+"        <t t-elif=\"object.team_id.allow_portal_ticket_closing\">\n"
+"            <a style=\"background-color: #875A7B; padding: 8px 16px 8px "
+"16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;"
+"\" t-att-href=\"'/my/ticket/close/%s/%s' % (object.id, object.access_token)"
+"\" target=\"_blank\">Zavřít požadavek</a>\n"
+"        </t>\n"
+"        <t t-if=\"object.team_id.use_website_helpdesk_forum or "
+"object.team_id.use_website_helpdesk_knowledge or "
+"object.team_id.use_website_helpdesk_slides\">\n"
+"            <a style=\"background-color: #875A7B; padding: 8px 16px 8px "
+"16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;"
+"\" t-att-href=\"object.team_id.feature_form_url\" "
+"target=\"_blank\">Navštívit centrum nápovědy</a>\n"
+"        </t><br/><br/>\n"
+"    </div>\n"
+"\n"
+"    S pozdravem,<br/><br/>\n"
+"    <t t-out=\"object.team_id.name or 'Helpdesk'\">Helpdesk</t> Tým\n"
+"</div>\n"
+"        "
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_kanban
@@ -257,13 +462,21 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_ticket_view_form
 msgid ""
-"<i class=\"fa fa-fw o_button_icon fa-smile-o text-success\" invisible=\"rating_avg &lt; 3.66\" title=\"Satisfied\"/>\n"
-"                            <i class=\"fa fa-fw o_button_icon fa-meh-o text-warning\" invisible=\"rating_avg &lt; 2.33 or rating_avg &gt;= 3.66\" title=\"Okay\"/>\n"
-"                            <i class=\"fa fa-fw o_button_icon fa-frown-o text-danger\" invisible=\"rating_avg &gt;= 2.33\" title=\"Dissatisfied\"/>"
+"<i class=\"fa fa-fw o_button_icon fa-smile-o text-success\" "
+"invisible=\"rating_avg &lt; 3.66\" title=\"Satisfied\"/>\n"
+"                            <i class=\"fa fa-fw o_button_icon fa-meh-o text-"
+"warning\" invisible=\"rating_avg &lt; 2.33 or rating_avg &gt;= 3.66\" "
+"title=\"Okay\"/>\n"
+"                            <i class=\"fa fa-fw o_button_icon fa-frown-o "
+"text-danger\" invisible=\"rating_avg &gt;= 2.33\" title=\"Dissatisfied\"/>"
 msgstr ""
-"<i class=\"fa fa-fw o_button_icon fa-smile-o text-success\" invisible=\"rating_avg &lt; 3.66\" title=\"Satisfied\"/>\n"
-"                            <i class=\"fa fa-fw o_button_icon fa-meh-o text-warning\" invisible=\"rating_avg &lt; 2.33 or rating_avg &gt;= 3.66\" title=\"Okay\"/>\n"
-"                            <i class=\"fa fa-fw o_button_icon fa-frown-o text-danger\" invisible=\"rating_avg &gt;= 2.33\" title=\"Dissatisfied\"/>"
+"<i class=\"fa fa-fw o_button_icon fa-smile-o text-success\" "
+"invisible=\"rating_avg &lt; 3.66\" title=\"Satisfied\"/>\n"
+"                            <i class=\"fa fa-fw o_button_icon fa-meh-o text-"
+"warning\" invisible=\"rating_avg &lt; 2.33 or rating_avg &gt;= 3.66\" "
+"title=\"Okay\"/>\n"
+"                            <i class=\"fa fa-fw o_button_icon fa-frown-o "
+"text-danger\" invisible=\"rating_avg &gt;= 2.33\" title=\"Dissatisfied\"/>"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_ticket_view_form
@@ -278,9 +491,9 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 msgid ""
 "<i class=\"fa fa-lightbulb-o\" role=\"img\"/><span class=\"ms-2\">To use an "
-"email alias, the first step is to configure an Alias Domain. You can achieve"
-" this by navigating to the General Settings and configuring the "
-"corresponding field.</span>"
+"email alias, the first step is to configure an Alias Domain. You can achieve "
+"this by navigating to the General Settings and configuring the corresponding "
+"field.</span>"
 msgstr ""
 "<i class=\"fa fa-lightbulb-o\" role=\"img\"/><span class=\"ms-2\">Chcete-li "
 "používat e-mailový alias, je třeba nejprve nakonfigurovat doménu aliasu. "
@@ -291,7 +504,9 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 msgid ""
 "<i class=\"fa fa-lightbulb-o\"/>\n"
-"                                    <span class=\"ms-2\">A rating request will automatically be sent by email to the customer when their ticket reaches the corresponding stage with the email template set.</span>"
+"                                    <span class=\"ms-2\">A rating request "
+"will automatically be sent by email to the customer when their ticket "
+"reaches the corresponding stage with the email template set.</span>"
 msgstr ""
 
 #. module: helpdesk
@@ -299,8 +514,10 @@ msgstr ""
 msgid ""
 "<i class=\"fa fa-lightbulb-o\"/>\n"
 "                                <span class=\"ms-2\">\n"
-"                                    Type <b>/ticket</b> to create tickets<br/>\n"
-"                                    Type <b>/search_tickets</b> to find tickets<br/>\n"
+"                                    Type <b>/ticket</b> to create tickets<br/"
+">\n"
+"                                    Type <b>/search_tickets</b> to find "
+"tickets<br/>\n"
 "                                </span>"
 msgstr ""
 
@@ -358,7 +575,8 @@ msgstr "<span class=\"m-1\"/>#"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_sla_view_form
 msgid "<span class=\"o_field_widget o_readonly_modifier\">Working Hours</span>"
-msgstr "<span class=\"o_field_widget o_readonly_modifier\">Pracovní doba</span>"
+msgstr ""
+"<span class=\"o_field_widget o_readonly_modifier\">Pracovní doba</span>"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_ticket_view_form
@@ -393,23 +611,23 @@ msgstr "<span class=\"o_stat_text\">Hodnocení</span>"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_kanban
-msgid "<span class=\"text-muted\">Failed</span>"
-msgstr "<span class=\"text-muted\">Nepodařené</span>"
+msgid "<span class=\"text-muted text-nowrap\">Failed</span>"
+msgstr ""
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_kanban
-msgid "<span class=\"text-muted\">Open</span>"
-msgstr "<span class=\"text-muted\">Otevřeno</span>"
+msgid "<span class=\"text-muted text-nowrap\">Open</span>"
+msgstr ""
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_kanban
-msgid "<span class=\"text-muted\">Unassigned</span>"
-msgstr "<span class=\"text-muted\">Nepřiřazené</span>"
+msgid "<span class=\"text-muted text-nowrap\">Unassigned</span>"
+msgstr ""
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_kanban
-msgid "<span class=\"text-muted\">Urgent</span>"
-msgstr "<span class=\"text-muted\">Naléhavé</span>"
+msgid "<span class=\"text-muted text-nowrap\">Urgent</span>"
+msgstr ""
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
@@ -550,11 +768,11 @@ msgstr "Typy aktivit"
 #. odoo-javascript
 #: code:addons/helpdesk/static/src/js/tours/helpdesk.js:0
 msgid ""
-"Adapt your <b>pipeline</b> to your workflow by adding <b>stages</b> <i>(e.g."
-" Awaiting Customer Feedback, etc.).</i>"
+"Adapt your <b>pipeline</b> to your workflow by adding <b>stages</b> <i>(e.g. "
+"Awaiting Customer Feedback, etc.).</i>"
 msgstr ""
-"Přizpůsobte svůj <b>kanál</b> vašemu pracovnímu postupu přidáním <b>fází</b>"
-" <i>(např. Čekání na zpětnou vazbu od zákazníků atd.).</i>"
+"Přizpůsobte svůj <b>kanál</b> vašemu pracovnímu postupu přidáním <b>fází</b> "
+"<i>(např. Čekání na zpětnou vazbu od zákazníků atd.).</i>"
 
 #. module: helpdesk
 #: model_terms:ir.actions.act_window,help:helpdesk.helpdesk_stage_action
@@ -574,8 +792,8 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/helpdesk/static/src/js/tours/helpdesk.js:0
 msgid ""
-"Add your stage and place it at the right step of your workflow by dragging &"
-" dropping it."
+"Add your stage and place it at the right step of your workflow by dragging & "
+"dropping it."
 msgstr ""
 "Přidejte fázi a umístěte ji na správný krok pracovního postupu přetažením."
 
@@ -693,12 +911,6 @@ msgid "Are you sure you want to delete these stages?"
 msgstr "Jste si jisti, že chcete tyto fáze odstranit?"
 
 #. module: helpdesk
-#. odoo-javascript
-#: code:addons/helpdesk/static/src/js/tours/helpdesk.js:0
-msgid "Assign the ticket to a <b>member of your team</b>."
-msgstr "Přidělte požadavek <b>členovi vašeho týmu</b>. "
-
-#. module: helpdesk
 #. odoo-python
 #: code:addons/helpdesk/controllers/portal.py:0
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_ticket_view_graph_main
@@ -727,7 +939,7 @@ msgstr "Přiřazeno k"
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_ticket_view_search_analysis
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_ticket_view_search_analysis_closed
 msgid "Assignee"
-msgstr "Nabyvatel"
+msgstr "Řešitel"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_team__assign_method
@@ -764,8 +976,8 @@ msgid ""
 "Automate the assignment of new tickets to the right people, and make sure "
 "all tickets are being handled"
 msgstr ""
-"Automatizujte přidělování nových tiketů správným lidem a zajistěte, aby byly"
-" zpracovány všechny tikety"
+"Automatizujte přidělování nových tiketů správným lidem a zajistěte, aby byly "
+"zpracovány všechny tikety"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_team__auto_assignment
@@ -1316,7 +1528,7 @@ msgstr "Zrušit"
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__display_name
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket_report_analysis__display_name
 msgid "Display Name"
-msgstr "Zobrazovací název"
+msgstr "Zobrazovaný název"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_tickets_view_search_base
@@ -1360,13 +1572,18 @@ msgstr "Emailová šablona"
 #. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_stage__template_id
 msgid ""
-"Email automatically sent to the customer when the ticket reaches this stage.\n"
-"By default, the email will be sent from the email alias of the helpdesk team.\n"
-"Otherwise it will be sent from the company's email address, or from the catchall (as defined in the System Parameters)."
+"Email automatically sent to the customer when the ticket reaches this "
+"stage.\n"
+"By default, the email will be sent from the email alias of the helpdesk "
+"team.\n"
+"Otherwise it will be sent from the company's email address, or from the "
+"catchall (as defined in the System Parameters)."
 msgstr ""
 "E-mail se automaticky odešle zákazníkovi, když tiket dosáhne této fáze.\n"
-"Ve výchozím nastavení bude e-mail odeslán z e-mailového aliasu týmu helpdesku.\n"
-"V opačném případě bude odeslán z e-mailové adresy společnosti nebo z obchodního místa (jak je definováno v Systémových parametrech)."
+"Ve výchozím nastavení bude e-mail odeslán z e-mailového aliasu týmu "
+"helpdesku.\n"
+"V opačném případě bude odeslán z e-mailové adresy společnosti nebo z "
+"obchodního místa (jak je definováno v Systémových parametrech)."
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__email_cc
@@ -1385,8 +1602,7 @@ msgstr "E-maily odeslané na adresu"
 
 #. module: helpdesk
 #: model_terms:digest.tip,tip_description:helpdesk.digest_tip_helpdesk_0
-msgid ""
-"Emails sent to a Helpdesk Team alias generate tickets in your pipeline."
+msgid "Emails sent to a Helpdesk Team alias generate tickets in your pipeline."
 msgstr ""
 "E-maily odeslané zástupnému týmu helpdesku generují požadavky ve vašem "
 "kanálu."
@@ -1538,20 +1754,20 @@ msgid ""
 "assigned to."
 msgstr ""
 "Přidáním zaměstnanců jako sledovaných osob jim můžete udělit přístup k týmu "
-"helpdesku nebo k tiketům. Zaměstnanci automaticky získají přístup k tiketům,"
-" ke kterým jsou přiřazeni."
+"helpdesku nebo k tiketům. Zaměstnanci automaticky získají přístup k tiketům, "
+"ke kterým jsou přiřazeni."
 
 #. module: helpdesk
 #. odoo-python
 #: code:addons/helpdesk/models/helpdesk_team.py:0
 msgid ""
-"Grant portal users access to your helpdesk team or tickets by adding them as"
-" followers. Customers automatically get access to their tickets in their "
+"Grant portal users access to your helpdesk team or tickets by adding them as "
+"followers. Customers automatically get access to their tickets in their "
 "portal."
 msgstr ""
-"Přidáním uživatelů portálu jako sledovaných osob jim můžete udělit přístup k"
-" týmu helpdesku nebo k tiketům. Zákazníci automaticky získají přístup ke "
-"svým tiketům na portálu."
+"Přidáním uživatelů portálu jako sledovaných osob jim můžete udělit přístup k "
+"týmu helpdesku nebo k tiketům. Zákazníci automaticky získají přístup ke svým "
+"tiketům na portálu."
 
 #. module: helpdesk
 #: model:ir.model.fields.selection,name:helpdesk.selection__helpdesk_sla_report_analysis__kanban_state__done
@@ -1766,8 +1982,8 @@ msgstr "ID"
 #. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_team__alias_parent_thread_id
 msgid ""
-"ID of the parent record holding the alias (example: project holding the task"
-" creation alias)"
+"ID of the parent record holding the alias (example: project holding the task "
+"creation alias)"
 msgstr ""
 "ID rodičovského záznamu obsahující alias (například: Projekt obsahující "
 "alias pro vytváření úkolů)"
@@ -1879,7 +2095,7 @@ msgstr "Stav kanban"
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__kanban_state_label
 msgid "Kanban State Label"
-msgstr "Státní označení Kanban"
+msgstr "Označení Kanban stavu"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__legend_done
@@ -2011,8 +2227,7 @@ msgstr "Nízká priorita"
 msgid ""
 "Make sure tickets are handled in a timely manner by using SLA Policies.<br>"
 msgstr ""
-"Zajistěte, aby požadavky byly zpracovány včas, v souladu se zásadamy "
-"SLA.<br>"
+"Zajistěte, aby požadavky byly zpracovány včas, v souladu se zásadamy SLA.<br>"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
@@ -2161,8 +2376,8 @@ msgid ""
 "New tickets will automatically be assigned to the team members that are "
 "available, according to their working hours and their time off."
 msgstr ""
-"Nové tikety budou automaticky přiřazeny členům týmu, kteří jsou k dispozici,"
-" podle jejich pracovní doby a volna."
+"Nové tikety budou automaticky přiřazeny členům týmu, kteří jsou k dispozici, "
+"podle jejich pracovní doby a volna."
 
 #. module: helpdesk
 #. odoo-python
@@ -2352,6 +2567,12 @@ msgid "Open Time (hours)"
 msgstr "Otevřený čas (hodiny)"
 
 #. module: helpdesk
+#. odoo-javascript
+#: code:addons/helpdesk/static/src/js/tours/helpdesk.js:0
+msgid "Open the ticket."
+msgstr ""
+
+#. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_team__alias_force_thread_id
 msgid ""
 "Optional ID of a thread (record) to which all incoming messages will be "
@@ -2385,8 +2606,8 @@ msgstr "ID vlákna nadřazeného záznamu"
 #. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_team__alias_parent_model_id
 msgid ""
-"Parent model holding the alias. The model holding the alias reference is not"
-" necessarily the model given by alias_model_id (example: project "
+"Parent model holding the alias. The model holding the alias reference is not "
+"necessarily the model given by alias_model_id (example: project "
 "(parent_model) and task (model))"
 msgstr ""
 "Nadřazený model s aliasem. Model obsahující odkaz na alias nemusí být nutně "
@@ -2404,23 +2625,39 @@ msgstr "Partnerské požadavky"
 msgid ""
 "People to whom this helpdesk team and its tickets will be visible.\n"
 "\n"
-"- Invited internal users: internal users can access the team and the tickets they are following. This access can be modified on each ticket individually by adding or removing the user as follower.\n"
-"A user with the helpdesk > administrator access right level can still access this team and its tickets, even if they are not explicitely part of the followers.\n"
+"- Invited internal users: internal users can access the team and the tickets "
+"they are following. This access can be modified on each ticket individually "
+"by adding or removing the user as follower.\n"
+"A user with the helpdesk > administrator access right level can still access "
+"this team and its tickets, even if they are not explicitely part of the "
+"followers.\n"
 "\n"
-"- All internal users: all internal users can access the team and all of its tickets without distinction.\n"
+"- All internal users: all internal users can access the team and all of its "
+"tickets without distinction.\n"
 "\n"
-"- Invited portal users and all internal users: all internal users can access the team and all of its tickets without distinction.\n"
-"Portal users can only access the tickets they are following. This access can be modified on each ticket individually by adding or removing the portal user as follower."
+"- Invited portal users and all internal users: all internal users can access "
+"the team and all of its tickets without distinction.\n"
+"Portal users can only access the tickets they are following. This access can "
+"be modified on each ticket individually by adding or removing the portal "
+"user as follower."
 msgstr ""
 "Lidé, kterým bude tento tým helpdesku a jeho tikety viditelný.\n"
 "\n"
-"- Pozvaní interní uživatelé: interní uživatelé mají přístup k týmu a tiketům, které sledují. Tento přístup lze upravit u každého tiketu jednotlivě přidáním nebo odebráním uživatele jako sledujícího.\n"
-"Uživatel s úrovní přístupových práv helpdesk > administrátor má stále přístup k tomuto týmu a jeho tiketům, i když nejsou explicitně součástí sledujících.\n"
+"- Pozvaní interní uživatelé: interní uživatelé mají přístup k týmu a "
+"tiketům, které sledují. Tento přístup lze upravit u každého tiketu "
+"jednotlivě přidáním nebo odebráním uživatele jako sledujícího.\n"
+"Uživatel s úrovní přístupových práv helpdesk > administrátor má stále "
+"přístup k tomuto týmu a jeho tiketům, i když nejsou explicitně součástí "
+"sledujících.\n"
 "\n"
-"- Všichni interní uživatelé: všichni interní uživatelé mají přístup k týmu a všem jeho tiketům bez rozdílu.\n"
+"- Všichni interní uživatelé: všichni interní uživatelé mají přístup k týmu a "
+"všem jeho tiketům bez rozdílu.\n"
 "\n"
-"- Pozvaní uživatelé portálu a všichni interní uživatelé: všichni interní uživatelé mají přístup k týmu a všem jeho tiketům bez rozdílu.\n"
-"Uživatelé portálu mají přístup pouze k tiketům, které sledují. Tento přístup lze upravit u každého tiketu jednotlivě přidáním nebo odebráním uživatele portálu jako sledujícího."
+"- Pozvaní uživatelé portálu a všichni interní uživatelé: všichni interní "
+"uživatelé mají přístup k týmu a všem jeho tiketům bez rozdílu.\n"
+"Uživatelé portálu mají přístup pouze k tiketům, které sledují. Tento přístup "
+"lze upravit u každého tiketu jednotlivě přidáním nebo odebráním uživatele "
+"portálu jako sledujícího."
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
@@ -2441,8 +2678,8 @@ msgstr "Procento tiketů, které byly uzavřeny bez porušení SLA."
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_kanban
 msgid ""
-"Percentage of tickets whose SLAs have successfully been reached on time over"
-" the total number of tickets closed within the past 7 days."
+"Percentage of tickets whose SLAs have successfully been reached on time over "
+"the total number of tickets closed within the past 7 days."
 msgstr ""
 "Procento tiketů, jejichž SLA bylo úspěšně dosaženo včas, na celkovém počtu "
 "tiketů uzavřených za posledních 7 dní."
@@ -2504,12 +2741,14 @@ msgid ""
 "Policy to post a message on the document using the mailgateway.\n"
 "- everyone: everyone can post\n"
 "- partners: only authenticated partners\n"
-"- followers: only followers of the related document or members of following channels\n"
+"- followers: only followers of the related document or members of following "
+"channels\n"
 msgstr ""
 "Zásady zveřejňování zpráv v dokumentu pomocí poštovní brány.\n"
 "- každý: každý může psát\n"
 "- partneři: pouze ověření partneři\n"
-"- sledující: pouze sledující související dokument nebo členové následujících kanálů\n"
+"- sledující: pouze sledující související dokument nebo členové následujících "
+"kanálů\n"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__access_url
@@ -2625,8 +2864,8 @@ msgstr "Připraveno"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 msgid ""
-"Receive notifications whenever tickets are created, rated or discussed on in"
-" this team"
+"Receive notifications whenever tickets are created, rated or discussed on in "
+"this team"
 msgstr ""
 "Přijímejte notifikace vždy, když jsou v tomto týmu vytvořeny, ohodnoceny "
 "nebo diskutovány tikety."
@@ -2776,6 +3015,7 @@ msgstr "Fáze SLA"
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_sla_report_analysis__sla_status_ids
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__sla_status_ids
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket_report_analysis__sla_status_ids
+#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_sla_report_analysis_view_search
 msgid "SLA Status"
 msgstr "Stav smlouvy SLA"
 
@@ -2853,6 +3093,12 @@ msgstr "Vzorek"
 #: model_terms:ir.ui.view,arch_db:helpdesk.team_rating_progress_data
 msgid "Satisfied"
 msgstr "Spokojený"
+
+#. module: helpdesk
+#. odoo-javascript
+#: code:addons/helpdesk/static/src/js/tours/helpdesk.js:0
+msgid "Save this ticket and the modifications you've made to it."
+msgstr "Uložte si tento požadavek a úpravy, které jste v něm provedli."
 
 #. module: helpdesk
 #. odoo-javascript
@@ -2967,8 +3213,8 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 msgid ""
 "Share presentations and videos, and organize them into courses. Allow "
-"customers to search your eLearning courses in the help center for answers to"
-" their questions."
+"customers to search your eLearning courses in the help center for answers to "
+"their questions."
 msgstr ""
 "Sdílejte prezentace a videa a uspořádejte je do kurzů. Umožněte zákazníkům "
 "vyhledávat v centrech nápovědy odpovědi na jejich otázky."
@@ -3155,11 +3401,17 @@ msgid "Templates"
 msgstr "Vzory"
 
 #. module: helpdesk
+#. odoo-python
+#: code:addons/helpdesk/models/helpdesk_ticket.py:0
+msgid "The customer cannot belong to a different company than the ticket."
+msgstr ""
+
+#. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_team__alias_model_id
 msgid ""
-"The model (Odoo Document Kind) to which this alias corresponds. Any incoming"
-" email that does not reply to an existing record will cause the creation of "
-"a new record of this model (e.g. a Project Task)"
+"The model (Odoo Document Kind) to which this alias corresponds. Any incoming "
+"email that does not reply to an existing record will cause the creation of a "
+"new record of this model (e.g. a Project Task)"
 msgstr ""
 "Model (Odoo Document Kind), ke kterému odpovídá tento alias. Jakýkoli "
 "příchozí e-mail, který neodpovídá stávajícímu záznamu, způsobí vytvoření "
@@ -3191,8 +3443,8 @@ msgstr "Čas strávený v těchto fázích nebude při výpočtu SLA zohledněn.
 #. odoo-python
 #: code:addons/helpdesk/models/helpdesk_team.py:0
 msgid ""
-"The visibility of the team needs to be set as \"Invited portal users and all"
-" internal users\" in order to use the website form."
+"The visibility of the team needs to be set as \"Invited portal users and all "
+"internal users\" in order to use the website form."
 msgstr ""
 "Viditelnost týmu musí být nastavena jako \"Pozvaní uživatelé portálu a "
 "všichni interní uživatelé\", aby bylo možné používat webový formulář."
@@ -3200,7 +3452,7 @@ msgstr ""
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.portal_helpdesk_ticket
 msgid "There are currently no Ticket for your account."
-msgstr "Momentálně na vášem účte neexistuje požadavka."
+msgstr "Momentálně zde není žádný požadavek."
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.ticket_creation
@@ -3210,8 +3462,7 @@ msgstr "Toto"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_sla_view_form
 msgid ""
-"This SLA Policy will apply to tickets matching ALL of the following "
-"criteria:"
+"This SLA Policy will apply to tickets matching ALL of the following criteria:"
 msgstr ""
 "Tyto zásady SLA se vztahují na tikety, které splňují VŠECHNA následující "
 "kritéria:"
@@ -3219,8 +3470,8 @@ msgstr ""
 #. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_ticket__campaign_id
 msgid ""
-"This is a name that helps you keep track of your different campaign efforts,"
-" e.g. Fall_Drive, Christmas_Special"
+"This is a name that helps you keep track of your different campaign efforts, "
+"e.g. Fall_Drive, Christmas_Special"
 msgstr ""
 "Toto je název, který vám pomůže sledovat různé kampaně, např. Fall_Drive, "
 "Christmas_Special"
@@ -3237,8 +3488,8 @@ msgid ""
 "This is the source of the link, e.g. Search Engine, another domain, or name "
 "of email list"
 msgstr ""
-"Toto je zdroj odkazu, např. vyhledávač, jiná doména nebo název seznamu "
-"e-mailů"
+"Toto je zdroj odkazu, např. vyhledávač, jiná doména nebo název seznamu e-"
+"mailů"
 
 #. module: helpdesk
 #. odoo-python
@@ -3258,8 +3509,7 @@ msgid ""
 "This will archive the stages and all of the tickets they contain from the "
 "following teams:"
 msgstr ""
-"Tím se archivují fáze a všechny tikety, které obsahují, z následujících "
-"týmů:"
+"Tím se archivují fáze a všechny tikety, které obsahují, z následujících týmů:"
 
 #. module: helpdesk
 #: model_terms:ir.actions.act_window,help:helpdesk.mail_activity_type_action_config_helpdesk
@@ -3306,8 +3556,10 @@ msgstr "Požadavka uzavřena"
 
 #. module: helpdesk
 #: model:mail.template,subject:helpdesk.solved_ticket_request_email_template
-msgid "Ticket Closed - Reference {{ object.id if object.id else 15 }}"
-msgstr "Tiket uzavřen - Reference {{ object.id if object.id else 15 }}"
+msgid ""
+"Ticket Closed - Reference {{ object.ticket_ref if object.ticket_ref else "
+"15 }}"
+msgstr ""
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_sla__ticket_count
@@ -3459,10 +3711,12 @@ msgstr "Tip: vytvořte požadavky z příchozích e-mailů"
 #: model_terms:ir.actions.act_window,help:helpdesk.helpdesk_ticket_action_unassigned
 msgid ""
 "To get things done, plan activities and use the ticket status.<br>\n"
-"                Collaborate efficiently by chatting in real-time or via email."
+"                Collaborate efficiently by chatting in real-time or via "
+"email."
 msgstr ""
 "Chcete-li věci dokončit, naplánujte si aktivity a použijte stav tiketu.<br>\n"
-"                Spolupracujte efektivně chatováním v reálném čase nebo e-mailem."
+"                Spolupracujte efektivně chatováním v reálném čase nebo e-"
+"mailem."
 
 #. module: helpdesk
 #. odoo-javascript
@@ -3588,8 +3842,8 @@ msgid ""
 "customers. Add new people to the followers' list to make them aware of the "
 "progress of this ticket."
 msgstr ""
-"Pomocí chatu můžete <b>odesílat e-maily</b> a efektivně komunikovat se svými"
-" zákazníky. Přidávejte nové lidi do seznamu sledovaných, abyste je "
+"Pomocí chatu můžete <b>odesílat e-maily</b> a efektivně komunikovat se svými "
+"zákazníky. Přidávejte nové lidi do seznamu sledovaných, abyste je "
 "informovali o průběhu tohoto tiketu."
 
 #. module: helpdesk
@@ -3626,8 +3880,8 @@ msgstr ""
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.tickets_followup
 msgid ""
-"We hope to have addressed your request satisfactorily. If you no longer need"
-" our assistance, please close this ticket. Thank you for your collaboration."
+"We hope to have addressed your request satisfactorily. If you no longer need "
+"our assistance, please close this ticket. Thank you for your collaboration."
 msgstr ""
 "Doufáme, že jsme váš požadavek uspokojivě vyřešili. Pokud již naši pomoc "
 "nepotřebujete, zavřete prosím tento ticket. Děkujeme vám za spolupráci."
@@ -3636,11 +3890,15 @@ msgstr ""
 #: model_terms:helpdesk.team,description:helpdesk.helpdesk_team1
 #: model_terms:helpdesk.team,description:helpdesk.helpdesk_team3
 msgid ""
-"We provide 24/7 support, Monday through Friday. Ticket responses are usually provided within 2 working days.<br>\n"
-"            Support is mainly provided in English. We can also assist in Spanish, French, and Dutch."
+"We provide 24/7 support, Monday through Friday. Ticket responses are usually "
+"provided within 2 working days.<br>\n"
+"            Support is mainly provided in English. We can also assist in "
+"Spanish, French, and Dutch."
 msgstr ""
-"Poskytujeme podporu 24/7, od pondělí do pátku. Odpovědi na tikety jsou obvykle poskytovány do 2 pracovních dnů.<br>\n"
-"            Podpora je poskytována převážně v angličtině. Můžeme také pomoci ve španělštině, francouzštině a holandštině."
+"Poskytujeme podporu 24/7, od pondělí do pátku. Odpovědi na tikety jsou "
+"obvykle poskytovány do 2 pracovních dnů.<br>\n"
+"            Podpora je poskytována převážně v angličtině. Můžeme také pomoci "
+"ve španělštině, francouzštině a holandštině."
 
 #. module: helpdesk
 #: model:helpdesk.tag,name:helpdesk.tag_website
@@ -3718,6 +3976,11 @@ msgid ""
 msgstr "Chcete také zrušit archivaci všech tiketů obsažených v těchto fázích?"
 
 #. module: helpdesk
+#: model:ir.model.fields,field_description:helpdesk.field_helpdesk_team__use_twitter
+msgid "X"
+msgstr ""
+
+#. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.view_helpdesk_stage_delete_wizard
 msgid ""
 "You cannot delete stages containing tickets. You can either archive them or "
@@ -3732,8 +3995,8 @@ msgid ""
 "You cannot delete stages containing tickets. You should first delete all of "
 "their tickets."
 msgstr ""
-"Fáze obsahující tikety nelze odstranit. Nejprve byste měli odstranit všechny"
-" jejich tikety."
+"Fáze obsahující tikety nelze odstranit. Nejprve byste měli odstranit všechny "
+"jejich tikety."
 
 #. module: helpdesk
 #: model:ir.model.constraint,message:helpdesk.constraint_res_users_target_closed_not_zero
@@ -3741,6 +4004,14 @@ msgstr ""
 #: model:ir.model.constraint,message:helpdesk.constraint_res_users_target_success_not_zero
 msgid "You cannot have negative targets"
 msgstr "Nemůžete mít negativní cíle"
+
+#. module: helpdesk
+#. odoo-python
+#: code:addons/helpdesk/models/res_partner.py:0
+msgid ""
+"You cannot update the company of this partner because it would lead to "
+"inconsistency with some of its tickets."
+msgstr ""
 
 #. module: helpdesk
 #: model_terms:ir.actions.act_window,help:helpdesk.helpdesk_ticket_action_sla
@@ -3761,7 +4032,7 @@ msgstr ""
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 msgid "alias"
-msgstr ""
+msgstr "alias"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_sla_view_form
@@ -3787,7 +4058,7 @@ msgstr "např. Produkt dorazil poškozený"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 msgid "e.g. mycompany.com"
-msgstr ""
+msgstr "např. \"mycompany.com\""
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_team__use_website_helpdesk_slides
@@ -3823,18 +4094,21 @@ msgstr "Požadavky"
 #. module: helpdesk
 #: model:mail.template,subject:helpdesk.rating_ticket_request_email_template
 msgid ""
-"{{ object.company_id.name or object.user_id.company_id.name or 'Helpdesk' "
-"}}: Service Rating Request"
+"{{ object.company_id.name or object.user_id.company_id.name or "
+"'Helpdesk' }}: Service Rating Request"
 msgstr ""
-"{{ object.company_id.name or object.user_id.company_id.name or 'Helpdesk'}}:"
-" Požadavek na hodnocení služby"
+"{{ object.company_id.name or object.user_id.company_id.name or 'Helpdesk'}}: "
+"Požadavek na hodnocení služby"
 
 #. module: helpdesk
 #: model:mail.template,subject:helpdesk.new_ticket_request_email_template
 msgid "{{ object.name }}"
-msgstr ""
+msgstr "{{ object.name }}"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.team_rating_data
 msgid "{{rating.res_name if t['is_helpdesk_user'] else ''}}"
 msgstr "{{rating.res_name if t['is_helpdesk_user'] else ''}}"
+
+#~ msgid "Ticket Closed - Reference {{ object.id if object.id else 15 }}"
+#~ msgstr "Tiket uzavřen - Reference {{ object.id if object.id else 15 }}"

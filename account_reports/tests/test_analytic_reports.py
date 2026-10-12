@@ -524,6 +524,53 @@ class TestAnalyticReport(TestAccountReportsCommon):
             options,
         )
 
+    def test_general_ledger_with_analytic_group_by(self):
+        analytic_plan = self.env["account.analytic.plan"].create({
+            "name": "Default Plan",
+        })
+        analytic_account = self.env["account.analytic.account"].create({
+            "name": "Test Account",
+            "plan_id": analytic_plan.id,
+        })
+
+        invoice = self.init_invoice(
+            "out_invoice",
+            amounts=[100, 200],
+            invoice_date="2023-01-01",
+        )
+        invoice.action_post()
+        invoice.invoice_line_ids[0].analytic_distribution = {analytic_account.id: 100}
+
+        general_ledger_report = self.env.ref("account_reports.general_ledger_report")
+        general_ledger_report.filter_analytic_groupby = True
+        options = self._generate_options(
+            general_ledger_report,
+            "2023-01-01",
+            "2023-01-01",
+            default_options={
+                'unfold_all': True,
+                'analytic_accounts_groupby': [analytic_account.id],
+            }
+        )
+
+        self.assertLinesValues(
+            general_ledger_report._get_lines(options),
+            #                                           [             Analytic account             ]|[                 Total                  ]
+            #   Name                                    Debit           Credit          Balance     |   Debit           Credit          Balance
+            [   0,                                      5,              6,              7,              12,             13,             14],
+            [
+                ['121000 Account Receivable',           0.00,             0.00,            0.00,      300.00,             0.00,          300.00],
+                ['INV/2023/00001',                      '',               '',                '',      300.00,             0.00,          300.00],
+                ['Total 121000 Account Receivable',     0.00,             0.00,            0.00,      300.00,             0.00,          300.00],
+                ['400000 Product Sales',                0.00,           100.00,         -100.00,        0.00,           300.00,         -300.00],
+                ['INV/2023/00001',                      0.00,           100.00,         -100.00,        0.00,           100.00,         -100.00],
+                ['INV/2023/00001',                      '',                 '',              '',        0.00,           200.00,         -300.00],
+                ['Total 400000 Product Sales',          0.00,           100.00,         -100.00,        0.00,           300.00,         -300.00],
+                ['Total',                               0.00,           100.00,         -100.00,      300.00,           300.00,            0.00],
+            ],
+            options,
+        )
+
     def test_analytic_groupby_with_horizontal_groupby(self):
 
         out_invoice_1 = self.env['account.move'].create([{
@@ -599,3 +646,243 @@ class TestAnalyticReport(TestAccountReportsCommon):
             ],
             options,
         )
+
+    def test_analytic_groupby_with_analytic_simulations(self):
+        """
+        Create an analytic simulation (analytic line without a move line)
+        and check that it is taken into account in the report
+        """
+
+        self.env['account.analytic.line'].create({
+            'name': 'Simulation',
+            'date': '2019-05-01',
+            'amount': 100.0,
+            'unit_amount': 1.0,
+            'company_id': self.env.company.id,
+            self.analytic_plan_parent._column_name(): self.analytic_account_parent.id,
+            'general_account_id': self.company_data['default_account_revenue'].id,
+        })
+
+        options = self._generate_options(
+            self.report,
+            '2019-01-01',
+            '2019-12-31',
+            default_options={
+                'analytic_plans_groupby': [self.analytic_plan_parent.id, self.analytic_plan_child.id],
+                'include_analytic_without_aml': True,
+            }
+        )
+
+        self.assertLinesValues(
+            self.report._get_lines(options),
+            [   0,                                     1,          2],
+            [
+                ('Revenue',                       100.00,       0.00),
+                ('Less Costs of Revenue',           0.00,       0.00),
+                ('Gross Profit',                  100.00,       0.00),
+                ('Less Operating Expenses',         0.00,       0.00),
+                ('Operating Income (or Loss)',    100.00,       0.00),
+                ('Plus Other Income',               0.00,       0.00),
+                ('Less Other Expenses',             0.00,       0.00),
+                ('Net Profit',                    100.00,       0.00),
+            ],
+            options,
+        )
+
+    def test_analytic_groupby_plans_without_analytic_accounts(self):
+        """
+        Ensure that grouping on several analytic plans without any analytic accounts works as expected
+        """
+        analytic_plans_without_accounts = self.env['account.analytic.plan'].create([
+            {'name': 'Plan 1'},
+            {'name': 'Plan 2'},
+        ])
+
+        options = self._generate_options(
+            self.report, '2019-01-01', '2019-12-31',
+            default_options={'analytic_plans_groupby': analytic_plans_without_accounts.ids}
+        )
+
+        self.assertEqual(
+            len(options['column_groups']), 3,
+            "the number of column groups should be 3, despite the 2 analytic plans having the exact same analytic accounts list"
+        )
+
+        self.assertLinesValues(
+            self.report._get_lines(options),
+            #                                     Plan 1        Plan 2         Total
+            [   0,                                     1,          2,             3],
+            [
+                ('Revenue',                         0.00,       0.00,          0.00),
+                ('Less Costs of Revenue',           0.00,       0.00,          0.00),
+                ('Gross Profit',                    0.00,       0.00,          0.00),
+                ('Less Operating Expenses',         0.00,       0.00,          0.00),
+                ('Operating Income (or Loss)',      0.00,       0.00,          0.00),
+                ('Plus Other Income',               0.00,       0.00,          0.00),
+                ('Less Other Expenses',             0.00,       0.00,          0.00),
+                ('Net Profit',                      0.00,       0.00,          0.00),
+            ],
+            options,
+        )
+
+    def test_profit_and_loss_multicompany_access_rights(self):
+        branch = self.env['res.company'].create([{
+            'name': "My Test Branch",
+            'parent_id': self.env.company.id,
+        }])
+        other_currency = self.setup_other_currency('EUR', rounding=0.001)
+        test_journal = self.env['account.journal'].create({
+            'name': 'Test Journal',
+            'code': 'TEST',
+            'type': 'sale',
+            'company_id': self.env.company.id,
+            'currency_id': other_currency.id,
+        })
+        test_user = self.env['res.users'].create({
+            'login': 'test',
+            'name': 'The King',
+            'email': 'noop@example.com',
+            'groups_id': [Command.link(self.env.ref('account.group_account_manager').id)],
+            'company_ids': [Command.link(self.env.company.id), Command.link(branch.id)],
+        })
+        self.env.invalidate_all()
+
+        options = self._generate_options(
+            self.report.with_user(test_user).with_company(branch), '2019-01-01', '2019-12-31',
+        )
+        lines = self.report._get_lines(options)
+        self.assertTrue(lines)
+        self.assertEqual(test_journal.display_name, "Test Journal (EUR)")
+
+    def test_show_analytic_coverage_column(self):
+        """
+        Ensures that the column of analytic coverage only appears when only one plan is shown
+        """
+        options = self._generate_options(
+            self.report,
+            '2019-01-01',
+            '2019-12-31',
+        )
+        self.assertIsNone(options.get('column_percent_comparison'))
+
+        options = self._generate_options(
+            self.report,
+            '2019-01-01',
+            '2019-12-31',
+            default_options={
+                'analytic_plans_groupby': [self.analytic_plan_child.id],
+            }
+        )
+        self.assertEqual(options.get('column_percent_comparison'), 'analytic_coverage')
+
+        options = self._generate_options(
+            self.report,
+            '2019-01-01',
+            '2019-12-31',
+            default_options={
+                'analytic_plans_groupby': [self.analytic_plan_parent, self.analytic_plan_child.id],
+            }
+        )
+        self.assertIsNone(options.get('column_percent_comparison'))
+
+        options = self._generate_options(
+            self.report,
+            '2019-01-01',
+            '2019-12-31',
+            default_options={
+                'analytic_accounts_groupby': [self.analytic_account_parent.id],
+            }
+        )
+        self.assertIsNone(options.get('column_percent_comparison'))
+
+        options = self._generate_options(
+            self.report,
+            '2019-01-01',
+            '2019-12-31',
+            default_options={
+                'analytic_accounts_groupby': [self.analytic_account_parent.id],
+                'analytic_plans_groupby': [self.analytic_plan_child.id],
+            }
+        )
+        self.assertIsNone(options.get('column_percent_comparison'))
+
+    def test_audit_analytic_lines(self):
+        def _get_action_dict(options, column_index):
+            lines = self.report._get_lines(options)
+            report_line = self.report.line_ids[0]
+            report_line_dict = next(x for x in lines if x['name'] == report_line.name)
+            audit_param = self._get_audit_params_from_report_line(options, report_line, report_line_dict, column_group_key=list(options['column_groups'])[column_index])
+            return self.report.action_audit_cell(options, audit_param)
+
+        other_plan = self.env['account.analytic.plan'].create({'name': "Other Plan"})
+        other_account = self.env['account.analytic.account'].create({'name': "Other Account", 'plan_id': other_plan.id, 'active': True})
+
+        parent_invoice = self.env['account.move'].create([{
+            'move_type': 'out_invoice',
+            'partner_id': self.partner_a.id,
+            'date': '2019-05-01',
+            'invoice_date': '2019-05-01',
+            'invoice_line_ids': [
+                Command.create({
+                    'product_id': self.product_a.id,
+                    'price_unit': 200.0,
+                    'analytic_distribution': {
+                        self.analytic_account_parent.id: 50,
+                        self.analytic_account_parent_2.id: 40,
+                    },
+                }),
+                Command.create({
+                    'product_id': self.product_b.id,
+                    'price_unit': 200.0,
+                    'analytic_distribution': {
+                        self.analytic_account_parent.id: 100,
+                    },
+                }),
+            ]
+        },
+        ])
+        parent_invoice.action_post()
+
+        other_invoice = self.env['account.move'].create([{
+            'move_type': 'out_invoice',
+            'partner_id': self.partner_a.id,
+            'date': '2019-05-01',
+            'invoice_date': '2019-05-01',
+            'invoice_line_ids': [
+                Command.create({
+                    'product_id': self.product_a.id,
+                    'price_unit': 200.0,
+                    'analytic_distribution': {
+                        other_account.id: 100,
+                    },
+                }),
+            ]
+        }])
+        other_invoice.action_post()
+
+        options = self._generate_options(
+            self.report,
+            '2019-01-01',
+            '2019-12-31',
+            default_options={
+                'analytic_plans_groupby': [self.analytic_plan_parent.id],
+            }
+        )
+
+        analytic_lines = parent_invoice.invoice_line_ids.analytic_line_ids + other_invoice.invoice_line_ids.analytic_line_ids
+
+        action_dict = _get_action_dict(options, 0)  # First column: analytic lines of parent plan
+        self.assertEqual(action_dict['context'].get('group_by'), 'move_line_id')
+        self.assertEqual(
+            self.env['account.analytic.line'].with_context(action_dict['context']).search(action_dict['domain']),
+            analytic_lines,
+        )
+
+        action_dict = _get_action_dict(options, 1)  # Second column: account move lines
+        move_lines = self.env['account.move.line'].with_context(action_dict['context']).search(action_dict['domain'])
+        move_line_parent_product_a = move_lines.filtered(lambda line: line.move_id.id == parent_invoice.id and line.product_id == self.product_a)
+        move_line_parent_product_b = move_lines.filtered(lambda line: line.move_id.id == parent_invoice.id and line.product_id == self.product_b)
+        move_line_other = move_lines.filtered(lambda line: line.move_id.id == other_invoice.id)
+        self.assertEqual(move_line_parent_product_a.analytic_coverage, 0.9)
+        self.assertEqual(move_line_parent_product_b.analytic_coverage, 1.0)
+        self.assertEqual(move_line_other.analytic_coverage, 0.0)

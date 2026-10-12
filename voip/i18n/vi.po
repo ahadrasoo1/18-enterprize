@@ -1,22 +1,23 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* voip
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Thi Huong Nguyen, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
+"POT-Creation-Date: 2025-12-29 18:45+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
+"Last-Translator: Thi Huong Nguyen, 2025\n"
 "Language-Team: Vietnamese (https://app.transifex.com/odoo/teams/41243/vi/)\n"
+"Language: vi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: vi\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. module: voip
@@ -141,7 +142,7 @@ msgid ""
 "\n"
 "%(error)s"
 msgstr ""
-"Đã xảy ra lỗi trong quá trình khởi tạo user agent:\n"
+"Đã xảy ra lỗi trong quá trình khởi tạo thành phần kết nối phía người dùng:\n"
 "\n"
 "%(error)s"
 
@@ -281,16 +282,21 @@ msgstr "Chọn một thiết bị:"
 #. module: voip
 #: model:ir.model.fields,help:voip.field_res_users_settings__how_to_call_on_mobile
 msgid ""
-"Choose the method to be used to place a call when using the mobile application:\n"
+"Choose the method to be used to place a call when using the mobile "
+"application:\n"
 "            • VoIP: Always use the Odoo softphone\n"
 "            • Device's phone: Always use the device's phone\n"
-"            • Ask: Always ask whether the softphone or the device's phone must be used\n"
+"            • Ask: Always ask whether the softphone or the device's phone "
+"must be used\n"
 "        "
 msgstr ""
-"Chọn phương thức sẽ sử dụng để thực hiện cuộc gọi khi sử dụng ứng dụng di động:\n"
+"Chọn phương thức sẽ sử dụng để thực hiện cuộc gọi khi sử dụng ứng dụng di "
+"động:\n"
 "            • VoIP: Luôn sử dụng ứng dụng điện thoại Odoo\n"
-"            • Tính năng điện thoại của thiết bị: Luôn sử dụng tính năng điện thoại của thiết bị\n"
-"            • Hỏi: Luôn hỏi xem có phải sử dụng ứng dụng điện thoại hay tính năng điện thoại của thiết bị không"
+"            • Tính năng điện thoại của thiết bị: Luôn sử dụng tính năng điện "
+"thoại của thiết bị\n"
+"            • Hỏi: Luôn hỏi xem có phải sử dụng ứng dụng điện thoại hay tính "
+"năng điện thoại của thiết bị không"
 
 #. module: voip
 #. odoo-javascript
@@ -517,8 +523,8 @@ msgid ""
 "If the \"Call from another device\" option is enabled, calls placed in Odoo "
 "will be transfered to this phone number."
 msgstr ""
-"Nếu tùy chọn \"Gọi từ thiết bị khác\" được bật, các cuộc gọi thực hiện trong"
-" Odoo sẽ được chuyển đến số điện thoại này."
+"Nếu tùy chọn \"Gọi từ thiết bị khác\" được bật, các cuộc gọi thực hiện trong "
+"Odoo sẽ được chuyển đến số điện thoại này."
 
 #. module: voip
 #. odoo-javascript
@@ -721,7 +727,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:voip.res_user_form
 #: model_terms:ir.ui.view,arch_db:voip.res_users_view_form_preferences
 msgid "Preferences"
-msgstr "Tùy chỉnh cá nhân"
+msgstr "Tùy chọn"
 
 #. module: voip
 #: model:ir.model.fields.selection,name:voip.selection__voip_provider__mode__prod
@@ -834,11 +840,11 @@ msgstr "Nên gọi từ một thiết bị khác"
 #. odoo-python
 #: code:addons/voip/models/voip_queue_mixin.py:0
 msgid ""
-"Some documents cannot be added to the call queue as they do not have a phone"
-" number set: %(record_names)s"
+"Some documents cannot be added to the call queue as they do not have a phone "
+"number set: %(record_names)s"
 msgstr ""
-"Không thể thêm một số bản ghi vào danh sách cuộc gọi chờ vì chúng chưa có số"
-" điện thoại: %(record_names)s"
+"Không thể thêm một số bản ghi vào danh sách cuộc gọi chờ vì chúng chưa có số "
+"điện thoại: %(record_names)s"
 
 #. module: voip
 #: model:ir.model.fields,field_description:voip.field_voip_call__start_date
@@ -886,8 +892,8 @@ msgid ""
 "persists, this is probably an issue with the server."
 msgstr ""
 "Lỗi có thể xuất phát từ tầng giao vận. Vui lòng yêu cầu quản trị viên xác "
-"minh URL máy chủ websocket trong Cài đặt chung. Nếu sự cố vẫn tiếp diễn, thì"
-" có thể máy chủ đã gặp vấn đề."
+"minh URL máy chủ websocket trong Cài đặt chung. Nếu sự cố vẫn tiếp diễn, thì "
+"có thể máy chủ đã gặp vấn đề."
 
 #. module: voip
 #: model:ir.model.fields,help:voip.field_voip_call__activity_name
@@ -898,10 +904,12 @@ msgstr "Tên của hoạt động liên quan đến cuộc gọi điện thoại
 #. odoo-javascript
 #: code:addons/voip/static/src/core/user_agent_service.js:0
 msgid ""
-"The number is incorrect, the user credentials could be wrong or the connection cannot be made. Please check your configuration.\n"
+"The number is incorrect, the user credentials could be wrong or the "
+"connection cannot be made. Please check your configuration.\n"
 "(Reason received: %(reasonPhrase)s)"
 msgstr ""
-"Số không chính xác, thông tin đăng nhập của người dùng có thể bị sai hoặc không thể thực hiện kết nối. Vui lòng kiểm tra cấu hình của bạn.\n"
+"Số không chính xác, thông tin đăng nhập của người dùng có thể bị sai hoặc "
+"không thể thực hiện kết nối. Vui lòng kiểm tra cấu hình của bạn.\n"
 "(Lý do nhận được:%(reasonPhrase)s)"
 
 #. module: voip
@@ -923,9 +931,9 @@ msgid ""
 "that you are reaching the right server (PBX server IP in the General "
 "Settings) and that the credentials in your user preferences are correct."
 msgstr ""
-"Máy chủ không thể xác minh bạn. Vui lòng yêu cầu quản trị viên xác thực rằng"
-" bạn đang truy cập đúng máy chủ (IP máy chủ PBX trong Cài đặt chung) và "
-"thông tin đăng nhập trong tùy chọn người dùng của bạn là chính xác."
+"Máy chủ không thể xác minh bạn. Vui lòng yêu cầu quản trị viên xác thực rằng "
+"bạn đang truy cập đúng máy chủ (IP máy chủ PBX trong Cài đặt chung) và thông "
+"tin đăng nhập trong tùy chọn người dùng của bạn là chính xác."
 
 #. module: voip
 #. odoo-javascript
@@ -935,9 +943,9 @@ msgid ""
 "incorrect. Please have an administrator check the websocket server URL in "
 "the General Settings."
 msgstr ""
-"Không thể khởi động user agent. URL máy chủ websocket có thể không chính "
-"xác. Vui lòng yêu cầu quản trị viên kiểm tra URL máy chủ websocket trong Cài"
-" đặt chung."
+"Không thể khởi động thành phần kết nối phía người dùng. URL máy chủ "
+"websocket có thể không chính xác. Vui lòng yêu cầu quản trị viên kiểm tra "
+"URL máy chủ websocket trong Cài đặt chung."
 
 #. module: voip
 #: model:ir.model.fields,help:voip.field_res_users_settings__voip_username
@@ -1123,15 +1131,3 @@ msgstr ""
 #: code:addons/voip/static/src/core/call_model.js:0
 msgid "less than a second"
 msgstr "dưới một giây"
-
-#. module: voip
-#. odoo-javascript
-#: code:addons/voip/static/src/mobile/call_method_selection_dialog.xml:0
-msgid "phone"
-msgstr "điện thoại"
-
-#. module: voip
-#. odoo-javascript
-#: code:addons/voip/static/src/mobile/call_method_selection_dialog.xml:0
-msgid "voip"
-msgstr "voip"

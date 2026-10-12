@@ -20,7 +20,6 @@ patch(accountTourSteps, {
 });
 
 registry.category("web_tour.tours").add("account_accountant_bank_rec_widget_ui", {
-    test: true,
     url: "/odoo",
     steps: () => [
         stepUtils.showAppsMenuItem(),
@@ -501,7 +500,7 @@ registry.category("web_tour.tours").add("account_accountant_bank_rec_widget_ui",
         },
         {
             content: "amls_tab is activated while still on line2 which doesn't contain a badge",
-            trigger: "div[name='line_ids']:has(.fa-trash-o)+.o_notebook a.active[name='amls_tab']",
+            trigger: ".o_notebook a.active[name='amls_tab']",
         },
         // Test view_switcher
         {
@@ -904,7 +903,6 @@ registry.category("web_tour.tours").add("account_accountant_bank_rec_widget_ui",
 
 registry.category("web_tour.tours").add('account_accountant_bank_rec_widget_reconciliation_button',
     {
-        test: true,
         url: '/odoo',
         steps: () => [
         stepUtils.showAppsMenuItem(),
@@ -957,7 +955,6 @@ registry.category("web_tour.tours").add('account_accountant_bank_rec_widget_reco
         {
             content: "check that we're back on the dashboard",
             trigger: 'a:contains("Customer Invoices")',
-            run() {},
         },
     ],
 });

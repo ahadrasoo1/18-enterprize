@@ -14,12 +14,12 @@ import {
     step,
 } from "@mail/../tests/mail_test_helpers";
 import { describe, test } from "@odoo/hoot";
-import { defineTestMailEnterpriseModels } from "@test_mail_enterprise/../tests/test_mail_enterprise_test_helpers";
+import { defineTestMailModels } from "@test_mail/../tests/test_mail_test_helpers";
 import { browser } from "@web/core/browser/browser";
 import { onRpc } from "@web/../tests/web_test_helpers";
 
 describe.current.tags("desktop");
-defineTestMailEnterpriseModels();
+defineTestMailModels();
 
 test("Should not have attachment preview for still uploading attachment", async () => {
     const pyEnv = await startServer();
@@ -47,7 +47,9 @@ test("Should not have attachment preview for still uploading attachment", async 
     await dragenterFiles(".o-mail-Chatter", files);
     await dropFiles(".o-Dropzone", files);
     await contains("iframe[data-src*='/web/static/lib/pdfjs/web/viewer.html']");
-    await click(".o-mail-AttachmentCard-unlink");
+    await click(
+        ".o-mail-AttachmentCard:not(.o-isUploading):contains(invoice.pdf) .o-mail-AttachmentCard-unlink"
+    );
     await click(".modal button", { text: "Ok" });
     await contains("iframe[data-src*='/web/static/lib/pdfjs/web/viewer.html']", { count: 0 });
     shouldBlockAttachmentUpload = true;

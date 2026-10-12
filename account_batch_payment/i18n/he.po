@@ -3,43 +3,49 @@
 # 	* account_batch_payment
 #
 # Translators:
-# Fishfur A Banter <fishfurbanter@gmail.com>, 2022
-# Lilach Gilliam <lilach@apprcase.com>, 2022
-# Roy Sayag, 2022
-# shaked <shaked@laylinetech.com>, 2022
-# Netta Waizer, 2022
-# Amit Spilman <amit@laylinetech.com>, 2022
-# Yihya Hugirat <hugirat@gmail.com>, 2022
-# Jonathan Spier, 2022
-# שהאב חוסיין <shhab89@gmail.com>, 2022
-# Lilach Gilliam <lilach.gilliam@gmail.com>, 2022
-# MichaelHadar, 2022
-# דודי מלכה <Dudimalka6@gmail.com>, 2022
-# ZVI BLONDER <ZVIBLONDER@gmail.com>, 2022
-# hed shefer <hed@laylinetech.com>, 2022
-# Moshe Flam <pashute@gmail.com>, 2022
-# Martin Trigaux, 2022
-# Ha Ketem <haketem@gmail.com>, 2022
-# NoaFarkash, 2022
+# Lilach Gilliam <lilach@apprcase.com>, 2024
+# yael terner, 2024
+# Jonathan Spier, 2024
+# shaked <shaked@laylinetech.com>, 2024
+# Fishfur A Banter <fishfurbanter@gmail.com>, 2024
+# Roy Sayag, 2024
+# Netta Waizer, 2024
+# Moshe Flam <pashute@gmail.com>, 2024
+# Amit Spilman <amit@laylinetech.com>, 2024
+# Yihya Hugirat <hugirat@gmail.com>, 2024
+# ZVI BLONDER <ZVIBLONDER@gmail.com>, 2024
+# דודי מלכה <Dudimalka6@gmail.com>, 2024
+# Martin Trigaux, 2024
+# Hed Shefer <hed@laylinetech.com>, 2024
+# Ha Ketem <haketem@gmail.com>, 2024
+# שהאב חוסיין <shhab89@gmail.com>, 2024
+# NoaFarkash, 2024
+# MichaelHadar, 2024
+# Yoram Lavi, 2024
+# Lilach Gilliam <lilach.gilliam@gmail.com>, 2025
+# or balmas, 2025
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 16.0beta+e\n"
+"Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-16 16:02+0000\n"
-"PO-Revision-Date: 2022-09-22 05:45+0000\n"
-"Last-Translator: NoaFarkash, 2022\n"
+"POT-Creation-Date: 2026-04-17 18:46+0000\n"
+"PO-Revision-Date: 2024-09-25 09:43+0000\n"
+"Last-Translator: or balmas, 2025\n"
 "Language-Team: Hebrew (https://app.transifex.com/odoo/teams/41243/he/)\n"
 "Language: he\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % 1 == 0) ? 1: (n % 10 == 0 && n % 1 == 0 && n > 10) ? 2 : 3;\n"
+"Plural-Forms: nplurals=3; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % "
+"1 == 0) ? 1: 2;\n"
 
 #. module: account_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.view_account_move_kanban
-msgid "<i class=\"fa fa-clock-o\" aria-label=\"Date\" role=\"img\" title=\"Date\"/>"
-msgstr "<i class=\"fa fa-clock-o\" aria-label=\"Date\" role=\"img\" title=\"Date\"/>"
+msgid ""
+"<i class=\"fa fa-clock-o\" aria-label=\"Date\" role=\"img\" title=\"Date\"/>"
+msgstr ""
+"<i class=\"fa fa-clock-o\" aria-label=\"Date\" role=\"img\" title=\"Date\"/>"
 
 #. module: account_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.view_account_payment_form_inherit_account_batch_payment
@@ -48,8 +54,10 @@ msgstr "<span>תשלום אצווה</span>"
 
 #. module: account_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.batch_error_wizard_form
-msgid "<strong attrs=\"{'invisible': [('warning_line_ids', '=', [])]}\">The following warnings were also raised; they do not impeach validation</strong>"
-msgstr "<strong attrs=\"{'invisible': [('warning_line_ids', '=', [])]}\">האזהרות הבאות הועלו, הן לא מבטלות את תוקף האימות</strong>"
+msgid ""
+"<strong invisible=\"not warning_line_ids\">The following warnings were also "
+"raised; they do not impeach validation</strong>"
+msgstr ""
 
 #. module: account_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.batch_error_wizard_form
@@ -60,6 +68,16 @@ msgstr "<strong>קודם כדאי להתייחס לאזהרות הבאות</stro
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.batch_error_wizard_form
 msgid "<strong>The following errors occurred</strong>"
 msgstr "<strong>השגיאות הבאות התרחשו</strong>"
+
+#. module: account_batch_payment
+#: model_terms:ir.ui.view,arch_db:account_batch_payment.print_batch_payment
+msgid "ABC Suppliers"
+msgstr ""
+
+#. module: account_batch_payment
+#: model_terms:ir.ui.view,arch_db:account_batch_payment.print_batch_payment
+msgid "Account Holder Name"
+msgstr "שם בעל החשבון "
 
 #. module: account_batch_payment
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_payment__message_needaction
@@ -89,12 +107,6 @@ msgstr "סוג פעילות"
 #. module: account_batch_payment
 #. odoo-python
 #: code:addons/account_batch_payment/models/account_batch_payment.py:0
-msgid "All payments in the batch must belong to the same company."
-msgstr "כל התשלומים באצווה חייבים להיות שייכים לאותה חברה."
-
-#. module: account_batch_payment
-#. odoo-python
-#: code:addons/account_batch_payment/models/account_batch_payment.py:0
 msgid "All payments in the batch must share the same payment method."
 msgstr "כל התשלומים באצווה חייבים לחלוק את אותו אמצעי תשלום."
 
@@ -108,12 +120,12 @@ msgstr "סכום כולל"
 #. module: account_batch_payment
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_payment__amount_residual
 msgid "Amount Residual"
-msgstr ""
+msgstr "יתרת סכום"
 
 #. module: account_batch_payment
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_payment__amount_residual_currency
 msgid "Amount Residual Currency"
-msgstr ""
+msgstr "מטבע יתרת סכום"
 
 #. module: account_batch_payment
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_payment__amount_signed
@@ -139,6 +151,11 @@ msgstr "בנק"
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.view_batch_payment_search
 msgid "Bank Journal"
 msgstr "יומן בנק"
+
+#. module: account_batch_payment
+#: model_terms:ir.ui.view,arch_db:account_batch_payment.print_batch_payment
+msgid "Bank Transfer"
+msgstr "העברה בנקאית"
 
 #. module: account_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.view_batch_payment_form
@@ -184,7 +201,8 @@ msgstr "סוג אצווה"
 #: model_terms:ir.actions.act_window,help:account_batch_payment.action_batch_payment_out
 msgid ""
 "Batch payments allow you grouping different payments to ease\n"
-"                    reconciliation. They are also useful when depositing checks\n"
+"                    reconciliation. They are also useful when depositing "
+"checks\n"
 "                    to the bank."
 msgstr ""
 "תשלומים אצווה מאפשרים לך לקבץ תשלומים שונים כדי להקל\n"
@@ -208,6 +226,12 @@ msgid "Cannot validate an empty batch. Please add some payments to it first."
 msgstr "לא ניתן לאמת אצווה ריקה. אנא הוסף כמה תשלומים בכדי ליצור תשלום אצווה."
 
 #. module: account_batch_payment
+#. odoo-python
+#: code:addons/account_batch_payment/models/account_batch_payment.py:0
+msgid "Check Payments"
+msgstr "בדיקת תשלומים"
+
+#. module: account_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.batch_error_wizard_form
 msgid "Close"
 msgstr "סגור"
@@ -218,14 +242,24 @@ msgid "Code"
 msgstr "קוד"
 
 #. module: account_batch_payment
+#: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_payment__company_id
+msgid "Company"
+msgstr "חברה"
+
+#. module: account_batch_payment
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_payment__company_currency_id
 msgid "Company Currency"
 msgstr "מטבע החברה"
 
 #. module: account_batch_payment
+#: model:ir.model.fields,help:account_batch_payment.field_account_batch_payment__company_id
+msgid "Company related to this journal"
+msgstr "חברה מקושרת ליומן זה"
+
+#. module: account_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.view_account_payment_tree_inherit_account_batch_payment
 msgid "Create Batch"
-msgstr ""
+msgstr "צור תשלום אצווה"
 
 #. module: account_batch_payment
 #. odoo-python
@@ -410,6 +444,17 @@ msgid "Inbound Batch Payments Sequence"
 msgstr "רצף של סבב תשלומים נכנס"
 
 #. module: account_batch_payment
+#. odoo-python
+#: code:addons/account_batch_payment/models/account_batch_payment.py:0
+msgid "Invalid Partners"
+msgstr ""
+
+#. module: account_batch_payment
+#: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_payment__invalid_sct_partners_ids
+msgid "Invalid Sct Partners"
+msgstr ""
+
+#. module: account_batch_payment
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_payment__message_is_follower
 msgid "Is Follower"
 msgstr "עוקב"
@@ -417,7 +462,7 @@ msgstr "עוקב"
 #. module: account_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.print_batch_payment
 msgid "Issuing bank account :"
-msgstr ""
+msgstr "חשבון הבנק המנפיק:"
 
 #. module: account_batch_payment
 #: model:ir.model,name:account_batch_payment.model_account_journal
@@ -457,6 +502,11 @@ msgstr "הודעת שגיאת שליחה"
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_payment__message_ids
 msgid "Messages"
 msgstr "הודעות"
+
+#. module: account_batch_payment
+#: model_terms:ir.ui.view,arch_db:account_batch_payment.print_batch_payment
+msgid "Monthly Payment"
+msgstr "תשלום חודשי"
 
 #. module: account_batch_payment
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_payment__my_activity_date_deadline
@@ -525,13 +575,18 @@ msgstr "מספר השגיאות"
 
 #. module: account_batch_payment
 #: model:ir.model.fields,help:account_batch_payment.field_account_batch_payment__message_needaction_counter
-msgid "Number of messages which requires an action"
-msgstr "מספר הודעות המחייבות פעולה"
+msgid "Number of messages requiring action"
+msgstr "מספר הודעות הדורשות פעולה"
 
 #. module: account_batch_payment
 #: model:ir.model.fields,help:account_batch_payment.field_account_batch_payment__message_has_error_counter
 msgid "Number of messages with delivery error"
 msgstr "מספר הודעות עם שגיאת משלוח"
+
+#. module: account_batch_payment
+#: model_terms:ir.ui.view,arch_db:account_batch_payment.print_batch_payment
+msgid "Odoo Payments LLC"
+msgstr ""
 
 #. module: account_batch_payment
 #: model:ir.model.fields.selection,name:account_batch_payment.selection__account_batch_payment__batch_type__outbound
@@ -550,6 +605,11 @@ msgid "Partner"
 msgstr "לקוח/ספק"
 
 #. module: account_batch_payment
+#: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_payment__payment_ids_domain
+msgid "Payment Ids Domain"
+msgstr ""
+
+#. module: account_batch_payment
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_payment__payment_method_id
 msgid "Payment Method"
 msgstr "אמצעי תשלום"
@@ -560,9 +620,22 @@ msgid "Payment Methods"
 msgstr "אמצעי תשלום"
 
 #. module: account_batch_payment
+#. odoo-python
+#: code:addons/account_batch_payment/models/account_payment.py:0
+msgid "Payment added in batch %s"
+msgstr "תשלום נוסף לאצווה %s"
+
+#. module: account_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.view_batch_payment_form
 msgid "Payment method"
 msgstr "אמצעי תשלום"
+
+#. module: account_batch_payment
+#. odoo-python
+#: code:addons/account_batch_payment/models/account_batch_payment.py:0
+#: code:addons/account_batch_payment/models/account_payment.py:0
+msgid "Payment removed from batch %s"
+msgstr "תשלום הוסר מאצווה %s"
 
 #. module: account_batch_payment
 #: model:ir.model,name:account_batch_payment.model_account_payment
@@ -574,15 +647,10 @@ msgstr "תשלומים"
 
 #. module: account_batch_payment
 #. odoo-python
+#: code:addons/account_batch_payment/models/account_batch_payment.py:0
 #: code:addons/account_batch_payment/wizard/batch_error.py:0
 msgid "Payments in Error"
 msgstr "מספר תשלומים בשגיאה"
-
-#. module: account_batch_payment
-#. odoo-python
-#: code:addons/account_batch_payment/models/account_batch_payment.py:0
-msgid "Payments must be posted to be added to a batch."
-msgstr "תשלומים חייבים להיות רשומים בכדי להוסיף אותם לאצווה."
 
 #. module: account_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.view_batch_payment_form
@@ -602,7 +670,7 @@ msgstr "המשך בהליך האימות"
 #. module: account_batch_payment
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_payment__rating_ids
 msgid "Ratings"
-msgstr ""
+msgstr "דירוגים"
 
 #. module: account_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.view_batch_payment_form
@@ -625,6 +693,12 @@ msgid "Reference"
 msgstr "מזהה"
 
 #. module: account_batch_payment
+#. odoo-python
+#: code:addons/account_batch_payment/models/account_batch_payment.py:0
+msgid "Remove the payments from the batch or change their state."
+msgstr "הסר את התשלומים מהאצווה או שנה את מצבם."
+
+#. module: account_batch_payment
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_payment__activity_user_id
 msgid "Responsible User"
 msgstr "משתמש אחראי"
@@ -638,12 +712,6 @@ msgstr "שגיאה בשליחת SMS"
 #: model:ir.model.fields.selection,name:account_batch_payment.selection__account_batch_payment__state__sent
 msgid "Sent"
 msgstr "נשלח"
-
-#. module: account_batch_payment
-#. odoo-python
-#: code:addons/account_batch_payment/models/account_batch_payment.py:0
-msgid "Set payments state to \"posted\"."
-msgstr "שינוי מצב התשלומים ל\"נרשם\"."
 
 #. module: account_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.batch_error_wizard_line_tree
@@ -663,12 +731,6 @@ msgstr "הצגת אפשרויות הסרה"
 #. module: account_batch_payment
 #. odoo-python
 #: code:addons/account_batch_payment/models/account_batch_payment.py:0
-msgid "Some payments have already been matched with a bank statement."
-msgstr "חלק מהתשלומים כבר הותאמו."
-
-#. module: account_batch_payment
-#. odoo-python
-#: code:addons/account_batch_payment/models/account_batch_payment.py:0
 msgid "Some payments have already been sent."
 msgstr "חלק מהתשלומים כבר הועברו."
 
@@ -676,7 +738,7 @@ msgstr "חלק מהתשלומים כבר הועברו."
 #. odoo-python
 #: code:addons/account_batch_payment/models/account_batch_payment.py:0
 msgid "Some recipient accounts do not allow out payments."
-msgstr ""
+msgstr "חלק מחשבונות המוטבים אינם מאפשרים תשלומים יוצאים."
 
 #. module: account_batch_payment
 #: model:ir.model.fields,field_description:account_batch_payment.field_account_batch_payment__state
@@ -705,8 +767,9 @@ msgstr "סה\"כ"
 #. module: account_batch_payment
 #. odoo-python
 #: code:addons/account_batch_payment/models/account_batch_payment.py:0
-msgid "Target another recipient account or allow sending money to the current one."
-msgstr ""
+msgid ""
+"Target another recipient account or allow sending money to the current one."
+msgstr "כוון לחשבון מוטב אחר או אפשר שליחת כסף לחשבון הנוכחי."
 
 #. module: account_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.batch_error_wizard_form
@@ -721,7 +784,8 @@ msgstr "לא ניתן לאמת את האצווה"
 #. module: account_batch_payment
 #. odoo-python
 #: code:addons/account_batch_payment/models/account_batch_payment.py:0
-msgid "The batch must have the same payment method as the payments it contains."
+msgid ""
+"The batch must have the same payment method as the payments it contains."
 msgstr "האצווה חייבת להיות בעלת אמצעי תשלום זהה לתשלומים שהיא מכילה."
 
 #. module: account_batch_payment
@@ -732,19 +796,38 @@ msgstr "האצווה חייבת להיות זהה לסוג התשלומים שה
 
 #. module: account_batch_payment
 #: model:ir.model.fields,help:account_batch_payment.field_account_batch_error_wizard__batch_payment_id
-msgid "The batch payment generating the errors and warnings displayed in this wizard."
+msgid ""
+"The batch payment generating the errors and warnings displayed in this "
+"wizard."
 msgstr "סבב התשלומים שיוצר את השגיאות והזהרות שיוצגו באשף זה."
+
+#. module: account_batch_payment
+#: model_terms:ir.ui.view,arch_db:account_batch_payment.view_batch_payment_form
+msgid "The country or city of"
+msgstr ""
 
 #. module: account_batch_payment
 #. odoo-python
 #: code:addons/account_batch_payment/models/account_batch_payment.py:0
-msgid "The journal of the batch payment and of the payments it contains must be the same."
-msgstr "היומן של סבב התשלומים והתשלומים המרכיבים את הסבב צריך להיות אותו יומן."
+msgid ""
+"The journal of the batch payment and of the payments it contains must be the "
+"same."
+msgstr "היומן של האצווה והתשלומים המרכיבים את האצווה צריכים להיות זהים."
 
 #. module: account_batch_payment
 #: model:ir.model.fields,help:account_batch_payment.field_account_batch_payment__payment_method_id
 msgid "The payment method used by the payments in this batch."
 msgstr "אמצעי התשלום המשמש את התשלומים באצווה זו."
+
+#. module: account_batch_payment
+#. odoo-python
+#: code:addons/account_batch_payment/models/account_batch_payment.py:0
+msgid ""
+"To validate the batch, payments must be in process. But some are already "
+"matched with a bank statement."
+msgstr ""
+"כדי לאמת את האצווה, התשלומים חייבים להיות במצב \"בתהליך\". אך חלק מהם כבר "
+"הותאמו עם דף בנק."
 
 #. module: account_batch_payment
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.view_batch_payment_form
@@ -753,8 +836,11 @@ msgstr "סה\"כ"
 
 #. module: account_batch_payment
 #: model:ir.model.fields,help:account_batch_payment.field_account_batch_error_wizard__show_remove_options
-msgid "True if and only if the options to remove the payments causing the errors or warnings from the batch should be shown"
-msgstr "נכון רק אם האפשרויות להציג את התשלומים שייצרו שגיאות או התראות ויוסרו מהסבב"
+msgid ""
+"True if and only if the options to remove the payments causing the errors or "
+"warnings from the batch should be shown"
+msgstr ""
+"נכון רק אם האפשרויות להציג את התשלומים שייצרו שגיאות או התראות ויוסרו מהסבב"
 
 #. module: account_batch_payment
 #: model:ir.model.fields,help:account_batch_payment.field_account_batch_payment__activity_exception_decoration
@@ -770,6 +856,11 @@ msgstr "לא מותאם"
 #: model_terms:ir.ui.view,arch_db:account_batch_payment.view_batch_payment_form
 msgid "Validate"
 msgstr "אשר"
+
+#. module: account_batch_payment
+#: model_terms:ir.ui.view,arch_db:account_batch_payment.print_batch_payment
+msgid "Vendor"
+msgstr "ספק"
 
 #. module: account_batch_payment
 #: model:ir.actions.act_window,name:account_batch_payment.action_batch_payment_out
@@ -798,17 +889,52 @@ msgstr "היסטורית התקשרויות מאתר האינטרנט"
 
 #. module: account_batch_payment
 #: model:ir.model.fields,help:account_batch_payment.field_account_batch_payment__file_generation_enabled
-msgid "Whether or not this batch payment should display the 'Generate File' button instead of 'Print' in form view."
-msgstr "אם סבב התשלומים הזה יציג אפ הכפתור 'יצירת קובץ' במקום 'הדפסה' בתצוגת הטופס."
-
-#. module: account_batch_payment
-#. odoo-python
-#: code:addons/account_batch_payment/models/account_batch_payment.py:0
-msgid "You cannot add payments that are not posted."
-msgstr "לא ניתן להוסיף תשלומים שלא נרשמו."
+msgid ""
+"Whether or not this batch payment should display the 'Generate File' button "
+"instead of 'Print' in form view."
+msgstr ""
+"אם סבב התשלומים הזה יציג אפ הכפתור 'יצירת קובץ' במקום 'הדפסה' בתצוגת הטופס."
 
 #. module: account_batch_payment
 #. odoo-python
 #: code:addons/account_batch_payment/models/account_batch_payment.py:0
 msgid "You cannot add payments with zero amount in a Batch Payment."
+msgstr "לא ניתן להוסיף תשלומים עם סכום אפס בתשלום אצווה."
+
+#. module: account_batch_payment
+#. odoo-python
+#: code:addons/account_batch_payment/models/account_batch_payment.py:0
+msgid "You cannot add the same payment to multiple batches."
+msgstr "לא ניתן להוסיף את אותו התשלום למספר אצוות."
+
+#. module: account_batch_payment
+#. odoo-python
+#: code:addons/account_batch_payment/models/account_batch_payment.py:0
+msgid ""
+"You cannot create a batch with payments that are already in another batch."
+msgstr "לא ניתן לייצר אצווה עם תשלומים שכבר קיימים באצווה אחרת."
+
+#. module: account_batch_payment
+#. odoo-python
+#: code:addons/account_batch_payment/models/account_batch_payment.py:0
+msgid "You cannot create batches with overlapping payments."
+msgstr "אינך יכול ליצור אצוות עם תשלומים חופפים."
+
+#. module: account_batch_payment
+#: model_terms:ir.ui.view,arch_db:account_batch_payment.view_batch_payment_form
+msgid "is not set, which could cause the file to be refused by the bank."
 msgstr ""
+
+#. module: account_batch_payment
+#: model_terms:ir.ui.view,arch_db:account_batch_payment.view_batch_payment_form
+msgid "these partners"
+msgstr ""
+
+#~ msgid "$1000.0"
+#~ msgstr "1000.0 $"
+
+#~ msgid "2023-08-14"
+#~ msgstr "14-08-2023"
+
+#~ msgid "2023-08-15"
+#~ msgstr "15/08/2023"

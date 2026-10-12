@@ -1,8 +1,6 @@
 /** @odoo-module **/
 
 import { registry } from "@web/core/registry";
-import { stepUtils } from "@web_tour/tour_service/tour_utils";
-
 
 function restoreDocumentSteps() {
     return [
@@ -36,15 +34,7 @@ function restoreDocumentSteps() {
 }
 
 registry.category("web_tour.tours").add("document_delete_tour", {
-    url: "/odoo",
-    test: true,
     steps: () => [
-        stepUtils.showAppsMenuItem(),
-        {
-            trigger: '.o_app[data-menu-xmlid="documents.menu_root"]',
-            content: "Open document app",
-            run: "click",
-        },
         // Archive a file in a folder and restore it
         {
             trigger: '.o_search_panel_field header.active:contains("Folder1")',
@@ -78,7 +68,7 @@ registry.category("web_tour.tours").add("document_delete_tour", {
         ...restoreDocumentSteps(),
         // 2) Archive a folder (and this its documents) and restore the archived document
         {
-            trigger: '.o_search_panel_field header:contains("Folder1")',
+            trigger: '.o_search_panel_field span:contains("Folder1")',
             content: "Go back to folder",
             run: "click",
         },
@@ -143,6 +133,19 @@ registry.category("web_tour.tours").add("document_delete_tour", {
         {
             trigger: ".o_kanban_renderer:not(:has(.o_kanban_record:not(.o_kanban_ghost)))",
             content: "Check that the document is no longer visible",
+        },
+    ],
+});
+
+registry.category("web_tour.tours").add("document_default_access_view", {
+    steps: () => [
+        {
+            trigger: '.o_record_selected:contains("Chouchou")',
+            content: "Check that Chouchou is selected.",
+        },
+        {
+            trigger: '.o_search_panel_category_value header.active:contains("Trash")',
+            content: "Check that we are in the Trash.",
         },
     ],
 });

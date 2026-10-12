@@ -1,23 +1,29 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* data_cleaning
-# 
+# * data_cleaning
+#
 # Translators:
-# Wil Odoo, 2024
-# 
+# Marta Wacławek, 2025
+# Wil Odoo, 2025
+#
+# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Marta (wacm)" <wacm@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:29+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Czech (https://app.transifex.com/odoo/teams/41243/cs/)\n"
+"POT-Creation-Date: 2026-04-03 18:59+0000\n"
+"PO-Revision-Date: 2026-02-27 05:17+0000\n"
+"Last-Translator: \"Marta (wacm)\" <wacm@odoo.com>\n"
+"Language-Team: Czech <https://translate.odoo.com/projects/odoo-18/"
+"data_cleaning/cs/>\n"
+"Language: cs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: cs\n"
-"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
+"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n "
+"<= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
+"X-Generator: Weblate 5.14.3\n"
 
 #. module: data_cleaning
 #. odoo-python
@@ -54,6 +60,7 @@ msgid ""
 msgstr ""
 
 #. module: data_cleaning
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_model_form
 #: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_model_form
 msgid "<span class=\"me-1\">Every</span>"
 msgstr "<span class=\"me-1\">Každý</span>"
@@ -75,6 +82,7 @@ msgstr "Pole se může zobrazit pouze jednou!"
 
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_cleaning_rule__action
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_model_form
 #: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_record_list
 msgid "Action"
 msgstr "Akce"
@@ -133,8 +141,8 @@ msgstr "Archivováno"
 #. odoo-javascript
 #: code:addons/data_cleaning/static/src/views/data_merge_list_view.js:0
 msgid ""
-"Are you sure that you want to merge the selected records in their respective"
-" group?"
+"Are you sure that you want to merge the selected records in their respective "
+"group?"
 msgstr ""
 "Jste si jisti, že chcete sloučit vybrané záznamy v jejich příslušné skupině?"
 
@@ -159,13 +167,23 @@ msgstr "Lze sloučit"
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_cleaning_rule__action_case
 msgid "Case"
-msgstr ""
+msgstr "Případ"
 
 #. module: data_cleaning
 #. odoo-python
 #: code:addons/data_cleaning/models/data_merge_rule.py:0
 msgid "Case/Accent Insensitive Match"
 msgstr "Shoda bez ohledu na malá a velká písmena"
+
+#. module: data_cleaning
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_model_form
+msgid "Clean"
+msgstr "Čistý"
+
+#. module: data_cleaning
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_model_form
+msgid "Cleaning Actions"
+msgstr ""
 
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_cleaning_model__cleaning_mode
@@ -402,7 +420,7 @@ msgstr "Zahozeno"
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_rule__display_name
 #: model:ir.model.fields,field_description:data_cleaning.field_ir_attachment_report__display_name
 msgid "Display Name"
-msgstr "Zobrazovací název"
+msgstr "Zobrazovaný název"
 
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_group__divergent_fields
@@ -434,8 +452,7 @@ msgstr ""
 
 #. module: data_cleaning
 #: model:ir.model.fields,help:data_cleaning.field_data_merge_model__create_threshold
-msgid ""
-"Duplicates with a similarity below this threshold will not be suggested"
+msgid "Duplicates with a similarity below this threshold will not be suggested"
 msgstr "Duplikáty s podobností pod touto prahovou hodnotou nebudou navrhovány"
 
 #. module: data_cleaning
@@ -512,8 +529,8 @@ msgstr "Skrýt tlačítko slučovací akce"
 #: model:ir.model.fields,help:data_cleaning.field_data_cleaning_rule__action_case
 msgid ""
 "How the type case is set by the rule. 'First Letters to Uppercase' sets "
-"every letter to lowercase except the first letter of each word, which is set"
-" to uppercase."
+"every letter to lowercase except the first letter of each word, which is set "
+"to uppercase."
 msgstr ""
 
 #. module: data_cleaning
@@ -556,11 +573,15 @@ msgstr ""
 #. module: data_cleaning
 #: model:ir.model.fields,help:data_cleaning.field_ir_model__hide_merge_action
 msgid ""
-"If the model already has a custom merge method, the class attribute `_merge_disabled` is set to true on\n"
-"             that model and the generic data merge action should not be available on that model."
+"If the model already has a custom merge method, the class attribute "
+"`_merge_disabled` is set to true on\n"
+"             that model and the generic data merge action should not be "
+"available on that model."
 msgstr ""
-"Pokud model již má vlastní metodu sloučení, atribut třídy `_merge_disabled` je nastaven na hodnotu pravda\n"
-"             v tomto modelu a akce sloučení obecných dat by v tomto modelu neměly být k dispozici."
+"Pokud model již má vlastní metodu sloučení, atribut třídy `_merge_disabled` "
+"je nastaven na hodnotu pravda\n"
+"             v tomto modelu a akce sloučení obecných dat by v tomto modelu "
+"neměly být k dispozici."
 
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_record__is_deleted
@@ -780,10 +801,11 @@ msgstr "ID záznamu"
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_cleaning_record__name
 msgid "Record Name"
-msgstr ""
+msgstr "Název záznamu"
 
 #. module: data_cleaning
 #: model_terms:ir.ui.view,arch_db:data_cleaning.data_merge_record_view_search_merge_action
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_model_form
 #: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_record_search
 #: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_record_search
 msgid "Records"
@@ -792,7 +814,7 @@ msgstr "Záznamy"
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_cleaning_model__records_to_clean_count
 msgid "Records To Clean"
-msgstr ""
+msgstr "Záznamy k vyčistění"
 
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_model__records_to_merge_count
@@ -816,8 +838,8 @@ msgid ""
 "Records with a similarity percentage above this threshold will be "
 "automatically merged"
 msgstr ""
-"Záznamy s procentem podobnosti nad touto prahovou hodnotou budou automaticky"
-" sloučeny"
+"Záznamy s procentem podobnosti nad touto prahovou hodnotou budou automaticky "
+"sloučeny"
 
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_ir_attachment_report__name
@@ -838,6 +860,11 @@ msgstr "Pravidla"
 #. module: data_cleaning
 #: model:ir.model.fields.selection,name:data_cleaning.selection__data_cleaning_rule__action__html
 msgid "Scrap HTML"
+msgstr ""
+
+#. module: data_cleaning
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_model_form
+msgid "Select a model to configure cleaning actions"
 msgstr ""
 
 #. module: data_cleaning
@@ -894,7 +921,7 @@ msgstr ""
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_cleaning_record__suggested_value_display
 msgid "Suggested"
-msgstr ""
+msgstr "Doporučené"
 
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_cleaning_record__suggested_value
@@ -917,6 +944,12 @@ msgstr ""
 msgid ""
 "The Python module `phonenumbers` is not installed. Format phone will not "
 "work."
+msgstr ""
+
+#. module: data_cleaning
+#. odoo-javascript
+#: code:addons/data_cleaning/static/src/views/data_merge_list_view.js:0
+msgid "The connection timed out. Please try merging fewer records at once."
 msgstr ""
 
 #. module: data_cleaning
@@ -957,7 +990,7 @@ msgstr "Tento název je již použitý"
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_ir_attachment_report__size
 msgid "Total Size"
-msgstr ""
+msgstr "Celková velikost"
 
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_cleaning_rule__action_trim

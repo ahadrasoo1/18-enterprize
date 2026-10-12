@@ -1,31 +1,36 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* appointment
-# 
+# * appointment
+#
 # Translators:
-# Wil Odoo, 2024
-# 
+# Rasareeyar Lappiam, 2025
+# Wil Odoo, 2025
+#
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
+# Nusara Boonma <nuboo@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-27 07:48+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Thai (https://app.transifex.com/odoo/teams/41243/th/)\n"
+"POT-Creation-Date: 2026-03-20 18:45+0000\n"
+"PO-Revision-Date: 2026-07-15 16:09+0000\n"
+"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"Language-Team: Thai <https://translate.odoo.com/projects/odoo-18/appointment/"
+"th/>\n"
+"Language: th\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: th\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 2026.6.1\n"
 
 #. module: appointment
 #. odoo-python
 #: code:addons/appointment/models/appointment_booking_line.py:0
-msgid "\"%(resource_name_list)s\" cannot be used for \"%(appointment_type_name)s\""
+msgid ""
+"\"%(resource_name_list)s\" cannot be used for \"%(appointment_type_name)s\""
 msgstr ""
-"\"%(resource_name_list)s\" ไม่สามารถใช้สำหรับ \"%(appointment_type_name)s\" "
-"ได้"
+"\"%(resource_name_list)s\" ไม่สามารถใช้สำหรับ \"%(appointment_type_name)s\" ได้"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__appointment_count
@@ -35,7 +40,7 @@ msgstr "# การนัดหมาย"
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__appointment_count_request
 msgid "# Appointments To Confirm"
-msgstr ""
+msgstr "# การนัดหมายที่ต้องยืนยัน"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_invite__calendar_event_count
@@ -62,7 +67,7 @@ msgstr "#ผู้ใช้ที่เป็นพนักงาน"
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__appointment_count_upcoming
 msgid "# Upcoming Appointments"
-msgstr ""
+msgstr "# การนัดหมายที่จะมาถึง"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_calendar
@@ -161,197 +166,311 @@ msgstr ""
 #: model:mail.template,body_html:appointment.attendee_invitation_mail_template
 msgid ""
 "<div>\n"
-"    <t t-set=\"colors\" t-value=\"{'needsAction': 'grey', 'accepted': 'green', 'tentative': '#FFFF00', 'declined': 'red'}\"></t>\n"
-"    <t t-set=\"customer\" t-value=\" object.event_id.find_partner_customer()\"></t>\n"
-"    <t t-set=\"target_responsible\" t-value=\"object.partner_id == object.event_id.partner_id\"></t>\n"
-"    <t t-set=\"target_customer\" t-value=\"object.partner_id == customer\"></t>\n"
-"    <t t-set=\"recurrent\" t-value=\"object.recurrence_id and not ctx.get('calendar_template_ignore_recurrence')\"></t>\n"
-"    <t t-set=\"attendee_description\" t-value=\"object.event_id._get_attendee_description()\"></t>\n"
-"    <t t-set=\"extra_message\" t-value=\"object.event_id.appointment_type_id.message_confirmation\"></t>\n"
+"    <t t-set=\"colors\" t-value=\"{'needsAction': 'grey', 'accepted': "
+"'green', 'tentative': '#FFFF00', 'declined': 'red'}\"/>\n"
+"    <t t-set=\"customer\" t-value=\" object.event_id.find_partner_customer()"
+"\"/>\n"
+"    <t t-set=\"target_responsible\" t-value=\"object.partner_id == "
+"object.event_id.partner_id\"/>\n"
+"    <t t-set=\"target_customer\" t-value=\"object.partner_id == customer\"/"
+">\n"
+"    <t t-set=\"recurrent\" t-value=\"object.recurrence_id and not "
+"ctx.get('calendar_template_ignore_recurrence')\"/>\n"
+"    <t t-set=\"attendee_description\" t-"
+"value=\"object.event_id._get_attendee_description()\"/>\n"
+"    <t t-set=\"extra_message\" t-"
+"value=\"object.event_id.appointment_type_id.message_confirmation\"/>\n"
 "\n"
 "    <p>\n"
-"        Hello <t t-out=\"object.common_name or ''\">Wood Corner</t>,<br><br>\n"
+"        Hello <t t-out=\"object.common_name or ''\">Wood Corner</t>,<br/><br/"
+">\n"
 "\n"
 "        <t t-if=\"target_customer\">\n"
-"            <t t-if=\"object.event_id.appointment_type_id.appointment_manual_confirmation\">\n"
+"            <t t-"
+"if=\"object.event_id.appointment_type_id.appointment_manual_confirmation\">\n"
 "                <t t-if=\"object.event_id.appointment_status == 'booked'\">\n"
-"                    We're happy to let you know your booking <strong t-out=\"object.event_id.appointment_type_id.name or ''\">Schedule a Demo</strong><t t-if=\"object.event_id.appointment_type_id.category != 'custom' and object.event_id.appointment_type_id.schedule_based_on == 'users'\"> with <t t-out=\"object.event_id.user_id.name or ''\">Ready Mat</t></t> has been confirmed.<br>\n"
+"                    We're happy to let you know your booking <strong t-"
+"out=\"object.event_id.appointment_type_id.name or ''\">Schedule a Demo</"
+"strong><t t-if=\"object.event_id.appointment_type_id.category != 'custom' "
+"and object.event_id.appointment_type_id.schedule_based_on == 'users'\"> with "
+"<t t-out=\"object.event_id.user_id.name or ''\">Ready Mat</t></t> has been "
+"confirmed.<br/>\n"
 "                </t>\n"
-"                <t t-elif=\"object.event_id.appointment_status == 'request'\">\n"
-"                    We've got your booking <strong t-out=\"object.event_id.appointment_type_id.name or ''\">Schedule a Demo</strong><t t-if=\"object.event_id.appointment_type_id.category != 'custom' and object.event_id.appointment_type_id.schedule_based_on == 'users'\"> with <t t-out=\"object.event_id.user_id.name or ''\">Ready Mat</t></t>.<br>\n"
+"                <t t-elif=\"object.event_id.appointment_status == "
+"'request'\">\n"
+"                    We've got your booking <strong t-"
+"out=\"object.event_id.appointment_type_id.name or ''\">Schedule a Demo</"
+"strong><t t-if=\"object.event_id.appointment_type_id.category != 'custom' "
+"and object.event_id.appointment_type_id.schedule_based_on == 'users'\"> with "
+"<t t-out=\"object.event_id.user_id.name or ''\">Ready Mat</t></t>.<br/>\n"
 "                    We'll notify you once it's confirmed.\n"
 "                </t>\n"
 "            </t>\n"
 "            <t t-else=\"\">\n"
-"                Your appointment <strong t-out=\"object.event_id.appointment_type_id.name or ''\">Schedule a Demo</strong> <t t-if=\"object.event_id.appointment_type_id.category != 'custom' and object.event_id.appointment_type_id.schedule_based_on == 'users'\"> with <t t-out=\"object.event_id.user_id.name or ''\">Ready Mat</t></t> has been booked.\n"
+"                Your appointment <strong t-"
+"out=\"object.event_id.appointment_type_id.name or ''\">Schedule a Demo</"
+"strong> <t t-if=\"object.event_id.appointment_type_id.category != 'custom' "
+"and object.event_id.appointment_type_id.schedule_based_on == 'users'\"> with "
+"<t t-out=\"object.event_id.user_id.name or ''\">Ready Mat</t></t> has been "
+"booked.\n"
 "            </t>\n"
-"            <div>\n"
+"            <span style=\"display: block;\">\n"
 "                Need to reschedule? Use this\n"
-"                <a t-attf-href=\"/calendar/meeting/view?token={{object.access_token}}&amp;id={{object.event_id.id}}\">link</a>\n"
-"            </div>\n"
+"                <a t-attf-href=\"/calendar/meeting/view?"
+"token={{object.access_token}}&amp;id={{object.event_id.id}}\">link</a>\n"
+"            </span>\n"
 "        </t>\n"
 "        <t t-elif=\"target_responsible\">\n"
 "            <t t-if=\"customer\">\n"
-"                <t t-out=\"customer.name or ''\"></t> scheduled the following appointment <strong t-out=\"object.event_id.appointment_type_id.name or ''\">Schedule a Demo</strong> with you.\n"
-"                <t t-if=\"object.event_id.appointment_type_id and object.event_id.appointment_status == 'request'\">\n"
-"                    <br>\n"
+"                <t t-out=\"customer.name or ''\"/> scheduled the following "
+"appointment <strong t-out=\"object.event_id.appointment_type_id.name or "
+"''\">Schedule a Demo</strong> with you.\n"
+"                <t t-if=\"object.event_id.appointment_type_id and "
+"object.event_id.appointment_status == 'request'\">\n"
 "                    It is awaiting confirmation.\n"
 "                </t>\n"
 "            </t>\n"
 "            <t t-else=\"\">\n"
-"                Your appointment <strong t-out=\"object.event_id.appointment_type_id.name or ''\">Schedule a Demo</strong> has been booked.\n"
+"                Your appointment <strong t-"
+"out=\"object.event_id.appointment_type_id.name or ''\">Schedule a Demo</"
+"strong> has been booked.\n"
 "            </t>\n"
 "        </t>\n"
 "        <t t-else=\"\">\n"
-"            You have been invited to the following appointment <strong t-out=\"object.event_id.appointment_type_id.name or ''\">Schedule a Demo</strong>.\n"
+"            You have been invited to the following appointment <strong t-"
+"out=\"object.event_id.appointment_type_id.name or ''\">Schedule a Demo</"
+"strong>.\n"
 "        </t>\n"
 "    </p>\n"
 "    <div style=\"text-align: center; padding: 16px 0px 16px 0px;\">\n"
-"        <t t-if=\"object.state != 'accepted'\">\n"
-"            <a t-attf-href=\"/calendar/meeting/accept?token={{object.access_token}}&amp;id={{object.event_id.id}}\" style=\"padding: 5px 10px; color: #FFFFFF; text-decoration: none; background-color: #875A7B; border: 1px solid #875A7B; border-radius: 3px\">\n"
-"                Accept</a>\n"
-"            <a t-attf-href=\"/calendar/meeting/decline?token={{object.access_token}}&amp;id={{object.event_id.id}}\" style=\"padding: 5px 10px; color: #FFFFFF; text-decoration: none; background-color: #875A7B; border: 1px solid #875A7B; border-radius: 3px\">\n"
-"                Decline</a>\n"
-"        </t>\n"
-"        <a t-if=\"not target_customer\" t-attf-href=\"/calendar/meeting/view?token={{object.access_token}}&amp;id={{object.event_id.id}}\" style=\"padding: 5px 10px; color: #FFFFFF; text-decoration: none; background-color: #875A7B; border: 1px solid #875A7B; border-radius: 3px\">View</a>\n"
+"        <a t-if=\"not target_customer\" t-attf-href=\"/calendar/meeting/view?"
+"token={{object.access_token}}&amp;id={{object.event_id.id}}\" "
+"style=\"padding: 5px 10px; color: #FFFFFF; text-decoration: none; background-"
+"color: #875A7B; border: 1px solid #875A7B; border-radius: 3px\">View</a>\n"
 "    </div>\n"
 "    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tr>\n"
 "        <td width=\"130px;\" style=\"min-width: 130px;\">\n"
-"            <div style=\"border-top-start-radius: 3px; border-top-end-radius: 3px; font-size: 12px; border-collapse: separate; text-align: center; font-weight: bold; color: #ffffff; min-height: 18px; background-color: #875A7B; border: 1px solid #875A7B;\">\n"
-"                <t t-out=\"format_datetime(dt=object.event_id.start, tz=object.mail_tz if not object.event_id.allday else None, dt_format='EEEE', lang_code=object.env.lang) or ''\">Tuesday</t>\n"
+"            <div style=\"border-top-start-radius: 3px; border-top-end-"
+"radius: 3px; font-size: 12px; border-collapse: separate; text-align: center; "
+"font-weight: bold; color: #ffffff; min-height: 18px; background-color: "
+"#875A7B; border: 1px solid #875A7B;\">\n"
+"                <t t-out=\"format_datetime(dt=object.event_id.start, "
+"tz=object.mail_tz if not object.event_id.allday else None, dt_format='EEEE', "
+"lang_code=object.env.lang) or ''\">Tuesday</t>\n"
 "            </div>\n"
-"            <div style=\"font-size: 48px; min-height: auto; font-weight: bold; text-align: center; color: #5F5F5F; background-color: #F8F8F8; border: 1px solid #875A7B;\">\n"
-"                <t t-out=\"format_datetime(dt=object.event_id.start, tz=object.mail_tz if not object.event_id.allday else None, dt_format='d', lang_code=object.env.lang) or ''\">4</t>\n"
+"            <div style=\"font-size: 48px; min-height: auto; font-weight: "
+"bold; text-align: center; color: #5F5F5F; background-color: #F8F8F8; border: "
+"1px solid #875A7B;\">\n"
+"                <t t-out=\"format_datetime(dt=object.event_id.start, "
+"tz=object.mail_tz if not object.event_id.allday else None, dt_format='d', "
+"lang_code=object.env.lang) or ''\">4</t>\n"
 "            </div>\n"
-"            <div style=\"font-size: 12px; text-align: center; font-weight: bold; color: #ffffff; background-color: #875A7B;\">\n"
-"                <t t-out=\"format_datetime(dt=object.event_id.start, tz=object.mail_tz if not object.event_id.allday else None, dt_format='MMMM y', lang_code=object.env.lang) or ''\">May 2021</t>\n"
+"            <div style=\"font-size: 12px; text-align: center; font-weight: "
+"bold; color: #ffffff; background-color: #875A7B;\">\n"
+"                <t t-out=\"format_datetime(dt=object.event_id.start, "
+"tz=object.mail_tz if not object.event_id.allday else None, dt_format='MMMM "
+"y', lang_code=object.env.lang) or ''\">May 2021</t>\n"
 "            </div>\n"
-"            <div style=\"border-collapse: separate; color: #5F5F5F; text-align: center; font-size: 12px; border-bottom-end-radius: 3px; font-weight: bold ; border: 1px solid #875A7B; border-bottom-start-radius: 3px;\">\n"
+"            <div style=\"border-collapse: separate; color: #5F5F5F; text-"
+"align: center; font-size: 12px; border-bottom-end-radius: 3px; font-weight: "
+"bold ; border: 1px solid #875A7B; border-bottom-start-radius: 3px;\">\n"
 "                <t t-if=\"not object.event_id.allday\">\n"
 "                    <div>\n"
-"                        <t t-out=\"format_time(time=object.event_id.start, tz=object.mail_tz, time_format='short', lang_code=object.env.lang) or ''\">11:00 AM</t>\n"
+"                        <t t-out=\"format_time(time=object.event_id.start, "
+"tz=object.mail_tz, time_format='short', lang_code=object.env.lang) or "
+"''\">11:00 AM</t>\n"
 "                    </div>\n"
-"                    <t t-if=\"not object.event_id.appointment_type_id.hide_timezone and object.mail_tz\">\n"
-"                        <div style=\"font-size: 10px; font-weight: normal\">\n"
-"                            (<t t-out=\"object.mail_tz or ''\">Europe/Brussels</t>)\n"
+"                    <t t-if=\"not "
+"object.event_id.appointment_type_id.hide_timezone and object.mail_tz\">\n"
+"                        <div style=\"font-size: 10px; font-weight: "
+"normal\">\n"
+"                            (<t t-out=\"object.mail_tz or ''\">Europe/"
+"Brussels</t>)\n"
 "                        </div>\n"
 "                    </t>\n"
 "                </t>\n"
 "            </div>\n"
 "        </td>\n"
-"        <td width=\"20px;\"></td>\n"
+"        <td width=\"20px;\"/>\n"
 "        <td style=\"padding-top: 5px;\">\n"
 "            <p><strong>Details of the event</strong></p>\n"
 "            <ul>\n"
-"                <li>Appointment Type: <t t-out=\"object.event_id.appointment_type_id.name or ''\">Schedule a Demo</t></li>\n"
+"                <li>Appointment Type: <t t-"
+"out=\"object.event_id.appointment_type_id.name or ''\">Schedule a Demo</t></"
+"li>\n"
 "                <t t-if=\"object.event_id.location\">\n"
-"                    <li>Location: <t t-out=\"object.event_id.location or ''\">Bruxelles</t>\n"
-"                        <a target=\"_blank\" t-if=\"object.event_id.location != object.event_id.appointment_type_id.location_id.name\" t-attf-href=\"http://maps.google.com/maps?oi=map&amp;q={{object.event_id.location}}\">(View Map)</a>\n"
+"                    <li>Location: <t t-out=\"object.event_id.location or "
+"''\">Bruxelles</t>\n"
+"                        <a target=\"_blank\" t-"
+"if=\"object.event_id.location != "
+"object.event_id.appointment_type_id.location_id.name\" t-attf-href=\"http://"
+"maps.google.com/maps?oi=map&amp;q={{object.event_id.location}}\">(View Map)</"
+"a>\n"
 "                    </li>\n"
 "                </t>\n"
 "                <t t-if=\"recurrent\">\n"
-"                    <li>When: <t t-out=\"object.recurrence_id.name or ''\">Every 1 Weeks, for 3 events</t></li>\n"
+"                    <li>When: <t t-out=\"object.recurrence_id.name or "
+"''\">Every 1 Weeks, for 3 events</t></li>\n"
 "                </t>\n"
-"                <t t-if=\"not object.event_id.appointment_type_id.hide_duration and not object.event_id.allday and object.event_id.duration\">\n"
-"                    <li>Duration: <t t-out=\"('%dH%02d' % (object.event_id.duration,round(object.event_id.duration*60)%60)) or ''\">0H30</t></li>\n"
+"                <t t-if=\"not "
+"object.event_id.appointment_type_id.hide_duration and not "
+"object.event_id.allday and object.event_id.duration\">\n"
+"                    <li>Duration: <t t-out=\"('%dH%02d' % "
+"(object.event_id.duration,round(object.event_id.duration*60)%60)) or "
+"''\">0H30</t></li>\n"
 "                </t>\n"
 "                <li>Attendees\n"
 "                <ul>\n"
-"                    <li t-foreach=\"object.event_id.attendee_ids\" t-as=\"attendee\">\n"
-"                        <div t-attf-style=\"display: inline-block; border-radius: 50%; width: 10px; height: 10px; background:{{ colors.get(attendee.state) or 'white' }};\"> </div>\n"
-"                        <t t-if=\"attendee.common_name != object.common_name\">\n"
-"                            <span style=\"margin-left:5px\" t-out=\"attendee.common_name or ''\">Mitchell Admin</span>\n"
+"                    <li t-foreach=\"object.event_id.attendee_ids\" t-"
+"as=\"attendee\">\n"
+"                        <div t-attf-style=\"display: inline-block; border-"
+"radius: 50%; width: 10px; height: 10px; background:"
+"{{ colors.get(attendee.state) or 'white' }};\"> </div>\n"
+"                        <t t-if=\"attendee.common_name != "
+"object.common_name\">\n"
+"                            <span style=\"margin-left:5px\" t-"
+"out=\"attendee.common_name or ''\">Mitchell Admin</span>\n"
 "                        </t>\n"
 "                        <t t-else=\"\">\n"
 "                            <span style=\"margin-left:5px\">You</span>\n"
 "                        </t>\n"
 "                    </li>\n"
 "                </ul></li>\n"
-"                <li t-if=\"object.event_id.appointment_type_id.resource_manage_capacity\">\n"
-"                    For: <t t-out=\"object.event_id.resource_total_capacity_reserved\"></t> people\n"
+"                <li t-"
+"if=\"object.event_id.appointment_type_id.resource_manage_capacity\">\n"
+"                    For: <t t-"
+"out=\"object.event_id.resource_total_capacity_reserved\"/> people\n"
 "                </li>\n"
-"                <li t-if=\"object.event_id.appointment_type_id.assign_method != 'time_auto_assign' and object.event_id.appointment_resource_ids\">\n"
+"                <li t-"
+"if=\"object.event_id.appointment_type_id.assign_method != 'time_auto_assign' "
+"and object.event_id.appointment_resource_ids\">\n"
 "                    Resources\n"
 "                    <ul>\n"
-"                        <li t-foreach=\"object.event_id.appointment_resource_ids\" t-as=\"resource\">\n"
-"                            <span style=\"margin-left:5px\" t-out=\"resource.name or ''\">Table 1</span>\n"
+"                        <li t-"
+"foreach=\"object.event_id.appointment_resource_ids\" t-as=\"resource\">\n"
+"                            <span style=\"margin-left:5px\" t-"
+"out=\"resource.name or ''\">Table 1</span>\n"
 "                        </li>\n"
 "                    </ul>\n"
 "                </li>\n"
 "                <li t-if=\"object.event_id.videocall_redirection\">\n"
 "                    How to Join:\n"
-"                    <t t-if=\"object.event_id.videocall_source == 'discuss'\"> Join with Odoo Discuss</t>\n"
-"                    <t t-else=\"\"> Join at</t><br>\n"
-"                    <a t-attf-href=\"{{ object.event_id.videocall_redirection }}\" target=\"_blank\" t-out=\"object.event_id.videocall_redirection or ''\">www.mycompany.com/calendar/videocall/xyz</a>\n"
+"                    <t t-if=\"object.event_id.videocall_source == "
+"'discuss'\"> Join with Odoo Discuss</t>\n"
+"                    <t t-else=\"\"> Join at</t><br/>\n"
+"                    <a t-attf-"
+"href=\"{{ object.event_id.videocall_redirection }}\" target=\"_blank\" t-"
+"out=\"object.event_id.videocall_redirection or ''\">www.mycompany.com/"
+"calendar/videocall/xyz</a>\n"
 "                </li>\n"
 "            </ul>\n"
 "        </td>\n"
 "    </tr></table>\n"
 "    <div t-if=\"attendee_description\" style=\"color:#000000;\">\n"
 "        Description of the event:\n"
-"        <div t-out=\"attendee_description\">Internal meeting for discussion for new pricing for product and services.</div>\n"
+"        <div t-out=\"attendee_description\">Internal meeting for discussion "
+"for new pricing for product and services.</div>\n"
 "    </div>\n"
-"    <t t-set=\"upcoming_appointments\" t-value=\"(object.event_id.appointment_booker_id.upcoming_appointment_ids - object.event_id).sorted('start')\"></t>\n"
+"    <t t-set=\"upcoming_appointments\" t-"
+"value=\"(object.event_id.appointment_booker_id.upcoming_appointment_ids - "
+"object.event_id).sorted('start')\"/>\n"
 "    <div t-if=\"target_customer and upcoming_appointments\">\n"
-"        <t t-set=\"appointment_booker_id\" t-value=\"object.event_id.appointment_booker_id.id\"></t>\n"
+"        <t t-set=\"appointment_booker_id\" t-"
+"value=\"object.event_id.appointment_booker_id.id\"/>\n"
 "        <p><strong>Your Other Upcoming Appointment(s)</strong></p>\n"
 "        <ul>\n"
-"            <li t-foreach=\"upcoming_appointments\" t-as=\"upcoming_appointment\">\n"
+"            <li t-foreach=\"upcoming_appointments\" t-"
+"as=\"upcoming_appointment\">\n"
 "                <span style=\"display: flex; font-size: small;\">\n"
-"                    <span style=\"margin-right: 4px\" t-out=\"upcoming_appointment.appointment_type_id.name or ''\">Technical Demo</span>\n"
-"                    (<span t-out=\"upcoming_appointment.start\" t-options='{\"widget\": \"datetime\", \"format\": \"medium\", \"tz_name\": object.mail_tz}'></span>)\n"
-"                    <a t-attf-href=\"/calendar/view/#{upcoming_appointment.access_token}?partner_id=#{appointment_booker_id}\" target=\"_blank\" style=\"margin-left: auto; margin-right: 8px;\">See Details</a>\n"
+"                    <span style=\"margin-right: 4px\" t-"
+"out=\"upcoming_appointment.appointment_type_id.name or ''\">Technical Demo</"
+"span>\n"
+"                    (<span t-out=\"upcoming_appointment.start\" t-"
+"options=\"{&quot;widget&quot;: &quot;datetime&quot;, &quot;format&quot;: "
+"&quot;medium&quot;, &quot;tz_name&quot;: object.mail_tz}\"/>)\n"
+"                    <a t-attf-href=\"/calendar/view/"
+"#{upcoming_appointment.access_token}?partner_id=#{appointment_booker_id}\" "
+"target=\"_blank\" style=\"margin-left: auto; margin-right: 8px;\">See "
+"Details</a>\n"
 "                </span>\n"
 "            </li>\n"
 "        </ul>\n"
 "    </div>\n"
-"    <br>\n"
-"    <t t-if=\"extra_message\" t-out=\"extra_message\"></t>\n"
+"    <br/>\n"
+"    <t t-if=\"extra_message\" t-out=\"extra_message\"/>\n"
 "    Thank you,\n"
-"    <t t-if=\"object.event_id.user_id.signature\">\n"
-"        <br>\n"
-"        <t t-out=\"object.event_id.user_id.signature or ''\">--<br>Mitchell Admin</t>\n"
+"    <t t-if=\"object.event_id.user_id.signature\" data-o-mail-quote-"
+"container=\"1\">\n"
+"        <br/>\n"
+"        <t t-out=\"object.event_id.user_id.signature or ''\" data-o-mail-"
+"quote=\"1\">--<br data-o-mail-quote=\"1\"/>Mitchell Admin</t>\n"
 "    </t>\n"
 "</div>\n"
 "            "
 msgstr ""
-
-#. module: appointment
-#: model:mail.template,body_html:appointment.appointment_booked_mail_template
-msgid ""
 "<div>\n"
-"    <t t-set=\"colors\" t-value=\"{'needsAction': 'grey', 'accepted': 'green', 'tentative': '#FFFF00', 'declined': 'red'}\"></t>\n"
-"    <t t-set=\"recurrent\" t-value=\"object.recurrence_id and not ctx.get('calendar_template_ignore_recurrence')\"></t>\n"
-"    <t t-set=\"mail_tz\" t-value=\"object._get_mail_tz() or ctx.get('mail_tz')\"></t>\n"
-"    <t t-set=\"attendee_description\" t-value=\"object._get_attendee_description()\"></t>\n"
+"    <t t-set=\"colors\" t-value=\"{'needsAction': 'grey', 'accepted': "
+"'green', 'tentative': '#FFFF00', 'declined': 'red'}\"></t>\n"
+"    <t t-set=\"recurrent\" t-value=\"object.recurrence_id and not ctx.get"
+"('calendar_template_ignore_recurrence')\"></t>\n"
+"    <t t-set=\"mail_tz\" t-value=\"object._get_mail_tz() or ctx.get"
+"('mail_tz')\"></t>\n"
+"    <t t-set=\"attendee_description\" t-"
+"value=\"object._get_attendee_description()\"></t>\n"
 "    <p>\n"
-"    Appointment booked for <t t-out=\"object.appointment_type_id.name or ''\">Technical Demo</t>\n"
-"    <t t-if=\"object.appointment_type_id.category != 'custom' and object.appointment_type_id.schedule_based_on == 'users'\"> with <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t></t>.\n"
+"    จองการนัดหมาย <t t-out=\"object.appointment_type_id.name or ''\">การสาธิตทา"
+"งเทคนิค</t>\n"
+"    <t t-if=\"object.appointment_type_id.category != 'custom' and "
+"object.appointment_type_id.schedule_based_on == 'users'\"> กับ <t t-"
+"out=\"object.partner_id.name or ''\">Brandon Freeman</t></t>\n"
 "    </p>\n"
 "    <div style=\"text-align: center; padding: 16px 0px 16px 0px;\">\n"
-"        <a t-attf-href=\"/calendar/meeting/join?token={{ object.access_token }}\" style=\"padding: 5px 10px; color: #FFFFFF; text-decoration: none; background-color: #875A7B; border: 1px solid #875A7B; border-radius: 3px\">\n"
-"            Join</a>\n"
-"        <a t-attf-href=\"/odoo/calendar.event/{{ object.id }}\" style=\"padding: 5px 10px; color: #FFFFFF; text-decoration: none; background-color: #875A7B; border: 1px solid #875A7B; border-radius: 3px\">\n"
-"            View</a>\n"
+"        <a t-attf-href=\"/calendar/meeting/join?token={{ "
+"object.access_token }}\" style=\"padding: 5px 10px; color: #FFFFFF; text-"
+"decoration: none; background-color: #875A7B; border: 1px solid #875A7B; "
+"border-radius: 3px\">\n"
+"            เข้าร่วม</a>\n"
+"        <a t-attf-href=\"/odoo/calendar.event/{{ object.id }}\" "
+"style=\"padding: 5px 10px; color: #FFFFFF; text-decoration: none; background-"
+"color: #875A7B; border: 1px solid #875A7B; border-radius: 3px\">\n"
+"            ดู</a>\n"
 "    </div>\n"
 "    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tr>\n"
 "            <td width=\"130px;\" style=\"min-width: 130px;\">\n"
-"                <div style=\"border-top-start-radius: 3px; border-top-end-radius: 3px; font-size: 12px; border-collapse: separate; text-align: center; font-weight: bold; color: #ffffff; min-height: 18px; background-color: #875A7B; border: 1px solid #875A7B;\">\n"
-"                    <t t-out=\"format_datetime(dt=object.start, tz=mail_tz if not object.allday else None, dt_format=&quot;EEEE&quot;, lang_code=object.env.lang) or ''\">Wednesday</t>\n"
+"                <div style=\"border-top-start-radius: 3px; border-top-end-"
+"radius: 3px; font-size: 12px; border-collapse: separate; text-align: center; "
+"font-weight: bold; color: #ffffff; min-height: 18px; background-color: "
+"#875A7B; border: 1px solid #875A7B;\">\n"
+"                    <t t-out=\"format_datetime(dt=object.start, tz=mail_tz "
+"if not object.allday else None, dt_format=&quot;EEEE&quot;, "
+"lang_code=object.env.lang) or ''\">วันพุธที่</t>\n"
 "                </div>\n"
-"                <div style=\"font-size: 48px; min-height: auto; font-weight: bold; text-align: center; color: #5F5F5F; background-color: #F8F8F8; border: 1px solid #875A7B;\">\n"
-"                    <t t-out=\"format_datetime(dt=object.start, tz=mail_tz if not object.allday else None, dt_format=&quot;d&quot;, lang_code=object.env.lang) or ''\">1</t>\n"
+"                <div style=\"font-size: 48px; min-height: auto; font-weight: "
+"bold; text-align: center; color: #5F5F5F; background-color: #F8F8F8; border: "
+"1px solid #875A7B;\">\n"
+"                    <t t-out=\"format_datetime(dt=object.start, tz=mail_tz "
+"if not object.allday else None, dt_format=&quot;d&quot;, "
+"lang_code=object.env.lang) or ''\">1</t>\n"
 "                </div>\n"
-"                <div style=\"font-size: 12px; text-align: center; font-weight: bold; color: #ffffff; background-color: #875A7B;\">\n"
-"                    <t t-out=\"format_datetime(dt=object.start, tz=mail_tz if not object.allday else None, dt_format=&quot;MMMM y&quot;, lang_code=object.env.lang) or ''\">January 2020</t>\n"
+"                <div style=\"font-size: 12px; text-align: center; font-"
+"weight: bold; color: #ffffff; background-color: #875A7B;\">\n"
+"                    <t t-out=\"format_datetime(dt=object.start, tz=mail_tz "
+"if not object.allday else None, dt_format=&quot;MMMM y&quot;, "
+"lang_code=object.env.lang) or ''\">มกราคม 2563</t>\n"
 "                </div>\n"
-"                <div style=\"border-collapse: separate; color: #5F5F5F; text-align: center; font-size: 12px; border-bottom-end-radius: 3px; font-weight: bold; border: 1px solid #875A7B; border-bottom-start-radius: 3px;\">\n"
+"                <div style=\"border-collapse: separate; color: #5F5F5F; text-"
+"align: center; font-size: 12px; border-bottom-end-radius: 3px; font-weight: "
+"bold; border: 1px solid #875A7B; border-bottom-start-radius: 3px;\">\n"
 "                    <t t-if=\"not object.allday\">\n"
 "                        <div>\n"
-"                            <t t-out=\"format_time(time=object.start, tz=mail_tz, time_format=&quot;short&quot;, lang_code=object.env.lang) or ''\">8:00</t>\n"
+"                            <t t-out=\"format_time(time=object.start, "
+"tz=mail_tz, time_format=&quot;short&quot;, lang_code=object.env.lang) or "
+"''\">8:00 น.</t>\n"
 "                        </div>\n"
-"                        <t t-if=\"not object.appointment_type_id.hide_timezone and mail_tz\">\n"
-"                            <div style=\"font-size: 10px; font-weight: normal;\">\n"
+"                        <t t-if=\"not "
+"object.appointment_type_id.hide_timezone and mail_tz\">\n"
+"                            <div style=\"font-size: 10px; font-weight: "
+"normal;\">\n"
 "                                (<t t-out=\"mail_tz\"></t>)\n"
 "                            </div>\n"
 "                        </t>\n"
@@ -360,58 +479,250 @@ msgid ""
 "            </td>\n"
 "            <td width=\"20px;\"></td>\n"
 "            <td style=\"padding-top: 5px;\">\n"
+"                <p><strong>รายละเอียดของกิจกรรม</strong></p>\n"
+"                <ul>\n"
+"                    <li t-if=\"object.location\">สถานที่: <t t-"
+"out=\"object.location or ''\">บรัสเซลส์</t>\n"
+"                        <a target=\"_blank\" t-if=\"object.location != "
+"object.appointment_type_id.location_id.name\" t-attf-href=\"http://"
+"maps.google.com/maps?oi=map&amp;q={{ object.location }}\">(ดูแผนที่)</a>\n"
+"                    </li>\n"
+"                    <li t-if=\"recurrent\">เมื่อ: <t t-"
+"out=\"object.recurrence_id.name or ''\">ทุก 1 สัปดาห์ สำหรับ 3 กิจกรรม</t></li>\n"
+"                    <li t-if=\"not object.appointment_type_id.hide_duration "
+"and not object.allday and object.duration\">ระยะเวลา: <t t-out=\"('%dH%02d' "
+"% (object.duration,round(object.duration*60)%60)) or ''\">30 นาที</t></li>\n"
+"                    <li>ผู้เข้าร่วม\n"
+"                    <ul>\n"
+"                        <li t-foreach=\"object.attendee_ids\" t-"
+"as=\"attendee\">\n"
+"                            <div t-attf-style=\"display: inline-block; "
+"border-radius: 50%; width: 10px; height: 10px; background:{{ colors.get"
+"(attendee.state) or 'white' }};\"> </div>\n"
+"                            <t t-if=\"attendee.common_name\">\n"
+"                                <span style=\"margin-left:5px\" t-"
+"out=\"attendee.common_name or ''\">Mitchell Admin</span>\n"
+"                            </t>\n"
+"                            <t t-else=\"\">\n"
+"                                <span style=\"margin-left:5px\">คุณ</span>\n"
+"                            </t>\n"
+"                        </li>\n"
+"                    </ul></li>\n"
+"                    <li t-"
+"if=\"object.appointment_type_id.resource_manage_capacity\">\n"
+"                        สำหรับ: <t t-"
+"out=\"object.resource_total_capacity_reserved\"></t> คน\n"
+"                    </li>\n"
+"                    <li t-if=\"object.appointment_type_id.assign_method != "
+"'time_auto_assign' and object.appointment_resource_ids\">\n"
+"                        ทรัพยากร\n"
+"                        <ul>\n"
+"                            <li t-"
+"foreach=\"object.appointment_resource_ids\" t-as=\"resource\">\n"
+"                                <span style=\"margin-left:5px\" t-"
+"out=\"resource.name or ''\">ตารางที่ 1</span>\n"
+"                            </li>\n"
+"                        </ul>\n"
+"                    </li>\n"
+"                    <li t-if=\"object.videocall_redirection\">\n"
+"                        วิธีการเข้าร่วม:\n"
+"                        <t t-if=\"object.videocall_source == 'discuss'\"> เข้า"
+"ร่วมที่ Odoo แชท</t>\n"
+"                        <t t-else=\"\"> เข้าร่วมที่</t><br>\n"
+"                        <a t-attf-href=\"{{ object.videocall_redirection }}"
+"\" target=\"_blank\" t-out=\"object.videocall_redirection or ''\">"
+"www.mycompany.com/calendar/videocall/xyz</a>\n"
+"                    </li>\n"
+"                </ul>\n"
+"            </td>\n"
+"    </tr></table>\n"
+"    <div t-if=\"attendee_description\" style=\"color:#000000;\">\n"
+"        คำอธิบายกิจกรรม:<div t-out=\"attendee_description\"></div>\n"
+"    </div>\n"
+"    <t t-set=\"upcoming_appointments\" t-value=\""
+"(object.appointment_booker_id.upcoming_appointment_ids - object).sorted"
+"('start')\"></t>\n"
+"    <div t-if=\"upcoming_appointments\">\n"
+"        <t t-set=\"appointment_booker_id\" t-"
+"value=\"object.appointment_booker_id.id\"></t>\n"
+"        <p><strong>การนัดหมายที่กำลังจะเกิดขึ้นของคุณ</strong></p>\n"
+"        <ul>\n"
+"            <li t-foreach=\"upcoming_appointments\" t-"
+"as=\"upcoming_appointment\">\n"
+"                <span style=\"display: flex; font-size: small;\">\n"
+"                    <span style=\"margin-right: 4px\" t-"
+"out=\"upcoming_appointment.appointment_type_id.name or ''\">การสาธิตทางเทคนิค</"
+"span>\n"
+"                    (<span t-out=\"upcoming_appointment.start\" t-options='"
+"{\"widget\": \"datetime\", \"format\": \"medium\", \"tz_name\": mail_tz}'></"
+"span>)\n"
+"                    <a t-attf-href=\"/calendar/view/#"
+"{upcoming_appointment.access_token}?partner_id=#{appointment_booker_id}\" "
+"target=\"_blank\" style=\"margin-left: auto; margin-right: 8px;\">ดูรายละเอีย"
+"ด</a>\n"
+"                </span>\n"
+"            </li>\n"
+"        </ul>\n"
+"    </div>\n"
+"</div>\n"
+"            "
+
+#. module: appointment
+#: model:mail.template,body_html:appointment.appointment_booked_mail_template
+msgid ""
+"<div>\n"
+"    <t t-set=\"colors\" t-value=\"{'needsAction': 'grey', 'accepted': "
+"'green', 'tentative': '#FFFF00', 'declined': 'red'}\"/>\n"
+"    <t t-set=\"recurrent\" t-value=\"object.recurrence_id and not "
+"ctx.get('calendar_template_ignore_recurrence')\"/>\n"
+"    <t t-set=\"mail_tz\" t-value=\"object._get_mail_tz() or "
+"ctx.get('mail_tz')\"/>\n"
+"    <t t-set=\"attendee_description\" t-"
+"value=\"object._get_attendee_description()\"/>\n"
+"    <p>\n"
+"    Appointment booked for <t t-out=\"object.appointment_type_id.name or "
+"''\">Technical Demo</t>\n"
+"    <t t-if=\"object.appointment_type_id.category != 'custom' and "
+"object.appointment_type_id.schedule_based_on == 'users'\"> with <t t-"
+"out=\"object.partner_id.name or ''\">Brandon Freeman</t></t>.\n"
+"    </p>\n"
+"    <div style=\"text-align: center; padding: 16px 0px 16px 0px;\">\n"
+"        <a t-attf-href=\"/calendar/meeting/join?"
+"token={{ object.access_token }}\" style=\"padding: 5px 10px; color: #FFFFFF; "
+"text-decoration: none; background-color: #875A7B; border: 1px solid #875A7B; "
+"border-radius: 3px\">\n"
+"            Join</a>\n"
+"        <a t-attf-href=\"/odoo/calendar.event/{{ object.id }}\" "
+"style=\"padding: 5px 10px; color: #FFFFFF; text-decoration: none; background-"
+"color: #875A7B; border: 1px solid #875A7B; border-radius: 3px\">\n"
+"            View</a>\n"
+"    </div>\n"
+"    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tr>\n"
+"            <td width=\"130px;\" style=\"min-width: 130px;\">\n"
+"                <div style=\"border-top-start-radius: 3px; border-top-end-"
+"radius: 3px; font-size: 12px; border-collapse: separate; text-align: center; "
+"font-weight: bold; color: #ffffff; min-height: 18px; background-color: "
+"#875A7B; border: 1px solid #875A7B;\">\n"
+"                    <t t-out=\"format_datetime(dt=object.start, tz=mail_tz "
+"if not object.allday else None, dt_format=&quot;EEEE&quot;, "
+"lang_code=object.env.lang) or ''\">Wednesday</t>\n"
+"                </div>\n"
+"                <div style=\"font-size: 48px; min-height: auto; font-weight: "
+"bold; text-align: center; color: #5F5F5F; background-color: #F8F8F8; border: "
+"1px solid #875A7B;\">\n"
+"                    <t t-out=\"format_datetime(dt=object.start, tz=mail_tz "
+"if not object.allday else None, dt_format=&quot;d&quot;, "
+"lang_code=object.env.lang) or ''\">1</t>\n"
+"                </div>\n"
+"                <div style=\"font-size: 12px; text-align: center; font-"
+"weight: bold; color: #ffffff; background-color: #875A7B;\">\n"
+"                    <t t-out=\"format_datetime(dt=object.start, tz=mail_tz "
+"if not object.allday else None, dt_format=&quot;MMMM y&quot;, "
+"lang_code=object.env.lang) or ''\">January 2020</t>\n"
+"                </div>\n"
+"                <div style=\"border-collapse: separate; color: #5F5F5F; text-"
+"align: center; font-size: 12px; border-bottom-end-radius: 3px; font-weight: "
+"bold; border: 1px solid #875A7B; border-bottom-start-radius: 3px;\">\n"
+"                    <t t-if=\"not object.allday\">\n"
+"                        <div>\n"
+"                            <t t-out=\"format_time(time=object.start, "
+"tz=mail_tz, time_format=&quot;short&quot;, lang_code=object.env.lang) or "
+"''\">8:00</t>\n"
+"                        </div>\n"
+"                        <t t-if=\"not "
+"object.appointment_type_id.hide_timezone and mail_tz\">\n"
+"                            <div style=\"font-size: 10px; font-weight: "
+"normal;\">\n"
+"                                (<t t-out=\"mail_tz\"/>)\n"
+"                            </div>\n"
+"                        </t>\n"
+"                    </t>\n"
+"                </div>\n"
+"            </td>\n"
+"            <td width=\"20px;\"/>\n"
+"            <td style=\"padding-top: 5px;\">\n"
 "                <p><strong>Details of the event</strong></p>\n"
 "                <ul>\n"
-"                    <li t-if=\"object.location\">Location: <t t-out=\"object.location or ''\">Bruxelles</t>\n"
-"                        <a target=\"_blank\" t-if=\"object.location != object.appointment_type_id.location_id.name\" t-attf-href=\"http://maps.google.com/maps?oi=map&amp;q={{ object.location }}\">(View Map)</a>\n"
+"                    <li t-if=\"object.location\">Location: <t t-"
+"out=\"object.location or ''\">Bruxelles</t>\n"
+"                        <a target=\"_blank\" t-if=\"object.location != "
+"object.appointment_type_id.location_id.name\" t-attf-href=\"http://"
+"maps.google.com/maps?oi=map&amp;q={{ object.location }}\">(View Map)</a>\n"
 "                    </li>\n"
-"                    <li t-if=\"recurrent\">When: <t t-out=\"object.recurrence_id.name or ''\">Every 1 Weeks, for 3 events</t></li>\n"
-"                    <li t-if=\"not object.appointment_type_id.hide_duration and not object.allday and object.duration\">Duration: <t t-out=\"('%dH%02d' % (object.duration,round(object.duration*60)%60)) or ''\">0H30</t></li>\n"
+"                    <li t-if=\"recurrent\">When: <t t-"
+"out=\"object.recurrence_id.name or ''\">Every 1 Weeks, for 3 events</t></"
+"li>\n"
+"                    <li t-if=\"not object.appointment_type_id.hide_duration "
+"and not object.allday and object.duration\">Duration: <t t-out=\"('%dH%02d' "
+"% (object.duration,round(object.duration*60)%60)) or ''\">0H30</t></li>\n"
 "                    <li>Attendees\n"
 "                    <ul>\n"
-"                        <li t-foreach=\"object.attendee_ids\" t-as=\"attendee\">\n"
-"                            <div t-attf-style=\"display: inline-block; border-radius: 50%; width: 10px; height: 10px; background:{{ colors.get(attendee.state) or 'white' }};\"> </div>\n"
+"                        <li t-foreach=\"object.attendee_ids\" t-"
+"as=\"attendee\">\n"
+"                            <div t-attf-style=\"display: inline-block; "
+"border-radius: 50%; width: 10px; height: 10px; background:"
+"{{ colors.get(attendee.state) or 'white' }};\"> </div>\n"
 "                            <t t-if=\"attendee.common_name\">\n"
-"                                <span style=\"margin-left:5px\" t-out=\"attendee.common_name or ''\">Mitchell Admin</span>\n"
+"                                <span style=\"margin-left:5px\" t-"
+"out=\"attendee.common_name or ''\">Mitchell Admin</span>\n"
 "                            </t>\n"
 "                            <t t-else=\"\">\n"
 "                                <span style=\"margin-left:5px\">You</span>\n"
 "                            </t>\n"
 "                        </li>\n"
 "                    </ul></li>\n"
-"                    <li t-if=\"object.appointment_type_id.resource_manage_capacity\">\n"
-"                        For: <t t-out=\"object.resource_total_capacity_reserved\"></t> people\n"
+"                    <li t-"
+"if=\"object.appointment_type_id.resource_manage_capacity\">\n"
+"                        For: <t t-"
+"out=\"object.resource_total_capacity_reserved\"/> people\n"
 "                    </li>\n"
-"                    <li t-if=\"object.appointment_type_id.assign_method != 'time_auto_assign' and object.appointment_resource_ids\">\n"
+"                    <li t-if=\"object.appointment_type_id.assign_method != "
+"'time_auto_assign' and object.appointment_resource_ids\">\n"
 "                        Resources\n"
 "                        <ul>\n"
-"                            <li t-foreach=\"object.appointment_resource_ids\" t-as=\"resource\">\n"
-"                                <span style=\"margin-left:5px\" t-out=\"resource.name or ''\">Table 1</span>\n"
+"                            <li t-"
+"foreach=\"object.appointment_resource_ids\" t-as=\"resource\">\n"
+"                                <span style=\"margin-left:5px\" t-"
+"out=\"resource.name or ''\">Table 1</span>\n"
 "                            </li>\n"
 "                        </ul>\n"
 "                    </li>\n"
 "                    <li t-if=\"object.videocall_redirection\">\n"
 "                        How to Join:\n"
-"                        <t t-if=\"object.videocall_source == 'discuss'\"> Join with Odoo Discuss</t>\n"
-"                        <t t-else=\"\"> Join at</t><br>\n"
-"                        <a t-attf-href=\"{{ object.videocall_redirection }}\" target=\"_blank\" t-out=\"object.videocall_redirection or ''\">www.mycompany.com/calendar/videocall/xyz</a>\n"
+"                        <t t-if=\"object.videocall_source == 'discuss'\"> "
+"Join with Odoo Discuss</t>\n"
+"                        <t t-else=\"\"> Join at</t><br/>\n"
+"                        <a t-attf-href=\"{{ object.videocall_redirection }}"
+"\" target=\"_blank\" t-out=\"object.videocall_redirection or "
+"''\">www.mycompany.com/calendar/videocall/xyz</a>\n"
 "                    </li>\n"
 "                </ul>\n"
 "            </td>\n"
 "    </tr></table>\n"
 "    <div t-if=\"attendee_description\" style=\"color:#000000;\">\n"
-"        Description of the event:<div t-out=\"attendee_description\"></div>\n"
+"        Description of the event:<div t-out=\"attendee_description\"/>\n"
 "    </div>\n"
-"    <t t-set=\"upcoming_appointments\" t-value=\"(object.appointment_booker_id.upcoming_appointment_ids - object).sorted('start')\"></t>\n"
+"    <t t-set=\"upcoming_appointments\" t-"
+"value=\"(object.appointment_booker_id.upcoming_appointment_ids - "
+"object).sorted('start')\"/>\n"
 "    <div t-if=\"upcoming_appointments\">\n"
-"        <t t-set=\"appointment_booker_id\" t-value=\"object.appointment_booker_id.id\"></t>\n"
+"        <t t-set=\"appointment_booker_id\" t-"
+"value=\"object.appointment_booker_id.id\"/>\n"
 "        <p><strong>Your Other Upcoming Appointment(s)</strong></p>\n"
 "        <ul>\n"
-"            <li t-foreach=\"upcoming_appointments\" t-as=\"upcoming_appointment\">\n"
+"            <li t-foreach=\"upcoming_appointments\" t-"
+"as=\"upcoming_appointment\">\n"
 "                <span style=\"display: flex; font-size: small;\">\n"
-"                    <span style=\"margin-right: 4px\" t-out=\"upcoming_appointment.appointment_type_id.name or ''\">Technical Demo</span>\n"
-"                    (<span t-out=\"upcoming_appointment.start\" t-options='{\"widget\": \"datetime\", \"format\": \"medium\", \"tz_name\": mail_tz}'></span>)\n"
-"                    <a t-attf-href=\"/calendar/view/#{upcoming_appointment.access_token}?partner_id=#{appointment_booker_id}\" target=\"_blank\" style=\"margin-left: auto; margin-right: 8px;\">See Details</a>\n"
+"                    <span style=\"margin-right: 4px\" t-"
+"out=\"upcoming_appointment.appointment_type_id.name or ''\">Technical Demo</"
+"span>\n"
+"                    (<span t-out=\"upcoming_appointment.start\" t-"
+"options=\"{&quot;widget&quot;: &quot;datetime&quot;, &quot;format&quot;: "
+"&quot;medium&quot;, &quot;tz_name&quot;: mail_tz}\"/>)\n"
+"                    <a t-attf-href=\"/calendar/view/"
+"#{upcoming_appointment.access_token}?partner_id=#{appointment_booker_id}\" "
+"target=\"_blank\" style=\"margin-left: auto; margin-right: 8px;\">See "
+"Details</a>\n"
 "                </span>\n"
 "            </li>\n"
 "        </ul>\n"
@@ -419,34 +730,325 @@ msgid ""
 "</div>\n"
 "            "
 msgstr ""
+"<div>\n"
+"    <t t-set=\"colors\" t-value=\"{'needsAction': 'grey', 'accepted': "
+"'green', 'tentative': '#FFFF00', 'declined': 'red'}\"></t>\n"
+"    <t t-set=\"recurrent\" t-value=\"object.recurrence_id and not ctx.get"
+"('calendar_template_ignore_recurrence')\"></t>\n"
+"    <t t-set=\"mail_tz\" t-value=\"object._get_mail_tz() or ctx.get"
+"('mail_tz')\"></t>\n"
+"    <t t-set=\"attendee_description\" t-"
+"value=\"object._get_attendee_description()\"></t>\n"
+"    <p>\n"
+"    จองการนัดหมาย <t t-out=\"object.appointment_type_id.name or ''\">การสาธิตทา"
+"งเทคนิค</t>\n"
+"    <t t-if=\"object.appointment_type_id.category != 'custom' and "
+"object.appointment_type_id.schedule_based_on == 'users'\"> กับ <t t-"
+"out=\"object.partner_id.name or ''\">Brandon Freeman</t></t>\n"
+"    </p>\n"
+"    <div style=\"text-align: center; padding: 16px 0px 16px 0px;\">\n"
+"        <a t-attf-href=\"/calendar/meeting/join?token={{ "
+"object.access_token }}\" style=\"padding: 5px 10px; color: #FFFFFF; text-"
+"decoration: none; background-color: #875A7B; border: 1px solid #875A7B; "
+"border-radius: 3px\">\n"
+"            เข้าร่วม</a>\n"
+"        <a t-attf-href=\"/odoo/calendar.event/{{ object.id }}\" "
+"style=\"padding: 5px 10px; color: #FFFFFF; text-decoration: none; background-"
+"color: #875A7B; border: 1px solid #875A7B; border-radius: 3px\">\n"
+"            ดู</a>\n"
+"    </div>\n"
+"    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tr>\n"
+"            <td width=\"130px;\" style=\"min-width: 130px;\">\n"
+"                <div style=\"border-top-start-radius: 3px; border-top-end-"
+"radius: 3px; font-size: 12px; border-collapse: separate; text-align: center; "
+"font-weight: bold; color: #ffffff; min-height: 18px; background-color: "
+"#875A7B; border: 1px solid #875A7B;\">\n"
+"                    <t t-out=\"format_datetime(dt=object.start, tz=mail_tz "
+"if not object.allday else None, dt_format=&quot;EEEE&quot;, "
+"lang_code=object.env.lang) or ''\">วันพุธที่</t>\n"
+"                </div>\n"
+"                <div style=\"font-size: 48px; min-height: auto; font-weight: "
+"bold; text-align: center; color: #5F5F5F; background-color: #F8F8F8; border: "
+"1px solid #875A7B;\">\n"
+"                    <t t-out=\"format_datetime(dt=object.start, tz=mail_tz "
+"if not object.allday else None, dt_format=&quot;d&quot;, "
+"lang_code=object.env.lang) or ''\">1</t>\n"
+"                </div>\n"
+"                <div style=\"font-size: 12px; text-align: center; font-"
+"weight: bold; color: #ffffff; background-color: #875A7B;\">\n"
+"                    <t t-out=\"format_datetime(dt=object.start, tz=mail_tz "
+"if not object.allday else None, dt_format=&quot;MMMM y&quot;, "
+"lang_code=object.env.lang) or ''\">มกราคม 2563</t>\n"
+"                </div>\n"
+"                <div style=\"border-collapse: separate; color: #5F5F5F; text-"
+"align: center; font-size: 12px; border-bottom-end-radius: 3px; font-weight: "
+"bold; border: 1px solid #875A7B; border-bottom-start-radius: 3px;\">\n"
+"                    <t t-if=\"not object.allday\">\n"
+"                        <div>\n"
+"                            <t t-out=\"format_time(time=object.start, "
+"tz=mail_tz, time_format=&quot;short&quot;, lang_code=object.env.lang) or "
+"''\">8:00 น.</t>\n"
+"                        </div>\n"
+"                        <t t-if=\"not "
+"object.appointment_type_id.hide_timezone and mail_tz\">\n"
+"                            <div style=\"font-size: 10px; font-weight: "
+"normal;\">\n"
+"                                (<t t-out=\"mail_tz\"></t>)\n"
+"                            </div>\n"
+"                        </t>\n"
+"                    </t>\n"
+"                </div>\n"
+"            </td>\n"
+"            <td width=\"20px;\"></td>\n"
+"            <td style=\"padding-top: 5px;\">\n"
+"                <p><strong>รายละเอียดของกิจกรรม</strong></p>\n"
+"                <ul>\n"
+"                    <li t-if=\"object.location\">สถานที่: <t t-"
+"out=\"object.location or ''\">บรัสเซลส์</t>\n"
+"                        <a target=\"_blank\" t-if=\"object.location != "
+"object.appointment_type_id.location_id.name\" t-attf-href=\"http://"
+"maps.google.com/maps?oi=map&amp;q={{ object.location }}\">(ดูแผนที่)</a>\n"
+"                    </li>\n"
+"                    <li t-if=\"recurrent\">เมื่อ: <t t-"
+"out=\"object.recurrence_id.name or ''\">ทุก 1 สัปดาห์ สำหรับ 3 กิจกรรม</t></li>\n"
+"                    <li t-if=\"not object.appointment_type_id.hide_duration "
+"and not object.allday and object.duration\">ระยะเวลา: <t t-out=\"('%dH%02d' "
+"% (object.duration,round(object.duration*60)%60)) or ''\">30 นาที</t></li>\n"
+"                    <li>ผู้เข้าร่วม\n"
+"                    <ul>\n"
+"                        <li t-foreach=\"object.attendee_ids\" t-"
+"as=\"attendee\">\n"
+"                            <div t-attf-style=\"display: inline-block; "
+"border-radius: 50%; width: 10px; height: 10px; background:{{ colors.get"
+"(attendee.state) or 'white' }};\"> </div>\n"
+"                            <t t-if=\"attendee.common_name\">\n"
+"                                <span style=\"margin-left:5px\" t-"
+"out=\"attendee.common_name or ''\">Mitchell Admin</span>\n"
+"                            </t>\n"
+"                            <t t-else=\"\">\n"
+"                                <span style=\"margin-left:5px\">คุณ</span>\n"
+"                            </t>\n"
+"                        </li>\n"
+"                    </ul></li>\n"
+"                    <li t-"
+"if=\"object.appointment_type_id.resource_manage_capacity\">\n"
+"                        สำหรับ: <t t-"
+"out=\"object.resource_total_capacity_reserved\"></t> คน\n"
+"                    </li>\n"
+"                    <li t-if=\"object.appointment_type_id.assign_method != "
+"'time_auto_assign' and object.appointment_resource_ids\">\n"
+"                        ทรัพยากร\n"
+"                        <ul>\n"
+"                            <li t-"
+"foreach=\"object.appointment_resource_ids\" t-as=\"resource\">\n"
+"                                <span style=\"margin-left:5px\" t-"
+"out=\"resource.name or ''\">ตารางที่ 1</span>\n"
+"                            </li>\n"
+"                        </ul>\n"
+"                    </li>\n"
+"                    <li t-if=\"object.videocall_redirection\">\n"
+"                        วิธีการเข้าร่วม:\n"
+"                        <t t-if=\"object.videocall_source == 'discuss'\"> เข้า"
+"ร่วมที่ Odoo แชท</t>\n"
+"                        <t t-else=\"\"> เข้าร่วมที่</t><br>\n"
+"                        <a t-attf-href=\"{{ object.videocall_redirection }}"
+"\" target=\"_blank\" t-out=\"object.videocall_redirection or ''\">"
+"www.mycompany.com/calendar/videocall/xyz</a>\n"
+"                    </li>\n"
+"                </ul>\n"
+"            </td>\n"
+"    </tr></table>\n"
+"    <div t-if=\"attendee_description\" style=\"color:#000000;\">\n"
+"        คำอธิบายกิจกรรม:<div t-out=\"attendee_description\"></div>\n"
+"    </div>\n"
+"    <t t-set=\"upcoming_appointments\" t-value=\""
+"(object.appointment_booker_id.upcoming_appointment_ids - object).sorted"
+"('start')\"></t>\n"
+"    <div t-if=\"upcoming_appointments\">\n"
+"        <t t-set=\"appointment_booker_id\" t-"
+"value=\"object.appointment_booker_id.id\"></t>\n"
+"        <p><strong>การนัดหมายที่กำลังจะเกิดขึ้นของคุณ</strong></p>\n"
+"        <ul>\n"
+"            <li t-foreach=\"upcoming_appointments\" t-"
+"as=\"upcoming_appointment\">\n"
+"                <span style=\"display: flex; font-size: small;\">\n"
+"                    <span style=\"margin-right: 4px\" t-"
+"out=\"upcoming_appointment.appointment_type_id.name or ''\">การสาธิตทางเทคนิค</"
+"span>\n"
+"                    (<span t-out=\"upcoming_appointment.start\" t-options='"
+"{\"widget\": \"datetime\", \"format\": \"medium\", \"tz_name\": mail_tz}'></"
+"span>)\n"
+"                    <a t-attf-href=\"/calendar/view/#"
+"{upcoming_appointment.access_token}?partner_id=#{appointment_booker_id}\" "
+"target=\"_blank\" style=\"margin-left: auto; margin-right: 8px;\">ดูรายละเอีย"
+"ด</a>\n"
+"                </span>\n"
+"            </li>\n"
+"        </ul>\n"
+"    </div>\n"
+"</div>\n"
+"            "
 
 #. module: appointment
 #: model:mail.template,body_html:appointment.appointment_canceled_mail_template
 msgid ""
 "<div>\n"
-"    <t t-set=\"colors\" t-value=\"{'needsAction': 'grey', 'accepted': 'green', 'tentative': '#FFFF00', 'declined': 'red'}\"></t>\n"
-"    <t t-set=\"recurrent\" t-value=\"object.recurrence_id and not ctx.get('calendar_template_ignore_recurrence')\"></t>\n"
-"    <t t-set=\"mail_tz\" t-value=\"object._get_mail_tz() or ctx.get('mail_tz')\"></t>\n"
-"    <t t-set=\"attendee_description\" t-value=\"object._get_attendee_description()\"></t>\n"
+"    <t t-set=\"colors\" t-value=\"{'needsAction': 'grey', 'accepted': "
+"'green', 'tentative': '#FFFF00', 'declined': 'red'}\"/>\n"
+"    <t t-set=\"recurrent\" t-value=\"object.recurrence_id and not "
+"ctx.get('calendar_template_ignore_recurrence')\"/>\n"
+"    <t t-set=\"mail_tz\" t-value=\"object._get_mail_tz() or "
+"ctx.get('mail_tz')\"/>\n"
+"    <t t-set=\"attendee_description\" t-"
+"value=\"object._get_attendee_description()\"/>\n"
 "    <p>\n"
-"    The appointment for <t t-out=\"object.appointment_type_id.name or ''\">Technical Demo</t> <t t-if=\"object.appointment_type_id.category != 'custom' and object.appointment_type_id.schedule_based_on == 'users'\"> with <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t></t> has been canceled.\n"
+"    The appointment for <t t-out=\"object.appointment_type_id.name or "
+"''\">Technical Demo</t> <t t-if=\"object.appointment_type_id.category != "
+"'custom' and object.appointment_type_id.schedule_based_on == 'users'\"> with "
+"<t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t></t> has been "
+"canceled.\n"
 "    </p>\n"
 "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tr>\n"
 "            <td width=\"130px;\" style=\"min-width: 130px;\">\n"
-"                <div style=\"border-top-start-radius: 3px; border-top-end-radius: 3px; font-size: 12px; border-collapse: separate; text-align: center; font-weight: bold; color: #ffffff; min-height: 18px; background-color: #875A7B; border: 1px solid #875A7B;\">\n"
-"                    <t t-out=\"format_datetime(dt=object.start, tz=mail_tz, dt_format=&quot;EEEE&quot;, lang_code=object.env.lang) or ''\">Wednesday</t>\n"
+"                <div style=\"border-top-start-radius: 3px; border-top-end-"
+"radius: 3px; font-size: 12px; border-collapse: separate; text-align: center; "
+"font-weight: bold; color: #ffffff; min-height: 18px; background-color: "
+"#875A7B; border: 1px solid #875A7B;\">\n"
+"                    <t t-out=\"format_datetime(dt=object.start, tz=mail_tz, "
+"dt_format=&quot;EEEE&quot;, lang_code=object.env.lang) or ''\">Wednesday</"
+"t>\n"
 "                </div>\n"
-"                <div style=\"font-size: 48px; min-height: auto; font-weight: bold; text-align: center; color: #5F5F5F; background-color: #F8F8F8; border: 1px solid #875A7B;\">\n"
+"                <div style=\"font-size: 48px; min-height: auto; font-weight: "
+"bold; text-align: center; color: #5F5F5F; background-color: #F8F8F8; border: "
+"1px solid #875A7B;\">\n"
 "                    <t t-out=\"str(object.start.day) or ''\">1</t>\n"
 "                </div>\n"
-"                <div style=\"font-size: 12px; text-align: center; font-weight: bold; color: #ffffff; background-color: #875A7B;\">\n"
-"                    <t t-out=\"format_datetime(dt=object.start, tz=mail_tz, dt_format=&quot;MMMM y&quot;, lang_code=object.env.lang) or ''\">January 2020</t>\n"
+"                <div style=\"font-size: 12px; text-align: center; font-"
+"weight: bold; color: #ffffff; background-color: #875A7B;\">\n"
+"                    <t t-out=\"format_datetime(dt=object.start, tz=mail_tz, "
+"dt_format=&quot;MMMM y&quot;, lang_code=object.env.lang) or ''\">January "
+"2020</t>\n"
 "                </div>\n"
-"                <div style=\"border-collapse: separate; color: #5F5F5F; text-align: center; font-size: 12px; border-bottom-end-radius: 3px; font-weight: bold; border: 1px solid #875A7B; border-bottom-start-radius: 3px;\">\n"
+"                <div style=\"border-collapse: separate; color: #5F5F5F; text-"
+"align: center; font-size: 12px; border-bottom-end-radius: 3px; font-weight: "
+"bold; border: 1px solid #875A7B; border-bottom-start-radius: 3px;\">\n"
 "                    <t t-if=\"not object.allday\">\n"
-"                        <div><t t-out=\"format_time(time=object.start, tz=mail_tz, time_format=&quot;short&quot;, lang_code=object.env.lang) or ''\">8:00</t></div>\n"
-"                        <t t-if=\"not object.appointment_type_id.hide_timezone and mail_tz\">\n"
-"                            <div style=\"font-size: 10px; font-weight: normal;\">\n"
+"                        <div><t t-out=\"format_time(time=object.start, "
+"tz=mail_tz, time_format=&quot;short&quot;, lang_code=object.env.lang) or "
+"''\">8:00</t></div>\n"
+"                        <t t-if=\"not "
+"object.appointment_type_id.hide_timezone and mail_tz\">\n"
+"                            <div style=\"font-size: 10px; font-weight: "
+"normal;\">\n"
+"                                (<t t-out=\"mail_tz\"/>)\n"
+"                            </div>\n"
+"                        </t>\n"
+"                    </t>\n"
+"                </div>\n"
+"            </td>\n"
+"            <td width=\"20px;\"/>\n"
+"            <td style=\"padding-top: 5px;\">\n"
+"                <del>\n"
+"                    <p><strong>Details of the event</strong></p>\n"
+"                    <ul>\n"
+"                            <li t-if=\"object.location\">Location: <t t-"
+"out=\"object.location or ''\">Bruxelles</t>\n"
+"                                <a target=\"_blank\" t-if=\"object.location !"
+"= object.appointment_type_id.location_id.name\" t-attf-href=\"http://"
+"maps.google.com/maps?oi=map&amp;q={{ object.location }}\">(View Map)</a>\n"
+"                            </li>\n"
+"                            <li t-if=\"recurrent\">When: <t t-"
+"out=\"object.recurrence_id.name or ''\">Every 1 Weeks, for 3 events</t></"
+"li>\n"
+"                            <li t-if=\"not "
+"object.appointment_type_id.hide_duration and not object.allday and "
+"object.duration\">Duration: <t t-out=\"('%dH%02d' % "
+"(object.duration,round(object.duration*60)%60)) or ''\">0H30</t></li>\n"
+"                        <li>Attendees\n"
+"                        <ul t-foreach=\"object.attendee_ids\" t-"
+"as=\"attendee\">\n"
+"                            <li>\n"
+"                                <div t-attf-style=\"display: inline-block; "
+"border-radius: 50%; width: 10px; height: 10px; background:"
+"{{ colors.get(attendee.state) or 'white' }};\"> </div>\n"
+"                                <t t-if=\"attendee.common_name\">\n"
+"                                    <span style=\"margin-left:5px\" t-"
+"out=\"attendee.common_name or ''\"/>\n"
+"                                </t>\n"
+"                                <t t-else=\"\">\n"
+"                                    <span style=\"margin-left:5px\">You</"
+"span>\n"
+"                                </t>\n"
+"                            </li>\n"
+"                        </ul></li>\n"
+"                        <li t-if=\"object.videocall_redirection\">\n"
+"                            How to Join:\n"
+"                            <t t-if=\"object.videocall_source == "
+"'discuss'\"> Join with Odoo Discuss</t>\n"
+"                            <t t-else=\"\"> Join at</t><br/>\n"
+"                            <a t-attf-"
+"href=\"{{ object.videocall_redirection }}\" target=\"_blank\" t-"
+"out=\"object.videocall_redirection or ''\">www.mycompany.com/calendar/"
+"videocall/xyz</a>\n"
+"                        </li>\n"
+"                    </ul>\n"
+"                </del>\n"
+"            </td>\n"
+"    </tr></table>\n"
+"    <del t-if=\"attendee_description\">\n"
+"        <div style=\"color:#000000;\">Description of the event:<div t-"
+"out=\"attendee_description\"/></div>\n"
+"    </del>\n"
+"</div>\n"
+"            "
+msgstr ""
+"<div>\n"
+"    <t t-set=\"colors\" t-value=\"{'needsAction': 'grey', 'accepted': "
+"'green', 'tentative': '#FFFF00', 'declined': 'red'}\"></t>\n"
+"    <t t-set=\"recurrent\" t-value=\"object.recurrence_id and not "
+"ctx.get('calendar_template_ignore_recurrence')\"></t>\n"
+"    <t t-set=\"mail_tz\" t-value=\"object._get_mail_tz() or "
+"ctx.get('mail_tz')\"></t>\n"
+"    <t t-set=\"attendee_description\" t-"
+"value=\"object._get_attendee_description()\"></t>\n"
+"    <p>\n"
+"    การนัดหมายสำหรับ <t t-out=\"object.appointment_type_id.name or "
+"''\">การสาธิตทางเทคนิค</t> <t t-if=\"object.appointment_type_id.category != "
+"'custom' and object.appointment_type_id.schedule_based_on == 'users'\"> กับ "
+"<t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t></t> "
+"ได้ถูกยกเลิกแล้ว\n"
+"    </p>\n"
+"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tr>\n"
+"            <td width=\"130px;\" style=\"min-width: 130px;\">\n"
+"                <div style=\"border-top-start-radius: 3px; border-top-end-"
+"radius: 3px; font-size: 12px; border-collapse: separate; text-align: center; "
+"font-weight: bold; color: #ffffff; min-height: 18px; background-color: "
+"#875A7B; border: 1px solid #875A7B;\">\n"
+"                    <t t-out=\"format_datetime(dt=object.start, tz=mail_tz, "
+"dt_format=&quot;EEEE&quot;, lang_code=object.env.lang) or ''\">วันพุธที่</t>\n"
+"                </div>\n"
+"                <div style=\"font-size: 48px; min-height: auto; font-weight: "
+"bold; text-align: center; color: #5F5F5F; background-color: #F8F8F8; border: "
+"1px solid #875A7B;\">\n"
+"                    <t t-out=\"str(object.start.day) or ''\">1</t>\n"
+"                </div>\n"
+"                <div style=\"font-size: 12px; text-align: center; font-"
+"weight: bold; color: #ffffff; background-color: #875A7B;\">\n"
+"                    <t t-out=\"format_datetime(dt=object.start, tz=mail_tz, "
+"dt_format=&quot;MMMM y&quot;, lang_code=object.env.lang) or ''\">มกราคม "
+"2563</t>\n"
+"                </div>\n"
+"                <div style=\"border-collapse: separate; color: #5F5F5F; text-"
+"align: center; font-size: 12px; border-bottom-end-radius: 3px; font-weight: "
+"bold; border: 1px solid #875A7B; border-bottom-start-radius: 3px;\">\n"
+"                    <t t-if=\"not object.allday\">\n"
+"                        <div><t t-out=\"format_time(time=object.start, "
+"tz=mail_tz, time_format=&quot;short&quot;, lang_code=object.env.lang) or "
+"''\">8:00 น.</t></div>\n"
+"                        <t t-if=\"not "
+"object.appointment_type_id.hide_timezone and mail_tz\">\n"
+"                            <div style=\"font-size: 10px; font-weight: "
+"normal;\">\n"
 "                                (<t t-out=\"mail_tz\"></t>)\n"
 "                            </div>\n"
 "                        </t>\n"
@@ -456,48 +1058,64 @@ msgid ""
 "            <td width=\"20px;\"></td>\n"
 "            <td style=\"padding-top: 5px;\">\n"
 "                <del>\n"
-"                    <p><strong>Details of the event</strong></p>\n"
+"                    <p><strong>รายละเอียดของกิจกรรม</strong></p>\n"
 "                    <ul>\n"
-"                            <li t-if=\"object.location\">Location: <t t-out=\"object.location or ''\">Bruxelles</t>\n"
-"                                <a target=\"_blank\" t-if=\"object.location != object.appointment_type_id.location_id.name\" t-attf-href=\"http://maps.google.com/maps?oi=map&amp;q={{ object.location }}\">(View Map)</a>\n"
+"                            <li t-if=\"object.location\">สถานที่: <t t-"
+"out=\"object.location or ''\">บรัสเซลส์</t>\n"
+"                                <a target=\"_blank\" t-if=\"object.location !"
+"= object.appointment_type_id.location_id.name\" t-attf-href=\"http://"
+"maps.google.com/maps?oi=map&amp;q={{ object.location }}\">(ดูแผนที่)</a>\n"
 "                            </li>\n"
-"                            <li t-if=\"recurrent\">When: <t t-out=\"object.recurrence_id.name or ''\">Every 1 Weeks, for 3 events</t></li>\n"
-"                            <li t-if=\"not object.appointment_type_id.hide_duration and not object.allday and object.duration\">Duration: <t t-out=\"('%dH%02d' % (object.duration,round(object.duration*60)%60)) or ''\">0H30</t></li>\n"
-"                        <li>Attendees\n"
-"                        <ul t-foreach=\"object.attendee_ids\" t-as=\"attendee\">\n"
+"                            <li t-if=\"recurrent\">เมื่อ: <t t-"
+"out=\"object.recurrence_id.name or ''\">ทุก 1 สัปดาห์ สำหรับ 3 กิจกรรม</t></li>\n"
+"                            <li t-if=\"not "
+"object.appointment_type_id.hide_duration and not object.allday and "
+"object.duration\">ระยะเวลา: <t t-out=\"('%dH%02d' % "
+"(object.duration,round(object.duration*60)%60)) or ''\">30 นาที</t></li>\n"
+"                        <li>ผู้เข้าร่วม\n"
+"                        <ul t-foreach=\"object.attendee_ids\" t-"
+"as=\"attendee\">\n"
 "                            <li>\n"
-"                                <div t-attf-style=\"display: inline-block; border-radius: 50%; width: 10px; height: 10px; background:{{ colors.get(attendee.state) or 'white' }};\"> </div>\n"
+"                                <div t-attf-style=\"display: inline-block; "
+"border-radius: 50%; width: 10px; height: 10px; background:"
+"{{ colors.get(attendee.state) or 'white' }};\"> </div>\n"
 "                                <t t-if=\"attendee.common_name\">\n"
-"                                    <span style=\"margin-left:5px\" t-out=\"attendee.common_name or ''\"></span>\n"
+"                                    <span style=\"margin-left:5px\" t-"
+"out=\"attendee.common_name or ''\"></span>\n"
 "                                </t>\n"
 "                                <t t-else=\"\">\n"
-"                                    <span style=\"margin-left:5px\">You</span>\n"
+"                                    <span style=\"margin-left:5px\">คุณ</"
+"span>\n"
 "                                </t>\n"
 "                            </li>\n"
 "                        </ul></li>\n"
 "                        <li t-if=\"object.videocall_redirection\">\n"
-"                            How to Join:\n"
-"                            <t t-if=\"object.videocall_source == 'discuss'\"> Join with Odoo Discuss</t>\n"
-"                            <t t-else=\"\"> Join at</t><br>\n"
-"                            <a t-attf-href=\"{{ object.videocall_redirection }}\" target=\"_blank\" t-out=\"object.videocall_redirection or ''\">www.mycompany.com/calendar/videocall/xyz</a>\n"
+"                            วิธีการเข้าร่วม:\n"
+"                            <t t-if=\"object.videocall_source == "
+"'discuss'\"> เข้าร่วมที่ Odoo แชท</t>\n"
+"                            <t t-else=\"\"> เข้าร่วมที่</t><br>\n"
+"                            <a t-attf-"
+"href=\"{{ object.videocall_redirection }}\" target=\"_blank\" t-"
+"out=\"object.videocall_redirection or ''\">www.mycompany.com/calendar/"
+"videocall/xyz</a>\n"
 "                        </li>\n"
 "                    </ul>\n"
 "                </del>\n"
 "            </td>\n"
 "    </tr></table>\n"
 "    <del t-if=\"attendee_description\">\n"
-"        <div style=\"color:#000000;\">Description of the event:<div t-out=\"attendee_description\"></div></div>\n"
+"        <div style=\"color:#000000;\">คำอธิบายกิจกรรม:<div t-"
+"out=\"attendee_description\"></div></div>\n"
 "    </del>\n"
 "</div>\n"
 "            "
-msgstr ""
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
-msgid "<i class=\"fa fa-check-circle text-success me-3\"/>Appointment Scheduled!"
+msgid ""
+"<i class=\"fa fa-check-circle text-success me-3\"/>Appointment Scheduled!"
 msgstr ""
-"<i class=\"fa fa-check-circle text-success "
-"me-3\"/>กำหนดการนัดหมายเรียบร้อยแล้ว!"
+"<i class=\"fa fa-check-circle text-success me-3\"/>กำหนดการนัดหมายเรียบร้อยแล้ว!"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_invite_view_form
@@ -507,9 +1125,11 @@ msgstr "<i class=\"fa fa-info-circle\" title=\"ข้อมูล\"/>"
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
 msgid ""
-"<i class=\"fa fa-lg fa-calendar-plus-o me-3 text-primary\"/>Schedule another"
-" meeting"
+"<i class=\"fa fa-lg fa-calendar-plus-o me-3 text-primary\"/>Schedule another "
+"meeting"
 msgstr ""
+"<i class=\"fa fa-lg fa-calendar-plus-o me-3 text-primary\"/"
+">กำหนดการประชุมอีกครั้ง"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form_gantt_booking
@@ -545,10 +1165,13 @@ msgstr "<i class=\"fa fa-thumbs-up me-3 text-info\"/>จองการนัด
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_info
 msgid ""
-"<i class=\"fa fa-times text-danger me-2\"/><strong>Appointment cancelled!</strong>\n"
-"                                        You can now choose a different schedule that suits you better."
+"<i class=\"fa fa-times text-danger me-2\"/><strong>Appointment cancelled!</"
+"strong>\n"
+"                                        You can now choose a different "
+"schedule that suits you better."
 msgstr ""
-"<i class=\"fa fa-times text-danger me-2\"/><strong>ยกเลิกการนัดหมายแล้ว!</strong>\n"
+"<i class=\"fa fa-times text-danger me-2\"/><strong>ยกเลิกการนัดหมายแล้ว!</"
+"strong>\n"
 "                                        ตอนนี้คุณสามารถเลือกกำหนดการอื่นที่เหมาะกับคุณมากขึ้นได้แล้ว"
 
 #. module: appointment
@@ -569,23 +1192,35 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_invite_view_form
 msgid ""
 "<i class=\"fa fa-warning me-2\"/>\n"
-"                    <span invisible=\"schedule_based_on != 'users'\">Impossible to share a link for an appointment type that has no user assigned.</span>\n"
-"                    <span invisible=\"schedule_based_on != 'resources'\">Impossible to share a link for an appointment type that has no resource assigned.</span>"
+"                    <span invisible=\"schedule_based_on != "
+"'users'\">Impossible to share a link for an appointment type that has no "
+"user assigned.</span>\n"
+"                    <span invisible=\"schedule_based_on != "
+"'resources'\">Impossible to share a link for an appointment type that has no "
+"resource assigned.</span>"
 msgstr ""
 "<i class=\"fa fa-warning me-2\"/>\n"
-"                    <span invisible=\"schedule_based_on != 'users'\">ไม่สามารถแชร์ลิงก์สำหรับประเภทการนัดหมายที่ไม่มีการกำหนดผู้ใช้ได้</span>\n"
-"                    <span invisible=\"schedule_based_on != 'resources'\">ไม่สามารถแชร์ลิงก์สำหรับประเภทการนัดหมายที่ไม่มีการกำหนดทรัพยากรได้</span>"
+"                    <span invisible=\"schedule_based_on != "
+"'users'\">ไม่สามารถแชร์ลิงก์สำหรับประเภทการนัดหมายที่ไม่มีการกำหนดผู้ใช้ได้</span>\n"
+"                    <span invisible=\"schedule_based_on != "
+"'resources'\">ไม่สามารถแชร์ลิงก์สำหรับประเภทการนัดหมายที่ไม่มีการกำหนดทรัพยากรได้</span>"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_invite_view_form
 msgid ""
 "<i class=\"fa fa-warning me-2\"/>\n"
-"                    <span invisible=\"schedule_based_on != 'users'\">You need to be part of an appointment type to be able to share a personal link.</span>\n"
-"                    <span invisible=\"schedule_based_on != 'resources'\">You can't create a personal link for an appointment type based on resources.</span>"
+"                    <span invisible=\"schedule_based_on != 'users'\">You "
+"need to be part of an appointment type to be able to share a personal link.</"
+"span>\n"
+"                    <span invisible=\"schedule_based_on != 'resources'\">You "
+"can't create a personal link for an appointment type based on resources.</"
+"span>"
 msgstr ""
 "<i class=\"fa fa-warning me-2\"/>\n"
-"                    <span invisible=\"schedule_based_on != 'users'\">คุณต้องเป็นส่วนหนึ่งของประเภทการนัดหมายจึงจะแชร์ลิงก์ส่วนตัวได้</span>\n"
-"                    <span invisible=\"schedule_based_on != 'resources'\">คุณไม่สามารถสร้างลิงก์ส่วนตัวสำหรับประเภทการนัดหมายตามทรัพยากรได้</span>"
+"                    <span invisible=\"schedule_based_on != "
+"'users'\">คุณต้องเป็นส่วนหนึ่งของประเภทการนัดหมายจึงจะแชร์ลิงก์ส่วนตัวได้</span>\n"
+"                    <span invisible=\"schedule_based_on != "
+"'resources'\">คุณไม่สามารถสร้างลิงก์ส่วนตัวสำหรับประเภทการนัดหมายตามทรัพยากรได้</span>"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_meeting_date
@@ -629,9 +1264,9 @@ msgstr "<span class=\"fa fa-trash\"/> ลบ"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form_gantt_booking
-msgid "<span class=\"me-1\">Attendees marked as busy at the selected time</span>"
-msgstr ""
-"<span class=\"me-1\">ผู้ลงเวลาทำเครื่องหมายว่าไม่ว่างในเวลาที่เลือก</span>"
+msgid ""
+"<span class=\"me-1\">Attendees marked as busy at the selected time</span>"
+msgstr "<span class=\"me-1\">ผู้ลงเวลาทำเครื่องหมายว่าไม่ว่างในเวลาที่เลือก</span>"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form_gantt_booking
@@ -639,6 +1274,11 @@ msgid ""
 "<span class=\"me-1\">You are scheduling a booking outside the available "
 "hours of</span>"
 msgstr "<span class=\"me-1\">คุณกำลังกำหนดเวลาการจองนอกเวลาทำการของ</span>"
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_form
+msgid "<span class=\"mx-1\">or</span>"
+msgstr ""
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
@@ -692,6 +1332,11 @@ msgid "<span> hours</span>"
 msgstr "<span>ชั่วโมง</span>"
 
 #. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_form
+msgid "<span>Add more details about you</span>"
+msgstr ""
+
+#. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
 msgid "<span>Not available anymore?</span>"
 msgstr "<span>ไม่สามารถใช้ได้?</span>"
@@ -710,8 +1355,10 @@ msgstr "<span>คน</span>"
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_info
 msgid ""
 "<strong>Appointment failed!</strong>\n"
-"                                            The selected timeslot is not available anymore.\n"
-"                                            Someone has booked the same time slot a few\n"
+"                                            The selected timeslot is not "
+"available anymore.\n"
+"                                            Someone has booked the same time "
+"slot a few\n"
 "                                            seconds before you."
 msgstr ""
 "<strong>การนัดหมายล้มเหลว!</strong>\n"
@@ -723,8 +1370,10 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_info
 msgid ""
 "<strong>Appointment failed!</strong>\n"
-"                                            The selected timeslot is not available.\n"
-"                                            It appears you already have another meeting with us at that date."
+"                                            The selected timeslot is not "
+"available.\n"
+"                                            It appears you already have "
+"another meeting with us at that date."
 msgstr ""
 "<strong>การนัดหมายล้มเหลว!</strong>\n"
 "                                            ช่วงเวลาที่เลือกไม่พร้อมใช้งาน\n"
@@ -793,8 +1442,7 @@ msgstr "รายการช่องข้อมูลจำเป็นเพ
 #: code:addons/appointment/controllers/calendar_view.py:0
 msgid ""
 "A list of slots information is needed to update this custom appointment type"
-msgstr ""
-"จำเป็นต้องมีรายการข้อมูลช่วงเวลาเพื่ออัปเดตประเภทการนัดหมายแบบกำหนดเองนี้"
+msgstr "จำเป็นต้องมีรายการข้อมูลช่วงเวลาเพื่ออัปเดตประเภทการนัดหมายแบบกำหนดเองนี้"
 
 #. module: appointment
 #. odoo-python
@@ -802,8 +1450,12 @@ msgstr ""
 msgid ""
 "A punctual appointment type should be limited between a start and end "
 "datetime."
-msgstr ""
-"ประเภทการนัดหมายที่ตรงต่อเวลาควรถูกจำกัดระหว่างวันที่เวลาเริ่มต้นและวันที่สิ้นสุด"
+msgstr "ประเภทการนัดหมายที่ตรงต่อเวลาควรถูกจำกัดระหว่างวันที่เวลาเริ่มต้นและวันที่สิ้นสุด"
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
+msgid "Accept"
+msgstr "ยอมรับ"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_calendar_event__access_token
@@ -826,7 +1478,7 @@ msgstr "จำเป็นต้องดำเนินการ"
 msgid ""
 "Activate manual confirmation only if the resource total capacity reserved "
 "exceeds this percentage."
-msgstr ""
+msgstr "เปิดใช้งานการยืนยันด้วยตนเองเฉพาะเมื่อความจุรวมของทรัพยากรสำรองเกินเปอร์เซ็นต์นี้"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_booking_line__active
@@ -898,11 +1550,6 @@ msgstr "เพิ่มการนัดหมายเฉพาะ"
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_info
 msgid "Add an intro message here..."
 msgstr "เพิ่มข้อความแนะนำที่นี่..."
-
-#. module: appointment
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_form
-msgid "Add more details about you"
-msgstr "เพิ่มรายละเอียดเพิ่มเติมเกี่ยวกับคุณ"
 
 #. module: appointment
 #: model:ir.model,name:appointment.model_appointment_manage_leaves
@@ -995,14 +1642,6 @@ msgstr "ประเภทคำตอบ"
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
 msgid "Answers"
 msgstr "คำตอบ"
-
-#. module: appointment
-#. odoo-javascript
-#: code:addons/appointment/static/src/views/appointment_calendar/appointment_calendar_controller.xml:0
-#: model:ir.model.fields.selection,name:appointment.selection__appointment_type__category__anytime
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_search
-msgid "Any Time"
-msgstr "เวลาใดก็ได้"
 
 #. module: appointment
 #: model:ir.model.fields.selection,name:appointment.selection__appointment_invite__resources_choice__all_assigned_resources
@@ -1242,6 +1881,13 @@ msgid "Archived"
 msgstr "เก็บถาวรแล้ว"
 
 #. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form_gantt_booking
+msgid ""
+"Are you sure you want to delete this Booking? Once it's gone, it's gone for "
+"good!"
+msgstr "คุณแน่ใจหรือไม่ว่าต้องการลบการจองนี้ เมื่อมันหายไป มันก็จะหายไปตลอด!"
+
+#. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_invite__resources_choice
 msgid "Assign to"
 msgstr "มอบหมายให้"
@@ -1298,7 +1944,7 @@ msgstr "พร้อมใช้งานใน"
 #. module: appointment
 #: model:ir.model.fields.selection,name:appointment.selection__appointment_type__category_time_display__recurring_fields
 msgid "Available now"
-msgstr ""
+msgstr "ว่างตอนนี้"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_resource__avatar_1920
@@ -1345,7 +1991,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/appointment/models/templates/appointment_type.py:0
 msgid "Book a resource for a specific time slot (e.g. tennis court, etc.)"
-msgstr ""
+msgstr "จองทรัพยากรสำหรับช่วงเวลาที่เฉพาะเจาะจง (เช่น สนามเทนนิส เป็นต้น)"
 
 #. module: appointment
 #: model:ir.model.fields.selection,name:appointment.selection__calendar_event__appointment_status__booked
@@ -1374,6 +2020,11 @@ msgstr "การจอง"
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_gantt_booking_resource
 msgid "Booking Details"
 msgstr "รายละเอียดการจอง"
+
+#. module: appointment
+#: model:ir.model.fields,field_description:appointment.field_appointment_type__booked_mail_template_id
+msgid "Booking Email"
+msgstr ""
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_booking_line__event_stop
@@ -1496,7 +2147,7 @@ msgstr "เช็คอินแล้ว"
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_search_booking
 msgid "Checked-in"
-msgstr ""
+msgstr "เช็คอิน"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointments_list_layout
@@ -1558,11 +2209,6 @@ msgid "Confirm Appointment"
 msgstr "ยืนยันการนัดหมาย"
 
 #. module: appointment
-#: model:ir.model.fields,field_description:appointment.field_appointment_type__booked_mail_template_id
-msgid "Confirmation Email"
-msgstr "อีเมลแจ้งการยืนยัน"
-
-#. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__message_confirmation
 msgid "Confirmation Message"
 msgstr "ข้อความยืนยัน"
@@ -1589,15 +2235,18 @@ msgid "Contact"
 msgstr "ติดต่อ"
 
 #. module: appointment
+#. odoo-python
+#: code:addons/appointment/models/calendar_event.py:0
+msgid "Contact Details"
+msgstr "รายละเอียดการติดต่อ"
+
+#. module: appointment
 #: model:ir.model.fields,help:appointment.field_appointment_type__message_partner_ids
 msgid ""
-"Contacts that need to be notified whenever a new appointment is booked or "
-"cancelled,                                                  regardless of "
-"whether they attend or not"
+"Contacts that need to be notified whenever a new appointment is requested, "
+"booked or cancelled,                                                  "
+"regardless of whether they attend or not"
 msgstr ""
-"ผู้ติดต่อที่ต้องได้รับแจ้งเมื่อมีการจองหรือยกเลิกการนัดหมายใหม่"
-"                                                  "
-"ไม่ว่าพวกเขาจะเข้าร่วมหรือไม่ก็ตาม"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointments_list_layout
@@ -1632,7 +2281,7 @@ msgstr "สร้างวันปิดทำการ"
 #. odoo-javascript
 #: code:addons/appointment/static/src/components/appointment_type_action_helper/appointment_type_action_helper.xml:0
 msgid "Create a Schedule from scratch or use one of our templates:"
-msgstr ""
+msgstr "สร้างตารางเวลาจากศูนย์หรือใช้เทมเพลตของเรา:"
 
 #. module: appointment
 #. odoo-javascript
@@ -1652,8 +2301,7 @@ msgstr "สร้างทรัพยากรของการนัดหม
 msgid ""
 "Create invites on the fly from your calendar and share them with anyone by "
 "using the Share Availabilities button."
-msgstr ""
-"สร้างคำเชิญได้ทันทีจากปฏิทินของคุณ และแบ่งปันกับใครก็ได้โดยใช้ปุ่มแชร์สถานะ"
+msgstr "สร้างคำเชิญได้ทันทีจากปฏิทินของคุณ และแบ่งปันกับใครก็ได้โดยใช้ปุ่มแชร์สถานะ"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_answer__create_uid
@@ -1680,11 +2328,6 @@ msgstr "สร้างโดย"
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__create_date
 msgid "Created on"
 msgstr "สร้างเมื่อ"
-
-#. module: appointment
-#: model:ir.model.fields.selection,name:appointment.selection__appointment_type__category__custom
-msgid "Custom"
-msgstr "กำหนดเอง"
 
 #. module: appointment
 #. odoo-javascript
@@ -1725,6 +2368,12 @@ msgstr "วันที่"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
+#, fuzzy
+msgid "Decline"
+msgstr "ปฏิเสธแล้ว"
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
 msgid "Declined"
 msgstr "ปฏิเสธแล้ว"
 
@@ -1737,15 +2386,20 @@ msgstr "ระยะเวลาเริ่มต้นไม่สามาร
 #. module: appointment
 #: model:ir.model.fields,help:appointment.field_appointment_slot__slot_type
 msgid ""
-"Defines the type of slot. The recurring slot is the default type which is used for\n"
-"        appointment type that are used recurringly in type like medical appointment.\n"
-"        The one shot type is only used when an user create a custom appointment type for a client by\n"
-"        defining non-recurring time slot (e.g. 10th of April 2021 from 10 to 11 am) from its calendar."
+"Defines the type of slot. The regular slot is the default type which is used "
+"for\n"
+"        appointment type that are used recurringly in type like medical "
+"appointment.\n"
+"        The one shot type is only used when an user create a custom "
+"appointment type for a client by\n"
+"        defining non-recurring time slot (e.g. 10th of April 2021 from 10 to "
+"11 am) from its calendar."
 msgstr ""
-"คุณกำหนดประเภทของช่วง ช่วงที่เกิดซ้ำเป็นประเภทเริ่มต้นที่ใช้สำหรับ\n"
+"คุณกำหนดประเภทของช่วง ช่วงที่เกิดขึ้นประจำเป็นประเภทเริ่มต้นที่ใช้สำหรับ\n"
 "        ประเภทการนัดหมายที่ใช้ประจำในประเภทเช่นการนัดหมายแพทย์\n"
 "       ประเภทอย่างสั้นจะใช้เฉพาะเมื่อผู้ใช้สร้างประเภทการนัดหมายแบบกำหนดเองสำหรับลูกค้าโดย\n"
-"        กำหนดช่วงเวลาที่ไม่เกิดซ้ำ (เช่น วันที่ 10 เมษายน 2021 เวลา 10.00 น. ถึง 11.00 น.) จากปฏิทิน"
+"        กำหนดช่วงเวลาที่ไม่เกิดซ้ำ (เช่น วันที่ 10 เมษายน 2021 เวลา 10.00 น. ถึง 11.00 "
+"น.) จากปฏิทิน"
 
 #. module: appointment
 #: model:ir.model.fields,help:appointment.field_appointment_type__event_videocall_source
@@ -1753,8 +2407,13 @@ msgid ""
 "Defines the type of video call link that will be used for the generated "
 "events. Keep it empty to prevent generating meeting url."
 msgstr ""
-"กำหนดประเภทของลิงก์แฮงเอาท์วิดีโอที่จะใช้สำหรับกิจกรรมที่สร้างขึ้น "
-"เว้นว่างไว้เพื่อป้องกันการสร้าง URL การประชุม"
+"กำหนดประเภทของลิงก์แฮงเอาท์วิดีโอที่จะใช้สำหรับกิจกรรมที่สร้างขึ้น เว้นว่างไว้เพื่อป้องกันการสร้าง "
+"URL การประชุม"
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form_gantt_booking
+msgid "Delete Booking"
+msgstr ""
 
 #. module: appointment
 #: model:appointment.type,name:appointment.appointment_type_dental_care
@@ -1791,10 +2450,8 @@ msgstr ""
 #. module: appointment
 #: model:ir.model.fields,help:appointment.field_appointment_slot__allday
 msgid ""
-"Determine if the slot englobe the whole day, mainly used for unique slot "
-"type"
-msgstr ""
-"ตรวจสอบว่าช่วงครอบคลุมทั้งวันหรือไม่ ส่วนใหญ่ใช้สำหรับประเภทช่วงที่ไม่ซ้ำกัน"
+"Determine if the slot englobe the whole day, mainly used for unique slot type"
+msgstr "ตรวจสอบว่าช่วงครอบคลุมทั้งวันหรือไม่ ส่วนใหญ่ใช้สำหรับประเภทช่วงที่ไม่ซ้ำกัน"
 
 #. module: appointment
 #. odoo-javascript
@@ -1832,8 +2489,11 @@ msgstr "เขตข้อมูลเวลาหมวดหมู่ที่
 #: model:ir.model.fields,help:appointment.field_appointment_type__appointment_manual_confirmation
 msgid ""
 "Do not automatically accept meetings created from the appointment.\n"
-"            The appointment is still considered as reserved for the slots availability."
+"            The appointment is still considered as reserved for the slots "
+"availability."
 msgstr ""
+"อย่ายอมรับการประชุมที่สร้างจากการนัดหมายโดยอัตโนมัติ\n"
+"            การนัดหมายยังคงถือว่าถูกจองไว้สำหรับช่องว่างที่ว่างอยู่"
 
 #. module: appointment
 #. odoo-python
@@ -1972,9 +2632,7 @@ msgstr "รับการแชร์ลิงก์"
 msgid ""
 "Get the users linked to the appointment type selected to apply a domain on "
 "the users that can be selected"
-msgstr ""
-"ให้ผู้ใช้เชื่อมโยงกับประเภทการนัดหมายที่เลือก "
-"เพื่อใช้โดเมนกับผู้ใช้ที่สามารถเลือกได้"
+msgstr "ให้ผู้ใช้เชื่อมโยงกับประเภทการนัดหมายที่เลือก เพื่อใช้โดเมนกับผู้ใช้ที่สามารถเลือกได้"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
@@ -2030,8 +2688,7 @@ msgstr "ซ่อนโซนเวลา"
 msgid ""
 "How users and resources will be assigned to meetings customers book on your "
 "website."
-msgstr ""
-"วิธีมอบหมายผู้ใช้และทรัพยากรให้กับการประชุมที่ลูกค้าจองบนเว็บไซต์ของคุณ"
+msgstr "วิธีมอบหมายผู้ใช้และทรัพยากรให้กับการประชุมที่ลูกค้าจองบนเว็บไซต์ของคุณ"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_answer__id
@@ -2098,6 +2755,12 @@ msgid ""
 msgstr "หากเว้นว่างไว้ ระบบจะใช้กำหนดการทำงานของบริษัทที่ตั้งไว้บนทรัพยากร"
 
 #. module: appointment
+#: model:ir.model.fields,help:appointment.field_appointment_type__booked_mail_template_id
+msgid ""
+"If set an email will be sent to the customer when the appointment is booked."
+msgstr "หากตั้งค่าไว้ระบบจะส่งอีเมลถึงลูกค้าเมื่อจองนัดหมาย"
+
+#. module: appointment
 #: model:ir.model.fields,help:appointment.field_appointment_type__canceled_mail_template_id
 msgid ""
 "If set an email will be sent to the customer when the appointment is "
@@ -2105,20 +2768,12 @@ msgid ""
 msgstr "หากตั้งค่าไว้อีเมลจะถูกส่งไปยังลูกค้าเมื่อการนัดหมายถูกยกเลิก"
 
 #. module: appointment
-#: model:ir.model.fields,help:appointment.field_appointment_type__booked_mail_template_id
-msgid ""
-"If set an email will be sent to the customer when the appointment is "
-"confirmed."
-msgstr "หากตั้งค่าไว้ อีเมลจะถูกส่งไปยังลูกค้าเมื่อการนัดหมายได้รับการยืนยัน"
-
-#. module: appointment
 #: model:ir.model.fields,help:appointment.field_appointment_resource__active
 msgid ""
 "If the active field is set to False, it will allow you to hide the resource "
 "record without removing it."
 msgstr ""
-"หากฟิลด์ที่ใช้งานอยู่ถูกตั้งค่าเป็น False "
-"ฟิลด์นี้จะอนุญาตให้คุณซ่อนการบันทึกทรัพยากรโดยไม่ต้องลบออก"
+"หากฟิลด์ที่ใช้งานอยู่ถูกตั้งค่าเป็น False ฟิลด์นี้จะอนุญาตให้คุณซ่อนการบันทึกทรัพยากรโดยไม่ต้องลบออก"
 
 #. module: appointment
 #: model:ir.model.fields,help:appointment.field_appointment_booking_line__active
@@ -2271,7 +2926,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/appointment/static/src/js/appointment_validation.js:0
 msgid "Link Copied!"
-msgstr ""
+msgstr "คัดลอกลิงก์แล้ว!"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_invite_view_form
@@ -2339,8 +2994,7 @@ msgstr "จัดการความจุ"
 msgid ""
 "Manage the maximum amount of people a resource can handle (e.g. Table for 6 "
 "persons, ...)"
-msgstr ""
-"จัดการจำนวนคนสูงสุดที่ทรัพยากรสามารถรองรับได้ (เช่น โต๊ะสำหรับ 6 คน ...)"
+msgstr "จัดการจำนวนคนสูงสุดที่ทรัพยากรสามารถรองรับได้ (เช่น โต๊ะสำหรับ 6 คน ...)"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_question__question_required
@@ -2388,13 +3042,6 @@ msgstr "ข้อความ"
 #: model:ir.model.fields.selection,name:appointment.selection__appointment_slot__weekday__1
 msgid "Monday"
 msgstr "วันจันทร์"
-
-#. module: appointment
-#. odoo-javascript
-#: code:addons/appointment/static/src/views/custom_appointment_form_dialog/custom_appointment_form_dialog.xml:0
-#: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form_gantt_booking
-msgid "More Options"
-msgstr "ตัวเลือกเพิ่มเติม"
 
 #. module: appointment
 #: model:ir.model.fields.selection,name:appointment.selection__appointment_question__question_type__text
@@ -2472,11 +3119,6 @@ msgid "No Appointment or Resource were found."
 msgstr "ไม่พบการนัดหมายหรือทรัพยากร"
 
 #. module: appointment
-#: model_terms:ir.actions.act_window,help:appointment.appointment_type_action_custom
-msgid "No Custom Availabilities Shared!"
-msgstr "ไม่มีการแชร์ความพร้อมใช้งานที่กำหนดเอง!"
-
-#. module: appointment
 #: model:ir.model.fields.selection,name:appointment.selection__appointment_type__avatars_display__hide
 msgid "No Picture"
 msgstr "ไม่มีรูปภาพ"
@@ -2491,6 +3133,11 @@ msgstr "ยังไม่มีลิงก์ที่แชร์!"
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_gantt_booking_resource
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_search_booking
 msgid "No Show"
+msgstr "ไม่แสดงตน"
+
+#. module: appointment
+#: model_terms:ir.actions.act_window,help:appointment.appointment_type_action_custom
+msgid "No Specific Slots Availabilities Shared!"
 msgstr ""
 
 #. module: appointment
@@ -2569,11 +3216,9 @@ msgstr "อนุญาตให้ใช้เฉพาะตัวอักษ
 #. odoo-python
 #: code:addons/appointment/models/appointment_invite.py:0
 msgid ""
-"Only letters, numbers, underscores and dashes are allowed in your links. You"
-" need to adapt %s."
-msgstr ""
-"อนุญาตให้ใช้เฉพาะตัวอักษร ตัวเลข ขีดล่าง และขีดกลางในลิงก์ของคุณ คุณต้องปรับ"
-" %s"
+"Only letters, numbers, underscores and dashes are allowed in your links. You "
+"need to adapt %s."
+msgstr "อนุญาตให้ใช้เฉพาะตัวอักษร ตัวเลข ขีดล่าง และขีดกลางในลิงก์ของคุณ คุณต้องปรับ %s"
 
 #. module: appointment
 #. odoo-python
@@ -2584,7 +3229,7 @@ msgstr "อนุญาตประเภทการนัดหมายเพ
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
 msgid "Oops! Your appointment is scheduled in less than"
-msgstr ""
+msgstr "อุ๊ย! นัดหมายของคุณมีกำหนดในอีกไม่ถึง"
 
 #. module: appointment
 #. odoo-javascript
@@ -2639,7 +3284,7 @@ msgstr "ผู้ที่จองการนัดหมาย"
 #. odoo-python
 #: code:addons/appointment/models/templates/appointment_type.py:0
 msgid "Personal Meeting"
-msgstr ""
+msgstr "การประชุมส่วนตัว"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_form
@@ -2688,6 +3333,12 @@ msgid "Preview"
 msgstr "ตัวอย่าง"
 
 #. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/appointment_calendar/appointment_calendar_controller.xml:0
+msgid "Propose Slots"
+msgstr ""
+
+#. module: appointment
 #: model:ir.model.fields.selection,name:appointment.selection__appointment_type__category__punctual
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_search
 msgid "Punctual"
@@ -2702,6 +3353,8 @@ msgid "Question"
 msgstr "คำถาม"
 
 #. module: appointment
+#. odoo-python
+#: code:addons/appointment/models/calendar_event.py:0
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__question_ids
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
 #: model_terms:ir.ui.view,arch_db:appointment.calendar_event_view_form
@@ -2730,16 +3383,16 @@ msgid "Reason"
 msgstr "เหตุผล"
 
 #. module: appointment
-#: model:ir.model.fields.selection,name:appointment.selection__appointment_slot__slot_type__recurring
-#: model:ir.model.fields.selection,name:appointment.selection__appointment_type__category__recurring
-#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_search
-msgid "Recurring"
-msgstr "เกิดซ้ำ"
-
-#. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_invite__redirect_url
 msgid "Redirect URL"
 msgstr "URL เปลี่ยนเส้นทาง"
+
+#. module: appointment
+#: model:ir.model.fields.selection,name:appointment.selection__appointment_slot__slot_type__recurring
+#: model:ir.model.fields.selection,name:appointment.selection__appointment_type__category__recurring
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_search
+msgid "Regular"
+msgstr "ปกติ"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__reminder_ids
@@ -2961,10 +3614,9 @@ msgid "Search in Responsible"
 msgstr "ค้นหาในความรับผิดชอบ"
 
 #. module: appointment
-#. odoo-javascript
-#: code:addons/appointment/static/src/views/appointment_calendar/appointment_calendar_controller.xml:0
-msgid "Select Dates"
-msgstr "เลือกวันที่"
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_invite_view_form
+msgid "Select Appointments to share..."
+msgstr ""
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_manage_leaves_view_form
@@ -3041,11 +3693,19 @@ msgid "Sequence"
 msgstr "ลำดับ"
 
 #. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/kanban/kanban_controller.xml:0
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_kanban
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_tree
 msgid "Share"
 msgstr "แชร์"
+
+#. module: appointment
+#. odoo-javascript
+#: code:addons/appointment/static/src/views/kanban/kanban_controller.js:0
+msgid "Share Appointment"
+msgstr ""
 
 #. module: appointment
 #. odoo-javascript
@@ -3063,6 +3723,12 @@ msgstr "แชร์ความพร้อม"
 
 #. module: appointment
 #. odoo-javascript
+#: code:addons/appointment/static/src/views/appointment_calendar/appointment_calendar_controller.xml:0
+msgid "Share Calendar"
+msgstr ""
+
+#. module: appointment
+#. odoo-javascript
 #: code:addons/appointment/static/src/views/appointment_calendar/appointment_calendar_controller.js:0
 msgid "Share Link"
 msgstr "แชร์ลิงก์"
@@ -3076,12 +3742,18 @@ msgstr "แชร์ลิงค์"
 #. odoo-python
 #: code:addons/appointment/models/templates/appointment_type.py:0
 msgid "Share this link to let others book a meeting in your calendar"
-msgstr ""
+msgstr "แชร์ลิงก์นี้เพื่อให้ผู้อื่นจองการประชุมในปฏิทินของคุณ"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_resource__shareable
 msgid "Shareable"
 msgstr "แชร์ได้"
+
+#. module: appointment
+#: model:ir.model.fields.selection,name:appointment.selection__appointment_type__category__anytime
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_search
+msgid "Shared Calendar"
+msgstr ""
 
 #. module: appointment
 #: model:ir.ui.menu,name:appointment.menu_appointment_invite
@@ -3108,6 +3780,11 @@ msgstr "คำเตือนเฉพาะรหัสแบบสั้น"
 #: model:ir.model.fields.selection,name:appointment.selection__appointment_type__avatars_display__show
 msgid "Show Pictures"
 msgstr "แสดงรูปภาพ"
+
+#. module: appointment
+#: model_terms:ir.ui.view,arch_db:appointment.appointment_form
+msgid "Sign in"
+msgstr "ลงชื่อเข้าใช้"
 
 #. module: appointment
 #: model:ir.model.fields.selection,name:appointment.selection__appointment_question__question_type__char
@@ -3158,6 +3835,11 @@ msgstr "ขออภัย เราไม่มีการนัดหมา�
 #: model:ir.model.fields,field_description:appointment.field_appointment_resource__source_resource_ids
 msgid "Source combination"
 msgstr "การรวมแหล่งที่มา"
+
+#. module: appointment
+#: model:ir.model.fields.selection,name:appointment.selection__appointment_type__category__custom
+msgid "Specific Slots"
+msgstr ""
 
 #. module: appointment
 #: model:ir.model.fields.selection,name:appointment.selection__appointment_invite__resources_choice__specific_resources
@@ -3257,7 +3939,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/appointment/models/templates/appointment_type.py:0
 msgid "Table"
-msgstr "โต๊ะ"
+msgstr "ตาราง"
 
 #. module: appointment
 #. odoo-python
@@ -3314,6 +3996,7 @@ msgid ""
 "The configuration has changed and synchronization is not possible anymore. "
 "Please reload the page."
 msgstr ""
+"การกำหนดค่ามีการเปลี่ยนแปลงและการซิงโครไนซ์ไม่สามารถทำได้อีกต่อไป โปรดโหลดหน้าใหม่อีกครั้ง"
 
 #. module: appointment
 #: model:ir.model.constraint,message:appointment.constraint_appointment_slot_check_start_and_end_hour
@@ -3332,7 +4015,7 @@ msgstr "กิจกรรม %s ไม่สามารถจองทรั�
 msgid ""
 "The event %s cannot have an appointment status without being linked to an "
 "appointment type."
-msgstr ""
+msgstr "กิจกรรม %s ไม่สามารถมีสถานะการนัดหมายได้โดยไม่เชื่อมโยงกับประเภทการนัดหมาย"
 
 #. module: appointment
 #. odoo-python
@@ -3366,7 +4049,8 @@ msgstr "ทรัพยากรควรมีกำลังการจุอ
 #. module: appointment
 #: model:ir.model.fields,help:appointment.field_appointment_resource__sequence
 msgid ""
-"The sequence dictates if the resource is going to be picked in higher priority against another resource\n"
+"The sequence dictates if the resource is going to be picked in higher "
+"priority against another resource\n"
 "        (e.g. for 2 tables of 4, the lowest sequence will be picked first)"
 msgstr ""
 "ลำดับจะกำหนดว่าทรัพยากรจะถูกเลือกในลำดับความสำคัญที่สูงกว่าเมื่อเทียบกับทรัพยากรอื่นหรือไม่\n"
@@ -3394,8 +4078,7 @@ msgid ""
 "This allows to share the resource with multiple attendee for a same time "
 "slot (e.g. a bar counter)"
 msgstr ""
-"ช่วยให้สามารถแชร์ทรัพยากรกับผู้เข้าร่วมหลายคนในช่วงเวลาเดียวกันได้ (เช่น "
-"เคาน์เตอร์บาร์)"
+"ช่วยให้สามารถแชร์ทรัพยากรกับผู้เข้าร่วมหลายคนในช่วงเวลาเดียวกันได้ (เช่น เคาน์เตอร์บาร์)"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_info
@@ -3429,11 +4112,10 @@ msgstr "ประเภทการนัดหมายนี้ไม่ว่
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_info
 msgid ""
-"This appointment type has no availabilities because it has no staff assigned"
-" and does not have any opening hours configured"
+"This appointment type has no availabilities because it has no staff assigned "
+"and does not have any opening hours configured"
 msgstr ""
-"ประเภทการนัดหมายนี้ไม่ว่าง "
-"เนื่องจากไม่มีการกำหนดพนักงานและไม่มีการกำหนดค่าเวลาเปิดทำการ"
+"ประเภทการนัดหมายนี้ไม่ว่าง เนื่องจากไม่มีการกำหนดพนักงานและไม่มีการกำหนดค่าเวลาเปิดทำการ"
 
 #. module: appointment
 #: model:ir.model.fields,help:appointment.field_appointment_resource__tz
@@ -3479,12 +4161,12 @@ msgstr "ถึง"
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
 msgid "To make any changes, please contact"
-msgstr ""
+msgstr "หากต้องการทำการเปลี่ยนแปลง กรุณาติดต่อ"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
 msgid "To make any changes, please contact us."
-msgstr ""
+msgstr "หากต้องการทำการเปลี่ยนแปลงใดๆ โปรดติดต่อเรา"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_invite__access_token
@@ -3583,8 +4265,7 @@ msgstr "ใช้เป็นค่าเริ่มต้นสำหรับ
 #. module: appointment
 #: model_terms:ir.actions.act_window,help:appointment.calendar_event_action_appointment_reporting
 #: model_terms:ir.actions.act_window,help:appointment.calendar_event_action_report_all
-msgid ""
-"Use this menu to overview your Appointments once you get some bookings."
+msgid "Use this menu to overview your Appointments once you get some bookings."
 msgstr "ใช้เมนูนี้เพื่อดูภาพรวมการนัดหมายของคุณเมื่อคุณได้รับการจองบางส่วน"
 
 #. module: appointment
@@ -3594,25 +4275,33 @@ msgid ""
 "\n"
 "        Can be one of:\n"
 "\n"
-"            - Recurring: the default category, weekly recurring slots. Accessible from the website\n"
+"            - Regular: the default category, weekly recurring slots. "
+"Accessible from the website\n"
 "\n"
-"            - Punctual: recurring slots limited between 2 datetimes. Accessible from the website\n"
+"            - Punctual: regular slots limited between 2 datetimes. "
+"Accessible from the website\n"
 "\n"
-"            - Custom: the user will create and share to another user a custom appointment type with hand-picked time slots\n"
+"            - Specific Slots: the user will create and share to another user "
+"a custom appointment type with hand-picked time slots\n"
 "\n"
-"            - Anytime: the user will create and share to another user an appointment type covering all their time slots"
+"            - Shared Calendar: the user will create and share to another "
+"user an appointment type covering all their time slots"
 msgstr ""
 "ใช้เพื่อกำหนดประเภทของการนัดหมายนี้\n"
 "\n"
 "        สามารถเป็นหนึ่งใน:\n"
 "\n"
-"            - การเกิดซ้ำ: หมวดหมู่เริ่มต้น, ช่วงเวลาที่เกิดซ้ำรายสัปดาห์ เข้าถึงได้จากเว็บไซต์\n"
+"            - การเกิดขึ้นประจำ: หมวดหมู่เริ่มต้น, ช่วงเวลาที่เกิดซ้ำรายสัปดาห์ "
+"เข้าถึงได้จากเว็บไซต์\n"
 "\n"
-"            - การตรงต่อเวลา: ช่องที่เกิดซ้ำจะถูกจำกัดระหว่าง 2 วันที่และเวลา เข้าถึงได้จากเว็บไซต์\n"
+"            - การตรงต่อเวลา: ช่องที่เกิดขึ้นประจำจะถูกจำกัดระหว่าง 2 วันที่และเวลา "
+"เข้าถึงได้จากเว็บไซต์\n"
 "\n"
-"            - กำหนดเอง: ผู้ใช้จะสร้างและแบ่งปันประเภทการนัดหมายแบบกำหนดเองกับผู้ใช้รายอื่นพร้อมช่วงเวลาที่เลือกเอง\n"
+"            - ช่องเฉพาะ: "
+"ผู้ใช้จะสร้างและแชร์ประเภทการนัดหมายแบบกำหนดเองกับผู้ใช้รายอื่นพร้อมช่วงเวลาที่เลือกเอง\n"
 "\n"
-"            - ทุกเวลา: ผู้ใช้จะสร้างและแบ่งปันประเภทการนัดหมายที่ครอบคลุมช่วงเวลาทั้งหมดให้กับผู้ใช้รายอื่น"
+"            - ปฏิทินที่ใช้ร่วมกัน: "
+"ผู้ใช้จะสร้างและแชร์ประเภทการนัดหมายที่ครอบคลุมช่วงเวลาทั้งหมดให้กับผู้ใช้รายอื่น"
 
 #. module: appointment
 #: model:res.groups,name:appointment.group_appointment_user
@@ -3630,7 +4319,7 @@ msgstr "ผู้ใช้"
 #. odoo-python
 #: code:addons/appointment/models/templates/appointment_type.py:0
 msgid "Video Call"
-msgstr ""
+msgstr "วีดีโอคอล"
 
 #. module: appointment
 #: model:ir.model.fields,field_description:appointment.field_appointment_type__event_videocall_source
@@ -3699,7 +4388,7 @@ msgstr "การนัดหมายของคุณ"
 #. odoo-javascript
 #: code:addons/appointment/static/src/components/appointment_sync_button/appointment_sync_button.js:0
 msgid "Your calendar is already configured and was successfully synchronized."
-msgstr ""
+msgstr "ปฏิทินของคุณได้รับการกำหนดค่าแล้วและซิงโครไนซ์สำเร็จแล้ว"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_meeting_user
@@ -3817,7 +4506,7 @@ msgstr "ไม่มีตารางที่ว่างเพิ่มเต
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
 msgid "hour(s) and cannot be cancelled at this time.<br/>"
-msgstr ""
+msgstr "ชั่วโมงและไม่สามารถยกเลิกได้ในขณะนี้<br/>"
 
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_type_view_form
@@ -3855,7 +4544,7 @@ msgstr "ใครบางคน"
 #. module: appointment
 #: model_terms:ir.ui.view,arch_db:appointment.appointment_validated
 msgid "this link"
-msgstr ""
+msgstr "ลิงก์นี้"
 
 #. module: appointment
 #. odoo-javascript
@@ -3878,9 +4567,3 @@ msgstr "เมื่อมากกว่า"
 #: model_terms:ir.ui.view,arch_db:appointment.portal_my_appointments
 msgid "with"
 msgstr "กับ"
-
-#. module: appointment
-#. odoo-javascript
-#: code:addons/appointment/static/src/components/appointment_type_action_helper/appointment_type_action_helper.xml:0
-msgid "{{templateInfo.title}}"
-msgstr ""

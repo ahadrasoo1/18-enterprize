@@ -4,7 +4,6 @@ import { registry } from "@web/core/registry";
 import { stepUtils } from "@web_tour/tour_service/tour_utils";
 
 registry.category("web_tour.tours").add("spreadsheet_save_multipage", {
-    test: true,
     steps: () => [
         stepUtils.showAppsMenuItem(),
         {
@@ -13,9 +12,33 @@ registry.category("web_tour.tours").add("spreadsheet_save_multipage", {
             run: "click",
         },
         {
+            trigger: '.o_documents_title:contains("Folders")',
+            content: "check if the folders are loaded",
+        },
+        {
+            trigger: ".o_searchview_input",
+            content: "click on search",
+            run: "click",
+        },
+        {
+            trigger: ".o_searchview_input",
+            content: "fill in searchbar",
+            run: `edit Test folder`,
+        },
+        {
+            content: "find the right folder",
+            trigger: ".o_searchview_autocomplete li:contains(Test folder)",
+            run: "click",
+        },
+        {
             trigger: '.o_kanban_record:contains("Test folder")',
             content: "Open the test folder",
             run: "dblclick",
+        },
+        {
+            trigger: ".o_searchview_facet .o_facet_remove",
+            content: "remove filter",
+            run: "click",
         },
         {
             trigger: ".o_cp_buttons:contains('New') .dropdown-toggle",

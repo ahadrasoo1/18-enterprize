@@ -1,54 +1,43 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* approvals
-# 
+# * approvals
+#
 # Translators:
 # Wichanon Jamwutthipreecha, 2024
-# Wil Odoo, 2024
-# 
+# Rasareeyar Lappiam, 2025
+# Wil Odoo, 2025
+#
+# Weblate <noreply-mt-weblate@weblate.org>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Thai (https://app.transifex.com/odoo/teams/41243/th/)\n"
+"POT-Creation-Date: 2026-04-10 18:47+0000\n"
+"PO-Revision-Date: 2025-11-29 18:31+0000\n"
+"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"Language-Team: Thai <https://translate.odoo.com/projects/odoo-18/approvals/"
+"th/>\n"
+"Language: th\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: th\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 5.14.3\n"
 
 #. module: approvals
 #: model:ir.actions.report,print_report_name:approvals.action_report_approval_request
 msgid "'Approval - %s' % object.name"
-msgstr ""
+msgstr "'การอนุมัติ - %s' % object.name"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
-msgid "07/07/2023 10:00:00"
-msgstr ""
-
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
-msgid "07/08/2023 10:00:00"
-msgstr ""
-
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
-msgid "1200"
+msgid "<span class=\"col-2 fw-bold\">Description:</span>"
 msgstr ""
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_category_view_form
 msgid "<span class=\"fa fa-warning\" title=\"Invalid minimum approvals\"/>"
 msgstr "<span class=\"fa fa-warning\" title=\"การอนุมัติขั้นต่ำไม่ถูกต้อง\"/>"
-
-#. module: approvals
-#: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
-msgid "<span class=\"fw-bold\">Description:</span>"
-msgstr ""
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
@@ -84,6 +73,11 @@ msgstr "การตกแต่งข้อยกเว้นกิจกรร
 #: model:ir.model.fields,field_description:approvals.field_approval_request__activity_state
 msgid "Activity State"
 msgstr "สถานะกิจกรรม"
+
+#. module: approvals
+#: model:ir.model,name:approvals.model_mail_activity_type
+msgid "Activity Type"
+msgstr "ประเภทกิจกรรม"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__activity_type_icon
@@ -229,9 +223,7 @@ msgstr "ผู้อนุมัติ"
 #: code:addons/approvals/models/approval_category.py:0
 msgid ""
 "Approver Sequence can only be activated with at least 1 minimum approver."
-msgstr ""
-"ลำดับผู้อนุมัติสามารถเปิดใช้งานได้โดยมีผู้อนุมัติขั้นต่ำอย่างน้อย 1 "
-"คนเท่านั้น"
+msgstr "ลำดับผู้อนุมัติสามารถเปิดใช้งานได้โดยมีผู้อนุมัติขั้นต่ำอย่างน้อย 1 คนเท่านั้น"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_category__user_ids
@@ -260,7 +252,7 @@ msgstr "ลำดับผู้อนุมัติ?"
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
 msgid "Approvers:"
-msgstr ""
+msgstr "ผู้รับรอง:"
 
 #. module: approvals
 #. odoo-javascript
@@ -419,8 +411,7 @@ msgid ""
 "Conversion between Units of Measure can only occur if they belong to the "
 "same category. The conversion will be made based on the ratios."
 msgstr ""
-"การแปลงระหว่างหน่วยวัดจะเกิดขึ้นได้ก็ต่อเมื่ออยู่ในหมวดหมู่เดียวกัน "
-"การแปลงจะอิงตามอัตราส่วน"
+"การแปลงระหว่างหน่วยวัดจะเกิดขึ้นได้ก็ต่อเมื่ออยู่ในหมวดหมู่เดียวกัน การแปลงจะอิงตามอัตราส่วน"
 
 #. module: approvals
 #: model_terms:ir.actions.act_window,help:approvals.product_product_action
@@ -524,7 +515,7 @@ msgstr "เอกสาร"
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
 msgid "Documents:"
-msgstr ""
+msgstr "เอกสาร:"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
@@ -580,6 +571,11 @@ msgstr "ไอคอนแบบฟอนต์ที่ยอดเยี่ย
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
 msgid "From:"
 msgstr "จาก:"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_search_view_search
+msgid "Future Activities"
+msgstr "กิจกรรมในอนาคต"
 
 #. module: approvals
 #: model:approval.category,name:approvals.approval_category_data_general_approval
@@ -662,7 +658,8 @@ msgid ""
 "\n"
 "        Empty: do nothing\n"
 "        Is Approver: the employee's manager will be in the approver list\n"
-"        Is Required Approver: the employee's manager will be required to approve the request.\n"
+"        Is Required Approver: the employee's manager will be required to "
+"approve the request.\n"
 "    "
 msgstr ""
 "วิธีที่ผู้จัดการของพนักงานโต้ตอบกับการอนุมัติประเภทนี้\n"
@@ -714,13 +711,12 @@ msgstr "หากเลือก คำขออนุมัติจะมี�
 #: model:ir.model.fields,help:approvals.field_approval_category__approver_sequence
 #: model:ir.model.fields,help:approvals.field_approval_request__approver_sequence
 msgid ""
-"If checked, the approvers have to approve in sequence (one after the other)."
-" If Employee's Manager is selected as approver, they will be the first in "
+"If checked, the approvers have to approve in sequence (one after the other). "
+"If Employee's Manager is selected as approver, they will be the first in "
 "line."
 msgstr ""
 "หากทำเครื่องหมาย ผู้อนุมัติจะต้องอนุมัติตามลำดับ (ทีละรายการ) "
-"หากผู้จัดการของพนักงานถูกเลือกเป็นผู้อนุมัติ "
-"พวกเขาจะเป็นคนแรกที่อยู่ในรายการ"
+"หากผู้จัดการของพนักงานถูกเลือกเป็นผู้อนุมัติ พวกเขาจะเป็นคนแรกที่อยู่ในรายการ"
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_category__image
@@ -777,6 +773,11 @@ msgid "Last Updated on"
 msgstr "อัปเดตครั้งล่าสุดเมื่อ"
 
 #. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_search_view_search
+msgid "Late Activities"
+msgstr "กิจกรรมล่าสุด"
+
+#. module: approvals
 #: model_terms:ir.actions.act_window,help:approvals.approval_request_action
 #: model_terms:ir.actions.act_window,help:approvals.approval_request_action_all
 msgid "Let's go to the"
@@ -800,6 +801,8 @@ msgid ""
 "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod "
 "tempor incididunt ut labore et dolore magna aliqua."
 msgstr ""
+"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod "
+"tempor incididunt ut labore et dolore magna aliqua."
 
 #. module: approvals
 #: model:ir.model.fields,field_description:approvals.field_approval_request__message_main_attachment_id
@@ -1022,7 +1025,7 @@ msgstr "ช่วงเวลา"
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.report_aprroval_request_document
 msgid "Period:"
-msgstr ""
+msgstr "ช่วง:"
 
 #. module: approvals
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
@@ -1188,7 +1191,7 @@ msgstr "ลำดับ"
 #. odoo-python
 #: code:addons/approvals/models/approval_category.py:0
 msgid "Sequence %(code)s"
-msgstr ""
+msgstr "ลำดับ %(code)s"
 
 #. module: approvals
 #: model:ir.model.fields,help:approvals.field_approval_approver__can_edit_user_id
@@ -1262,13 +1265,13 @@ msgstr ""
 #. odoo-python
 #: code:addons/approvals/models/approval_request.py:0
 msgid "The request %(request_name)s for %(request_owner)s has been accepted"
-msgstr ""
+msgstr "คำขอ %(request_name)s สำหรับ %(request_owner)s ได้รับการยอมรับแล้ว"
 
 #. module: approvals
 #. odoo-python
 #: code:addons/approvals/models/approval_request.py:0
 msgid "The request %(request_name)s for %(request_owner)s has been refused"
-msgstr ""
+msgstr "คำขอ %(request_name)s สำหรับ %(request_owner)s ถูกปฏิเสธ"
 
 #. module: approvals
 #. odoo-python
@@ -1276,15 +1279,14 @@ msgstr ""
 msgid ""
 "The request created on %(create_date)s by %(request_owner)s has been "
 "accepted."
-msgstr ""
+msgstr "คำขอที่ถูกสร้างเมื่อ %(create_date)s โดย %(request_owner)s ได้รับการยอมรับแล้ว"
 
 #. module: approvals
 #. odoo-python
 #: code:addons/approvals/models/approval_request.py:0
 msgid ""
-"The request created on %(create_date)s by %(request_owner)s has been "
-"refused."
-msgstr ""
+"The request created on %(create_date)s by %(request_owner)s has been refused."
+msgstr "คำขอที่ถูกสร้างเมื่อ %(create_date)s โดย %(request_owner)s ถูกปฏิเสธ"
 
 #. module: approvals
 #: model:res.groups,comment:approvals.group_approval_user
@@ -1302,9 +1304,7 @@ msgstr "ผู้ใช้จะสามารถเข้าถึงการ
 msgid ""
 "This request needs to be approved by your manager. There is no manager "
 "linked to your employee profile."
-msgstr ""
-"คำขอนี้ต้องได้รับการอนุมัติจากผู้จัดการของคุณ "
-"ไม่มีผู้จัดการที่เชื่อมโยงกับโปรไฟล์พนักงานของคุณ"
+msgstr "คำขอนี้ต้องได้รับการอนุมัติจากผู้จัดการของคุณ ไม่มีผู้จัดการที่เชื่อมโยงกับโปรไฟล์พนักงานของคุณ"
 
 #. module: approvals
 #. odoo-python
@@ -1312,9 +1312,7 @@ msgstr ""
 msgid ""
 "This request needs to be approved by your manager. There is no user linked "
 "to your manager."
-msgstr ""
-"คำขอนี้ต้องได้รับการอนุมัติจากผู้จัดการของคุณ "
-"ไม่มีผู้ใช้ที่เชื่อมโยงกับผู้จัดการของคุณ"
+msgstr "คำขอนี้ต้องได้รับการอนุมัติจากผู้จัดการของคุณ ไม่มีผู้ใช้ที่เชื่อมโยงกับผู้จัดการของคุณ"
 
 #. module: approvals
 #. odoo-python
@@ -1322,9 +1320,7 @@ msgstr ""
 msgid ""
 "This request needs to be approved by your manager. Your manager is not in "
 "the approvers list."
-msgstr ""
-"คำขอนี้ต้องได้รับการอนุมัติจากผู้จัดการของคุณ "
-"ผู้จัดการของคุณไม่อยู่ในรายชื่อผู้อนุมัติ"
+msgstr "คำขอนี้ต้องได้รับการอนุมัติจากผู้จัดการของคุณ ผู้จัดการของคุณไม่อยู่ในรายชื่อผู้อนุมัติ"
 
 #. module: approvals
 #. odoo-javascript
@@ -1343,6 +1339,11 @@ msgstr "การทบทวน:"
 #: model:ir.model.fields.selection,name:approvals.selection__approval_request__request_status__new
 msgid "To Submit"
 msgstr "การส่ง"
+
+#. module: approvals
+#: model_terms:ir.ui.view,arch_db:approvals.approval_search_view_search
+msgid "Today Activities"
+msgstr "กิจกรรมวันนี้"
 
 #. module: approvals
 #: model:ir.model.fields,help:approvals.field_approval_request__activity_exception_decoration
@@ -1416,9 +1417,20 @@ msgstr "คุณไม่สามารถอนุมัติก่อนผ
 #. module: approvals
 #. odoo-python
 #: code:addons/approvals/models/approval_request.py:0
-msgid ""
-"You cannot assign the same approver multiple times on the same request."
+msgid "You cannot assign the same approver multiple times on the same request."
 msgstr "คุณไม่สามารถมอบหมายผู้อนุมัติคนเดียวกันหลายครั้งในคำขอเดียวกันได้"
+
+#. module: approvals
+#. odoo-python
+#: code:addons/approvals/models/approval_request.py:0
+msgid "You cannot change approval request."
+msgstr ""
+
+#. module: approvals
+#. odoo-python
+#: code:addons/approvals/models/approval_request.py:0
+msgid "You cannot duplicate an approver."
+msgstr ""
 
 #. module: approvals
 #. odoo-python
@@ -1427,8 +1439,8 @@ msgid ""
 "You cannot unlink an attachment which is linked to a validated, refused or "
 "cancelled approval request."
 msgstr ""
-"คุณไม่สามารถยกเลิกการเชื่อมโยงเอกสารแนบที่เชื่อมโยงกับคำขออนุมัติที่ได้รับการตรวจสอบ"
-" ปฏิเสธ หรือยกเลิกได้"
+"คุณไม่สามารถยกเลิกการเชื่อมโยงเอกสารแนบที่เชื่อมโยงกับคำขออนุมัติที่ได้รับการตรวจสอบ ปฏิเสธ "
+"หรือยกเลิกได้"
 
 #. module: approvals
 #. odoo-python
@@ -1483,3 +1495,6 @@ msgstr "คำร้องขอใหม่"
 #: model_terms:ir.ui.view,arch_db:approvals.approval_request_view_form
 msgid "to:"
 msgstr "ถึง:"
+
+#~ msgid "1200"
+#~ msgstr "1200"

@@ -8,10 +8,12 @@ import {
     press,
     queryAllTexts,
     queryOne,
+    queryRect,
     scroll,
 } from "@odoo/hoot-dom";
 import { Deferred, advanceTime, animationFrame, mockDate, runAllTimers } from "@odoo/hoot-mock";
 import {
+    asyncStep,
     contains,
     defineParams,
     fields,
@@ -19,12 +21,14 @@ import {
     onRpc,
     patchWithCleanup,
     validateSearch,
+    waitForSteps,
 } from "@web/../tests/web_test_helpers";
 import { ResUsers, Tasks, defineGanttModels } from "./gantt_mock_models";
 import {
     CLASSES,
     SELECTORS,
     clickCell,
+    cssClassPresencePerCellInColumn,
     dragPill,
     editPill,
     focusToday,
@@ -42,6 +46,7 @@ import {
     setScale,
 } from "./web_gantt_test_helpers";
 
+import { deserializeDate } from "@web/core/l10n/dates";
 import { omit, pick } from "@web/core/utils/objects";
 
 // Hard-coded daylight saving dates from 2019
@@ -80,28 +85,28 @@ test("date navigation with timezone (1h)", async () => {
 
     expect.verifySteps(["&,start,<,2019-02-28 23:00:00,stop,>,2018-11-30 23:00:00"]);
 
-    expect(getGridContent().range).toBe("From: 12/01/2018 to: 02/28/2019");
+    expect(getGridContent().range).toBe("12/01/2018 -> 02/28/2019");
 
     // switch to day view and check day navigation
     await setScale(5);
     await ganttControlsChanges();
 
     expect.verifySteps(["&,start,<,2019-02-28 23:00:00,stop,>,2018-11-30 23:00:00"]);
-    expect(getGridContent().range).toBe("From: 12/01/2018 to: 02/28/2019");
+    expect(getGridContent().range).toBe("12/01/2018 -> 02/28/2019");
 
     // switch to week view and check week navigation
     await setScale(1);
     await ganttControlsChanges();
 
     expect.verifySteps(["&,start,<,2019-02-28 23:00:00,stop,>,2018-11-30 23:00:00"]);
-    expect(getGridContent().range).toBe("From: 12/01/2018 to: 02/28/2019");
+    expect(getGridContent().range).toBe("12/01/2018 -> 02/28/2019");
 
     // switch to year view and check year navigation
     await setScale(5);
     await ganttControlsChanges();
 
     expect.verifySteps(["&,start,<,2019-02-28 23:00:00,stop,>,2018-11-30 23:00:00"]);
-    expect(getGridContent().range).toBe("From: 12/01/2018 to: 02/28/2019");
+    expect(getGridContent().range).toBe("12/01/2018 -> 02/28/2019");
 });
 
 test("if a on_create is specified, execute the action rather than opening a dialog. And reloads after the action", async () => {
@@ -238,7 +243,7 @@ test("select cells to plan a task: 1-level grouped", async () => {
     const { moveTo, drop } = await contains(getCell("11 December 2018")).drag();
     moveTo(getCell("12 December 2018"));
     await runAllTimers(); // Pointer move is subjected to throttleForAnimation in gantt
-    drop();
+    await drop();
 
     expect.verifySteps(["[dialog] Plan"]);
 });
@@ -280,7 +285,7 @@ test("select cells to plan a task: 2-level grouped", async () => {
     const dragAndDrop2 = await contains(getCell("11 December 2018", "Project 1")).drag();
     dragAndDrop2.moveTo(getCell("12 December 2018", "Project 1"));
     await advanceTime(20);
-    dragAndDrop2.drop();
+    await dragAndDrop2.drop();
 
     expect.verifySteps(["[dialog] Plan"]);
 });
@@ -936,28 +941,81 @@ test("resize a pill (2)", async () => {
     expect.verifySteps([[[2], { stop: "2018-12-23 06:29:59" }]]);
 });
 
-test.tags("desktop")(
-    "resize a pill: quickly enter the neighbour pill when resize start",
-    async () => {
-        await mountGanttView({
-            resModel: "tasks",
-            arch: '<gantt date_start="start" date_stop="stop" />',
-            domain: [["id", "in", [4, 7]]],
-        });
-        expect(SELECTORS.pill).toHaveCount(2);
-        await contains(getPillWrapper("Task 4")).hover();
-        expect(getPillWrapper("Task 4")).toHaveClass(CLASSES.resizable);
-        expect(SELECTORS.resizeHandle).toHaveCount(2);
+test("resize a pill: invalid result", async () => {
+    Tasks._records[1].start = "2018-12-17 10:30:00";
+    Tasks._records[1].stop = "2018-12-17 15:30:00";
+    onRpc("write", () => {
+        throw new Error("Pill should not be resized");
+    });
 
-        // Here we simulate a resize start on Task 4 and quickly enter Task 7
-        // The resize handle should not be added to Task 7
-        await pointerDown(SELECTORS.resizeEndHandle);
-        await hover(getPillWrapper("Task 7"));
+    await mountGanttView({
+        resModel: "tasks",
+        arch: '<gantt date_start="start" date_stop="stop" />',
+        domain: [["id", "=", 2]],
+    });
 
-        expect(getPillWrapper("Task 4").querySelectorAll(SELECTORS.resizeHandle)).toHaveCount(2);
-        expect(getPillWrapper("Task 7").querySelectorAll(SELECTORS.resizeHandle)).toHaveCount(0);
-    }
-);
+    expect(SELECTORS.pill).toHaveCount(1);
+
+    await contains(getPillWrapper("Task 2")).hover();
+
+    expect(getPillWrapper("Task 2")).toHaveClass(CLASSES.resizable);
+    expect(SELECTORS.resizeHandle).toHaveCount(2);
+    expect(getGridContent().rows).toEqual([
+        {
+            pills: [{ title: "Task 2", level: 0, colSpan: "17 December 2018 -> 17 December 2018" }],
+        },
+    ]);
+
+    // shift end date towards start date
+    await resizePill(getPillWrapper("Task 2"), "end", -1);
+
+    expect(".modal").toHaveCount(0);
+    expect(getGridContent().rows).toEqual([
+        {
+            pills: [{ title: "Task 2", level: 0, colSpan: "17 December 2018 -> 17 December 2018" }],
+        },
+    ]);
+    expect(".o_notification").toHaveCount(1);
+    expect(".o_notification .o_notification_body").toHaveText(
+        "Ending date cannot be before the starting date"
+    );
+    await contains(".o_notification_close").click();
+
+    // shift start date towards end date
+    await resizePill(getPillWrapper("Task 2"), "start", +1);
+
+    expect(".modal").toHaveCount(0);
+    expect(getGridContent().rows).toEqual([
+        {
+            pills: [{ title: "Task 2", level: 0, colSpan: "17 December 2018 -> 17 December 2018" }],
+        },
+    ]);
+    expect(".o_notification").toHaveCount(1);
+    expect(".o_notification .o_notification_body").toHaveText(
+        "Starting date cannot be after the ending date"
+    );
+});
+
+test.tags("desktop");
+test("resize a pill: quickly enter the neighbour pill when resize start", async () => {
+    await mountGanttView({
+        resModel: "tasks",
+        arch: '<gantt date_start="start" date_stop="stop" />',
+        domain: [["id", "in", [4, 7]]],
+    });
+    expect(SELECTORS.pill).toHaveCount(2);
+    await contains(getPillWrapper("Task 4")).hover();
+    expect(getPillWrapper("Task 4")).toHaveClass(CLASSES.resizable);
+    expect(SELECTORS.resizeHandle).toHaveCount(2);
+
+    // Here we simulate a resize start on Task 4 and quickly enter Task 7
+    // The resize handle should not be added to Task 7
+    await pointerDown(SELECTORS.resizeEndHandle);
+    await hover(getPillWrapper("Task 7"));
+
+    expect(getPillWrapper("Task 4").querySelectorAll(SELECTORS.resizeHandle)).toHaveCount(2);
+    expect(getPillWrapper("Task 7").querySelectorAll(SELECTORS.resizeHandle)).toHaveCount(0);
+});
 
 test("create a task maintains the domain", async () => {
     Tasks._views = { form: '<form><field name="name"/></form>' };
@@ -1532,7 +1590,6 @@ test("unavailabilities should not be reloaded when period changes if display_una
 
 test("close tooltip when drag pill", async () => {
     Tasks._records[1].start = "2018-12-16 03:00:00";
-    Tasks._views = { form: "<form/>" };
 
     await mountGanttView({
         resModel: "tasks",
@@ -1585,7 +1642,6 @@ test("drag&drop on other pill in grouped view", async () => {
     Tasks._records[0].start = "2018-12-16 05:00:00";
     Tasks._records[0].stop = "2018-12-16 07:00:00";
     Tasks._records[1].stop = "2018-12-17 13:00:00";
-    Tasks._views = { form: `<form />` };
 
     const def = new Deferred();
     onRpc("write", () => def);
@@ -1636,6 +1692,92 @@ test("drag&drop on other pill in grouped view", async () => {
             title: "Project 2",
             pills: [{ title: "Task 7", level: 0, colSpan: "20 (1/2) W51 2018 -> 20 W51 2018" }],
         },
+    ]);
+});
+
+test("disable drop of pill on groups by readonly field", async () => {
+    // Group "Work Order" by: color > cost (readonly) > employee > size
+    // Pills can be only be dropped in the same "child groups" (employee & size)
+    // or any group above the highest readonly parent (color)
+    await mountGanttView({
+        resModel: "workorders",
+        arch: '<gantt date_start="start" date_stop="stop" />',
+        groupBy: ["color", "cost", "employee", "size"],
+    });
+
+    /*  Structure is the following:
+
+        color (1)
+        └── cost (86)
+            ├── employee (Jordan)
+            │   └── size (198) --> Work Order 1
+            └── employee (Michael)
+                └── size (198) --> Work Order 3
+        color (2)
+        └── cost (420)
+            └── employee (Jordan)
+                └── size (183) --> Work Order 2
+
+        Before drag, all but color rows should have the readonly class.
+    */
+    expect(cssClassPresencePerCellInColumn("o_gantt_readonly", "16 December 2018")).toEqual([
+        false, // "color" is not readonly
+        true, // "cost" is readonly
+        true, // "employee"(Jordan) is not readonly but parent "cost" is
+        true, // "size"(198) is not readonly but parent "cost" is
+        true, // "employee"(Michael) is not readonly but parent "cost" is
+        true, // "size"(198) is not readonly but parent "cost" is
+        false, // "color" is not readonly
+        true, // "cost" is readonly
+        true, // "employee" is not readonly but parent "cost" is
+        true, // "size" is not readonly but parent "cost" is
+    ]);
+
+    const { drop, moveTo } = await dragPill("Work Order 1");
+    await moveTo({ pill: "Work Order 3" });
+    await advanceTime(20); // Pointer move is subjected to throttleForAnimation in gantt
+
+    // // During drag, the user should be able to drop in
+    // //  - the child groups (employee & size), so rows 3 to 6
+    // //  - the group above the highest readonly parent (color), so rows 1 & 7
+    expect(cssClassPresencePerCellInColumn("o_gantt_readonly", "16 December 2018")).toEqual([
+        false,
+        true,
+        false, // part of child group
+        false, // original row of the pill
+        false, // part of child group
+        false, // part of child group
+        false,
+        true,
+        true, // NOT part of the child group so should remain readonly
+        true, // NOT part of the child group so should remain readonly
+    ]);
+
+    await drop({ pill: "Work Order 3" });
+    await advanceTime(20);
+
+    /*  After drop, structure should be the following:
+
+        color (1)
+        └── cost (86)
+            └── employee (Michael)
+                └── size (198) --> Work Order 1 & Work Order 3
+        color (2)
+        └── cost (420)
+            └── employee (Jordan)
+                └── size (183) --> Work Order 2
+
+        Again, all but color rows should have the readonly class
+    */
+    expect(cssClassPresencePerCellInColumn("o_gantt_readonly", "16 December 2018")).toEqual([
+        false,
+        true,
+        true,
+        true,
+        false,
+        true,
+        true,
+        true,
     ]);
 });
 
@@ -1771,8 +1913,8 @@ test("unavailabilities fetched with right parameters", async () => {
 });
 
 test("progress bars fetched with the right start/stop dates", async () => {
-    onRpc("get_gantt_data", async ({ kwargs, parent }) => {
-        const result = await parent();
+    onRpc("get_gantt_data", ({ kwargs, parent }) => {
+        const result = parent();
         expect.step([kwargs.start_date, kwargs.stop_date]);
         result.progress_bars.user_id = {
             1: { value: 50, max_value: 100 },
@@ -1839,7 +1981,7 @@ test("focus today with scroll (in range & outside)", async () => {
     await scroll(".o_content", { left: 2000 });
     await animationFrame();
 
-    expect(".o_gantt_cell.o_gantt_today").not.toBeVisible();
+    expect(".o_gantt_cell.o_gantt_today").not.toHaveCount();
     columnHeaders = getGridContent().columnHeaders;
     expect(columnHeaders).toHaveLength(34);
     expect(columnHeaders[0].title).toBe("07"); // January
@@ -1866,7 +2008,7 @@ test("focus today with range change (in range & outside)", async () => {
     expect(".o_gantt_cell.o_gantt_today").toBeVisible();
     expect(queryOne(".o_gantt_cell.o_gantt_today")).toBe(getCell("20 December 2018"));
     let gridContent = getGridContent();
-    expect(gridContent.range).toBe("From: 12/01/2018 to: 02/28/2019");
+    expect(gridContent.range).toBe("12/01/2018 -> 02/28/2019");
     expect(gridContent.columnHeaders).toHaveLength(34);
     expect(gridContent.columnHeaders[0].title).toBe("03"); // December
     expect(gridContent.columnHeaders.at(-1).title).toBe("05"); // January
@@ -1876,7 +2018,7 @@ test("focus today with range change (in range & outside)", async () => {
     expect(".o_gantt_cell.o_gantt_today").toBeVisible();
     expect(queryOne(".o_gantt_cell.o_gantt_today")).toBe(getCell("20 December 2018"));
     gridContent = getGridContent();
-    expect(gridContent.range).toBe("From: 11/15/2018 to: 02/15/2019");
+    expect(gridContent.range).toBe("11/15/2018 -> 02/15/2019");
     expect(gridContent.columnHeaders).toHaveLength(34);
     expect(gridContent.columnHeaders[0].title).toBe("03"); // December
     expect(gridContent.columnHeaders.at(-1).title).toBe("05"); // January
@@ -1885,15 +2027,15 @@ test("focus today with range change (in range & outside)", async () => {
     // nothing happens
 
     await selectGanttRange({ startDate: "2019-01-01", stopDate: "2019-02-28" });
-    expect(getGridContent().range).toBe("From: 01/01/2019 to: 02/28/2019");
+    expect(getGridContent().range).toBe("01/01/2019 -> 02/28/2019");
     expect.verifySteps(["get_gantt_data"]);
-    expect(".o_gantt_cell.o_gantt_today").not.toBeVisible();
+    expect(".o_gantt_cell.o_gantt_today").not.toHaveCount();
 
     await focusToday();
     await ganttControlsChanges();
     expect.verifySteps(["get_gantt_data"]);
     expect(".o_gantt_cell.o_gantt_today").toBeVisible();
-    expect(getGridContent().range).toBe("From: 11/21/2018 to: 01/17/2019");
+    expect(getGridContent().range).toBe("11/21/2018 -> 01/17/2019");
 });
 
 test("set scale: should keep focused date", async () => {
@@ -1974,7 +2116,7 @@ test("Select a range via the range menu", async () => {
         arch: '<gantt date_start="start" date_stop="stop"/>',
     });
     let content = getGridContent();
-    expect(content.range).toBe("From: 12/01/2018 to: 02/28/2019");
+    expect(content.range).toBe("12/01/2018 -> 02/28/2019");
 
     await selectRange("Today");
     content = getGridContent();
@@ -1999,14 +2141,14 @@ test("Select a range via the range menu", async () => {
 
 test("Select range with left/rigth arrows", async () => {
     onRpc("get_gantt_data", ({ kwargs }) => {
-        expect.step(kwargs.domain);
+        asyncStep(kwargs.domain);
     });
 
     await mountGanttView({
         resModel: "tasks",
         arch: '<gantt date_start="start" date_stop="stop" default_range="month"/>',
     });
-    expect.verifySteps([
+    await waitForSteps([
         ["&", ["start", "<", "2018-12-31 23:00:00"], ["stop", ">", "2018-11-30 23:00:00"]],
     ]);
 
@@ -2019,7 +2161,7 @@ test("Select range with left/rigth arrows", async () => {
     await click(SELECTORS.previousButton);
     await ganttControlsChanges();
 
-    expect.verifySteps([
+    await waitForSteps([
         ["&", ["start", "<", "2019-02-28 23:00:00"], ["stop", ">", "2019-01-31 23:00:00"]],
     ]);
     content = getGridContent();
@@ -2027,7 +2169,8 @@ test("Select range with left/rigth arrows", async () => {
 
     await press("alt+n");
     await ganttControlsChanges();
-    expect.verifySteps([
+
+    await waitForSteps([
         ["&", ["start", "<", "2019-03-31 23:00:00"], ["stop", ">", "2019-02-28 23:00:00"]],
     ]);
     content = getGridContent();
@@ -2036,7 +2179,7 @@ test("Select range with left/rigth arrows", async () => {
 
 test("Select scale with +/- buttons", async () => {
     onRpc("get_gantt_data", () => {
-        expect.step("get_gantt_data");
+        asyncStep("get_gantt_data");
     });
 
     await mountGanttView({
@@ -2047,33 +2190,34 @@ test("Select scale with +/- buttons", async () => {
     expect(getActiveScale()).toBe(5);
     expect(SELECTORS.minusButton).toBeEnabled();
     expect(SELECTORS.plusButton).not.toBeEnabled();
-    expect.verifySteps(["get_gantt_data"]);
+    await waitForSteps(["get_gantt_data"]);
 
     for (let i = 0; i < 9; i++) {
         await click(SELECTORS.minusButton);
     }
     await ganttControlsChanges();
 
+    await waitForSteps(["get_gantt_data"]);
     expect(getActiveScale()).toBe(0);
     expect(SELECTORS.minusButton).not.toBeEnabled();
     expect(SELECTORS.plusButton).toBeEnabled();
-    expect.verifySteps(["get_gantt_data"]);
 
     await click(SELECTORS.plusButton);
     await click(SELECTORS.plusButton);
     await ganttControlsChanges();
 
+    await waitForSteps(["get_gantt_data"]);
     expect(getActiveScale()).toBe(2);
     expect(SELECTORS.minusButton).toBeEnabled();
     expect(SELECTORS.plusButton).toBeEnabled();
-    expect.verifySteps(["get_gantt_data"]);
 
     await press("alt+i");
     await ganttControlsChanges();
+
+    await waitForSteps(["get_gantt_data"]);
     expect(getActiveScale()).toBe(3);
     expect(SELECTORS.minusButton).toBeEnabled();
     expect(SELECTORS.plusButton).toBeEnabled();
-    expect.verifySteps(["get_gantt_data"]);
 });
 
 test("make tooltip visible for a long pill", async () => {
@@ -2100,4 +2244,247 @@ test("make tooltip visible for a long pill", async () => {
     const { left: popoverLeft, right: popoverRight } = popover.getBoundingClientRect();
     expect(popoverLeft).toBeWithin(0, window.innerWidth);
     expect(popoverRight).toBeWithin(0, window.innerWidth);
+});
+
+test("date fields: domain", async () => {
+    expect.assertions(4);
+    Tasks._fields.start = fields.Date();
+    Tasks._fields.stop = fields.Date();
+    const domains = [
+        ["&", ["start", "<", "2018-12-21"], ["stop", ">=", "2018-12-20"]],
+        ["&", ["start", "<", "2018-12-23"], ["stop", ">=", "2018-12-16"]],
+        ["&", ["start", "<", "2019-01-01"], ["stop", ">=", "2018-01-01"]],
+        ["&", ["start", "<", "2019-01-01"], ["stop", ">=", "2018-12-01"]],
+    ];
+    onRpc("get_gantt_data", ({ kwargs }) => {
+        expect(kwargs.domain).toEqual(domains.pop());
+    });
+    await mountGanttView({
+        type: "gantt",
+        resModel: "tasks",
+        arch: `<gantt date_start="start" date_stop="stop" default_range="month"/>`,
+    });
+    await selectRange("This year");
+    await selectRange("This week");
+    await selectRange("Today");
+});
+
+test("date fields: pill columns", async () => {
+    Tasks._fields.start = fields.Date();
+    Tasks._fields.stop = fields.Date();
+    Tasks._records = Tasks._records.slice(0, 1);
+    Tasks._records[0].start = "2018-12-20";
+    Tasks._records[0].stop = "2018-12-22";
+    await mountGanttView({
+        type: "gantt",
+        resModel: "tasks",
+        arch: `<gantt date_start="start" date_stop="stop"/>`,
+    });
+    expect(getGridContent().rows).toEqual([
+        {
+            pills: [
+                {
+                    colSpan: "20 December 2018 -> 22 December 2018",
+                    level: 0,
+                    title: "Task 1",
+                },
+            ],
+        },
+    ]);
+});
+
+test.tags("desktop");
+test("date fields: resize a pill", async () => {
+    expect.assertions(4);
+    Tasks._fields.start = fields.Date();
+    Tasks._fields.stop = fields.Date();
+    Tasks._records = Tasks._records.slice(0, 1);
+    Tasks._records[0].start = "2018-12-20";
+    Tasks._records[0].stop = "2018-12-22";
+    onRpc("write", ({ args }) => {
+        expect(args[0]).toEqual([1]);
+        // initial dates -- start: '"2018-12-20"', stop: '"2018-12-22"'
+        expect(args[1]).toEqual({ stop: "2018-12-21" });
+    });
+    await mountGanttView({
+        type: "gantt",
+        resModel: "tasks",
+        arch: `<gantt date_start="start" date_stop="stop"/>`,
+    });
+    expect(getGridContent().rows).toEqual([
+        {
+            pills: [
+                {
+                    colSpan: "20 December 2018 -> 22 December 2018",
+                    level: 0,
+                    title: "Task 1",
+                },
+            ],
+        },
+    ]);
+    await resizePill(getPillWrapper("Task 1"), "end", -1);
+    expect(getGridContent().rows).toEqual([
+        {
+            pills: [
+                {
+                    colSpan: "20 December 2018 -> 21 December 2018",
+                    level: 0,
+                    title: "Task 1",
+                },
+            ],
+        },
+    ]);
+});
+
+test("date fields: drag a pill", async () => {
+    expect.assertions(4);
+    Tasks._fields.start = fields.Date();
+    Tasks._fields.stop = fields.Date();
+    Tasks._records = Tasks._records.slice(0, 1);
+    Tasks._records[0].start = "2018-12-20";
+    Tasks._records[0].stop = "2018-12-22";
+    onRpc("write", ({ args }) => {
+        expect(args[0]).toEqual([1]);
+        // initial dates -- start: '"2018-12-20"', stop: '"2018-12-22"'
+        expect(args[1]).toEqual({ start: "2018-12-19", stop: "2018-12-21" });
+    });
+    await mountGanttView({
+        type: "gantt",
+        resModel: "tasks",
+        arch: `<gantt date_start="start" date_stop="stop"/>`,
+    });
+    expect(getGridContent().rows).toEqual([
+        {
+            pills: [
+                {
+                    colSpan: "20 December 2018 -> 22 December 2018",
+                    level: 0,
+                    title: "Task 1",
+                },
+            ],
+        },
+    ]);
+    const { drop } = await dragPill("Task 1");
+    await drop({ column: "19 December 2018", part: 1 });
+    expect(getGridContent().rows).toEqual([
+        {
+            pills: [
+                {
+                    colSpan: "19 December 2018 -> 21 December 2018",
+                    level: 0,
+                    title: "Task 1",
+                },
+            ],
+        },
+    ]);
+});
+
+test("date fields: popover", async () => {
+    expect.assertions(5);
+    Tasks._fields.start = fields.Date();
+    Tasks._fields.stop = fields.Date();
+    Tasks._records = Tasks._records.slice(0, 1);
+    Tasks._records[0].start = "2018-12-20";
+    Tasks._records[0].stop = "2018-12-22";
+    const task1 = Tasks._records[0];
+    const startDateLocalString = deserializeDate(task1.start).toFormat("f");
+    const stopDateLocalString = deserializeDate(task1.stop).toFormat("f");
+    await mountGanttView({
+        type: "gantt",
+        resModel: "tasks",
+        arch: `<gantt date_start="start" date_stop="stop"/>`,
+    });
+    expect(getGridContent().rows).toEqual([
+        {
+            pills: [
+                {
+                    colSpan: "20 December 2018 -> 22 December 2018",
+                    level: 0,
+                    title: "Task 1",
+                },
+            ],
+        },
+    ]);
+    expect(".o_popover").toHaveCount(0);
+    await contains(SELECTORS.pill).click();
+    expect(".o_popover").toHaveCount(1);
+    expect(queryAllTexts(".o_popover .popover-body span")).toEqual([
+        "Task 1",
+        startDateLocalString,
+        stopDateLocalString,
+    ]);
+    await contains(".o_popover .popover-header i.fa.fa-close").click();
+    expect(".o_popover").toHaveCount(0);
+});
+
+test("date fields: dialog", async () => {
+    Tasks._fields.start = fields.Date();
+    Tasks._fields.stop = fields.Date();
+    Tasks._records = Tasks._records.slice(0, 1);
+    Tasks._records[0].start = "2018-12-20";
+    Tasks._records[0].stop = "2018-12-22";
+    Tasks._views = {
+        form: `
+            <form>
+                <field name="name"/>
+                <field name="start"/>
+                <field name="stop"/>
+            </form>
+        `,
+    };
+    await mountGanttView({
+        type: "gantt",
+        resModel: "tasks",
+        arch: `<gantt date_start="start" date_stop="stop"/>`,
+    });
+    expect(".modal").toHaveCount(0);
+    await editPill("Task 1");
+    // check that the dialog is opened with prefilled fields
+    expect(".modal").toHaveCount(1);
+    const modal = queryOne(".modal");
+    expect(modal.querySelector(".o_field_widget[name=start] input")).toHaveValue("12/20/2018");
+    expect(modal.querySelector(".o_field_widget[name=stop] input")).toHaveValue("12/22/2018");
+});
+
+test("markup html server values", async function () {
+    Tasks._fields.description = fields.Html();
+    Tasks._records = Tasks._records.slice(0, 1);
+    Tasks._records[0].description = `<span>Hello</span>`;
+
+    await mountGanttView({
+        type: "gantt",
+        resModel: "tasks",
+        arch: `
+            <gantt date_start="start" date_stop="stop">
+                <field name="description"/>
+                <templates>
+                    <t t-name="gantt-popover">
+                        <div>
+                            <t t-out="description"/>
+                        </div>
+                    </t>
+                </templates>
+            </gantt>
+        `,
+    });
+    expect(".o_popover").toHaveCount(0);
+
+    await contains(SELECTORS.pill).click();
+    expect(".o_popover").toHaveCount(1);
+    expect(queryAllTexts(".o_popover .popover-body")).toEqual(["Hello"]);
+
+    await contains(".o_popover .popover-header i.fa.fa-close").click();
+    expect(".o_popover").toHaveCount(0);
+});
+
+test("group header width is capped by available space", async () => {
+    await mountGanttView({
+        resModel: "tasks",
+        arch: '<gantt date_start="start" date_stop="stop"/>',
+        groupBy: ["user_id"],
+    });
+    const titleWidth = queryRect(".o_gantt_title").width;
+    expect(".o_gantt_header_title:first").toHaveStyle({
+        maxWidth: document.body.clientWidth - titleWidth,
+    });
 });

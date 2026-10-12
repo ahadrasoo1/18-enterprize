@@ -1,23 +1,27 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* stock_barcode_mrp
-# 
+# * stock_barcode_mrp
+#
 # Translators:
-# Wil Odoo, 2024
-# 
+# Abe Manyo, 2025
+# Wil Odoo, 2025
+#
+# "Nurul Aini Akrima Sabila (nuaas)" <nuaas@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:28+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Indonesian (https://app.transifex.com/odoo/teams/41243/id/)\n"
+"POT-Creation-Date: 2025-12-29 18:49+0000\n"
+"PO-Revision-Date: 2026-04-29 19:31+0000\n"
+"Last-Translator: \"Nurul Aini Akrima Sabila (nuaas)\" <nuaas@odoo.com>\n"
+"Language-Team: Indonesian <https://translate.odoo.com/projects/odoo-18/"
+"stock_barcode_mrp/id/>\n"
+"Language: id\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: id\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 5.17\n"
 
 #. module: stock_barcode_mrp
 #: model_terms:ir.ui.view,arch_db:stock_barcode_mrp.res_config_settings_view_form
@@ -209,7 +213,7 @@ msgstr "Produksi Semua"
 #. odoo-javascript
 #: code:addons/stock_barcode_mrp/static/src/components/header.xml:0
 msgid "Producing"
-msgstr ""
+msgstr "Memproduksi"
 
 #. module: stock_barcode_mrp
 #: model_terms:ir.ui.view,arch_db:stock_barcode_mrp.mrp_product_selector
@@ -251,9 +255,13 @@ msgstr "Scan produk untuk memfilter order."
 
 #. module: stock_barcode_mrp
 #. odoo-javascript
-#: code:addons/stock_barcode_mrp/static/src/kanban/stock_barcode_kanban_renderer.xml:0
-msgid "Scan an"
-msgstr "Scan"
+#: code:addons/stock_barcode_mrp/static/src/kanban/stock_barcode_kanban_renderer.js:0
+msgid ""
+"Scan an %(bold_start)s order %(bold_end)s or a %(bold_start)s product %"
+"(bold_end)s to filter your records"
+msgstr ""
+"Scan %(bold_start)s pesanan %(bold_end)s atau %(bold_start)s produk %"
+"(bold_end)s untuk memfilter record Anda"
 
 #. module: stock_barcode_mrp
 #. odoo-javascript
@@ -270,7 +278,7 @@ msgstr "Nomor Seri/Lot"
 #. module: stock_barcode_mrp
 #: model:ir.model,name:stock_barcode_mrp.model_stock_move
 msgid "Stock Move"
-msgstr "Pergerakkan Stok"
+msgstr "Pergerakan Stok"
 
 #. module: stock_barcode_mrp
 #. odoo-javascript
@@ -321,8 +329,8 @@ msgstr "Transfer"
 #: model_terms:ir.actions.act_window,help:stock_barcode_mrp.mrp_action_kanban
 msgid "Transfers allow you to move products from one location to another."
 msgstr ""
-"Transfer memungkinkan Anda untuk menggerakan produk dari satu lokasi ke yang"
-" lain."
+"Transfer memungkinkan Anda untuk menggerakan produk dari satu lokasi ke yang "
+"lain."
 
 #. module: stock_barcode_mrp
 #: model_terms:ir.ui.view,arch_db:stock_barcode_mrp.mrp_product_selector
@@ -332,11 +340,15 @@ msgstr "Satuan Ukuran"
 #. module: stock_barcode_mrp
 #: model:ir.model.fields,help:stock_barcode_mrp.field_stock_move_line__manual_consumption
 msgid ""
-"When activated, then the registration of consumption for that component is recorded manually exclusively.\n"
-"If not activated, and any of the components consumption is edited manually on the manufacturing order, Odoo assumes manual consumption also."
+"When activated, then the registration of consumption for that component is "
+"recorded manually exclusively.\n"
+"If not activated, and any of the components consumption is edited manually "
+"on the manufacturing order, Odoo assumes manual consumption also."
 msgstr ""
-"Saat diaktifkan, pendaftaran konsumsi untuk komponen tersebut akan secara eksklusif dicatat manual.\n"
-"Bila tidak diaktifkan, dan konsumsi komponen apapun diedit secara manual pada manufacturing order, Odoo mengasumsikan juga konsumsi manual."
+"Saat diaktifkan, pendaftaran konsumsi untuk komponen tersebut akan secara "
+"eksklusif dicatat manual.\n"
+"Bila tidak diaktifkan, dan konsumsi komponen apapun diedit secara manual "
+"pada manufacturing order, Odoo mengasumsikan juga konsumsi manual."
 
 #. module: stock_barcode_mrp
 #: model:ir.model,name:stock_barcode_mrp.model_mrp_production_backorder
@@ -346,30 +358,11 @@ msgstr "Wizard untuk menandai sebagai Selesai atau membuat backorder"
 #. module: stock_barcode_mrp
 #. odoo-javascript
 #: code:addons/stock_barcode_mrp/static/src/models/barcode_mrp_model.js:0
+msgid "You are expected to scan one or more products."
+msgstr "Anda diharapkan untuk scan satu atau lebih produk."
+
+#. module: stock_barcode_mrp
+#. odoo-javascript
+#: code:addons/stock_barcode_mrp/static/src/models/barcode_mrp_model.js:0
 msgid "You can't add the final product of a MO as a byproduct."
-msgstr ""
-"Anda tidak dapat menambahkan produk final MO sebagai produk sampingan."
-
-#. module: stock_barcode_mrp
-#. odoo-javascript
-#: code:addons/stock_barcode_mrp/static/src/kanban/stock_barcode_kanban_renderer.xml:0
-msgid "or a"
-msgstr ""
-
-#. module: stock_barcode_mrp
-#. odoo-javascript
-#: code:addons/stock_barcode_mrp/static/src/kanban/stock_barcode_kanban_renderer.xml:0
-msgid "order"
-msgstr ""
-
-#. module: stock_barcode_mrp
-#. odoo-javascript
-#: code:addons/stock_barcode_mrp/static/src/kanban/stock_barcode_kanban_renderer.xml:0
-msgid "product"
-msgstr "produk"
-
-#. module: stock_barcode_mrp
-#. odoo-javascript
-#: code:addons/stock_barcode_mrp/static/src/kanban/stock_barcode_kanban_renderer.xml:0
-msgid "to filter your records"
-msgstr ""
+msgstr "Anda tidak dapat menambahkan produk final MO sebagai produk sampingan."

@@ -10,6 +10,7 @@ from collections import defaultdict
 from contextlib import ExitStack
 from http import HTTPStatus
 from typing import NamedTuple
+from urllib.parse import quote
 
 from werkzeug.exceptions import BadRequest, Forbidden
 
@@ -19,6 +20,7 @@ from odoo.http import request, content_disposition
 from odoo.osv import expression
 from odoo.tools import replace_exceptions, str2bool, consteq
 
+from odoo.addons.base.models.ir_qweb import keep_query
 from odoo.addons.mail.controllers.attachment import AttachmentController
 
 logger = logging.getLogger(__name__)
@@ -89,9 +91,10 @@ class ShareRoute(http.Controller):
         if not document_token or document_id < 1:
             return Doc
         document_sudo = Doc.browse(document_id).sudo()
-        if not document_sudo.document_token:  # like exists() but prefetch
-            return Doc
-        if not request.env.user._is_internal() and not document_sudo.active:
+        try:
+            if not document_sudo.document_token: # like exists() but prefetch 
+                return Doc
+        except MissingError:
             return Doc
 
         # Permissions
@@ -100,6 +103,8 @@ class ShareRoute(http.Controller):
             and (document_sudo.user_permission != 'none'
                  or document_sudo.access_via_link != 'none')
         ):
+            return Doc
+        if not request.env.user._is_internal() and not document_sudo.active:
             return Doc
 
         # Document access
@@ -112,6 +117,9 @@ class ShareRoute(http.Controller):
                 ]):
                     access.last_access_date = fields.Datetime.now()
                 else:
+                    if doc_sudo._get_permission_without_token() == 'none':
+                        # Used to trigger webclient reload
+                        document_sudo = document_sudo.with_context(document_newly_accessible=True)
                     request.env['documents.access'].sudo().create([{
                         'document_id': doc_sudo.id,
                         'partner_id': request.env.user.partner_id.id,
@@ -172,14 +180,16 @@ class ShareRoute(http.Controller):
             if document.type == 'url':
                 raise ValueError("cannot create a zip item out of an url")
             if document.type == 'folder':
+                document_name = document.name.replace('/', '_')
                 # it is the ending slash that makes it appears as a
                 # folder inside the zip file.
-                return Item(unique(f'{folder.path}{document.name}') + '/', '')
+                return Item(unique(f'{folder.path}{document_name}') + '/', '')
             try:
                 stream = self._documents_content_stream(document.shortcut_document_id or document)
+                download_name = stream.download_name.replace('/', '_')
             except (ValueError, MissingError):
                 return None  # skip
-            return Item(unique(f'{folder.path}{stream.download_name}'), stream.read())
+            return Item(unique(f'{folder.path}{download_name}'), stream.read())
 
         def generate_zip_items(documents_sudo, folder):
             documents_sudo = documents_sudo.sorted(lambda d: d.id)
@@ -250,6 +260,7 @@ class ShareRoute(http.Controller):
                 if page['old_file_type'] == 'document':
                     document_ids.add(page['old_file_index'])
         documents = request.env['documents.document'].browse(document_ids)
+        documents.check_access('read')
 
         with ExitStack() as stack:
             files = request.httprequest.files.getlist('ufile')
@@ -283,22 +294,32 @@ class ShareRoute(http.Controller):
     def documents_home(self, access_token):
         document_sudo = self._from_access_token(access_token)
 
+        member_signup_token = request.params.get('member_signup_token')
+        member_id = int(request.params.get('member_id') or "0")
+
         if not document_sudo:
             Redirect = request.env['documents.redirect'].sudo()
             if document_sudo := Redirect._get_redirection(access_token):
                 return request.redirect(
-                    f'/documents/{document_sudo.access_token}',
+                    f'/documents/{quote(document_sudo.access_token, safe="")}?{keep_query("*")}',
                     HTTPStatus.MOVED_PERMANENTLY,
                 )
 
         if request.env.user._is_public():
+            if not document_sudo:
+                redirect_url = f'/documents/{quote(access_token, safe="")}?{keep_query("*")}'
+                if signup_url := request.env["documents.access"]._get_signup_url(
+                    member_id, member_signup_token, access_token, redirect_url):
+                    # Document requires a member to access (not "access_via_link")
+                    # and we have a signup token -> redirect user to signup
+                    return request.redirect(signup_url)
             return self._documents_render_public_view(document_sudo)
         elif request.env.user._is_portal():
             return self._documents_render_portal_view(document_sudo)
         else:  # assume internal user
             # Internal users use the /odoo/documents/<access_token> route
             return request.redirect(
-                f'/odoo/documents/{access_token}',
+                f'/odoo/documents/{quote(access_token, safe="")}?{keep_query("*")}',
                 HTTPStatus.TEMPORARY_REDIRECT,
             )
 
@@ -309,7 +330,8 @@ class ShareRoute(http.Controller):
             and target_sudo.access_via_link != 'none'
             and not target_sudo.is_access_via_link_hidden
         ):
-            return request.redirect(f'/odoo/documents/{target_sudo.access_token}')
+            return request.redirect(
+                f'/odoo/documents/{quote(target_sudo.access_token, safe="")}?{keep_query("*")}')
         if target_sudo or not document_sudo:
             return request.render(
                 'documents.not_available', {'document': document_sudo}, status=404)
@@ -317,9 +339,9 @@ class ShareRoute(http.Controller):
             return request.redirect(
                 document_sudo.url, code=HTTPStatus.TEMPORARY_REDIRECT, local=False)
         if document_sudo.type == 'binary' and document_sudo.attachment_id:
-            return request.render('documents.share_file', {'document': document_sudo})
+            return request.render('documents.share_file', {'document': document_sudo, 'quote': lambda v: quote(v, safe='')})
         if document_sudo.type == 'binary':
-            return request.render('documents.document_request_page', {'document': document_sudo})
+            return request.render('documents.document_request_page', {'document': document_sudo, 'quote': lambda v: quote(v, safe='')})
         if document_sudo.type == 'folder':
             sub_documents_sudo = ShareRoute._get_folder_children(document_sudo)
             return request.render('documents.public_folder_page', {
@@ -329,7 +351,8 @@ class ShareRoute(http.Controller):
                     sub_folder_sudo.id: ShareRoute._get_folder_children(sub_folder_sudo)
                     for sub_folder_sudo in sub_documents_sudo
                     if sub_folder_sudo.type == 'folder'
-                }
+                },
+                'quote': lambda v: quote(v, safe=''),
             })
         else:
             e = f"unknown document type {document_sudo.type}"
@@ -373,17 +396,21 @@ class ShareRoute(http.Controller):
         document.ensure_one()
         documents_init = {}
 
-        # If the user does not have access to the parent folder, we open it in the "SHARED" folder.
-        if document.type != 'folder':
+        # If the document is archived, we open the TRASH
+        if not document.active:
+            documents_init['folder_id'] = 'TRASH'
+            documents_init['document_id'] = document.id
+        # Shortcuts to archived folders behave like binary documents because these folders cannot be browsed.
+        elif document.type != 'folder' or document.shortcut_document_id and not document.shortcut_document_id.active:
             parent = document.folder_id
             shared_root = False if user.share else "SHARED"  # Portal don't have 'Shared with me'
+            # If the user does not have access to the parent folder, we open it in the "SHARED" folder.
             if parent:
                 documents_init['folder_id'] = parent.id if parent.user_permission in {'view', 'edit'} else shared_root
             else:
                 documents_init['folder_id'] = (
                     "MY" if document.owner_id == user
-                    else "COMPANY" if not user.share and (
-                        document.owner_id == document.env.ref('base.user_root') or document.access_internal != 'none')
+                    else "COMPANY" if not user.share and document.owner_id == document.env.ref('base.user_root')
                     else shared_root
                 )
             documents_init['document_id'] = document.id
@@ -418,6 +445,12 @@ class ShareRoute(http.Controller):
         """
         document_sudo = self._from_access_token(access_token, skip_log=True)
         if not document_sudo:
+            Redirect = request.env['documents.redirect'].sudo()
+            if document_sudo := Redirect._get_redirection(access_token):
+                return request.redirect(
+                    f'/odoo/documents/{quote(document_sudo.access_token, safe="")}',
+                    HTTPStatus.MOVED_PERMANENTLY,
+                )
             raise request.not_found()
         if document_sudo.type == 'url':
             return request.redirect(
@@ -443,11 +476,13 @@ class ShareRoute(http.Controller):
 
     @http.route('/documents/redirect/<access_token>', type='http', auth='public', readonly=True)
     def documents_redirect(self, access_token):
-        return request.redirect(f'/odoo/documents/{access_token}', HTTPStatus.MOVED_PERMANENTLY)
+        return request.redirect(f'/odoo/documents/{quote(access_token, safe="")}', HTTPStatus.MOVED_PERMANENTLY)
 
     @http.route('/documents/touch/<access_token>', type='json', auth='user')
     def documents_touch(self, access_token):
-        self._from_access_token(access_token)
+        doc = self._from_access_token(access_token)
+        if doc.env.context.get('document_newly_accessible'):
+            return {'reload': True}
         return {}
 
     @http.route(['/documents/thumbnail/<access_token>',
@@ -507,14 +542,14 @@ class ShareRoute(http.Controller):
         '/document/download/all/<access_token>'], type='http', auth='public')
     def documents_download_all_legacy(self, access_token=None, share_id=None):
         logger.warning("Deprecated since Odoo 18. Please access /documents/content/<access_token> instead.")
-        return request.redirect(f'/documents/content/{access_token}', HTTPStatus.MOVED_PERMANENTLY)
+        return request.redirect(f'/documents/content/{quote(access_token or "", safe="")}', HTTPStatus.MOVED_PERMANENTLY)
 
     @http.route([
         '/document/share/<int:share_id>/<token>',
         '/document/share/<token>'], type='http', auth='public')
     def share_portal(self, share_id=None, token=None):
         logger.warning("Deprecated since Odoo 18. Please access /odoo/documents/<access_token> instead.")
-        return request.redirect(f'/odoo/documents/{token}', code=HTTPStatus.MOVED_PERMANENTLY)
+        return request.redirect(f'/odoo/documents/{quote(token or "", safe="")}', code=HTTPStatus.MOVED_PERMANENTLY)
 
     @http.route(['/documents/upload/', '/documents/upload/<access_token>'],
                 type='http', auth='public', methods=['POST'],
@@ -527,6 +562,7 @@ class ShareRoute(http.Controller):
         partner_id='',
         res_id='',
         res_model='',
+        allowed_company_ids='',
     ):
         """
         Replace an existing document or create new ones.
@@ -540,6 +576,8 @@ class ShareRoute(http.Controller):
         :param owner_id, partner_id, res_id, res_model: field values
             when creating new documents, for internal users only
         """
+        if allowed_company_ids:
+            request.update_context(allowed_company_ids=json.loads(allowed_company_ids))
         is_internal_user = request.env.user._is_internal()
         if is_internal_user and not access_token:
             document_sudo = request.env['documents.document'].sudo()
@@ -589,7 +627,7 @@ class ShareRoute(http.Controller):
         is_internal_user = request.env.user._is_internal()
 
         document_ids = []
-        AttachmentSudo = request.env['ir.attachment'].sudo(not is_internal_user)
+        AttachmentSudo = request.env["ir.attachment"].sudo().with_context(image_no_postprocess=True)
 
         if document_sudo.type == 'binary':
             attachment_sudo = AttachmentSudo._from_request_file(
@@ -619,9 +657,11 @@ class ShareRoute(http.Controller):
                     'res_id': res_id,
                 })
                 document_ids.append(document_sudo.id)
-            if folder_sudo.create_activity_option:
-                folder_sudo.browse(document_ids).documents_set_activity(
-                    settings_record=folder_sudo)
+
+            # Make sure uploader can access documents in "Company"
+            document_sudo.filtered(
+                lambda d: not d.folder_id and d.owner_id == request.env.ref('base.user_root')
+            ).action_update_access_rights(partners={request.env.user.partner_id: ('edit', False)})
 
         return document_ids
 

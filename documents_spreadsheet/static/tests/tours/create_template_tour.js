@@ -8,14 +8,37 @@ const SHEET_NAME = "Res Partner Test Spreadsheet";
 const TEMPLATE_NAME = `${SHEET_NAME} - Template`;
 
 registry.category("web_tour.tours").add("documents_spreadsheet_create_template_tour", {
-    test: true,
     url: "/odoo",
     steps: () => [
         ...stepUtils.goToAppSteps("documents.menu_root", "Open Document app"),
         {
+            trigger: '.o_documents_title:contains("Folders")',
+            content: "check if the folders are loaded",
+        },
+        {
+            trigger: ".o_searchview_input",
+            content: "click on search",
+            run: "click",
+        },
+        {
+            trigger: ".o_searchview_input",
+            content: "fill in searchbar",
+            run: `edit Test folder`,
+        },
+        {
+            content: "find the right folder",
+            trigger: ".o_searchview_autocomplete li:contains(Test folder)",
+            run: "click",
+        },
+        {
             trigger: '.o_kanban_record:contains("Test folder")',
             content: "Open the test folder",
             run: "dblclick",
+        },
+        {
+            trigger: ".o_searchview_facet .o_facet_remove",
+            content: "remove filter",
+            run: "click",
         },
         {
             trigger: `div[title="${SHEET_NAME}"]`,
@@ -48,6 +71,25 @@ registry.category("web_tour.tours").add("documents_spreadsheet_create_template_t
         {
             trigger: ".o-sp-breadcrumb",
             content: "Go back to Document App",
+            run: "click",
+        },
+        {
+            trigger: ".btn.btn-primary.dropdown-toggle[data-hotkey='c']",
+            content: "new dropdown",
+            run: "click",
+        },
+        {
+            trigger: ".btn.btn-link.o_documents_kanban_spreadsheet",
+            content: "Spreadsheet",
+            run: "click",
+        },
+        {
+            trigger: `.o-spreadsheet-grid-item-name:contains(${TEMPLATE_NAME})`,
+            content: "verify that the template name is displayed",
+        },
+        {
+            trigger: "button.btn-close",
+            content: "close the popup",
             run: "click",
         },
         {

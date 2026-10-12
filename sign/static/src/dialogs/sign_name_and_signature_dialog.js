@@ -20,6 +20,7 @@ export class SignNameAndSignature extends NameAndSignature {
         frame: { type: Object, optional: true },
         hash: String,
         onNameChange: Function,
+        onSignatureChange: { type: Function, optional: true },
     };
 
     setup() {
@@ -73,6 +74,7 @@ export class SignNameAndSignature extends NameAndSignature {
     onSignatureAreaClick() {
         if (this.state.signMode === "draw") {
             this.props.signature.signatureChanged = true;
+            this.props.onSignatureChange(this.state.signMode);
         }
     }
 
@@ -105,6 +107,7 @@ export class SignNameAndSignature extends NameAndSignature {
     onInputSignName(e) {
         super.onInputSignName(e);
         this.props.onNameChange(this.props.signature.name);
+        this.props.onSignatureChange(this.state.signMode);
     }
 }
 
@@ -132,7 +135,8 @@ export class SignNameAndSignatureDialog extends Component {
 
     setup() {
         this.footerState = useState({
-            buttonsDisabled: !this.props.signature.name,
+            signButtonDisabled: !this.props.signature.name || !this.props.signature.signatureChanged,
+            signAllButtonsDisabled: !this.props.signature.name,
         });
     }
 
@@ -148,6 +152,7 @@ export class SignNameAndSignatureDialog extends Component {
             hash: this.props.hash,
             onNameChange: this.onNameChange.bind(this),
             defaultFont: "LaBelleAurore-Regular.ttf",
+            onSignatureChange: this.onSignatureChange.bind(this),
         };
     }
 
@@ -159,8 +164,25 @@ export class SignNameAndSignatureDialog extends Component {
     }
 
     onNameChange(name) {
-        if (this.footerState.buttonsDisabled !== !name) {
-            this.footerState.buttonsDisabled = !name;
+        const isNameFilled = Boolean(name);
+        this.footerState.signButtonDisabled = !isNameFilled;
+        this.footerState.signAllButtonsDisabled = !isNameFilled;
+    }
+
+    onSignatureChange(signMode) {
+        const { name, isSignatureEmpty, signatureChanged } = this.props.signature;
+        const isAutoMode = signMode === "auto"
+        // Disable Sign all button if:
+        // - Name is missing or empty
+        //   - In "auto" mode, the name is only whitespace
+        //   - In any other mode, the signature is empty
+        const buttonsDisabled = !name || isAutoMode ? !name.trim() : isSignatureEmpty
+        if (this.footerState.signAllButtonsDisabled !== buttonsDisabled){
+            this.footerState.signAllButtonsDisabled = buttonsDisabled;
         }
+        // Disable Sign button if:
+        // - signature is not changed
+        // - name is missing
+        this.footerState.signButtonDisabled = buttonsDisabled || !signatureChanged;
     }
 }

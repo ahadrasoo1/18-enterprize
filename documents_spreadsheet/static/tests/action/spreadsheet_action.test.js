@@ -1,6 +1,8 @@
 import {
     DocumentsDocument,
     defineDocumentSpreadsheetModels,
+    getBasicData,
+    getBasicServerData,
 } from "@documents_spreadsheet/../tests/helpers/data";
 import { createSpreadsheet } from "@documents_spreadsheet/../tests/helpers/spreadsheet_test_utils";
 import { describe, expect, getFixture, test } from "@odoo/hoot";
@@ -8,7 +10,6 @@ import { dblclick } from "@odoo/hoot-dom";
 import { animationFrame } from "@odoo/hoot-mock";
 import * as spreadsheet from "@odoo/o-spreadsheet";
 import { selectCell, setCellContent, setSelection } from "@spreadsheet/../tests/helpers/commands";
-import { getBasicData, getBasicServerData } from "@spreadsheet/../tests/helpers/data";
 import { getCell, getCellValue } from "@spreadsheet/../tests/helpers/getters";
 import { makeDocumentsSpreadsheetMockEnv } from "@documents_spreadsheet/../tests/helpers/model";
 import { doMenuAction } from "@spreadsheet/../tests/helpers/ui";
@@ -100,7 +101,6 @@ test("breadcrumb is rendered the navbar", async function () {
     };
     const views = {
         "documents.document,false,list": '<list><field name="name"/></list>',
-        "documents.document,false,search": "<search></search>",
     };
     const serverData = { actions, models: getBasicData(), views };
     await prepareWebClientForSpreadsheet();
@@ -223,6 +223,22 @@ test("ask confirmation when merging", async function () {
     expect(model.getters.isSingleCellOrMerge(sheetId, toZone("A1:A2"))).toBe(true);
 });
 
+test("Cancel callback of askConfirmation is called when using the cancel button", async function () {
+    const { env } = await createSpreadsheet();
+    env.askConfirmation(
+        "Dialog title",
+        () => {},
+        () => {
+            expect.step("cancel callback");
+        }
+    );
+    await animationFrame();
+    expect(".o_dialog .btn-primary").toHaveText("Yes");
+    expect(".o_dialog .btn-secondary").toHaveText("No");
+    await contains(".o_dialog .btn-secondary").click();
+    expect.verifySteps(["cancel callback"]);
+});
+
 test("Grid has still the focus after a dialog", async function () {
     const { model, env } = await createSpreadsheet();
     selectCell(model, "F4");
@@ -281,7 +297,7 @@ test("menu > copy", async function () {
             if (method === "copy") {
                 expect.step("copy");
                 expect(args[0]).toEqual([2]);
-                expect("default" in kwargs).toBe(true);
+                expect(kwargs).toInclude("default");
             }
         },
     });

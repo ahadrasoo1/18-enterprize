@@ -8,8 +8,8 @@ import hashlib
 import logging
 import uuid
 
-from odoo.exceptions import UserError
-from odoo import fields
+from odoo.exceptions import UserError, ValidationError
+from odoo import fields, _
 
 _logger = logging.getLogger(__name__)
 
@@ -18,6 +18,8 @@ NS_MAP = {'ds': "http://www.w3.org/2000/09/xmldsig#"}
 
 TEST_ENDPOINT = "https://vpfe-hab.dian.gov.co/WcfDianCustomerServices.svc?wsdl"
 ENDPOINT = "https://vpfe.dian.gov.co/WcfDianCustomerServices.svc?wsdl"
+
+FORCED_PROD_SERVICES = {'GetAcquirer'}
 
 
 def _canonicalize_node(node, **kwargs):
@@ -120,7 +122,9 @@ def _uuid1():
 
 
 def _build_and_send_request(self, payload, service, company):
-    cert_sudo = company.sudo().l10n_co_dian_certificate_ids[-1]
+    cert_sudo = company.sudo().l10n_co_dian_certificate_ids[-1:]
+    if not cert_sudo:
+        raise ValidationError(_('Certificate is not available'))
     dt_now = fields.datetime.utcnow()
     vals = {
         'creation_time': dt_now.isoformat(timespec='milliseconds') + "Z",
@@ -139,7 +143,7 @@ def _build_and_send_request(self, payload, service, company):
     # Send the request
     try:
         response = requests.post(
-            url=TEST_ENDPOINT if company.l10n_co_dian_test_environment else ENDPOINT,
+            url=TEST_ENDPOINT if company.l10n_co_dian_test_environment and service not in FORCED_PROD_SERVICES else ENDPOINT,
             data=etree.tostring(envelope),
             timeout=3,
             headers={"Content-Type": f'application/soap+xml;charset=UTF-8;action="http://wcf.dian.colombia/IWcfDianCustomerServices/{service}"'},
@@ -149,3 +153,45 @@ def _build_and_send_request(self, payload, service, company):
     if response.status_code != 200:
         _logger.info("DIAN server returned code %s\n%s", response.status_code, response.text)
     return {'response': response.text, 'status_code': response.status_code}
+
+
+def _get_qr_code_value(root, currency, is_support_document=False):
+    """ Returns the value to be embedded inside the QR Code on the PDF report.
+    For Support Documents, see section 12.2 ('Anexo-Tecnico-Documento-Soporte[...].pdf').
+    Otherwise, see section 11.7 ('Anexo-Tecnico-[...]-1-9.pdf').
+    """
+    nsmap = {k: v for k, v in root.nsmap.items() if k}  # empty namespace prefix is not supported for XPaths
+    supplier_company_id = root.findtext('./cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme/cbc:CompanyID', namespaces=nsmap)
+    customer_company_id = root.findtext('./cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cbc:CompanyID', namespaces=nsmap)
+    line_extension_amount = root.findtext('./cac:LegalMonetaryTotal/cbc:LineExtensionAmount', namespaces=nsmap)
+    tax_amount_01 = currency.round(sum(float(x) for x in root.xpath('./cac:TaxTotal[.//cbc:ID/text()="01"]/cbc:TaxAmount/text()', namespaces=nsmap)))
+    payable_amount = root.findtext('./cac:LegalMonetaryTotal/cbc:PayableAmount', namespaces=nsmap)
+    identifier = root.findtext('./cbc:UUID', namespaces=nsmap)
+    qr_code = root.findtext('./ext:UBLExtensions/ext:UBLExtension/ext:ExtensionContent/sts:DianExtensions/sts:QRCode', namespaces=nsmap)
+    vals = {
+        'NumDS': root.findtext('./cbc:ID', namespaces=nsmap),
+        'FecFD': root.findtext('./cbc:IssueDate', namespaces=nsmap),
+        'HorDS': root.findtext('./cbc:IssueTime', namespaces=nsmap),
+    }
+    if is_support_document:
+        vals.update({
+            'NumSNO': supplier_company_id,
+            'DocABS': customer_company_id,
+            'ValDS': line_extension_amount,
+            'ValIva': tax_amount_01,
+            'ValTolDS': payable_amount,
+            'CUDS': identifier,
+            'QRCode': qr_code,
+        })
+    else:
+        vals.update({
+            'NitFac': supplier_company_id,
+            'DocAdq': customer_company_id,
+            'ValFac': line_extension_amount,
+            'ValIva': tax_amount_01,
+            'ValOtroIm': currency.round(sum(float(x) for x in root.xpath('./cac:TaxTotal[.//cbc:ID/text()!="01"]/cbc:TaxAmount/text()', namespaces=nsmap))),
+            'ValTolFac': payable_amount,
+            'CUFE': identifier,
+            'QRCode': qr_code,
+        })
+    return "\n".join(f"{k}: {v}" for k, v in vals.items())

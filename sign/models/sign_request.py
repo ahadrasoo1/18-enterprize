@@ -7,11 +7,6 @@ import os
 import time
 import uuid
 
-from odoo.tools.pdf import PdfFileReader, PdfWriter as PdfFileWriter  # bt: core PDF layer (core no longer patches PyPDF2)
-try:
-    from PyPDF2.errors import PdfReadError
-except ImportError:
-    from PyPDF2.utils import PdfReadError
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
@@ -32,7 +27,8 @@ from odoo import api, fields, models, http, _, Command
 from odoo.tools import config, email_normalize, format_list, get_lang, is_html_empty, format_date, formataddr, groupby, consteq
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools.misc import hmac
-from odoo.tools.pdf import reshape_text
+from odoo.tools.pdf import PdfFileReader, PdfFileWriter, PdfReadError, reshape_text, NameObject
+
 
 TTFSearchPath.append(os.path.join(config["root_path"], "..", "addons", "web", "static", "fonts", "sign"))
 
@@ -171,8 +167,9 @@ class SignRequest(models.Model):
         for sign_request in self:
             sign_request.cc_partner_ids = sign_request.message_follower_ids.partner_id - sign_request.request_item_ids.partner_id
 
-    @api.depends('request_item_ids.access_token')
+    @api.depends('request_item_ids.access_token', 'state')
     def _compute_share_link(self):
+        self.share_link = False
         for sign_request in self.filtered(lambda sr: sr.state == 'shared'):
             sign_request.share_link = "%s/sign/document/mail/%s/%s" % (self.get_base_url(), sign_request.id, sign_request.request_item_ids[0].sudo().access_token)
 
@@ -191,6 +188,13 @@ class SignRequest(models.Model):
             sign_requests.send_signature_accesses()
         return sign_requests
 
+    def write(self, vals):
+        today = fields.Date.today()
+        if vals.get('validity') and fields.Date.from_string(vals['validity']) < today:
+            vals['state'] = 'expired'
+        res = super().write(vals)
+        return res
+
     def copy_data(self, default=None):
         default = dict(default or {})
         vals_list = super().copy_data(default=default)
@@ -204,6 +208,14 @@ class SignRequest(models.Model):
         for old_request, new_request in zip(self, sign_requests):
             new_request.message_subscribe(partner_ids=old_request.cc_partner_ids.ids)
         return sign_requests
+
+    @api.ondelete(at_uninstall=False)
+    def _unlink_if_not_signed(self):
+        """
+        Raise an error if any of the records are in 'signed' state.
+        """
+        if any(r.state == 'signed' for r in self):
+            raise UserError(_("Signed documents cannot be deleted for legal reasons. Please archive them instead."))
 
     def toggle_active(self):
         self.filtered(lambda sr: sr.active and sr.state == 'sent').cancel()
@@ -327,7 +339,8 @@ class SignRequest(models.Model):
         self.ensure_one()
         if not default_action:
             default_action = {}
-        action_rec = self.env['ir.actions.act_window'].search([
+        # user might not have access to Action Window model
+        action_rec = self.env['ir.actions.act_window'].sudo().search([
             ('res_model', '=', self.reference_doc._name),
             ('context', 'not ilike', 'active_id')], limit=1)
         if action_rec:
@@ -336,6 +349,7 @@ class SignRequest(models.Model):
                 "views": [(False, "form")],
                 "view_mode":  'form',
                 "res_id": self.reference_doc.id,
+                "target": 'current',
             })
         else:
             action = default_action
@@ -346,7 +360,7 @@ class SignRequest(models.Model):
         # check if frontend user or backend
         action = self.env["ir.actions.actions"]._for_xml_id("sign.sign_request_action")
         result = {"action": action, "label": _("Close"), "custom_action": False}
-        if self.reference_doc and self.reference_doc.exists():
+        if self.reference_doc and self.reference_doc.exists() and self.reference_doc.has_access('read'):
             action = self._get_linked_record_action(action)
             result = {"action": action, "label": _("Back to %s", self.reference_doc._description), "custom_action": True}
         return result
@@ -400,11 +414,16 @@ class SignRequest(models.Model):
             'subject': subject,
             'body': Markup('<p style="white-space: pre">{}</p>').format(refusal_reason),
         }, lang=partner_lang, minimal_qcontext=True)
-
+        notification_template = 'mail.mail_notification_light'
+        if self.env.ref('sign.sign_mail_notification_light', raise_if_not_found=False):
+            notification_template = 'sign.sign_mail_notification_light'
         self._message_send_mail(
-            body, 'mail.mail_notification_light',
+            body, notification_template,
             {'record_name': self.reference},
-            {'model_description': 'signature', 'company': self.communication_company_id or self.create_uid.company_id},
+            {
+                'model_description': _('Signature'),
+                'company': self.communication_company_id or self.create_uid.company_id
+            },
             {'email_from': self.create_uid.email_formatted,
              'author_id': self.create_uid.partner_id.id,
              'email_to': partner.email_formatted,
@@ -427,6 +446,7 @@ class SignRequest(models.Model):
         # find all expired sign requests and those that need a reminder
         # in one query, the code will handle them differently
         # note: archived requests are not fetched.
+        self.flush_model(fnames=['state', 'active', 'validity', 'reminder_enabled', 'last_reminder', 'reminder'])
         self.env.cr.execute(f'''
         SELECT id
         FROM sign_request sr
@@ -440,7 +460,7 @@ class SignRequest(models.Model):
         res = self.env.cr.fetchall()
         request_to_send = self.env['sign.request']
         for request in self.browse(v[0] for v in res):
-            if request.validity < today:
+            if request.validity and request.validity < today:
                 request.state = 'expired'
             else:
                 request_to_send += request
@@ -485,16 +505,28 @@ class SignRequest(models.Model):
         old_pdf = PdfFileReader(io.BytesIO(base64.b64decode(self.template_id.attachment_id.datas)), strict=False, overwriteWarnings=False)
         return old_pdf.isEncrypted
 
+    def _check_requires_password(self):
+        """ Check if a password required to open and download the document """
+        if not self._check_is_encrypted():
+            return False
+
+        old_pdf = PdfFileReader(io.BytesIO(base64.b64decode(self.template_id.attachment_id.datas)), strict=False, overwriteWarnings=False)
+        result = old_pdf.decrypt("")
+        # A result of 0 means that an empty string is not a valid password, so a real password is required
+        return result == 0
+
     def cancel(self):
-        for sign_request in self:
+        # Exclude sign requests that are in 'signed' state as they mustn't be canceled.
+        sign_requests = self.filtered(lambda request: request.state != 'signed')
+        for sign_request in sign_requests:
             sign_request.write({'access_token': self._default_access_token(), 'state': 'canceled'})
-        self.request_item_ids._cancel()
+        sign_requests.request_item_ids._cancel()
 
         # cancel activities for signers
-        for user in self.request_item_ids.sudo().partner_id.user_ids.filtered(lambda u: u.has_group('sign.group_sign_user')):
-            self.activity_unlink(['mail.mail_activity_data_todo'], user_id=user.id)
+        for user in sign_requests.request_item_ids.sudo().partner_id.user_ids.filtered(lambda u: u.has_group('sign.group_sign_user')):
+            sign_requests.activity_unlink(['mail.mail_activity_data_todo'], user_id=user.id)
 
-        self.env['sign.log'].sudo().create([{'sign_request_id': sign_request.id, 'action': 'cancel'} for sign_request in self])
+        self.env['sign.log'].sudo().create([{'sign_request_id': sign_request.id, 'action': 'cancel'} for sign_request in sign_requests])
 
     def _send_completed_document(self):
         """ Send the completed document to signers and Contacts in copy with emails
@@ -547,11 +579,17 @@ class SignRequest(models.Model):
             'signers': signers,
             'request_edited': request_edited,
             }, lang=partner_lang, minimal_qcontext=True)
-
-        self.env['sign.request']._message_send_mail(
-            body, 'mail.mail_notification_light',
+        notification_template = 'mail.mail_notification_light'
+        if self.env.ref('sign.sign_mail_notification_light', raise_if_not_found=False):
+            notification_template = 'sign.sign_mail_notification_light'
+        self._message_send_mail(
+            body, notification_template,
             {'record_name': self.reference},
-            {'model_description': 'signature', 'company': self.communication_company_id or self.create_uid.company_id},
+            {
+                'model_description': _('Signature'),
+                'company': self.communication_company_id or self.create_uid.company_id,
+                'partner': partner,
+            },
             {'email_from': self.create_uid.email_formatted,
              'author_id': self.create_uid.partner_id.id,
              'email_to': partner.email_formatted,
@@ -574,12 +612,24 @@ class SignRequest(models.Model):
 
     @staticmethod
     def get_page_size(pdf_reader):
-        first_page = pdf_reader.pages and pdf_reader.pages[0]
-        media_box = first_page and first_page.mediaBox
-        width = media_box and media_box.getWidth()
-        height = media_box and media_box.getHeight()
+        max_width = max_height = 0
+        for page in pdf_reader.pages:
+            media_box = page.mediaBox
+            width = media_box and media_box.getWidth()
+            height = media_box and media_box.getHeight()
+            max_width = width if width > max_width else max_width
+            max_height = height if height > max_height else max_height
 
-        return (width, height) if width and height else None
+        return (max_width, max_height) if max_width and max_height else None
+
+    def _get_user_formatted_datetime(self, datetime_val):
+        """
+        Get the user's preferred datetime format based on their language settings.
+        """
+        lang = self.env['res.lang']._lang_get(self.create_uid.lang)
+        user_date_format, user_time_format = lang.date_format, lang.time_format
+
+        return datetime_val.strftime(f"{user_date_format} {user_time_format}")
 
     def _generate_completed_document(self, password=""):
         self.ensure_one()
@@ -741,9 +791,25 @@ class SignRequest(models.Model):
             new_pdf = PdfFileWriter()
 
             for p in range(0, old_pdf.getNumPages()):
-                page = old_pdf.getPage(p)
+                new_pdf.addPage(old_pdf.getPage(p))
+                page = new_pdf.getPage(-1)
                 page.mergePage(item_pdf.getPage(p))
-                new_pdf.addPage(page)
+                page.compressContentStreams()
+                # Preserve page indirect object identity so internal PDF references remain valid.
+                ref = page.indirect_reference if hasattr(page, "indirect_reference") else None
+                if ref:
+                    old_pdf.resolved_objects[ref.generation, ref.idnum] = page
+
+            # Copy bookmarks from the original PDF to the new one, if any exist
+            root = old_pdf.trailer.get("/Root")
+            old_outlines_ref = root.get("/Outlines") if root else None
+            if old_outlines_ref:
+                outlines_obj = old_outlines_ref.getObject()
+                copied_outlines = new_pdf._addObject(outlines_obj)
+                new_pdf._root_object.update({
+                    NameObject("/Outlines"): copied_outlines,
+                    NameObject("/PageMode"): NameObject("/UseOutlines")
+                })
 
             if isEncrypted:
                 new_pdf.encrypt(password)
@@ -794,14 +860,32 @@ class SignRequest(models.Model):
         default_lang = get_lang(self.env, lang_code=kwargs.get('lang')).code
         lang = kwargs.get('lang', default_lang)
         sign_request = self.with_context(lang=lang)
+        model_description = notif_values.get('model_description')
+        partner = notif_values.get('partner')
 
         # the notif layout wrapping expects a mail.message record, but we don't want
         # to actually create the record
         # See @tde-banana-odoo for details
         msg = sign_request.env['mail.message'].sudo().new(dict(body=body, **message_values))
-        body_html = self.env['ir.qweb']._render(email_layout_xmlid, dict(message=msg, **notif_values), minimal_qcontext=True)
+        body_html = sign_request.env['ir.qweb']._render(
+            email_layout_xmlid,
+            dict(message=msg, **notif_values),
+            minimal_qcontext=True
+        )
         body_html = sign_request.env['mail.render.mixin']._replace_local_links(body_html)
-
+        if partner and len(partner.user_ids) == 1 and partner.user_ids.notification_type == "inbox":
+            self.message_notify(
+                subject=mail_values.get("subject"),
+                body=body,
+                partner_ids=partner.ids,
+                record_name=self.subject,
+                email_layout_xmlid='mail.mail_notification_layout',
+                model_description=model_description,
+                mail_auto_delete=False,
+                attachment_ids=mail_values.get("attachment_ids"),
+                author_id=self.create_uid.partner_id.id,
+                email_from=mail_values.get("email_from"),
+            )
         mail_values['reply_to'] = mail_values.get('email_from')
         mail = sign_request.env['mail.mail'].sudo().create(dict(body_html=body_html, **mail_values))
         if force_send:
@@ -867,7 +951,7 @@ class SignRequestItem(models.Model):
         if any(sri.partner_id and not sri.signer_email for sri in self):
             raise ValidationError(_("All signers must have valid email addresses"))
 
-    @api.constrains('partner_id', 'role_id')
+    @api.constrains('sign_request_id', 'partner_id', 'role_id')
     def _check_signers_validity(self):
         # this check allows one signer to be False, which is used to "share" a sign template
         self.sign_request_id._check_signers_roles_validity()
@@ -985,8 +1069,11 @@ class SignRequestItem(models.Model):
             }, lang=signer_lang, minimal_qcontext=True)
 
             attachment_ids = signer.sign_request_id.attachment_ids.ids
+            notification_template = 'mail.mail_notification_light'
+            if self.env.ref('sign.sign_mail_notification_light', raise_if_not_found=False):
+                notification_template = 'sign.sign_mail_notification_light'
             self.env['sign.request']._message_send_mail(
-                body, 'mail.mail_notification_light',
+                body, notification_template,
                 {'record_name': signer.sign_request_id.reference},
                 {'model_description': _('Signature'), 'company': signer.communication_company_id or signer.sign_request_id.create_uid.company_id},
                 {'email_from': signer.create_uid.email_formatted,
@@ -1085,11 +1172,16 @@ class SignRequestItem(models.Model):
             'signer': self.partner_id,
             'auth_method': dict(self.role_id._fields['auth_method']._description_selection(self.env))[self.role_id.auth_method]
         }, lang=partner_lang, minimal_qcontext=True)
-
+        notification_template = 'mail.mail_notification_light'
+        if self.env.ref('sign.sign_mail_notification_light', raise_if_not_found=False):
+            notification_template = 'sign.sign_mail_notification_light'
         self.env['sign.request']._message_send_mail(
-            body, 'mail.mail_notification_light',
+            body, notification_template,
             {'record_name': self.reference},
-            {'model_description': 'signature', 'company': self.communication_company_id or self.create_uid.company_id},
+            {
+                'model_description': _('Signature'),
+                'company': self.communication_company_id or self.create_uid.company_id
+            },
             {
                 'email_from': self.create_uid.email_formatted,
                 'author_id': self.create_uid.partner_id.id,

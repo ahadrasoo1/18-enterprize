@@ -29,10 +29,12 @@ class DocumentMixin(models.AbstractModel):
             access_rights_vals = self._get_document_vals_access_rights()
             if set(access_rights_vals) - {'access_via_link', 'access_internal', 'is_access_via_link_hidden'}:
                 raise ValueError("Invalid access right values")
+            folder = self._get_document_folder()
             document_vals = {
                 'attachment_id': attachment.id,
                 'name': attachment.name or self.display_name,
-                'folder_id': self._get_document_folder().id,
+                'folder_id': folder.id,
+                'company_id': folder.company_id.id,
                 'owner_id': self._get_document_owner().id,
                 'partner_id': self._get_document_partner().id,
                 'tag_ids': [(6, 0, self._get_document_tags().ids)],
@@ -119,11 +121,11 @@ class DocumentMixin(models.AbstractModel):
             if 'access_ids' in pre_vals:
                 continue
             access_ids = vals.get('access_ids') or []
-            partner_with_access = {access[2]['partner_id'] for access in access_ids}  # list of Command.create tuples
+            partner_with_access = {access[2]['partner_id'] for access in access_ids if access[2]}  # list of Command.create tuples
             related_document_access = related_record._get_document_access_ids()
             if related_document_access is False:
                 # Keep logs but remove members
-                access_ids = [a for a in access_ids if not a[2].get('role')]
+                access_ids = [a for a in access_ids if a[2] and not a[2].get('role')]
             else:
                 accesses_to_add = [
                     (partner, access)

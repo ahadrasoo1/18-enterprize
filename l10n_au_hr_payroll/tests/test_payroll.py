@@ -4,7 +4,7 @@
 from collections import defaultdict
 from datetime import date
 from freezegun import freeze_time
-from contextlib import contextmanager
+from contextlib import closing
 from unittest import skip
 
 from odoo import Command
@@ -23,13 +23,6 @@ class TestPayroll(TestPayrollCommon):
         cls.tax_treatment_category = 'R'
 
     def test_withholding_amounts(self):
-
-        @contextmanager
-        def rollback():
-            savepoint = self.cr.savepoint()
-            yield
-            savepoint.rollback()
-
         test_scales = [
             {'l10n_au_tax_free_threshold': False},  # Scale 1
             {'l10n_au_tax_free_threshold': True},  # Scale 2
@@ -53,7 +46,7 @@ class TestPayroll(TestPayrollCommon):
                 self.contract_ids[0].wage = earnings
                 for idx, test_data in enumerate(row[1:]):
                     with self.subTest(earnings=earnings, scale=test_scales[idx]):
-                        with rollback():
+                        with closing(self.env.cr.savepoint()):
                             self.employee_id.write(test_scales[idx])
                             coefficients = payslip._l10n_au_tax_schedule_parameters()
                             amount = payslip._l10n_au_compute_withholding_amount(earnings, period, coefficients)
@@ -279,7 +272,7 @@ class TestPayroll(TestPayrollCommon):
         # Scenario 13: 4 children, medicare reduction
         employee_id.write({
             "l10n_au_tfn_declaration": "provided",
-            "l10n_au_tfn": "12345678",
+            "l10n_au_tfn": "999999661",
             "marital": "married",
             "children": 4,
         })
@@ -288,7 +281,7 @@ class TestPayroll(TestPayrollCommon):
         self.assertEqual(-lbc["WITHHOLD.TOTAL"]["total"], 893, "test scenario 13: 4 children, medicare reduction")
         employee_id.write({
             "l10n_au_tfn_declaration": "provided",
-            "l10n_au_tfn": "12345678",
+            "l10n_au_tfn": "999999661",
             # kill the wife
             "marital": "single",
             # kill the children
@@ -399,7 +392,7 @@ class TestPayroll(TestPayrollCommon):
         # Scenario 38: 4 children, medicare reduction
         employee_id.write({
             "l10n_au_tfn_declaration": "provided",
-            "l10n_au_tfn": "12345678",
+            "l10n_au_tfn": "999999661",
             "marital": "married",
             "children": 4,
         })
@@ -408,7 +401,7 @@ class TestPayroll(TestPayrollCommon):
         self.assertEqual(-lbc["WITHHOLD.TOTAL"]["total"], 142, "test scenario 38: 4 children, medicare reduction")
         employee_id.write({
             "l10n_au_tfn_declaration": "provided",
-            "l10n_au_tfn": "12345678",
+            "l10n_au_tfn": "999999661",
             # kill the wife
             "marital": "single",
             # kill the children

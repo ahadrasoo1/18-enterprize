@@ -12,6 +12,7 @@
     --btn-font-size: 0.875rem;
     --btn-line-height: 1.5;
     --border-radius: 0.25rem;
+    --sidebar-width: 200px;
 }
 
 .btn {
@@ -71,18 +72,19 @@
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     text-align: center;
-    border: 1px dashed rgb(var(--bs-primary-rgb));
     vertical-align: middle;
     display: inline-block;
     margin: 0;
     padding: 0;
-    box-shadow: 0px 0px 3px 1px rgb(var(--bs-primary-rgb));
     resize: none;
-    background-color: rgba(var(--bs-white-rgb), 0.9);
     font-family: Helvetica;
-    line-height: 1.25;
     z-index: 100;
     cursor: pointer;
+}
+
+.o_sign_sign_item.o_sign_sign_item_default {
+    border: 1px dashed rgb(var(--bs-primary-rgb));
+    box-shadow: 0px 0px 3px 1px rgb(var(--bs-primary-rgb));
 }
 
 .o_sign_responsible_display {
@@ -97,6 +99,7 @@
     width: 100%;
     height: 100%;
     overflow: hidden;
+    visibility: inherit !important;
 }
 
 .o_sign_sign_item.o_readonly_mode {
@@ -104,7 +107,7 @@
 }
 
 .o_sign_sign_item .o_placeholder {
-    vertical-align: middle;
+    vertical-align: unset;
     padding-left: 30px;
     overflow: hidden;
 }
@@ -137,6 +140,7 @@
 
 .o_custom_checkbox {
     display: inline-block;
+    margin-left: 1rem;
     width: 1em;
     height: 0.8em;
     position: relative;
@@ -310,7 +314,7 @@
     height: 50px;
     font-size: 1.4em;
     text-transform: uppercase;
-    z-index: 90;
+    z-index: 100;
     padding: 0 10px 0 5px;
     color: white;
     cursor: pointer;
@@ -474,6 +478,61 @@
     left: 0;
 }
 
-.textLayer {
-    z-index: 2 !important; /* allow for text selection after adding canvas_layer_0 */
+.textLayer,
+.annotationLayer section {
+    z-index: 2 !important; /* allow text selection and link clicks after adding canvas_layer_0 */
+}
+
+#outerContainer {
+    overflow: hidden;
+}
+
+#sidebarContainer {
+    inset-inline-end: calc(-1 * var(--sidebar-width));
+    inset-inline-start: unset !important;
+    transition-property: inset-inline-end !important;
+}
+
+#viewerContainer {
+    inset-inline-start: 0 !important;
+}
+
+#outerContainer.sidebarOpen #sidebarContainer {
+    inset-inline-end: 0;
+}
+
+#outerContainer.sidebarOpen #loadingBar {
+    inset-inline-end: var(--sidebar-width);
+    inset-inline-start: unset !important;
+}
+
+#outerContainer.sidebarOpen #viewerContainer:not(.pdfPresentationMode) {
+    inset-inline-end: var(--sidebar-width);
+    transition-property: inset-inline-end;
+}
+
+#sidebarResizer {
+    inset-inline-end: unset !important;
+    position: absolute;
+    inset-block: unset;
+}
+
+#sidebarToggleButton {
+    position: absolute;
+    right: 0;
+    z-index: 1000;
+}
+
+#toolbarViewerRight {
+    padding-right: 40px !important;
+}
+
+@media all and (max-width: 690px) {
+    #sidebarToggle {
+        margin-right: 16px;
+    }
+
+    #toolbarViewerRight {
+        padding-right: 56px !important;
+    }
 }

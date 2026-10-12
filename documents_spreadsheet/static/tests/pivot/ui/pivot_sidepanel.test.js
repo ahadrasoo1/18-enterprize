@@ -1,21 +1,20 @@
-import { defineDocumentSpreadsheetModels } from "@documents_spreadsheet/../tests/helpers/data";
+import {
+    defineDocumentSpreadsheetModels,
+    getBasicData,
+    getBasicServerData,
+} from "@documents_spreadsheet/../tests/helpers/data";
 import { createSpreadsheetFromPivotView } from "@documents_spreadsheet/../tests/helpers/pivot_helpers";
 import { getHighlightsFromStore } from "@documents_spreadsheet/../tests/helpers/store_helpers";
 import { beforeEach, describe, expect, getFixture, test } from "@odoo/hoot";
 import { animationFrame } from "@odoo/hoot-mock";
 import { registries } from "@odoo/o-spreadsheet";
-import {
-    Partner,
-    getBasicData,
-    getBasicPivotArch,
-    getBasicServerData,
-} from "@spreadsheet/../tests/helpers/data";
+import { Partner, getBasicPivotArch } from "@spreadsheet/../tests/helpers/data";
 import {
     getZoneOfInsertedDataSource,
     insertPivotInSpreadsheet,
 } from "@spreadsheet/../tests/helpers/pivot";
 import * as dsHelpers from "@web/../tests/core/tree_editor/condition_tree_editor_test_helpers";
-import { contains, fields, onRpc } from "@web/../tests/web_test_helpers";
+import { contains, fields, makeServerError, onRpc } from "@web/../tests/web_test_helpers";
 
 defineDocumentSpreadsheetModels();
 describe.current.tags("desktop");
@@ -39,7 +38,6 @@ test("Open pivot properties", async function () {
                                 <field name="bar" type="row"/>
                                 <field name="probability" type="measure"/>
                             </pivot>`,
-                "partner,false,search": `<search/>`,
             },
         },
     });
@@ -57,9 +55,9 @@ test("Pivot properties panel shows ascending sorting", async function () {
     env.openSidePanel("PivotSidePanel", { pivotId });
     await animationFrame();
 
-    const sections = target.querySelectorAll(".o_side_panel_section");
-    expect(sections.length).toBe(5, { message: "it should have 5 sections" });
-    const pivotSorting = sections[3];
+    const sections = target.querySelectorAll(".o_spreadsheet_pivot_side_panel div .o-section");
+    expect(sections.length).toBe(6, { message: "it should have 6 sections" });
+    const pivotSorting = sections[4];
 
     expect(pivotSorting.children[0]).toHaveText("Sorting");
     expect(pivotSorting.children[1]).toHaveText("Probability (ascending)");
@@ -75,12 +73,40 @@ test("Pivot properties panel shows descending sorting", async function () {
     env.openSidePanel("PivotSidePanel", { pivotId });
     await animationFrame();
 
-    const sections = target.querySelectorAll(".o_side_panel_section");
-    expect(sections.length).toBe(5, { message: "it should have 5 sections" });
-    const pivotSorting = sections[3];
+    const sections = target.querySelectorAll(".o_spreadsheet_pivot_side_panel div .o-section");
+    expect(sections.length).toBe(6, { message: "it should have 6 sections" });
+    const pivotSorting = sections[4];
 
     expect(pivotSorting.children[0]).toHaveText("Sorting");
     expect(pivotSorting.children[1]).toHaveText("Probability (descending)");
+});
+
+test("Removing the measure removes the sortedColumn", async function () {
+    const { env, pivotId, model } = await createSpreadsheetFromPivotView({
+        actions: async () => {
+            await contains("thead .o_pivot_measure_row").click();
+        },
+    });
+    env.openSidePanel("PivotSidePanel", { pivotId });
+    await animationFrame();
+    expect(model.getters.getPivot(pivotId).definition.sortedColumn).not.toBe(undefined);
+
+    await contains(".pivot-measure .fa-trash").click();
+    expect(model.getters.getPivot(pivotId).definition.sortedColumn).toBe(undefined);
+});
+
+test("Removing a column removes the sortedColumn", async function () {
+    const { env, pivotId, model } = await createSpreadsheetFromPivotView({
+        actions: async () => {
+            await contains("thead .o_pivot_measure_row").click();
+        },
+    });
+    env.openSidePanel("PivotSidePanel", { pivotId });
+    await animationFrame();
+
+    expect(model.getters.getPivot(pivotId).definition.sortedColumn).not.toBe(undefined);
+    await contains(".pivot-dimension .fa-trash").click();
+    expect(model.getters.getPivot(pivotId).definition.sortedColumn).toBe(undefined);
 });
 
 test("Open pivot properties properties with non-loaded field", async function () {
@@ -101,7 +127,9 @@ test("Update the pivot title from the side panel", async function () {
     const { model, env, pivotId } = await createSpreadsheetFromPivotView();
     env.openSidePanel("PivotSidePanel", { pivotId });
     await animationFrame();
-    await contains(".os-input").edit("new name");
+    const target = await contains(".os-input");
+    await target.click();
+    await target.edit("new name");
     expect(model.getters.getPivotName(pivotId)).toBe("new name");
 });
 
@@ -138,11 +166,11 @@ test("Opening the sidepanel of a pivot while the panel of another pivot is open 
     });
     env.openSidePanel("PivotSidePanel", { pivotId });
     await animationFrame();
-    expect(".o_side_panel_section .o_model_name").toHaveText("Partner (partner)");
+    expect(".o-section .o_model_name").toHaveText("Partner (partner)");
 
     env.openSidePanel("PivotSidePanel", { pivotId: pivotId2 });
     await animationFrame();
-    expect(".o_side_panel_section .o_model_name").toHaveText("Product (product)");
+    expect(".o-section .o_model_name").toHaveText("Product (product)");
 });
 
 test("Duplicate the pivot from the side panel", async function () {
@@ -177,6 +205,28 @@ test("A warning is displayed in the side panel if the pivot is unused", async fu
     model.dispatch("REQUEST_UNDO");
     await animationFrame();
     expect(".o-validation-warning").toHaveCount(0);
+});
+
+test("An error is displayed in the side panel if the pivot has invalid model", async function () {
+    const { model, env, pivotId } = await createSpreadsheetFromPivotView({
+        mockRPC: async function (route, { model, method, kwargs }) {
+            if (model === "unknown" && method === "fields_get") {
+                throw makeServerError({ code: 404 });
+            }
+        },
+    });
+    const pivot = model.getters.getPivotCoreDefinition(pivotId);
+    env.model.dispatch("UPDATE_PIVOT", {
+        pivotId,
+        pivot: {
+            ...pivot,
+            model: "unknown",
+        },
+    });
+    env.openSidePanel("PivotSidePanel", { pivotId });
+    await animationFrame();
+
+    expect(".o-validation-error").toHaveCount(1);
 });
 
 test("Deleting the pivot open the side panel with all pivots", async function () {
@@ -222,7 +272,6 @@ test("can drag a column dimension to row", async function () {
                                 <field name="bar" type="row"/>
                                 <field name="probability" type="measure"/>
                             </pivot>`,
-                "partner,false,search": `<search/>`,
             },
         },
     });
@@ -270,7 +319,6 @@ test("updates are applied immediately after defer update checkbox has been unche
                                 <field name="bar" type="row"/>
                                 <field name="probability" type="measure"/>
                             </pivot>`,
-                "partner,false,search": `<search/>`,
             },
         },
     });
@@ -300,7 +348,6 @@ test("remove pivot dimension", async function () {
                                 <field name="bar" type="row"/>
                                 <field name="probability" type="measure"/>
                             </pivot>`,
-                "partner,false,search": `<search/>`,
             },
         },
     });
@@ -326,7 +373,6 @@ test("remove pivot date time dimension", async function () {
                                 <field name="date" type="row" interval="month"/>
                                 <field name="probability" type="measure"/>
                             </pivot>`,
-                "partner,false,search": `<search/>`,
             },
         },
     });
@@ -349,15 +395,13 @@ test("add column dimension", async function () {
                             <pivot>
                                 <field name="probability" type="measure"/>
                             </pivot>`,
-                "partner,false,search": `<search/>`,
             },
         },
     });
-    const fixture = getFixture();
     env.openSidePanel("PivotSidePanel", { pivotId });
     await animationFrame();
     await contains(".add-dimension.o-button").click();
-    await contains(fixture.querySelectorAll(".o-popover .o-autocomplete-value")[0]).click();
+    await contains(".o-popover .o-autocomplete-value").click();
     await contains(".pivot-defer-update .o-checkbox").click();
     const definition = JSON.parse(JSON.stringify(model.getters.getPivotCoreDefinition(pivotId)));
     expect(definition.columns).toEqual([{ fieldName: "bar", order: "asc" }]);
@@ -373,15 +417,13 @@ test("add row dimension", async function () {
                             <pivot>
                                 <field name="probability" type="measure"/>
                             </pivot>`,
-                "partner,false,search": `<search/>`,
             },
         },
     });
-    const fixture = getFixture();
     env.openSidePanel("PivotSidePanel", { pivotId });
     await animationFrame();
-    await contains(fixture.querySelectorAll(".add-dimension.o-button")[1]).click();
-    await contains(fixture.querySelectorAll(".o-popover .o-autocomplete-value")[0]).click();
+    await contains(".add-dimension.o-button:eq(1)").click();
+    await contains(".o-popover .o-autocomplete-value").click();
     await contains(".pivot-defer-update .o-checkbox").click();
     const definition = JSON.parse(JSON.stringify(model.getters.getPivotCoreDefinition(pivotId)));
     expect(definition.columns).toEqual([]);
@@ -397,28 +439,36 @@ test("select dimensions with arrow keys", async function () {
                             <pivot>
                                 <field name="probability" type="measure"/>
                             </pivot>`,
-                "partner,false,search": `<search/>`,
             },
         },
     });
-    const fixture = getFixture();
     env.openSidePanel("PivotSidePanel", { pivotId });
     await animationFrame();
     await contains(".add-dimension.o-button").click();
-    let options = [...fixture.querySelectorAll(".o-popover .o-autocomplete-dropdown > div")];
-    expect(options.every((el) => !el.className.includes("o-autocomplete-value-focus"))).toBe(true);
+    expect(".o-popover .o-autocomplete-dropdown > div").not.toHaveClass(
+        "o-autocomplete-value-focus"
+    );
     await contains(".o-popover input").press("ArrowDown");
-    options = [...fixture.querySelectorAll(".o-popover .o-autocomplete-dropdown > div")];
-    expect(options[0].className.includes("o-autocomplete-value-focus")).toBe(true);
-    expect(options[1].className.includes("o-autocomplete-value-focus")).toBe(false);
+    expect(".o-popover .o-autocomplete-dropdown > div:eq(0)").toHaveClass(
+        "o-autocomplete-value-focus"
+    );
+    expect(".o-popover .o-autocomplete-dropdown > div:eq(1)").not.toHaveClass(
+        "o-autocomplete-value-focus"
+    );
     await contains(".o-popover input").press("ArrowDown");
-    options = [...fixture.querySelectorAll(".o-popover .o-autocomplete-dropdown > div")];
-    expect(options[0].className.includes("o-autocomplete-value-focus")).toBe(false);
-    expect(options[1].className.includes("o-autocomplete-value-focus")).toBe(true);
+    expect(".o-popover .o-autocomplete-dropdown > div:eq(0)").not.toHaveClass(
+        "o-autocomplete-value-focus"
+    );
+    expect(".o-popover .o-autocomplete-dropdown > div:eq(1)").toHaveClass(
+        "o-autocomplete-value-focus"
+    );
     await contains(".o-popover input").press("ArrowUp");
-    options = [...fixture.querySelectorAll(".o-popover .o-autocomplete-dropdown > div")];
-    expect(options[0].className.includes("o-autocomplete-value-focus")).toBe(true);
-    expect(options[1].className.includes("o-autocomplete-value-focus")).toBe(false);
+    expect(".o-popover .o-autocomplete-dropdown > div:eq(0)").toHaveClass(
+        "o-autocomplete-value-focus"
+    );
+    expect(".o-popover .o-autocomplete-dropdown > div:eq(1)").not.toHaveClass(
+        "o-autocomplete-value-focus"
+    );
     await contains(".o-popover input").press("Enter");
     await contains(".pivot-defer-update .o-checkbox").click();
     const definition = JSON.parse(JSON.stringify(model.getters.getPivotCoreDefinition(pivotId)));
@@ -456,7 +506,6 @@ test("clicking the add button toggles the fields popover", async function () {
                             <pivot>
                                 <field name="probability" type="measure"/>
                             </pivot>`,
-                "partner,false,search": `<search/>`,
             },
         },
     });
@@ -496,7 +545,6 @@ test("add and search dimension", async function () {
                             <pivot>
                                 <field name="probability" type="measure"/>
                             </pivot>`,
-                "partner,false,search": `<search/>`,
             },
         },
     });
@@ -526,7 +574,6 @@ test("remove pivot measure", async function () {
                                 <field name="bar" type="row"/>
                                 <field name="probability" type="measure"/>
                             </pivot>`,
-                "partner,false,search": `<search/>`,
             },
         },
     });
@@ -553,7 +600,6 @@ test("add measure", async function () {
                                 <field name="bar" type="row"/>
                                 <field name="probability" type="measure"/>
                             </pivot>`,
-                "partner,false,search": `<search/>`,
             },
         },
     });
@@ -581,7 +627,6 @@ test("change measure aggregator", async function () {
                             <pivot>
                                 <field name="probability" type="measure"/>
                             </pivot>`,
-                "partner,false,search": `<search/>`,
             },
         },
     });
@@ -630,7 +675,6 @@ test("pivot with a reference field measure", async function () {
                             <pivot>
                                 <field name="currency_reference" type="measure"/>
                             </pivot>`,
-                "partner,false,search": `<search/>`,
             },
         },
     });
@@ -650,7 +694,6 @@ test("change dimension order", async function () {
                                 <field name="foo" type="row"/>
                                 <field name="probability" type="measure"/>
                             </pivot>`,
-                "partner,false,search": `<search/>`,
             },
         },
     });
@@ -682,7 +725,6 @@ test("change date dimension granularity", async function () {
                                 <field name="date" interval="day" type="row"/>
                                 <field name="probability" type="measure"/>
                             </pivot>`,
-                "partner,false,search": `<search/>`,
             },
         },
     });
@@ -709,7 +751,6 @@ test("pivot with twice the same date field with different granularity", async fu
                                     <field name="date" interval="day" type="row"/>
                                     <field name="probability" type="measure"/>
                                 </pivot>`,
-                "partner,false,search": `<search/>`,
             },
         },
     });

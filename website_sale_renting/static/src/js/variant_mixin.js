@@ -44,10 +44,11 @@ VariantMixin._onChangeCombination = function (ev, $parent, combination) {
     const $rentingDetails = $parent.find(".o_renting_details");
     const $duration = $rentingDetails.find(".o_renting_duration");
     const $unit = $rentingDetails.find(".o_renting_unit");
-    $unitListPrice.text(this._priceToStr(combination.list_price));
-    $unitPrice.text(this._priceToStr(combination.price));
-    $price.text(this._priceToStr(combination.current_rental_price_per_unit));
-    $totalPrice.text(this._priceToStr(combination.current_rental_price));
+    const precision = combination.currency_precision;
+    $unitListPrice.text(this._priceToStr(combination.list_price, precision));
+    $unitPrice.text(this._priceToStr(combination.price, precision));
+    $price.text(this._priceToStr(combination.current_rental_price_per_unit, precision));
+    $totalPrice.text(this._priceToStr(combination.current_rental_price, precision));
     $duration.text(combination.current_rental_duration);
     $unit.text(combination.current_rental_unit);
 

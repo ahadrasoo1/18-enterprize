@@ -12,6 +12,7 @@ hrContractSalary.include({
         "change input[name='fold_company_car_total_depreciated_cost']": "onchangeCompanyCar",
         "change input[name='fold_private_car_reimbursed_amount']": "onchangePrivateCar",
         "change input[name='fold_l10n_be_bicyle_cost']": "onchangePrivateBike",
+        "change input[name='l10n_be_bicyle_cost_manual']": "onchangePrivateBike",
         "change input[name='l10n_be_has_ambulatory_insurance_radio']": "onchangeAmbulatory",
         "change input[name='l10n_be_ambulatory_insured_children_manual']": "onchangeAmbulatory",
         "change input[name='l10n_be_ambulatory_insured_adults_manual']": "onchangeAmbulatory",
@@ -19,6 +20,22 @@ hrContractSalary.include({
         "change input[name='children']": "onchangeChildren",
         "change input[name='fold_wishlist_car_total_depreciated_cost']": "onchangeWishlistCar",
     }),
+
+    setUpBenefits() {
+        this._super.apply(this, arguments);
+        const fuelCardSlider = $("input[name='fuel_card_slider']");
+        if (fuelCardSlider.length > 0) {
+            const mandatoryBenefits = fuelCardSlider.data('benefit_ids-mandatory');
+            if (mandatoryBenefits) {
+                const anyMandatorySelected = mandatoryBenefits.trim().split(' ').some(adv => this.checkInputSelected(adv));
+
+                if (!anyMandatorySelected) {
+                    fuelCardSlider.attr("disabled", "disabled");
+                    fuelCardSlider.parent().addClass('o_disabled');
+                }
+            }
+        }
+    },
 
     getBenefits() {
         var res = this._super.apply(this, arguments);
@@ -97,21 +114,27 @@ hrContractSalary.include({
         }
     },
 
-    onchangePrivateBike: function(event) {
-        if (event.target.checked) {
-            // Set the fuel card slider value to 0 and disable it
+    onchangePrivateBike: function() {
+        const privateBikeCheckboxEl = this.el.querySelector("input[name='fold_l10n_be_bicyle_cost']");
+        const privateBikeInputEl = this.el.querySelector("input[name='l10n_be_bicyle_cost_manual']");
+        
+        const isCheckboxChecked = privateBikeCheckboxEl?.checked || false;
+        const privateBikeValue = parseFloat(privateBikeInputEl?.value || "0.0");
+        
+        if (isCheckboxChecked && privateBikeValue > 0) {
+            // Set the fuel card values to 0 and disable it
             const fuelCardSliderEl = this.el.querySelector("input[name='fuel_card_slider']");
             const fuelCardEl = this.el.querySelector("input[name='fuel_card']");
             if (fuelCardSliderEl) {
-                fuelCardEl.value = 0;
-                fuelCardEl.disabled = true;
+                fuelCardSliderEl.value = 0;
             }
             if (fuelCardEl) {
                 fuelCardEl.value = 0;
             }
+            this.el.querySelector("label[for='fuel_card']")?.parentElement.classList.add("o_disabled");
         } else {
-            // Enable the fuel card slider when "Private Bike" is unchecked
-            this.el.querySelector("input[name='fuel_card_slider']")?.removeAttribute("disabled");
+            // Enable the fuel card element when checkbox is unchecked or value is 0
+            this.el.querySelector("label[for='fuel_card']")?.parentElement.classList.remove("o_disabled");
         }
     },
 

@@ -16,7 +16,7 @@
             </div>
             <!-- Buttons -->
             <div class="d-flex gap-1 flex-md-nowrap mx-auto justify-content-end">
-                <a role="button" t-on-click="() => this.env.createArticle('private')" class="btn btn-primary btn-create text-nowrap" data-hotkey="n">New</a>
+                <a t-if="canCreateArticle" role="button" t-on-click="() => this.env.createArticle('private')" class="btn btn-primary btn-create text-nowrap" data-hotkey="n">New</a>
                 <div class="o-dropdown dropdown" t-if="props.record.resId and props.record.data.active">
                     <a t-ref="sharePanel_button" role="button" class="btn btn-light btn-share dropdown-toggle o-no-caret" id="dropdown_share_panel" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-hotkey="shift+s">
                         <i class="fa fa-fw fs-6 fa-share-alt me-1 o_knowledge_share_panel_icon"/>
@@ -86,7 +86,7 @@
                                     </button>
                                 </t>
                                 <div class="dropdown-item user-select-none d-inline-flex align-items-start" t-if="props.record.data.user_can_write and props.record.data.active"
-                                    t-on-click.stop="() => this.props.record.update({full_width: !props.record.data.full_width})">
+                                    t-on-click.stop="() => this.toggleFullWidth()">
                                     <div class="pe-3">
                                         <i class="me-2 oi oi-fw oi-large oi-arrows-h"/> Full Width
                                     </div>
@@ -117,7 +117,7 @@
                                     t-if="!props.record.data.to_delete and !props.record.data.active">
                                 <i class="me-2 fa fa-fw fa-lg fa-archive"/> Unarchive
                             </button>
-                            <button class="dropdown-item" t-on-click="this.cloneArticle">
+                            <button t-if="canCreateArticle" class="dropdown-item" t-on-click="this.cloneArticle">
                                 <i class="me-2 fa fa-fw fa-lg fa-copy"/> Create a Copy
                             </button>
                             <button class="dropdown-item"

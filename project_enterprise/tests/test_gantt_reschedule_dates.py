@@ -9,7 +9,7 @@ from odoo.tests.common import users, tagged, freeze_time
 from .gantt_reschedule_dates_common import ProjectEnterpriseGanttRescheduleCommon, fake_now
 
 
-@tagged('gantt_reschedule')
+@tagged('gantt_reschedule', 'post_install', '-at_install')
 @freeze_time(fake_now)
 class TestGanttRescheduleOnTasks(ProjectEnterpriseGanttRescheduleCommon):
 
@@ -1115,22 +1115,35 @@ class TestGanttRescheduleOnTasks(ProjectEnterpriseGanttRescheduleCommon):
             """
         )
 
+        # the project will automatically be timesheetable since the default value is true and so the allocated_hours will
+        # not be recomputed when the project is timesheetable since we assume the user will manually set the allocated
+        # hours on his tasks to correctly timesheets.
+        allocated_hours = 4
+        day = 21
+        start_project2_task4 = 21
+        hour_task4 = 8
+        if self.is_module_timesheet_grid_installed:
+            day = 19
+            allocated_hours = 20
+            start_project2_task4 = 15
+            hour_task4 = 13
+
         # assert 4, 6 planned before 0, 6 should be planned before 16
         self.assert_new_dates(
             self.project2_task_6,
-            datetime(year=2024, month=2, day=19, hour=13),
+            datetime(year=2024, month=2, day=day, hour=13),
             datetime(year=2024, month=2, day=21, hour=17),
-            """
-                task 6 duration = allocated_hours = 20 Hours
+            f"""
+                task 6 duration = allocated_hours = {allocated_hours} Hours
                 even than task 0 starts on 01/03, we need to plan task 6 before task 16 (starts on 22/02 8H)
             """
         )
         self.assert_new_dates(
             self.project2_task_4,
-            datetime(year=2024, month=2, day=15, hour=13),
-            datetime(year=2024, month=2, day=19, hour=12),
-            """
-                task 4 duration = allocated_hours = 16 Hours
+            datetime(year=2024, month=2, day=start_project2_task4, hour=hour_task4),
+            datetime(year=2024, month=2, day=day, hour=12),
+            f"""
+                task 4 duration = allocated_hours = {allocated_hours} Hours
                 4 Hours on 19/02
                 8 Hours on 16/02
                 4 Hours on 15/02

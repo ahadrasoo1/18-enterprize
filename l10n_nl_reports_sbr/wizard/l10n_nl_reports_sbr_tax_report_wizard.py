@@ -9,6 +9,8 @@ import re
 import requests
 import uuid
 import xmlsec
+from cryptography import x509
+from cryptography.exceptions import UnsupportedAlgorithm
 from cryptography.hazmat.primitives.serialization import Encoding
 from tempfile import NamedTemporaryFile
 from odoo.tools import zeep
@@ -19,12 +21,16 @@ from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from markupsafe import Markup
 from OpenSSL import crypto
+from contextlib import suppress
 from urllib3.util.ssl_ import create_urllib3_context
 from urllib3.contrib.pyopenssl import inject_into_urllib3
 from urllib3.connectionpool import HTTPSConnectionPool
 from requests.exceptions import SSLError
+from stdnum.nl.btw import compact
 
 server_leaf_cert = None
+server_intermediate_certs = []
+
 
 def _create_soap_client(wsdl_address, root_cert_file, client_cert, client_pkey):
     # The Zeep module uses a Client which will handle the creation and signature of the SOAP message sent to the government system.
@@ -36,6 +42,26 @@ def _create_soap_client(wsdl_address, root_cert_file, client_cert, client_pkey):
         signature = BinarySignatureTimestamp(client_pkey, client_cert)
         plugins = [WsaSBR()]
         return Client(wsdl_address, wsse=signature, session=session, plugins=plugins)
+    except SSLError as e:
+        # The certificate was not accepted by the government server
+        raise UserError(_("An error occured while using your certificate. Please verify the certificate you uploaded and try again.")) from e
+
+
+def _create_soap_client_logius(wsdl_address, root_cert_file, client_cert, client_pkey, trusted_roots_pem, service_address):
+    # The Zeep module uses a Client which will handle the creation and signature of the SOAP message sent to the government system.
+    try:
+        session = requests.Session()
+        session.mount('https://', MemoryCertificateAndKeyHTTPAdapter())
+        session.cert = (client_cert, client_pkey)
+        session.verify = root_cert_file.name
+        signature = BinarySignatureTimestamp(client_pkey, client_cert, trusted_roots=trusted_roots_pem)
+        plugins = [WsaSBR()]
+        client = Client(wsdl_address, wsse=signature, session=session, plugins=plugins)
+        service_proxy = client.service
+        service = next(iter(client._Client__obj.wsdl.services.values()))
+        port = next(iter(service.ports.values()))
+        service_proxy = client.create_service(port.binding.name, service_address)
+        return client, service_proxy
     except SSLError as e:
         # The certificate was not accepted by the government server
         raise UserError(_("An error occured while using your certificate. Please verify the certificate you uploaded and try again.")) from e
@@ -113,8 +139,13 @@ class PatchedHTTPSConnectionPool(HTTPSConnectionPool):
             **httplib_request_kw
         )
         # pylint: disable=global-statement
-        global server_leaf_cert
+        global server_leaf_cert, server_intermediate_certs  # noqa: PLW0603
         server_leaf_cert = conn.sock.connection.get_peer_certificate().to_cryptography().public_bytes(Encoding.PEM)
+        peer_chain = conn.sock.connection.get_peer_cert_chain() or []
+        server_intermediate_certs = [
+            c.to_cryptography().public_bytes(Encoding.PEM)
+            for c in peer_chain[1:]
+        ]
         return httplib_response
 
 class MemoryCertificateAndKeyHTTPAdapter(requests.adapters.HTTPAdapter):
@@ -161,6 +192,7 @@ class BinarySignatureTimestamp(wsse.BinarySignature):
         key_file,
         certfile,
         password=None,
+        trusted_roots=None,
     ):
         # The init method from BinarySignature wants filepath, not stored-in-memory values.
         # The alternative to keep using in-memory certificate and key is with MemorySignature.
@@ -172,6 +204,22 @@ class BinarySignatureTimestamp(wsse.BinarySignature):
             certfile,
             password,
         )
+        # Parse the PEM bundle into trusted root anchors and untrusted intermediates.
+        # Only self-signed certificates (subject == issuer) are genuine root CAs and should be
+        # added to the X509Store as trust anchors. Non-self-signed certificates from the bundle
+        # are intermediates: they help build the chain but must not be unconditionally trusted,
+        # otherwise a compromised intermediate would bypass root CA validation.
+        self._trusted_roots = []         # self-signed root CAs → store.add_cert()
+        self._bundle_intermediates = []  # non-self-signed CAs  → untrusted chain helpers
+        if trusted_roots:
+            pem_data = trusted_roots if isinstance(trusted_roots, bytes) else trusted_roots.encode()
+            for match in re.finditer(rb'-----BEGIN CERTIFICATE-----.*?-----END CERTIFICATE-----', pem_data, re.DOTALL):
+                with suppress(crypto.Error):
+                    cert = crypto.load_certificate(crypto.FILETYPE_PEM, match.group(0))
+                    if cert.get_subject().der() == cert.get_issuer().der():
+                        self._trusted_roots.append(cert)
+                    else:
+                        self._bundle_intermediates.append(cert)
 
     def apply(self, envelope, headers):
         # OVERRIDE
@@ -194,7 +242,7 @@ class BinarySignatureTimestamp(wsse.BinarySignature):
 
     def verify(self, envelope):
         # Verify the server message signature with the server certificate that we grabbed during the first handshake.
-        key = wsse.signature._make_verify_key(server_leaf_cert)
+        wsse.signature._make_verify_key(server_leaf_cert)
         soap_env = wsse.signature.detect_soap_env(envelope)
 
         header = envelope.find(etree.QName(soap_env, 'Header'))
@@ -209,6 +257,17 @@ class BinarySignatureTimestamp(wsse.BinarySignature):
 
         ctx = xmlsec.SignatureContext()
 
+        binary_token = security.find(etree.QName(zeep.ns.WSSE, 'BinarySecurityToken'))
+        try:
+            der_cert = base64.b64decode(binary_token.text)
+            cert_pem = x509.load_der_x509_certificate(der_cert).public_bytes(Encoding.PEM)
+        except (ValueError, TypeError):
+            raise wsse.signature.SignatureVerificationFailed()
+
+        # Verify that the signing cert (from the SOAP message) chains to our trusted root.
+        if not self._is_trusted_signing_cert(cert_pem):
+            raise wsse.signature.SignatureVerificationFailed(_("The signing certificate is not trusted."))
+
         # Find each signed element and register its ID with the signing context.
         refs = signature.iterfind('ds:SignedInfo/ds:Reference', namespaces={'ds': zeep.ns.DS})
         for ref in refs:
@@ -216,14 +275,61 @@ class BinarySignatureTimestamp(wsse.BinarySignature):
             referenced_id = ref.get('URI')[1:]
             referenced = envelope.find(".//*[@wsu:Id='%s']" % referenced_id, namespaces={'wsu': zeep.ns.WSU})
             ctx.register_id(referenced, 'Id', zeep.ns.WSU)
-
-        ctx.key = key
+        ctx.key = wsse.signature._make_verify_key(cert_pem)
 
         try:
             ctx.verify(signature)
         except xmlsec.Error:
             raise wsse.signature.SignatureVerificationFailed()
         return envelope
+
+    def _is_trusted_signing_cert(self, cert_pem):
+        """Return True if cert_pem chains to a trusted Digipoort root and is valid for signing.
+
+        Note: revocation checking (CRL/OCSP) is not performed. OpenSSL's X509StoreContext does not
+        fetch CRL distribution points or query OCSP unless explicitly configured with CRL data.
+        For high-assurance environments, supply a pre-fetched CRL to store.add_crl() and set
+        X509StoreFlags.CRL_CHECK | CRL_CHECK_ALL, or accept this as a documented residual risk.
+        """
+        if not self._trusted_roots:
+            return False
+        try:
+            store = crypto.X509Store()
+            for root_cert in self._trusted_roots:
+                store.add_cert(root_cert)
+            candidate = crypto.load_certificate(crypto.FILETYPE_PEM, cert_pem)
+            # Untrusted chain helpers: intermediates from the configured bundle + intermediates
+            # captured from the TLS handshake. Neither set is trusted unconditionally; they are
+            # only used to build the certificate path up to a trusted root anchor.
+            intermediates = list(self._bundle_intermediates)
+            for ic_pem in (server_intermediate_certs or []):
+                with suppress(crypto.Error):
+                    intermediates.append(crypto.load_certificate(crypto.FILETYPE_PEM, ic_pem))
+            crypto.X509StoreContext(store, candidate, intermediates).verify_certificate()
+        except (crypto.X509StoreContextError, crypto.Error):
+            return False
+        return self._cert_has_signing_purpose(cert_pem)
+
+    def _cert_has_signing_purpose(self, cert_pem):
+        """Return True if the cert does not explicitly forbid digital signatures.
+
+        Some government signing certificates use EKU profiles that do not match generic
+        server/client expectations. Enforce only the cryptographically relevant Key Usage
+        constraint when it is present and treat EKU as informational.
+        """
+        try:
+            cert = x509.load_pem_x509_certificate(cert_pem)
+            try:
+                ku = cert.extensions.get_extension_for_class(x509.KeyUsage).value
+                # Accept digital_signature or content_commitment (non-repudiation) as signing-capable.
+                signing_ku = ku.digital_signature or ku.content_commitment
+                if not signing_ku:
+                    return False
+            except x509.ExtensionNotFound:
+                pass  # No Key Usage extension; do not reject — some PKIoverheid certs omit it.
+            return True
+        except (ValueError, TypeError, UnsupportedAlgorithm):
+            return False
 
 class WsaSBR(wsa.WsAddressingPlugin):
     def egress(self, envelope, http_headers, operation, binding_options):
@@ -258,8 +364,17 @@ class L10nNlTaxReportSBRWizard(models.TransientModel):
     contact_type = fields.Selection([('BPL', 'Taxpayer (BPL)'), ('INT', 'Intermediary (INT)')], string="Contact Type", default='BPL', required=True,
         help="BPL: if the taxpayer files a turnover tax return as an individual entrepreneur."
         "INT: if the turnover tax return is made by an intermediary.")
+    tax_consultant_order = fields.Selection([
+            ('NBA', 'NBA - Accountants'),
+            ('RB', 'RB - Register of Tax Advisors'),
+            ('NOB', 'NOB - Dutch Order of Tax Advisors'),
+            ('NOAB', 'NOAB - Dutch Order of Administrative and Tax Experts'),
+        ], default='NBA', required=True, string="Tax Consultant Order",
+        compute="_compute_tax_consultant_order", readonly=False,
+        help="The order of tax consultants the tax consultant belongs to."
+    )
     tax_consultant_number = fields.Char(string="Tax Consultant Number", help="The tax consultant number of the office aware of the content of this report.")
-    is_test = fields.Boolean(string="Is Test", help="Check this if you want the system to use the pre-production environment with test certificates.")
+    is_test = fields.Boolean(string="Is Test", help="Check this if you want the system to use the pre-production environment. A valid PKIoverheid certificate is required for both pre-production and production environments.")
 
     @api.depends('date_to', 'date_from', 'is_test')
     def _compute_sending_conditions(self):
@@ -273,23 +388,30 @@ class L10nNlTaxReportSBRWizard(models.TransientModel):
                 )
             )
 
+    def _compute_tax_consultant_order(self):
+        self.tax_consultant_order = self.tax_consultant_order or 'NBA'
+
     def _check_values(self):
         if self.env.company.account_representative_id:
             if not self.env.company.account_representative_id.vat:
                 raise RedirectWarning(
                     _('Your Accounting Firm does not have a VAT set. Please set it up before trying to send the report.'),
-                    self.env.ref('base.action_res_company_form'),
+                    self.env.ref('base.action_res_company_form').id,
                     _('Company settings')
                 )
         elif not self.env.company.vat:
             raise RedirectWarning(
                 _('Your company does not have a VAT set. Please set it up before trying to send the report.'),
-                self.env.ref('base.action_res_company_form'),
+                self.env.ref('base.action_res_company_form').id,
                 _('Company settings')
             )
 
-    def _get_sbr_identifier(self):
-        return self.env.company.vat[2:] if self.env.company.vat.startswith('NL') else self.env.company.vat
+    def _get_sbr_identifier(self, options=None):
+        vat = self.env.company.vat[2:] if self.env.company.vat.startswith('NL') else self.env.company.vat
+        if options and options.get('report_id'):
+            report = self.env['account.report'].browse(options['report_id'])
+            vat = report.get_vat_for_export(options, raise_warning=False)
+        return compact(vat) if vat else ''
 
     def _additional_processing(self, options, kenmerk, closing_move):
         # TO BE OVERRIDEN by additional service(s)
@@ -334,25 +456,40 @@ class L10nNlTaxReportSBRWizard(models.TransientModel):
         report_file = xbrl_data['file_content']
 
         serv_root_cert = self.env.company._l10n_nl_get_server_root_certificate_bytes()
+        if not self.env.company.sudo().l10n_nl_reports_sbr_cert_id.pem_certificate or not self.env.company.sudo().l10n_nl_reports_sbr_cert_id.private_key_id.pem_key:
+            raise RedirectWarning(
+                _("The certificate or the private key is missing. Please upload it in the Accounting Settings first."),
+                self.env.ref('account.action_account_config').id,
+                _("Go to the Accounting Settings"),
+            )
         certificate = base64.b64decode(self.env.company.sudo().l10n_nl_reports_sbr_cert_id.pem_certificate)
         private_key = base64.b64decode(self.env.company.sudo().l10n_nl_reports_sbr_cert_id.private_key_id.pem_key)
         try:
             with NamedTemporaryFile(delete=False) as f:
                 f.write(serv_root_cert)
-            wsdl = 'https://' + ('preprod-' if self.is_test else '') + 'dgp2.procesinfrastructuur.nl/wus/2.0/aanleverservice/1.2?wsdl'
-            delivery_client = _create_soap_client(wsdl, f, certificate, private_key)
-            factory = delivery_client.type_factory('ns0')
-            aanleverkenmerk = wsse.utils.get_unique_id()
+                f.flush()
+                wsdl = 'https://' + ('preprod-' if self.is_test else '') + 'dgp2.procesinfrastructuur.nl/wus/2.0/aanleverservice/1.2?wsdl'
+                service_address = 'https://' + ('wus.preproductie.digipoort.' if self.is_test else 'wus.digipoort.') + 'logius.nl/wus/2.0/aanleverservice/1.2'
+                delivery_client, delivery_service = _create_soap_client_logius(
+                    wsdl,
+                    f,
+                    certificate,
+                    private_key,
+                    serv_root_cert,
+                    service_address,
+                )
+                factory = delivery_client.type_factory('ns0')
+                aanleverkenmerk = wsse.utils.get_unique_id()
 
-            response = delivery_client.service.aanleveren(
-                berichtsoort='Omzetbelasting',
-                aanleverkenmerk=aanleverkenmerk,
-                identiteitBelanghebbende=factory.identiteitType(nummer=self._get_sbr_identifier(), type='BTW'),
-                rolBelanghebbende='Bedrijf',
-                berichtInhoud=factory.berichtInhoudType(mimeType='application/xml', bestandsnaam='TaxReport.xbrl', inhoud=report_file),
-                autorisatieAdres='http://geenausp.nl',
-            )
-            kenmerk = response.kenmerk
+                response = delivery_service.aanleveren(
+                    berichtsoort='Omzetbelasting',
+                    aanleverkenmerk=aanleverkenmerk,
+                    identiteitBelanghebbende=factory.identiteitType(nummer=self._get_sbr_identifier(options), type='BTW'),
+                    rolBelanghebbende='Bedrijf',
+                    berichtInhoud=factory.berichtInhoudType(mimeType='application/xml', bestandsnaam='TaxReport.xbrl', inhoud=report_file),
+                    autorisatieAdres='http://geenausp.nl',
+                )
+                kenmerk = response.kenmerk
         except Fault as fault:
             detail_fault = fault.detail.getchildren()[0]
             raise RedirectWarning(
@@ -397,9 +534,14 @@ class L10nNlTaxReportSBRWizard(models.TransientModel):
     def _generate_general_codes_values(self, options):
         self._check_values()
         report = self.env['account.report'].browse(options['report_id'])
+        sender_vat = report._get_sender_company_for_export(options).vat
+        vat_identification_division = compact(sender_vat) if sender_vat else ''
         vat = report.get_vat_for_export(options)
+        message_reference_supplier_vat = (self.env.company.account_representative_id.vat or vat)
+        if message_reference_supplier_vat.startswith('NL'):
+            message_reference_supplier_vat = compact(message_reference_supplier_vat)
         return {
-            'identifier': self._get_sbr_identifier() or (vat[2:] if vat.startswith('NL') else vat),
+            'identifier': self._get_sbr_identifier(options),
             'startDate': fields.Date.to_string(self.date_from),
             'endDate': fields.Date.to_string(self.date_to),
             'ContactInitials': self.contact_initials or '',
@@ -408,10 +550,12 @@ class L10nNlTaxReportSBRWizard(models.TransientModel):
             'ContactTelephoneNumber': re.sub(r"[^\+\d]", "", self.contact_phone or ''),
             'ContactType': self.contact_type,
             'DateTimeCreation': fields.Datetime.now().strftime("%Y%m%d%H%M"),
-            'MessageReferenceSupplierVAT': ((self.env.company.account_representative_id.vat or vat) + '-' + str(uuid.uuid4()))[:20],
+            'MessageReferenceSupplierVAT': (message_reference_supplier_vat + '-' + str(uuid.uuid4()))[:20],
             'ProfessionalAssociationForTaxServiceProvidersName': (self.env.company.account_representative_id.name or '')[:20],
+            'ProfessionalAssociationForTaxServiceProvidersOrder': self.tax_consultant_order,
             'SoftwarePackageName': 'Odoo',
             'SoftwarePackageVersion': '.'.join(self.sudo().env.ref('base.module_base').latest_version.split('.')[0:3]),
             'SoftwareVendorAccountNumber': 'swo02770',
             'TaxConsultantNumber': self.tax_consultant_number,
+            'VATIdentificationNumberNLFiscalEntityDivision': vat_identification_division,
         }

@@ -52,7 +52,7 @@ class HrContract(models.Model):
     @api.depends('wage_with_holidays')
     def _compute_double_holiday_wage(self):
         for contract in self:
-            contract.double_holiday_wage = contract.wage_with_holidays * 0.92
+            contract.double_holiday_wage = contract._get_wage_to_apply() * 0.92
 
     @api.model
     def _benefit_white_list(self):
@@ -116,8 +116,12 @@ class HrContract(models.Model):
         }
 
     def _get_benefit_values_wishlist_car_total_depreciated_cost(self, contract, benefits):
-        if benefits.get('fold_wishlist_car_total_depreciated_cost', False):
-            model_id = benefits['select_wishlist_car_total_depreciated_cost'].split('-')[1]
+        selected_car = (
+            benefits.get('fold_wishlist_car_total_depreciated_cost')
+            and benefits.get('select_wishlist_car_total_depreciated_cost')
+        )
+        if selected_car:
+            model_id = selected_car.split('-')[1]
             return {
                 'new_car': True,
                 'new_car_model_id': int(model_id)

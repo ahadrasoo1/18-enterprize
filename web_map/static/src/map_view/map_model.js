@@ -126,8 +126,8 @@ export class MapModel extends Model {
                 const record = this.data.records.find((r) => r.id === resequencedRecord.id);
                 record[fieldName] = resequencedRecord[fieldName];
             }
-            this.notify();
             await this._updatePartnerCoordinate(this.metaData, this.data);
+            this.notify();
         }
     }
 
@@ -266,7 +266,7 @@ export class MapModel extends Model {
         };
         for (const fieldName of fieldNames) {
             specification[fieldName] = {};
-            if (metaData.resPartnerField === "id") {
+            if (fieldName === "id" && metaData.resPartnerField === "id") {
                 Object.assign(specification, fieldsToAdd);
             } else if (
                 ["many2one", "one2many", "many2many"].includes(metaData.fields[fieldName].type)
@@ -348,7 +348,12 @@ export class MapModel extends Model {
      */
     _fetchRoute(metaData, data) {
         const coordinatesParam = data.records
-            .filter((record) => record.partner.partner_latitude && record.partner.partner_longitude)
+            .filter(
+                (record) =>
+                    record.partner &&
+                    record.partner.partner_latitude &&
+                    record.partner.partner_longitude
+            )
             .map(({ partner }) => `${partner.partner_longitude},${partner.partner_latitude}`);
         const address = encodeURIComponent(coordinatesParam.join(";"));
         const token = metaData.mapBoxToken;

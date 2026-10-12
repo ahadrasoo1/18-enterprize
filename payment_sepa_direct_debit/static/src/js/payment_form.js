@@ -48,9 +48,9 @@ paymentForm.include({
      * @param {string} flow - The payment flow of the selected payment option.
      * @return {void}
      */
-    _initiatePaymentFlow(providerCode, paymentOptionId, paymentMethodCode, flow) {
+    async _initiatePaymentFlow(providerCode, paymentOptionId, paymentMethodCode, flow) {
         if (providerCode !== 'sepa_direct_debit' || flow === 'token') {
-            this._super(...arguments); // Tokens are handled by the generic flow.
+            await this._super(...arguments); // Tokens are handled by the generic flow.
             return;
         }
 
@@ -61,7 +61,7 @@ paymentForm.include({
             return; // Let the browser request to fill out required fields
         }
 
-        this._super(...arguments);
+        await this._super(...arguments);
     },
 
     /**
@@ -91,10 +91,8 @@ paymentForm.include({
             window.location = '/payment/status';
         }).catch((error) => {
             if (error instanceof RPCError) {
-                this._displayErrorDialog(
-                    _t("Payment processing failed"),
-                    error.data.message,
-                );
+                this._displayErrorDialog(_t("Payment processing failed"), error.data.message);
+                this._enableButton();
             } else {
                 return Promise.reject(error);
             }

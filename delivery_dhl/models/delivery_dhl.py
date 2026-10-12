@@ -14,7 +14,7 @@ class Providerdhl(models.Model):
     _inherit = 'delivery.carrier'
 
     delivery_type = fields.Selection(selection_add=[
-        ('dhl', "DHL")
+        ('dhl', "DHL (Legacy)")
     ], ondelete={'dhl': lambda recs: recs.write({'delivery_type': 'fixed', 'fixed_price': 0})})
 
     dhl_SiteID = fields.Char(string="DHL SiteID", groups="base.group_system")
@@ -28,7 +28,7 @@ class Providerdhl(models.Model):
                                                 ('K', 'Kilograms')],
                                                default='K',
                                                string="Package Weight Unit")
-    dhl_default_package_type_id = fields.Many2one('stock.package.type', string='DHL Package Type')
+    dhl_default_package_type_id = fields.Many2one('stock.package.type', string='DHL Legacy Package Type')
     dhl_region_code = fields.Selection([('AP', 'Asia Pacific'),
                                         ('AM', 'America'),
                                         ('EU', 'Europe')],
@@ -255,7 +255,9 @@ class Providerdhl(models.Model):
             logmessage = Markup(_("Shipment created into DHL <br/> <b>Tracking Number: </b>%s")) % (traking_number)
             dhl_labels = [('%s-%s.%s' % (self._get_delivery_label_prefix(), traking_number, self.dhl_label_image_format), dhl_response.LabelImage[0].OutputImage)]
             dhl_cmi = [('%s-%s.%s' % (self._get_delivery_doc_prefix(), mlabel.DocName, mlabel.DocFormat), mlabel.DocImageVal) for mlabel in dhl_response.LabelImage[0].MultiLabels.MultiLabel] if dhl_response.LabelImage[0].MultiLabels else None
-            lognote_pickings = picking.sale_id.picking_ids if picking.sale_id else picking
+            lognote_pickings = picking
+            if picking.sale_id:
+                lognote_pickings |= picking.sale_id.picking_ids.filtered(lambda p: p.state not in ('done', 'cancel'))
             for pick in lognote_pickings:
                 pick.message_post(body=logmessage, attachments=dhl_labels)
                 if dhl_cmi:

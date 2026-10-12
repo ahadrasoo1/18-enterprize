@@ -1,28 +1,29 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* quality
+# * quality
 #
 # Translators:
 # Djordje Marjanovic <djvmarjanovic@gmail.com>, 2022
 # Uros Kalajdzic <ukalajdzic@gmail.com>, 2022
 # Martin Trigaux, 2022
-# Dragan Vukosavljevic <dragan.vukosavljevic@gmail.com>, 2023
-#
+# Dragan Vukosavljevic <dragan.vukosavljevic@gmail.com>, 2023, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-03 09:03+0000\n"
-"PO-Revision-Date: 2022-09-22 05:48+0000\n"
-"Last-Translator: Dragan Vukosavljevic <dragan.vukosavljevic@gmail.com>, "
-"2023\n"
-"Language-Team: Serbian (https://app.transifex.com/odoo/teams/41243/sr/)\n"
-"Language: sr\n"
+"POT-Creation-Date: 2026-05-22 17:54+0000\n"
+"PO-Revision-Date: 2026-04-29 19:45+0000\n"
+"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"Language-Team: Serbian (Latin script) <https://translate.odoo.com/projects/"
+"odoo-18/quality/sr_Latn/>\n"
+"Language: sr@latin\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
-"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"X-Generator: Weblate 5.17\n"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert_team__alert_count
@@ -43,6 +44,12 @@ msgid ""
 msgstr ""
 "Python rečnik koji će biti procenjen kako bi se pružila podrazumevana "
 "vrednost prilikom kreiranja novih zapisa za ovaj alias."
+
+#. module: quality
+#. odoo-python
+#: code:addons/quality/models/quality.py:0
+msgid "A quality team must have a company assigned."
+msgstr ""
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert__message_needaction
@@ -95,7 +102,7 @@ msgstr "Aktivnosti"
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_check__additional_note
 msgid "Additional Note"
-msgstr ""
+msgstr "Dodatna beleška"
 
 #. module: quality
 #: model:ir.model.fields,help:quality.field_quality_check__additional_note
@@ -129,9 +136,8 @@ msgstr "Bezbednost alias kontakta"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert_team__alias_domain_id
-#, fuzzy
 msgid "Alias Domain"
-msgstr "Domen aliasa"
+msgstr "Alias domen"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert_team__alias_domain
@@ -141,9 +147,8 @@ msgstr "Domen aliasa"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert_team__alias_full_name
-#, fuzzy
 msgid "Alias Email"
-msgstr "Domen aliasa"
+msgstr "Alias Email"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert_team__alias_name
@@ -153,12 +158,12 @@ msgstr "Naziv aliasa"
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert_team__alias_status
 msgid "Alias Status"
-msgstr ""
+msgstr "Status aliasa"
 
 #. module: quality
 #: model:ir.model.fields,help:quality.field_quality_alert_team__alias_status
 msgid "Alias status assessed on the last message received."
-msgstr ""
+msgstr "Status aliasa procenjen na osnovu poslednje primljene poruke."
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert_team__alias_model_id
@@ -338,7 +343,7 @@ msgstr "Email cc"
 #. module: quality
 #: model:ir.model.fields,help:quality.field_quality_alert_team__alias_domain
 msgid "Email domain e.g. 'example.com' in 'odoo@example.com'"
-msgstr ""
+msgstr "Email domen npr. 'example.com' u 'odoo@example.com'"
 
 #. module: quality
 #: model:ir.model.fields.selection,name:quality.selection__quality_check__quality_state__fail
@@ -466,7 +471,7 @@ msgstr "U radu"
 #: model:quality.point.test_type,name:quality.test_type_instructions
 #: model_terms:ir.ui.view,arch_db:quality.quality_point_view_form
 msgid "Instructions"
-msgstr ""
+msgstr "Instrukcije"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert__message_is_follower
@@ -508,7 +513,7 @@ msgstr "Zakasnele aktivnosti"
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert_team__alias_incoming_local
 msgid "Local-part based incoming detection"
-msgstr ""
+msgstr "Dolazna detekcija zasnovana na lokalnim delovima"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert__lot_id
@@ -744,6 +749,12 @@ msgid "Preventive Action"
 msgstr "Preventivna Akcija"
 
 #. module: quality
+#. odoo-javascript
+#: code:addons/quality/static/src/tablet_image_field/tablet_image_field.xml:0
+msgid "Preview"
+msgstr "Pregled"
+
+#. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert__priority
 msgid "Priority"
 msgstr "Prioritet"
@@ -829,7 +840,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:quality.field_quality_check__rating_ids
 #: model:ir.model.fields,field_description:quality.field_quality_point__rating_ids
 msgid "Ratings"
-msgstr ""
+msgstr "Ocene"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert_team__alias_force_thread_id
@@ -1036,7 +1047,7 @@ msgstr "Dobavljač"
 #. module: quality
 #: model:ir.model.fields.selection,name:quality.selection__quality_alert__priority__3
 msgid "Very High"
-msgstr ""
+msgstr "Veoma visoko"
 
 #. module: quality
 #. odoo-javascript

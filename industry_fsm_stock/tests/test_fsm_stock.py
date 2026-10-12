@@ -180,7 +180,7 @@ class TestFsmFlowStock(TestFsmFlowSaleCommon):
             'location_id': cls.warehouse.lot_stock_id.id,
         }]).action_apply_inventory()
 
-    def test_fsm_flow(self):
+    def _test_fsm_flow(self):
         '''
             3 delivery step
             1. Add product and lot on SO
@@ -214,6 +214,15 @@ class TestFsmFlowStock(TestFsmFlowSaleCommon):
         self.assertEqual(move.quantity, 3, "We deliver 3 (even they are only 2 in stock)")
 
         self.assertEqual(self.task.sale_order_id.picking_ids.mapped('state'), ['done', 'done', 'done'], "Pickings should be set as done")
+
+    def test_fsm_flow_without_auto_done(self):
+        self._test_fsm_flow()
+
+    def test_fsm_with_auto_done(self):
+        """ The settings to automatically lock SO upon confirmation
+        should never be applied to sales orders for FSM tasks. """
+        self.project_user.groups_id += self.env.ref('sale.group_auto_done_setting')
+        self._test_fsm_flow()
 
     def test_fsm_mixed_pickings(self):
         '''
@@ -1421,6 +1430,43 @@ class TestFsmFlowStock(TestFsmFlowSaleCommon):
         self.task.sale_order_id.order_line.move_ids._action_done()
         self.assertFalse(product.quantity_decreasable)
 
+    def test_quantity_decreasable_on_multicompany(self):
+        # Give user access of company A + B, with default A
+        company_A = self.env.company
+        company_B = self.env['res.company'].search([('id', '!=', company_A.id)], limit=1)
+        self.env.user.write({'company_ids': [(6, 0, [company_A.id, company_B.id])], 'company_id': company_A.id})
+        warehouse_B = self.env.user.with_company(company_B)._get_default_warehouse_id()
+        if not warehouse_B:
+            warehouse_B = self.env['stock.warehouse'].sudo().create({'name': 'WH', 'code': 'WH-B', 'company_id': company_B.id})
+            self.assertEqual(self.env.user.with_company(company_B)._get_default_warehouse_id(), warehouse_B)
+
+        # customer belongs to company B
+        customer = self.env['res.partner'].create({'name': 'Customer', 'company_id': company_B.id})
+
+        # Task setup
+        project = self.env['project.project'].create({
+            'name': 'test-project',
+            'allow_billable': True,
+            'allow_material': True,
+        })
+        fsm_task = self.env['project.task'].create({
+            'name': 'Fsm task',
+            'project_id': project.id,
+            'partner_id':customer.id,
+        })
+        fsm_task.with_user(self.env.user)._fsm_ensure_sale_order()
+        product = self.storable_product_ordered.with_context({'fsm_task_id': fsm_task.id})
+
+        # Check that quantity is decreasable
+        product.set_fsm_quantity(2)
+        product._compute_quantity_decreasable()
+        self.assertTrue(product.quantity_decreasable)
+        self.assertEqual(product.quantity_decreasable_sum, 2)
+
+        # Validate warehouse assignment from company_B's default
+        move = self.env['stock.move'].search([('product_id', '=', product.id)], limit=1)
+        self.assertEqual(move.warehouse_id.id, warehouse_B.id, "Reservation happened on a wrong warehouse")
+
     def test_is_same_warehouse(self):
         self.task.write({'partner_id': self.partner_1.id})
         self.task.with_user(self.project_user)._fsm_ensure_sale_order()
@@ -1722,3 +1768,121 @@ class TestFsmFlowStock(TestFsmFlowSaleCommon):
         picking.write({'priority': "1"})
         self.task.with_user(self.project_user).action_fsm_validate()
         self.assertEqual(self.task.fsm_done, True)
+
+    def test_fsm_under_warranty_task(self):
+        self.task.write({
+            'under_warranty': True,
+        })
+        self.task.write({'partner_id': self.partner_1.id})
+        so = self.task._fsm_ensure_sale_order()
+        action_stock_tracking = self.product_lot.with_context({'fsm_task_id': self.task.id}).action_assign_serial()
+        wizard = self.env['fsm.stock.tracking'].browse(action_stock_tracking['res_id'])
+        wizard.write({
+            'tracking_line_ids': [
+                Command.create({
+                    'product_id': self.product_lot.id,
+                    'quantity': 3,
+                    'lot_id': self.lot_id3.id,
+                })
+            ]
+        })
+        wizard.generate_lot()
+        self.assertEqual(so.amount_total, 0)
+        so.order_line.price_unit = 500
+        self.assertEqual(so.amount_total, 1500)
+        wizard = self.env['fsm.stock.tracking'].browse(action_stock_tracking['res_id'])
+        wizard.write({
+            'tracking_line_ids': [
+                Command.create({
+                    'product_id': self.product_lot.id,
+                    'quantity': 8,
+                    'lot_id': self.lot_id3.id,
+                })
+            ]
+        })
+        wizard.generate_lot()
+        self.assertEqual(so.amount_total, 0)
+
+    def test_kit_product_delivery_validate_when_mark_as_done(self):
+        """
+        check that when the product added to the sale order is a kit, clicking on mark as done on the task
+        still validates the delivery (as it would with a non kit product)
+        """
+        if self.env['ir.module.module']._get('sale_mrp').state != 'installed':
+            self.skipTest("If the 'sale_mrp' module isn't installed, we can't test bom!")
+        # create BOM
+        product_a, product_b, final_product = self.env['product.product'].create([{
+            'name': p_name,
+            'type': 'consu',
+            'is_storable': True,
+            'seller_ids': [
+                Command.create({
+                    'partner_id': self.partner_1.id,
+                })
+            ],
+        } for p_name in ['Comp 1', 'Comp 2', 'Final Product']]).with_context({'fsm_task_id': self.task.id})
+        self.env['mrp.bom'].create({
+            'product_id': final_product.id,
+            'product_tmpl_id': final_product.product_tmpl_id.id,
+            'product_qty': 1,
+            'consumption': 'flexible',
+            'type': 'phantom',
+            'bom_line_ids': [
+                Command.create({
+                    'product_id': product_a.id,
+                    'product_qty': 1
+                }),
+                Command.create({
+                    'product_id': product_b.id,
+                    'product_qty': 1
+                }),
+            ]
+        })
+        # add a product to the task's sale order
+        self.task.write({'partner_id': self.partner_1.id})
+        self.task.with_user(self.project_user)._fsm_ensure_sale_order()
+        so = self.task.sale_order_id
+        so.write({
+            'order_line': [
+                Command.create({
+                    'product_id': final_product.id,
+                    'product_uom_qty': 1,
+                    'task_id': self.task.id,
+                }),
+            ],
+        })
+        self.task.with_user(self.project_user).action_fsm_validate()
+        self.assertEqual(so.picking_ids.state, 'done')
+
+    def test_dropship_delivered_qty(self):
+        """
+        Check that the delivered quantity of dropshipped products added to the sale order
+        is computed based on stock moves.
+        """
+        if self.env['ir.module.module']._get('stock_dropshipping').state != 'installed':
+            self.skipTest("If the 'stock_dropshipping' module isn't installed, we cannot rely on dropshipping.")
+
+        dropship_route = self.env.ref('stock_dropshipping.route_drop_shipping')
+        self.product.write({
+            'is_storable': True,
+            'route_ids': [Command.set(dropship_route.ids)],
+            'seller_ids': [Command.create({
+                    'partner_id': self.partner_a.id,
+                    'price': 10,
+                }),
+            ],
+        })
+        self.task.write({'partner_id': self.partner_1.id})
+        self.task.with_user(self.project_user)._fsm_ensure_sale_order()
+        self.product.with_context(fsm_task_id=self.task.id).fsm_quantity = 3.0
+        order_line = self.task.sale_order_id.order_line
+        self.assertRecordValues(order_line, [
+            {'product_id': self.product.id, 'qty_to_deliver': 3.0, 'qty_delivered': 0.0},
+        ])
+        po = self.task.sale_order_id._get_purchase_orders()
+        po.button_confirm()
+        po.picking_ids.move_ids.quantity = 2.0
+        Form.from_action(self.env, po.picking_ids.button_validate()).save().process_cancel_backorder()
+        self.assertRecordValues(order_line, [
+            {'product_id': self.product.id, 'qty_to_deliver': 1.0, 'qty_delivered': 2.0},
+        ])

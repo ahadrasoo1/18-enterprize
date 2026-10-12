@@ -49,7 +49,7 @@ test("Expiration Panel one app installed, buy subscription", async () => {
         storeData: true, // used by subscription service to know whether mail is installed
         warning: "admin",
     });
-    onRpc("/web/dataset/call_kw/res.users/search_count", () => 7);
+    onRpc("res.users", "search_count", () => 7);
     await mountWithCleanup(WebClientEnterprise);
     await animationFrame();
     await runAllTimers();
@@ -128,7 +128,7 @@ test("Expiration Panel one app installed, try several times to register subscrip
         expect(args[0]).toHaveLength(0);
         return true;
     });
-    onRpc("/web/dataset/call_kw/res.users/search_count", () => 7);
+    onRpc("res.users", "search_count", () => 7);
     await mountWithCleanup(WebClientEnterprise);
     await animationFrame();
 
@@ -395,8 +395,8 @@ test("One app installed, renew", async () => {
     await animationFrame();
 
     expect(".oe_instance_register").toHaveText(
-        "This database will expire in 10 days.\n" +
-            "Renew your subscription\n" +
+        "Your subscription expired 9 days ago. This database will be blocked soon.\n" +
+            "Renew now\n" +
             "I paid, please recheck!"
     );
 
@@ -571,7 +571,7 @@ test("One app installed, navigation to renewal page", async () => {
     await runAllTimers();
 
     expect(".oe_instance_register").toHaveText(
-        "This database has expired.\nRenew your subscription\nI paid, please recheck!"
+        "This database has expired.\nRenew now\nI paid, please recheck!"
     );
 
     expect(".database_expiration_panel").toHaveClass("alert-danger");
@@ -603,9 +603,7 @@ test("One app installed, different locale (arabic)", async () => {
         warning: "admin",
     });
     serverState.lang = "ar-001";
-    onRpc("get_param", () => {
-        return "2019-11-09 12:00:00";
-    });
+    onRpc("get_param", () => "2019-11-09 12:00:00");
     onRpc("update_notification", () => true);
     await mountWithCleanup(WebClientEnterprise);
     await animationFrame();

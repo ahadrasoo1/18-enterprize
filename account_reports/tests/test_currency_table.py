@@ -18,9 +18,10 @@ class TestCurrencyTable(TestAccountReportsCommon):
         cls.company_eur_data = cls.setup_other_company(name="EUR Company 1", sequence=3, currency_id=cls.env.ref('base.EUR').id)
         cls.company_eur_data_2 = cls.setup_other_company(name="EUR Company 2", sequence=4, currency_id=cls.env.ref('base.EUR').id)
         cls.company_chf_data = cls.setup_other_company(name="CHF Company", sequence=5, currency_id=cls.env.ref('base.CHF').id)
+        cls.company_mxn_data = cls.setup_other_company(name="MXN Company", sequence=5, currency_id=cls.env.ref('base.MXN').id)
 
         # Add equity account to the company data
-        for company_data in (cls.company_usd_data, cls.company_usd_data_2, cls.company_eur_data, cls.company_eur_data_2, cls.company_chf_data):
+        for company_data in (cls.company_usd_data, cls.company_usd_data_2, cls.company_eur_data, cls.company_eur_data_2, cls.company_chf_data, cls.company_mxn_data):
             company_data['equity_account'] = cls.env['account.account'].search([
                 ('company_ids', '=', company_data['company'].id),
                 ('account_type', '=', 'equity'),
@@ -105,6 +106,22 @@ class TestCurrencyTable(TestAccountReportsCommon):
         self.init_invoice('out_invoice', company=self.company_eur_data['company'], invoice_date='2020-01-15', amounts=[23], post=True)
         self.init_invoice('out_invoice', company=self.company_eur_data['company'], invoice_date='2020-02-20', amounts=[64], post=True)
         self.init_invoice('out_invoice', company=self.company_eur_data['company'], invoice_date='2020-03-30', amounts=[100], post=True)
+        equity_unaffected_account = self.env['account.account'].search(
+            [
+                ('account_type', '=', 'equity_unaffected'),
+                *self.env['account.account']._check_company_domain(self.company_eur_data['company']),
+            ], limit=1,
+        )
+        self.env['account.move'].create(
+            {
+                'date': '2020-02-15',
+                'company_id': self.company_eur_data['company'].id,
+                'line_ids': [
+                    Command.create({'account_id': equity_unaffected_account.id, 'debit': 100.0}),
+                    Command.create({'account_id': self.company_eur_data['default_account_receivable'].id, 'credit': 100.0}),
+                ],
+            },
+        ).action_post()
         self._generate_equity_move(self.company_eur_data, '2020-03-15', 20)
         self._generate_equity_move(self.company_eur_data, '2020-03-31', 5)
 
@@ -120,6 +137,12 @@ class TestCurrencyTable(TestAccountReportsCommon):
         self.init_invoice('out_invoice', company=self.company_chf_data['company'], invoice_date='2020-12-31', amounts=[22], post=True)
         self._generate_equity_move(self.company_chf_data, '2020-03-15', 20)
 
+        # MXN OPERATIONS
+        self.setup_other_currency('MXN', rates=[('2020-05-10', 2)])
+        self.init_invoice('out_invoice', company=self.company_mxn_data['company'], invoice_date='2020-01-01', amounts=[10], post=True)
+        self.init_invoice('out_invoice', company=self.company_mxn_data['company'], invoice_date='2020-07-01', amounts=[21], post=True)
+        self._generate_equity_move(self.company_mxn_data, '2020-03-15', 2)
+
         # Test conversion : date range cta
         self.report.currency_translation = 'cta'
         cta_options_range = self._generate_options(self.report, '2019-12-22', '2020-12-31')
@@ -127,15 +150,16 @@ class TestCurrencyTable(TestAccountReportsCommon):
             self.report._get_lines(cta_options_range),
             [   0,                          1],
             [
-                ("Asset",              204.00),
+                ("Asset",              194.50),
                 ("USD Company 1",       10.00),
                 ("USD Company 2",       25.00),
                 # EUR current rate = 1/4
-                ("EUR Company 1",       46.75),  # (23 + 64 + 100) / 4
+                ("EUR Company 1",       21.75),  # (23 + 64 + 100 - 100) / 4
                 ("EUR Company 2",       32.75),  # (54 + 77) / 4
                 # CHF current rate = 1/2
                 ("CHF Company",         89.50),  # (58 + 99 + 22) / 2
-                ("Income",            -160.86),
+                ("MXN Company",         15.50),  # (10 + 21) / 2
+                ("Income",            -182.13),
                 ("USD Company 1",      -10.00),
                 ("USD Company 2",      -25.00),
                 # EUR average rate = (1/11 * 10 + 1/2 * 71 + 1/5 * 18 + 1/20 * 2 + 1/4 * 275) / 376 = 0.289518859
@@ -143,12 +167,15 @@ class TestCurrencyTable(TestAccountReportsCommon):
                 ("EUR Company 2",      -37.93),  # (-54 - 77) * 0.289518859
                 # CHF average rate = (1/3 * 99 + 1/7 * 41 + 1/8 * 229 + 1/2 * 7) / 376 = 0.188782295
                 ("CHF Company",        -33.79),  # (-58 - 99 -22) * 0.188782295
-                ("Equity",             161.92),
+                # MXN average rate = (1 * 140 + 1/2 * 236) / 376 = 0.686170213
+                ("MXN Company",        -21.27),  # (-10 - 21) * 0.686170213
+                ("Equity",             192.87),
                 ("USD Company 1",      130.00),
                 ("USD Company 2",       11.00),
-                ("EUR Company 1",        4.25),  # 20 / 5 + 5 / 20
+                ("EUR Company 1",       33.20),  # 20 / 5 + 5 / 20 + 100 * 0.289518859
                 ("EUR Company 2",       10.00),  # 40 / 4
                 ("CHF Company",          6.67),  # 20 / 3
+                ("MXN Company",          2.00),  # 2 / 1
             ],
             cta_options_range,
         )
@@ -162,15 +189,17 @@ class TestCurrencyTable(TestAccountReportsCommon):
             self.report._get_lines(cta_options_single),
             [   0,                          1],
             [
-                ("Asset",              204.00),
+                ("Asset",              194.50),
                 ("USD Company 1",       10.00),
                 ("USD Company 2",       25.00),
                 # EUR current rate = 1/4
-                ("EUR Company 1",       46.75),  # (23 + 64 + 100) / 4
+                ("EUR Company 1",       21.75),  # (23 + 64 + 100 - 100) / 4
                 ("EUR Company 2",       32.75),  # (54 + 77) / 4
                 # CHF current rate = 1/2
                 ("CHF Company",         89.50),  # (58 + 99 + 22) / 2
-                ("Income",            -161.88),
+                # MXN current rate = 1/2
+                ("MXN Company",         15.50),  # (10 + 21) / 2
+                ("Income",            -182.88),
                 ("USD Company 1",      -10.00),
                 ("USD Company 2",      -25.00),
                 # EUR average rate = (1/2 * 71 + 1/5 * 18 + 1/20 * 2 + 1/4 * 275) / 366 = 0.294945355
@@ -178,12 +207,15 @@ class TestCurrencyTable(TestAccountReportsCommon):
                 ("EUR Company 2",      -38.64),  # (-54 - 77) * 0.294945355
                 # CHF average rate = (1/3 * 89 + 1/7 * 41 + 1/8 * 229 + 1/2 * 7) / 366 = 0.184832813
                 ("CHF Company",        -33.09),  # (-58 - 99 -22) * 0.184832813
-                ("Equity",             161.92),
+                # MXN average rate = (1 * 130 + 1/2 * 236) / 366 = 0.677595628
+                ("MXN Company",        -21.01),  # (-10 - 21) * 0.677595628
+                ("Equity",             193.41),
                 ("USD Company 1",      130.00),
                 ("USD Company 2",       11.00),
-                ("EUR Company 1",        4.25),  # 20 / 5 + 5 / 20
+                ("EUR Company 1",       33.74),  # 20 / 5 + 5 / 20 + 100 * 0.294945355
                 ("EUR Company 2",       10.00),  # 40 / 4
                 ("CHF Company",          6.67),  # 20 / 3
+                ("MXN Company",          2.00),  # 2 / 1
             ],
             cta_options_single,
         )
@@ -192,24 +224,27 @@ class TestCurrencyTable(TestAccountReportsCommon):
         current_expected_lines = [
             # EUR current rate = 1/4
             # CHF current rate = 1/2
-            ("Asset",              204.00),
+            ("Asset",              194.50),
             ("USD Company 1",       10.00),
             ("USD Company 2",       25.00),
-            ("EUR Company 1",       46.75),  # (23 + 64 + 100) / 4
+            ("EUR Company 1",       21.75),  # (23 + 64 + 100 - 100) / 4
             ("EUR Company 2",       32.75),  # (54 + 77) / 4
             ("CHF Company",         89.50),  # (58 + 99 + 22) / 2
-            ("Income",            -204.00),
+            ("MXN Company",         15.50),  # (10 + 21) / 2
+            ("Income",            -219.50),
             ("USD Company 1",      -10.00),
             ("USD Company 2",      -25.00),
             ("EUR Company 1",      -46.75),  # (-23 - 64 - 100) / 4
             ("EUR Company 2",      -32.75),  # (-54 - 77) / 4
             ("CHF Company",        -89.50),  # (-58 - 99 -22) / 2
-            ("Equity",             167.25),
+            ("MXN Company",        -15.50),  # (-10 - 21) / 2
+            ("Equity",             193.25),
             ("USD Company 1",      130.00),
             ("USD Company 2",       11.00),
-            ("EUR Company 1",        6.25),  # (20 + 5) / 4
+            ("EUR Company 1",        31.25),  # (20 + 5 + 100) / 4
             ("EUR Company 2",       10.00),  # 40 / 4
             ("CHF Company",         10.00),  # 20 / 2
+            ("MXN Company",          1.00),  # 2 / 2
         ]
 
         self.report.currency_translation = 'current'

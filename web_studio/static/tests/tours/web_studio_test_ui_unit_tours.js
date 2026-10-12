@@ -2,13 +2,12 @@
 import { registry } from "@web/core/registry";
 import { stepNotInStudio, assertEqual } from "@web_studio/../tests/tours/tour_helpers";
 import { queryFirst, drag, waitFor } from "@odoo/hoot-dom";
+import { rpcBus } from "@web/core/network/rpc";
 
 registry
     .category("web_tour.tours")
     .add("web_studio_test_form_view_not_altered_by_studio_xml_edition", {
-        test: true,
         url: "/odoo?debug=1",
-        sequence: 260,
         steps: () => [
             {
                 trigger: "a[data-menu-xmlid='web_studio.studio_test_partner_menu']",
@@ -43,9 +42,7 @@ registry
 
 /* global ace */
 registry.category("web_tour.tours").add("web_studio_test_edit_with_xml_editor", {
-    test: true,
     url: "/odoo?debug=1",
-    sequence: 260,
     steps: () => [
         {
             trigger: "a[data-menu-xmlid='web_studio.studio_test_partner_menu']",
@@ -103,8 +100,6 @@ registry.category("web_tour.tours").add("web_studio_test_edit_with_xml_editor", 
 });
 
 registry.category("web_tour.tours").add("web_studio_enter_x2many_edition_and_add_field", {
-    test: true,
-    sequence: 260,
     steps: () => [
         {
             trigger: "a[data-menu-xmlid='web_studio.studio_test_partner_menu']",
@@ -168,8 +163,6 @@ registry.category("web_tour.tours").add("web_studio_enter_x2many_edition_and_add
 });
 
 registry.category("web_tour.tours").add("web_studio_enter_x2many_auto_inlined_subview", {
-    test: true,
-    sequence: 260,
     steps: () => [
         {
             trigger: "a[data-menu-xmlid='web_studio.studio_test_partner_menu']",
@@ -236,8 +229,6 @@ registry.category("web_tour.tours").add("web_studio_enter_x2many_auto_inlined_su
 registry
     .category("web_tour.tours")
     .add("web_studio_enter_x2many_auto_inlined_subview_with_multiple_field_matching", {
-        test: true,
-        sequence: 260,
         steps: () => [
             {
                 trigger: "a[data-menu-xmlid='web_studio.studio_test_partner_menu']",
@@ -302,8 +293,6 @@ registry
     });
 
 registry.category("web_tour.tours").add("web_studio_boolean_field_drag_and_drop", {
-    test: true,
-    sequence: 260,
     steps: () => [
         {
             trigger: "a[data-menu-xmlid='web_studio.studio_test_partner_menu']",
@@ -335,8 +324,6 @@ registry.category("web_tour.tours").add("web_studio_boolean_field_drag_and_drop"
 });
 
 registry.category("web_tour.tours").add("web_studio_field_with_group", {
-    test: true,
-    sequence: 260,
     steps: () => [
         {
             trigger: "a[data-menu-xmlid='web_studio.studio_test_partner_menu']",
@@ -393,8 +380,6 @@ registry.category("web_tour.tours").add("web_studio_field_with_group", {
 });
 
 registry.category("web_tour.tours").add("web_studio_set_tree_node_conditional_invisibility", {
-    test: true,
-    sequence: 260,
     steps: () => [
         {
             trigger: "a[data-menu-xmlid='web_studio.studio_test_partner_menu']",
@@ -438,8 +423,6 @@ registry.category("web_tour.tours").add("web_studio_set_tree_node_conditional_in
 });
 
 registry.category("web_tour.tours").add("web_studio_elements_with_groups_form", {
-    test: true,
-    sequence: 260,
     steps: () => [
         {
             trigger: "a[data-menu-xmlid='web_studio.studio_test_partner_menu']",
@@ -496,8 +479,6 @@ registry.category("web_tour.tours").add("web_studio_elements_with_groups_form", 
 });
 
 registry.category("web_tour.tours").add("test_element_group_in_sidebar", {
-    test: true,
-    sequence: 260,
     steps: () => [
         {
             trigger: "a[data-menu-xmlid='web_studio.studio_test_partner_menu']",
@@ -533,8 +514,6 @@ registry.category("web_tour.tours").add("test_element_group_in_sidebar", {
 });
 
 registry.category("web_tour.tours").add("web_studio_custom_selection_field_edit_values", {
-    test: true,
-    sequence: 260,
     steps: () => [
         {
             trigger: "a[data-menu-xmlid='web_studio.studio_test_partner_menu']",
@@ -631,8 +610,6 @@ registry.category("web_tour.tours").add("web_studio_custom_selection_field_edit_
 });
 
 registry.category("web_tour.tours").add("web_studio_test_create_one2many_lines_then_edit_name", {
-    test: true,
-    sequence: 260,
     steps: () => [
         {
             trigger: "a[data-menu-xmlid='web_studio.studio_test_partner_menu']",
@@ -674,8 +651,6 @@ registry.category("web_tour.tours").add("web_studio_test_create_one2many_lines_t
 });
 
 registry.category("web_tour.tours").add("web_studio_test_address_view_id_no_edit", {
-    test: true,
-    sequence: 260,
     steps: () => [
         {
             trigger: "a[data-menu-xmlid='web_studio.studio_test_partner_menu']",
@@ -718,16 +693,33 @@ registry.category("web_tour.tours").add("web_studio_test_address_view_id_no_edit
             },
         },
         {
-            trigger: ".o_web_studio_leave",
+            trigger: ".o_field_widget[name='lang']",
             run: "click",
         },
-        ...stepNotInStudio(".o_form_view"),
+        {
+            trigger: ".o_web_studio_sidebar input[id='required']",
+            run: "click",
+        },
+        {
+            trigger: ".o_web_studio_snackbar .fa-check",
+        },
+        {
+            trigger: ".o_address_format",
+            run: function () {
+                if (
+                    this.anchor.querySelectorAll("[name=street]").length ||
+                    !this.anchor.querySelectorAll("[name=lang]").length
+                ) {
+                    throw new Error(
+                        "The address view id set on the company country shouldn't be editable"
+                    );
+                }
+            },
+        },
     ],
 });
 
 registry.category("web_tour.tours").add("web_studio_test_create_new_model_from_existing_view", {
-    test: true,
-    sequence: 260,
     steps: () => [
         {
             trigger: "a[data-menu-xmlid='web_studio.studio_test_partner_menu']",
@@ -766,8 +758,6 @@ registry.category("web_tour.tours").add("web_studio_test_create_new_model_from_e
 });
 
 registry.category("web_tour.tours").add("web_studio_test_create_model_with_clickable_stages", {
-    test: true,
-    sequence: 260,
     steps: () => [
         {
             trigger: "a[data-menu-xmlid='web_studio.studio_test_partner_menu']",
@@ -826,7 +816,7 @@ registry.category("web_tour.tours").add("web_studio_test_create_model_with_click
             trigger: ".o_arrow_button_current:contains(In Progress)",
         },
         {
-            trigger: ".o_form_button_save",
+            trigger: ".o_form_button_save:not(:visible)",
             run: "click",
         },
         {
@@ -844,8 +834,6 @@ registry.category("web_tour.tours").add("web_studio_test_create_model_with_click
 registry
     .category("web_tour.tours")
     .add("web_studio_test_enter_x2many_edition_with_multiple_subviews", {
-        test: true,
-        sequence: 260,
         steps: () => [
             {
                 trigger: "a[data-menu-xmlid='web_studio.studio_test_partner_menu']",
@@ -882,8 +870,6 @@ registry
 registry
     .category("web_tour.tours")
     .add("web_studio_test_enter_x2many_edition_with_multiple_subviews_correct_xpath", {
-        test: true,
-        sequence: 260,
         steps: () => [
             {
                 trigger: "a[data-menu-xmlid='web_studio.studio_test_partner_menu']",
@@ -932,7 +918,6 @@ registry
     });
 
 registry.category("web_tour.tours").add("web_studio_test_studio_view_is_last", {
-    test: true,
     steps: () => [
         {
             trigger: "a[data-menu-xmlid='web_studio.studio_test_partner_menu']",
@@ -973,7 +958,6 @@ registry.category("web_tour.tours").add("web_studio_test_studio_view_is_last", {
 });
 
 registry.category("web_tour.tours").add("web_studio_test_edit_form_subview_attributes", {
-    test: true,
     steps: () => [
         {
             trigger: "a[data-menu-xmlid='web_studio.studio_test_partner_menu']",
@@ -1016,7 +1000,6 @@ registry.category("web_tour.tours").add("web_studio_test_edit_form_subview_attri
 });
 
 registry.category("web_tour.tours").add("web_studio_x2many_two_levels_edition", {
-    test: true,
     steps: () => [
         {
             trigger: "a[data-menu-xmlid='web_studio.studio_test_partner_menu']",
@@ -1074,7 +1057,6 @@ registry.category("web_tour.tours").add("web_studio_x2many_two_levels_edition", 
 });
 
 registry.category("web_tour.tours").add("web_studio_field_group_studio_no_fetch", {
-    test: true,
     steps: () => [
         {
             trigger: "a[data-menu-xmlid='web_studio.studio_test_partner_menu']",
@@ -1136,11 +1118,17 @@ registry.category("web_tour.tours").add("web_studio_field_group_studio_no_fetch"
                 );
             },
         },
+        {
+            trigger: ".o_web_studio_views_icons a[title='Calendar']",
+            run: "click",
+        },
+        {
+            trigger: ".o_web_studio_view_renderer .o_calendar_view",
+        },
     ],
 });
 
 registry.category("web_tour.tours").add("web_studio_test_move_similar_field", {
-    test: true,
     steps: () => [
         {
             trigger: "a[data-menu-xmlid='web_studio.studio_test_partner_menu']",
@@ -1171,7 +1159,6 @@ registry.category("web_tour.tours").add("web_studio_test_move_similar_field", {
 });
 
 registry.category("web_tour.tours").add("web_studio_test_related_file", {
-    test: true,
     steps: () => [
         {
             trigger: "a[data-menu-xmlid='web_studio.studio_test_user_menu']",
@@ -1233,7 +1220,6 @@ registry.category("web_tour.tours").add("web_studio_test_related_file", {
 });
 
 registry.category("web_tour.tours").add("web_studio_test_undo_new_field", {
-    test: true,
     steps: () => [
         {
             trigger: "a[data-menu-xmlid='web_studio.studio_test_partner_menu']",
@@ -1262,7 +1248,6 @@ registry.category("web_tour.tours").add("web_studio_test_undo_new_field", {
 });
 
 registry.category("web_tour.tours").add("web_studio_test_change_lone_attr_modifier_form", {
-    test: true,
     steps: () => [
         {
             trigger: "a[data-menu-xmlid='web_studio.studio_test_partner_menu']",
@@ -1310,7 +1295,6 @@ registry.category("web_tour.tours").add("web_studio_test_change_lone_attr_modifi
 });
 
 registry.category("web_tour.tours").add("web_studio_test_new_field_rename_description", {
-    test: true,
     steps: () => [
         {
             trigger: "a[data-menu-xmlid='web_studio.studio_test_partner_menu']",
@@ -1342,9 +1326,7 @@ registry.category("web_tour.tours").add("web_studio_test_new_field_rename_descri
 });
 
 registry.category("web_tour.tours").add("web_studio_test_edit_digits_option", {
-    test: true,
     url: "/odoo",
-    sequence: 260,
     steps: () => [
         {
             trigger: "a[data-menu-xmlid='web_studio.studio_test_partner_menu']",
@@ -1377,7 +1359,6 @@ registry.category("web_tour.tours").add("web_studio_test_edit_digits_option", {
 });
 
 registry.category("web_tour.tours").add("web_studio_no_fetch_subview", {
-    test: true,
     steps: () => [
         {
             trigger: "a[data-menu-xmlid='web_studio.studio_test_partner_menu']",
@@ -1421,7 +1402,6 @@ registry.category("web_tour.tours").add("web_studio_no_fetch_subview", {
 });
 
 registry.category("web_tour.tours").add("web_studio.test_button_rainbow_effect", {
-    test: true,
     steps: () => [
         {
             trigger: "a[data-menu-xmlid='web_studio.studio_test_partner_menu']",
@@ -1473,7 +1453,6 @@ registry.category("web_tour.tours").add("web_studio.test_button_rainbow_effect",
 });
 
 registry.category("web_tour.tours").add("web_studio.test_res_users_fake_fields", {
-    test: true,
     steps: () => [
         {
             trigger: ".o_web_studio_existing_fields_header",
@@ -1492,7 +1471,6 @@ registry.category("web_tour.tours").add("web_studio.test_res_users_fake_fields",
 });
 
 registry.category("web_tour.tours").add("web_studio_test_reload_after_restoring_default_view", {
-    test: true,
     steps: () => [
         {
             trigger: "a[data-menu-xmlid='web_studio.studio_test_partner_menu']",
@@ -1536,7 +1514,6 @@ registry.category("web_tour.tours").add("web_studio_test_reload_after_restoring_
 });
 
 registry.category("web_tour.tours").add("web_studio_test_edit_reified_field", {
-    test: true,
     steps: () => [
         {
             trigger: "a[data-menu-xmlid='web_studio.studio_test_partner_menu']",
@@ -1565,7 +1542,6 @@ registry.category("web_tour.tours").add("web_studio_test_edit_reified_field", {
 });
 
 registry.category("web_tour.tours").add("web_studio_test_add_all_types_fields_related", {
-    test: true,
     steps: () => [
         {
             trigger: "a[data-menu-xmlid='web_studio.studio_test_user_menu']",
@@ -1614,7 +1590,6 @@ registry.category("web_tour.tours").add("web_studio_test_add_all_types_fields_re
 });
 
 registry.category("web_tour.tours").add("web_studio_add_one2many_no_related_many2one", {
-    test: true,
     steps: () => [
         {
             trigger: ".o_home_menu_background",
@@ -1648,7 +1623,6 @@ registry.category("web_tour.tours").add("web_studio_add_one2many_no_related_many
 });
 
 registry.category("web_tour.tours").add("web_studio_test_approval_button_xml_id", {
-    test: true,
     steps: () => [
         {
             trigger: "a[data-menu-xmlid='web_studio.studio_test_partner_menu']",
@@ -1679,7 +1653,6 @@ registry.category("web_tour.tours").add("web_studio_test_approval_button_xml_id"
 });
 
 registry.category("web_tour.tours").add("web_studio_test_kanban_field_bold", {
-    test: true,
     steps: () => [
         {
             trigger: "a[data-menu-xmlid='web_studio.studio_test_partner_menu']",
@@ -1764,7 +1737,6 @@ async function animationFrame(timeoutBefore) {
 }
 
 registry.category("web_tour.tours").add("web_studio_test_kanban_menu_ribbon", {
-    test: true,
     steps: () => [
         {
             trigger: "a[data-menu-xmlid='web_studio.studio_test_partner_menu']",
@@ -1785,6 +1757,14 @@ registry.category("web_tour.tours").add("web_studio_test_kanban_menu_ribbon", {
             run: "click",
         },
         {
+            trigger: ".nav .o_web_studio_new.active",
+            run() {
+                return waitFor(".o_web_studio_component.o_web_studio_field_menu", {
+                    timeout: 3000,
+                });
+            },
+        },
+        {
             trigger: ".o_web_studio_view_renderer .o_web_studio_hook[data-type='t']",
         },
         {
@@ -1792,14 +1772,14 @@ registry.category("web_tour.tours").add("web_studio_test_kanban_menu_ribbon", {
             async run() {
                 await animationFrame();
                 const { drop, moveTo } = await drag(this.anchor);
-                await moveTo(".o_kanban_record:first()");
+                await moveTo(".o_kanban_record:first");
                 await animationFrame(500); // wait for animations to finish in under 500ms
                 const target = await waitFor(".o_web_studio_hook_visible", {
                     visible: true,
                     timeout: 5000,
                 });
-                await moveTo(target);
-                await drop(target);
+                await moveTo(target, { interactive: false });
+                await drop();
             },
         },
         {
@@ -1810,7 +1790,415 @@ registry.category("web_tour.tours").add("web_studio_test_kanban_menu_ribbon", {
             run: "drag_and_drop(.o_web_studio_hook[data-type='ribbon'])",
         },
         {
-            trigger: ".o_kanban_view .o_kanban_record:first() .o_widget_web_ribbon",
+            trigger:
+                ".o_kanban_view .o_kanban_record:first() .o_widget_web_ribbon .ribbon:contains(demo)",
+        },
+    ],
+});
+
+registry.category("web_tour.tours").add("web_studio_test_create_related", {
+    steps: () => [
+        {
+            trigger: "a[data-menu-xmlid='web_studio.studio_test_partner_menu']",
+            run: "click",
+        },
+        {
+            trigger: ".o_form_view",
+        },
+        {
+            trigger: ".o_web_studio_navbar_item button:enabled",
+            run: "click",
+        },
+        {
+            trigger: ".o_web_studio_view_renderer .o_form_view",
+        },
+        {
+            trigger: ".o_web_studio_component.o_web_studio_field_related",
+            run: "drag_and_drop (.o_web_studio_hook:last())",
+        },
+        {
+            trigger: ".modal .o_model_field_selector_value",
+            run: "click",
+        },
+        {
+            trigger: ".o_model_field_selector_popover_search input",
+            run: "edit Related Company",
+        },
+        {
+            trigger:
+                ".o_model_field_selector_popover_item[data-name='parent_id'] .o_model_field_selector_popover_relation_icon",
+            run: "click",
+        },
+        {
+            trigger: ".o_model_field_selector_popover_title:contains(Related Company)",
+        },
+        {
+            trigger: ".o_model_field_selector_popover_search input",
+            run: "edit Contact",
+        },
+        {
+            trigger:
+                ".o_model_field_selector_popover_item[data-name='child_ids'] .o_model_field_selector_popover_item_name",
+            run: "click",
+        },
+        {
+            trigger: ".modal footer button.btn-primary",
+            run: "click",
+        },
+        {
+            trigger: ".o_web_studio_view_renderer .o_field_widget.o_field_one2many",
+        },
+    ],
+});
+
+registry.category("web_tour.tours").add("web_studio_test_negated_groups", {
+    steps: () => [
+        {
+            trigger: "a[data-menu-xmlid='web_studio.studio_test_partner_menu']",
+            run: "click",
+        },
+        {
+            trigger: ".o_form_view",
+        },
+        {
+            trigger: ".o_web_studio_navbar_item button:enabled",
+            run: "click",
+        },
+        {
+            trigger: ".o_web_studio_sidebar .o_web_studio_view",
+            run: "click",
+        },
+        {
+            trigger: ".o_web_studio_sidebar input#show_invisible",
+            run: "click",
+        },
+        {
+            trigger: ".o_web_studio_form_view_editor .o-web-studio-editor--element-clickable",
+            run: "click",
+        },
+        {
+            trigger:
+                ".o_web_studio_sidebar [name='negated_groups_id'] .o_badge:contains(studio has group)",
+        },
+        {
+            trigger: ".o_web_studio_sidebar [name='negated_groups_id'] .o_delete",
+            run: "click",
+        },
+        {
+            trigger:
+                ".o_web_studio_sidebar [name='negated_groups_id']:not(:contains(studio has group))",
+        },
+        {
+            trigger: ".o_web_studio_sidebar [name='negated_groups_id'] input",
+            run: "edit Access Rights",
+        },
+        {
+            trigger: "a.dropdown-item:contains(Administration / Access Rights)",
+            run: "click",
+        },
+        {
+            trigger:
+                ".o_web_studio_sidebar [name='negated_groups_id'] .o_badge:contains(Administration / Access Rights)",
+        },
+    ],
+});
+
+registry.category("web_tour.tours").add("web_studio_test_use_action_domain", {
+    steps: () => [
+        {
+            trigger: "a[data-menu-xmlid='web_studio.studio_test_partner_menu']",
+            run: "click",
+        },
+        {
+            trigger: ".o_list_view",
+        },
+        {
+            trigger: ".o_web_studio_navbar_item button",
+            run: "click",
+        },
+        {
+            trigger: ".o_web_studio_sidebar",
+        },
+        {
+            trigger: ".o_list_table",
+            run() {
+                const names = Array.from(
+                    document.querySelectorAll(".o_list_table td[name=display_name]")
+                ).map((e) => e.textContent);
+                if (names.length !== 1 || names[0] !== "Michel") {
+                    throw new Error("record with employee=false should not be matched");
+                }
+            },
+        },
+    ],
+});
+
+registry.category("web_tour.tours").add("web_studio_test_drag_before_sheet", {
+    steps: () => [
+        {
+            trigger: "a[data-menu-xmlid='web_studio.studio_test_partner_menu']",
+            run: "click",
+        },
+        {
+            trigger: ".o_form_view .o_form_editable",
+            run: "click",
+        },
+        {
+            trigger: ".o_web_studio_navbar_item button",
+            run: "click",
+        },
+        {
+            trigger: ".o_web_studio_sidebar .o_web_studio_new_fields .o_web_studio_field_html",
+            run: "drag_and_drop (.o_web_studio_form_view_editor .o_web_studio_hook:eq(0))",
+        },
+        {
+            trigger: "button.o_web_studio_undo.o_web_studio_active",
+            run() {},
+        },
+        {
+            trigger: ".o_web_studio_leave",
+            run() {},
+        },
+    ],
+});
+
+registry.category("web_tour.tours").add("web_studio_test_default_value_company", {
+    steps: () => [
+        {
+            trigger: "a[data-menu-xmlid='web_studio.studio_test_partner_menu']",
+            run: "click",
+        },
+        {
+            trigger: ".o_form_view .o_form_editable",
+            run: "click",
+        },
+        {
+            trigger: ".o_web_studio_navbar_item button",
+            run: "click",
+        },
+        {
+            trigger: ".o_web_studio_view_renderer .o_form_view .o_field_widget[name='name']",
+            run: "click",
+        },
+        {
+            trigger: ".o_web_studio_sidebar input[id='default_value']",
+            async run(helpers) {
+                // in this flow, only the input's value is changing
+                // We want to wait for the RPC to return. That will
+                // "commit" the value in the input.
+                // Since when the value of an input changes, there are no DOM
+                // mutations, we need to use the waitFor from Hoot
+                // instead of the macro.js machinery to assert that the value has changed
+                // as a consequence of the RPC
+                this.anchor.scrollIntoView();
+                const cb = ({ detail }) => {
+                    if (detail.url === "/web_studio/set_default_value") {
+                        this.anchor.value = "";
+                        rpcBus.removeEventListener("RPC:REQUEST", cb);
+                    }
+                };
+                rpcBus.addEventListener("RPC:REQUEST", cb);
+                await helpers.edit("from studio");
+                await helpers.press("ENTER");
+                return waitFor(
+                    ".o_web_studio_sidebar input[id='default_value']:value(from studio)",
+                    { timeout: 5000 }
+                );
+            },
+        },
+    ],
+});
+
+registry.category("web_tour.tours").add("web_studio_test_subview_multiple_occurences", {
+    steps: () => [
+        {
+            trigger: "a[data-menu-xmlid='web_studio.studio_test_partner_menu']",
+            run: "click",
+        },
+        {
+            trigger: ".o_form_view .o_form_editable",
+            run: "click",
+        },
+        {
+            trigger: ".o_web_studio_navbar_item button",
+            run: "click",
+        },
+        {
+            trigger: ".o_web_studio_form_view_editor div[name='child_ids']",
+            run: "click",
+        },
+        {
+            trigger:
+                ".o_web_studio_form_view_editor div[name='child_ids'] .o_web_studio_editX2Many[data-type='list']",
+            run: "click",
+        },
+        {
+            trigger: ".o_web_studio_list_view_editor th[data-name='function']",
+            run() {
+                assertEqual(
+                    Array.from(document.querySelectorAll("th[data-name='function']")).length,
+                    1
+                );
+            },
+        },
+        {
+            trigger: ".o_web_studio_list_view_editor th[data-name='function']",
+            run: "click",
+        },
+        {
+            trigger: ".o_web_studio_sidebar input[name='string']",
+            run: "edit new label from tour && click body",
+        },
+        {
+            trigger: ".o_web_studio_snackbar .fa-check",
+        },
+    ],
+});
+
+registry.category("web_tour.tours").add("web_studio_test_negated_groups_do_not_interfere_with_invisible", {
+    steps: () => [
+        {
+            trigger: "a[data-menu-xmlid='web_studio.studio_test_partner_menu']",
+            run: "click",
+        },
+        {
+            trigger: ".o_form_view",
+        },
+        {
+            trigger: ".o_web_studio_navbar_item button:enabled",
+            run: "click",
+        },
+        {
+            trigger:
+                ".o_in_studio .o_form_view:has([data-field-name=name]):not(:has([data-field-name=function])",
+        },
+        {
+            trigger: ".o_web_studio_sidebar .o_web_studio_view",
+            run: "click",
+        },
+        {
+            trigger: ".o_web_studio_sidebar input#show_invisible",
+            run: "click",
+        },
+        {
+            content: "Click on the function field",
+            trigger: ".o_web_studio_form_view_editor .o-web-studio-editor--element-clickable:eq(2)",
+            run: "click",
+        },
+        {
+            content: "The invisible checkbox should not be checked",
+            trigger: ".o_web_studio_property #invisible:not(:checked)",
+        },
+        {
+            trigger: ".o_web_studio_attrs[data-type=invisible]",
+            run: "click",
+        },
+        {
+            trigger: ".o_model_field_selector_value",
+            run: "click",
+        },
+        {
+            trigger: ".o_model_field_selector_popover_item_name:contains('Display Name')",
+            run: "click",
+        },
+        {
+            trigger: ".o_tree_editor_condition input.o_input",
+            run: "edit Robert && click body",
+        },
+        {
+            trigger: ".modal-footer .btn-primary",
+            run: "click",
+        },
+        {
+            trigger: ".o_web_studio_property .o_web_studio_checkbox_indeterminate #invisible",
+        },
+        {
+            trigger: ".o_web_studio_leave",
+            run: "click",
+        },
+        ...stepNotInStudio(".o_form_view"),
+    ],
+});
+
+registry.category("web_tour.tours").add("web_studio_test_automagically_added_fields", {
+    steps: () => [
+        {
+            trigger: ".o_list_view",
+        },
+        {
+            trigger: ".o_web_studio_navbar_item button",
+            run: "click",
+        },
+        {
+            trigger: ".o_web_studio_editor_manager .o_list_view",
+        },
+        {
+            trigger: ".o_web_studio_sidebar .o_web_studio_view",
+            run: "click",
+        },
+        {
+            trigger: ".o_web_studio_sidebar input[name='show_invisible']",
+            run: "click",
+        },
+        {
+            trigger: ".o_web_studio_editor_manager .o_list_view .o_web_studio_show_invisible",
+            run: () => {
+                const allTh = document.querySelectorAll(".o_list_view th:not(.o_web_studio_hook)");
+                assertEqual([...allTh].map((th) => th.textContent).toString(), "Display Name,Name");
+            },
+        },
+        {
+            trigger: ".o_web_studio_views_icons a[title='Kanban']",
+            run: "click",
+        },
+        {
+            trigger: ".o_web_studio_editor_manager .o_kanban_view",
+        },
+        {
+            trigger: ".o_web_studio_sidebar .o_web_studio_view",
+            run: "click",
+        },
+        {
+            trigger: ".o_web_studio_sidebar input[name='show_invisible']",
+            run: "click",
+        },
+        {
+            trigger:
+                ".o_web_studio_editor_manager .o_kanban_record:has(.o_web_studio_show_invisible)",
+            run() {
+                const allInvisible = [...document.querySelectorAll(".o_web_studio_show_invisible")];
+                assertEqual(allInvisible.length, 2);
+                assertEqual(
+                    allInvisible.map((el) => el.getAttribute("name")).toString(),
+                    "display_name,name"
+                );
+            },
+        },
+        {
+            trigger: ".o_web_studio_views_icons a[title='Form']",
+            run: "click",
+        },
+        {
+            trigger: ".o_web_studio_editor_manager .o_form_view",
+        },
+        {
+            trigger: ".o_web_studio_sidebar .o_web_studio_view",
+            run: "click",
+        },
+        {
+            trigger: ".o_web_studio_sidebar input[name='show_invisible']",
+            run: "click",
+        },
+        {
+            trigger: ".o_web_studio_editor_manager .o_form_view:has(.o_web_studio_show_invisible)",
+            run() {
+                const allInvisible = [...document.querySelectorAll(".o_field_widget")];
+                assertEqual(allInvisible.length, 2);
+                assertEqual(
+                    allInvisible.map((el) => el.getAttribute("name")).toString(),
+                    "display_name,name"
+                );
+            },
         },
     ],
 });

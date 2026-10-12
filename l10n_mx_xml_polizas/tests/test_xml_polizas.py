@@ -19,6 +19,10 @@ class AccountXmlPolizasWizard(TestMxEdiCommon, TestAccountReportsCommon):
         # Setup the company
         cls.company = cls.company_data['company']
         cls.company_2 = cls.company_data_2['company']
+        # Enforce old default expence account
+        cls.company_data['default_account_expense'] = cls.env.ref(f'account.{cls.company.id}_cuenta601_84')
+        cls.company_data_2['default_account_expense'] = cls.env.ref(f'account.{cls.company_2.id}_cuenta601_84')
+
         cls.company.vat = 'AAAA611013AAA'
         cls.company_2.vat = 'P&G851223B24'
         cls.wizard = cls.env['l10n_mx_xml_polizas.xml_polizas_wizard'].create({
@@ -310,6 +314,7 @@ class AccountXmlPolizasWizard(TestMxEdiCommon, TestAccountReportsCommon):
                 'quantity': 5,
                 'discount': 20.0,
                 'tax_ids': [],
+                'account_id': self.company_data['default_account_expense'].id,
             })],
         })
 
@@ -436,7 +441,7 @@ class AccountXmlPolizasWizard(TestMxEdiCommon, TestAccountReportsCommon):
                       </PLZ:Transaccion>
                 </PLZ:Poliza>
                 <PLZ:Poliza Fecha="2017-01-02" Concepto="Bank" NumUnIdenPol="PBNK1/2017/00001">
-                    <PLZ:Transaccion Concepto="Bank - Manual Payment: INV/2017/00001" DesCta="___ignore___" NumCta="OSTR00" Haber="0.00" Debe="1820.00">
+                    <PLZ:Transaccion Concepto="Bank - Manual Payment: INV/2017/00001" DesCta="___ignore___" NumCta="102.01.04" Haber="0.00" Debe="1820.00">
                         <PLZ:CompNal UUID_CFDI="AAAAAAAA-ABCD-ABCD-ABCD-AAAAAAAAAAAA" RFC="XEXX010101000" MontoTotal="1820.00"/>
                       </PLZ:Transaccion>
                     <PLZ:Transaccion Concepto="Bank - Manual Payment: INV/2017/00001" DesCta="___ignore___" NumCta="105.01.01" Haber="1820.00" Debe="0.00">

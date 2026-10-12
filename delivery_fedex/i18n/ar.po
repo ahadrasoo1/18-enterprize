@@ -1,23 +1,25 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* delivery_fedex
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Malaz Abuidris <msea@odoo.com>, 2024
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
+"POT-Creation-Date: 2025-12-29 18:50+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
+"Last-Translator: Malaz Abuidris <msea@odoo.com>, 2024\n"
 "Language-Team: Arabic (https://app.transifex.com/odoo/teams/41243/ar/)\n"
+"Language: ar\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: ar\n"
-"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
+"&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
 
 #. module: delivery_fedex
 #: model_terms:ir.ui.view,arch_db:delivery_fedex.view_delivery_carrier_form_with_provider_fedex
@@ -40,10 +42,12 @@ msgstr "<span class=\"o_form_label\">وحدة طول الطرد</span> "
 #: model_terms:ir.ui.view,arch_db:delivery_fedex.view_delivery_carrier_form_with_provider_fedex
 msgid ""
 "<span invisible=\"fedex_weight_unit != 'KG'\">CM</span>\n"
-"                                <span invisible=\"fedex_weight_unit != 'LB'\">IN</span>"
+"                                <span invisible=\"fedex_weight_unit != "
+"'LB'\">IN</span>"
 msgstr ""
 "<span invisible=\"fedex_weight_unit != 'KG'\">CM</span>\n"
-"                                <span invisible=\"fedex_weight_unit != 'LB'\">IN</span>"
+"                                <span invisible=\"fedex_weight_unit != "
+"'LB'\">IN</span>"
 
 #. module: delivery_fedex
 #: model_terms:ir.ui.view,arch_db:delivery_fedex.view_delivery_carrier_form_with_provider_fedex
@@ -117,18 +121,18 @@ msgstr "البيانات الإضافية "
 
 #. module: delivery_fedex
 #: model:ir.model.fields,field_description:delivery_fedex.field_delivery_carrier__fedex_extra_data_rate_request
-msgid "Extra data for rate"
-msgstr "البيانات الإضافية للسعر "
+msgid "Extra data for rate (legacy)"
+msgstr "البيانات الإضافية للسعر (القديم) "
 
 #. module: delivery_fedex
 #: model:ir.model.fields,field_description:delivery_fedex.field_delivery_carrier__fedex_extra_data_return_request
-msgid "Extra data for return"
-msgstr "البيانات الإضافية للإرجاع "
+msgid "Extra data for return (legacy)"
+msgstr "البيانات الإضافية للإرجاع (القديم) "
 
 #. module: delivery_fedex
 #: model:ir.model.fields,field_description:delivery_fedex.field_delivery_carrier__fedex_extra_data_ship_request
-msgid "Extra data for ship"
-msgstr "البيانات الإضافية للشحن "
+msgid "Extra data for ship (legacy)"
+msgstr "البيانات الإضافية للشحن (القديم) "
 
 #. module: delivery_fedex
 #: model:ir.model.fields,field_description:delivery_fedex.field_delivery_carrier__fedex_label_file_type
@@ -173,7 +177,7 @@ msgstr "FEDEX_GROUND"
 #. module: delivery_fedex
 #: model:ir.model.fields.selection,name:delivery_fedex.selection__delivery_carrier__fedex_service_type__fedex_international_connect_plus
 msgid "FEDEX_INTERNATIONAL_CONNECT_PLUS"
-msgstr ""
+msgstr "FEDEX_INTERNATIONAL_CONNECT_PLUS"
 
 #. module: delivery_fedex
 #: model:ir.model.fields.selection,name:delivery_fedex.selection__delivery_carrier__fedex_service_type__fedex_international_priority
@@ -238,24 +242,18 @@ msgstr "FIRST_OVERNIGHT"
 #. module: delivery_fedex
 #: model:ir.model.fields.selection,name:delivery_fedex.selection__delivery_carrier__delivery_type__fedex
 #: model:ir.model.fields.selection,name:delivery_fedex.selection__stock_package_type__package_carrier_type__fedex
-msgid "FedEx"
-msgstr "FedEx"
+msgid "FedEx (Legacy)"
+msgstr "FedEx (القديم) "
 
 #. module: delivery_fedex
 #: model:ir.model.fields,field_description:delivery_fedex.field_delivery_carrier__fedex_account_number
-msgid "FedEx Account Number"
-msgstr "رقم حساب FedEx"
+msgid "FedEx Legacy Account Number"
+msgstr "رقم حساب FedEx القديم "
 
 #. module: delivery_fedex
 #: model:ir.model.fields,field_description:delivery_fedex.field_delivery_carrier__fedex_saturday_delivery
 msgid "FedEx Saturday Delivery"
 msgstr "توصيل FedEx يوم السبت "
-
-#. module: delivery_fedex
-#: model_terms:ir.ui.view,arch_db:delivery_fedex.res_config_settings_view_form_sale
-#: model_terms:ir.ui.view,arch_db:delivery_fedex.res_config_settings_view_form_stock
-msgid "FedEx Shipping Methods"
-msgstr "طرق شحن FedEx "
 
 #. module: delivery_fedex
 #: model_terms:ir.ui.view,arch_db:delivery_fedex.view_delivery_carrier_form_with_provider_fedex
@@ -287,7 +285,7 @@ msgstr "دفع جمارك Fedex "
 #: model:delivery.carrier,name:delivery_fedex.delivery_carrier_fedex_inter
 #: model:product.template,name:delivery_fedex.product_product_delivery_fedex_inter_product_template
 msgid "Fedex International"
-msgstr "FedEx الدولية"
+msgstr "خدمة فيديكس الدولية "
 
 #. module: delivery_fedex
 #: model:ir.model.fields,field_description:delivery_fedex.field_delivery_carrier__fedex_default_package_type_id
@@ -558,11 +556,11 @@ msgstr "لقد تم إلغاء الشحنة رقم %s  "
 #. odoo-python
 #: code:addons/delivery_fedex/models/delivery_fedex.py:0
 msgid ""
-"Shipment created into Fedex<br/><b>Tracking Numbers:</b> "
-"%(tracking_numbers)s<br/><b>Packages:</b> %(packages)s"
+"Shipment created into Fedex<br/><b>Tracking Numbers:</b> %"
+"(tracking_numbers)s<br/><b>Packages:</b> %(packages)s"
 msgstr ""
-"تم إنشاء الشحنة في FedEx <br/> <b>رقم التتبع:</b> "
-"%(tracking_numbers)s<br/><b>الحزم:</b> %s"
+"تم إنشاء الشحنة في FedEx <br/> <b>أرقام التتبع:</b> %(tracking_numbers)s<br/"
+"><b>الطرود:</b> %(packages)s"
 
 #. module: delivery_fedex
 #: model:ir.model,name:delivery_fedex.model_delivery_carrier
@@ -606,24 +604,30 @@ msgstr "نوع طرود المخزون "
 #: model:ir.model.fields,help:delivery_fedex.field_delivery_carrier__fedex_extra_data_ship_request
 msgid ""
 "The extra data in FedEx is organized like the inside of a json file.\n"
-"This functionality is advanced/technical and should only be used if you know what you are doing.\n"
+"This functionality is advanced/technical and should only be used if you know "
+"what you are doing.\n"
 "\n"
 "Example of valid value: ```\n"
-"\"ShipmentDetails\": {\"Pieces\": {\"Piece\": {\"AdditionalInformation\": \"extra info\"}}}\n"
+"\"ShipmentDetails\": {\"Pieces\": {\"Piece\": {\"AdditionalInformation\": "
+"\"extra info\"}}}\n"
 "```\n"
 "\n"
-"With the above example, the AdditionalInformation of each piece will be updated.\n"
-"More info on https://www.fedex.com/en-us/developer/web-services/process.html#documentation"
+"With the above example, the AdditionalInformation of each piece will be "
+"updated.\n"
+"More info on https://www.fedex.com/en-us/developer/web-services/"
+"process.html#documentation"
 msgstr ""
 "يتم تنظيم المعلومات الإضافية في FedEx كما في دتاخل ملف json.\n"
 "هذه الخاصية تقنية/متقدمة ويجب استخدامها فقط إذا كنت تعرف طريقة استخدامها.\n"
 "\n"
 "مثال على قيمة صالحة: ```\n"
-"\"ShipmentDetails\": {\"Pieces\": {\"Piece\": {\"AdditionalInformation\": \"extra info\"}}}\n"
+"\"ShipmentDetails\": {\"Pieces\": {\"Piece\": {\"AdditionalInformation\": "
+"\"extra info\"}}}\n"
 "```\n"
 "\n"
 "مع المثال أعلاه، سيتم تحديث المعلومات الإضافية لكل قطعة.\n"
-"المزيد من المعلومات على https://www.fedex.com/en-us/developer/web-services/process.html#documentation"
+"المزيد من المعلومات على https://www.fedex.com/en-us/developer/web-services/"
+"process.html#documentation"
 
 #. module: delivery_fedex
 #: model_terms:ir.ui.view,arch_db:delivery_fedex.view_delivery_carrier_form_with_provider_fedex
@@ -633,8 +637,8 @@ msgstr "الخطوة الأخيرة هي"
 #. module: delivery_fedex
 #: model_terms:ir.ui.view,arch_db:delivery_fedex.view_delivery_carrier_form_with_provider_fedex
 msgid ""
-"These certifications usually require that you contact the FedEx support team"
-" by email."
+"These certifications usually require that you contact the FedEx support team "
+"by email."
 msgstr ""
 "غالبًا ما يتطلب اعتماد هذه الشهادات أن تتواصل مع فريق دعم FedEx عن طريق "
 "البريد الإلكتروني. "

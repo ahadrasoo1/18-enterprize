@@ -4,7 +4,6 @@ import { registry } from "@web/core/registry";
 import { stepUtils } from "@web_tour/tour_service/tour_utils";
 
 registry.category("web_tour.tours").add("test_sign_flow_tour", {
-    test: true,
     url: "/odoo",
     steps: () => [
         stepUtils.showAppsMenuItem(),
@@ -63,10 +62,6 @@ registry.category("web_tour.tours").add("test_sign_flow_tour", {
             run: "click",
         },
         {
-            isActive: ["auto"],
-            trigger: ":iframe input.o_sign_sign_item:focus",
-        },
-        {
             content: "Fill the sign item",
             trigger: ":iframe input.o_sign_sign_item",
             run: "edit Mitchell Admin",
@@ -77,12 +72,11 @@ registry.category("web_tour.tours").add("test_sign_flow_tour", {
             run: "click",
         },
         {
-            content: "Click sign it",
-            trigger: ':iframe .o_sign_sign_item_navigator:contains("sign it")',
+            content: "Click it",
+            trigger: ":iframe .o_sign_sign_item_navigator",
             run: "click",
         },
         {
-            isActive: ["auto"],
             trigger: ":iframe :not(:has(.o_sign_sign_item_navigator))",
         },
         {
@@ -112,11 +106,12 @@ registry.category("web_tour.tours").add("test_sign_flow_tour", {
             run: "click",
         },
         {
-            trigger: ".modal-dialog",
+            trigger:
+                ".modal-dialog .modal-body:contains(You will get the signed document by email.)",
         },
         {
-            content: "view",
-            trigger: ".modal-footer button.btn-primary, .modal-footer button.btn-secondary",
+            content: "Close modal",
+            trigger: ".modal-footer button.btn-secondary:contains(close)",
             run: "click",
         },
     ],

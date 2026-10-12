@@ -31,7 +31,6 @@ class StockQuant(models.Model):
                 val[2]['lot_id'] = self.env['stock.lot'].create({
                     'name': val[2].pop('lot_name'),
                     'product_id': val[2].get('product_id', quant_db and quant_db.product_id.id or False),
-                    'company_id': self.env['stock.location'].browse(val[2].get('location_id') or quant_db.location_id.id).company_id.id
                 }).id
 
         quant_ids = []
@@ -104,7 +103,7 @@ class StockQuant(models.Model):
         uoms = products.uom_id
         # If UoM setting is active, fetch all UoM's data.
         if self.env.user.has_group('uom.group_uom'):
-            uoms = self.env['uom.uom'].search([])
+            uoms = self.env['uom.uom'].with_context(active_test=False).search([])
 
         data = {
             "records": {
@@ -132,6 +131,7 @@ class StockQuant(models.Model):
             'inventory_quantity',
             'inventory_quantity_set',
             'quantity',
+            'available_quantity',
             'product_uom_id',
             'lot_id',
             'package_id',
@@ -143,3 +143,13 @@ class StockQuant(models.Model):
 
     def _get_inventory_fields_write(self):
         return ['dummy_id'] + super()._get_inventory_fields_write()
+
+    def _get_stock_barcode_specific_data(self):
+        return {
+            'product.product': self.product_id.read(self.env['product.product']._get_fields_stock_barcode(), load=False),
+            'uom.uom': self.product_id.uom_id.read(self.env['uom.uom']._get_fields_stock_barcode(), load=False),
+            'stock.location': self.location_id.read(self.env['stock.location']._get_fields_stock_barcode(), load=False),
+            'stock.lot': self.lot_id.read(self.env['stock.lot']._get_fields_stock_barcode(), load=False),
+            'stock.quant.package': self.package_id.read(self.env['stock.quant.package']._get_fields_stock_barcode(), load=False),
+            'res.partner': self.owner_id.read(self.env['res.partner']._get_fields_stock_barcode(), load=False),
+        }

@@ -1,6 +1,7 @@
 import {
     DocumentsDocument,
     defineDocumentSpreadsheetModels,
+    getBasicServerData,
 } from "@documents_spreadsheet/../tests/helpers/data";
 import {
     createSpreadsheet,
@@ -11,7 +12,6 @@ import { press } from "@odoo/hoot-dom";
 import { animationFrame } from "@odoo/hoot-mock";
 import * as spreadsheet from "@odoo/o-spreadsheet";
 import { setCellContent } from "@spreadsheet/../tests/helpers/commands";
-import { getBasicServerData } from "@spreadsheet/../tests/helpers/data";
 import { getCellContent, getCellValue } from "@spreadsheet/../tests/helpers/getters";
 import { doMenuAction } from "@spreadsheet/../tests/helpers/ui";
 import { UNTITLED_SPREADSHEET_NAME } from "@spreadsheet/helpers/constants";
@@ -78,8 +78,7 @@ test("Display notification for new spreadsheet creation based on action response
     expect.verifySteps(["action_open_new_spreadsheet"]);
 
     await animationFrame(); // Wait for the notification to be displayed
-    const notification = document.querySelector(".o_notification_content");
-    expect(notification.textContent).toBe("New spreadsheet created in Documents");
+    expect(".o_notification_content").toHaveText("New spreadsheet created in Documents");
 });
 
 test("Action action_download_spreadsheet is correctly fired with topbar menu", async function () {
@@ -93,6 +92,7 @@ test("Action action_download_spreadsheet is correctly fired with topbar menu", a
     expect(actionParam).toEqual({
         xlsxData: model.exportXLSX(),
         name: UNTITLED_SPREADSHEET_NAME.toString(),
+        sources: [],
     });
 });
 

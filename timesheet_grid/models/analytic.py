@@ -10,6 +10,7 @@ from odoo.addons.resource.models.utils import make_aware
 from odoo.addons.resource.models.utils import filter_domain_leaf
 from odoo.exceptions import RedirectWarning, UserError, AccessError
 from odoo.osv import expression
+from odoo.tools import format_date
 
 
 class AnalyticLine(models.Model):
@@ -36,6 +37,11 @@ class AnalyticLine(models.Model):
     display_timer = fields.Boolean(
         "Technical field used to display the timer if the encoding unit is 'Hours'.",
         compute='_compute_display_timer', export_string_translation=False)
+
+    @api.constrains('unit_amount')
+    def _check_timesheet_unit_amount(self):
+        if any(abs(t.unit_amount) > 999999 for t in self if t.is_timesheet):
+            raise UserError(_("You can't encode numbers with more than six digits."))
 
     def _is_readonly(self):
         return super()._is_readonly() or self.validated
@@ -76,7 +82,20 @@ class AnalyticLine(models.Model):
             return list(set(unavailable_days))
 
         def get_company_unavailable_dates():
-            return get_unavailable_dates(self.env.company.resource_calendar_id._work_intervals_batch(from_datetime, to_datetime)[False])
+            company_calendar = self.env.company.resource_calendar_id
+            if company_calendar.flexible_hours:
+                return []
+            return get_unavailable_dates(company_calendar._work_intervals_batch(from_datetime, to_datetime)[False])
+
+        def get_current_user_unavailable_dates():
+            resource = self.env.user.employee_id.resource_id
+            if resource:
+                resource_work_intervals, _ = resource._get_valid_work_intervals(
+                    from_datetime, to_datetime
+                )
+                if resource.id in resource_work_intervals:
+                    return get_unavailable_dates(resource_work_intervals[resource.id])
+            return False
 
         if groupby == 'employee_id':
             employees = self.env['hr.employee'].browse(set(res_ids))
@@ -86,19 +105,26 @@ class AnalyticLine(models.Model):
                 unavailability_intervals_per_employee_id[False] = get_company_unavailable_dates()
                 return unavailability_intervals_per_employee_id
             if self.env.company.resource_calendar_id.id in calendar_work_intervals:
-                company_unavailable_days = get_unavailable_dates(calendar_work_intervals[self.env.company.resource_calendar_id.id])
+                company_unavailable_days = [] if self.env.company.resource_calendar_id.flexible_hours else get_unavailable_dates(calendar_work_intervals[self.env.company.resource_calendar_id.id])
             else:
                 company_unavailable_days = get_company_unavailable_dates()
             unavailability_intervals_per_employee_id = {
                 employee_id:
-                    get_unavailable_dates(availability_intervals_per_resource_id[resource_id])
+                    []
+                    if self.env['resource.resource'].browse(resource_id)._is_flexible()
+                    else get_unavailable_dates(availability_intervals_per_resource_id[resource_id])
                     if resource_id in availability_intervals_per_resource_id
                     else company_unavailable_days
                 for resource_id, employee_id in employee_id_per_resource_id.items()
             }
             unavailability_intervals_per_employee_id[False] = company_unavailable_days
+        elif self.env.context.get('get_current_user_unavailable_dates', False):
+            unavailability_intervals_per_employee_id[False] = get_current_user_unavailable_dates()
         else:
-            unavailability_intervals_per_employee_id[False] = get_company_unavailable_dates()
+            if self.env.user.resource_calendar_id.flexible_hours:
+                unavailability_intervals_per_employee_id[False] = []
+            else:
+                unavailability_intervals_per_employee_id[False] = get_company_unavailable_dates()
         return unavailability_intervals_per_employee_id
 
     def _compute_project_id(self):
@@ -282,7 +308,7 @@ class AnalyticLine(models.Model):
                             show_access_error = True
 
                 if show_access_error:
-                    last_validated_timesheet_date_str = str(last_validated_timesheet_date.strftime('%m/%d/%Y'))
+                    last_validated_timesheet_date_str = format_date(self.env, last_validated_timesheet_date)
                     if delete:
                         error_message = _('Timesheets before the %(date)s (included) have been validated, and can no longer be deleted.', date=last_validated_timesheet_date_str)
                     else:
@@ -290,8 +316,6 @@ class AnalyticLine(models.Model):
                     raise AccessError(error_message)
 
     def _check_can_create(self):
-        if self.filtered(lambda t: t.unit_amount > 999999):
-            raise UserError(_("You can't encode numbers with more than six digits."))
         # Check if the user has the correct access to create timesheets
         if (
             not (self.env.user.has_group('hr_timesheet.group_hr_timesheet_approver') or self.env.su)
@@ -303,8 +327,6 @@ class AnalyticLine(models.Model):
         return super()._check_can_create()
 
     def _check_can_write(self, vals):
-        if vals.get('unit_amount', 0) > 999999:
-            raise UserError(_("You can't encode numbers with more than six digits."))
         if not self.env.user.has_group('hr_timesheet.group_hr_timesheet_approver'):
             if 'validated' in vals:
                 raise AccessError(_('You can only validate the timesheets of employees of whom you are the manager or the timesheet approver.'))
@@ -345,7 +367,7 @@ class AnalyticLine(models.Model):
         non_validated_timesheets = timesheets.filtered(lambda timesheet: not timesheet.validated)
         if len(non_validated_timesheets) > 1 or (len(timesheets) == 1 and timesheets.validated):
             timesheets[0].copy({
-                'name': '/',
+                'name': self._context.get('default_name', '/'),
                 measure_field_name: value,
             })
         elif len(non_validated_timesheets) == 1:
@@ -365,7 +387,7 @@ class AnalyticLine(models.Model):
                 raise UserError(_("You cannot adjust the time of the timesheet for a project with timesheets disabled."))
 
             self.create({
-                'name': '/',
+                'name': self._context.get('default_name', '/'),
                 'project_id': project_id,
                 field_name: field_value,
                 measure_field_name: value,
@@ -451,9 +473,9 @@ class AnalyticLine(models.Model):
             timesheet = self.create(self._get_new_timesheet_timer_vals())
             timesheet.action_timer_start()
         elif not self.user_timer_id.timer_start and self.display_timer:
-            if self.date != fields.Date.context_today(self):
+            if self.date != fields.Date.context_today(self) and not self._context.get('_from_action_timer'):
                 timesheet = self.create(self._get_new_timesheet_timer_vals())
-                timesheet.action_timer_start()
+                timesheet.with_context(_from_action_timer=True).action_timer_start()
             else:
                 super().action_timer_start()
 
@@ -464,7 +486,7 @@ class AnalyticLine(models.Model):
             ('user_id', '=', self.env.user.id),
             ('project_id', '=', self.project_id.id),
             ('task_id', '=', self.task_id.id),
-            ('date', '=', fields.Date.today()),
+            ('date', '=', fields.Date.context_today(self)),
             ('name', '=', '/'),
             ('validated', '=', False),
         ]
@@ -477,11 +499,11 @@ class AnalyticLine(models.Model):
             return 0
         minimum_duration = int(self.env['ir.config_parameter'].sudo().get_param('timesheet_grid.timesheet_min_duration', 0))
         rounding = int(self.env['ir.config_parameter'].sudo().get_param('timesheet_grid.timesheet_rounding', 0))
-        minutes_spent = self._timer_rounding(minutes_spent, minimum_duration, rounding)
-        amount = self.unit_amount + minutes_spent * 60 / 3600
+        minutes_spent = self._timer_rounding(minutes_spent, minimum_duration, rounding) * 60 / 3600
+        amount = self.unit_amount + minutes_spent
         if not try_to_match or self.name != '/':
             self.write({'unit_amount': amount})
-            return amount
+            return minutes_spent
 
         domain = self._get_last_timesheet_domain()
         last_timesheet_id = self.search(domain, limit=1)
@@ -492,7 +514,7 @@ class AnalyticLine(models.Model):
             self.unlink()
         else:
             self.write({'unit_amount': amount})
-        return amount
+        return minutes_spent
 
     def action_timer_stop(self, try_to_match=False):
         """ Action stop the timer of the current timesheet
@@ -544,7 +566,11 @@ class AnalyticLine(models.Model):
 
     def _get_timesheet_timer_data(self, timer=None):
         if self.company_id in self.env.companies:
-            return {'id': (timer or self.user_timer_id).res_id}
+            return {
+                'id': (timer or self.user_timer_id).res_id,
+                'project_id': self.project_id.id,
+                'task_id': self.task_id.id,
+            }
         return {'other_company': True}
 
     @api.model

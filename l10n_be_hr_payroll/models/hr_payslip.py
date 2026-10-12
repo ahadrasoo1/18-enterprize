@@ -6,7 +6,7 @@ from dateutil import rrule
 from collections import defaultdict, Counter
 from datetime import date, datetime, timedelta
 
-from odoo import api, models, fields, _
+from odoo import api, Command, models, fields, _
 from odoo.tools import float_round, float_is_zero, date_utils, ormcache
 from odoo.exceptions import UserError
 
@@ -16,8 +16,9 @@ class Payslip(models.Model):
 
     meal_voucher_count = fields.Integer(
         compute='_compute_work_entry_dependent_benefits')  # Overrides compute method
+    # YTI NOTE: Changed nature of field (from missing dats to granting days)
     private_car_missing_days = fields.Integer(
-        string='Days Not Granting Private Car Reimbursement',
+        string='Days Granting Private Car Reimbursement',
         compute='_compute_work_entry_dependent_benefits')
     representation_fees_missing_days = fields.Integer(
         string='Days Not Granting Representation Fees',
@@ -62,6 +63,16 @@ class Payslip(models.Model):
                         'input_type_id': european_type.id,
                     })]
                     slip.write({'input_line_ids': to_remove_vals + to_add_vals})
+            elif slip.struct_id.code == 'CP200CCT90':
+                cct90_input_type = self.env.ref('l10n_be_hr_payroll.input_cct90_bonus_plan')
+                lines_to_remove = slip.input_line_ids.filtered(lambda x: x.input_type_id == cct90_input_type)
+                to_remove_vals = [Command.unlink(line.id) for line in lines_to_remove]
+                to_add_vals = [Command.create({
+                    'name': _('CCT90 Bonus Plan'),
+                    'amount': 0,
+                    'input_type_id': cct90_input_type.id,
+                })]
+                slip.write({'input_line_ids': to_remove_vals + to_add_vals})
         return res
 
     @ormcache('self.employee_id', 'self.date_from', 'self.date_to')
@@ -112,7 +123,7 @@ class Payslip(models.Model):
         if self.env.context.get('salary_simulation'):
             for payslip in self:
                 payslip.meal_voucher_count = 20
-                payslip.private_car_missing_days = 0
+                payslip.private_car_missing_days = 20
                 payslip.representation_fees_missing_days = 0
         else:
             all_benefits = self.env['hr.work.entry.type'].get_work_entry_type_benefits()
@@ -166,7 +177,7 @@ class Payslip(models.Model):
                 intervals = mapped_intervals[(calendar, payslip.date_from, payslip.date_to)][resource.id]
 
                 nb_of_days_to_work = len({dt_from.date(): True for (dt_from, dt_to, attendance) in intervals})
-                payslip.private_car_missing_days = nb_of_days_to_work - (benefits['private_car'] if 'private_car' in benefits else 0)
+                payslip.private_car_missing_days = benefits['private_car'] if 'private_car' in benefits else 0
                 payslip.representation_fees_missing_days = nb_of_days_to_work - (benefits['representation_fees'] if 'representation_fees' in benefits else 0)
                 payslip.meal_voucher_count = benefits['meal_voucher']
 
@@ -453,17 +464,19 @@ class Payslip(models.Model):
         if not contracts or not first_contract_date:
             return 0.0
 
+        if first_contract_date.year == self.date_from.year and first_contract_date.month > 6:
+            return 0.0
+
         date_from = max(first_contract_date, self.date_from + relativedelta(day=1, month=1))
         date_to = self.date_to + relativedelta(day=31)
 
         basic = self.contract_id._get_contract_wage()
 
         force_months = self.input_line_ids.filtered(lambda l: l.code == 'MONTHS')
-        work_time_rates = contracts.resource_calendar_id.mapped('work_time_rate')[::-1]
-        non_zero_rates = [rate for rate in work_time_rates if rate != 0]
-        if not non_zero_rates:
+        work_time_rates = [c.resource_calendar_id.work_time_rate for c in contracts if c.resource_calendar_id.work_time_rate]
+        if not work_time_rates:
             return 0.0
-        current_work_rate = non_zero_rates[0] / 100
+        current_work_rate = work_time_rates[-1] / 100.0
 
         if force_months:
             n_months = force_months[0].amount
@@ -541,6 +554,10 @@ class Payslip(models.Model):
                 )._get_last_year_average_variable_revenues()
         return fixed_salary + avg_variable_revenues
 
+    def _get_paid_amount_cct90_bonus_plan(self):
+        self.ensure_one()
+        return self._get_input_line_amount('CCT90BONUSPLAN')
+
     def _get_paid_amount(self):
         self.ensure_one()
         belgian_payslip = self.struct_id.country_id.code == "BE"
@@ -551,6 +568,8 @@ class Payslip(models.Model):
                 return self._get_paid_amount_warrant()
             if self.struct_id.code == 'CP200DOUBLE':
                 return self._get_paid_double_holiday()
+            if self.struct_id.code == 'CP200CCT90':
+                return self._get_paid_amount_cct90_bonus_plan()
         return super()._get_paid_amount()
 
     def _is_active_belgian_languages(self):
@@ -634,6 +653,8 @@ class Payslip(models.Model):
         # See: https://www.securex.eu/lex-go.nsf/vwReferencesByCategory_fr/52DA120D5DCDAE78C12584E000721081?OpenDocument
         self.ensure_one()
         def find_rates(x, rates):
+            low_bound, high_bound = rates[0][0], rates[-1][1]
+            x = min(max(low_bound, x), high_bound)
             for low, high, rate in rates:
                 if low <= x <= high:
                     return rate
@@ -826,6 +847,7 @@ class Payslip(models.Model):
 
     def _get_employment_bonus_employees_volet_A(self, localdict):
         categories = localdict['categories']
+        result_rules = localdict['result_rules']
         if not self.worked_days_line_ids and not self.env.context.get('salary_simulation'):
             return 0
 
@@ -837,12 +859,13 @@ class Payslip(models.Model):
             paid_hours = 1
             total_hours = 1
         else:
-            worked_days = self.worked_days_line_ids.filtered(lambda wd: wd.code not in ['LEAVE300', 'LEAVE301'])
+            worked_days = self.worked_days_line_ids.filtered(lambda wd: wd.code not in ['LEAVE300', 'LEAVE301', 'MEDIC01'])
             paid_hours = sum(worked_days.filtered(lambda wd: wd.amount).mapped('number_of_hours'))  # H
             total_hours = sum(worked_days.mapped('number_of_hours'))  # U
 
         # 1. - Détermination du salaire mensuel de référence (S)
-        salary = categories['BRUT'] * total_hours / paid_hours  # S = (W/H) x U
+        basic = categories['BRUT'] - result_rules['HolPayRecN']['total'] - result_rules['HolPayRecN1']['total']
+        salary = basic * total_hours / paid_hours  # S = (W/H) x U
 
         # 2. - Détermination du montant de base de la réduction (R)
         bonus_basic_amount_volet_A = self._rule_parameter('work_bonus_basic_amount_volet_A')
@@ -866,6 +889,7 @@ class Payslip(models.Model):
 
     def _get_employment_bonus_employees_volet_B(self, localdict):
         categories = localdict['categories']
+        result_rules = localdict['result_rules']
         if not self.worked_days_line_ids and not self.env.context.get('salary_simulation'):
             return 0
 
@@ -877,12 +901,13 @@ class Payslip(models.Model):
             paid_hours = 1
             total_hours = 1
         else:
-            worked_days = self.worked_days_line_ids.filtered(lambda wd: wd.code not in ['LEAVE300', 'LEAVE301'])
+            worked_days = self.worked_days_line_ids.filtered(lambda wd: wd.code not in ['LEAVE300', 'LEAVE301', 'MEDIC01'])
             paid_hours = sum(worked_days.filtered(lambda wd: wd.amount).mapped('number_of_hours'))  # H
             total_hours = sum(worked_days.mapped('number_of_hours'))  # U
 
         # 1. - Détermination du salaire mensuel de référence (S)
-        salary = categories['BRUT'] * total_hours / paid_hours  # S = (W/H) x U
+        basic = categories['BRUT'] - result_rules['HolPayRecN']['total'] - result_rules['HolPayRecN1']['total']
+        salary = basic * total_hours / paid_hours  # S = (W/H) x U
 
         # 2. - Détermination du montant de base de la réduction (R)
         bonus_basic_amount = self._rule_parameter('work_bonus_basic_amount')
@@ -908,13 +933,11 @@ class Payslip(models.Model):
     def _get_employment_bonus_employees(self, localdict):
         self.ensure_one()
         categories = localdict['categories']
+        result_rules = localdict['result_rules']
         if self.date_from >= date(2024, 4, 1):
-            bonus_volet_A = self._get_employment_bonus_employees_volet_A(localdict)
-            bonus_volet_B = self._get_employment_bonus_employees_volet_B(localdict)
+            bonus_volet_A = localdict['result_rules']['EmpBonus.A']['total']
+            bonus_volet_B = localdict['result_rules']['EmpBonus.B']['total']
             result = bonus_volet_A + bonus_volet_B
-            # Nasty lazy dev
-            localdict['result_rules']['bonus_volet_A']['total'] = bonus_volet_A
-            localdict['result_rules']['bonus_volet_B']['total'] = bonus_volet_B
             return min(result, -categories['ONSS'])
 
         bonus_basic_amount = self._rule_parameter('work_bonus_basic_amount')
@@ -930,12 +953,13 @@ class Payslip(models.Model):
             paid_hours = 1
             total_hours = 1
         else:
-            worked_days = self.worked_days_line_ids.filtered(lambda wd: wd.code not in ['LEAVE300', 'LEAVE301'])
+            worked_days = self.worked_days_line_ids.filtered(lambda wd: wd.code not in ['LEAVE300', 'LEAVE301', 'MEDIC01'])
             paid_hours = sum(worked_days.filtered(lambda wd: wd.amount).mapped('number_of_hours'))  # H
             total_hours = sum(worked_days.mapped('number_of_hours'))  # U
 
         # 1. - Détermination du salaire mensuel de référence (S)
-        salary = categories['BRUT'] * total_hours / paid_hours  # S = (W/H) x U
+        basic = categories['BRUT'] - result_rules['HolPayRecN']['total'] - result_rules['HolPayRecN1']['total']
+        salary = basic * total_hours / paid_hours  # S = (W/H) x U
 
         # 2. - Détermination du montant de base de la réduction (R)
         if self.date_from < date(2023, 7, 1):
@@ -963,114 +987,101 @@ class Payslip(models.Model):
 
         return min(result, -categories['ONSS'])
 
-    def _get_be_double_holiday_withholding_taxes(self, localdict):
-        self.ensure_one()
-        # See: https://www.securex.eu/lex-go.nsf/vwReferencesByCategory_fr/52DA120D5DCDAE78C12584E000721081?OpenDocument
+    def _get_withholding_taxes_after_child_allowances(self, rates, gross, apply_reduction=True):
+
         def find_rates(x, rates):
+            low_bound, high_bound = rates[0][0], rates[-1][1]
+            x = min(max(low_bound, x), high_bound)
             for low, high, rate in rates:
                 if low <= x <= high:
                     return rate / 100.0
 
-        categories = localdict['categories']
-        rates = self._rule_parameter('holiday_pay_pp_rates')
         children_exoneration = self._rule_parameter('holiday_pay_pp_exoneration')
         children_reduction = self._rule_parameter('holiday_pay_pp_rate_reduction')
 
         employee = self.contract_id.employee_id
 
+        contract = self.contract_id
+        monthly_revenue = contract._get_contract_wage()
+        # Count ANT in yearly remuneration
+        if contract.internet:
+            monthly_revenue += 5.0
+        if contract.mobile and not contract.internet:
+            monthly_revenue += 4.0 + 5.0
+        if contract.mobile and contract.internet:
+            monthly_revenue += 4.0
+        if contract.has_laptop:
+            monthly_revenue += 7.0
+
+        yearly_revenue = monthly_revenue * (1 - 0.1307) * 12.0
+
+        if contract.transport_mode_car:
+            if 'vehicle_id' in self:
+                yearly_revenue += self.vehicle_id._get_car_atn(date=self.date_from) * 12.0
+            else:
+                yearly_revenue += contract.car_atn * 12.0
+
+        # Exoneration
+        children = employee.dependent_children
+        if children > 0 and yearly_revenue <= children_exoneration.get(children, children_exoneration[12]):
+            yearly_revenue -= children_exoneration.get(children, children_exoneration[12]) - yearly_revenue
+            yearly_revenue = max(yearly_revenue, 0)
+
+        withholding_tax_amount = gross * find_rates(yearly_revenue, rates)
+        # Reduction
+        if (apply_reduction and
+            children > 0 and
+            yearly_revenue <= children_reduction.get(children, children_reduction[5])[1]
+        ):
+            withholding_tax_amount *= (1 - children_reduction.get(children, children_reduction[5])[0] / 100.0)
+
+        return - withholding_tax_amount
+
+    def _get_be_double_holiday_withholding_taxes(self, localdict):
+        self.ensure_one()
+        # See: https://www.securex.eu/lex-go.nsf/vwReferencesByCategory_fr/52DA120D5DCDAE78C12584E000721081?OpenDocument
+
+        rates = self._rule_parameter('holiday_pay_pp_rates')
+
+        categories = localdict['categories']
         if self.struct_id.code == "CP200DOUBLE":
             gross = categories['GROSS']
         elif self.struct_id.code == "CP200MONTHLY":
             gross = categories['DDPG']
 
-        contract = self.contract_id
-        monthly_revenue = contract._get_contract_wage()
-        # Count ANT in yearly remuneration
-        if contract.internet:
-            monthly_revenue += 5.0
-        if contract.mobile and not contract.internet:
-            monthly_revenue += 4.0 + 5.0
-        if contract.mobile and contract.internet:
-            monthly_revenue += 4.0
-        if contract.has_laptop:
-            monthly_revenue += 7.0
-
-        yearly_revenue = monthly_revenue * (1 - 0.1307) * 12.0
-
-        if contract.transport_mode_car:
-            if 'vehicle_id' in self:
-                yearly_revenue += self.vehicle_id._get_car_atn(date=self.date_from) * 12.0
-            else:
-                yearly_revenue += contract.car_atn * 12.0
-
-        # Exoneration
-        children = employee.dependent_children
-        if children > 0 and yearly_revenue <= children_exoneration.get(children, children_exoneration[12]):
-            yearly_revenue -= children_exoneration.get(children, children_exoneration[12]) - yearly_revenue
-
-        # Reduction
-        if children > 0 and yearly_revenue <= children_reduction.get(children, children_reduction[5])[1]:
-            withholding_tax_amount = gross * find_rates(yearly_revenue, rates) * (1 - children_reduction.get(children, children_reduction[5])[0] / 100.0)
-        else:
-            withholding_tax_amount = gross * find_rates(yearly_revenue, rates)
-        return - withholding_tax_amount
+        return self._get_withholding_taxes_after_child_allowances(rates, gross)
 
     def _get_thirteen_month_withholding_taxes(self, localdict):
         self.ensure_one()
         # See: https://www.securex.eu/lex-go.nsf/vwReferencesByCategory_fr/52DA120D5DCDAE78C12584E000721081?OpenDocument
-        def find_rates(x, rates):
-            for low, high, rate in rates:
-                if low <= x <= high:
-                    return rate / 100.0
 
-        categories = localdict['categories']
         rates = self._rule_parameter('exceptional_allowances_pp_rates')
-        children_exoneration = self._rule_parameter('holiday_pay_pp_exoneration')
-        children_reduction = self._rule_parameter('holiday_pay_pp_rate_reduction')
-
-        employee = self.contract_id.employee_id
-
+        categories = localdict['categories']
         gross = categories['GROSS']
 
-        contract = self.contract_id
-        monthly_revenue = contract._get_contract_wage()
-        # Count ANT in yearly remuneration
-        if contract.internet:
-            monthly_revenue += 5.0
-        if contract.mobile and not contract.internet:
-            monthly_revenue += 4.0 + 5.0
-        if contract.mobile and contract.internet:
-            monthly_revenue += 4.0
-        if contract.has_laptop:
-            monthly_revenue += 7.0
+        return self._get_withholding_taxes_after_child_allowances(rates, gross)
 
-        yearly_revenue = monthly_revenue * (1 - 0.1307) * 12.0
+    def _get_termination_fees_withholding_taxes(self, localdict):
+        # See: https://www.securex.eu/lex-go.nsf/vwReferencesByCategory_fr/52DA120D5DCDAE78C12584E000721081?OpenDocument
+        if self.date_from.year >= 2024:
+            self.ensure_one()
 
-        if contract.transport_mode_car:
-            if 'vehicle_id' in self:
-                yearly_revenue += self.vehicle_id._get_car_atn(date=self.date_from) * 12.0
-            else:
-                yearly_revenue += contract.car_atn * 12.0
+            rates = self._rule_parameter('termination_fees_pp_rates')
+            categories = localdict['categories']
+            gross = categories['GROSS']
 
-        # Exoneration
-        children = employee.dependent_children
-        if children > 0 and yearly_revenue <= children_exoneration.get(children, children_exoneration[12]):
-            yearly_revenue -= children_exoneration.get(children, children_exoneration[12]) - yearly_revenue
+            return self._get_withholding_taxes_after_child_allowances(rates, gross, apply_reduction=False)
 
-        # Reduction
-        if children > 0 and yearly_revenue <= children_reduction.get(children, children_reduction[5])[1]:
-            withholding_tax_amount = gross * find_rates(yearly_revenue, rates) * (1 - children_reduction.get(children, children_reduction[5])[0] / 100.0)
         else:
-            withholding_tax_amount = gross * find_rates(yearly_revenue, rates)
-        return - withholding_tax_amount
+            return self._get_be_withholding_taxes(localdict)
 
     def _get_withholding_reduction(self, localdict):
         self.ensure_one()
         categories = localdict['categories']
         if categories['EmpBonus']:
             if self.date_from >= date(2024, 4, 1):
-                bonus_volet_A = localdict['result_rules']['bonus_volet_A']['total']
-                bonus_volet_B = localdict['result_rules']['bonus_volet_B']['total']
+                bonus_volet_A = localdict['result_rules']['EmpBonus.A']['total']
+                bonus_volet_B = localdict['result_rules']['EmpBonus.B']['total']
                 reduction = bonus_volet_A * 0.3314 + bonus_volet_B * 0.5254
             else:
                 reduction = categories['EmpBonus'] * 0.3314
@@ -1315,9 +1326,10 @@ class Payslip(models.Model):
                 employee_hourly_cost = self.contract_id.contract_wage / self.sum_worked_hours
             else:
                 employee_hourly_cost = self.contract_id.contract_wage * 3 / 13 / self.contract_id.resource_calendar_id.hours_per_week
-        remaining_day_amount = min(remaining_day, number_of_days) * employee_hourly_cost * 7.6
+        employee_hours_per_day = self.contract_id.resource_calendar_id.hours_per_day
+        remaining_day_amount = min(remaining_day, number_of_days) * employee_hourly_cost * employee_hours_per_day
         days_to_recover = employee['l10n_be_holiday_pay_to_recover_' + recovery_type]
-        max_amount_to_recover = min(days_to_recover, employee_hourly_cost * number_of_days * 7.6)
+        max_amount_to_recover = min(days_to_recover, employee_hourly_cost * number_of_days * employee_hours_per_day)
         leave120_amount = self._get_worked_days_line_amount('LEAVE120')
         holiday_amount = min(leave120_amount, employee_hourly_cost * self._get_worked_days_line_number_of_hours('LEAVE120'))
         remaining_amount = max(0, max_amount_to_recover - employee['l10n_be_holiday_pay_recovered_' + recovery_type])

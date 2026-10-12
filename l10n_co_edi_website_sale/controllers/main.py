@@ -21,7 +21,7 @@ class L10nCOWebsiteSale(WebsiteSale):
         return mandatory_fields
 
     def _get_mandatory_delivery_address_fields(self, country_sudo):
-        mandatory_fields = super()._get_mandatory_billing_address_fields(country_sudo)
+        mandatory_fields = super()._get_mandatory_delivery_address_fields(country_sudo)
         company_country = request.website.sudo().company_id.account_fiscal_country_id
         if country_sudo.code == 'CO' and country_sudo.id == company_country.id:
             mandatory_fields |= {
@@ -34,9 +34,9 @@ class L10nCOWebsiteSale(WebsiteSale):
     def _parse_form_data(self, form_data):
         # This is needed so that the field is correctly read as list from the request
         if form_data.get('l10n_co_edi_obligation_type_ids'):
-            form_data['l10n_co_edi_obligation_type_ids'] = request.httprequest.form.getlist('l10n_co_edi_obligation_type_ids')
+            form_data['l10n_co_edi_obligation_type_ids'] = request.httprequest.form.getlist('l10n_co_edi_obligation_type_ids', int)
         # Set default values for fiscal regimen and obligation types when identification type is not NIT
-        nit_id_type = request.env['l10n_latam.identification.type'].sudo().search([('name', '=', 'NIT')])
+        nit_id_type = request.env['l10n_latam.identification.type'].sudo().search([('name', '=', 'NIT'), ('country_id.code', '=', 'CO')], limit=1)
         id_type_id = form_data.get('l10n_latam_identification_type_id')
         if id_type_id and nit_id_type and int(id_type_id) != nit_id_type.id:
             default_obligations = ['R-99-PN']

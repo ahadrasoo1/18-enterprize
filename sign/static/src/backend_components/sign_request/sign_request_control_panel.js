@@ -30,8 +30,8 @@ function useResendButtons() {
                 ".o_sign_signer_status.o_sign_signer_waiting"
             );
             Array.from(signerNames).forEach((signerNameEl) => {
-                const stateSet =
-                    component.signInfo.get("requestItemStates")[signerNameEl.dataset.id];
+                const requestItemStates = component.signInfo.get("requestItemStates") || {};
+                const stateSet = requestItemStates[signerNameEl.dataset.id];
                 const title = stateSet ? _t("Resend the invitation") : _t("Send the invitation");
                 const text = stateSet ? _t("Resend") : _t("Send");
                 const button = document.createElement("button");

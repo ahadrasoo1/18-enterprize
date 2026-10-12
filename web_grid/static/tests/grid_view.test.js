@@ -161,7 +161,6 @@ class Task extends models.Model {
 
     _views = {
         form: `<form><field name="display_name"/></form>`,
-        search: `<search/>`,
     };
 }
 
@@ -171,12 +170,11 @@ beforeEach(() => {
     mockDate("2017-01-30 00:00:00");
 });
 
-onRpc("grid_unavailability", () => {
-    return {};
-});
+onRpc("grid_unavailability", () => ({}));
 onRpc("has_group", () => true);
 
-describe.tags("desktop")("grid_view_desktop", () => {
+describe.tags("desktop");
+describe("grid_view_desktop", () => {
     test("basic empty grid view", async () => {
         await mountView({
             type: "grid",
@@ -859,7 +857,7 @@ describe.tags("desktop")("grid_view_desktop", () => {
         await contains(".o_grid_cell button.o_grid_search_btn").click();
     });
 
-    test("editing a value [REQUIRE FOCUS]", async () => {
+    test("editing a value", async () => {
         onRpc("grid_update_cell", (args) => {
             expect(args.model).toBe("analytic.line", {
                 message: "The update cell should be called in the current model.",
@@ -942,6 +940,41 @@ describe.tags("desktop")("grid_view_desktop", () => {
         expect(rowTotal).toHaveText(
             `${rowTotalHours + 2}:${String(rowTotalMinutes).padStart(2, "0")}`
         );
+    });
+
+    test("edit grid cell with action context defined", async () => {
+        onRpc("grid_update_cell", (args) => {
+            const context = args.kwargs.context;
+            expect.step("grid_update_cell");
+            // the project in the action context should be replaced by the project linked to the grid cell altered
+            expect(context.default_project_id).toBe(31);
+            expect(context.default_selection_field).toBe("abc");
+        });
+        await mountView({
+            type: "grid",
+            resModel: "analytic.line",
+            arch: `<grid editable="1">
+                <field name="project_id" type="row"/>
+                <field name="task_id" type="row"/>
+                <field name="date" type="col">
+                    <range name="week" string="Week" span="week" step="day"/>
+                    <range name="month" string="Month" span="month" step="day"/>
+                </field>
+                <field name="unit_amount" type="measure" widget="float_time"/>
+            </grid>`,
+            context: {
+                default_project_id: 1,
+                default_selection_field: "abc",
+            },
+        });
+
+        await hover(".o_grid_row .o_grid_cell_readonly");
+        await runAllTimers();
+        await contains(".o_grid_cell").click();
+        await animationFrame();
+        expect(".o_grid_cell input").toHaveCount(1);
+        await contains(".o_grid_cell input").edit("2");
+        expect.verifySteps(["grid_update_cell"]);
     });
 
     test("hide row total", async () => {
@@ -1128,9 +1161,7 @@ describe.tags("desktop")("grid_view_desktop", () => {
 
     test("dialog should not close when clicking the link to many2one field", async () => {
         // create an action manager to test the interactions with the search view
-        onRpc("/web/dataset/call_kw/task/get_formview_id", (route, args) => {
-            return false;
-        });
+        onRpc("task", "get_formview_id", () => false);
         await mountWithCleanup(WebClient);
         await getService("action").doAction({
             res_model: "analytic.line",
@@ -1372,7 +1403,7 @@ describe.tags("desktop")("grid_view_desktop", () => {
     });
 
     test("stop edition when the user clicks outside", async () => {
-        const arch = Line._views["grid,false"].replace("<grid>", '<grid editable="1">');
+        const arch = Line._views["grid"].replace("<grid>", '<grid editable="1">');
         await mountView({
             type: "grid",
             resModel: "analytic.line",
@@ -1392,7 +1423,7 @@ describe.tags("desktop")("grid_view_desktop", () => {
     });
 
     test("display no content helper when no data and sample data is used (with display_empty='1')", async () => {
-        const arch = Line._views["grid,false"].replace(
+        const arch = Line._views["grid"].replace(
             "<grid>",
             `<grid create_inline="1"
                     form_view_id="%(timesheet_grid.my_timesheet_form_view)d"
@@ -1669,6 +1700,118 @@ describe.tags("desktop")("grid_view_desktop", () => {
         });
     });
 
+    test("columns getter: weekends hidden in 'month' range", async () => {
+        await mountView({
+            type: "grid",
+            resModel: "analytic.line",
+            arch: `<grid editable="1">
+                <field name="project_id" type="row"/>
+                <field name="task_id" type="row"/>
+                <field name="date" type="col">
+                    <range name="month" string="Month" span="month" step="day"/>
+                    <range name="year" string="Year" span="Year" step="month"/>
+                </field>
+                <field name="unit_amount" type="measure" widget="float_time"/>
+            </grid>`,
+        });
+        await contains(".scale_button_selection").click();
+        await contains(".o_show_weekends").click();
+        await animationFrame();
+
+        function getColumnHeaders() {
+            return Array.from(document.querySelectorAll(".o_grid_column_title")).map((el) =>
+                el.textContent.trim()
+            );
+        }
+
+        function hasWeekend(dateLabels) {
+            return dateLabels.some((text) => text.includes("Sat") || text.includes("Sun"));
+        }
+
+        // By default, it's "month"
+        let headers = getColumnHeaders();
+        expect(hasWeekend(headers)).toBe(false);
+
+        // Switch to "year"
+        await contains(".scale_button_selection").click();
+        await contains(".o_scale_button_year").click();
+        await animationFrame();
+        headers = getColumnHeaders();
+        expect(headers.length).toBe(14);
+    });
+
+    test("range step should correctly be taken into account to load data", async () => {
+        expect.assertions(8 + 7);
+
+        let rangeStep = "day";
+        onRpc("web_read_group", (args) => {
+            expect(args.kwargs.groupby).toEqual([`date:${rangeStep}`, "project_id", "task_id"]);
+        });
+        await mountView({
+            type: "grid",
+            resModel: "analytic.line",
+            arch: `
+                <grid display_empty="1">
+                    <field name="project_id" type="row"/>
+                    <field name="task_id" type="row"/>
+                    <field name="date" type="col">
+                        <range name="day" string="Day" span="day" step="day"/>
+                        <range name="day2" string="Day2" span="day" step="month"/>
+                        <range name="week" string="Week" span="week" step="day"/>
+                        <range name="week2" string="Week2" span="week" step="month"/>
+                        <range name="month" string="Month" span="month" step="day"/>
+                        <range name="month2" string="Month2" span="month" step="month"/>
+                        <range name="year" string="Year" span="year" step="day"/>
+                        <range name="year2" string="Year2" span="year" step="month"/>
+                    </field>
+                    <field name="unit_amount" type="measure"/>
+                </grid>
+            `,
+        });
+        await contains(".scale_button_selection").click();
+        rangeStep = "month";
+        await contains(".o-dropdown--menu .o_scale_button_day2").click();
+        expect(".o_view_scale_selector button.scale_button_selection").toHaveText("Day2", {
+            message: "The active range should be Day2",
+        });
+        await contains(".scale_button_selection").click();
+        rangeStep = "day";
+        await contains(".o-dropdown--menu .o_scale_button_week").click();
+        expect(".o_view_scale_selector button.scale_button_selection").toHaveText("Week", {
+            message: "The active range should be Week",
+        });
+        await contains(".scale_button_selection").click();
+        rangeStep = "month";
+        await contains(".o-dropdown--menu .o_scale_button_week2").click();
+        expect(".o_view_scale_selector button.scale_button_selection").toHaveText("Week2", {
+            message: "The active range should be Week2",
+        });
+        await contains(".scale_button_selection").click();
+        rangeStep = "day";
+        await contains(".o-dropdown--menu .o_scale_button_month").click();
+        expect(".o_view_scale_selector button.scale_button_selection").toHaveText("Month", {
+            message: "The active range should be Month",
+        });
+        await contains(".scale_button_selection").click();
+        rangeStep = "month";
+        await contains(".o-dropdown--menu .o_scale_button_month2").click();
+        expect(".o_view_scale_selector button.scale_button_selection").toHaveText("Month2", {
+            message: "The active range should be Month2",
+        });
+        await contains(".scale_button_selection").click();
+        rangeStep = "day";
+        await contains(".o-dropdown--menu .o_scale_button_year").click();
+        expect(".o_view_scale_selector button.scale_button_selection").toHaveText("Year", {
+            message: "The active range should be year",
+        });
+        await contains(".scale_button_selection").click();
+        rangeStep = "month";
+        await contains(".o-dropdown--menu .o_scale_button_year2").click();
+        expect(".o_view_scale_selector button.scale_button_selection").toHaveText("Year2", {
+            message: "The active range should be year2",
+        });
+    });
+
     test("display notification when the update of the grid cell cannot be done", async () => {
         onRpc("grid_update_cell", () => {
             expect.step("grid_update_cell");
@@ -1893,7 +2036,7 @@ describe.tags("desktop")("grid_view_desktop", () => {
     });
 
     test("export navigationInfo when col is not a range", async () => {
-        Line._views["grid,false"] = `<grid>
+        Line._views["grid"] = `<grid>
             <field name="project_id" type="row"/>
             <field name="task_id" type="col"/>
             <field name="unit_amount" type="measure" widget="float_time"/>
@@ -1943,8 +2086,29 @@ describe.tags("desktop")("grid_view_desktop", () => {
         expect(".scale_button_selection").toHaveText("Year");
         expect.verifySteps(["scale_year"]);
     });
+
+    test("Selection field label is displayed instead of its key when clicking on cell magnifier", async () => {
+        Line._views["grid"] = `<grid>
+            <field name="selection_field" type="row"/>
+            <field name="task_id" type="col"/>
+            <field name="unit_amount" type="measure" widget="float_time"/>
+        </grid>`;
+        await mountWithCleanup(WebClient);
+        await getService("action").doAction({
+            res_model: "analytic.line",
+            type: "ir.actions.act_window",
+            views: [[false, "grid"]],
+        });
+
+        await hover(".o_grid_row .o_grid_cell_readonly:eq(3)");
+        await contains(".o_grid_cell button.o_grid_search_btn").click();
+        expect(queryAllTexts(".o_control_panel_breadcrumbs .o_last_breadcrumb_item")).toEqual([
+            "GHI (BS task)",
+        ]);
+    });
 });
-describe.tags("mobile")("grid_view_mobile", () => {
+describe.tags("mobile");
+describe("grid_view_mobile", () => {
     test("basic empty grid view in mobile", async () => {
         await mountView({
             type: "grid",
@@ -2034,5 +2198,66 @@ describe.tags("mobile")("grid_view_mobile", () => {
         expect(".o_view_scale_selector button.scale_button_selection").toHaveText("Day", {
             message: "The default active range should be the first one define in the grid view",
         });
+    });
+
+    test("virtual scroll loads next records on mobile", async () => {
+        // Inspired by the test `Only relevant grid rows are rendered with larger recordsets`
+
+        // Setup: generates 100 new tasks and related analytic lines distributed
+        // in all available projects, deterministically based on their ID.
+        const { _fields: alFields, _records: analyticLines } = Line;
+        const { _records: tasks } = Task;
+        const { _records: projects } = Project;
+        const selectionValues = alFields.selection_field.selection;
+        const today = luxon.DateTime.local().toFormat("yyyy-MM-dd");
+        for (let id = 100; id < 200; id++) {
+            const projectId = projects[id % projects.length].id;
+            tasks.push({
+                id,
+                name: `BS task #${id}`,
+                project_id: projectId,
+            });
+            analyticLines.push({
+                id,
+                project_id: projectId,
+                task_id: id,
+                selection_field: selectionValues[id % selectionValues.length][0],
+                date: today,
+                unit_amount: (id % 10) + 1, // 1 to 10
+            });
+        }
+
+        await mountView({
+            type: "grid",
+            resModel: "analytic.line",
+            arch: `
+                <grid>
+                    <field name="project_id" type="row"/>
+                    <field name="task_id" type="row"/>
+                    <field name="date" type="col">
+                        <range name="week" string="Week" span="week" step="day"/>
+                        <range name="day" string="Day" span="day" step="day"/>
+                    </field>
+                    <field name="unit_amount" type="measure"/>
+                </grid>`,
+        });
+
+        const content = queryOne(".o_content");
+        content.style = "height: 600px; overflow: scroll;";
+
+        // This is to ensure that the virtual rows will not be impacted by
+        // sub-pixel calculations.
+        await scroll(content, { top: 0 });
+        await animationFrame();
+
+        // Scroll to the middle of the grid
+        await scroll(content, { top: content.scrollHeight / 2 });
+        await animationFrame();
+        expect(`a[href="/odoo/m-task/101"]`).toHaveCount(1);
+
+        // Scroll to the end of the grid
+        await scroll(content, { top: content.scrollHeight });
+        await animationFrame();
+        expect(`a[href="/odoo/m-task/199"]`).toHaveCount(1);
     });
 });

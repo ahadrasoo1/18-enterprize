@@ -90,3 +90,26 @@ class TestFsmFlow(TestIndustryFsmCommon):
             partner.action_partner_navigate()['url'],
             "https://www.google.com/maps/dir/?api=1&destination=Chauss%C3%A9e+de+Namur+40%2C+1367+Ramillies",
         )
+
+    def test_start_timer_on_private_project(self):
+        task = self.env['project.task'].create({
+            'name': 'Task A',
+            'project_id': self.project.id,
+            'user_ids': self.project_user.ids,
+        })
+        self.employee_user.user_id = self.project_user
+        self.project_user.groups_id += self.env.ref("hr_timesheet.group_hr_timesheet_user")
+        task_with_employee_user = task.with_user(self.project_user)
+        with self.assertRaises(AccessError):
+            self.project.with_user(self.project_user).read(['name'])
+        task_with_employee_user.action_timer_start()
+        self.assertTrue(task_with_employee_user.user_timer_id)
+        result = task_with_employee_user.action_timer_stop()
+        wizard = self.env[result['res_model']] \
+                     .with_context(result['context']) \
+                     .with_user(self.project_user) \
+                     .new()
+        self.env['project.project'].invalidate_model()
+        timesheet = wizard.save_timesheet()
+        self.assertEqual(timesheet.task_id, task)
+        self.assertEqual(timesheet.project_id, self.project)

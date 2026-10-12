@@ -44,7 +44,7 @@ class ApprovalProductLine(models.Model):
             else:
                 line.po_uom_qty = 0.0
 
-    @api.depends('product_id', 'po_uom_qty')
+    @api.depends('product_id', 'po_uom_qty', 'product_id.seller_ids')
     def _compute_seller_id(self):
         for line in self:
             if line.product_id and line.po_uom_qty:
@@ -52,8 +52,14 @@ class ApprovalProductLine(models.Model):
                     quantity=line.po_uom_qty,
                     uom_id=line.product_id.uom_po_id,
                 )
+                if not line.seller_id:
+                    # If no vendor found for the right quantity, we still want to display a vendor if any
+                    line.seller_id = line.product_id.with_company(line.company_id)._select_seller(
+                        quantity=None,
+                        uom_id=line.product_id.uom_po_id,
+                    )
 
-    @api.depends('product_id', 'po_uom_qty')
+    @api.depends('product_id', 'po_uom_qty', 'product_id.seller_ids')
     def _compute_has_no_seller(self):
         for line in self:
             line.has_no_seller = False
@@ -62,10 +68,16 @@ class ApprovalProductLine(models.Model):
                     quantity=line.po_uom_qty,
                     uom_id=line.product_id.uom_po_id,
                 ))
+                if line.has_no_seller:
+                    # If no vendor found for the right quantity, we still want to know if there is a vendor
+                    line.has_no_seller = not bool(line.product_id.with_company(line.company_id)._select_seller(
+                        quantity=None,
+                        uom_id=line.product_id.uom_po_id,
+                    ))
 
     def _check_products_vendor(self):
         """ Raise an error if at least one product requires a seller. """
-        product_lines_without_seller = self.filtered(lambda line: not line.seller_id)
+        product_lines_without_seller = self.filtered(lambda line: line.has_no_seller)
         if product_lines_without_seller:
             product_names = product_lines_without_seller.product_id.mapped('display_name')
             raise UserError(
@@ -82,6 +94,7 @@ class ApprovalProductLine(models.Model):
             ('company_id', '=', self.company_id.id),
             ('partner_id', '=', vendor.id),
             ('state', '=', 'draft'),
+            ('currency_id', '=', self.seller_id.currency_id.id),
         ]
         return domain
 
@@ -99,5 +112,6 @@ class ApprovalProductLine(models.Model):
             'company_id': self.company_id.id,
             'payment_term_id': vendor.property_supplier_payment_term_id.id,
             'fiscal_position_id':self.env['account.fiscal.position']._get_fiscal_position(vendor).id,
+            'currency_id': self.seller_id.currency_id.id,
         }
         return vals

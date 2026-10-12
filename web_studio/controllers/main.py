@@ -143,6 +143,8 @@ class WebStudioController(http.Controller):
             "mrp.label_production_view_pdf",
             "delivery_iot.report_shipping_labels",
             "delivery_iot.report_shipping_docs",
+            "l10n_co_reports.report_libro_diario",
+            "account.report_original_vendor_bill",
         ]
         report_domain = expression.AND([
             # One can edit only reports backed by persisting models
@@ -348,7 +350,7 @@ class WebStudioController(http.Controller):
         if rel_id := values.pop('relation_id', None):
             values['relation'] = request.env['ir.model'].browse(rel_id).model
         # For related one2many fields
-        if related := values.get('related') and values.get('ttype') == 'one2many':
+        if related := values.get('related') if values.get('ttype') == 'one2many' else "":
             field_name = related.rsplit('.', 1)[-1]
             field = request.env['ir.model.fields'].search([
                 ('name', '=', field_name),
@@ -359,6 +361,8 @@ class WebStudioController(http.Controller):
                 relation=field.relation,
                 relation_field=field.relation_field,
             )
+            if values.get("store", True) is False:
+                values["relation_field"] = False
         # For one2many fields
         if rel := values.pop('relation_field_id', None):
             field = request.env['ir.model.fields'].browse(rel)
@@ -405,7 +409,7 @@ class WebStudioController(http.Controller):
                 model.write({'is_mail_activity': True})
 
         try:
-            request.env[res_model].get_view(view_type=view_type)
+            request.env[res_model].with_context(no_address_format=True).get_view(view_type=view_type)
         except UserError:
             return False
         self.edit_action(action_type, action_id, args)
@@ -447,6 +451,7 @@ class WebStudioController(http.Controller):
         return True
 
     def _get_studio_view(self, view):
+        view = view._get_closest_primary_view()
         domain = [('inherit_id', '=', view.id), ('name', '=', self._generate_studio_view_name(view))]
         return view.search(domain, order='priority desc, name desc, id desc', limit=1)
 
@@ -487,7 +492,7 @@ class WebStudioController(http.Controller):
             context = {}
 
         ViewModel = request.env[view.model]
-        fields_view = ViewModel.with_context(dict(context, studio=True)).get_view(view.id, view.type)
+        fields_view = ViewModel.with_context(dict(context, studio=True, no_address_format=True)).get_view(view.id, view.type)
         view_type = view.type
         models = fields_view['models']
 
@@ -731,6 +736,7 @@ class WebStudioController(http.Controller):
                 filename_field_id.write({'name': new_name + '_filename'})
 
     def _create_studio_view(self, view, arch):
+        view = view._get_closest_primary_view()
         # We have to play with priorities in order for our customization to be the last
         # to be applied.
         # In studio, what the user sees is the resulting view from all the inheritance.
@@ -837,9 +843,15 @@ Are you sure you want to remove the selection values of those records?""", len(r
         return etree.tostring(arch, encoding='unicode', pretty_print=True, method='html')
 
     def _node_to_expr(self, node):
-        if node.get('xpath_info') and not node.get('subview_xpath'):
+        if node.get('xpath_info'):
+            expr_list = node.get('xpath_info')
+            if node.get("subview_xpath"):
+                # The first element of that list is the view's node
+                # If we are editing a subview, this view's node is actually
+                # targetted by subview_xpath, so let's remove it from the xpath_info
+                expr_list = expr_list[1:]
             # Format of expr is /form/tag1[]/tag2[]/[...]/tag[]
-            expr = ''.join(['/%s[%s]' % (parent['tag'], parent['indice']) for parent in node.get('xpath_info')])
+            expr = ''.join(['/%s[%s]' % (parent['tag'], parent['indice']) for parent in expr_list])
         else:
             # Format of expr is //tag[@attr1_name=attr1_value][@attr2_name=attr2_value][...]
             expr = '//' + node['tag']
@@ -1037,16 +1049,35 @@ Are you sure you want to remove the selection values of those records?""", len(r
 
         if 'groups' in new_attrs:
             eval_attr = []
+            group_ids = {}
             for many2many_value in new_attrs['groups']:
-                group_xmlid = ir_model_data.search([
-                    ('model', '=', 'res.groups'),
-                    ('res_id', '=', many2many_value)])
-                if not group_xmlid:
-                    raise UserError(_(
-                        "Only groups with an external ID can be used here. Please choose another "
-                        "group or assign manually an external ID to this group."
-                    ))
-                eval_attr.append(group_xmlid.complete_name)
+                if isinstance(many2many_value, str) and many2many_value.startswith("!"):
+                    allow = False
+                    _id = int(many2many_value[1:])
+                else:
+                    allow = True
+                    _id = int(many2many_value)
+                group_ids[_id] = allow
+
+            if group_ids:
+                xml_ids = {
+                    imd["res_id"]: imd["complete_name"] for imd in ir_model_data.search_read([
+                        ('model', '=', 'res.groups'),
+                        ('res_id', 'in', list(group_ids.keys()))], ["res_id", "complete_name"]
+                    )
+                }
+
+                for g_id, allow in group_ids.items():
+                    if g_id not in xml_ids:
+                        raise UserError(_(
+                            "Only groups with an external ID can be used here. Please choose another "
+                            "group or assign manually an external ID to this group."
+                        ))
+                    group_attr = xml_ids[g_id]
+                    if not allow:
+                        group_attr = "!" + group_attr
+
+                    eval_attr.append(group_attr)
             eval_attr = ",".join(eval_attr)
             new_attrs['groups'] = eval_attr
 
@@ -1076,7 +1107,8 @@ Are you sure you want to remove the selection values of those records?""", len(r
 
         for key, new_attr in new_attrs.items():
             xml_node = etree.Element('attribute', {'name': key})
-            xml_node.text = json.dumps(new_attr) if isinstance(new_attr, bool) else str(new_attr)
+            if new_attr is not None:
+                xml_node.text = json.dumps(new_attr) if isinstance(new_attr, bool) else str(new_attr)
             xpath_node.insert(0, xml_node)
 
             # change the field description when changing the field label (for custom fields)
@@ -1089,7 +1121,7 @@ Are you sure you want to remove the selection values of those records?""", len(r
     def _operation_buttonbox(self, arch, operation, model=None):
         studio_view_arch = arch  # The actual arch is the studio view arch
         # Get the arch of the form view with inherited views applied
-        arch = request.env[model].get_view(view_type='form')['arch']
+        arch = request.env[model].with_context(studio=True, no_address_format=True).get_view(view_type='form')['arch']
         parser = etree.XMLParser(remove_blank_text=True)
         arch = etree.fromstring(arch, parser=parser)
 
@@ -1349,7 +1381,7 @@ Are you sure you want to remove the selection values of those records?""", len(r
 
         # check if there's already a bottom right section
         # boy o boy i sure hope there's only one kanban!
-        base_arch = request.env[model].get_view(view_type='kanban')['arch']
+        base_arch = request.env[model].with_context(studio=True, no_address_format=True).get_view(view_type='kanban')['arch']
         base_tree = etree.fromstring(base_arch)
         has_br_container = base_tree.xpath('//div[hasclass("oe_kanban_bottom_right")]')
 
@@ -1428,7 +1460,7 @@ Are you sure you want to remove the selection values of those records?""", len(r
             """ % (field_id.name))
         )
         studio_view_arch = arch
-        arch = request.env[model].get_view(view_type='kanban')['arch']
+        arch = request.env[model].with_context(studio=True, no_address_format=True).get_view(view_type='kanban')['arch']
         parser = etree.XMLParser(remove_blank_text=True)
         arch = etree.fromstring(arch, parser=parser)
 
@@ -1499,7 +1531,7 @@ Are you sure you want to remove the selection values of those records?""", len(r
 
     def _operation_avatar_image(self, arch, operation, model):
         studio_view_arch = arch  # The actual arch is the studio view arch
-        arch = request.env[model].get_view(view_type='form')['arch']
+        arch = request.env[model].with_context(studio=True, no_address_format=True).get_view(view_type='form')['arch']
         parser = etree.XMLParser(remove_blank_text=True)
         arch = etree.fromstring(arch, parser=parser)
 
@@ -1719,16 +1751,22 @@ Are you sure you want to remove the selection values of those records?""", len(r
             })
 
     @http.route('/web_studio/get_default_value', type='json', auth='user')
-    def get_default_value(self, model_name, field_name):
+    def get_default_value(self, model_name, field_name, company_id=False):
         """ Return the default value associated to the given field. """
+        context = {}
+        if company_id:
+            context["allowed_company_ids"] = [company_id]
         return {
-            'default_value': request.env['ir.default']._get(model_name, field_name, company_id=True)
+            'default_value': request.env['ir.default'].with_context(context)._get(model_name, field_name, company_id=True)
         }
 
     @http.route('/web_studio/set_default_value', type='json', auth='user')
-    def set_default_value(self, model_name, field_name, value):
+    def set_default_value(self, model_name, field_name, value, company_id=False):
         """ Set the default value associated to the given field. """
-        request.env['ir.default'].with_context(studio=True).set(model_name, field_name, value, company_id=True)
+        context = { "studio": True }
+        if company_id:
+            context["allowed_company_ids"] = [company_id]
+        request.env['ir.default'].with_context(context).set(model_name, field_name, value, company_id=True)
 
     @http.route('/web_studio/set_currency', type='json', auth='user')
     def set_currency(self, model_name, field_name, value):
@@ -1754,7 +1792,7 @@ Are you sure you want to remove the selection values of those records?""", len(r
                 'expr': subview_xpath,
                 'position': position
             })
-        view_arch, _ = request.env[model]._get_view(view_type=subview_type)
+        view_arch, _ = request.env[model].with_context(no_address_format=True)._get_view(view_type=subview_type)
         xml_node = self._inline_view_filter_nodes(view_arch)
         xpath_node.insert(0, xml_node)
         studio_view.arch_db = etree.tostring(arch, encoding='utf-8', pretty_print=True)

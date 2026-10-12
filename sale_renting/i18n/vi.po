@@ -1,24 +1,27 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* sale_renting
-# 
+# * sale_renting
+#
 # Translators:
 # Wil Odoo, 2024
-# Thi Huong Nguyen, 2024
-# 
+# Thi Huong Nguyen, 2025
+#
+# "Thi Huong Nguyen (thng)" <thng@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Thi Huong Nguyen, 2024\n"
-"Language-Team: Vietnamese (https://app.transifex.com/odoo/teams/41243/vi/)\n"
+"POT-Creation-Date: 2026-04-10 18:47+0000\n"
+"PO-Revision-Date: 2026-01-10 09:08+0000\n"
+"Last-Translator: \"Thi Huong Nguyen (thng)\" <thng@odoo.com>\n"
+"Language-Team: Vietnamese <https://translate.odoo.com/projects/odoo-18/"
+"sale_renting/vi/>\n"
+"Language: vi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: vi\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 5.14.3\n"
 
 #. module: sale_renting
 #. odoo-python
@@ -44,7 +47,7 @@ msgstr "%(amount)s/%(duration)s"
 
 #. module: sale_renting
 #. odoo-python
-#: code:addons/sale_renting/controllers/utils.py:0
+#: code:addons/sale_renting/models/product_template.py:0
 #: code:addons/sale_renting/models/sale_order_recurrence.py:0
 msgid "%(duration)s %(unit)s"
 msgstr "%(duration)s %(unit)s"
@@ -74,16 +77,6 @@ msgstr "123 Main St"
 #: model:sale.temporal.recurrence,name:sale_renting.recurrence_2_weeks
 msgid "2 Weeks"
 msgstr "2 tuần"
-
-#. module: sale_renting
-#: model_terms:ir.ui.view,arch_db:sale_renting.report_rental_order_document
-msgid "2023-08-01"
-msgstr "2023-08-01"
-
-#. module: sale_renting
-#: model_terms:ir.ui.view,arch_db:sale_renting.report_rental_order_document
-msgid "2023-08-10"
-msgstr "2023-08-10"
 
 #. module: sale_renting
 #: model:sale.temporal.recurrence,name:sale_renting.recurrence_3_hours
@@ -120,18 +113,23 @@ msgstr "<span class=\"o_stat_text\">trong Cho thuê</span>"
 #: model_terms:ir.ui.view,arch_db:sale_renting.rental_order_form_view
 msgid ""
 "<span invisible=\"duration_days != 1\"> day </span>\n"
-"                    <span invisible=\"duration_days in [0,1]\"> days </span>\n"
-"                    <span invisible=\"duration_days == 0 or remaining_hours == 0\">and </span>"
+"                    <span invisible=\"duration_days in [0,1]\"> days </"
+"span>\n"
+"                    <span invisible=\"duration_days == 0 or remaining_hours "
+"== 0\">and </span>"
 msgstr ""
 "<span invisible=\"duration_days != 1\"> ngày </span>\n"
-"                    <span invisible=\"duration_days in [0,1]\"> ngày </span>\n"
-"                    <span invisible=\"duration_days == 0 or remaining_hours == 0\">và </span>"
+"                    <span invisible=\"duration_days in [0,1]\"> ngày </"
+"span>\n"
+"                    <span invisible=\"duration_days == 0 or remaining_hours "
+"== 0\">và </span>"
 
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.rental_order_form_view
 msgid ""
 "<span invisible=\"remaining_hours != 1\"> hour </span>\n"
-"                    <span invisible=\"remaining_hours in [0,1]\"> hours </span>"
+"                    <span invisible=\"remaining_hours in [0,1]\"> hours </"
+"span>"
 msgstr ""
 "<span invisible=\"remaining_hours != 1\"> giờ </span>\n"
 "                    <span invisible=\"remaining_hours in [0,1]\"> giờ </span>"
@@ -140,8 +138,13 @@ msgstr ""
 #: model_terms:web_tour.tour,rainbow_man_message:sale_renting.rental_tour
 msgid "<span><b>Good job!</b> You went through all steps of this tour.</span>"
 msgstr ""
-"<span><b>Tốt lắm!</b> Bạn đã xem qua tất cả các bước của tour hướng dẫn "
-"này.</span>"
+"<span><b>Tốt lắm!</b> Bạn đã xem qua tất cả các bước của tour hướng dẫn này."
+"</span>"
+
+#. module: sale_renting
+#: model_terms:ir.ui.view,arch_db:sale_renting.report_rental_order_document
+msgid "<strong class=\"d-block mt-3\">Shipping Address:</strong>"
+msgstr ""
 
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.rental_schedule_view_gantt
@@ -161,12 +164,7 @@ msgstr "<strong>Trả hàng — </strong>"
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.report_rental_order_document
 msgid "<strong>Salesperson:</strong>"
-msgstr "<strong>Chuyên viên sales</strong>"
-
-#. module: sale_renting
-#: model_terms:ir.ui.view,arch_db:sale_renting.report_rental_order_document
-msgid "<strong>Shipping Address:</strong>"
-msgstr "<strong>Địa chỉ giao hàng:</strong>"
+msgstr "<strong>Nhân viên sales</strong>"
 
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.rental_schedule_view_gantt
@@ -177,7 +175,7 @@ msgstr "<strong>Trạng thái — </strong>"
 #. odoo-python
 #: code:addons/sale_renting/models/product_template.py:0
 msgid "A rental combo product can only contain rental products."
-msgstr ""
+msgstr "Một sản phẩm combo cho thuê chỉ có thể chứa các sản phẩm thuê."
 
 #. module: sale_renting
 #: model:ir.model.fields,field_description:sale_renting.field_sale_temporal_recurrence__active
@@ -233,6 +231,7 @@ msgstr "Hủy"
 #: model:ir.model.fields.selection,name:sale_renting.selection__sale_rental_report__state__cancel
 #: model:ir.model.fields.selection,name:sale_renting.selection__sale_rental_schedule__rental_status__cancel
 #: model:ir.model.fields.selection,name:sale_renting.selection__sale_rental_schedule__state__cancel
+#: model_terms:ir.ui.view,arch_db:sale_renting.rental_schedule_view_gantt
 msgid "Cancelled"
 msgstr "Đã hủy"
 
@@ -325,7 +324,7 @@ msgstr "Tạo một báo giá mới, bước đầu tiên của hoạt động c
 #. module: sale_renting
 #: model_terms:ir.actions.act_window,help:sale_renting.product_pricing_action
 msgid "Create a new recurrence"
-msgstr "Tạo một định kỳ mới"
+msgstr "Tạo một chu kỳ lặp mới"
 
 #. module: sale_renting
 #: model_terms:ir.actions.act_window,help:sale_renting.action_rental_report
@@ -1193,7 +1192,7 @@ msgstr "Dự trữ"
 #: model:ir.model.fields.selection,name:sale_renting.selection__sale_rental_schedule__report_line_status__reserved
 #: model_terms:ir.ui.view,arch_db:sale_renting.rental_schedule_view_gantt
 msgid "Reserved"
-msgstr "Đã dự trữ"
+msgstr "Đặt trước"
 
 #. module: sale_renting
 #: model:ir.model.fields.selection,name:sale_renting.selection__rental_order_wizard__status__return
@@ -1261,7 +1260,7 @@ msgstr "Bộ phận sales"
 #. module: sale_renting
 #: model:ir.model.fields,field_description:sale_renting.field_sale_rental_report__user_id
 msgid "Salesman"
-msgstr "Chuyên viên sales"
+msgstr "Nhân viên sales"
 
 #. module: sale_renting
 #: model:ir.model.fields,field_description:sale_renting.field_sale_rental_schedule__user_id
@@ -1269,7 +1268,7 @@ msgstr "Chuyên viên sales"
 #: model_terms:ir.ui.view,arch_db:sale_renting.rental_report_search_view
 #: model_terms:ir.ui.view,arch_db:sale_renting.rental_schedule_view_search
 msgid "Salesperson"
-msgstr "Chuyên viên sales"
+msgstr "Nhân viên sales"
 
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.report_rental_order_document
@@ -1408,8 +1407,8 @@ msgstr "Không có lịch lấy hoặc trả nào."
 #. module: sale_renting
 #: model:ir.model.fields,help:sale_renting.field_res_config_settings__extra_day
 msgid ""
-"This is the default extra cost per day set on newly created products. You "
-"can change this value for existing products directly on the product itself."
+"This is the default extra cost per day set on newly created products.You can "
+"change this value for existing products directly on the product itself."
 msgstr ""
 "Đây là chi phí bổ sung mặc định mỗi ngày được đặt cho các sản phẩm mới tạo. "
 "Bạn có thể trực tiếp thay đổi giá trị này cho các sản phẩm hiện có trên "
@@ -1418,7 +1417,7 @@ msgstr ""
 #. module: sale_renting
 #: model:ir.model.fields,help:sale_renting.field_res_config_settings__extra_hour
 msgid ""
-"This is the default extra cost per hour set on newly created products. You "
+"This is the default extra cost per hour set on newly created products.You "
 "can change this value for existing products directly on the product itself."
 msgstr ""
 "Đây là chi phí bổ sung mặc định mỗi giờ được đặt cho các sản phẩm mới tạo. "
@@ -1436,8 +1435,8 @@ msgid ""
 "This will update the unit price of all rental products based on the new "
 "period."
 msgstr ""
-"Việc này sẽ cập nhật đơn giá của tất cả sản phẩm cho thuê dựa trên giai đoạn"
-" mới."
+"Việc này sẽ cập nhật đơn giá của tất cả sản phẩm cho thuê dựa trên giai đoạn "
+"mới."
 
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.res_config_settings_view_form
@@ -1559,19 +1558,18 @@ msgstr "Năm"
 #. module: sale_renting
 #: model_terms:ir.actions.act_window,help:sale_renting.rental_product_template_action
 msgid ""
-"You can also create additional products or services to sell by checking *Can"
-" be Sold* in the product form (e.g. insurance)."
+"You can also create additional products or services to sell by checking *Can "
+"be Sold* in the product form (e.g. insurance)."
 msgstr ""
-"Bạn cũng có thể tạo thêm sản phẩm hoặc dịch vụ để bán bằng cách chọn *Có thể"
-" bán* trong biểu mẫu sản phẩm (vd: bảo hiểm)."
+"Bạn cũng có thể tạo thêm sản phẩm hoặc dịch vụ để bán bằng cách chọn *Có thể "
+"bán* trong biểu mẫu sản phẩm (vd: bảo hiểm)."
 
 #. module: sale_renting
 #. odoo-python
 #: code:addons/sale_renting/models/product_pricelist.py:0
 msgid "You can not have a time-based rule for products that are not rentable."
 msgstr ""
-"Bạn không thể đặt quy tắc theo thời gian cho các sản phẩm không thể cho "
-"thuê."
+"Bạn không thể đặt quy tắc theo thời gian cho các sản phẩm không thể cho thuê."
 
 #. module: sale_renting
 #: model_terms:ir.actions.act_window,help:sale_renting.rental_order_today_pickup_action
@@ -1598,8 +1596,8 @@ msgid ""
 "You cannot have multiple pricing for the same variant, recurrence and "
 "pricelist"
 msgstr ""
-"Bạn không thể có nhiều cách định giá cho cùng một biến thể, định kỳ và bảng "
-"giá"
+"Bạn không thể có nhiều cách định giá cho cùng một biến thể, chu kỳ lặp và "
+"bảng giá"
 
 #. module: sale_renting
 #: model:ir.model.constraint,message:sale_renting.constraint_sale_order_line_rental_stock_coherence
@@ -1622,3 +1620,9 @@ msgstr "tất cả biến thể"
 #: model_terms:ir.ui.view,arch_db:sale_renting.res_config_settings_view_form
 msgid "hours"
 msgstr "giờ"
+
+#~ msgid "2023-08-01"
+#~ msgstr "2023-08-01"
+
+#~ msgid "2023-08-10"
+#~ msgstr "2023-08-10"

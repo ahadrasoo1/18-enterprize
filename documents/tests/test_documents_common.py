@@ -48,6 +48,7 @@ class TransactionCaseDocuments(TransactionCase):
                 'name': 'Public user',
             },
         ])
+        cls.odoobot = cls.env.ref('base.user_root')
         cls.folder_a, cls.folder_b = cls.env['documents.document'].create([
             {
                 'type': 'folder',
@@ -86,3 +87,15 @@ class TransactionCaseDocuments(TransactionCase):
             'owner_id': cls.doc_user.id,
         })
         cls.document_txt.access_via_link = "view"
+
+        cls.server_action = cls.env['ir.actions.server'].create({
+            'name': 'Add tag_a',
+            'model_id': cls.env.ref('documents.model_documents_document').id,
+            'type': 'ir.actions.server',
+            'groups_id': cls.env.ref('base.group_user').ids,
+            'update_path': 'tag_ids',
+            'usage': 'ir_actions_server',
+            'state': 'object_write',
+            'update_m2m_operation': 'add',
+            'resource_ref': f'documents.tag,{cls.tag_a.id}',
+        })

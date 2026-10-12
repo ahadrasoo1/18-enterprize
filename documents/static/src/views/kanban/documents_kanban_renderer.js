@@ -7,14 +7,16 @@ import { useBus, useService } from "@web/core/utils/hooks";
 import { DocumentsDropZone } from "../helper/documents_drop_zone";
 import { FileUploadProgressContainer } from "@web/core/file_upload/file_upload_progress_container";
 import { FileUploadProgressKanbanRecord } from "@web/core/file_upload/file_upload_progress_record";
+import { DocumentsRendererMixin } from "@documents/views/documents_renderer_mixin";
 import { DocumentsKanbanRecord } from "./documents_kanban_record";
 import { DocumentsActionHelper } from "../helper/documents_action_helper";
 import { DocumentsFileViewer } from "../helper/documents_file_viewer";
+import { DocumentsDetailsPanel } from "@documents/components/documents_details_panel/documents_details_panel";
 import { useCommand } from "@web/core/commands/command_hook";
-import { useRef, useState } from "@odoo/owl";
-import { Chatter } from "@mail/chatter/web_portal/chatter";
+import { onMounted, useRef } from "@odoo/owl";
+import { DocumentsChatter } from "@documents/views/chatter/documents_chatter";
 
-export class DocumentsKanbanRenderer extends KanbanRenderer {
+export class DocumentsKanbanRenderer extends DocumentsRendererMixin(KanbanRenderer) {
     static props = [...KanbanRenderer.props, "previewStore"];
     static template = "documents.DocumentsKanbanRenderer";
     static components = Object.assign({}, KanbanRenderer.components, {
@@ -24,7 +26,8 @@ export class DocumentsKanbanRenderer extends KanbanRenderer {
         KanbanRecord: DocumentsKanbanRecord,
         DocumentsActionHelper,
         DocumentsFileViewer,
-        Chatter,
+        DocumentsDetailsPanel,
+        Chatter: DocumentsChatter,
     });
 
     setup() {
@@ -50,11 +53,12 @@ export class DocumentsKanbanRenderer extends KanbanRenderer {
         );
         useCommand(
             _t("Toggle favorite"),
-            () => {
-                if (this.props.list.selection.length) {
-                    this.props.list.selection[0].update({
-                        is_favorited: !this.props.list.selection[0].data.is_favorited,
-                    });
+            async () => {
+                if (this.targetRecords.length) {
+                    await this.env.model.orm.call("documents.document", "toggle_favorited_multi", [
+                        this.targetRecords.map((record) => record.resId),
+                    ]);
+                    this.env.model.load();
                 }
             },
             {
@@ -62,18 +66,18 @@ export class DocumentsKanbanRenderer extends KanbanRenderer {
                 hotkey: "alt+t",
             }
         );
-
-        // TODO: clean that crap
-        this.chatterState = useState({
-            visible: this.documentService.isChatterVisible(),
-            previewedDocument: null,
+        useBus(this.documentService.bus, "DOCUMENT_ACTIVITY_CHANGED", ({ detail }) => {
+            if (
+                this.targetRecords.length == 1 &&
+                this.targetRecords[0].data.id == detail.recordId
+            ) {
+                this.render(true); // Re-render this Component and its children on activity add/edit/unlink
+            }
         });
-        useBus(this.env.documentsView.bus, "documents-toggle-chatter", (event) => {
-            this.chatterState.visible = !this.chatterState.visible;
-            this.documentService.setChatterVisible(this.chatterState.visible);
-        });
-        useBus(this.documentService.bus, "DOCUMENT_PREVIEWED", async (ev) => {
-            this.chatterState.previewedDocument = this.documentService.previewedDocument;
+        onMounted(() => {
+            if (this.isMobile && this.isRecentFolder) {
+                this.root.el.classList.add('o_documents_recent');
+            }
         });
     }
 
@@ -173,15 +177,6 @@ export class DocumentsKanbanRenderer extends KanbanRenderer {
 
     get isMobile() {
         return this.env.isSmall;
-    }
-
-    /**
-     * Records on which we will execute the actions / see the chatter.
-     */
-    get targetRecords() {
-        return this.chatterState.previewedDocument
-            ? [this.chatterState.previewedDocument.record]
-            : this.props.list.selection;
     }
 
     /**

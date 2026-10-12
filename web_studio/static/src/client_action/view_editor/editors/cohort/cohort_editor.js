@@ -49,7 +49,7 @@ export class CohortEditorSidebar extends Component {
         return fieldsToChoices(
             this.viewEditorModel.fields,
             ["integer", "float", "monetary"],
-            (field) => field.name !== "id" && field.store
+            (field) => field.name !== "id" && field.store && field.aggregator
         );
     }
 

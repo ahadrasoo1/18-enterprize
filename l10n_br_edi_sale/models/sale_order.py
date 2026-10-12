@@ -52,3 +52,7 @@ class SaleOrder(models.Model):
             res["l10n_latam_document_type_id"] = self.env.ref("l10n_br.dt_SE").id
 
         return res
+
+    def _l10n_br_get_line_uom(self, line_id):
+        # Override.
+        return self.env['sale.order.line'].browse(line_id).product_uom

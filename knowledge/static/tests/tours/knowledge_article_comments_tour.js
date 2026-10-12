@@ -4,7 +4,7 @@ import { registry } from "@web/core/registry";
 import { insertText } from "@web/../tests/utils";
 import { stepUtils } from "@web_tour/tour_service/tour_utils";
 
-import { makeVisible, endKnowledgeTour } from './knowledge_tour_utils.js';
+import { endKnowledgeTour } from "./knowledge_tour_utils.js";
 import { setSelection, boundariesIn } from "@web_editor/js/editor/odoo-editor/src/utils/utils";
 
 const addAnswerComment = (commentText) => [{
@@ -14,14 +14,13 @@ const addAnswerComment = (commentText) => [{
     }
 }, {
     // Send comment
-    trigger: '.o-mail-Composer-send:not([disabled=""])',
+    trigger: '.o-mail-Composer-send:enabled',
     run: "click",
 }, {
     trigger: `.o-mail-Thread :contains(${commentText})`,
 }];
 
 registry.category('web_tour.tours').add('knowledge_article_comments', {
-    test: true,
     url: '/odoo',
     steps: () => [
         stepUtils.showAppsMenuItem(), { // Open Knowledge App
@@ -38,20 +37,25 @@ registry.category('web_tour.tours').add('knowledge_article_comments', {
         },
         ...addAnswerComment("Sure thing boss, all done!"),
         {
-            trigger: '.o-mail-Message-actions',
-            run: () => {
-                makeVisible('.o-mail-Message-actions');
-            }
-        }, { // Resolve Thread
-            trigger: 'button[name="closeThread"]',
+            content: "Hover on first message to make actions visible and click on it",
+            trigger: ".o-mail-Message-core:first",
+            run: "hover && click .o-mail-Message-actions:first",
+        },
+        {
+            content: "Resolve Thread",
+            trigger: ".o-mail-Message-actions:first button[name=closeThread]",
             run: "click",
-        }, { // Wait for the composer to be fully closed
-            trigger: 'body:not(:has(.o-mail-Thread))',
-        }, { // Select some text in the first paragraph
-            trigger: '.note-editable p.o_knowledge_tour_first_paragraph',
+        },
+        {
+            content: "Wait for the composer to be fully closed",
+            trigger: "body:not(:has(.o-mail-Thread))",
+        },
+        {
+            content: "Select some text in the first paragraph",
+            trigger: ".note-editable p.o_knowledge_tour_first_paragraph",
             run: function () {
                 setSelection(...boundariesIn(this.anchor));
-            }
+            },
         }, { // Trigger comment creation with the editor toolbar
             trigger: '.o-we-toolbar button[name="comments"]',
             run: "click",
@@ -61,10 +65,10 @@ registry.category('web_tour.tours').add('knowledge_article_comments', {
                 await insertText('.o-mail-Composer-input', 'My Knowledge Comment');
             }
         }, { // Send comment
-            trigger: '.o_knowledge_comments_popover .o-mail-Composer-send:not([disabled=""])',
+            trigger: '.o_knowledge_comments_popover .o-mail-Composer-send:enabled',
             run: "click",
         }, { // Wait for the comment to be fully created
-            trigger: ".note-editable p.o_knowledge_tour_first_paragraph a:not([data-id='undefined'])",
+            trigger: ".note-editable p.o_knowledge_tour_first_paragraph a:not([data-id='undefined']):not(:visible)",
         }, {
             trigger: '.o_knowledge_comment_box[data-thread-id] .o_knowledge_comment_small_ui img',
         }, { // Open the comments panel

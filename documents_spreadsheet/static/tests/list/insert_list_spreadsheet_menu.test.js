@@ -1,4 +1,7 @@
-import { defineDocumentSpreadsheetModels } from "@documents_spreadsheet/../tests/helpers/data";
+import {
+    defineDocumentSpreadsheetModels,
+    getBasicServerData,
+} from "@documents_spreadsheet/../tests/helpers/data";
 import {
     invokeInsertListInSpreadsheetDialog,
     spawnListViewForSpreadsheet,
@@ -7,10 +10,18 @@ import {
 import { SpreadsheetAction } from "@documents_spreadsheet/bundle/actions/spreadsheet_action";
 import { beforeEach, describe, expect, getFixture, test } from "@odoo/hoot";
 import { animationFrame } from "@odoo/hoot-mock";
-import { Partner, getBasicServerData } from "@spreadsheet/../tests/helpers/data";
+import { helpers } from "@odoo/o-spreadsheet";
+import { Product } from "@spreadsheet/../tests/helpers/data";
 import { waitForDataLoaded } from "@spreadsheet/helpers/model";
 import { getSpreadsheetActionModel } from "@spreadsheet_edition/../tests/helpers/webclient_helpers";
-import { contains, patchWithCleanup, toggleActionMenu } from "@web/../tests/web_test_helpers";
+import {
+    contains,
+    MockServer,
+    patchWithCleanup,
+    toggleActionMenu,
+} from "@web/../tests/web_test_helpers";
+
+const { sanitizeSheetName } = helpers;
 
 defineDocumentSpreadsheetModels();
 describe.current.tags("desktop");
@@ -117,6 +128,30 @@ test("List name can be changed from the dialog", async () => {
     expect(model.getters.getListDisplayName("1")).toBe("(#1) New name");
 });
 
+test("Sheet is created when list name contains invalid characters", async () => {
+    const { env } = await spawnListViewForSpreadsheet();
+
+    let spreadsheetAction;
+    patchWithCleanup(SpreadsheetAction.prototype, {
+        setup() {
+            super.setup();
+            spreadsheetAction = this;
+        },
+    });
+    await invokeInsertListInSpreadsheetDialog(env);
+    const listName = "Do not keep Unsupported characters: '-:-*-?-\\-[-]-/";
+    await contains(".o_sp_name").edit(listName);
+    await contains(".modal button.btn-primary").click();
+    const model = getSpreadsheetActionModel(spreadsheetAction);
+    await waitForDataLoaded(model);
+    expect(model.getters.getListName("1")).toBe(listName);
+    expect(model.getters.getListDisplayName("1")).toBe(`(#1) ${listName}`);
+    const sanitizedSheetName = sanitizeSheetName(listName);
+    expect(model.getters.getSheetName(model.getters.getActiveSheetId())).toBe(
+        `${sanitizedSheetName} (List #1)`
+    );
+});
+
 test("Unsorted List name doesn't contains sorting info", async function () {
     const { env } = await spawnListViewForSpreadsheet();
 
@@ -159,5 +194,27 @@ test("Grouped list: we take the number of elements not the number of groups", as
     });
 
     await invokeInsertListInSpreadsheetDialog(env);
-    expect("input#threshold").toHaveValue(Partner._records.length);
+    expect("input#threshold").toHaveValue(MockServer.env["partner"].length);
+});
+
+test("Rows of list multi-lines fields are auto-resized", async function () {
+    let spreadsheetAction;
+    patchWithCleanup(SpreadsheetAction.prototype, {
+        setup() {
+            super.setup();
+            spreadsheetAction = this;
+        },
+    });
+    Product._records[0].display_name = "This \n has \n multiple \n lines";
+    await spawnListViewForSpreadsheet();
+    await animationFrame();
+    await toggleActionMenu(target);
+    await toggleCogMenuSpreadsheet(target);
+    await contains(".o_insert_list_spreadsheet_menu").click();
+    await contains(".modal button.btn-primary").click();
+    await animationFrame();
+
+    const model = getSpreadsheetActionModel(spreadsheetAction);
+    const sheetId = model.getters.getActiveSheetId();
+    expect(model.getters.getRowSize(sheetId, 1)).toBe(70);
 });

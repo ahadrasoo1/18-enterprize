@@ -189,7 +189,7 @@ class AccountReportSend(models.TransientModel):
         for wizard in self:
             wizard.partner_ids = wizard.account_report_id._get_report_send_recipients(wizard.report_options)
 
-    @api.depends('account_report_id', 'report_options')
+    @api.depends('account_report_id', 'report_options', 'mail_template_id')
     def _compute_mail_partner_ids(self):
         for wizard in self:
             wizard.mail_partner_ids = wizard.partner_ids
@@ -243,6 +243,7 @@ class AccountReportSend(models.TransientModel):
         if not recipient_partner_ids:
             recipient_partner_ids = partners.filtered('email').ids
 
+        email_from = mail_template_id._render_field('email_from', partner_ids) if mail_template_id else {}
         downloadable_attachments = self.env['ir.attachment']
 
         for partner in partners:
@@ -260,9 +261,10 @@ class AccountReportSend(models.TransientModel):
                 partner.message_post(
                     body=body,
                     subject=subject,
+                    email_from=email_from.get(partner.id),
                     partner_ids=recipient_partner_ids,
                     attachment_ids=attachments_ids + report_attachment.ids,
-                    subtype_id=self.env.ref('mail.mt_comment').id,
+                    email_add_signature=False,
                 )
 
             if to_download:
@@ -287,7 +289,9 @@ class AccountReportSend(models.TransientModel):
             # Set sending information on report
             if self.account_report_id.send_and_print_values:
                 raise UserError(_('There are currently reports waiting to be sent, please try again later.'))
+
             self.account_report_id.send_and_print_values = self._get_wizard_values()
+
             self.env.ref('account_reports.ir_cron_account_report_send')._trigger()
             return {
                 'type': 'ir.actions.client',

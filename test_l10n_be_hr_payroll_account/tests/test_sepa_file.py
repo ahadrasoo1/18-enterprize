@@ -60,6 +60,7 @@ class TestSEPAFile(AccountTestInvoicingCommon):
             'resource_calendar_id': cls.company.resource_calendar_id.id,
             'company_id': cls.env.company.id,
             'distance_home_work': 75,
+            'private_country_id': cls.env.ref('base.be').id,
         })
 
         cls.contract = cls.env['hr.contract'].create({
@@ -102,3 +103,4 @@ class TestSEPAFile(AccountTestInvoicingCommon):
         self.assertTrue("<InstrPrty>HIGH</InstrPrty>" in sepa_file_content)
         self.assertTrue("<Cd>SALA</Cd>" in sepa_file_content)
         self.assertTrue("<Ustrd>/A/ SLIP" in sepa_file_content)
+        self.assertTrue("<Ustrd>SLIP" not in sepa_file_content)

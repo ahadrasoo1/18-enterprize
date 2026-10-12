@@ -4,7 +4,7 @@ import * as helper from './tour_helper_stock_barcode';
 import { registry } from "@web/core/registry";
 import { stepUtils } from "./tour_step_utils";
 
-registry.category("web_tour.tours").add('test_internal_picking_from_scratch', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_internal_picking_from_scratch', { steps: () => [
     // Move 2 product1 from WH/Stock/Section 1 to WH/Stock/Section 2.
     {
         trigger: '.o_add_line',
@@ -232,52 +232,113 @@ registry.category("web_tour.tours").add('test_internal_picking_from_scratch', {t
     }
 ]});
 
-registry.category("web_tour.tours").add('test_internal_picking_from_scratch_with_package', { test: true, steps: () => [
-    // Creates a first internal transfert (Section 1 -> Section 2).
-    { trigger: '.o_stock_barcode_main_menu', run: 'scan WHINT' },
-    // Scans product1 and put it in P00001, then do the same for product2.
-    { trigger: '.o_barcode_client_action', run: 'scan product1' },
-    { trigger: '.o_barcode_line.o_selected', run: 'scan P00001' },
-    // Scans the destination.
-    { trigger: '.o_barcode_line .result-package', run: 'scan LOC-01-02-00' },
-    { trigger: '.o_barcode_line:not(.o_selected)', run: 'scan product2' },
-    { trigger: '.o_barcode_line[data-barcode="product2"].o_selected', run: 'scan P00001' },
-    { // Scans the destination.
-        trigger: '.o_barcode_line[data-barcode="product2"] .result-package', run: 'scan LOC-01-02-00',
-    },
-    { // Validates the internal picking.
-        trigger: '.o_barcode_line[data-barcode="product2"] .o_line_destination_location',
-        run: 'scan OBTVALI',
-    },
-    {
-        trigger: '.o_notification_bar.bg-success',
-        run: "click",
-    },
-    {
-        trigger: '.o_notification button.o_notification_close',
-        run: "click",
-    },
-
-    // Creates a second internal transfert (WH/Stock -> WH/Stock).
-    { trigger: '.o_stock_barcode_main_menu', run: 'scan WHINT' },
-    { trigger: '.o_barcode_client_action', run: () => helper.assertLinesCount(0) },
-    // Scans a package with some quants and checks lines was created for its content.
-    { trigger: '.o_barcode_client_action', run: 'scan P00002' },
-    {
-        trigger: '.o_barcode_line[data-barcode="product1"] + .o_barcode_line[data-barcode="product2"]',
-        run: () => {
-            helper.assertLinesCount(2);
-            helper.assertLineQty(0, "1");
-            helper.assertLineQty(1, "2");
+registry.category("web_tour.tours").add("test_internal_picking_from_scratch_with_package", {
+    steps: () => [
+        // Creates a first internal transfert (Stock -> Section 2).
+        { trigger: ".o_stock_barcode_main_menu", run: "scan WHINT" },
+        // Scans product1 and put it in P00001, then do the same for product2.
+        { trigger: ".o_barcode_client_action", run: "scan product1" },
+        { trigger: ".o_barcode_line.o_selected", run: "scan P00001" },
+        { trigger: ".o_barcode_line:contains(P00001)", run: "scan product2" },
+        { trigger: ".o_barcode_line[data-barcode='product2'].o_selected", run: "scan P00001" },
+        {
+            content: "Scans the destination",
+            trigger: ".o_barcode_line[data-barcode='product2'] .result-package",
+            run: "scan LOC-01-02-00",
         },
-    },
-    // Scans the destination location and validate the transfert.
-    { trigger: '.o_barcode_line.o_selected + .o_barcode_line.o_selected', run: 'scan LOC-01-02-00' },
-    { trigger: '.o_barcode_line:not(.o_selected)', run: 'scan OBTVALI' },
-    { trigger: '.o_notification_bar.bg-success'},
-]});
+        {
+            content: "Validates the internal transfer",
+            trigger: ".o_barcode_line[data-barcode='product2'] .o_line_destination_location",
+            run: "scan OBTVALI",
+        },
+        {
+            trigger: ".o_notification_bar.bg-success",
+            run: "click",
+        },
+        {
+            trigger: ".o_notification button.o_notification_close",
+            run: "click",
+        },
+        // Creates a second internal transfert (WH/Stock -> WH/Stock).
+        { trigger: ".o_stock_barcode_main_menu", run: "scan WHINT" },
+        { trigger: ".o_barcode_client_action", run: () => helper.assertLinesCount(0) },
+        // Scans a package with some quants and checks lines was created for its content.
+        { trigger: ".o_barcode_client_action", run: "scan P00002" },
+        {
+            trigger:
+                ".o_barcode_line[data-barcode='product1'] + .o_barcode_line[data-barcode='product2']",
+            run: () => {
+                helper.assertLinesCount(2);
+                helper.assertLineQty(0, "1");
+                helper.assertLineQty(1, "2");
+            },
+        },
+        { trigger: ".o_barcode_client_action", run: "scan product1" },
+        {
+            trigger:
+                ".o_barcode_line[data-barcode=product1] + .o_barcode_line[data-barcode=product2] + .o_barcode_line[data-barcode=product1]",
+            run: () => {
+                const [line1, line2, line3] = helper.getLines();
+                helper.assert(line1.querySelector(".package").innerText, "P00002");
+                helper.assert(line2.querySelector(".package").innerText, "P00002");
+                helper.assert(line3.querySelector(".package"), null);
+            },
+        },
+        { trigger: ".o_barcode_client_action", run: "scan 76543210" },
+        { trigger: ".o_barcode_line:contains('Battle Droid')", run: "scan productlot1" },
+        {
+            content: "Check that the owner was prefilled when unambiguous",
+            trigger: ".o_barcode_line[data-barcode=productlot1]",
+            run: () => {
+                const [line1, line2, line3, line4, line5] = helper.getLines();
+                helper.assert(line1.querySelector(".o_line_owner"), null);
+                helper.assert(line2.querySelector(".o_line_owner"), null);
+                helper.assert(line3.querySelector(".o_line_owner"), null);
+                helper.assert(line4.querySelector(".o_line_owner").innerText, "Azure Interior");
+                helper.assert(line5.querySelector(".o_line_owner"), null);
+            },
+        },
+        { trigger: ".o_barcode_client_action", run: "scan LOC-01-02-00" },
+        ...stepUtils.validateBarcodeOperation(),
+    ],
+});
 
-registry.category("web_tour.tours").add('test_internal_picking_reserved_1', {test: true, steps: () => [
+registry.category("web_tour.tours").add("test_internal_pack_in_same_package", {
+    steps: () => [
+        // 1st transfer: scan a product and pack it into an existing empty package.
+        { trigger: ".o_stock_barcode_main_menu", run: "scan WHINT" },
+        { trigger: ".o_scan_message.o_scan_product", run: "scan pack1" },
+        { trigger: ".o_barcode_line", run: "scan pack3" },
+        {
+            trigger: ".result-package:contains('pack3')",
+            run: () => {
+                helper.assertLinesCount(1);
+                helper.assertLineProduct(0, "[TEST] product1");
+                helper.assertLinePackage(0, "pack1");
+                helper.assertLineResultPackage(0, "pack3");
+            },
+        },
+        ...stepUtils.validateBarcodeOperation(),
+
+        // 2nd transfer: scan a product and pack it into the same package (which has content now.)
+        { trigger: ".o_stock_barcode_main_menu", run: "scan WHINT" },
+        { trigger: ".o_scan_message.o_scan_product", run: "scan pack2" },
+        { trigger: ".o_barcode_line", run: "scan pack3" },
+        {
+            trigger: ".result-package:contains('pack3')",
+            run: () => {
+                helper.assertLinesCount(1);
+                helper.assertLineProduct(0, "product2");
+                helper.assertLinePackage(0, "pack2");
+                helper.assertLineResultPackage(0, "pack3");
+            },
+        },
+        ...stepUtils.validateBarcodeOperation(),
+        { trigger: ".o_stock_barcode_main_menu" },
+    ],
+});
+
+registry.category("web_tour.tours").add('test_internal_picking_reserved_1', { steps: () => [
     {
         trigger: '.o_barcode_client_action',
         run: function() {
@@ -442,15 +503,14 @@ registry.category("web_tour.tours").add('test_internal_picking_reserved_1', {tes
     },
 ]});
 
-registry.category("web_tour.tours").add('test_procurement_backorder', {
-    test: true, steps: () => [
+registry.category("web_tour.tours").add('test_procurement_backorder', { steps: () => [
         { trigger: '.o_barcode_client_action', run: 'scan PB' },
         { trigger: '.o_barcode_line:contains("PB")', run: 'scan OBTVALI' },
         { trigger: '.o_notification_bar.bg-success'},
     ]
 });
 
-registry.category("web_tour.tours").add('test_receipt_reserved_1', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_receipt_reserved_1', { steps: () => [
     {
         trigger: '.o_barcode_client_action',
         run: function() {
@@ -552,7 +612,7 @@ registry.category("web_tour.tours").add('test_receipt_reserved_1', {test: true, 
     ...stepUtils.discardBarcodeForm(),
 ]});
 
-registry.category("web_tour.tours").add('test_receipt_reserved_2_partial_put_in_pack', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_receipt_reserved_2_partial_put_in_pack', { steps: () => [
     // Scan the picking's name to open it.
     { trigger: '.o_stock_barcode_main_menu', run: 'scan receipt_test' },
     {
@@ -655,7 +715,7 @@ registry.category("web_tour.tours").add('test_receipt_reserved_2_partial_put_in_
     { trigger: '.o_stock_barcode_main_menu' },
 ]});
 
-registry.category("web_tour.tours").add('test_receipt_product_not_consecutively', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_receipt_product_not_consecutively', { steps: () => [
     // Scan two products (product1 - product2 - product1)
     { trigger: '.o_barcode_client_action', run: 'scan product1' },
     { trigger: '.o_barcode_line', run: 'scan product2' },
@@ -669,7 +729,7 @@ registry.category("web_tour.tours").add('test_receipt_product_not_consecutively'
     },
 ]});
 
-registry.category("web_tour.tours").add("test_delivery_source_location", {test: true, steps: () => [
+registry.category("web_tour.tours").add("test_delivery_source_location", { steps: () => [
     // FIRST DELIVERY (using stock from WH/Stock)
     { trigger: ".o_stock_barcode_main_menu", run: 'scan delivery_from_stock' },
     // Tries to scan a location who doesn't belong to the delivery's source location.
@@ -733,7 +793,7 @@ registry.category("web_tour.tours").add("test_delivery_source_location", {test: 
     },
 ]});
 
-registry.category("web_tour.tours").add("test_delivery_lot_with_multi_companies", {test: true, steps: () => [
+registry.category("web_tour.tours").add("test_delivery_lot_with_multi_companies", { steps: () => [
     // Scans tsn-002: should find nothing since this SN belongs to another company.
     { trigger: ".o_barcode_client_action", run: "scan tsn-002" },
     // Checks a warning was displayed and scans tsn-001: a line should be added.
@@ -757,7 +817,7 @@ registry.category("web_tour.tours").add("test_delivery_lot_with_multi_companies"
     { trigger: ".o_notification_bar.bg-success"},
 ]});
 
-registry.category("web_tour.tours").add('test_delivery_lot_with_package', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_delivery_lot_with_package', { steps: () => [
     // Unfold grouped lines.
     {
         trigger: '.o_line_button.o_toggle_sublines',
@@ -836,7 +896,7 @@ registry.category("web_tour.tours").add('test_delivery_lot_with_package', {test:
     ...stepUtils.validateBarcodeOperation(),
 ]});
 
-registry.category("web_tour.tours").add('test_delivery_lot_with_package_delivery_step', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_delivery_lot_with_package_delivery_step', { steps: () => [
     {
         trigger: '.o_barcode_line',
         run: 'scan LOC-01-02-00',
@@ -861,7 +921,41 @@ registry.category("web_tour.tours").add('test_delivery_lot_with_package_delivery
     },
 ]});
 
-registry.category("web_tour.tours").add('test_delivery_reserved_1', {test: true, steps: () => [
+registry.category("web_tour.tours").add("test_delivery_pack_from_different_location", {
+    steps: () => [
+        { trigger: ".o_stock_barcode_main_menu", run: "scan WHOUT" },
+        // Scan first source location then scan a product.
+        { trigger: ".o_scan_message.o_scan_src", run: "scan LOC-01-01-00" },
+        { trigger: ".o_scan_message.o_scan_product", run: "scan product1" },
+        // Scan second source location then scan a product.
+        { trigger: ".o_barcode_line.o_selected", run: "scan LOC-01-02-00" },
+        { trigger: ".o_barcode_line:not(.o_selected)", run: "scan product1" },
+        {
+            content: "Check lines source location before to scan the package.",
+            trigger: ".o_barcode_line:nth-child(2).o_selected",
+            run: () => {
+                helper.assertLinesCount(2);
+                helper.assertLineSourceLocation(0, "WH/Stock/Section 1");
+                helper.assertLineSourceLocation(1, "WH/Stock/Section 2");
+            }
+        },
+        // Scan an empty package and check the lines' source weren't changed.
+        { trigger: ".o_barcode_line.o_selected", run: "scan pack-test" },
+        {
+            trigger: ".o_barcode_line .result-package",
+            run: () => {
+                helper.assertLinesCount(2);
+                const [ line1, line2 ] = helper.getLines();
+                helper.assertLineSourceLocation(line1, "WH/Stock/Section 1");
+                helper.assert(line1.querySelector('.result-package').innerText, "pack-test");
+                helper.assertLineSourceLocation(line2, "WH/Stock/Section 2");
+                helper.assert(line2.querySelector('.result-package').innerText, "pack-test");
+            }
+        },
+    ],
+});
+
+registry.category("web_tour.tours").add('test_delivery_reserved_1', { steps: () => [
     // test that picking note properly pops up + close it
     {
         trigger: '.alert:contains("A Test Note")',
@@ -938,7 +1032,7 @@ registry.category("web_tour.tours").add('test_delivery_reserved_1', {test: true,
     { trigger: '.o_barcode_line' },
 ]});
 
-registry.category("web_tour.tours").add('test_delivery_reserved_2', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_delivery_reserved_2', { steps: () => [
     {
         trigger: '.o_barcode_client_action',
         run: function() {
@@ -1028,7 +1122,7 @@ registry.category("web_tour.tours").add('test_delivery_reserved_2', {test: true,
     },
 ]});
 
-registry.category("web_tour.tours").add('test_delivery_reserved_3', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_delivery_reserved_3', { steps: () => [
     {
         trigger: '.o_barcode_client_action',
         run: function() {
@@ -1055,7 +1149,7 @@ registry.category("web_tour.tours").add('test_delivery_reserved_3', {test: true,
     },
 ]});
 
-registry.category("web_tour.tours").add("test_delivery_reserved_4_backorder", { test: true, steps: () => [
+registry.category("web_tour.tours").add("test_delivery_reserved_4_backorder", {  steps: () => [
     {
         trigger: ".o_barcode_client_action",
         run: function() {
@@ -1131,7 +1225,7 @@ registry.category("web_tour.tours").add("test_delivery_reserved_4_backorder", { 
     }
 ]});
 
-registry.category("web_tour.tours").add("test_delivery_reserved_5_dont_show_reserved_sn", { test: true, steps: () => [
+registry.category("web_tour.tours").add("test_delivery_reserved_5_dont_show_reserved_sn", {  steps: () => [
     {
         trigger: '.o_barcode_client_action',
         run: function() {
@@ -1188,13 +1282,27 @@ registry.category("web_tour.tours").add("test_delivery_reserved_5_dont_show_rese
             helper.assertLineQty(0, "2/4");
         }
     },
+
+    // "There should be no faulty line if show reserved sn/lot is disabled"
+    { trigger: '.o_line_button.o_toggle_sublines', run: 'click' },
+    {
+        trigger: '.o_sublines',
+        run: function() {
+            helper.assertLineQty(0, "2/4");
+            const unreservedLine = document.querySelector('.o_faulty');
+            helper.assert(
+                Boolean(unreservedLine), false, "There should be no faulty line if show reserved sn/lot is disabled"
+            );
+        }
+    },
+
     // Scans 2 more SN to complete the delivery and validates it.
     { trigger: '.o_barcode_client_action', run: 'scan sn2' },
     { trigger: '.o_barcode_client_action', run: 'scan sn3' },
     ...stepUtils.validateBarcodeOperation(".o_barcode_line.o_selected.o_line_completed"),
 ]});
 
-registry.category("web_tour.tours").add("test_delivery_reserved_6_dont_show_reserved_lots", { test: true, steps: () => [
+registry.category("web_tour.tours").add("test_delivery_reserved_6_dont_show_reserved_lots", {  steps: () => [
     {
         trigger: '.o_barcode_client_action',
         run: function() {
@@ -1255,8 +1363,8 @@ registry.category("web_tour.tours").add("test_delivery_reserved_6_dont_show_rese
             const sublines = helper.getSublines();
             helper.assertLinesCount(1);
             helper.assertSublinesCount(2);
-            helper.assertLineQty(sublines[0], "1/4");
-            helper.assertLineQty(sublines[1], "1/4");
+            helper.assertLineQty(sublines[0], "1");
+            helper.assertLineQty(sublines[1], "1");
             helper.assertLinesTrackingNumbers(sublines, ["lot-001", "lot-002"]);
         }
     },
@@ -1268,15 +1376,15 @@ registry.category("web_tour.tours").add("test_delivery_reserved_6_dont_show_rese
             const sublines = helper.getSublines();
             helper.assertLinesCount(1);
             helper.assertSublinesCount(3);
-            helper.assertLineQty(sublines[0], "1/4");
-            helper.assertLineQty(sublines[1], "1/4");
+            helper.assertLineQty(sublines[0], "1");
+            helper.assertLineQty(sublines[1], "1");
             helper.assertLineQty(sublines[2], "1");
             helper.assertLinesTrackingNumbers(sublines, ["lot-001", "lot-002", "lot-005"]);
         }
     },
 ]});
 
-registry.category("web_tour.tours").add('test_delivery_using_buttons', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_delivery_using_buttons', { steps: () => [
     {
         trigger: '.o_barcode_client_action',
         run: function() {
@@ -1462,7 +1570,7 @@ registry.category("web_tour.tours").add('test_delivery_using_buttons', {test: tr
     },
 ]});
 
-registry.category("web_tour.tours").add('test_remaining_decimal_accuracy', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_remaining_decimal_accuracy', { steps: () => [
     {
         trigger: '.o_barcode_client_action',
         run: function() {
@@ -1548,7 +1656,7 @@ registry.category("web_tour.tours").add('test_remaining_decimal_accuracy', {test
     },
 ]});
 
-registry.category("web_tour.tours").add('test_receipt_from_scratch_with_lots_1', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_receipt_from_scratch_with_lots_1', { steps: () => [
     {
         trigger: '.o_barcode_client_action',
         run: 'scan lot1',
@@ -1615,7 +1723,7 @@ registry.category("web_tour.tours").add('test_receipt_from_scratch_with_lots_1',
     ...stepUtils.validateBarcodeOperation(),
 ]});
 
-registry.category("web_tour.tours").add('test_receipt_from_scratch_with_lots_2', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_receipt_from_scratch_with_lots_2', { steps: () => [
     {
         trigger: '.o_barcode_client_action',
         run: 'scan productlot1'
@@ -1693,7 +1801,7 @@ registry.category("web_tour.tours").add('test_receipt_from_scratch_with_lots_2',
     ...stepUtils.validateBarcodeOperation(),
 ]});
 
-registry.category("web_tour.tours").add('test_receipt_from_scratch_with_lots_3', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_receipt_from_scratch_with_lots_3', { steps: () => [
     { trigger: '.o_barcode_client_action', run: 'scan product1' },
     {
         trigger: '.o_barcode_line',
@@ -1759,7 +1867,7 @@ registry.category("web_tour.tours").add('test_receipt_from_scratch_with_lots_3',
     ...stepUtils.validateBarcodeOperation(),
 ]});
 
-registry.category("web_tour.tours").add('test_receipt_from_scratch_with_lots_4', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_receipt_from_scratch_with_lots_4', { steps: () => [
     {
         trigger: '.o_barcode_client_action',
         run: 'scan productserial1',
@@ -1786,7 +1894,7 @@ registry.category("web_tour.tours").add('test_receipt_from_scratch_with_lots_4',
     ...stepUtils.discardBarcodeForm(),
 ]});
 
-registry.category("web_tour.tours").add('test_delivery_from_scratch_with_lots_1', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_delivery_from_scratch_with_lots_1', { steps: () => [
 
     {
         trigger: '.o_barcode_client_action',
@@ -1827,7 +1935,7 @@ registry.category("web_tour.tours").add('test_delivery_from_scratch_with_lots_1'
     ...stepUtils.discardBarcodeForm(),
 ]});
 
-registry.category("web_tour.tours").add('test_delivery_from_scratch_with_incompatible_lot', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_delivery_from_scratch_with_incompatible_lot', { steps: () => [
     { trigger: '.o_barcode_client_action', run: 'scan 0000000001' },
     {
         trigger: '.o_barcode_line:first-child .o_edit',
@@ -1836,7 +1944,7 @@ registry.category("web_tour.tours").add('test_delivery_from_scratch_with_incompa
     ...stepUtils.discardBarcodeForm(),
 ]});
 
-registry.category("web_tour.tours").add('test_delivery_from_scratch_with_common_lots_name', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_delivery_from_scratch_with_common_lots_name', { steps: () => [
     {
         trigger: '.o_barcode_client_action',
         run: 'scan product1',
@@ -1881,12 +1989,12 @@ registry.category("web_tour.tours").add('test_delivery_from_scratch_with_common_
     ...stepUtils.discardBarcodeForm(),
 ]});
 
-registry.category("web_tour.tours").add('test_receipt_with_sn_1', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_receipt_with_sn_1', { steps: () => [
     { trigger: '.o_barcode_client_action', run: 'scan sn1' },
     ...stepUtils.validateBarcodeOperation(),
 ]});
 
-registry.category("web_tour.tours").add('test_delivery_from_scratch_with_sn_1', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_delivery_from_scratch_with_sn_1', { steps: () => [
     /* scan a product tracked by serial number. Then scan 4 a its serial numbers.
     */
     {
@@ -1938,7 +2046,7 @@ registry.category("web_tour.tours").add('test_delivery_from_scratch_with_sn_1', 
 
 ]});
 
-registry.category("web_tour.tours").add('test_delivery_reserved_lots_1', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_delivery_reserved_lots_1', { steps: () => [
     { trigger: '.o_barcode_client_action', run: 'scan productlot1' },
     { trigger: '.o_barcode_line.o_selected .o_toggle_sublines', run: 'click' },
     {
@@ -1954,6 +2062,7 @@ registry.category("web_tour.tours").add('test_delivery_reserved_lots_1', {test: 
         },
     },
     { trigger: '.o_barcode_client_action', run: 'scan lot1' },
+    { trigger: '.o_barcode_line.o_selected', run: 'scan lot2' },
     { trigger: '.o_barcode_line.o_selected', run: 'scan lot3' },
     {
         trigger: '.o_sublines .o_barcode_line:nth-child(3)',
@@ -1964,10 +2073,11 @@ registry.category("web_tour.tours").add('test_delivery_reserved_lots_1', {test: 
             // Check lines and "Add quantity" buttons quantities are correctly updated.
             helper.assertLineQty(sublines[0], "1/2");
             helper.assert(sublines[0].querySelector('button.o_add_remaining_quantity').innerText, "+1");
-            helper.assertLineQty(sublines[1], "1");
-            helper.assert(sublines[1].querySelector('button.o_add_remaining_quantity').innerText, "+1");
-            helper.assertLineQty(sublines[2], "0/3");
-            helper.assert(sublines[2].querySelector('button.o_add_remaining_quantity').innerText, "+3");
+            helper.assertLineQty(sublines[1], "1/3");
+            helper.assert(sublines[1].querySelector('button.o_add_remaining_quantity').innerText, "+2");
+            helper.assertLineQty(sublines[2], "1");
+            helper.assert(sublines[2].querySelector('button.o_add_remaining_quantity').innerText, "+1");
+
         },
     },
     { trigger: '.o_barcode_client_action', run: 'scan lot1' },
@@ -1979,13 +2089,12 @@ registry.category("web_tour.tours").add('test_delivery_reserved_lots_1', {test: 
             const sublines = helper.getSublines();
             helper.assertLineQty(sublines[0], "2/2");
             helper.assert(sublines[0].querySelector('button.o_add_remaining_quantity').innerText, "+1");
-            helper.assertLineQty(sublines[1], "1");
+            helper.assertLineQty(sublines[1], "1/3");
             helper.assert(sublines[1].querySelector('button.o_add_remaining_quantity').innerText, "+1");
-            helper.assertLineQty(sublines[2], "0/3");
-            helper.assert(sublines[2].querySelector('button.o_add_remaining_quantity').innerText, "+2");
+            helper.assertLineQty(sublines[2], "1");
+            helper.assert(sublines[2].querySelector('button.o_add_remaining_quantity').innerText, "+1");
         },
     },
-    { trigger: '.o_barcode_client_action', run: 'scan lot2' },
     { trigger: '.o_barcode_line.o_selected:not(.o_line_completed)', run: 'scan lot2' },
     {
         trigger: '.o_barcode_location_group > .o_barcode_line.o_line_completed',
@@ -1997,10 +2106,10 @@ registry.category("web_tour.tours").add('test_delivery_reserved_lots_1', {test: 
             helper.assertLineQty(sublines[0], "2/2");
             helper.assertButtonIsVisible(sublines[0], "add_quantity", false);
             helper.assertButtonIsVisible(sublines[0], "o_add_remaining_quantity", false);
-            helper.assertLineQty(sublines[1], "1");
+            helper.assertLineQty(sublines[1], "2/3");
             helper.assertButtonIsVisible(sublines[1], "add_quantity", false);
             helper.assertButtonIsVisible(sublines[1], "o_add_remaining_quantity", false);
-            helper.assertLineQty(sublines[2], "2/3");
+            helper.assertLineQty(sublines[2], "1");
             helper.assertButtonIsVisible(sublines[2], "add_quantity", false);
             helper.assertButtonIsVisible(sublines[2], "o_add_remaining_quantity", false);
         },
@@ -2011,7 +2120,7 @@ registry.category("web_tour.tours").add('test_delivery_reserved_lots_1', {test: 
     ...stepUtils.discardBarcodeForm(),
 ]});
 
-registry.category("web_tour.tours").add('test_delivery_different_products_with_same_lot_name', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_delivery_different_products_with_same_lot_name', { steps: () => [
 
     {
         trigger: '.o_barcode_client_action',
@@ -2063,7 +2172,7 @@ registry.category("web_tour.tours").add('test_delivery_different_products_with_s
     ...stepUtils.discardBarcodeForm(),
 ]});
 
-registry.category("web_tour.tours").add('test_delivery_reserved_with_sn_1', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_delivery_reserved_with_sn_1', { steps: () => [
     /* scan a product tracked by serial number. Then scan 4 a its serial numbers.
     */
     { trigger: '.o_barcode_client_action', run: 'scan productserial1' },
@@ -2089,7 +2198,7 @@ registry.category("web_tour.tours").add('test_delivery_reserved_with_sn_1', {tes
     ...stepUtils.discardBarcodeForm(),
 ]});
 
-registry.category("web_tour.tours").add('test_nomenclature_alias_and_conversion', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_nomenclature_alias_and_conversion', { steps: () => [
     // Before all, create a new receipt on the fly.
     { trigger: '.o_stock_barcode_main_menu', run: 'scan WHIN' },
     // First, scan the alias and check the product was found (a line was then created.)
@@ -2121,7 +2230,7 @@ registry.category("web_tour.tours").add('test_nomenclature_alias_and_conversion'
     },
 ]});
 
-registry.category("web_tour.tours").add('test_receipt_reserved_lots_multiloc_1', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_receipt_reserved_lots_multiloc_1', { steps: () => [
     /* Receipt of a product tracked by lots. Open an existing picking with 4
     * units initial demands. Scan 2 units in lot1 in location WH/Stock. Then scan
     * 2 unit in lot2 in location WH/Stock/Section 2
@@ -2169,7 +2278,7 @@ registry.category("web_tour.tours").add('test_receipt_reserved_lots_multiloc_1',
     ...stepUtils.validateBarcodeOperation(),
 ]});
 
-registry.category("web_tour.tours").add('test_receipt_duplicate_serial_number', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_receipt_duplicate_serial_number', { steps: () => [
     // Create a receipt. Try to scan twice the same serial in different locations.
     { trigger: '.o_stock_barcode_main_menu:contains("Scan or tap")', run: "click" },
     { trigger: '.o_stock_barcode_main_menu', run: 'scan WHIN' },
@@ -2227,7 +2336,7 @@ registry.category("web_tour.tours").add('test_receipt_duplicate_serial_number', 
     },
 ]});
 
-registry.category("web_tour.tours").add('test_delivery_duplicate_serial_number', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_delivery_duplicate_serial_number', { steps: () => [
     // Create a delivery. Try to scan twice the same serial in different locations.
     { trigger: '.o_stock_barcode_main_menu', run: 'scan WHOUT' },
     { trigger: '.o_scan_message.o_scan_src', run: 'scan LOC-01-01-00' },
@@ -2282,7 +2391,7 @@ registry.category("web_tour.tours").add('test_delivery_duplicate_serial_number',
     },
 ]});
 
-registry.category("web_tour.tours").add('test_bypass_source_scan', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_bypass_source_scan', { steps: () => [
     /* Scan directly a serial number, a package or a lot in delivery order.
     * It should implicitely trigger the same action than a source location
     * scan with the state location.
@@ -2366,7 +2475,7 @@ registry.category("web_tour.tours").add('test_bypass_source_scan', {test: true, 
     ...stepUtils.validateBarcodeOperation(),
 ]});
 
-registry.category("web_tour.tours").add('test_picking_type_mandatory_scan_settings_pick_int_1', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_picking_type_mandatory_scan_settings_pick_int_1', { steps: () => [
     {
         trigger: '.o_barcode_client_action',
         run: function () {
@@ -2443,7 +2552,7 @@ registry.category("web_tour.tours").add('test_picking_type_mandatory_scan_settin
     { trigger: '.o_notification_bar.bg-success'},
 ]});
 
-registry.category("web_tour.tours").add('test_picking_type_mandatory_scan_settings_pick_int_2', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_picking_type_mandatory_scan_settings_pick_int_2', { steps: () => [
     {
         trigger: '.o_barcode_client_action',
         run: function () {
@@ -2602,7 +2711,7 @@ registry.category("web_tour.tours").add('test_picking_type_mandatory_scan_settin
     { trigger: '.o_notification_bar.bg-success'},
 ]});
 
-registry.category("web_tour.tours").add('test_receipt_scan_package_and_location_after_group_of_product', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_receipt_scan_package_and_location_after_group_of_product', { steps: () => [
     {
         trigger: ".o_barcode_client_action",
         run: function () {
@@ -2707,6 +2816,19 @@ registry.category("web_tour.tours").add('test_receipt_scan_package_and_location_
     { trigger: ".o_barcode_line.o_selected:not(.o_line_completed)", run: "scan lot-03" },
     { trigger: ".o_barcode_line.o_selected:not(.o_line_completed)", run: "scan lot-03" },
     { trigger: ".o_barcode_line.o_selected.o_line_completed", run: "scan pack-128" },
+    // Try to validate without setting a destination and check we are blocked by the
+    // barcode_validation_after_dest_location setting
+    {
+        content: "Trigger validation, even if it is not highlithed",
+        trigger: ".o_validate_page.btn-secondary",
+        run: "click",
+    },
+    {
+        trigger: ".o_notification_bar.bg-danger",
+        run: () => {
+            helper.assertErrorMessage("Destination location must be scanned");
+        },
+    },
     // Scans another destination: only the packaged lines should go to this location.
     { trigger: ".o_barcode_line [name='package']", run: "scan shelf3" },
     {
@@ -2749,7 +2871,7 @@ registry.category("web_tour.tours").add('test_receipt_scan_package_and_location_
     ...stepUtils.validateBarcodeOperation(),
 ]});
 
-registry.category("web_tour.tours").add('test_receipt_assign_sibling_reservation_no_empty_line', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_receipt_assign_sibling_reservation_no_empty_line', { steps: () => [
     {
         trigger: ".o_barcode_client_action",
         run: function () {
@@ -2779,7 +2901,7 @@ registry.category("web_tour.tours").add('test_receipt_assign_sibling_reservation
     ...stepUtils.validateBarcodeOperation(),
 ]});
 
-registry.category("web_tour.tours").add('test_picking_type_mandatory_scan_product_packaging', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_picking_type_mandatory_scan_product_packaging', { steps: () => [
     {
         trigger: '.o_barcode_line',
         run: () => {
@@ -2793,7 +2915,7 @@ registry.category("web_tour.tours").add('test_picking_type_mandatory_scan_produc
 
 ]});
 
-registry.category("web_tour.tours").add('test_picking_type_mandatory_scan_complete_flux_receipt', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_picking_type_mandatory_scan_complete_flux_receipt', { steps: () => [
     {
         trigger: '.o_barcode_client_action',
         run: function() {
@@ -2882,7 +3004,7 @@ registry.category("web_tour.tours").add('test_picking_type_mandatory_scan_comple
     },
 ]});
 
-registry.category("web_tour.tours").add('test_picking_type_mandatory_scan_complete_flux_internal', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_picking_type_mandatory_scan_complete_flux_internal', { steps: () => [
     {
         trigger: '.o_barcode_client_action',
         run: function() {
@@ -3036,7 +3158,7 @@ registry.category("web_tour.tours").add('test_picking_type_mandatory_scan_comple
     },
 ]});
 
-registry.category("web_tour.tours").add('test_picking_type_mandatory_scan_complete_flux_pick', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_picking_type_mandatory_scan_complete_flux_pick', { steps: () => [
     {
         trigger: '.o_barcode_client_action',
         run: function() {
@@ -3286,7 +3408,7 @@ registry.category("web_tour.tours").add('test_picking_type_mandatory_scan_comple
     },
 ]});
 
-registry.category("web_tour.tours").add('test_picking_type_mandatory_scan_complete_flux_pack', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_picking_type_mandatory_scan_complete_flux_pack', { steps: () => [
     {
         trigger: '.o_barcode_client_action',
         run: function() {
@@ -3329,7 +3451,7 @@ registry.category("web_tour.tours").add('test_picking_type_mandatory_scan_comple
     { trigger: '.o_notification_bar.bg-success'},
 ]});
 
-registry.category("web_tour.tours").add('test_picking_type_mandatory_scan_complete_flux_delivery', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_picking_type_mandatory_scan_complete_flux_delivery', { steps: () => [
     {
         trigger: '.o_barcode_client_action',
         run: function() {
@@ -3353,7 +3475,7 @@ registry.category("web_tour.tours").add('test_picking_type_mandatory_scan_comple
     { trigger: '.o_notification_bar.bg-success'},
 ]});
 
-registry.category("web_tour.tours").add('test_pack_multiple_scan', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_pack_multiple_scan', { steps: () => [
     // Create a receipt, scan product1 and product2, pack them and validate the receipt.
     { trigger: '.o_stock_barcode_main_menu', run: 'scan WHIN' },
     { trigger: '.o_barcode_client_action', run: 'scan product1' },
@@ -3398,7 +3520,7 @@ registry.category("web_tour.tours").add('test_pack_multiple_scan', {test: true, 
     },
 ]});
 
-registry.category("web_tour.tours").add('test_pack_common_content_scan', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_pack_common_content_scan', { steps: () => [
     /* Scan 2 packages PACK1 and PACK2 that contains both product1 and
      * product 2. It also scan a single product1 before scanning both packages.
      * The purpose is to check that lines with a same product are not merged
@@ -3441,7 +3563,7 @@ registry.category("web_tour.tours").add('test_pack_common_content_scan', {test: 
     },
 ]});
 
-registry.category("web_tour.tours").add('test_pack_multiple_location', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_pack_multiple_location', { steps: () => [
     {
         trigger: '.o_stock_barcode_main_menu',
         run: 'scan WHINT',
@@ -3501,7 +3623,7 @@ registry.category("web_tour.tours").add('test_pack_multiple_location', {test: tr
     },
 ]});
 
-registry.category("web_tour.tours").add('test_pack_multiple_location_02', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_pack_multiple_location_02', { steps: () => [
     {
         trigger: '.o_barcode_client_action',
         run: 'scan LOC-01-01-00'
@@ -3529,7 +3651,7 @@ registry.category("web_tour.tours").add('test_pack_multiple_location_02', {test:
     },
 ]});
 
-registry.category("web_tour.tours").add('test_pack_multiple_location_03', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_pack_multiple_location_03', { steps: () => [
     {trigger: '.o_barcode_client_action', run: 'scan shelf3'},
     {
         trigger: '.o_barcode_line',
@@ -3549,7 +3671,26 @@ registry.category("web_tour.tours").add('test_pack_multiple_location_03', {test:
     ...stepUtils.validateBarcodeOperation(),
 ]});
 
-registry.category("web_tour.tours").add('test_put_in_pack_from_multiple_pages', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_pack_source_location', { steps: () => [
+    {
+        trigger: '.o_stock_barcode_main_menu',
+        run: 'scan WHINT',
+    },
+    {
+        trigger: '.o_scan_message.o_scan_product',
+        run: 'scan PACK123666',
+    },
+    {
+        trigger: '.o_barcode_line',
+        run: function() {
+            const line = helper.getLine({ barcode: 'product1' });
+            helper.assertLineSourceLocation(line, "WH/Stock/Section 4");
+        },
+    },
+    ...stepUtils.validateBarcodeOperation(),
+]});
+
+registry.category("web_tour.tours").add('test_put_in_pack_from_multiple_pages', { steps: () => [
     {
         trigger: '.o_barcode_client_action',
         run: function () {
@@ -3610,7 +3751,7 @@ registry.category("web_tour.tours").add('test_put_in_pack_from_multiple_pages', 
     ...stepUtils.validateBarcodeOperation('.o_barcode_line:contains("PACK")'),
 ]});
 
-registry.category("web_tour.tours").add('test_put_in_pack_no_freeze', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_put_in_pack_no_freeze', { steps: () => [
     { trigger: 'button.o_button_operations', run: 'click' },
 
     { trigger: '.o_kanban_record:contains(Receipts)', run: 'click' },
@@ -3634,7 +3775,7 @@ registry.category("web_tour.tours").add('test_put_in_pack_no_freeze', {test: tru
     { trigger: 'button.o_exit', run: 'click' },
 ]});
 
-registry.category("web_tour.tours").add('test_reload_flow', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_reload_flow', { steps: () => [
     {
         trigger: '.o_stock_barcode_main_menu',
         run: 'scan WHIN'
@@ -3709,30 +3850,7 @@ registry.category("web_tour.tours").add('test_reload_flow', {test: true, steps: 
     ...stepUtils.validateBarcodeOperation(),
 ]});
 
-registry.category("web_tour.tours").add('test_highlight_packs', {test: true, steps: () => [
-    {
-        trigger: '.o_barcode_client_action',
-        run: function () {
-            helper.assertLinesCount(1);
-            helper.assertScanMessage('scan_product_or_package');
-            helper.assertValidateVisible(true);
-            helper.assertValidateIsHighlighted(false);
-            helper.assertValidateEnabled(true);
-            helper.assertLineIsHighlighted(0, false);
-
-        },
-    },
-
-    {
-        trigger: '.o_barcode_client_action',
-        run: 'scan PACK002',
-    },
-
-    {
-        trigger: '.o_barcode_client_action:contains("PACK002")',
-        run: "click",
-    },
-
+registry.category("web_tour.tours").add('test_highlight_packs', { steps: () => [
     {
         trigger: '.o_barcode_client_action',
         run: function () {
@@ -3741,14 +3859,79 @@ registry.category("web_tour.tours").add('test_highlight_packs', {test: true, ste
             helper.assertValidateVisible(true);
             helper.assertValidateIsHighlighted(false);
             helper.assertValidateEnabled(true);
-            const packageLine = document.querySelector('.o_barcode_line[data-package="PACK002"]');
-            helper.assertLineIsHighlighted(packageLine, true);
+            helper.assertLineIsHighlighted(0, false);
+        },
+    },
+    // Check barcode line is correctly unselected when package line is selected and vice versa.
+    { trigger: '.o_barcode_line[data-barcode="product3"]', run: "click" },
+    {
+        trigger: '.o_barcode_line[data-barcode="product3"].o_selected',
+        run: () => {
+            helper.assertLineIsHighlighted(helper.getLine({ barcode: "product3"}));
+            helper.assertLineIsHighlighted(helper.getLine({ package: "PACK001"}), false);
+        },
+    },
+    { trigger: '.o_barcode_line[data-package="PACK001"]', run: "click" },
+    {
+        trigger: '.o_barcode_line[data-package="PACK001"].o_selected',
+        run: () => {
+            helper.assertLineIsHighlighted(helper.getLine({ barcode: "product3"}), false);
+            helper.assertLineIsHighlighted(helper.getLine({ package: "PACK001"}));
+        },
+    },
+    { trigger: '.o_barcode_line[data-barcode="product3"]', run: "click" },
+    {
+        trigger: '.o_barcode_line[data-barcode="product3"].o_selected',
+        run: () => {
+            helper.assertLineIsHighlighted(helper.getLine({ barcode: "product3"}));
+            helper.assertLineIsHighlighted(helper.getLine({ package: "PACK001"}), false);
+        },
+    },
+
+        // Scan another package and check the right package line is selected.
+    {
+        trigger: '.o_barcode_client_action',
+        run: 'scan PACK002',
+    },
+    {
+        trigger: '.o_barcode_line[data-package="PACK002"]',
+        run: function () {
+            helper.assertLinesCount(3);
+            helper.assertScanMessage('scan_product_or_package');
+            helper.assertValidateVisible(true);
+            helper.assertValidateIsHighlighted(false);
+            helper.assertValidateEnabled(true);
+            helper.assertLineIsHighlighted(helper.getLine({ package: "PACK001"}), false);
+            helper.assertLineIsHighlighted(helper.getLine({ package: "PACK002"}));
+        },
+    },
+    {
+        trigger: 'button.o_exit',
+        run: "click",
+    },
+    {
+        trigger: 'button.o_button_operations',
+        run: "click",
+    },
+    {
+        trigger: '.o_kanban_record:contains("Delivery Orders")',
+        run: "click",
+    },
+    {
+        trigger: '.o_kanban_record:contains("Full Package Delivery")',
+        run: "click",
+    },
+    {
+        trigger: '.o_barcode_client_action',
+        run: function () {
+            const pack2Line = document.querySelector('.o_barcode_line[data-package="PACK002"]');
+            helper.assertLineQty(pack2Line, "1/1");
         },
     },
 
 ]});
 
-registry.category("web_tour.tours").add('test_put_in_pack_from_different_location', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_put_in_pack_from_different_location', { steps: () => [
     {
         trigger: '.o_barcode_client_action',
         run: 'scan product1',
@@ -3780,7 +3963,7 @@ registry.category("web_tour.tours").add('test_put_in_pack_from_different_locatio
     ...stepUtils.validateBarcodeOperation('.o_scan_message.o_scan_validate'),
 ]});
 
-registry.category("web_tour.tours").add('test_put_in_pack_before_dest', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_put_in_pack_before_dest', { steps: () => [
     {
         trigger: '.o_barcode_client_action',
         run: 'scan LOC-01-01-00',
@@ -3847,7 +4030,7 @@ registry.category("web_tour.tours").add('test_put_in_pack_before_dest', {test: t
     ...stepUtils.validateBarcodeOperation(),
 ]});
 
-registry.category("web_tour.tours").add('test_put_in_pack_scan_package', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_put_in_pack_scan_package', { steps: () => [
     {
         trigger: '.o_barcode_client_action',
         run: function() {
@@ -3921,7 +4104,7 @@ registry.category("web_tour.tours").add('test_put_in_pack_scan_package', {test: 
     ...stepUtils.validateBarcodeOperation(),
 ]});
 
-registry.category("web_tour.tours").add('test_put_in_pack_new_lines', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_put_in_pack_new_lines', { steps: () => [
     {
         trigger: '.o_barcode_client_action',
         run: 'scan P00001',
@@ -3947,7 +4130,7 @@ registry.category("web_tour.tours").add('test_put_in_pack_new_lines', {test: tru
     },
 ]});
 
-registry.category("web_tour.tours").add('test_picking_owner_scan_package', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_picking_owner_scan_package', { steps: () => [
     {
         trigger: '.o_stock_barcode_main_menu',
         run: 'scan WHOUT',
@@ -3961,7 +4144,7 @@ registry.category("web_tour.tours").add('test_picking_owner_scan_package', {test
     ...stepUtils.validateBarcodeOperation(),
 ]});
 
-registry.category("web_tour.tours").add('test_receipt_delete_button', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_receipt_delete_button', { steps: () => [
     {
         trigger: '.o_barcode_client_action',
         run: 'scan product1',
@@ -4024,7 +4207,7 @@ registry.category("web_tour.tours").add('test_receipt_delete_button', {test: tru
     },
 ]});
 
-registry.category("web_tour.tours").add("test_scan_aggregate_barcode", {test: true, steps: () => [
+registry.category("web_tour.tours").add("test_scan_aggregate_barcode", { steps: () => [
     { trigger: '.o_stock_barcode_main_menu', run: 'scan WHIN' },
     // Scan 3x product1 (using ',' as separator).
     { trigger: '.o_barcode_client_action', run: 'scan product1,product1,product1' },
@@ -4066,7 +4249,28 @@ registry.category("web_tour.tours").add("test_scan_aggregate_barcode", {test: tr
     ...stepUtils.validateBarcodeOperation(),
 ]});
 
-registry.category("web_tour.tours").add("test_scrap", {test: true, steps: () => [
+registry.category("web_tour.tours").add("test_scrap_change_source_location", { steps: () => [
+    { trigger: ".o_barcode_actions", run: "click" },
+    { trigger: "input#manual_barcode", run: "edit LOC-01-01-00" },
+    { trigger: "button:contains('Apply')", run: "click" },
+    { trigger: ".o_barcode_actions", run: "click" },
+    { trigger: "input#manual_barcode", run: "edit Lot1" },
+    { trigger: "button:contains('Apply')", run: "click" },
+    { trigger: ".o_line_button:contains('+9')", run: "click" },
+    { trigger: ".o_barcode_actions", run: "click" },
+    { trigger: ".o_scrap", run: "click" },
+    { trigger: "input#product_id_0", run: "edit product1" },
+    { trigger: ".ui-menu-item > a:contains('product1')", run: "click" },
+    { trigger: "input#scrap_qty_0", run: "edit 15" },
+    { trigger: "input#location_id_0", run: "edit WH/Stock/Section 1" },
+    { trigger: ".ui-menu-item > a:contains('WH/Stock/Section 1')", run: "click" },
+    { trigger: "input#lot_id_0", run: "edit lot1" },
+    { trigger: ".ui-menu-item > a:contains('lot1')", run: "click" },
+    { trigger: "button.o_save", run: "click" },
+    ...stepUtils.validateBarcodeOperation(),
+]});
+
+registry.category("web_tour.tours").add("test_scrap", { steps: () => [
     // Opens the receipt and checks we can't scrap if not done.
     { trigger: ".o_stock_barcode_main_menu", run: "scan receipt_scrap_test" },
     {
@@ -4269,7 +4473,7 @@ registry.category("web_tour.tours").add("test_scrap", {test: true, steps: () => 
     },
 ]});
 
-registry.category("web_tour.tours").add("test_picking_scan_package_confirmation", {test: true, steps: () => [
+registry.category("web_tour.tours").add("test_picking_scan_package_confirmation", { steps: () => [
     // Scan product 1
     { trigger: '.o_barcode_client_action', run: 'scan product1' },
     // Scan Package 1 to trigger the scan confirmation
@@ -4289,7 +4493,7 @@ registry.category("web_tour.tours").add("test_picking_scan_package_confirmation"
     { trigger: '.o_barcode_line .qty-done:contains("2")'},
 ]});
 
-registry.category("web_tour.tours").add('test_show_entire_package', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_show_entire_package', { steps: () => [
     {
         trigger: 'button.o_button_operations',
         run: "click",
@@ -4315,6 +4519,7 @@ registry.category("web_tour.tours").add('test_show_entire_package', {test: true,
             const line = helper.getLine();
             helper.assertLineIsHighlighted(line, false);
             helper.assertButtonIsVisible(line, "package_content");
+            helper.assertButtonIsVisible(line, "add_remaining_quantity", false);
             helper.assert(line.querySelector('[name="package"]').innerText, "package001package001");
             helper.assertLineQty(line, "0/1");
         },
@@ -4332,6 +4537,28 @@ registry.category("web_tour.tours").add('test_show_entire_package', {test: true,
     {
         trigger: 'button.o_close',
         run: "click",
+    },
+    // Scan the unreserved package002 and remove it as it was a mistake
+    { trigger: '.o_barcode_lines', run: 'scan package002' },
+    {
+        trigger: '.o_barcode_line[data-package=package002]',
+        run: function () {
+            helper.assertLinesCount(2);
+            const [line1, line2] = helper.getLines();
+            helper.assert(line1.querySelector("[name=package]").innerText, "package001package001");
+            helper.assertLineQty(line1, "0/1");
+            helper.assertLineIsFaulty(line1, false)
+            helper.assert(line2.querySelector("[name=package]").innerText, "package002package002");
+            helper.assertLineQty(line2, "1");
+            helper.assertLineIsFaulty(line2, true)
+        },
+    },
+    {
+        trigger: '.o_barcode_line[data-package=package002] .o_delete_line',
+        run: 'click',
+    },
+    {
+        trigger: '.o_barcode_lines:not(:has(.o_delete_line))'
     },
     // Scans package001 to be sure no moves will be created but the package line will be done.
     { trigger: '.o_barcode_lines', run: 'scan package001' },
@@ -4377,7 +4604,7 @@ registry.category("web_tour.tours").add('test_show_entire_package', {test: true,
     },
 ]});
 
-registry.category("web_tour.tours").add('test_define_the_destination_package', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_define_the_destination_package', { steps: () => [
     {
         trigger: '.o_line_button.o_add_remaining_quantity',
         run: "click",
@@ -4398,7 +4625,7 @@ registry.category("web_tour.tours").add('test_define_the_destination_package', {
     },
 ]});
 
-registry.category("web_tour.tours").add('stock_barcode_package_with_lot', {test: true, steps: () => [
+registry.category("web_tour.tours").add('stock_barcode_package_with_lot', { steps: () => [
     {
         trigger: "[data-menu-xmlid='stock_barcode.stock_barcode_menu']", // open barcode app
         run: "click",
@@ -4423,7 +4650,7 @@ registry.category("web_tour.tours").add('stock_barcode_package_with_lot', {test:
     },
 ]});
 
-registry.category("web_tour.tours").add('test_scan_same_lot_different_products', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_scan_same_lot_different_products', { steps: () => [
     // Scanning 123 will fetch the lot 123 for the 'aaa' product and add them
     // both in the cache (the 'aaa' product and its lot.)
     {
@@ -4448,7 +4675,7 @@ registry.category("web_tour.tours").add('test_scan_same_lot_different_products',
     },
 ]});
 
-registry.category("web_tour.tours").add('test_avoid_useless_line_creation', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_avoid_useless_line_creation', { steps: () => [
     {
         trigger: '.o_barcode_client_action',
         run: 'scan LOT01',
@@ -4471,7 +4698,7 @@ registry.category("web_tour.tours").add('test_avoid_useless_line_creation', {tes
     ...stepUtils.discardBarcodeForm(),
 ]});
 
-registry.category("web_tour.tours").add('test_setting_barcode_allow_extra_product', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_setting_barcode_allow_extra_product', { steps: () => [
     // Scans the delivery to open it.
     { trigger: '.o_stock_barcode_main_menu', run: 'scan delivery_test' },
     // Scans the reserved product.
@@ -4497,7 +4724,75 @@ registry.category("web_tour.tours").add('test_setting_barcode_allow_extra_produc
     }},
 ]});
 
-registry.category("web_tour.tours").add('test_split_line_reservation', {test: true, steps: () => [
+registry.category("web_tour.tours").add("test_setting_barcode_allow_extra_product_with_packages", {
+    steps: () => [
+        {
+            trigger: ".o_stock_barcode_main_menu",
+            run: "scan SBAEPWP",
+        },
+        // Scan package with extra product -> ignored + raise notification
+        {
+            trigger: ".o_barcode_client_action",
+            run: "scan PACK04",
+        },
+        {
+            trigger: '.o_notification_bar.bg-danger',
+            run: function () {
+                helper.assertErrorMessage("This package contains extra products and extra products are not allowed on this operation.");
+            },
+        },
+        // Scan valid package -> should be processed
+        {
+            trigger: ".o_barcode_client_action",
+            run: "scan PACK01",
+        },
+        {
+            trigger: ".o_barcode_line:contains(PACK01)",
+            run: () => {
+                helper.assertLinesCount(2);
+                const [line1, line2] = helper.getLines();
+                helper.assertLineQty(line1, "0/5");
+                helper.assertLineQty(line2, "10");
+            }
+        },
+        {
+            trigger: "button.o_exit",
+            run: "click"
+        },
+        // process the move entire packages delivery
+        {
+            trigger: ".o_stock_barcode_main_menu",
+            run: "scan SBAEPWMEP",
+        },
+        // Scan package with extra product -> ignored + raise notification
+        {
+            trigger: ".o_barcode_client_action",
+            run: "scan PACK04",
+        },
+        {
+            trigger: '.o_notification_bar.bg-danger',
+            run: function () {
+                helper.assertErrorMessage("This package contains extra products and extra products are not allowed on this operation.");
+            },
+        },
+        // Scan valid package -> should be processed
+        {
+            trigger: ".o_barcode_client_action",
+            run: "scan PACK03",
+        },
+        {
+            trigger: ".o_barcode_line[data-package=PACK03]",
+            run: () => {
+                helper.assertLinesCount(2);
+                const [line1, line2] = helper.getLines();
+                helper.assert(line1.querySelector("[name=package]").innerText, "PACK02PACK02")
+                helper.assert(line2.querySelector("[name=package]").innerText, "PACK03PACK03")
+            }
+        },
+    ],
+});
+
+registry.category("web_tour.tours").add('test_split_line_reservation', { steps: () => [
     {
         trigger: '.o_barcode_client_action',
         run: function () {
@@ -4659,7 +4954,7 @@ registry.category("web_tour.tours").add('test_split_line_reservation', {test: tr
     },
 ]});
 
-registry.category("web_tour.tours").add('test_split_line_on_destination_scan', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_split_line_on_destination_scan', { steps: () => [
     // Open the receipt then scans 2x product1.
     { trigger: '.o_stock_barcode_main_menu', run: "scan receipt_split_line_on_destination_scan" },
     { trigger: '.o_barcode_line', run: "scan product1" },
@@ -4689,7 +4984,7 @@ registry.category("web_tour.tours").add('test_split_line_on_destination_scan', {
     { trigger: '.o_barcode_line.o_selected:not(.o_line_completed)', run: "scan product1" },
     { trigger: '.o_barcode_line.o_selected.o_line_completed', run: "scan LOC-01-01-00" },
     {
-        trigger: '.o_validate_page.btn-primary',
+        trigger: '.o_line_destination_location:contains(".../Section 1")',
         run: () => {
             helper.assertLinesCount(2);
             helper.assertLineDestinationLocation(0, "WH/Stock");
@@ -4772,7 +5067,7 @@ registry.category("web_tour.tours").add('test_split_line_on_destination_scan', {
     ...stepUtils.validateBarcodeOperation('.o_validate_page.btn-primary'),
 ]});
 
-registry.category("web_tour.tours").add('test_split_line_on_exit_for_delivery', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_split_line_on_exit_for_delivery', { steps: () => [
     // Opens the delivery and checks its lines.
     { trigger: ".o_stock_barcode_main_menu", run: "scan delivery_split_line_on_exit" },
     {
@@ -4800,7 +5095,78 @@ registry.category("web_tour.tours").add('test_split_line_on_exit_for_delivery', 
     { trigger: ".o_stock_barcode_main_menu" },
 ]});
 
-registry.category("web_tour.tours").add('test_split_line_on_exit_for_receipt', {test: true, steps: () => [
+registry.category("web_tour.tours").add("test_split_uncomplete_moves_on_exit_with_neutral_changes", {
+    steps: () => [
+        {
+            trigger: ".o_stock_barcode_main_menu",
+            run: "scan SUMOEWNC"
+        },
+        {
+            trigger: ".o_barcode_line .o_toggle_sublines",
+            run: "click",
+        },
+        {
+            trigger: ".o_barcode_line",
+            run: () => {
+                helper.assertLinesCount(1);
+                helper.assertLineQty(0, "0/4");
+                const [ subLine1, subLine2 ] = helper.getSublines();
+                helper.assert(subLine1.querySelector(".o_line_lot_name").innerText, "LN001");
+                helper.assertLineQty(subLine1, "0/2");
+                helper.assert(subLine2.querySelector(".o_line_lot_name").innerText, "LN002");
+                helper.assertLineQty(subLine2, "0/2");
+            }
+        },
+        // Scans SN01 and remove it
+        { trigger: ".o_barcode_client_action", run: "scan LN001" },
+        { trigger: ".o_barcode_client_action", run: "scan LN001" },
+        {
+            trigger: ".o_barcode_line.o_line_completed .o_edit",
+            run: "click",
+        },
+        {
+            trigger: ".o_field_widget[name='qty_done'] input",
+            run: "edit 0",
+        },
+        {
+            trigger: ".o_save",
+            run: "click",
+        },
+        {
+            trigger: ".o_barcode_line",
+            run: () => {
+                helper.assertLinesCount(1);
+                helper.assertLineQty(0, "0/4");
+                const [ subLine1, subLine2 ] = helper.getSublines();
+                helper.assert(subLine1.querySelector(".o_line_lot_name").innerText, "LN001");
+                helper.assertLineQty(subLine1, "0/2");
+                helper.assert(subLine2.querySelector(".o_line_lot_name").innerText, "LN002");
+                helper.assertLineQty(subLine2, "0/2");
+            }
+        },
+        // Leave and re-open the picking it directly
+        { trigger: "button.o_exit", run: "click" },
+        { trigger: ".o_stock_barcode_main_menu", run: "scan SUMOEWNC" },
+        {
+            trigger: ".o_barcode_line .o_toggle_sublines",
+            run: "click",
+        },
+        {
+            trigger: ".o_barcode_line",
+            run: () => {
+                helper.assertLinesCount(1);
+                helper.assertLineQty(0, "0/4");
+                const [ subLine1, subLine2 ] = helper.getSublines();
+                helper.assert(subLine1.querySelector(".o_line_lot_name").innerText, "LN002");
+                helper.assertLineQty(subLine1, "0/2");
+                helper.assert(subLine2.querySelector(".o_line_lot_name").innerText, "LN001");
+                helper.assertLineQty(subLine2, "0/2");
+            }
+        },
+    ]
+});
+
+registry.category("web_tour.tours").add('test_split_line_on_exit_for_receipt', { steps: () => [
     // Opens the receipt and check its lines.
     { trigger: ".o_stock_barcode_main_menu", run: "scan receipt_split_line_on_exit" },
     {
@@ -4862,7 +5228,128 @@ registry.category("web_tour.tours").add('test_split_line_on_exit_for_receipt', {
     },
 ]});
 
-registry.category("web_tour.tours").add('test_split_line_on_scan', {test: true, steps: () => [
+registry.category("web_tour.tours").add("test_split_line_on_exit_for_delivery_with_lot", { steps: () => [
+    // Opens the delivery and checks its lines.
+    { trigger: ".o_stock_barcode_main_menu", run: "scan delivery_split_move_on_exit" },
+    {
+        trigger: ".o_barcode_client_action",
+        run: () => {
+            helper.assertLinesCount(1);
+            helper.assertLineProduct(0, "productlot1");
+            helper.assertLineQty(0, "0/3");
+        }
+    },
+    // Scans 3x productlot1: 2x LOT002 and 1x LOT001.
+    { trigger: ".o_barcode_client_action", run: "scan productlot1" },
+    { trigger: ".o_barcode_line.o_selected", run: "scan LOT002" },
+    { trigger: ".o_barcode_line.o_selected", run: "scan LOT002" },
+    { trigger: ".o_barcode_line.o_selected", run: "scan LOT001" },
+    {
+        trigger: ".o_barcode_line.o_selected.o_line_completed  .o_line_button.o_toggle_sublines",
+        run: "click",
+    },
+    {
+        trigger: ".o_barcode_line_details .o_line_lot_name:contains(LOT001)",
+        run: () => {
+            helper.assertLinesCount(1);
+            helper.assertLineQty(0, "3/3");
+            const [lot002Line, lot001Line] = helper.getSublines();
+            helper.assertLineTrackingNumber(lot002Line, "LOT002");
+            helper.assertLineQty(lot002Line, "2");
+            helper.assertLineTrackingNumber(lot001Line, "LOT001");
+            helper.assertLineQty(lot001Line, "1");
+        }
+    },
+    // Leaves the delivery and re-open it directly, then checks not lines were splitted.
+    { trigger: "button.o_exit", run: "click" },
+    { trigger: ".o_stock_barcode_main_menu", run: "scan delivery_split_move_on_exit" },
+    {
+        trigger: ".o_barcode_line.o_line_completed  .o_line_button.o_toggle_sublines",
+        run: "click",
+    },
+    {
+        trigger: ".o_barcode_line_details .o_line_lot_name:contains(LOT001)",
+        run: () => {
+            helper.assertLinesCount(1);
+            helper.assertLineQty(0, "3/3");
+            const [lot002Line, lot001Line] = helper.getSublines();
+            helper.assertLineTrackingNumber(lot002Line, "LOT002");
+            helper.assertLineQty(lot002Line, "2");
+            helper.assertLineTrackingNumber(lot001Line, "LOT001");
+            helper.assertLineQty(lot001Line, "1");
+        }
+    },
+    { trigger: "button.o_exit", run: "click" },
+    { trigger: ".o_stock_barcode_main_menu", run(){} },
+]});
+
+registry.category("web_tour.tours").add("test_split_line_on_exit_for_receipt_with_grouped_lot", {
+    steps: () => [
+        // Opens the receipt and checks its lines.
+        { trigger: ".o_stock_barcode_main_menu", run: "scan SPLOEFRWGL" },
+        {
+            trigger: ".o_barcode_client_action",
+            run: () => {
+                helper.assertLinesCount(1);
+                helper.assertLineProduct(0, "productlot1");
+                helper.assertLineQty(0, "0/3");
+            }
+        },
+        // Add one unit
+        {
+            trigger: ".o_edit .fa-pencil",
+            run: "click",
+        },
+        {
+            trigger: ".o_digipad_increment",
+            run: "click",
+        },
+        {
+            trigger: '.o_save',
+            run: "click",
+        },
+        {
+            trigger: ".o_barcode_line_details",
+            run: () => {
+                helper.assertLinesCount(1);
+                helper.assertLineQty(0, "1/3");
+            }
+        },
+        // Leaves the receipt and re-open it directly, the line was not splitted.
+        { trigger: "button.o_exit", run: "click" },
+        { trigger: ".o_stock_barcode_main_menu", run: "scan SPLOEFRWGL" },
+        {
+            trigger: ".o_barcode_line_details",
+            run: () => {
+                helper.assertLinesCount(1);
+                helper.assertLineQty(0, "1/3");
+            }
+        },
+        // Add the remaining quantity and leave
+        {
+            trigger: ".o_add_remaining_quantity",
+            run: "click",
+        },
+        {
+            trigger: ".o_barcode_line .qty-done:contains(3)",
+            run: () => {
+                helper.assertLinesCount(1);
+                helper.assertLineQty(0, "3/3");
+            }
+        },
+        { trigger: "button.o_exit", run: "click" },
+        { trigger: ".o_stock_barcode_main_menu", run: "scan SPLOEFRWGL" },
+        {
+            trigger: ".o_barcode_line .qty-done:contains(3)",
+            run: () => {
+                helper.assertLinesCount(1);
+                helper.assertLineQty(0, "3/3");
+            }
+        },
+    ],
+});
+
+registry.category("web_tour.tours").add('test_split_line_on_scan', { steps: () => [
     // Scan product2 twice
     {
         trigger: '.o_barcode_client_action',
@@ -4931,7 +5418,7 @@ registry.category("web_tour.tours").add('test_split_line_on_scan', {test: true, 
     { trigger: '.o_notification_bar.bg-success'},
 ]});
 
-registry.category("web_tour.tours").add('test_scan_line_splitting_preserve_destination', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_scan_line_splitting_preserve_destination', { steps: () => [
     // Select the first (only) line
     {
         trigger: '.o_barcode_line',
@@ -5013,8 +5500,51 @@ registry.category("web_tour.tours").add('test_scan_line_splitting_preserve_desti
     { trigger: '.o_notification_bar.bg-success'},
 ]});
 
-registry.category("web_tour.tours").add('test_editing_done_picking', {
-    test: true, steps: () => [
+registry.category("web_tour.tours").add("test_split_line_preserve_package", { steps: () => [
+    {
+        trigger:  ".o_barcode_line",
+        run: function () {
+            helper.assertLinesCount(1);
+            helper.assertLineQty(0, "0/50");
+            helper.assertLinePackage(0, "THEPACK1");
+        },
+    },
+    {
+        trigger: ".o_barcode_line .o_edit",
+        run: "click",
+    },
+    {
+        trigger: "div[name=qty_done] input",
+        run() {
+            //input type number not supported by tour helpers.
+            // It would work if the clipboard was mocked in tours the same way it is in unit tests.
+            this.anchor.value = "25";
+            this.anchor.dispatchEvent(new InputEvent("input", { bubbles: true }));
+        }
+    },
+    {
+        trigger: ".o_save",
+        run: "click",
+    },
+    // Scan a destination package so the split line function will
+    // split the source line into two different lines
+    {
+        trigger:  ".o_barcode_line.o_selected",
+        run: "scan THEPACK2"
+    },
+    // Assert that the two lines have the source package of the origin line
+    {
+        trigger: ".o_barcode_line .result-package:contains('THEPACK2')",
+        run: () => {
+            helper.assertLinesCount(2);
+            helper.assertLinePackage(0, "THEPACK1");
+            helper.assertLinePackage(1, "THEPACK1");
+        }
+    },
+    { trigger: "button.o_exit", run: "click" },
+]});
+
+registry.category("web_tour.tours").add('test_editing_done_picking', { steps: () => [
         { trigger: '.o_barcode_client_action', run: 'scan OBTVALI' },
         {
             trigger: '.o_notification_bar.bg-danger',
@@ -5025,7 +5555,119 @@ registry.category("web_tour.tours").add('test_editing_done_picking', {
     ]
 });
 
-registry.category("web_tour.tours").add("test_sml_sort_order_by_product_category", { test: true, steps: () => [
+registry.category("web_tour.tours").add("test_split_uncomplete_moves_on_exit", {
+    steps: () => [
+        {
+            trigger: ".o_barcode_line",
+            run: "scan product1",
+        },
+        {
+            trigger: ".o_barcode_line[data-barcode='product1'] .qty-done:contains('1')",
+        },
+        {
+            trigger: ".o_edit .fa-pencil",
+            run: "click",
+        },
+        {
+            trigger: ".o_field_widget[name='qty_done'] input",
+        },
+        {
+            content: "Exit the barcode app to look at look at back end data.",
+            trigger: ".o_field_widget[name=product_id] > a",
+            run: "click",
+        },
+        {
+            trigger: ".breadcrumb-item.o_back_button",
+        },
+        {
+            content: "Come back to the record in the barcode App.",
+            trigger: ".breadcrumb-item.o_back_button",
+            run: "click",
+        },
+        {
+            trigger: ".o_barcode_client_action",
+        },
+        {
+            trigger: ".o_barcode_client_action",
+            run: () => {
+                helper.assertLinesCount(3);
+                helper.assertLineQty(0, "0/3");
+                helper.assertLineQty(1, "0/5");
+                helper.assertLineQty(2, "1/1");
+            }
+        },
+        {
+            trigger: ".o_barcode_line",
+            run: "scan product2",
+        },
+        {
+            trigger: ".o_barcode_line[data-barcode='product2'] .qty-done:contains('1')",
+        },
+        {
+            trigger: ".o_edit .fa-pencil",
+            run: "click",
+        },
+        {
+            trigger: ".o_field_widget[name='qty_done'] input",
+        },
+        {
+            content: "Exit the barcode app to look at look at back end data.",
+            trigger: ".o_field_widget[name=product_id] > a",
+            run: "click",
+        },
+        {
+            trigger: ".breadcrumb-item.o_back_button",
+        },
+        {
+            content: "Come back to the record in the barcode App.",
+            trigger: ".breadcrumb-item.o_back_button",
+            run: "click",
+        },
+        {
+            trigger: ".o_barcode_client_action",
+        },
+        {
+            trigger: ".o_barcode_client_action",
+            run: () => {
+                helper.assertLinesCount(4);
+                helper.assertLineQty(0, "0/3");
+                helper.assertLineQty(1, "0/4");
+                helper.assertLineQty(2, "1/1");
+                helper.assertLineQty(3, "1/1");
+            }
+        },
+]});
+
+registry.category("web_tour.tours").add('test_split_uncomplete_manually_assigned_moves_on_exit', {
+    steps: () => [
+        {
+            trigger: '.o_barcode_line',
+            run: 'scan product1'
+        },
+        {
+            trigger: ".o_barcode_line[data-barcode='product1'] .qty-done:contains('1')",
+            run() {},
+        },
+        // Leave and re-open the picking it directly
+        {
+            trigger: "button.o_exit",
+            run: "click",
+        },
+        {
+            trigger: ".o_stock_barcode_main_menu",
+            run: "scan SUMAMOE"
+        },
+        {
+            trigger: ".o_barcode_client_action",
+            run: () => {
+                helper.assertLinesCount(2);
+                helper.assertLineQty(0, "0/2");
+                helper.assertLineQty(1, "1/1");
+            }
+        },
+]});
+
+registry.category("web_tour.tours").add("test_sml_sort_order_by_product_category", {  steps: () => [
     {
         trigger: ".o_barcode_client_action",
         run: () => {
@@ -5044,7 +5686,60 @@ registry.category("web_tour.tours").add("test_sml_sort_order_by_product_category
     },
 ]});
 
-registry.category("web_tour.tours").add('test_barcode_signature_flow', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_barcode_picking_return', { steps: () => [
+    {
+        trigger: ".o_barcode_client_action",
+    },
+    {
+        trigger: "span.o_scan_message:contains('This picking is already done')",
+    },
+    // Press return
+    {
+        trigger: "button.o_create_return",
+        run: "click",
+    },
+    {
+        trigger: "span.o_scan_message:contains('Scan a product')",
+    },
+    {
+        trigger: '.o_barcode_line_title > div.o_product_label:contains("product2")',
+    },
+    // Scan a product not in the original picking
+    {
+        trigger: "span.o_scan_message:contains('Scan a product')",
+        run: "scan product1",
+    },
+    ...stepUtils.confirmAddingUnreservedProduct(),
+    {
+        trigger: '.o_barcode_line_title > div.o_product_label:contains("product1")',
+    },
+    // Press validate before signing the picking
+    {
+        trigger: "button.o_validate_page",
+        run: "click",
+    },
+]});
+
+registry.category("web_tour.tours").add('test_scan_package_with_decimal', {
+    steps: () => [
+        {
+            content: "Scan package with more than 3.6 kg (275.86 kg)",
+            trigger: '.o_barcode_lines',
+            run: 'scan P00001',
+        },
+        {
+            trigger: '.o_barcode_line.o_line_completed',
+            run: () => {
+                helper.assertLinesCount(2);
+                helper.assertLineQty(0, "3.6/3.6");
+                helper.assertLineQty(1, "272.24");
+            }
+        },
+        ...stepUtils.validateBarcodeOperation(),
+    ]
+});
+
+registry.category("web_tour.tours").add('test_barcode_signature_flow', { steps: () => [
     {
         trigger: "div.o_kanban_record_title > span:contains(Delivery Orders)",
         run: "click",
@@ -5103,8 +5798,7 @@ registry.category("web_tour.tours").add('test_barcode_signature_flow', {test: tr
     { trigger: ".o_kanban_tip_filter" },
 ]});
 
-registry.category("web_tour.tours").add('test_create_backorder_after_qty_modified', {
-    test: true, steps: () => [
+registry.category("web_tour.tours").add('test_create_backorder_after_qty_modified', { steps: () => [
         { trigger: '.o_edit', run: 'click' },
         { trigger: '.o_digipad_increment', run: 'click' },
         { trigger: '.o_save', run: 'click' },
@@ -5113,7 +5807,7 @@ registry.category("web_tour.tours").add('test_create_backorder_after_qty_modifie
     ]
 });
 
-registry.category("web_tour.tours").add('test_open_picking_dont_override_assigned_user', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_open_picking_dont_override_assigned_user', { steps: () => [
     {
         trigger: '.o_button_operations',
         run: 'click',
@@ -5139,7 +5833,7 @@ registry.category("web_tour.tours").add('test_open_picking_dont_override_assigne
     },
 ]});
 
-registry.category("web_tour.tours").add('test_serial_product_packaging', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_serial_product_packaging', { steps: () => [
     { trigger: ".o_stock_barcode_main_menu", run: "scan WHIN" },
     { trigger: '.o_barcode_client_action', run: "scan PCK4" },
     {
@@ -5153,10 +5847,7 @@ registry.category("web_tour.tours").add('test_serial_product_packaging', {test: 
             helper.assertButtonIsVisible(0, "edit");
         }
     },
-    { trigger: '.o_barcode_client_action', run: "scan sn1" },
-    { trigger: '.o_barcode_client_action', run: 'scan sn2' },
-    { trigger: '.o_barcode_client_action', run: 'scan sn3' },
-    { trigger: '.o_barcode_client_action', run: 'scan sn4' },
+    { trigger: ".o_barcode_client_action", run: "scan sn1,sn2,sn3,sn4" },
     {
         trigger: '.o_barcode_line.o_selected.o_line_completed .o_line_button.o_toggle_sublines',
         run: 'click',
@@ -5169,16 +5860,15 @@ registry.category("web_tour.tours").add('test_serial_product_packaging', {test: 
             helper.assertSublinesCount(4);
             const sublines = helper.getSublines();
             helper.assertLinesTrackingNumbers(sublines, ["sn4", "sn3", "sn2", "sn1"]);
-            helper.assertLineQty(sublines[0], "1/1");
-            helper.assertLineQty(sublines[1], "1/1");
-            helper.assertLineQty(sublines[2], "1/1");
-            helper.assertLineQty(sublines[3], "1/1");
+            helper.assertLineQty(sublines[0], "1");
+            helper.assertLineQty(sublines[1], "1");
+            helper.assertLineQty(sublines[2], "1");
+            helper.assertLineQty(sublines[3], "1");
         }
     },
 ]});
 
-registry.category("web_tour.tours").add('test_multi_company_record_access_in_barcode', {
-    test: true, steps: () => [
+registry.category("web_tour.tours").add('test_multi_company_record_access_in_barcode', { steps: () => [
         { trigger: '.o_stock_barcode_main_menu', run: 'scan company2_receipt' },
         // Shouldn't have access to company1 prod while in company2 picking type
         { trigger: '.o_barcode_client_action', run: 'scan company1_product' },
@@ -5195,8 +5885,7 @@ registry.category("web_tour.tours").add('test_multi_company_record_access_in_bar
     ]
 });
 
-registry.category("web_tour.tours").add('test_no_zero_demand_new_line_from_split', {
-    test: true, steps: () => [
+registry.category("web_tour.tours").add('test_no_zero_demand_new_line_from_split', { steps: () => [
         { trigger: '.o_stock_barcode_main_menu', run: 'scan TNZDNLFS picking' },
         { trigger: '.o_edit', run: 'click' },
         { trigger: 'button.o_digipad_increment', run: 'click' },
@@ -5209,16 +5898,17 @@ registry.category("web_tour.tours").add('test_no_zero_demand_new_line_from_split
         { trigger: '.o_save', run: 'click' },
         { trigger: '.o_barcode_line' },
         { trigger: '.o_exit', run: 'click' },
+        { trigger: '.o_stock_barcode_main_menu'},
     ]
 });
 
-registry.category("web_tour.tours").add("test_barcode_pack_lot_tour", { test: true, steps: () => [
+registry.category("web_tour.tours").add("test_barcode_pack_lot_tour", {  steps: () => [
     // Pack two units of the same not reserved lot in different packages
     { trigger: '.o_barcode_line', run: "scan LOT005" },
-    { trigger: '.o_line_button.o_toggle_sublines', run: 'click'},
-    { trigger: 'span.o_line_lot_name:contains(LOT005)'},
+    { trigger: '.o_barcode_line .o_line_lot_name:contains(LOT005)'},
     { trigger: 'button.o_put_in_pack', run: 'click'},
-    { trigger: '.o_barcode_line:nth-child(2):has(.fa-archive)'},
+    { trigger: '.o_line_button.o_toggle_sublines', run: 'click'},
+    { trigger: '.o_barcode_line:nth-child(2):has(.fa-archive):contains(LOT005)'},
     { trigger: '.o_barcode_line_summary', run: 'click'},
     { trigger: '.o_barcode_line_summary', run: "scan LOT005" },
     { trigger: '.o_barcode_line.o_line_not_completed:contains(LOT005):not(:has(.fa-archive))'},
@@ -5237,3 +5927,551 @@ registry.category("web_tour.tours").add("test_barcode_pack_lot_tour", { test: tr
     { trigger:  '.btn.o_validate_page', run: 'click'},
     { trigger: '.o_notification_bar.bg-success'},
 ]});
+
+registry.category("web_tour.tours").add("test_barcode_create_serials_in_batch_with_single_scan", {  steps: () => [
+    // Pack two units of the same not reserved lot in different packages
+    { trigger: ".o_barcode_line", run: "scan productlot1"},
+    { trigger: ".o_barcode_line", run: "scan " + Array.from({ length: 100 }, (_, i) => `SN${(i + 1).toString().padStart(4, "0")}`).join(";")},
+    { trigger: ".o_barcode_scanner_qty .qty-done:contains(100)"},
+]});
+
+registry.category("web_tour.tours").add("test_barcode_lazy_cache_scan_two_lots", {  steps: () => [
+    { trigger: ".o_barcode_line", run: "scan SN-001" },
+    { trigger: ".o_barcode_line", run: "scan SN-002" },
+    { trigger: ".o_barcode_scanner_qty .qty-done:contains(2)"},
+]});
+
+registry.category("web_tour.tours").add('test_scan_location_destination_for_internal_transfers', {
+    steps: () => [
+        {
+            trigger: ".o_button_operations",
+            run: "click",
+        },
+        {
+            trigger: ".o_barcode_picking_type:has(.o_kanban_record_title:contains('Internal Transfers'))",
+            run: "click",
+        },
+        {
+            trigger: "button.o-kanban-button-new",
+        },
+        {
+            trigger: "button.o-kanban-button-new",
+            run: "click",
+        },
+        {
+            trigger: "button.o_add_line:contains('Add Product')",
+            run: "click",
+        },
+        {
+            trigger: ".o_field_widget[name='product_id'] input.o_input",
+            run: "click",
+        },
+        {
+            trigger: ".o_field_widget[name='product_id'] input.o_input",
+            run: "edit Lovely Product",
+        },
+        {
+            trigger: ".dropdown-item:contains('Lovely Product')",
+            run: "click",
+        },
+        {
+            trigger: ".o_save",
+            run: "click",
+        },
+        {
+            trigger: ".o_scan_message.o_scan_product_or_dest",
+        },
+        {
+            trigger: ".o_barcode_line",
+            run: "scan WH-LOVE",
+        },
+        {
+            trigger: "div[name='destination_location']:contains(Lovely)",
+        },
+        {
+            trigger: '.o_validate_page',
+            run: "click",
+        },
+        {
+            trigger: '.o_notification_bar.bg-success',
+        },
+]});
+
+registry.category("web_tour.tours").add("test_scan_product_when_in_form_view", {
+    steps: () => [
+        // Scan a location to create an internal picking.
+        { trigger: ".o_stock_barcode_main_menu", run: "scan shelf3" },
+        // Scan a product and open the form view.
+        { trigger: ".o_barcode_client_action", run: "scan product1" },
+        { trigger: ".o_barcode_line .o_edit", run: "click" },
+        // Update the quantity then scan another product.
+        { trigger: ".o_field_widget[name=qty_done] input", run: "edit 5" },
+        { trigger: ".o_barcode_line_form", run: "scan product2" },
+        {
+            trigger: ".o_barcode_line_form",
+            run: () => {
+                helper.assertFormQuantity("5");
+            },
+        },
+        // Save the change and validate the picking.
+        { trigger: ".o_save", run: "click" },
+        ...stepUtils.validateBarcodeOperation(".o_barcode_line .qty-done:contains(5)"),
+    ],
+});
+
+registry.category("web_tour.tours").add("test_fetch_archived_records_in_lazy_barcode_cache", {
+    steps: () => [
+        {
+            trigger: "button.o_add_remaining_quantity",
+            run: "click",
+        },
+        {
+            trigger: ".o_validate_page",
+            run: "click",
+        },
+        {
+            trigger: ".o_notification_bar.bg-success",
+            run() {},
+        },
+    ]
+});
+
+registry.category("web_tour.tours").add("test_validate_uncomplete_return", {
+    steps: () => [
+        // Open and process the receipt.
+        { trigger: ".o_stock_barcode_main_menu", run: "scan TEST/IN/0001" },
+        { trigger: ".o_barcode_client_action", run: "scan product1" },
+        { trigger: ".o_barcode_line", run: "scan product1" },
+        ...stepUtils.validateBarcodeOperation(".o_barcode_line.o_line_completed"),
+        // Re-open the receipt and create a return.
+        { trigger: ".o_stock_barcode_main_menu", run: "scan TEST/IN/0001" },
+        { trigger: "button.o_create_return", run: "click" },
+        { trigger: ".o_barcode_line", run: "scan product1" },
+        ...stepUtils.validateBarcodeOperation(".o_barcode_line.o_selected"),
+        { trigger: ".o_stock_barcode_main_menu" },
+        { trigger: ".o_web_client:not(.modal-open)" },
+    ],
+});
+
+registry.category("web_tour.tours").add("test_select_with_same_product_and_lot", {
+    steps: () => [
+        {
+            trigger: '.o_barcode_client_action',
+            run: () => {
+                helper.assertLinesCount(2);
+                helper.assertValidateVisible(true);
+                helper.assertValidateEnabled(true);
+            }
+        },
+        // Select the second line
+        {
+            trigger: '.o_barcode_line:last-child',
+            run: 'click',
+        },
+        // Scan the lot 2 times
+        {
+            trigger: '.o_barcode_client_action',
+            run: 'scan lot_xyz',
+        },
+        {
+            trigger: '.o_barcode_line.o_selected .o_barcode_scanner_qty .qty-done:contains("1")',
+            run: 'scan lot_xyz',
+        },
+        {
+            trigger: '.o_barcode_line.o_selected .o_barcode_scanner_qty .qty-done:contains("2")',
+            run: () => {
+                const [line1, line2] = helper.getLines();
+                helper.assertLineQty(line1, "0/2", "No product should be scanned for the first line");
+                helper.assertLineQty(line2, "2/2", "2 units should be scanned for the second line");
+            },
+        },
+        // Select the first line
+        {
+            trigger: '.o_barcode_line:first-child',
+            run: 'click',
+        },
+        // Scan the lot 2 times
+        {
+            trigger: '.o_barcode_client_action',
+            run: 'scan lot_xyz',
+        },
+        {
+            trigger: '.o_barcode_line.o_selected .o_barcode_scanner_qty .qty-done:contains("1")',
+            run: 'scan lot_xyz',
+        },
+        {
+            trigger: '.o_barcode_line.o_selected .o_barcode_scanner_qty .qty-done:contains("2")',
+            run: () => {
+                helper.assertLinesCount(2);
+                const completedLines = helper.getLines({ completed: true });
+                helper.assert(completedLines.length, 2, "Both sublines should be completed");
+            },
+        },
+    ]
+});
+
+registry.category("web_tour.tours").add("test_description_picking_tour", { steps: () => [
+    { trigger: '.o_stock_barcode_main_menu', run: 'scan WHIN' },
+    { trigger: '.o_barcode_client_action', run: 'scan test_product' },
+    ...stepUtils.validateBarcodeOperation(),
+]});
+
+registry.category("web_tour.tours").add("test_uom_update_picking_tour", { steps: () => [
+    // Open the operations menu
+    {
+        trigger: ".o_button_operations",
+        run: "click",
+    },
+    // Click on the 'Receipts' test_product_uom_partner
+    {
+        trigger: ".o_kanban_record:contains('Receipts')",
+        run: "click",
+    },
+    // Wait until the 'Operations' breadcrumb is visible
+    {
+        trigger: ".breadcrumb:contains('Operations')"
+    },
+    {
+        trigger: ".o_kanban_record:contains('test_product_uom_partner')",
+        run: "click",
+    },
+    // Click the pencil to edit the line
+    {
+        trigger: ".o_barcode_line .o_edit",
+        run: "click",
+    },
+    // Open the UoM dropdown
+    {
+        trigger: ".o_field_widget[name='product_uom_id'] input",
+        run: "click",
+    },
+    // Select the 'Dozen' UoM
+    {
+        trigger: ".ui-menu-item > a:contains('Dozen')",
+        run: "click",
+    },
+    {
+        trigger: ".o_digipad_increment",
+        run: "click",
+    },
+    // Save the changes
+    {
+        trigger: ".o_barcode_control .o_save",
+        run: "click",
+    },
+    {
+        trigger: ".o_line_uom:contains(/Dozens/)",
+    },
+    {
+        trigger: ".qty-done:text(1)",
+    },
+    {
+        trigger: ".o_barcode_scanner_qty span:eq(1):text(/10)",
+    },
+]});
+
+registry.category("web_tour.tours").add("test_no_validate_no_dest_package", {
+    steps: () => [
+    {
+        trigger: "button.o_button_operations",
+        run: "click",
+    },
+    {
+        trigger: ".o_kanban_record:contains(Internal)",
+        run: "click",
+    },
+    {
+        trigger: "button.o-kanban-button-new",
+        run: "click",
+    },
+    {
+        trigger: ".o_barcode_client_action",
+        run: "scan LOC-01-00-00"
+    },
+    {
+        trigger: ".o_barcode_client_action",
+        run: "scan Pack1"
+    },
+    {
+        trigger: ".btn.o_validate_page",
+        run: "click",
+    },
+    {
+        trigger: ".o_notification_bar.bg-danger",
+        run: () => {
+            helper.assertErrorMessage("Destination location must be scanned");
+        },
+    },
+    {
+        trigger: ".o_notification_close",
+        run: "click",
+    },
+    // Add an additional line, delete it and then check we still can't validate the operation.
+    {
+        trigger: ".o_barcode_client_action",
+        run: "scan product1"
+    },
+    {
+        trigger: ".o_barcode_line[data-barcode='product1'] .o_delete_line",
+        run: "click",
+    },
+    {
+        trigger: ".btn.o_validate_page",
+        run: "click",
+    },
+    {
+        trigger: ".o_notification_bar.bg-danger",
+        run: () => {
+            helper.assertErrorMessage("Destination location must be scanned");
+        },
+    },
+    // Finally, scan a destination and thus check we can validate the operation.
+    {
+        trigger: ".o_barcode_line",
+        run: "click",
+    },
+    {
+        trigger: ".o_barcode_line.o_selected",
+        run: "scan LOC-01-02-00",
+    },
+    {
+        trigger: ".btn.o_validate_page.btn-primary",
+        run: "click",
+    },
+    {
+        trigger: ".o_stock_barcode_list_kanban_view",
+    },
+]});
+
+registry.category("web_tour.tours").add("test_remove_sublines_and_scan_serial_again", {
+    steps: () => [
+        { trigger: ".o_barcode_line:nth-child(1)", run: "click" },
+        { trigger: ".o_barcode_line.o_selected", run: "scan abc1" },
+        { trigger: ".o_barcode_line.o_selected", run: "scan abc2" },
+        { trigger: ".o_barcode_line.o_selected", run: "scan abc3" },
+        { trigger: ".o_barcode_line:nth-child(1) .o_toggle_sublines", run: "click" },
+        ...stepUtils.decrementLotLineQty("abc1"),
+        ...stepUtils.decrementLotLineQty("abc2"),
+        ...stepUtils.decrementLotLineQty("abc3"),
+        { trigger: ".o_barcode_line:nth-child(1)", run: "click" },
+        { trigger: ".o_barcode_line.o_selected", run: "scan abc3" },
+        { trigger: ".o_barcode_line.o_selected", run: "scan abc2" },
+        { trigger: ".o_barcode_line.o_selected", run: "scan abc1" },
+        { trigger: ".o_barcode_line:nth-child(1) .o_barcode_line_details:contains(3/3)"},
+        { trigger: ".o_validate_page", run: "click" },
+    ],
+});
+
+registry.category("web_tour.tours").add("test_scan_package_with_different_uom", {
+    steps: () => [
+        {
+            trigger: '.o_barcode_client_action',
+            run: 'scan LOC-01-00-00',
+        },
+        {
+            trigger: '.o_barcode_client_action',
+            run: 'scan package001',
+        },
+        {
+            trigger: '.o_barcode_line.o_line_completed',
+            run: function() {
+                helper.assertLinesCount(1);
+            },
+        },
+        {
+            trigger: '.o_barcode_scanner_qty .qty-done:contains("10000")',
+            run() {},
+        },
+    ]
+});
+
+registry.category("web_tour.tours").add("test_quantity_distribution_sublines_same_lot", {
+    steps: () => [
+        {
+            trigger: ".o_barcode_client_action",
+            run: "scan lot 1",
+        },
+        {
+            trigger: ".o_barcode_client_action",
+            run: "scan lot 1",
+        },
+        ...stepUtils.validateBarcodeOperation(".o_barcode_location_group > .o_barcode_line.o_line_completed"),
+    ]
+});
+
+registry.category("web_tour.tours").add("test_rental_partial_reception", {
+    steps: () => [
+        {
+            trigger: ".o_barcode_client_action",
+            run: "scan RNT01",
+        },
+        {
+            trigger: '.o_barcode_line[data-barcode="RNT01"] .qty-done:contains("1")',
+            run: 'scan OBTVALI',
+        },
+        {
+            trigger: ".modal-content.o_barcode_backorder_dialog",
+            run: function() {
+                const incompleteLines = document.querySelectorAll(".o_barcode_backorder_product_row");
+                helper.assert(incompleteLines.length, 1);
+                const line = incompleteLines[0];
+                helper.assert(line.querySelector("[name='qty-done']").innerText, "1");
+                helper.assert(line.querySelector("[name='reserved-qty']").innerText, "4");
+                helper.assert(line.querySelector("[name='backorder-qty']").innerText, "3");
+            },
+        },
+        {
+            trigger: ".modal-dialog button.btn-primary",
+            run: "click",
+        },
+        {
+            trigger: ".o_notification",
+            run: function() {
+                const backorderLink = document.querySelector(".o_notification_buttons span");
+                helper.assert(
+                    backorderLink.innerText.includes("WH/IN/"), true,
+                    "The notification should contain a link to the created backorder."
+                );
+            },
+        },
+    ]
+});
+
+registry.category("web_tour.tours").add("test_no_validate_multiple_times", {
+    steps: () => [
+        {
+            trigger: "button.o_button_operations",
+            run: "click",
+        },
+        {
+            trigger: ".o_kanban_record:contains(Internal)",
+            run: "click",
+        },
+        {
+            trigger: "button.o-kanban-button-new",
+            run: "click",
+        },
+        {
+            trigger: ".o_barcode_client_action",
+            run: "scan product2"
+        },
+        {
+            trigger: ".o_barcode_client_action",
+            run: "scan LOC-01-01-00"
+        },
+        {
+            trigger: ".btn.o_validate_page.btn-primary",
+        },
+        {
+            trigger: ".o_barcode_client_action",
+            async run(helpers) {
+                for (let i = 0; i < 2; i++) {
+                    helpers.scan('O-BTN.validate');
+                }
+            }
+        },
+        {
+            trigger: '.o_notification_bar.bg-success',
+        },
+    ]
+});
+
+registry.category("web_tour.tours").add("test_gs1_receipt_multiple_extra_items", {
+    steps: () => [
+        {
+            trigger: ".o_barcode_client_action",
+            run: "scan 0112345678900005", // Wanted product
+        },
+        {
+            trigger: ".o_barcode_line[data-barcode='12345678900005'] .qty-done:contains('1')",
+            run: "scan 0112345678900012", // Extra product 1
+        },
+        {
+            trigger: ".modal-content .o_barcode_extra_product_dialog div.row[data-barcode='12345678900012'] span.col-3:contains('1')",
+            run: "scan 01123456789000123010", // Extra product 1 (10 qty)
+        },
+        {
+            trigger: ".modal-content .o_barcode_extra_product_dialog div.row[data-barcode='12345678900012'] span.col-3:contains('11')",
+            run: "scan 011234567890002921001", // Extra product 2 (Serial 001)
+        },
+        {
+            trigger: ".modal-content .o_barcode_extra_product_dialog div.row[data-barcode='12345678900029'] span.col-3:contains('1')",
+            run: "scan 011234567890002921002", // Extra product 2 (Serial 002)
+        },
+        {
+            trigger: ".modal-content .o_barcode_extra_product_dialog div.row[data-barcode='12345678900029'] span.col-3:contains('2')",
+            run: "scan 011234567890003610L001#305", // Extra product 3 (Lot L001, Qty 5)
+        },
+        {
+            trigger: ".modal-content .o_barcode_extra_product_dialog div.row[data-barcode='12345678900036'] span.col-3:contains('5')",
+            run: "scan 011234567890003610L001#305", // Extra product 3 (Lot L001, Qty 5) scanned again, should increase the quantity but not the number of lines
+        },
+        {
+            trigger: ".modal-content .o_barcode_extra_product_dialog div.row[data-barcode='12345678900036'] span.col-3:contains('10')",
+            run: "scan 011234567890002921002", // Serial already in list & awaiting confirmation -> Skipped, notification should be shown
+        },
+        {
+            trigger: ".o_notification_bar.bg-danger",
+            run: function() {
+                helper.assertErrorMessage("The scanned serial number 002 is already awaiting confirmation.");
+            },
+        },
+        {
+            trigger: ".modal-content .o_barcode_extra_product_dialog div.row[data-barcode='12345678900012'] input[type='checkbox']",
+            run: "uncheck", //Remove Extra Product 1 from selected products
+        },
+        {
+            trigger: ".modal-dialog button.btn-primary",
+            run: "click",
+        },
+        {
+            trigger: "button.o_toggle_sublines",
+            run: "click", // Open the sublines of the serial product to see all the tracked items
+        },
+        {
+            trigger: ".o_barcode_client_action",
+            run: function() {
+                helper.assertLinesCount(3);
+                helper.assertSublinesCount(2);
+                helper.assertLineQty(0, "1/2 Units");
+                helper.assertLineQty(1, "2 Units");
+                helper.assertLineTrackingNumber(2, "001");
+                helper.assertLineTrackingNumber(3, "002");
+                helper.assertLineQty(4, "10 Units");
+                helper.assertLineTrackingNumber(4, "L001");
+            },
+        },
+    ]
+});
+
+registry.category("web_tour.tours").add("test_quantity_updates_on_exit_spam", {
+    steps: () => [
+        {
+            trigger: ".o_stock_barcode_main_menu",
+            run: "scan Lovely Delivery"
+        },
+        {
+            trigger: ".o_barcode_client_action",
+            run: "scan product1",
+        },
+        {
+            trigger: ".o_barcode_line.o_selected",
+            run: () => {
+                helper.assertLinesCount(1);
+                helper.assertLineQty(0, "1");
+            },
+        },
+        {
+            trigger: "button.o_exit",
+            run: () => {
+                const exitBtn = document.querySelector("button.o_exit");
+                exitBtn.click();
+                exitBtn.click();
+                exitBtn.click();
+            },
+        },
+        {
+            trigger: ".o_stock_barcode_main_menu",
+        },
+    ]
+});

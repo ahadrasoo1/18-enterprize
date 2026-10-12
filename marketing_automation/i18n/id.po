@@ -1,23 +1,28 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* marketing_automation
-# 
+# * marketing_automation
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Abe Manyo, 2025
+#
+# Weblate <noreply-mt-weblate@weblate.org>, 2026.
+# "Nurul Aini Akrima Sabila (nuaas)" <nuaas@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Indonesian (https://app.transifex.com/odoo/teams/41243/id/)\n"
+"POT-Creation-Date: 2026-06-12 17:46+0000\n"
+"PO-Revision-Date: 2026-05-07 10:20+0000\n"
+"Last-Translator: \"Nurul Aini Akrima Sabila (nuaas)\" <nuaas@odoo.com>\n"
+"Language-Team: Indonesian <https://translate.odoo.com/projects/odoo-18/"
+"marketing_automation/id/>\n"
+"Language: id\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: id\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 5.17\n"
 
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_activity_summary_template
@@ -179,18 +184,28 @@ msgstr "<span class=\"o_form_label\">Record</span>"
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_campaign_view_form
 msgid ""
-"<span role=\"img\" title=\"Graph\" aria-label=\"Graph\" class=\"o_ma_activity_tab active\" data-tab-type=\"graph\">\n"
-"                                                            <i class=\"fa fa-pie-chart\"/>\n"
+"<span role=\"img\" title=\"Graph\" aria-label=\"Graph\" "
+"class=\"o_ma_activity_tab active\" data-tab-type=\"graph\">\n"
+"                                                            <i class=\"fa fa-"
+"pie-chart\"/>\n"
 "                                                        </span>\n"
-"                                                        <span title=\"Filter\" role=\"img\" aria-label=\"Filter\" class=\"o_ma_activity_tab\" data-tab-type=\"filter\">\n"
-"                                                            <i class=\"fa fa-filter\"/>\n"
+"                                                        <span "
+"title=\"Filter\" role=\"img\" aria-label=\"Filter\" "
+"class=\"o_ma_activity_tab\" data-tab-type=\"filter\">\n"
+"                                                            <i class=\"fa fa-"
+"filter\"/>\n"
 "                                                        </span>"
 msgstr ""
-"<span role=\"img\" title=\"Grafik\" aria-label=\"Graph\" class=\"o_ma_activity_tab active\" data-tab-type=\"graph\">\n"
-"                                                            <i class=\"fa fa-pie-chart\"/>\n"
+"<span role=\"img\" title=\"Grafik\" aria-label=\"Graph\" "
+"class=\"o_ma_activity_tab active\" data-tab-type=\"graph\">\n"
+"                                                            <i class=\"fa fa-"
+"pie-chart\"/>\n"
 "                                                        </span>\n"
-"                                                        <span title=\"Filter\" role=\"img\" aria-label=\"Filter\" class=\"o_ma_activity_tab\" data-tab-type=\"filter\">\n"
-"                                                            <i class=\"fa fa-filter\"/>\n"
+"                                                        <span "
+"title=\"Filter\" role=\"img\" aria-label=\"Filter\" "
+"class=\"o_ma_activity_tab\" data-tab-type=\"filter\">\n"
+"                                                            <i class=\"fa fa-"
+"filter\"/>\n"
 "                                                        </span>"
 
 #. module: marketing_automation
@@ -357,6 +372,12 @@ msgid "Allows us to filter relevant Campaigns"
 msgstr "Izinkan kami untuk memfilter Kampanye yang relevan"
 
 #. module: marketing_automation
+#. odoo-python
+#: code:addons/marketing_automation/wizard/marketing_campaign_test.py:0
+msgid "Another test has been launched for this participant"
+msgstr "Test lain telah diluncurkan untuk peserta ini"
+
+#. module: marketing_automation
 #: model:ir.model.fields,field_description:marketing_automation.field_marketing_activity__domain
 msgid "Applied Filter"
 msgstr "Filter yang Diterapkan"
@@ -389,8 +410,8 @@ msgstr "Kampanye yang Dibuat Otomatis"
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_campaign_view_form
 msgid ""
-"Be aware that participants that had no more activities could be reintroduced"
-" into the campaign and new traces could be created for them."
+"Be aware that participants that had no more activities could be reintroduced "
+"into the campaign and new traces could be created for them."
 msgstr ""
 "Hati-hati, peserta yang tidak memiliki kegiatan lagi dapat dimasukkan ulang "
 "ke kampanye dan pelacak baru dapat dibuat untuk mereka."
@@ -623,8 +644,7 @@ msgstr "Hapus"
 #. odoo-javascript
 #: code:addons/marketing_automation/static/src/js/marketing_automation_one2many.js:0
 msgid ""
-"Deleting this activity will delete ALL its children activities. Are you "
-"sure?"
+"Deleting this activity will delete ALL its children activities. Are you sure?"
 msgstr ""
 "Menghapus kegiatan ini akan menghapus SEMUA kegiatan anaknya. Apakah Anda "
 "yakin?"
@@ -725,6 +745,12 @@ msgstr "Error! Anda tidak boleh membuat Kegiatan dengan hirarki rekursi."
 #. module: marketing_automation
 #. odoo-python
 #: code:addons/marketing_automation/models/marketing_activity.py:0
+msgid "Error! You can't modify the hierarchy of an active Activity."
+msgstr ""
+
+#. module: marketing_automation
+#. odoo-python
+#: code:addons/marketing_automation/models/marketing_activity.py:0
 msgid "Exception in mass mailing: %s"
 msgstr "Pengecualian di email massal: %s"
 
@@ -764,6 +790,11 @@ msgstr "Domain filter favorit"
 #: model:ir.model.fields,field_description:marketing_automation.field_marketing_campaign__domain
 msgid "Filter"
 msgstr "Saring"
+
+#. module: marketing_automation
+#: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_campaign_view_form
+msgid "Generate Participants"
+msgstr "Buat Peserta"
 
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_campaign_view_form
@@ -843,7 +874,7 @@ msgstr "Terakhir Diperbarui pada"
 #. module: marketing_automation
 #: model:ir.model.fields,field_description:marketing_automation.field_marketing_campaign__last_sync_date
 msgid "Last activities synchronization"
-msgstr "Sikronisasi aktifitas terakhir"
+msgstr "Sikronisasi aktivitas terakhir"
 
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_campaign_test_view_form
@@ -890,7 +921,7 @@ msgstr ""
 #. module: marketing_automation
 #: model:ir.model.fields,field_description:marketing_automation.field_marketing_trace__links_click_datetime
 msgid "Links Click Datetime"
-msgstr ""
+msgstr "Tanggalwaktu Klik Link"
 
 #. module: marketing_automation
 #: model:ir.model.fields.selection,name:marketing_automation.selection__marketing_activity__trigger_category__email
@@ -971,6 +1002,8 @@ msgid ""
 "Mailings %(mailing_names)s are used in marketing campaigns. You should take "
 "care of this before unlinking the mailings."
 msgstr ""
+"Mailing %(mailing_names)s digunakan di kampanye marketing. Anda harus "
+"mengatasi ini sebelum membatalkan link mailing."
 
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_campaign_view_form
@@ -1214,6 +1247,14 @@ msgid "Offer free catalog"
 msgstr "Tawarkan katalog gratis"
 
 #. module: marketing_automation
+#. odoo-python
+#: code:addons/marketing_automation/models/mailing_mailing.py:0
+msgid ""
+"Oops! You can't retry sending emails from inside a Marketing Automation "
+"campaign."
+msgstr ""
+
+#. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_campaign_view_form
 msgid "Opened"
 msgstr "Dibuka"
@@ -1438,6 +1479,11 @@ msgstr "Jalankan"
 
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_campaign_view_form
+msgid "Run Activities"
+msgstr "Jalankan Kegiatan"
+
+#. module: marketing_automation
+#: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_campaign_view_form
 msgid "Run the next scheduled activity for each participant of this campaign?"
 msgstr ""
 "Jalankan kegiatan yang dijadwalkan berikutnya untuk setiap peserta kampanye "
@@ -1515,8 +1561,7 @@ msgstr "Kirim katalog gratis dan follow-up sesuai dengan tanggapan."
 #: code:addons/marketing_automation/models/marketing_campaign.py:0
 msgid "Send a welcome email to contacts and tag them if they click in it."
 msgstr ""
-"Kirim email selamat datang ke kontak dan tag mereka bila mereka "
-"mengekliknya."
+"Kirim email selamat datang ke kontak dan tag mereka bila mereka mengekliknya."
 
 #. module: marketing_automation
 #. odoo-python
@@ -1561,8 +1606,8 @@ msgstr "Post Sosmed"
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_campaign_view_form
 msgid ""
-"Some participants are already running on this campaign. Click on 'Update' to"
-" apply the modifications you've just made."
+"Some participants are already running on this campaign. Click on 'Update' to "
+"apply the modifications you've just made."
 msgstr ""
 "Ada partisipan yang sedang menjalankan kampanye ini. Klik 'Perbarui' untuk "
 "menyimpan perubahan yang telah dibuat."
@@ -1705,8 +1750,8 @@ msgid ""
 "The saved filter targets different model and is incompatible with this "
 "campaign."
 msgstr ""
-"Filter yang disimpan menyasar model yang berbeda dan tidak kompatibel dengan"
-" kampanye ini."
+"Filter yang disimpan menyasar model yang berbeda dan tidak kompatibel dengan "
+"kampanye ini."
 
 #. module: marketing_automation
 #. odoo-javascript
@@ -1816,7 +1861,8 @@ msgid ""
 msgstr ""
 "Digunakan untuk menghindari duplikasi berdasarkan pada model field.\n"
 "misalnya.\n"
-"                Untuk model 'Pelanggan', pilih field email ini jika kamu tidak\n"
+"                Untuk model 'Pelanggan', pilih field email ini jika kamu "
+"tidak\n"
 "                ingin memproses record yang memiliki alamat email yang sama"
 
 #. module: marketing_automation
@@ -1883,30 +1929,38 @@ msgstr "Workflow Dimulai Pada"
 #. odoo-python
 #: code:addons/marketing_automation/models/marketing_activity.py:0
 msgid ""
-"You are trying to set the activity \"%(parent_activity)s\" as \"%(parent_type)s\" while its child \"%(activity)s\" has the trigger type \"%(trigger_type)s\"\n"
+"You are trying to set the activity \"%(parent_activity)s\" as \"%"
+"(parent_type)s\" while its child \"%(activity)s\" has the trigger type \"%"
+"(trigger_type)s\"\n"
 "Please modify one of those activities before saving."
 msgstr ""
-"Anda mencoba menetapkan kegiatan \"%(parent_activity)s\" sebagai \"%(parent_type)s\" selama anaknya \"%(activity)s\" memiliki tipe pemicu \"%(trigger_type)s\"\n"
+"Anda mencoba menetapkan kegiatan \"%(parent_activity)s\" sebagai \"%"
+"(parent_type)s\" selama anaknya \"%(activity)s\" memiliki tipe pemicu \"%"
+"(trigger_type)s\"\n"
 "Mohon modifikasi salah satu kegiatan tersebut sebelum menyimpan."
 
 #. module: marketing_automation
 #. odoo-python
 #: code:addons/marketing_automation/models/utm_campaign.py:0
 msgid ""
-"You cannot delete these UTM Campaigns as they are linked to the following marketing campaigns in Marketing Automation:\n"
+"You cannot delete these UTM Campaigns as they are linked to the following "
+"marketing campaigns in Marketing Automation:\n"
 "%(campaign_names)s"
 msgstr ""
-"Anda tidak dapat menghapus Kampanye UTM ini karena terhubung ke kampanye marketing berikut di Otomatisasi Marketing:\n"
+"Anda tidak dapat menghapus Kampanye UTM ini karena terhubung ke kampanye "
+"marketing berikut di Otomatisasi Marketing:\n"
 "%(campaign_names)s"
 
 #. module: marketing_automation
 #. odoo-python
 #: code:addons/marketing_automation/models/utm_source.py:0
 msgid ""
-"You cannot delete these UTM Sources as they are linked to the following marketing activities in Marketing Automation:\n"
+"You cannot delete these UTM Sources as they are linked to the following "
+"marketing activities in Marketing Automation:\n"
 "%(activities_names)s"
 msgstr ""
-"Anda tidak dapat menghapus Sumber UTM ini karena terhubung ke kegiatan marketing berikut di Otomatisasi Marketing:\n"
+"Anda tidak dapat menghapus Sumber UTM ini karena terhubung ke kegiatan "
+"marketing berikut di Otomatisasi Marketing:\n"
 "%(activities_names)s"
 
 #. module: marketing_automation
@@ -1947,8 +2001,8 @@ msgstr ""
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_activity_summary_template
 msgid ""
-"after the Participant <strong>replied</strong> to the "
-"<strong>Mailing</strong> sent by the Activity \""
+"after the Participant <strong>replied</strong> to the <strong>Mailing</"
+"strong> sent by the Activity \""
 msgstr ""
 "setelah Peserta <strong>membalas</strong> <strong>Mailing</strong> yang "
 "dikirim oleh Kegiatan \""
@@ -1961,7 +2015,7 @@ msgstr "setelah pelaksanaan Kegiatan \""
 #. module: marketing_automation
 #: model:ir.model.fields.selection,name:marketing_automation.selection__marketing_activity__trigger_type__activity
 msgid "another activity"
-msgstr "aktifitas lainnya"
+msgstr "aktivitas lainnya"
 
 #. module: marketing_automation
 #: model:ir.model.fields.selection,name:marketing_automation.selection__marketing_activity__trigger_type__begin
@@ -2030,9 +2084,3 @@ msgstr "untuk membuat Peserta Tes"
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_activity_summary_template
 msgid "will be"
 msgstr "akan"
-
-#. module: marketing_automation
-#. odoo-javascript
-#: code:addons/marketing_automation/static/src/components/campaign_template_picker_dialog/campaign_template_picker_dialog.xml:0
-msgid "{{template_value.title}}"
-msgstr "{{template_value.title}}"

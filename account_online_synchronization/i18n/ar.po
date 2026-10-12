@@ -1,23 +1,26 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* account_online_synchronization
-# 
+#
 # Translators:
-# Wil Odoo, 2024
-# 
+# Mustafa J. Kadhem <safi2266@gmail.com>, 2024
+# Malaz Abuidris <msea@odoo.com>, 2025
+# Wil Odoo, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:26+0000\n"
+"POT-Creation-Date: 2025-12-29 18:46+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
+"Last-Translator: Wil Odoo, 2025\n"
 "Language-Team: Arabic (https://app.transifex.com/odoo/teams/41243/ar/)\n"
+"Language: ar\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: ar\n"
-"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
+"&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
 
 #. module: account_online_synchronization
 #. odoo-python
@@ -25,14 +28,19 @@ msgstr ""
 msgid ""
 "\n"
 "\n"
-"If you've already opened a ticket for this issue, don't report it again: a support agent will contact you shortly."
+"If you've already opened a ticket for this issue, don't report it again: a "
+"support agent will contact you shortly."
 msgstr ""
+"\n"
+"\n"
+"إذا قمت بفتح تذكرة دعم لهذه المشكلة بالفعل، لا تقم بالإبلاغ عنها مجدداً: "
+"سيتواصل معك أحد موظفي الدعم عما قريب. "
 
 #. module: account_online_synchronization
 #. odoo-python
 #: code:addons/account_online_synchronization/wizard/account_journal_duplicate_transactions.py:0
 msgid "%s duplicate transactions"
-msgstr ""
+msgstr "%s معاملات مكررة "
 
 #. module: account_online_synchronization
 #. odoo-javascript
@@ -53,7 +61,7 @@ msgstr "تم جلب 0 معاملات "
 #. module: account_online_synchronization
 #: model_terms:ir.ui.view,arch_db:account_online_synchronization.account_duplicate_transaction_wizard_view_form
 msgid "<i class=\"fa fa-trash me-1\"/> Delete Selected"
-msgstr ""
+msgstr "<i class=\"fa fa-trash me-1\"/> حذف العناصر المحددة "
 
 #. module: account_online_synchronization
 #: model_terms:ir.ui.view,arch_db:account_online_synchronization.account_journal_form
@@ -63,32 +71,61 @@ msgstr "<i class=\"oi oi-arrow-right me-2\"/> إرسال الآن "
 #. module: account_online_synchronization
 #: model:mail.template,body_html:account_online_synchronization.email_template_sync_reminder
 msgid ""
-"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-top: 16px; background-color: #FFFFFF; font-family:Verdana, Arial,sans-serif; color: #454748; width: 100%; border-collapse:separate;\">\n"
+"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-top: "
+"16px; background-color: #FFFFFF; font-family:Verdana, Arial,sans-serif; "
+"color: #454748; width: 100%; border-collapse:separate;\">\n"
 "                    <tr>\n"
 "                        <td align=\"center\">\n"
-"                            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" style=\"padding: 16px; background-color: #FFFFFF; color: #454748; border-collapse:separate;\">\n"
+"                            <table border=\"0\" cellpadding=\"0\" "
+"cellspacing=\"0\" width=\"590\" style=\"padding: 16px; background-color: "
+"#FFFFFF; color: #454748; border-collapse:separate;\">\n"
 "                                <tbody>\n"
 "                                    <!-- CONTENT -->\n"
 "                                    <tr>\n"
-"                                        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"                                            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                                        <td align=\"center\" style=\"min-"
+"width: 590px;\">\n"
+"                                            <table border=\"0\" "
+"cellpadding=\"0\" cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; "
+"background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;"
+"\">\n"
 "                                                <tr>\n"
-"                                                    <td valign=\"top\" style=\"font-size: 13px;\">\n"
+"                                                    <td valign=\"top\" "
+"style=\"font-size: 13px;\">\n"
 "                                                        <div>\n"
-"                                                            Hello,<br><br>\n"
-"                                                            The connection between <b><a t-att-href=\"object.get_base_url()\" t-out=\"object.get_base_url() or ''\">https://yourcompany.odoo.com</a></b> and <t t-out=\"object.account_online_link_id.name or ''\">Belfius</t> <t t-if=\"not object.expiring_synchronization_due_day\">expired.</t><t t-else=\"\">expires in <t t-out=\"object.expiring_synchronization_due_day or ''\">10</t> days.</t><br>\n"
-"                                                            <div style=\"margin: 16px 0px 16px 0px;\">\n"
-"                                                                <a t-attf-href=\"{{ website_url }}/renew_consent/{{ object.id }}?access_token={{object.access_token}}\" style=\"background-color: #4caf50; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;\">\n"
-"                                                                    Renew Consent\n"
+"                                                            Hello,<br/><br/"
+">\n"
+"                                                            The connection "
+"between <b><a t-att-href=\"object.get_base_url()\" t-"
+"out=\"object.get_base_url() or ''\">https://yourcompany.odoo.com</a></b> and "
+"<t t-out=\"object.account_online_link_id.name or ''\">Belfius</t> <t t-"
+"if=\"not object.expiring_synchronization_due_day\">expired.</t><t t-"
+"else=\"\">expires in <t t-out=\"object.expiring_synchronization_due_day or "
+"''\">10</t> days.</t><br/>\n"
+"                                                            <div "
+"style=\"margin: 16px 0px 16px 0px;\">\n"
+"                                                                <a t-attf-"
+"href=\"{{ website_url }}/renew_consent/{{ object.id }}?"
+"access_token={{object.access_token}}\" style=\"background-color: #4caf50; "
+"padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-"
+"radius: 5px; font-size:13px;\">\n"
+"                                                                    Renew "
+"Consent\n"
 "                                                                </a>\n"
 "                                                            </div>\n"
-"                                                            Security Tip: Check that the domain name you are redirected to is: <b><a t-att-href=\"object.get_base_url()\" t-out=\"object.get_base_url() or ''\">https://yourcompany.odoo.com</a></b>\n"
+"                                                            Security Tip: "
+"Check that the domain name you are redirected to is: <b><a t-att-"
+"href=\"object.get_base_url()\" t-out=\"object.get_base_url() or ''\">https://"
+"yourcompany.odoo.com</a></b>\n"
 "                                                        </div>\n"
 "                                                    </td>\n"
 "                                                </tr>\n"
 "                                                <tr>\n"
-"                                                    <td style=\"text-align:center;\">\n"
-"                                                        <hr width=\"100%\" style=\"background-color:rgb(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;\">\n"
+"                                                    <td style=\"text-"
+"align:center;\">\n"
+"                                                        <hr width=\"100%\" "
+"style=\"background-color:rgb(204,204,204);border:medium "
+"none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; "
+"margin: 16px 0px 16px 0px;\"/>\n"
 "                                                    </td>\n"
 "                                                </tr>\n"
 "                                            </table>\n"
@@ -101,17 +138,26 @@ msgid ""
 "                    <!-- POWERED BY -->\n"
 "                    <tr>\n"
 "                        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"                            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-color: #F1F1F1; color: #454748; padding: 8px; border-collapse:separate;\">\n"
+"                            <table border=\"0\" cellpadding=\"0\" "
+"cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-color: "
+"#F1F1F1; color: #454748; padding: 8px; border-collapse:separate;\">\n"
 "                                <tr>\n"
-"                                    <td style=\"text-align: center; font-size: 13px;\">\n"
-"                                        Powered by <a target=\"_blank\" href=\"https://www.odoo.com?utm_source=db&amp;utm_medium=auth\" style=\"color: #875A7B;\">Odoo</a>\n"
+"                                    <td style=\"text-align: center; font-"
+"size: 13px;\">\n"
+"                                        Powered by <a target=\"_blank\" "
+"href=\"https://www.odoo.com?utm_source=db&amp;utm_medium=auth\" "
+"style=\"color: #875A7B;\">Odoo</a>\n"
 "                                    </td>\n"
 "                                </tr>\n"
 "                            </table>\n"
-"                            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; color: #454748; padding: 8px; border-collapse:separate;\">\n"
+"                            <table border=\"0\" cellpadding=\"0\" "
+"cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; color: #454748; "
+"padding: 8px; border-collapse:separate;\">\n"
 "                                <tr>\n"
-"                                    <td style=\"text-align: center; font-size: 11px;\">\n"
-"                                        PS: This is an automated email sent by Odoo Accounting to remind you before a bank sync consent expiration.\n"
+"                                    <td style=\"text-align: center; font-"
+"size: 11px;\">\n"
+"                                        PS: This is an automated email sent "
+"by Odoo Accounting to remind you before a bank sync consent expiration.\n"
 "                                    </td>\n"
 "                                </tr>\n"
 "                            </table>\n"
@@ -120,32 +166,61 @@ msgid ""
 "                </table>\n"
 "            "
 msgstr ""
-"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-top: 16px; background-color: #FFFFFF; font-family:Verdana, Arial,sans-serif; color: #454748; width: 100%; border-collapse:separate;\">\n"
+"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding-top: "
+"16px; background-color: #FFFFFF; font-family:Verdana, Arial,sans-serif; "
+"color: #454748; width: 100%; border-collapse:separate;\">\n"
 "                    <tr>\n"
 "                        <td align=\"center\">\n"
-"                            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" style=\"padding: 16px; background-color: #FFFFFF; color: #454748; border-collapse:separate;\">\n"
+"                            <table border=\"0\" cellpadding=\"0\" "
+"cellspacing=\"0\" width=\"590\" style=\"padding: 16px; background-color: "
+"#FFFFFF; color: #454748; border-collapse:separate;\">\n"
 "                                <tbody>\n"
 "                                    <!-- CONTENT -->\n"
 "                                    <tr>\n"
-"                                        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"                                            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;\">\n"
+"                                        <td align=\"center\" style=\"min-"
+"width: 590px;\">\n"
+"                                            <table border=\"0\" "
+"cellpadding=\"0\" cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; "
+"background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;"
+"\">\n"
 "                                                <tr>\n"
-"                                                    <td valign=\"top\" style=\"font-size: 13px;\">\n"
+"                                                    <td valign=\"top\" "
+"style=\"font-size: 13px;\">\n"
 "                                                        <div>\n"
-"                                                            مرحباً،<br><br>\n"
-"                                                            الاتصال بين <b><a t-att-href=\"object.get_base_url()\" t-out=\"object.get_base_url() or ''\">https://yourcompany.odoo.com</a></b> و <t t-out=\"object.account_online_link_id.name or ''\">Belfius</t> <t t-if=\"not object.expiring_synchronization_due_day\">قد انتهت صلاحيته.</t><t t-else=\"\">تنتهي صلاحيته في <t t-out=\"object.expiring_synchronization_due_day or ''\">10</t> أيام.</t><br>\n"
-"                                                            <div style=\"margin: 16px 0px 16px 0px;\">\n"
-"                                                                <a t-attf-href=\"{{ website_url }}/renew_consent/{{ object.id }}?access_token={{object.access_token}}\" style=\"background-color: #4caf50; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;\">\n"
-"                                                                    تجديد الإذن\n"
+"                                                            مرحباً،<br/><br/"
+">\n"
+"                                                            الاتصال بين "
+"<b><a t-att-href=\"object.get_base_url()\" t-out=\"object.get_base_url() or "
+"''\">https://yourcompany.odoo.com</a></b> و <t t-"
+"out=\"object.account_online_link_id.name or ''\">Belfius</t> <t t-if=\"not "
+"object.expiring_synchronization_due_day\">قد انتهت صلاحيته.</t><t t-"
+"else=\"\">تنتهي صلاحيته في <t t-"
+"out=\"object.expiring_synchronization_due_day or ''\">10</t> أيام.</t><br/>\n"
+"                                                            <div "
+"style=\"margin: 16px 0px 16px 0px;\">\n"
+"                                                                <a t-attf-"
+"href=\"{{ website_url }}/renew_consent/{{ object.id }}?"
+"access_token={{object.access_token}}\" style=\"background-color: #4caf50; "
+"padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-"
+"radius: 5px; font-size:13px;\">\n"
+"                                                                    تجديد "
+"الإذن\n"
 "                                                                </a>\n"
 "                                                            </div>\n"
-"                                                            نصيحة للأمان: تحقق من أن اسم النطاق الذي تمت إعادة توجيهك إليه هو: <b><a t-att-href=\"object.get_base_url()\" t-out=\"object.get_base_url() or ''\">https://yourcompany.odoo.com</a></b>\n"
+"                                                            نصيحة للأمان: "
+"تحقق من أن اسم النطاق الذي تمت إعادة توجيهك إليه هو: <b><a t-att-"
+"href=\"object.get_base_url()\" t-out=\"object.get_base_url() or ''\">https://"
+"yourcompany.odoo.com</a></b>\n"
 "                                                        </div>\n"
 "                                                    </td>\n"
 "                                                </tr>\n"
 "                                                <tr>\n"
-"                                                    <td style=\"text-align:center;\">\n"
-"                                                        <hr width=\"100%\" style=\"background-color:rgb(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;\">\n"
+"                                                    <td style=\"text-"
+"align:center;\">\n"
+"                                                        <hr width=\"100%\" "
+"style=\"background-color:rgb(204,204,204);border:medium "
+"none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; "
+"margin: 16px 0px 16px 0px;\"/>\n"
 "                                                    </td>\n"
 "                                                </tr>\n"
 "                                            </table>\n"
@@ -158,17 +233,27 @@ msgstr ""
 "                    <!-- POWERED BY -->\n"
 "                    <tr>\n"
 "                        <td align=\"center\" style=\"min-width: 590px;\">\n"
-"                            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-color: #F1F1F1; color: #454748; padding: 8px; border-collapse:separate;\">\n"
+"                            <table border=\"0\" cellpadding=\"0\" "
+"cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; background-color: "
+"#F1F1F1; color: #454748; padding: 8px; border-collapse:separate;\">\n"
 "                                <tr>\n"
-"                                    <td style=\"text-align: center; font-size: 13px;\">\n"
-"                                        مشغل بواسطة <a target=\"_blank\" href=\"https://www.odoo.com?utm_source=db&amp;utm_medium=auth\" style=\"color: #875A7B;\">أودو</a>\n"
+"                                    <td style=\"text-align: center; font-"
+"size: 13px;\">\n"
+"                                        مشغل بواسطة <a target=\"_blank\" "
+"href=\"https://www.odoo.com?utm_source=db&amp;utm_medium=auth\" "
+"style=\"color: #875A7B;\">أودو</a>\n"
 "                                    </td>\n"
 "                                </tr>\n"
 "                            </table>\n"
-"                            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; color: #454748; padding: 8px; border-collapse:separate;\">\n"
+"                            <table border=\"0\" cellpadding=\"0\" "
+"cellspacing=\"0\" width=\"590\" style=\"min-width: 590px; color: #454748; "
+"padding: 8px; border-collapse:separate;\">\n"
 "                                <tr>\n"
-"                                    <td style=\"text-align: center; font-size: 11px;\">\n"
-"                                        ملاحظة: هذا البريد الإلكتروني التلقائي مرسل بواسطة محاسبة أودو لتذكيرك قبل انتهاء صلاحية إذن مزامنة البنك.\n"
+"                                    <td style=\"text-align: center; font-"
+"size: 11px;\">\n"
+"                                        ملاحظة: هذا البريد الإلكتروني "
+"التلقائي مرسل بواسطة محاسبة أودو لتذكيرك قبل انتهاء صلاحية إذن مزامنة "
+"البنك.\n"
 "                                    </td>\n"
 "                                </tr>\n"
 "                            </table>\n"
@@ -260,6 +345,11 @@ msgid "Activity State"
 msgstr "حالة النشاط"
 
 #. module: account_online_synchronization
+#: model:ir.model,name:account_online_synchronization.model_mail_activity_type
+msgid "Activity Type"
+msgstr "نوع النشاط"
+
+#. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_link__activity_type_icon
 msgid "Activity Type Icon"
 msgstr "أيقونة نوع النشاط"
@@ -346,7 +436,7 @@ msgstr "ألقِ نظرة على الوثائق "
 #: model_terms:ir.ui.view,arch_db:account_online_synchronization.account_duplicate_transaction_wizard_view_form
 msgid ""
 "Choose a date and a journal from which you want to check the transactions."
-msgstr ""
+msgstr "اختر التاريخ ودفتر اليومية الذي ترغب في التحقق من المعاملات فيه "
 
 #. module: account_online_synchronization
 #: model_terms:ir.ui.view,arch_db:account_online_synchronization.account_missing_transaction_wizard_view_form
@@ -392,6 +482,11 @@ msgstr "اتصل"
 #. module: account_online_synchronization
 #: model_terms:ir.ui.view,arch_db:account_online_synchronization.view_account_bank_selection_form_wizard
 msgid "Connect Bank"
+msgstr "توصيل البنك "
+
+#. module: account_online_synchronization
+#: model_terms:ir.ui.view,arch_db:account_online_synchronization.account_journal_dashboard_inherit_online_sync
+msgid "Connect bank"
 msgstr "توصيل البنك "
 
 #. module: account_online_synchronization
@@ -558,7 +653,7 @@ msgstr "جري جلب... "
 #: code:addons/account_online_synchronization/models/account_journal.py:0
 #: code:addons/account_online_synchronization/static/src/components/bank_reconciliation/find_duplicate_transactions_cog_menu.xml:0
 msgid "Find Duplicate Transactions"
-msgstr ""
+msgstr "العثور على المعاملات المكررة "
 
 #. module: account_online_synchronization
 #. odoo-javascript
@@ -571,7 +666,7 @@ msgstr "العثور على المعاملات المفقودة "
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_duplicate_transaction_wizard__first_ids_in_group
 msgid "First Ids In Group"
-msgstr ""
+msgstr "المُعرّفات الأولى في المجموعة "
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_link__message_follower_ids
@@ -658,13 +753,16 @@ msgstr "إذا كان محدداً، سيتم عكس علامة المعاملة
 #. module: account_online_synchronization
 #: model:ir.model.fields,help:account_online_synchronization.field_account_online_link__auto_sync
 msgid ""
-"If possible, we will try to automatically fetch new transactions for this record\n"
+"If possible, we will try to automatically fetch new transactions for this "
+"record\n"
 "                \n"
-"If the automatic sync is disabled. that will be due to security policy on the bank's end. So, they have to launch the sync manually"
+"If the automatic sync is disabled. that will be due to security policy on "
+"the bank's end. So, they have to launch the sync manually"
 msgstr ""
 "إذا أمكن، سنحاول جلب المعاملات الجديدة تلقائياً لهذا السجل\n"
 "                \n"
-"إذا كانت خاصية المزامنة التلقائية معطلة. سيكون ذلك بسبب سياسة الأمن التي يفرضها البنك. لذلك، سيتوجب عليهم تشغيل عملية المزامنة يدوياً "
+"إذا كانت خاصية المزامنة التلقائية معطلة. سيكون ذلك بسبب سياسة الأمن التي "
+"يفرضها البنك. لذلك، سيتوجب عليهم تشغيل عملية المزامنة يدوياً "
 
 #. module: account_online_synchronization
 #. odoo-javascript
@@ -732,8 +830,8 @@ msgstr "دفتر اليومية"
 #: code:addons/account_online_synchronization/models/account_online.py:0
 msgid ""
 "Journal %(journal_name)s has been set up with a different currency and "
-"already has existing entries. You can't link selected bank account in "
-"%(currency_name)s to it"
+"already has existing entries. You can't link selected bank account in %"
+"(currency_name)s to it"
 msgstr ""
 "تم إعداد دفتر اليومية %(journal_name)s بعملة مختلفة ويحتوي بالفعل على قيود "
 "موجودة. لا يمكنك ربط الحساب البنكي المحدد %(currency_name)s به "
@@ -1041,6 +1139,11 @@ msgid "Represent a link for a given user towards a banking institution"
 msgstr "تقديم رابط لمستخدم معين إلى منشأة بنكية "
 
 #. module: account_online_synchronization
+#: model_terms:ir.ui.view,arch_db:account_online_synchronization.account_online_link_view_form
+msgid "Reset"
+msgstr "إعادة الضبط "
+
+#. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_link__activity_user_id
 msgid "Responsible User"
 msgstr "المستخدم المسؤول"
@@ -1062,8 +1165,7 @@ msgid ""
 "Security Tip: always check the domain name of this page, before clicking on "
 "the button."
 msgstr ""
-"نصيحة للأمان: تحقق دائماً من اسم النطاق لهذه الصفحة، عن طريق الضغط على الزر."
-" "
+"نصيحة للأمان: تحقق دائماً من اسم النطاق لهذه الصفحة، عن طريق الضغط على الزر. "
 
 #. module: account_online_synchronization
 #. odoo-javascript
@@ -1111,10 +1213,15 @@ msgid "Setup Bank Account"
 msgstr "إعداد الحساب البنكي "
 
 #. module: account_online_synchronization
+#: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_link__show_sync_actions
+msgid "Show Sync Actions"
+msgstr "عرض إجراءات المزامنة "
+
+#. module: account_online_synchronization
 #. odoo-javascript
 #: code:addons/account_online_synchronization/static/src/components/views/account_online_authorization_kanban_controller.xml:0
 msgid "Some transactions"
-msgstr ""
+msgstr "بعض المعاملات "
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_duplicate_transaction_wizard__date
@@ -1127,7 +1234,7 @@ msgstr "تاريخ البدء"
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_journal__account_online_link_state
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_online_link__state
 msgid "State"
-msgstr "الولاية "
+msgstr "الحالة "
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,help:account_online_synchronization.field_account_online_link__activity_state
@@ -1160,8 +1267,8 @@ msgid ""
 "The online synchronization service is not available at the moment. Please "
 "try again later."
 msgstr ""
-"خدمة المزامنة عبر الإنترنت غير متوفرة في الوقت الحالي. الرجاء المحاولة "
-"مجدداً لاحقاً "
+"خدمة المزامنة عبر الإنترنت غير متوفرة في الوقت الحالي. الرجاء المحاولة مجدداً "
+"لاحقاً "
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,help:account_online_synchronization.field_account_online_link__provider_type
@@ -1174,6 +1281,13 @@ msgid ""
 "This action will delete all selected transactions. Are you sure you want to "
 "proceed?"
 msgstr ""
+"سيؤدي هذا الإجراء إلى حذف كافة المعاملات المحددة. هل أنت متأكد أنك ترغب في "
+"المتابعة؟ "
+
+#. module: account_online_synchronization
+#: model_terms:ir.ui.view,arch_db:account_online_synchronization.account_online_link_view_form
+msgid "This button will reset the fetching status"
+msgstr "سيؤدي هذا الزر إلى إعادة ضبط حالة عملية البحث "
 
 #. module: account_online_synchronization
 #. odoo-python
@@ -1203,8 +1317,8 @@ msgstr "الرمز المستخدَم للوصول إلى الواجهة الب�
 #: model:ir.model.fields,help:account_online_synchronization.field_account_online_link__refresh_token
 msgid "Token used to sign API request, Never disclose it"
 msgstr ""
-"الرمز المستخدَم للتوقيع على طلب الواجهة البرمجية للتطبيق، لا تقم بالإفصاح "
-"عنه أبداً "
+"الرمز المستخدَم للتوقيع على طلب الواجهة البرمجية للتطبيق، لا تقم بالإفصاح عنه "
+"أبداً "
 
 #. module: account_online_synchronization
 #: model:ir.model.fields,field_description:account_online_synchronization.field_account_duplicate_transaction_wizard__transaction_ids
@@ -1263,7 +1377,7 @@ msgstr "سجل تواصل الموقع الإلكتروني "
 #. module: account_online_synchronization
 #: model:ir.model,name:account_online_synchronization.model_account_duplicate_transaction_wizard
 msgid "Wizard for duplicate transactions"
-msgstr ""
+msgstr "معالج للمعاملات المكررة "
 
 #. module: account_online_synchronization
 #: model:ir.model,name:account_online_synchronization.model_account_missing_transaction_wizard
@@ -1274,7 +1388,8 @@ msgstr "معالج للمعاملات المفقودة "
 #. odoo-javascript
 #: code:addons/account_online_synchronization/static/src/components/transient_bank_statement_line_list_view/transient_bank_statement_line_list_view.xml:0
 msgid ""
-"You are importing transactions before the creation of your online synchronization\n"
+"You are importing transactions before the creation of your online "
+"synchronization\n"
 "                    ("
 msgstr ""
 "أنت تقوم باستيراد المعاملات قبل إنشاء المزامنة عبر الإنترنت\n"
@@ -1288,6 +1403,12 @@ msgstr "يمكنك التواصل مع فريق الدعم لدى أودو "
 
 #. module: account_online_synchronization
 #. odoo-python
+#: code:addons/account_online_synchronization/models/account_online.py:0
+msgid "You can manage your bank synchronization consent for this connection %s"
+msgstr ""
+
+#. module: account_online_synchronization
+#. odoo-python
 #: code:addons/account_online_synchronization/models/account_journal.py:0
 msgid "You can only execute this action for bank-synchronized journals."
 msgstr "لا يمكنك تنفيذ هذا الإجراء إلا لدفاتر اليومية المتزامنة مع البنك. "
@@ -1296,8 +1417,7 @@ msgstr "لا يمكنك تنفيذ هذا الإجراء إلا لدفاتر ا�
 #. odoo-python
 #: code:addons/account_online_synchronization/models/account_journal.py:0
 #: code:addons/account_online_synchronization/wizard/account_journal_missing_transactions.py:0
-msgid ""
-"You can't find missing transactions for a journal that isn't connected."
+msgid "You can't find missing transactions for a journal that isn't connected."
 msgstr "لا يمكنك العثور على المعاملات المفقودة لدفتر يومية غير متصل. "
 
 #. module: account_online_synchronization
@@ -1357,7 +1477,7 @@ msgstr "جاري التحميل..."
 #. odoo-javascript
 #: code:addons/account_online_synchronization/static/src/components/views/account_online_authorization_kanban_controller.xml:0
 msgid "may be duplicates."
-msgstr ""
+msgstr "قد تكون عناك نُسخ مكررة "
 
 #. module: account_online_synchronization
 #: model_terms:ir.ui.view,arch_db:account_online_synchronization.portal_renew_consent

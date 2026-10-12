@@ -6,12 +6,11 @@ import { stepUtils } from "@web_tour/tour_service/tour_utils";
 
 /**
  * Tests the cover picker feature when unsplash credentials are set. In this
- * case, the "Add Cover" button should either add a random picture from a 
+ * case, the "Add Cover" button should either add a random picture from a
  * selected unsplash collection if no name is set on the article, either
  * add a random image using the article name as query word.
  */
 registry.category("web_tour.tours").add('knowledge_random_cover_tour', {
-    test: true,
     url: '/odoo',
     steps: () => [stepUtils.showAppsMenuItem(), {
     // Open Knowledge App
@@ -39,7 +38,6 @@ registry.category("web_tour.tours").add('knowledge_random_cover_tour', {
     run: "click",
 },
 {
-    isActive: ["auto"],
     trigger: ".modal-body .o_load_done_msg",
 },
 {
@@ -77,7 +75,6 @@ registry.category("web_tour.tours").add('knowledge_random_cover_tour', {
     run: "click",
 },
 {
-    isActive: ["auto"],
     trigger: ".modal-body .o_load_more",
 },
 {

@@ -8,6 +8,7 @@ from importlib import metadata
 from PIL import ImageFont
 
 from odoo import api, models, _, fields
+from odoo.osv import expression
 from odoo.exceptions import UserError
 from odoo.tools import date_utils, float_repr, SQL, parse_version
 from odoo.tools.misc import format_date, file_path
@@ -49,18 +50,13 @@ class SlspCustomHandler(models.AbstractModel):
 
         # 1) Build the queries to get the months
         for column_group_key, column_group_options in report._split_options_per_column_group(options).items():
-            domain = [('move_id.move_type', '=', options['move_type'])]
-            if not column_group_options.get('include_no_tin'):
-                domain.append(('partner_id.vat', '!=', False))
-            query = report._get_report_query(column_group_options, "strict_range", domain)
+            query = self._get_report_query(report, column_group_options)
             # The joins are there to filter out months for which we would not have any lines in the report.
             queries.append(SQL(
                 """
                   SELECT (date_trunc('month', account_move_line.date::date) + interval '1 month' - interval '1 day')::date AS taxable_month,
                          %(column_group_key)s                                                                              AS column_group_key
                     FROM %(table_references)s
-                    JOIN account_account_tag_account_move_line_rel account_tag_rel ON account_tag_rel.account_move_line_id = account_move_line.id
-                    JOIN account_account_tag account_tag ON account_tag.id = account_tag_rel.account_account_tag_id
                    WHERE %(search_condition)s
                 GROUP BY taxable_month
                 ORDER BY taxable_month DESC
@@ -104,18 +100,15 @@ class SlspCustomHandler(models.AbstractModel):
         end_date = fields.Date.from_string(month)  # Month is already set to the last day of the month.
         start_date = date_utils.start_of(end_date, 'month')
         queries = []
+        extra_domain = [
+            # Make sure to only fetch records that are in the parent's row month
+            ('date', '>=', start_date),
+            ('date', '<=', end_date),
+        ]
         for column_group_key, column_group_options in report._split_options_per_column_group(options).items():
-            domain = [
-                ('move_id.move_type', '=', options['move_type']),
-                # Make sure to only fetch records that are in the parent's row month
-                ('date', '>=', start_date),
-                ('date', '<=', end_date),
-            ]
-            if not column_group_options.get('include_no_tin'):
-                domain.append(('partner_id.vat', '!=', False))
-            query = report._get_report_query(column_group_options, "strict_range", domain=domain)
+            query = self._get_report_query(report, column_group_options, extra_domain=extra_domain)
             tail_query = report._get_engine_query_tail(offset, limit)
-            account_tag_name = self.env['account.account.tag']._field_to_sql('account_tag', 'name')
+            account_tag_name = self.env['account.account.tag']._field_to_sql('account_tag', 'name', query)
             queries.append(SQL(
                 """
                   SELECT %(column_group_key)s                                                                   AS column_group_key,
@@ -133,11 +126,10 @@ class SlspCustomHandler(models.AbstractModel):
                     FROM %(table_references)s
                     JOIN res_partner p ON p.id = account_move_line__move_id.partner_id
                     JOIN res_partner cp ON cp.id = p.commercial_partner_id
-                    JOIN account_account_tag_account_move_line_rel account_tag_rel ON account_tag_rel.account_move_line_id = account_move_line.id
-                    JOIN account_account_tag account_tag ON account_tag.id = account_tag_rel.account_account_tag_id
                     %(currency_table_join)s
                    WHERE %(search_condition)s
                 GROUP BY p.id, cp.id, %(account_tag_name)s
+                ORDER BY p.complete_name, p.id DESC
                 %(tail_query)s
                 """,
                 balance_select=report._currency_table_apply_rate(SQL("account_move_line.balance")),
@@ -216,16 +208,16 @@ class SlspCustomHandler(models.AbstractModel):
         end_date = fields.Date.from_string(month)
         start_date = date_utils.start_of(end_date, 'month')
         queries = []
+
+        extra_domain = [
+            ('date', '>=', start_date),
+            ('date', '<=', end_date),
+            ('move_id.partner_id', '=', partner_id),
+        ]
         for column_group_key, column_group_options in report._split_options_per_column_group(options).items():
-            query = report._get_report_query(column_group_options, "strict_range", domain=[
-                ('move_id.move_type', '=', options['move_type']),
-                # Make sure to only fetch records that are in the parent's row month
-                ('date', '>=', start_date),
-                ('date', '<=', end_date),
-                ('move_id.partner_id', '=', partner_id),
-            ])
+            query = self._get_report_query(report, column_group_options, extra_domain=extra_domain)
             tail_query = report._get_engine_query_tail(offset, limit)
-            account_tag_name = self.env['account.account.tag']._field_to_sql('account_tag', 'name')
+            account_tag_name = self.env['account.account.tag']._field_to_sql('account_tag', 'name', query)
             queries.append(SQL(
                 """
                   SELECT %(column_group_key)s                                                                   AS column_group_key,
@@ -237,11 +229,10 @@ class SlspCustomHandler(models.AbstractModel):
                              * CASE WHEN account_move_line.tax_tag_invert THEN -1 ELSE 1 END
                          )                                                                                      AS balance
                     FROM %(table_references)s
-                    JOIN account_account_tag_account_move_line_rel account_tag_rel ON account_tag_rel.account_move_line_id = account_move_line.id
-                    JOIN account_account_tag account_tag ON account_tag.id = account_tag_rel.account_account_tag_id
                     %(currency_table_join)s
                    WHERE %(search_condition)s
                 GROUP BY account_move_line__move_id.id, %(account_tag_name)s
+                ORDER BY account_move_line__move_id.date DESC, account_move_line__move_id.name DESC, account_move_line__move_id.invoice_date DESC, account_move_line__move_id.id DESC
                 %(tail_query)s
                 """,
                 balance_select=report._currency_table_apply_rate(SQL("account_move_line.balance")),
@@ -290,6 +281,12 @@ class SlspCustomHandler(models.AbstractModel):
             'caret_options': 'account.move',
         }
 
+    def _get_grand_total_line_domain(self, options):
+        domain = super()._get_grand_total_line_domain(options)
+        if not options.get("include_no_tin"):
+            domain = expression.AND([domain, [("partner_id.vat", "!=", False)]])
+        return domain
+
     # xlsx export methods
     @api.model
     def export_slsp(self, options):
@@ -317,7 +314,7 @@ class SlspCustomHandler(models.AbstractModel):
             # We only need to get the move type, grid map and the column from the section. The rest is standard.
             section_options = section.get_options(options)
             options.update({
-                'move_type': section_options['move_type'],
+                'journal_type': section_options['journal_type'],
                 'report_grids_map': section_options['report_grids_map'],
                 'columns': section_options['columns'],
             })
@@ -340,7 +337,7 @@ class SlspCustomHandler(models.AbstractModel):
         })
 
         # Write the data.
-        sheet = workbook.add_worksheet(_('sls') if options['move_type'] == 'out_invoice' else _('slp'))
+        sheet = workbook.add_worksheet(_('sls') if options['journal_type'] == 'sale' else _('slp'))
         # Add the styles to the sheet to make it easier to get them later.
         sheet.styles = {
             'text': workbook.add_format({'font_name': 'Arial', 'border': 1, 'align': 'left'}),
@@ -350,9 +347,9 @@ class SlspCustomHandler(models.AbstractModel):
             'date': workbook.add_format({'font_name': 'Arial', 'border': 1, 'align': 'left', "num_format": "yyyy-mm-dd"}),
         }
         # Write the header part.
-        self._slsp_write_header_data(sheet, fonts, options['move_type'])
+        self._slsp_write_header_data(sheet, fonts, options['journal_type'])
         # Write the data part.
-        self._slsp_write_invoice_data(sheet, fonts, lines, options['move_type'], report)
+        self._slsp_write_invoice_data(sheet, fonts, lines, options['journal_type'], report)
         # End of report.
         self._slsp_write_next_row(sheet, fonts, [])  # Empty row.
         self._slsp_write_next_row(sheet, fonts, [(_('END OF REPORT'), 1, sheet.styles['text'])])
@@ -364,7 +361,7 @@ class SlspCustomHandler(models.AbstractModel):
         generated_file = output.read()
         output.close()
         return {
-            'file_name': _('sl_sales') if options['move_type'] == 'out_invoice' else _('sl_purchases'),
+            'file_name': _('sl_sales') if options['journal_type'] == 'sale' else _('sl_purchases'),
             'file_content': generated_file,
             'file_type': 'xlsx',
         }
@@ -377,8 +374,8 @@ class SlspCustomHandler(models.AbstractModel):
         title_style = sheet.styles['title']
         self._slsp_write_next_row(
             sheet, fonts,
-            [(_('PURCHASE TRANSACTION') if move_type == 'in_invoice' else _('SALES TRANSACTION'), 3, title_style)]
-            + [('', 1, text_style)] * (8 if move_type == 'out_invoice' else 11)  # We need to add empty cells to align everything. Done only the first time, for the others we'll get the amount of col from the sheet.
+            [(_('PURCHASE TRANSACTION') if move_type == 'purchase' else _('SALES TRANSACTION'), 3, title_style)]
+            + [('', 1, text_style)] * (8 if move_type == 'sale' else 11)  # We need to add empty cells to align everything. Done only the first time, for the others we'll get the amount of col from the sheet.
         )
         self._slsp_write_next_row(sheet, fonts, [(_('RECONCILIATION OF LISTING FOR ENFORCEMENT'), 3, title_style)])
         self._slsp_write_next_row(sheet, fonts, [])  # Empty row.
@@ -405,7 +402,7 @@ class SlspCustomHandler(models.AbstractModel):
     @api.model
     def _slsp_write_invoice_data(self, sheet, fonts, lines, move_type, report):
         """ Write the invoice data in the sheet. """
-        if move_type == 'out_invoice':
+        if move_type == 'sale':
             amount_columns = [
                 ('gross_amount', _('GROSS SALES')),
                 ('exempt_amount', _('EXEMPT SALES')),
@@ -437,8 +434,8 @@ class SlspCustomHandler(models.AbstractModel):
             (_('TAXABLE'), 1, title_style),
             (_('TAXPAYER'), 1, title_style),
             (_('REGISTER NAME'), 1, title_style),
-            (_('NAME OF CUSTOMER') if move_type == 'out_invoice' else _('NAME OF SUPPLIER'), 1, title_style),
-            (_('CUSTOMER\'S ADDRESS') if move_type == 'out_invoice' else _('SUPPLIER\'S ADDRESS'), 1, title_style),
+            (_('NAME OF CUSTOMER') if move_type == 'sale' else _('NAME OF SUPPLIER'), 1, title_style),
+            (_('CUSTOMER\'S ADDRESS') if move_type == 'sale' else _('SUPPLIER\'S ADDRESS'), 1, title_style),
         ] + [(_('AMOUNT OF'), 1, title_style)] * len(amount_columns))
         self._slsp_write_next_row(sheet, fonts, [
             (_('MONTH'), 1, title_style),
@@ -466,6 +463,8 @@ class SlspCustomHandler(models.AbstractModel):
 
         # Finally write the moves' data.
         line_vals = {}
+        amount_expression_labels = [amount_column[0] for amount_column in amount_columns]
+
         for line in report_lines:
             model = report._parse_line_id(line['id'])[-1][1]
             # Lines are ordered, so for month and partner lines we can gather the vals, and then write the lines when we are processing aml.
@@ -480,9 +479,9 @@ class SlspCustomHandler(models.AbstractModel):
                 continue
             # if we want to group by partner, we add a check here and not update the vals, and not continue above
             elif model == 'account.move':
-                # Make sure to only override the values for which we have a value.
+                # Make sure to only override the amount values (we want to keep the partner info)
                 line_vals.update({
-                    col['expression_label']: col['no_format'] for col in line['columns'] if col["no_format"]
+                    col['expression_label']: col['no_format'] for col in line['columns'] if col["expression_label"] in amount_expression_labels
                 })
             # Time to write our line.
             self._slsp_write_next_row(sheet, fonts, [

@@ -38,15 +38,17 @@ export const DocumentsSpreadsheetControllerMixin = () => ({
      * @override
      */
     async _onOpenDocumentsPreview({ mainDocument }) {
-        if (["spreadsheet", "frozen_spreadsheet"].includes(mainDocument.data.handler)) {
+        const mainDocumentOrTarget = mainDocument.shortcutTarget;
+        if (["spreadsheet", "frozen_spreadsheet"].includes(mainDocumentOrTarget.data.handler)) {
             this.action.doAction({
                 type: "ir.actions.client",
                 tag: "action_open_spreadsheet",
                 params: {
-                    spreadsheet_id: mainDocument.resId,
+                    spreadsheet_id: mainDocumentOrTarget.resId,
                 },
             });
-        } else if (XLSX_MIME_TYPES.includes(mainDocument.data.mimetype)) {
+        } else if (XLSX_MIME_TYPES.includes(mainDocumentOrTarget.data.mimetype)) {
+            // Keep MainDocument as `active` can be different for shortcut and target.
             if (!mainDocument.data.active) {
                 this.dialogService.add(ConfirmationDialog, {
                     title: _t("Restore file?"),
@@ -58,16 +60,19 @@ export const DocumentsSpreadsheetControllerMixin = () => ({
                         await this.orm.call("documents.document", "action_unarchive", [
                             mainDocument.resId,
                         ]);
-                        this.env.searchModel.toggleCategoryValue(1, mainDocument.data.folder_id[0]);
+                        this.env.searchModel.toggleCategoryValue(
+                            1,
+                            mainDocument.data.folder_id[0] ?? false
+                        );
                     },
                     confirmLabel: _t("Restore"),
                 });
-            } else {
+            } else if (this.documentService.userIsInternal) {
                 this.dialogService.add(SpreadsheetCloneXlsxDialog, {
                     title: _t("Excel file preview"),
                     cancel: () => {},
                     cancelLabel: _t("Discard"),
-                    documentId: mainDocument.resId,
+                    documentId: mainDocumentOrTarget.resId,
                     confirmLabel: _t("Open with Odoo Spreadsheet"),
                 });
             }
@@ -77,9 +82,14 @@ export const DocumentsSpreadsheetControllerMixin = () => ({
     },
 
     async onClickCreateSpreadsheet(ev) {
+        const folderId = this.env.searchModel.getSelectedFolderId() || undefined;
+        const context = this.props.context;
+        if (folderId === "COMPANY") {
+            context.default_owner_id = this.documentService.store.odoobot.userId;
+        }
         this.dialogService.add(TemplateDialog, {
-            folderId: this.env.searchModel.getSelectedFolderId() || undefined,
-            context: this.props.context,
+            folderId,
+            context,
             folders: this.env.searchModel
                 .getFolders()
                 .filter((folder) => folder.id && typeof folder.id === "number"),

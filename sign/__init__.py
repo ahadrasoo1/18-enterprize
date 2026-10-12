@@ -7,7 +7,12 @@ from . import report
 from . import wizard
 from . import PYPDF2_MonkeyPatch
 
-ITSME_AVAILABLE_COUNTRIES = ['BE', 'NL']
+ITSME_AVAILABLE_COUNTRIES = [
+    'BE', 'NL', 'AT', 'BG', 'HR', 'CY', 'CZ', 'DK', 'EE',
+    'FR', 'DE', 'GR', 'HU', 'IS', 'IE', 'IT', 'LV', 'LT',
+    'LU', 'MT', 'NO', 'PL', 'PT', 'RO', 'SK', 'SI', 'ES',
+    'SE', 'GB', 'FI'
+]
 
 
 def _sign_post_init(env):
@@ -24,3 +29,11 @@ def uninstall_hook(env):
     # disable the a sign invoices while uninstalling a module
     if env['ir.module.module']._get('account_accountant').state == 'installed':
         env['res.company'].search([]).sign_invoice = False
+
+    if env['ir.module.module']._get('documents').state == 'installed':
+        document_query = env['documents.document']._search([('res_model', '=', 'sign.template')])
+        mail_activities = env['mail.activity'].search([
+            ('res_model', '=', 'documents.document'),
+            ('res_id', 'in', document_query)
+        ])
+        mail_activities.unlink()

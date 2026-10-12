@@ -117,12 +117,26 @@ class RentalOrderLine(models.Model):
         for (from_date, to_date, warehouse_id), line_ids in rented_product_lines._partition_so_lines_by_rental_period():
             lines = self.env['sale.order.line'].browse(line_ids)
             for line in lines:
-                rentable_qty = line.product_id.with_context(
-                    from_date=from_date,
-                    to_date=to_date,
-                    warehouse_id=warehouse_id).qty_available
-                if from_date > fields.Datetime.now():
-                    rentable_qty += line.product_id.with_context(warehouse_id=line.order_id.warehouse_id.id).qty_in_rent
+                if from_date <= fields.Datetime.now():
+                    rentable_qty = line.product_id.with_context(
+                        from_date=from_date,
+                        to_date=to_date,
+                        warehouse_id=warehouse_id).qty_available
+                else:
+                    # For performance reason it is not reasonable to find the minimal forecasted quantity
+                    # during the rental period so that we fallback on the forecasted quantity at the
+                    # first day of the rental period.
+                    rentable_qty = line.product_id.with_context(
+                        from_date=False,
+                        to_date=from_date,
+                        warehouse_id=warehouse_id).virtual_available
+                    # The rented_qty_during_period can overlap with planned
+                    # incoming/outgoing moves taken into account by the virtual_available qty
+                    rentable_qty += line.product_id._get_virtual_unavailable_qty_in_rent(
+                        pivot_date=from_date,
+                        ignored_soline_id=line and line.state == 'draft' and line.id,
+                        warehouse_id=line.order_id.warehouse_id.id,
+                    )
                 rented_qty_during_period = line.product_id._get_unavailable_qty(
                     from_date, to_date,
                     ignored_soline_id=line and line.id,
@@ -297,10 +311,12 @@ class RentalOrderLine(models.Model):
             'name': _("Rental move: %(order)s", order=self.order_id.name),
             'state': 'confirmed',
         })
-        rental_stock_move._action_assign()
-        rental_stock_move.quantity = qty
-        rental_stock_move.picked = True
-        rental_stock_move._action_done()
+        rental_stock_moves = rental_stock_move._set_rental_sm_qty()
+        for move in rental_stock_moves:
+            move._action_assign()
+            move.quantity = move.product_uom_qty
+            move.picked = True
+        rental_stock_moves._action_done()
 
     def _return_qty(self, qty, location_id, location_dest_id):
         """Undo a qty move (partially or totally depending on qty).
@@ -337,7 +353,7 @@ class RentalOrderLine(models.Model):
     def _create_procurements(self, product_qty, procurement_uom, origin, values):
         """ Change the destination for rental procurement groups. """
         if self.is_rental and self._are_rental_pickings_enabled():
-            values['route_ids'] = self.env.ref('sale_stock_renting.route_rental')
+            values['route_ids'] = values.get('route_ids', self.env['stock.route']) | (self.env.ref('sale_stock_renting.route_rental', raise_if_not_found=False) or self.env['stock.route'])
             delivery_values = {
                 **values,
                 'date_planned': self.order_id.rental_start_date,
@@ -357,7 +373,7 @@ class RentalOrderLine(models.Model):
                     self.product_id.display_name, origin, self.order_id.company_id, return_values)]
         return super()._create_procurements(product_qty, procurement_uom, origin, values)
 
-    def _action_launch_stock_rule(self, previous_product_uom_qty=False):
+    def _action_launch_stock_rule(self, **kwargs):
         """ If the rental picking setting is deactivated:
         Disable stock moves for rental order lines.
         Stock moves for rental orders are created on pickup/return.
@@ -367,7 +383,7 @@ class RentalOrderLine(models.Model):
         If the rental picking setting is activated:
         Process all lines at the same time. """
         if not self or self._are_rental_pickings_enabled():
-            super()._action_launch_stock_rule(previous_product_uom_qty)
+            super()._action_launch_stock_rule(**kwargs)
             returns = self.move_ids.filtered(lambda m: m.location_id == self.company_id.rental_loc_id)
             picks = self.move_ids.filtered(lambda m: m.location_id == self.warehouse_id.lot_stock_id)
             moves_by_order_line = defaultdict(lambda: {'picks': self.env['stock.move'], 'returns': self.env['stock.move']})
@@ -385,11 +401,11 @@ class RentalOrderLine(models.Model):
                     'move_orig_ids': [Command.link(pick.id) for pick in moves['picks']],
                     'procure_method': 'make_to_order'
                 })
-                moves['returns'].picking_id.return_id = moves['picks'].picking_id
+                moves['returns'].picking_id.return_id = moves['picks'].picking_id[:1]
             returns._recompute_state()
         else:
             other_lines = self.filtered(lambda sol: not sol.is_rental)
-            super(RentalOrderLine, other_lines)._action_launch_stock_rule(previous_product_uom_qty)
+            super(RentalOrderLine, other_lines)._action_launch_stock_rule(**kwargs)
 
     def _get_outgoing_incoming_moves(self, strict=True):
         outgoing_moves, incoming_moves = super()._get_outgoing_incoming_moves(strict)
@@ -397,7 +413,7 @@ class RentalOrderLine(models.Model):
             for move in self.move_ids.filtered(lambda r: r.state != 'cancel' and not r.scrapped and self.product_id == r.product_id):
                 if (
                         strict and move.location_dest_id == self.company_id.rental_loc_id or
-                        not strict and move.location_id == self.order_id.warehouse_id.lot_stock_id
+                        not strict and move.location_id._child_of(self.order_id.warehouse_id.lot_stock_id)
                 ):
                     outgoing_moves |= move
                 elif strict and move.location_id == self.company_id.rental_loc_id:
@@ -450,7 +466,7 @@ class RentalOrderLine(models.Model):
         self.product_id.ensure_one()
         rented_quantities = defaultdict(float)
         now = fields.Datetime.now()
-        for so_line in self:
+        for so_line in self.filtered('is_rental'):
             rented_quantities[so_line.reservation_begin] += so_line.product_uom_qty
             rented_quantities[so_line.return_date] -= so_line.product_uom_qty
             # Adjust the rented quantities for early pickups.
@@ -470,7 +486,7 @@ class RentalOrderLine(models.Model):
         return rented_quantities, key_dates
 
     def _are_rental_pickings_enabled(self):
-        if self and self.order_id.create_uid:
+        if self and self[0].order_id.create_uid:
             return self[0].order_id.create_uid.has_group(
                 'sale_stock_renting.group_rental_stock_picking'
             )

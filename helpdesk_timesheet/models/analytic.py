@@ -5,6 +5,7 @@ from collections import defaultdict
 from odoo import api, Command, fields, models, _
 from odoo.osv import expression
 from odoo.exceptions import ValidationError
+from odoo.tools.sql import column_exists, create_column
 
 
 class AccountAnalyticLine(models.Model):
@@ -17,6 +18,12 @@ class AccountAnalyticLine(models.Model):
     project_id = fields.Many2one(inverse="_inverse_project_id")
     has_helpdesk_team = fields.Boolean(related='project_id.has_helpdesk_team', export_string_translation=False)
     display_task = fields.Boolean(compute="_compute_display_task", export_string_translation=False)
+
+    def _auto_init(self):
+        # At install implementation of `_compute_helpdesk_ticket_id` -> default value of NULL for all rows
+        if not column_exists(self.env.cr, 'account_analytic_line', 'helpdesk_ticket_id'):
+            create_column(self.env.cr, 'account_analytic_line', 'helpdesk_ticket_id', 'int4')
+        return super()._auto_init()
 
     @api.depends('has_helpdesk_team', 'project_id', 'task_id', 'helpdesk_ticket_id')
     def _compute_display_task(self):
@@ -54,12 +61,23 @@ class AccountAnalyticLine(models.Model):
     @api.depends('task_id')
     def _compute_helpdesk_ticket_id(self):
         # set helpdesk_ticket_id to false when a task_id has been assigned
-        self.filtered(lambda line: line.task_id and line.helpdesk_ticket_id).helpdesk_ticket_id = False
+        timesheet_to_update = self.filtered(lambda line: line.task_id and line.helpdesk_ticket_id)
+        # no need to recompute the project_id if nothing changes.
+        # unless the record is not yet created
+        self.env.remove_to_compute(self._fields['project_id'],
+                                   (self - timesheet_to_update).filtered(lambda line: line._origin))
+        timesheet_to_update.helpdesk_ticket_id = False
 
     @api.constrains('task_id', 'helpdesk_ticket_id')
     def _check_no_link_task_and_ticket(self):
         # Check if any timesheets are not linked to a ticket and a task at the same time
-        if any(timesheet.task_id and timesheet.helpdesk_ticket_id for timesheet in self):
+        has_linked_to_both = self.env['account.analytic.line'].search(
+            [('id', 'in', self.ids),
+             ('task_id', '!=', False),
+             ('helpdesk_ticket_id', '!=', False)],
+            limit=1,
+        )
+        if has_linked_to_both:
             raise ValidationError(_("You cannot link a timesheet entry to a task and a ticket at the same time."))
 
     @api.depends('helpdesk_ticket_id.partner_id')
@@ -68,6 +86,12 @@ class AccountAnalyticLine(models.Model):
         for line in self:
             if line.helpdesk_ticket_id:
                 line.partner_id = line.helpdesk_ticket_id.partner_id or line.partner_id
+
+    @api.onchange('project_id')
+    def _onchange_project_id(self):
+        super()._onchange_project_id()
+        if not self.project_id or self.helpdesk_ticket_id.project_id != self.project_id:
+            self.helpdesk_ticket_id = False
 
     def write(self, values):
         if values.get("helpdesk_ticket_id"):
@@ -95,9 +119,9 @@ class AccountAnalyticLine(models.Model):
                 vals_update = {'account_id': ticket.analytic_account_id.id}
                 if ticket.project_id:
                     vals_update['project_id'] = ticket.project_id.id
-                if 'company_id' not in ticket_vals_list:
-                    vals_update['company_id'] = ticket.project_id.company_id.id
                 for vals in ticket_vals_list:
+                    if 'company_id' not in vals:
+                        vals_update['company_id'] = ticket.project_id.company_id.id or ticket.company_id.id
                     vals.update(vals_update)
         return super().create(vals_list)
 
@@ -134,3 +158,15 @@ class AccountAnalyticLine(models.Model):
             **super()._get_new_timesheet_timer_vals(),
             'helpdesk_ticket_id': self.helpdesk_ticket_id.id,
         }
+
+    def _get_last_timesheet_domain(self):
+        return expression.AND([
+            super()._get_last_timesheet_domain(),
+            [('helpdesk_ticket_id', '=', self.helpdesk_ticket_id.id)],
+        ])
+
+    def _get_timesheet_timer_data(self, timer=None):
+        timesheet_timer_data = super()._get_timesheet_timer_data(timer)
+        if 'other_company' not in timesheet_timer_data:
+            timesheet_timer_data['helpdesk_ticket_id'] = self.helpdesk_ticket_id.id
+        return timesheet_timer_data

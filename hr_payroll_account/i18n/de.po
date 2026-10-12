@@ -1,23 +1,23 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* hr_payroll_account
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# Larissa Manderfeld, 2024
-# 
+# Larissa Manderfeld, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:27+0000\n"
+"POT-Creation-Date: 2025-12-29 18:47+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Larissa Manderfeld, 2024\n"
+"Last-Translator: Larissa Manderfeld, 2025\n"
 "Language-Team: German (https://app.transifex.com/odoo/teams/41243/de/)\n"
+"Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: de\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #. module: hr_payroll_account
@@ -30,13 +30,19 @@ msgstr "# Gehaltsabrechnungen"
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_payslip_run_view_form
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_payslip_view_form
 msgid ""
-"<span class=\"o_stat_text\" invisible=\"move_state != 'draft'\">Journal Entry <br/>(Draft)</span>\n"
-"                        <span class=\"o_stat_text\" invisible=\"move_state != 'posted'\">Journal Entry <br/>(Posted)</span>\n"
-"                        <span class=\"o_stat_text\" invisible=\"move_state != 'cancel'\">Journal Entry <br/>(Canceled)</span>"
+"<span class=\"o_stat_text\" invisible=\"move_state != 'draft'\">Journal "
+"Entry <br/>(Draft)</span>\n"
+"                        <span class=\"o_stat_text\" invisible=\"move_state !"
+"= 'posted'\">Journal Entry <br/>(Posted)</span>\n"
+"                        <span class=\"o_stat_text\" invisible=\"move_state !"
+"= 'cancel'\">Journal Entry <br/>(Canceled)</span>"
 msgstr ""
-"<span class=\"o_stat_text\" invisible=\"move_state != 'draft'\">Journalbuchung <br/>(Entwurf)</span>\n"
-"                        <span class=\"o_stat_text\" invisible=\"move_state != 'posted'\">Journalbuchung <br/>(Gebucht)</span>\n"
-"                        <span class=\"o_stat_text\" invisible=\"move_state != 'cancel'\">Journalbuchung <br/>(Storniert)</span>"
+"<span class=\"o_stat_text\" invisible=\"move_state != "
+"'draft'\">Journalbuchung <br/>(Entwurf)</span>\n"
+"                        <span class=\"o_stat_text\" invisible=\"move_state !"
+"= 'posted'\">Journalbuchung <br/>(Gebucht)</span>\n"
+"                        <span class=\"o_stat_text\" invisible=\"move_state !"
+"= 'cancel'\">Journalbuchung <br/>(Storniert)</span>"
 
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.view_move_form_inherit
@@ -174,21 +180,21 @@ msgid ""
 "into a single account move line. This will anonymize the accounting entries "
 "but also disable single payment generations."
 msgstr ""
-"Aktivieren Sie diese Option, um alle Buchungseinträge für denselben Zeitraum"
-" in einer einzigen Kontobuchungszeile zusammenzufassen. Dadurch werden die "
-"Buchungseinträge anonymisiert, aber auch die Generierung von Einzelzahlungen"
-" deaktiviert."
+"Aktivieren Sie diese Option, um alle Buchungseinträge für denselben Zeitraum "
+"in einer einzigen Kontobuchungszeile zusammenzufassen. Dadurch werden die "
+"Buchungseinträge anonymisiert, aber auch die Generierung von Einzelzahlungen "
+"deaktiviert."
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,help:hr_payroll_account.field_hr_salary_rule__split_move_lines
 msgid ""
-"Enable this option to split the accountig entries for this rule according to"
-" the payslip line name. It could be useful for deduction/reimbursement or "
+"Enable this option to split the accountig entries for this rule according to "
+"the payslip line name. It could be useful for deduction/reimbursement or "
 "salary attachments for instance."
 msgstr ""
-"Aktivieren Sie diese Option, um die Buchungen für diese Regel nach dem Namen"
-" der Gehaltsabrechnungszeile aufzuteilen. Dies kann z. B. bei "
-"Abzügen/Erstattungen oder Gehaltspfändungen nützlich sein."
+"Aktivieren Sie diese Option, um die Buchungen für diese Regel nach dem Namen "
+"der Gehaltsabrechnungszeile aufzuteilen. Dies kann z. B. bei Abzügen/"
+"Erstattungen oder Gehaltsabtretungen/-zulagen nützlich sein."
 
 #. module: hr_payroll_account
 #: model_terms:ir.actions.act_window,help:hr_payroll_account.action_res_partner_bank_account_form
@@ -269,12 +275,6 @@ msgstr "Nicht in der Nettoberechnung berücksichtigt"
 msgid "One of the contract for these payslips has no structure type."
 msgstr ""
 "Einer der Verträge für diese Gehaltsabrechnungen hat keinen Strukturtyp."
-
-#. module: hr_payroll_account
-#. odoo-python
-#: code:addons/hr_payroll_account/models/hr_payslip.py:0
-msgid "One of the payroll structures has no account journal defined on it."
-msgstr "In einer der Abrechnungsstrukturen ist kein Kontenjournal definiert."
 
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_account_payment_register
@@ -394,9 +394,9 @@ msgstr "Das Bankkonto des Mitarbeiters ist nicht vertrauenswürdig"
 #. module: hr_payroll_account
 #: model:ir.model.fields,help:hr_payroll_account.field_hr_salary_rule__not_computed_in_net
 msgid ""
-"This field allows you to delete the value of this rule in the \"Net Salary\""
-" rule at the accounting level to explicitly display the value of this rule "
-"in the accounting. For example, if you want to display the value of your "
+"This field allows you to delete the value of this rule in the \"Net Salary\" "
+"rule at the accounting level to explicitly display the value of this rule in "
+"the accounting. For example, if you want to display the value of your "
 "representation fees, you can check this field."
 msgstr ""
 "Mit diesem Feld können Sie den Wert dieser Regel in der „Nettogehalt“-Regel "
@@ -423,7 +423,19 @@ msgstr "Sie können nur Zahlungen für unbezahlte Dokumente registrieren."
 
 #. module: hr_payroll_account
 #. odoo-python
+#: code:addons/hr_payroll_account/models/hr_payslip.py:0
+msgid "You can't create a journal entry for a paid payslip."
+msgstr ""
+"Sie können keine Journalbuchung für eine bezahlte Gehaltsabrechnung "
+"erstellen."
+
+#. module: hr_payroll_account
+#. odoo-python
 #: code:addons/hr_payroll_account/models/account_journal.py:0
 msgid "You cannot delete the journal linked to a Salary Structure"
 msgstr ""
 "Sie können das mit einer Gehaltsstruktur verknüpfte Journal nicht löschen."
+
+#~ msgid "One of the payroll structures has no account journal defined on it."
+#~ msgstr ""
+#~ "In einer der Abrechnungsstrukturen ist kein Kontenjournal definiert."

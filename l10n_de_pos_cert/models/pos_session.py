@@ -2,7 +2,7 @@
 
 from typing import Dict
 
-from odoo import models, fields, _, release
+from odoo import api, fields, models, release, _
 from odoo.tools.float_utils import float_repr
 from odoo.exceptions import UserError
 import uuid
@@ -55,15 +55,13 @@ class PosSession(models.Model):
         orders = self.order_ids.filtered(lambda o: o.state in ['done', 'invoiced'])
         # We don't want to block the user that need to validate his session order in order to create his TSS
         if self.config_id.is_company_country_germany and self.config_id.l10n_de_fiskaly_tss_id and orders:
-            orders = orders.sorted('l10n_de_fiskaly_time_end')
+            orders = orders.sorted('write_date')  # there are possible cases where the end date won't be set
             json = self._l10n_de_create_cash_point_closing_json(orders)
             self._l10n_de_send_fiskaly_cash_point_closing(json)
 
         return res
 
     def _l10n_de_create_cash_point_closing_json(self, orders):
-        vat_definitions = self._l10n_de_fiskaly_get_vat_definitions()
-
         self.env.cr.execute("""
             SELECT pm.is_cash_count, sum(p.amount) AS amount
             FROM pos_payment p
@@ -82,27 +80,77 @@ class PosSession(models.Model):
             else:
                 total_bank = payment['amount']
 
-        self.env.cr.execute("""
-            SELECT account_tax.amount,
-                   sum(pos_order_line.price_subtotal) as excl_vat,
-                   sum(pos_order_line.price_subtotal_incl) as incl_vat
-            FROM pos_order
-            JOIN pos_order_line ON pos_order.id=pos_order_line.order_id
-            JOIN account_tax_pos_order_line_rel ON account_tax_pos_order_line_rel.pos_order_line_id=pos_order_line.id
-            JOIN account_tax ON account_tax_pos_order_line_rel.account_tax_id=account_tax.id
-            WHERE pos_order.session_id=%s
-            GROUP BY account_tax.amount
-        """, [self.id])
-
-        amounts_per_vat_id_result = self.env.cr.dictfetchall()
-
         return self._get_dsfinvk_cash_point_closing_data(**{
             'orders': orders,
             'total_cash': total_cash,
             'total_bank': total_bank,
-            'vat_definitions': vat_definitions,
-            'amounts_per_vat_id': amounts_per_vat_id_result
+            'vat_definitions': False,
+            'amounts_per_vat_id': False,
         })
+
+    def _get_vat_details(self, export_vat_id, incl_vat, excl_vat):
+        precision = self.currency_id.decimal_places
+        return {
+                'vat_definition_export_id': export_vat_id,
+                'incl_vat': float_repr(incl_vat, precision),
+                'excl_vat': float_repr(excl_vat, precision),
+                'vat': float_repr(incl_vat - excl_vat, precision),
+            }
+
+    def get_cash_statement_cases(self, transactions):
+        # Since multiple business cases can occur, we group transactions by their type to clearly differentiate and categorize each
+        precision = self.currency_id.decimal_places
+        summary = {}
+        for txn in transactions:
+            lines = txn.get('data', {}).get('lines', [])
+            for line in lines:
+                business_case = line.get('business_case', {})
+                case_type = business_case.get('type')
+                amounts = business_case.get('amounts_per_vat_id', [])
+
+                if case_type not in summary:
+                    summary[case_type] = []
+
+                for amt in amounts:
+                    vat_id = amt.get('vat_definition_export_id', 5)
+                    # There can be multiple VAT rates under the same case type (e.g., standard sales with both 19% and 7% rates),
+                    # so we need to summarize the data per case type and per VAT rate.
+                    existing_statement_entry = next(
+                        (entry for entry in summary[case_type] if entry.get('vat_definition_export_id') == vat_id),
+                        None
+                    )
+                    if existing_statement_entry:
+                        # Add to existing totals
+                        existing_statement_entry['incl_vat'] = float_repr(float(existing_statement_entry['incl_vat']) + float(amt.get('incl_vat', 0)), precision)
+                        existing_statement_entry['excl_vat'] = float_repr(float(existing_statement_entry['excl_vat']) + float(amt.get('excl_vat', 0)), precision)
+                        existing_statement_entry['vat'] = float_repr(float(existing_statement_entry['vat']) + float(amt.get('vat', 0)), precision)
+                    else:
+                        # Create new statement entry for this vat
+                        summary[case_type].append({
+                            'vat_definition_export_id': vat_id,
+                            'incl_vat': amt.get('incl_vat', '0'),
+                            'excl_vat': amt.get('excl_vat', '0'),
+                            'vat': amt.get('vat', '0'),
+                        })
+
+        # Build final statements directly
+        # This refers to transactions that fall entirely outside the scope of VAT law (UStG) → Nicht steuerbar (Not Taxable) so vat id 5.
+        statements = [
+            {'type': 'Anfangsbestand', 'name': 'Opening Cash', 'amounts_per_vat_id': [self._get_vat_details(5, self.cash_register_balance_start, self.cash_register_balance_start)]},
+            {'type': 'DifferenzSollIst', 'name': 'Cash Discrepancy', 'amounts_per_vat_id': [self._get_vat_details(5, self.cash_register_difference, self.cash_register_difference)]},
+        ]
+
+        for cash_move in self.statement_line_ids.sorted('create_date').filtered(lambda l: not l.is_reconciled):  # remove cash difference line
+            # Need to update here if we update format in _prepareTryCashInOutPayload(), _prepare_account_bank_statement_line_vals()
+            # current structure of name is: {session_name}-{move_type}-{statement_type}-{move_reason}
+            # so if - is in name or reason direct spiltting won't work
+            move_parts = cash_move.payment_ref.removeprefix(self.name).split('-')
+            move_type, statement_type, move_reason = move_parts[1], move_parts[2], "-".join(move_parts[3:])
+            statement_type = (statement_type[0].upper() + statement_type[1:]) if statement_type else ''
+            statements.append({"type": statement_type, "name": f"Cash {move_type} - {move_reason}"[:40], "amounts_per_vat_id": [self._get_vat_details(5, cash_move.amount, cash_move.amount)]})
+        for case_type, vat_summaries in summary.items():
+            statements.append({'type': case_type, 'amounts_per_vat_id': vat_summaries})
+        return statements
 
     def _get_dsfinvk_cash_point_closing_data(
         self,
@@ -117,128 +165,85 @@ class PosSession(models.Model):
         config = self.config_id
         session = self
 
+        precision = self.currency_id.decimal_places
+        transactions = []
+
+        # We need to maintain a sequence of orders per config
+        # if we have total 40 orders 30 in older sessions and 10 in current search_count gives 40, but we need to start from 31
+        # so we need to remove the number of orders of current session to get the length of old orders
+        next_transaction_export_id = self.env['pos.order'].search_count([('config_id', '=', config.id)]) - len(orders)
+        for i, order in enumerate(orders, start=1):
+            buyer = {}
+            if partner := order.partner_id:
+                buyer.update({
+                    'name': f'{partner.name[:50]}',
+                    'buyer_export_id': f'{partner.id}',
+                    'type': 'Kunde' if company.id != partner.company_id.id else 'Mitarbeiter',
+                    'address': {'country_code': COUNTRY_CODE_MAP.get(partner.country_id.code) or 'DEU'},
+                })
+                if street := partner.street:
+                    buyer['address']['street'] = street[:60]
+                if postal_code := partner.zip:
+                    buyer['address']['postal_code'] = postal_code[:10]
+
+            lines_data, payment_types = order._prepare_lines_and_payments()
+            adjusted_order_total = self.currency_id.round(sum(
+                float(amount.get('incl_vat'))
+                for entry in lines_data
+                for amount in entry['business_case'].get('amounts_per_vat_id', [])
+            ))
+            transaction = {
+                'head': {
+                    'tx_id': f'{order.l10n_de_fiskaly_transaction_uuid}',
+                    'transaction_export_id': str(next_transaction_export_id + i),
+                    'closing_client_id': f'{config.l10n_de_fiskaly_client_id}',
+                    'type': 'Beleg',
+                    'storno': False,
+                    'number': order.id,
+                    'timestamp_start': order.l10n_de_fiskaly_time_start and int(order.l10n_de_fiskaly_time_start.timestamp()) or 0,
+                    'timestamp_end': order.l10n_de_fiskaly_time_end and int(order.l10n_de_fiskaly_time_end.timestamp()) or 0,
+                    'user': {
+                        'user_export_id': f'{(order.user_id or order.create_uid).id}',
+                        'name': f'{(order.user_id or order.create_uid).name[:50]}',
+                    },
+                },
+                'data': {
+                    'full_amount_incl_vat': float_repr(adjusted_order_total, precision),
+                    'payment_types': payment_types,
+                    'amounts_per_vat_id': order._l10n_de_amounts_per_vat(),
+                    'lines': lines_data,
+                },
+                # `l10n_de_fiskaly_signature_public_key` is set only when the transaction finishes successfully (no 5xx errors or network issues).
+                'security': {'tss_tx_id': f'{order.l10n_de_fiskaly_transaction_uuid}'} if order.l10n_de_fiskaly_signature_public_key else {'error_message': 'Error while reaching TSS may be due to network issues or TSS unavailability.'},
+            }
+            if buyer:
+                transaction['head']['buyer'] = buyer
+            transactions.append(transaction)
+
         return {
             "client_id": config.l10n_de_fiskaly_client_id,
             "cash_point_closing_export_id": session.id,
             "head": {
                 "export_creation_date": int(session.write_date.timestamp()),
-                "first_transaction_export_id": f"{orders[0].id}",
-                "last_transaction_export_id": f"{orders[-1].id}",
+                "first_transaction_export_id": "1",  # default to 1 for each session
+                "last_transaction_export_id": f"{len(orders)}",  # number of orders in the session
             },
-            "cash_statement": {
-                "business_cases": [
-                    {
-                        "type": "Umsatz",
-                        "amounts_per_vat_id": [
-                            {
-                                "vat_definition_export_id": vat_definitions[a["amount"]],
-                                "incl_vat": float_repr(a["incl_vat"], 5),
-                                "excl_vat": float_repr(a["excl_vat"], 5),
-                                "vat": float_repr(a["incl_vat"] - a["excl_vat"], 5),
-                            }
-                            for a in amounts_per_vat_id
-                        ],
-                    }
-                ],
-                "payment": {
-                    "full_amount": float_repr(total_cash + total_bank, 5),
-                    "cash_amount": float_repr(total_cash, 5),
-                    "cash_amounts_by_currency": [
-                        {"currency_code": "EUR", "amount": float_repr(total_cash, 5)}
+            'cash_statement': {
+                'business_cases': self.get_cash_statement_cases(transactions),
+                'payment': {
+                    'full_amount': float_repr(total_cash + total_bank, precision),
+                    'cash_amount': float_repr(total_cash, precision),
+                    'cash_amounts_by_currency': [
+                        {'currency_code': 'EUR', 'amount': float_repr(total_cash, precision)}
                     ],
                     "payment_types":
-                        ([{"type": "Bar", "currency_code": "EUR", "amount": float_repr(total_cash, 5)}]
+                        ([{"type": "Bar", "currency_code": "EUR", "amount": float_repr(total_cash, precision)}]
                             if total_cash or not total_bank else []) +
-                        ([{"type": "Unbar", "currency_code": "EUR", "amount": float_repr(total_bank, 5)}]
+                        ([{"type": "Unbar", "currency_code": "EUR", "amount": float_repr(total_bank, precision)}]
                             if total_bank else [])
                 }
             },
-            "transactions": [
-                {
-                    "head": {
-                        "tx_id": f"{o.l10n_de_fiskaly_transaction_uuid}",
-                        "transaction_export_id": f"{o.id}",
-                        "closing_client_id": f"{config.l10n_de_fiskaly_client_id}",
-                        "type": "Beleg",
-                        "storno": False,
-                        "number": o.id,
-                        "timestamp_start": int(o.l10n_de_fiskaly_time_start.timestamp()),
-                        "timestamp_end": int(o.l10n_de_fiskaly_time_end.timestamp()),
-                        "user": {"user_export_id": f"{o.user_id.id}", "name": f"{o.user_id.name[:50]}"},
-                        "buyer": {
-                            "name": f"{o.partner_id.name[:50]}",
-                            "buyer_export_id": f"{o.partner_id.id}",
-                            "type": "Kunde"
-                            if company.id != o.partner_id.company_id.id
-                            else "Mitarbeiter",
-                            **({
-                                    "address": {
-                                        **({"street": f"{o.partner_id.street}"} if o.partner_id.street else {}),
-                                        **({"postal_code": f"{o.partner_id.zip}"} if o.partner_id.zip else {}),
-                                        **({"country_code": f"{COUNTRY_CODE_MAP.get(o.partner_id.country_id.code)}"} if COUNTRY_CODE_MAP.get(o.partner_id.country_id.code) else {}),
-                                    }
-                                }
-                                if o.amount_total > 200
-                                else {}
-                            ),
-                        }
-                        if o.partner_id
-                        else {"name": "Customer", "buyer_export_id": "null", "type": "Kunde"},
-                    },
-                    "data": {
-                        "full_amount_incl_vat": float_repr(o.amount_total, 5),
-                        "payment_types": [
-                            {
-                                "type": f"{p['type']}",
-                                "currency_code": "EUR",
-                                "amount": float_repr(p["amount"], 5),
-                            }
-                            for p in o._l10n_de_payment_types()
-                        ],
-                        "amounts_per_vat_id": [
-                            {
-                                "vat_definition_export_id": vat_definitions[a["amount"]],
-                                "incl_vat": float_repr(a["incl_vat"], 5),
-                                "excl_vat": float_repr(a["excl_vat"], 5),
-                                "vat": float_repr(a["incl_vat"] - a["excl_vat"], 5),
-                            }
-                            for a in o._l10n_de_amounts_per_vat()
-                        ],
-                        "lines": [
-                            {
-                                "business_case": {
-                                    "type": "Umsatz",
-                                    "amounts_per_vat_id": [
-                                        {
-                                            "vat_definition_export_id": vat_definitions[
-                                                l.tax_ids[0].amount
-                                            ],
-                                            "incl_vat": float_repr(l.price_subtotal_incl, 5),
-                                            "excl_vat": float_repr(l.price_subtotal, 5),
-                                            "vat": float_repr(
-                                                l.price_subtotal_incl - l.price_subtotal, 5
-                                            ),
-                                        }
-                                    ],
-                                },
-                                "lineitem_export_id": f"{l.id}",
-                                "storno": False,
-                                "text": f"{l.product_id.product_tmpl_id.name}",
-                                "item": {
-                                    "number": f"{l.product_id.id}",
-                                    "quantity": float_repr(l.qty, 3),
-                                    "price_per_unit": float_repr(l.price_unit, 5)
-                                    if l.qty == 0
-                                    else float_repr(l.price_subtotal_incl / l.qty, 5),
-                                },
-                            }
-                            for l in o.lines
-                        ],
-                    },
-                    "security": {"tss_tx_id": f"{o.l10n_de_fiskaly_transaction_uuid}"},
-                }
-                for o in orders
-            ],
+            'transactions': transactions,
         }
 
     def _l10n_de_send_fiskaly_cash_point_closing(self, json):
@@ -267,7 +272,15 @@ class PosSession(models.Model):
 
         self.company_id._l10n_de_fiskaly_dsfinvk_rpc('PUT', '/cash_registers/%s' % self.config_id.l10n_de_fiskaly_client_id, json)
 
+    @api.model
+    def _load_pos_data_models(self, config_id):
+        data = super()._load_pos_data_models(config_id)
+        if self.env.company.l10n_de_is_germany_and_fiskaly():
+            data += ['account.journal']
+        return data
+
     def _l10n_de_fiskaly_get_vat_definitions(self):
+        # This function's functionality is handled in l10n_de_update_vat_export_data method of company, so it's not used anymore.
         vat_definitions_resp = self.company_id._l10n_de_fiskaly_dsfinvk_rpc('GET', '/vat_definitions')
         vat_definitions = {}
         for vat in vat_definitions_resp.json()['data']:

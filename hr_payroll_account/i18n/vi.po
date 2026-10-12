@@ -1,22 +1,23 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* hr_payroll_account
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Thi Huong Nguyen, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:27+0000\n"
+"POT-Creation-Date: 2025-12-29 18:47+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
+"Last-Translator: Thi Huong Nguyen, 2025\n"
 "Language-Team: Vietnamese (https://app.transifex.com/odoo/teams/41243/vi/)\n"
+"Language: vi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: vi\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. module: hr_payroll_account
@@ -29,13 +30,19 @@ msgstr "# phiếu lương"
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_payslip_run_view_form
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_payslip_view_form
 msgid ""
-"<span class=\"o_stat_text\" invisible=\"move_state != 'draft'\">Journal Entry <br/>(Draft)</span>\n"
-"                        <span class=\"o_stat_text\" invisible=\"move_state != 'posted'\">Journal Entry <br/>(Posted)</span>\n"
-"                        <span class=\"o_stat_text\" invisible=\"move_state != 'cancel'\">Journal Entry <br/>(Canceled)</span>"
+"<span class=\"o_stat_text\" invisible=\"move_state != 'draft'\">Journal "
+"Entry <br/>(Draft)</span>\n"
+"                        <span class=\"o_stat_text\" invisible=\"move_state !"
+"= 'posted'\">Journal Entry <br/>(Posted)</span>\n"
+"                        <span class=\"o_stat_text\" invisible=\"move_state !"
+"= 'cancel'\">Journal Entry <br/>(Canceled)</span>"
 msgstr ""
-"<span class=\"o_stat_text\" invisible=\"move_state != 'draft'\">Bút toán <br/>(Nháp)</span>\n"
-"                        <span class=\"o_stat_text\" invisible=\"move_state != 'posted'\">Bút toán <br/>(Đã ghi sổ)</span>\n"
-"                        <span class=\"o_stat_text\" invisible=\"move_state != 'cancel'\">Bút toán <br/>(Đã huỷ)</span>"
+"<span class=\"o_stat_text\" invisible=\"move_state != 'draft'\">Bút toán <br/"
+">(Nháp)</span>\n"
+"                        <span class=\"o_stat_text\" invisible=\"move_state !"
+"= 'posted'\">Bút toán <br/>(Đã ghi sổ)</span>\n"
+"                        <span class=\"o_stat_text\" invisible=\"move_state !"
+"= 'cancel'\">Bút toán <br/>(Đã huỷ)</span>"
 
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.view_move_form_inherit
@@ -93,14 +100,14 @@ msgstr "Tài khoản ngân hàng"
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.res_config_settings_view_form
 msgid "Batch Account Move Lines"
-msgstr "Dòng bút toán kế toán hàng loạt"
+msgstr "Dòng bút toán kế toán theo lô"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_payslip__batch_payroll_move_lines
 #: model:ir.model.fields,field_description:hr_payroll_account.field_res_company__batch_payroll_move_lines
 #: model:ir.model.fields,field_description:hr_payroll_account.field_res_config_settings__batch_payroll_move_lines
 msgid "Batch Payroll Move Lines"
-msgstr "Dòng bút toán bảng lương hàng loạt"
+msgstr "Dòng bút toán bảng lương theo lô"
 
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_res_company
@@ -180,8 +187,8 @@ msgstr ""
 #. module: hr_payroll_account
 #: model:ir.model.fields,help:hr_payroll_account.field_hr_salary_rule__split_move_lines
 msgid ""
-"Enable this option to split the accountig entries for this rule according to"
-" the payslip line name. It could be useful for deduction/reimbursement or "
+"Enable this option to split the accountig entries for this rule according to "
+"the payslip line name. It could be useful for deduction/reimbursement or "
 "salary attachments for instance."
 msgstr ""
 "Bật tùy chọn này để tách các bút toán kế toán cho quy tắc này theo tên dòng "
@@ -205,7 +212,7 @@ msgstr "HR Payroll Payment Report Wizard"
 #: model:ir.model.fields,field_description:hr_payroll_account.field_account_setup_bank_manual_config__has_alt_bank_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_res_partner_bank__has_alt_bank_account
 msgid "Has Alt Bank Account"
-msgstr ""
+msgstr "Có tài khoản ngân hàng thay thế"
 
 #. module: hr_payroll_account
 #. odoo-python
@@ -250,7 +257,7 @@ msgstr "Dịch chuyển"
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_payslip_run__move_state
 msgid "Move State"
-msgstr ""
+msgstr "Move State"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_salary_rule__not_computed_in_net
@@ -262,13 +269,6 @@ msgstr "Không được tính toán trong kế toán ròng"
 #: code:addons/hr_payroll_account/models/hr_payslip.py:0
 msgid "One of the contract for these payslips has no structure type."
 msgstr "Một hợp đồng của các phiếu lương này không có loại cấu trúc."
-
-#. module: hr_payroll_account
-#. odoo-python
-#: code:addons/hr_payroll_account/models/hr_payslip.py:0
-msgid "One of the payroll structures has no account journal defined on it."
-msgstr ""
-"Một trong những cấu trúc bảng lương không có sổ kế toán được xác định."
 
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_account_payment_register
@@ -350,8 +350,8 @@ msgid ""
 "line in the journal entry."
 msgstr ""
 "Các thẻ được gán cho dòng này sẽ ảnh hưởng đến báo cáo tài chính khi được "
-"dịch sang bút toán kế toán. Chúng sẽ được áp dụng trên dòng tài khoản ghi có"
-" trong bút toán."
+"dịch sang bút toán kế toán. Chúng sẽ được áp dụng trên dòng tài khoản ghi có "
+"trong bút toán."
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,help:hr_payroll_account.field_hr_payslip_line__debit_tag_ids
@@ -362,8 +362,8 @@ msgid ""
 "line in the journal entry."
 msgstr ""
 "Các thẻ được gán cho dòng này sẽ ảnh hưởng đến báo cáo tài chính khi được "
-"dịch sang bút toán kế toán. Chúng sẽ được áp dụng trên dòng tài khoản ghi nợ"
-" trong bút toán."
+"dịch sang bút toán kế toán. Chúng sẽ được áp dụng trên dòng tài khoản ghi nợ "
+"trong bút toán."
 
 #. module: hr_payroll_account
 #. odoo-python
@@ -387,20 +387,20 @@ msgstr "Tài khoản ngân hàng của nhân viên không đáng tin cậy"
 #. module: hr_payroll_account
 #: model:ir.model.fields,help:hr_payroll_account.field_hr_salary_rule__not_computed_in_net
 msgid ""
-"This field allows you to delete the value of this rule in the \"Net Salary\""
-" rule at the accounting level to explicitly display the value of this rule "
-"in the accounting. For example, if you want to display the value of your "
+"This field allows you to delete the value of this rule in the \"Net Salary\" "
+"rule at the accounting level to explicitly display the value of this rule in "
+"the accounting. For example, if you want to display the value of your "
 "representation fees, you can check this field."
 msgstr ""
 "Trường này cho phép bạn xóa giá trị của quy tắc này trong quy tắc \"Lương "
-"ròng\" ở cấp độ kế toán để hiển thị rõ ràng giá trị của quy tắc này trong kế"
-" toán. Ví dụ, nếu bạn muốn hiển thị giá trị của phí đại điện của bạn, bạn có"
-" thể chọn trường này."
+"ròng\" ở cấp độ kế toán để hiển thị rõ ràng giá trị của quy tắc này trong kế "
+"toán. Ví dụ, nếu bạn muốn hiển thị giá trị của phí đại điện của bạn, bạn có "
+"thể chọn trường này."
 
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.view_partner_bank_form_inherit_hr_payroll_account
 msgid "This will replace the employee existing bank account."
-msgstr ""
+msgstr "Tài khoản này sẽ thay thế tài khoản ngân hàng hiện tại của nhân viên."
 
 #. module: hr_payroll_account
 #. odoo-python
@@ -412,10 +412,20 @@ msgstr "Bạn chỉ có thể ghi nhận thanh toán cho các bút toán đã v�
 #. odoo-python
 #: code:addons/hr_payroll_account/models/hr_payslip.py:0
 msgid "You can only register payments for unpaid documents."
-msgstr ""
+msgstr "Bạn chỉ có thể ghi nhận thanh toán cho các chứng từ chưa thanh toán."
+
+#. module: hr_payroll_account
+#. odoo-python
+#: code:addons/hr_payroll_account/models/hr_payslip.py:0
+msgid "You can't create a journal entry for a paid payslip."
+msgstr "Bạn không thể tạo một bút toán cho phiếu lương đã được thanh toán"
 
 #. module: hr_payroll_account
 #. odoo-python
 #: code:addons/hr_payroll_account/models/account_journal.py:0
 msgid "You cannot delete the journal linked to a Salary Structure"
 msgstr "Bạn không thể xóa sổ nhật ký liên kết với Cấu trúc lương"
+
+#~ msgid "One of the payroll structures has no account journal defined on it."
+#~ msgstr ""
+#~ "Một trong những cấu trúc bảng lương không có sổ kế toán được xác định."

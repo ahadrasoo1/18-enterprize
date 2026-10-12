@@ -43,7 +43,7 @@ class TestSaleAvalaraBr(TestAvalaraBrCommon):
             self.product_expenses,
             self.product_invoicing,
         )
-        order = self.env['sale.order'].create({
+        order = self.env['sale.order'].sudo().create({
             'partner_id': self.partner.id,
             'fiscal_position_id': self.fp_avatax.id,
             'date_order': '2021-01-01',

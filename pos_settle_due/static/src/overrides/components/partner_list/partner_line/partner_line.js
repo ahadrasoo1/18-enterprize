@@ -14,4 +14,11 @@ patch(PartnerLine.prototype, {
         this.props.close();
         this.pos.settleCustomerDue(this.props.partner);
     },
+    payLaterPaymentExists() {
+        return this.pos.models["pos.payment.method"].some(
+            (pm) =>
+                this.pos.config.payment_method_ids.some((m) => m.id === pm.id) &&
+                pm.type === "pay_later"
+        );
+    },
 });

@@ -62,6 +62,14 @@ class Frontdesk(models.Model):
     is_favorite = fields.Boolean()
     active = fields.Boolean(default=True)
 
+    @api.onchange('company_id')
+    def _onchange_company_id(self):
+        """ Ensure that the public user has access to the selected company. """
+        if self.company_id and self.company_id != self.env.company:
+            public_user = self.env.ref('base.public_user')
+            if self.company_id not in public_user.company_ids:
+                public_user.company_ids = [(4, self.company_id.id)]
+
     def _compute_dashboard_data(self):
         """ This method computes the number of guests currently on site, the number of pending visitors, the number
         of drinks to serve, and the time of the latest check-in. """
@@ -100,14 +108,21 @@ class Frontdesk(models.Model):
     @api.depends('access_token')
     def _compute_kiosk_url(self):
         for frontdesk in self:
-            frontdesk.kiosk_url = url_join(frontdesk.get_base_url(), '/kiosk/%s/%s' % (frontdesk.id, frontdesk.access_token))
+            frontdesk.kiosk_url = url_join(self.env['frontdesk.frontdesk'].get_base_url(), '/kiosk/%s/%s' % (frontdesk.id, frontdesk.access_token))
 
     def action_open_kiosk(self):
         self.ensure_one()
         return {
             'type': 'ir.actions.act_url',
             'url': self.kiosk_url,
-            'target': 'new',
+            'target': 'self',
+        }
+
+    def install_kiosk(self):
+        return {
+            "type": "ir.actions.act_url",
+            "url": f"/scoped_app?app_id=frontdesk&path=kiosk/{self.id}/{self.access_token}",
+            "target": "new",
         }
 
     def action_open_visitors(self):

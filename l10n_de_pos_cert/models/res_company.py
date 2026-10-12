@@ -1,11 +1,12 @@
-# -*- coding: utf-8 -*-
+# Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import models, fields, _, api
+import json
+import requests
+from urllib.parse import urljoin
+from requests.exceptions import ConnectTimeout
+from odoo import api, fields, models, _
 from odoo.addons.iap import jsonrpc
 from odoo.exceptions import ValidationError, UserError
-import requests
-from requests.exceptions import ConnectTimeout
-from urllib.parse import urljoin
 
 DEFAULT_ENDPOINT = 'https://l10n-de-pos.api.odoo.com/api/l10n_de_pos'
 
@@ -187,6 +188,7 @@ class ResCompany(models.Model):
                         'l10n_de_fiskaly_api_key': response['api_key'],
                         'l10n_de_fiskaly_api_secret': response['api_secret'],
                     })
+                    self.l10n_de_update_vat_export_data()
                 else:   # the request to create credentials failed but the company was still well registered
                     self.l10n_de_fiskaly_organization_id = response['organization_id']
 
@@ -199,3 +201,15 @@ class ResCompany(models.Model):
             'l10n_de_fiskaly_api_key': response['api_key'],
             'l10n_de_fiskaly_api_secret': response['api_secret'],
         })
+        if not self.get_vat_mapping_json():
+            self.l10n_de_update_vat_export_data()
+
+    def l10n_de_update_vat_export_data(self):
+        """Fetch and update the VAT definition export IDs for the company's taxes from Fiskaly."""
+        self.ensure_one()
+        vat_response = self._l10n_de_fiskaly_dsfinvk_rpc('GET', '/vat_definitions')
+        if vat_response.status_code == 200:
+            self.env['ir.config_parameter'].sudo().set_param('l10n_de_pos.vat_mapping_json', json.dumps(vat_response.json().get("data", [])))
+
+    def get_vat_mapping_json(self):
+        return self.env['ir.config_parameter'].sudo().get_param('l10n_de_pos.vat_mapping_json', '').strip()

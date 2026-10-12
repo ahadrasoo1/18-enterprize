@@ -33,6 +33,7 @@ class AgedPartnerBalanceCustomHandler(models.AbstractModel):
 
         options['multi_currency'] = report.env.user.has_group('base.group_multi_currency')
         options['show_currency'] = options['multi_currency'] and (previous_options or {}).get('show_currency', False)
+        options['no_xlsx_currency_code_columns'] = True
         if not options['show_currency']:
             hidden_columns.update(['amount_currency', 'currency'])
 
@@ -158,8 +159,9 @@ class AgedPartnerBalanceCustomHandler(models.AbstractModel):
 
         always_present_groupby = SQL("period_table.period_index")
         if current_groupby:
-            select_from_groupby = SQL("%s AS grouping_key,", SQL.identifier("account_move_line", current_groupby))
-            groupby_clause = SQL("%s, %s", SQL.identifier("account_move_line", current_groupby), always_present_groupby)
+            groupby_field_sql = self.env['account.move.line']._field_to_sql("account_move_line", current_groupby, query)
+            select_from_groupby = SQL("%s AS grouping_key,", groupby_field_sql)
+            groupby_clause = SQL("%s, %s", groupby_field_sql, always_present_groupby)
         else:
             select_from_groupby = SQL()
             groupby_clause = always_present_groupby
@@ -194,7 +196,7 @@ class AgedPartnerBalanceCustomHandler(models.AbstractModel):
                 ) AS amount_currency,
                 ARRAY_AGG(DISTINCT account_move_line.partner_id) AS partner_id,
                 ARRAY_AGG(account_move_line.payment_id) AS payment_id,
-                ARRAY_AGG(DISTINCT move.invoice_date) AS invoice_date,
+                ARRAY_AGG(DISTINCT account_move_line.invoice_date) AS invoice_date,
                 ARRAY_AGG(DISTINCT COALESCE(account_move_line.%(aging_date_field)s, account_move_line.date)) AS report_date,
                 ARRAY_AGG(DISTINCT %(account_code)s) AS account_name,
                 ARRAY_AGG(DISTINCT COALESCE(account_move_line.%(aging_date_field)s, account_move_line.date)) AS due_date,
@@ -206,7 +208,6 @@ class AgedPartnerBalanceCustomHandler(models.AbstractModel):
             FROM %(table_references)s
 
             JOIN account_journal journal ON journal.id = account_move_line.journal_id
-            JOIN account_move move ON move.id = account_move_line.move_id
             %(currency_table_join)s
 
             LEFT JOIN LATERAL (
@@ -247,6 +248,9 @@ class AgedPartnerBalanceCustomHandler(models.AbstractModel):
             HAVING
                 ROUND(SUM(%(having_debit)s), %(currency_precision)s) != 0
                 OR ROUND(SUM(%(having_credit)s), %(currency_precision)s) != 0
+
+            ORDER BY %(groupby_clause)s
+
             %(tail_query)s
             """,
             account_code=account_code,
@@ -260,8 +264,8 @@ class AgedPartnerBalanceCustomHandler(models.AbstractModel):
             date_to=date_to,
             search_condition=query.where_clause,
             groupby_clause=groupby_clause,
-            having_debit=report._currency_table_apply_rate(SQL("account_move_line.debit - COALESCE(part_debit.amount, 0)")),
-            having_credit=report._currency_table_apply_rate(SQL("account_move_line.credit - COALESCE(part_credit.amount, 0)")),
+            having_debit=report._currency_table_apply_rate(SQL("CASE WHEN account_move_line.balance > 0  THEN account_move_line.balance else 0 END - COALESCE(part_debit.amount, 0)")),
+            having_credit=report._currency_table_apply_rate(SQL("CASE WHEN account_move_line.balance < 0  THEN -account_move_line.balance else 0 END - COALESCE(part_credit.amount, 0)")),
             currency_precision=self.env.company.currency_id.decimal_places,
             tail_query=tail_query,
         )
@@ -292,9 +296,11 @@ class AgedPartnerBalanceCustomHandler(models.AbstractModel):
         action.get('context', {}).update({'search_default_group_by_account': 0, 'search_default_group_by_partner': 1})
         return action
 
-    def open_partner_ledger(self, options, params):
+    def open_customer_statement(self, options, params):
         report = self.env['account.report'].browse(options['report_id'])
         record_model, record_id = report._get_model_info_from_id(params.get('line_id'))
+        if self.env.ref('account_reports.customer_statement_report', raise_if_not_found=False):
+            return self.env[record_model].browse(record_id).open_customer_statement()
         return self.env[record_model].browse(record_id).open_partner_ledger()
 
     def _common_custom_unfold_all_batch_data_generator(self, internal_type, report, options, lines_to_expand_by_function):
@@ -382,14 +388,26 @@ class AgedPartnerBalanceCustomHandler(models.AbstractModel):
         if period != "total" and period[-1].isdigit():
             period_number = int(period[-1])
             if period_number == 0:
-                domain = [('date_maturity', '>=', options['date']['date_to'])]
+                domain = [
+                    '|',
+                    ('date_maturity', '>=', options['date']['date_to']),
+                    '&', ('date_maturity', '=', False), ('date', '>=', options['date']['date_to']),
+                ]
             else:
                 options_date_to = datetime.datetime.strptime(options['date']['date_to'], '%Y-%m-%d')
                 period_end = options_date_to - datetime.timedelta(30*(period_number-1)+1)
                 period_start = options_date_to - datetime.timedelta(30*(period_number))
-                domain = [('date_maturity', '>=', period_start), ('date_maturity', '<=', period_end)]
+                domain = [
+                        '|',
+                        '&', ('date_maturity', '>=', period_start), ('date_maturity', '<=', period_end),
+                        '&', '&', ('date_maturity', '=', False), ('date', '>=', period_start), ('date', '<=', period_end),
+                    ]
                 if period_number == 5:
-                    domain = [('date_maturity', '<=', period_end)]
+                    domain = [
+                        '|',
+                        ('date_maturity', '<=', period_end),
+                        '&', ('date_maturity', '=', False), ('date', '<=', period_end),
+                    ]
         else:
             domain = []
         return domain

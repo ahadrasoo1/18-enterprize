@@ -1,10 +1,11 @@
-import { Component } from "@odoo/owl";
+import { Component, onWillStart } from "@odoo/owl";
 import { ChatGPTPromptDialog } from "@html_editor/main/chatgpt/chatgpt_prompt_dialog";
 import { parseHTML } from "@html_editor/utils/html";
 import { ArticleTemplatePickerDialog } from "@knowledge/components/article_template_picker_dialog/article_template_picker_dialog";
 import { ItemCalendarPropsDialog } from "@knowledge/components/item_calendar_props_dialog/item_calendar_props_dialog";
 import { PromptEmbeddedViewNameDialog } from "@knowledge/components/prompt_embedded_view_name_dialog/prompt_embedded_view_name_dialog";
 import { _t } from "@web/core/l10n/translation";
+import { user } from "@web/core/user";
 import { renderToFragment } from "@web/core/utils/render";
 import { useService } from "@web/core/utils/hooks";
 
@@ -20,6 +21,9 @@ export class WysiwygArticleHelper extends Component {
         this.actionService = useService("action");
         this.dialogService = useService("dialog");
         this.orm = useService("orm");
+        onWillStart(async () => {
+            this.isPortalUser = await user.hasGroup("base.group_portal");
+        });
     }
 
     onLoadTemplateBtnClick() {
@@ -37,8 +41,8 @@ export class WysiwygArticleHelper extends Component {
                 this.props.editor.editable.replaceChildren(
                     parseHTML(this.props.editor.document, body)
                 );
-                this.props.editor.shared.setCursorEnd(this.props.editor.editable);
-                this.props.editor.dispatch("ADD_STEP");
+                this.props.editor.shared.selection.setCursorEnd(this.props.editor.editable);
+                this.props.editor.shared.history.addStep();
                 // TODO: apply_template could return all modified values on the current
                 // article and record.update would reload related components
                 await this.actionService.doAction(
@@ -81,8 +85,8 @@ export class WysiwygArticleHelper extends Component {
                     title,
                 });
                 this.props.editor.editable.replaceChildren(...fragment.children);
-                this.props.editor.shared.setCursorEnd(this.props.editor.editable);
-                this.props.editor.dispatch("ADD_STEP");
+                this.props.editor.shared.selection.setCursorEnd(this.props.editor.editable);
+                this.props.editor.shared.history.addStep();
                 this.props.record.update({ name: title });
             },
         });
@@ -119,8 +123,8 @@ export class WysiwygArticleHelper extends Component {
                     title,
                 });
                 this.props.editor.editable.replaceChildren(...fragment.children);
-                this.props.editor.shared.setCursorEnd(this.props.editor.editable);
-                this.props.editor.dispatch("ADD_STEP");
+                this.props.editor.shared.selection.setCursorEnd(this.props.editor.editable);
+                this.props.editor.shared.history.addStep();
                 this.props.record.update({ name: title });
             },
         });
@@ -153,8 +157,8 @@ export class WysiwygArticleHelper extends Component {
                     title,
                 });
                 this.props.editor.editable.replaceChildren(...fragment.children);
-                this.props.editor.shared.setCursorEnd(this.props.editor.editable);
-                this.props.editor.dispatch("ADD_STEP");
+                this.props.editor.shared.selection.setCursorEnd(this.props.editor.editable);
+                this.props.editor.shared.history.addStep();
                 this.props.record.update({ name: title });
             },
         });
@@ -163,6 +167,7 @@ export class WysiwygArticleHelper extends Component {
     onGenerateArticleClick() {
         this.dialogService.add(ChatGPTPromptDialog, {
             initialPrompt: _t("Write an article about"),
+            baseContainer: "P",
             insert: (fragment) => {
                 const generatedContentTitle = fragment.querySelector("h1,h2");
                 const articleTitle = this.props.editor.document.createElement("h1");
@@ -175,8 +180,8 @@ export class WysiwygArticleHelper extends Component {
                     fragment.prepend(articleTitle);
                 }
                 this.props.editor.editable.replaceChildren(...fragment.children);
-                this.props.editor.shared.setCursorEnd(this.props.editor.editable);
-                this.props.editor.dispatch("ADD_STEP");
+                this.props.editor.shared.selection.setCursorEnd(this.props.editor.editable);
+                this.props.editor.shared.history.addStep();
             },
             sanitize: (fragment) => {
                 return DOMPurify.sanitize(fragment, {

@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, test } from "@odoo/hoot";
 import { click, queryAll } from "@odoo/hoot-dom";
 import { animationFrame } from "@odoo/hoot-mock";
 import {
+    contains,
     defineModels,
     fields,
     getDropdownMenu,
@@ -48,7 +49,7 @@ test("add custom field button with other optional columns - studio not installed
     onRpc("search_read", ({ model }) => {
         if (model === "ir.module.module") {
             expect.step("studio_module_id");
-            return Promise.resolve([{ id: 42 }]);
+            return [{ id: 42 }];
         }
     });
     onRpc("button_immediate_install", ({ model, args }) => {
@@ -104,7 +105,7 @@ test("add custom field button without other optional columns - studio not instal
     onRpc("search_read", ({ model }) => {
         if (model === "ir.module.module") {
             expect.step("studio_module_id");
-            return Promise.resolve([{ id: 42 }]);
+            return [{ id: 42 }];
         }
     });
     onRpc("button_immediate_install", ({ model, args }) => {
@@ -218,6 +219,46 @@ test("add custom field button not shown with invalid action", async () => {
     expect(".o_optional_columns_dropdown_toggle").toHaveCount(0);
 });
 
+test("add custom field button not shown with bank statement line model", async () => {
+    class AccountBankStatementLine extends models.Model {
+        name = fields.Char();
+        _views = {
+            kanban: `
+                <kanban>
+                    <template>
+                        <t t-name="card">
+                            <field name="display_name"/>
+                        </t>
+                    </template>
+                </kanban>
+            `,
+            list: `<list><field name="display_name" /> <field name="name" optional="1" /></list>`,
+        };
+    }
+    defineModels([AccountBankStatementLine]);
+
+    expect.assertions(3);
+
+    await mountWithCleanup(WebClientEnterprise);
+    await animationFrame();
+
+    await getService("action").doAction({
+        xml_id: "test",
+        id: 1312,
+        name: "test",
+        res_id: 1,
+        res_model: "account.bank.statement.line",
+        type: "ir.actions.act_window",
+        views: [[false, "kanban"], [false, "list"]],
+    });
+
+    expect("button.o_switch_view.o_list[data-tooltip='List']").toHaveCount(1);
+    await contains("button.o_switch_view.o_list[data-tooltip='List']").click();
+    expect(".o_list_renderer .o_list_controller button.dropdown-toggle").toHaveCount(1);
+    await contains(".o_list_renderer .o_list_controller button.dropdown-toggle").click();
+    expect(".dropdown-item-studio").toHaveCount(0);
+});
+
 test("x2many should not be editable", async () => {
     class Bar extends models.Model {}
     defineModels([Bar]);
@@ -255,8 +296,7 @@ test("upsell studio feature is not polluted by another view", async () => {
         name = fields.Char();
 
         _views = {
-            "list,false": `<list><field name="display_name" /> <field name="name" optional="1" /></list>`,
-            "search,false": `<search />`,
+            list: `<list><field name="display_name" /> <field name="name" optional="1" /></list>`,
         };
     }
 

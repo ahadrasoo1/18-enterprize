@@ -15,3 +15,10 @@ class IrQWeb(models.AbstractModel):
                 if k in values:
                     del values[k]
         return super()._prepare_environment(values)
+
+    def _get_bundles_to_pregenarate(self):
+        js_assets, css_assets = super()._get_bundles_to_pregenarate()
+        assets = {
+            'web_studio.studio_assets',
+        }
+        return (js_assets | assets, css_assets | assets)

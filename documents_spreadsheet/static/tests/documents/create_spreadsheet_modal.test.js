@@ -1,8 +1,11 @@
-import { defineDocumentSpreadsheetModels } from "@documents_spreadsheet/../tests/helpers/data";
-import { getEnrichedSearchArch } from "@documents_spreadsheet/../tests/helpers/document_helpers";
+import {
+    defineDocumentSpreadsheetModels,
+    getDocumentBasicData,
+} from "@documents_spreadsheet/../tests/helpers/data";
+import { getEnrichedSearchArch } from "@documents/../tests/helpers/views/search";
 import { mockActionService } from "@documents_spreadsheet/../tests/helpers/spreadsheet_test_utils";
 import { describe, expect, test } from "@odoo/hoot";
-import { click, dblclick, queryFirst } from "@odoo/hoot-dom";
+import { click, dblclick, queryFirst, select } from "@odoo/hoot-dom";
 import { animationFrame } from "@odoo/hoot-mock";
 import { makeDocumentsSpreadsheetMockEnv } from "@documents_spreadsheet/../tests/helpers/model";
 import { contains, mountView } from "@web/../tests/web_test_helpers";
@@ -18,6 +21,7 @@ const kanbanArch = /* xml */ `
             <field name="access_token"/>
             <field name="mimetype"/>
             <field name="folder_id"/>
+            <field name="owner_id"/>
             <field name="active"/>
             <field name="type"/>
             <field name="attachment_id"/>
@@ -39,33 +43,6 @@ const TEST_TEMPLATES = [
     { id: 11, name: "Template 11", spreadsheet_data: "{}" },
     { id: 12, name: "Template 12", spreadsheet_data: "{}" },
 ];
-
-function getDocumentBasicData(views = {}) {
-    const models = {};
-    models["mail.alias"] = { records: [{ alias_name: "hazard@rmcf.es", id: 1 }] };
-    models["documents.document"] = {
-        records: [
-            {
-                name: "Workspace1",
-                alias_id: 1,
-                description: "Workspace",
-                type: "folder",
-                id: 1,
-                available_embedded_actions_ids: [],
-            },
-        ],
-    };
-    models["spreadsheet.template"] = {
-        records: [
-            { id: 1, name: "Template 1", spreadsheet_data: "{}" },
-            { id: 2, name: "Template 2", spreadsheet_data: "{}" },
-        ],
-    };
-    return {
-        models,
-        views,
-    };
-}
 
 /**
  * @typedef InitArgs
@@ -99,8 +76,8 @@ async function initTestEnvWithBlankSpreadsheet(params = {}) {
     serverData.models["documents.document"] = {
         records: [
             {
-                name: "Workspace1",
-                description: "Workspace",
+                name: "Folder 1",
+                description: "Folder",
                 type: "folder",
                 id: 1,
                 available_embedded_actions_ids: [],
@@ -407,4 +384,34 @@ test("Can navigate through templates with keyboard", async function () {
     await contains(defaultTemplate).press("ArrowLeft");
     expect(firstTemplate).not.toHaveClass("o-spreadsheet-grid-selected");
     expect(defaultTemplate).toHaveClass("o-spreadsheet-grid-selected");
+});
+
+test("Can create a blank spreadsheet from template dialog in a specific folder", async function () {
+    const mockDoAction = (action) => {
+        expect.step("redirect");
+        expect(action.tag).toBe("action_open_spreadsheet");
+    };
+    await initTestEnvWithBlankSpreadsheet({
+        mockRPC: async function (route, args) {
+            if (
+                args.model === "documents.document" &&
+                args.method === "action_open_new_spreadsheet"
+            ) {
+                expect(args.args[0].folder_id).toBe(1);
+                expect.step("action_open_new_spreadsheet");
+            }
+        },
+    });
+    mockActionService(mockDoAction);
+
+    await contains(".o_search_panel_section").click();
+
+    await openTemplateDialog();
+
+    await select("2", { target: ".o-spreadsheet-templates-dialog select" });
+
+    await contains(`${dialogSelector} .o-spreadsheet-grid-image`).click();
+    await contains(`${dialogSelector} .o-spreadsheet-create`).click();
+
+    expect.verifySteps(["action_open_new_spreadsheet", "redirect"]);
 });

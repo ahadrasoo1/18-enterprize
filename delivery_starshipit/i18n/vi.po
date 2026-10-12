@@ -1,29 +1,44 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* delivery_starshipit
-# 
+# * delivery_starshipit
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Thi Huong Nguyen, 2025
+#
+# Weblate <noreply-mt-weblate@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:24+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Vietnamese (https://app.transifex.com/odoo/teams/41243/vi/)\n"
+"POT-Creation-Date: 2026-02-05 18:46+0000\n"
+"PO-Revision-Date: 2026-04-29 18:45+0000\n"
+"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"Language-Team: Vietnamese <https://translate.odoo.com/projects/odoo-18/"
+"delivery_starshipit/vi/>\n"
+"Language: vi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: vi\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 5.17\n"
 
 #. module: delivery_starshipit
 #. odoo-python
 #: code:addons/delivery_starshipit/models/delivery_carrier.py:0
-msgid " after deleting the order on Starshipit"
-msgstr "sau khi xóa đơn hàng trên Starshipit"
+msgid ""
+"%(order_info)sHowever, the shipping label creation failed with the following "
+"error:\n"
+"%(error)s\n"
+"\n"
+"Please either continue the configuration or delete the order in Starshipit "
+"before trying again."
+msgstr ""
+"%(order_info)sTuy nhiên, việc tạo nhãn vận chuyển đã thất bại với lỗi sau:\n"
+"%(error)s\n"
+"\n"
+"Vui lòng tiếp tục cấu hình hoặc xóa đơn hàng trong Starshipit trước khi thử "
+"lại."
 
 #. module: delivery_starshipit
 #: model_terms:ir.ui.view,arch_db:delivery_starshipit.view_delivery_carrier_form
@@ -37,11 +52,17 @@ msgstr ""
 #. module: delivery_starshipit
 #: model_terms:ir.ui.view,arch_db:delivery_starshipit.view_delivery_carrier_form
 msgid ""
-"<i class=\"fa fa-exclamation-triangle\"/> In <b>Test Environment</b>, your shippings are automatically <b>archived</b> after the label creation. <br/>\n"
-"                        Please note that charges can still occur for label creations and some shipping carriers may automatically validate the shipment when printing labels."
+"<i class=\"fa fa-exclamation-triangle\"/> In <b>Test Environment</b>, your "
+"shippings are automatically <b>archived</b> after the label creation. <br/>\n"
+"                        Please note that charges can still occur for label "
+"creations and some shipping carriers may automatically validate the shipment "
+"when printing labels."
 msgstr ""
-"<i class=\"fa fa-exclamation-triangle\"/>Trong <b>Môi trường kiểm thử</b>, các đơn vận chuyển của bạn sẽ tự động <b>được lưu trữ</b> sau khi tạo nhãn.<br/>\n"
-"                          Xin lưu ý rằng việc tạo nhãn vẫn có thể bị tính phí và một số đơn vị vận chuyển có thể tự động xác thực lô hàng khi in nhãn."
+"<i class=\"fa fa-exclamation-triangle\"/>Trong <b>Môi trường kiểm thử</b>, "
+"các đơn vận chuyển của bạn sẽ tự động <b>được lưu trữ</b> sau khi tạo nhãn."
+"<br/>\n"
+"                          Xin lưu ý rằng việc tạo nhãn vẫn có thể bị tính "
+"phí và một số đơn vị vận chuyển có thể tự động xác thực lô hàng khi in nhãn."
 
 #. module: delivery_starshipit
 #: model_terms:ir.ui.view,arch_db:delivery_starshipit.view_shipping_method_starshipit
@@ -49,8 +70,19 @@ msgid ""
 "<i class=\"fa fa-info-circle\"/> Available shipping services depend on "
 "enabled carriers in your Starshipit account."
 msgstr ""
-"<i class=\"fa fa-info-circle\"/> Các dịch vụ vận chuyển có sẵn phụ thuộc vào"
-" đơn vị vận chuyển đã được kích hoạt trong tài khoản Starshipit của bạn."
+"<i class=\"fa fa-info-circle\"/> Các dịch vụ vận chuyển có sẵn phụ thuộc vào "
+"đơn vị vận chuyển đã được kích hoạt trong tài khoản Starshipit của bạn."
+
+#. module: delivery_starshipit
+#: model_terms:ir.ui.view,arch_db:delivery_starshipit.choose_delivery_carrier_view_form
+msgid "<i class=\"oi oi-arrow-right me-1\"/>Get more delivery methods"
+msgstr ""
+
+#. module: delivery_starshipit
+#. odoo-python
+#: code:addons/delivery_starshipit/wizard/starshipit_shipping_wizard.py:0
+msgid "Add a shipping method"
+msgstr "Thêm phương thức vận chuyển"
 
 #. module: delivery_starshipit
 #: model_terms:ir.ui.view,arch_db:delivery_starshipit.view_shipping_method_starshipit
@@ -81,8 +113,8 @@ msgstr "Xác nhận"
 #. module: delivery_starshipit
 #: model:ir.model.fields,help:delivery_starshipit.field_starshipit_shipping_wizard__available_services
 msgid ""
-"Contains the list of available services for the starshipit account to select"
-" from."
+"Contains the list of available services for the starshipit account to select "
+"from."
 msgstr ""
 "Chứa danh sách các dịch vụ khả dụng cho tài khoản Starshipit để lựa chọn."
 
@@ -99,17 +131,22 @@ msgstr "Được tạo vào"
 #. module: delivery_starshipit
 #: model_terms:ir.ui.view,arch_db:delivery_starshipit.view_delivery_carrier_form
 msgid "Default Package Type"
-msgstr "Kiểu đóng gói mặc định"
+msgstr "Loại kiện hàng mặc định"
 
 #. module: delivery_starshipit
 #: model:ir.model.fields,field_description:delivery_starshipit.field_delivery_carrier__starshipit_default_package_type_id
 msgid "Default Package Type for Starshipit"
-msgstr "Kiểu đóng gói mặc định cho Starshipit"
+msgstr "Loại kiện hàng mặc định cho Starshipit"
 
 #. module: delivery_starshipit
 #: model:ir.model.fields,field_description:delivery_starshipit.field_starshipit_shipping_wizard__carrier_id
 msgid "Delivery"
 msgstr "Giao hàng"
+
+#. module: delivery_starshipit
+#: model:ir.model,name:delivery_starshipit.model_choose_delivery_carrier
+msgid "Delivery Carrier Selection Wizard"
+msgstr "Công cụ chọn đơn vị giao hàng"
 
 #. module: delivery_starshipit
 #: model_terms:ir.ui.view,arch_db:delivery_starshipit.view_shipping_method_starshipit
@@ -120,6 +157,13 @@ msgstr "Dịch vụ giao hàng"
 #: model:ir.model.fields,field_description:delivery_starshipit.field_starshipit_shipping_wizard__display_name
 msgid "Display Name"
 msgstr "Tên hiển thị"
+
+#. module: delivery_starshipit
+#. odoo-python
+#: code:addons/delivery_starshipit/models/delivery_carrier.py:0
+msgid ""
+"Error: %(file_name)s file could not be obtained for order %(order_name)s."
+msgstr "Lỗi: Không thể lấy được tệp %(file_name)s cho đơn hàng %(order_name)s."
 
 #. module: delivery_starshipit
 #. odoo-python
@@ -171,17 +215,22 @@ msgid ""
 "Order %(order)s was already sent to the carrier during label creation.\n"
 "Manifest number: %(manifest_number)s"
 msgstr ""
-"Đơn hàng %(order)s đã được gửi đến đơn vị vận chuyển trong quá trình tạo nhãn.\n"
+"Đơn hàng %(order)s đã được gửi đến đơn vị vận chuyển trong quá trình tạo "
+"nhãn.\n"
 "Số kê khai: %(manifest_number)s"
 
 #. module: delivery_starshipit
 #. odoo-python
 #: code:addons/delivery_starshipit/models/delivery_carrier.py:0
 msgid ""
-"Order %(order)s was sent to the carrier during label creation.As you are in a test environment, please make sure to cancel the order with your carrier directly.\n"
+"Order %(order)s was sent to the carrier during label creation.As you are in "
+"a test environment, please make sure to cancel the order with your carrier "
+"directly.\n"
 "Manifest number: %(manifest_number)s"
 msgstr ""
-"Đơn hàng %(order)s đã được gửi đến đơn vị vận chuyển trong quá trình tạo nhãn. Vì bạn đang ở trong môi trường kiểm thử, hãy nhớ trực tiếp hủy đơn hàng với đơn vị vận chuyển của bạn.\n"
+"Đơn hàng %(order)s đã được gửi đến đơn vị vận chuyển trong quá trình tạo "
+"nhãn. Vì bạn đang ở trong môi trường kiểm thử, hãy nhớ trực tiếp hủy đơn "
+"hàng với đơn vị vận chuyển của bạn.\n"
 "Số kê khai: %(manifest_number)s"
 
 #. module: delivery_starshipit
@@ -207,14 +256,8 @@ msgid ""
 "Package dimensions are required to get more accurate rates. You can define "
 "these in a package type that you set as default"
 msgstr ""
-"Kích thước kiện hàng là thông tin bắt buộc để tính phí chính xác hơn. Bạn có"
-" thể xác định chúng trong kiểu đóng gói được đặt làm mặc định."
-
-#. module: delivery_starshipit
-#. odoo-python
-#: code:addons/delivery_starshipit/models/delivery_carrier.py:0
-msgid "Please delete the order on Starshipit then try again."
-msgstr "Vui lòng xóa đơn hàng trên Starshipit rồi thử lại."
+"Kích thước kiện hàng là thông tin bắt buộc để tính phí chính xác hơn. Bạn có "
+"thể xác định chúng trong loại kiện hàng được đặt làm mặc định."
 
 #. module: delivery_starshipit
 #. odoo-python
@@ -230,7 +273,7 @@ msgstr "Nhà cung cấp"
 #. module: delivery_starshipit
 #: model:ir.model,name:delivery_starshipit.model_stock_return_picking
 msgid "Return Picking"
-msgstr "Phiếu lấy hàng trả lại"
+msgstr "Phiếu xuất kho trả hàng"
 
 #. module: delivery_starshipit
 #. odoo-python
@@ -242,20 +285,26 @@ msgstr "Nhãn trả hàng đã được tạo cho đơn hàng %s"
 #. odoo-python
 #: code:addons/delivery_starshipit/models/delivery_carrier.py:0
 msgid ""
-"Return order %(order)s was already sent to the carrier during label creation.\n"
+"Return order %(order)s was already sent to the carrier during label "
+"creation.\n"
 "Manifest number: %(manifest_number)s"
 msgstr ""
-"Đơn trả hàng %(order)s đã được gửi đến đơn vị vận chuyển trong quá trình tạo nhãn.\n"
+"Đơn trả hàng %(order)s đã được gửi đến đơn vị vận chuyển trong quá trình tạo "
+"nhãn.\n"
 "Số kê khai: %(manifest_number)s"
 
 #. module: delivery_starshipit
 #. odoo-python
 #: code:addons/delivery_starshipit/models/delivery_carrier.py:0
 msgid ""
-"Return order %(order)s was sent to the carrier during label creation.As you are in a test environment, please make sure to cancel the order with your carrier directly.\n"
+"Return order %(order)s was sent to the carrier during label creation.As you "
+"are in a test environment, please make sure to cancel the order with your "
+"carrier directly.\n"
 "Manifest number: %(manifest_number)s"
 msgstr ""
-"Đơn trả hàng %(order)s đã được gửi đến đơn vị vận chuyển trong quá trình tạo nhãn. Vì bạn đang ở trong môi trường kiểm thử, hãy nhớ trực tiếp hủy đơn hàng với đơn vị vận chuyển của bạn.\n"
+"Đơn trả hàng %(order)s đã được gửi đến đơn vị vận chuyển trong quá trình tạo "
+"nhãn. Vì bạn đang ở trong môi trường kiểm thử, hãy nhớ trực tiếp hủy đơn "
+"hàng với đơn vị vận chuyển của bạn.\n"
 "Số kê khai: %(manifest_number)s"
 
 #. module: delivery_starshipit
@@ -289,6 +338,14 @@ msgstr "Mã dịch vụ"
 #: model:ir.model.fields,field_description:delivery_starshipit.field_delivery_carrier__starshipit_service_name
 msgid "Service Name"
 msgstr "Tên dịch vụ"
+
+#. module: delivery_starshipit
+#. odoo-python
+#: code:addons/delivery_starshipit/models/delivery_carrier.py:0
+msgid ""
+"Shipping Cost has been updated from Starshipit. The Sales Order can now be "
+"invoiced."
+msgstr ""
 
 #. module: delivery_starshipit
 #: model:ir.model,name:delivery_starshipit.model_delivery_carrier
@@ -331,7 +388,7 @@ msgstr "Đã vượt quá tốc độ API của Starshipit. Vui lòng thử lạ
 #. module: delivery_starshipit
 #: model:ir.model.fields,field_description:delivery_starshipit.field_delivery_carrier__starshipit_api_key
 msgid "Starshipit Api Key"
-msgstr "Mã khoá API Starshipit"
+msgstr "Khoá API Starshipit"
 
 #. module: delivery_starshipit
 #: model_terms:ir.ui.view,arch_db:delivery_starshipit.view_delivery_carrier_form
@@ -342,6 +399,12 @@ msgstr "Cấu hình Starshipit"
 #: model:ir.model.fields,field_description:delivery_starshipit.field_stock_picking__starshipit_parcel_reference
 msgid "Starshipit Parcel Reference"
 msgstr "Tham chiếu bưu kiện Starshipit"
+
+#. module: delivery_starshipit
+#. odoo-python
+#: code:addons/delivery_starshipit/models/delivery_carrier.py:0
+msgid "Starshipit Price Update Cron: System Error fetching price: %s"
+msgstr ""
 
 #. module: delivery_starshipit
 #: model:ir.model.fields,field_description:delivery_starshipit.field_stock_picking__starshipit_return_parcel_reference
@@ -371,14 +434,56 @@ msgstr ""
 
 #. module: delivery_starshipit
 #. odoo-python
-#: code:addons/delivery_starshipit/models/starshipit_service.py:0
-msgid "Starshipit returned an error: %(message)s"
-msgstr "Starshipit báo lỗi sau: %(message)s"
+#: code:addons/delivery_starshipit/models/delivery_carrier.py:0
+msgid ""
+"Starshipit: Delivery cost re-evaluated on Sales Order based on updated exact "
+"price (%(final_carrier_price)s) from transfer %(picking_name)s."
+msgstr ""
+
+#. module: delivery_starshipit
+#. odoo-python
+#: code:addons/delivery_starshipit/models/delivery_carrier.py:0
+msgid ""
+"Starshipit: Exact shipping cost for delivery %(picking_name)s is now %"
+"(final_carrier_price)s, but automatic sale order delivery cost re-evaluation "
+"failed: %(e_so)s"
+msgstr ""
+"Starshipit: Phí giao hàng chính xác cho đơn giao hàng %(picking_name)s hiện "
+"là %(final_carrier_price)s, nhưng việc tự động đánh giá lại phí giao hàng "
+"trên đơn bán hàng đã không thành công: %(e_so)s"
+
+#. module: delivery_starshipit
+#. odoo-python
+#: code:addons/delivery_starshipit/models/delivery_carrier.py:0
+msgid ""
+"Starshipit: Exact shipping cost for delivery %(picking_name)s is now %"
+"(final_carrier_price)s. This sale order is already invoiced, please review "
+"if a manual adjustment to the invoice is needed."
+msgstr ""
+"Starshipit: Chi phí vận chuyển chính xác cho đơn giao hàng %(picking_name)s "
+"hiện là %(final_carrier_price)s. Đơn bán hàng này đã được xuất hóa đơn, vui "
+"lòng xem xét có cần điều chỉnh thủ công hóa đơn hay không."
+
+#. module: delivery_starshipit
+#: model:ir.actions.server,name:delivery_starshipit.ir_cron_starshipit_fetch_pending_prices_ir_actions_server
+msgid "Starshipit: Fetch Pending Shipping Prices"
+msgstr ""
+
+#. module: delivery_starshipit
+#. odoo-python
+#: code:addons/delivery_starshipit/models/delivery_carrier.py:0
+msgid "Starshipit: Shipping Cost updated"
+msgstr ""
 
 #. module: delivery_starshipit
 #: model:ir.model,name:delivery_starshipit.model_stock_package_type
 msgid "Stock package type"
-msgstr "Kiểu đóng gói tồn kho"
+msgstr "Loại kiện hàng tồn kho"
+
+#. module: delivery_starshipit
+#: model_terms:ir.ui.view,arch_db:delivery_starshipit.view_picking_form_inherit_stock
+msgid "The Shipping Cost is being fetched in the background."
+msgstr ""
 
 #. module: delivery_starshipit
 #: model:ir.model.fields,help:delivery_starshipit.field_delivery_carrier__starshipit_carrier_code
@@ -391,13 +496,33 @@ msgstr ""
 
 #. module: delivery_starshipit
 #. odoo-python
+#: code:addons/delivery_starshipit/models/delivery_carrier.py:0
+msgid ""
+"The exact price could not be retrieved. It will be updated by a scheduled "
+"action."
+msgstr ""
+
+#. module: delivery_starshipit
+#. odoo-python
+#: code:addons/delivery_starshipit/models/delivery_carrier.py:0
+msgid "The order '%(order_number)s' has been created!\n"
+msgstr ""
+
+#. module: delivery_starshipit
+#. odoo-python
+#: code:addons/delivery_starshipit/models/delivery_carrier.py:0
+msgid "The order has been created!\n"
+msgstr ""
+
+#. module: delivery_starshipit
+#. odoo-python
 #: code:addons/delivery_starshipit/models/starshipit_service.py:0
 msgid ""
 "The picking %(picking_name)s sequence is too long for Starshipit. Please "
 "update your pickings sequence in order to use at most 50 characters."
 msgstr ""
-"Số thứ tự phiếu lấy hàng %(picking_name)s quá dài đối với Starshipit. Vui "
-"lòng cập nhật số thứ tự phiếu lấy hàng của bạn với giới hạn tối đa 50 ký tự."
+"Số thứ tự phiếu xuất kho %(picking_name)s quá dài đối với Starshipit. Vui "
+"lòng cập nhật số thứ tự phiếu xuất kho của bạn với giới hạn tối đa 50 ký tự."
 
 #. module: delivery_starshipit
 #. odoo-python
@@ -413,8 +538,8 @@ msgid ""
 "the code inside starshipit to be at most 100 characters, then update your "
 "shipping carrier %(shipping_carrier)s to the new code."
 msgstr ""
-"Mã dịch vụ %(service_code)s quá dài đối với Starshipit. Vui lòng cập nhật mã"
-" trong Starshipit với giới hạn tối đa 100 ký tự, sau đó cập nhật mã mới cho "
+"Mã dịch vụ %(service_code)s quá dài đối với Starshipit. Vui lòng cập nhật mã "
+"trong Starshipit với giới hạn tối đa 100 ký tự, sau đó cập nhật mã mới cho "
 "đơn vị vận chuyển %(shipping_carrier)s của bạn."
 
 #. module: delivery_starshipit
@@ -431,28 +556,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/delivery_starshipit/models/delivery_carrier.py:0
 msgid ""
-"The shipping label creation failed with the following error:\n"
-"%(error)s"
-msgstr ""
-"Việc tạo nhãn vận chuyển không thành công với lỗi sau:\n"
-"%(error)s"
-
-#. module: delivery_starshipit
-#. odoo-python
-#: code:addons/delivery_starshipit/models/delivery_carrier.py:0
-msgid ""
-"There are no shipping services available, please verify the shipping address"
-" or activate suitable carriers in your starshipit account."
+"There are no shipping services available, please verify the shipping address "
+"or activate suitable carriers in your starshipit account."
 msgstr ""
 "Không có dịch vụ vận chuyển nào khả dụng, vui lòng xác thực địa chỉ giao "
-"hàng hoặc kích hoạt các đơn vị vận chuyển phù hợp trong tài khoản Starshipit"
-" của bạn."
-
-#. module: delivery_starshipit
-#. odoo-python
-#: code:addons/delivery_starshipit/models/delivery_carrier.py:0
-msgid "There was an issue when creating the order, please try again"
-msgstr "Đã xảy ra sự cố khi tạo đơn hàng, vui lòng thử lại"
+"hàng hoặc kích hoạt các đơn vị vận chuyển phù hợp trong tài khoản Starshipit "
+"của bạn."
 
 #. module: delivery_starshipit
 #. odoo-python
@@ -472,3 +581,16 @@ msgstr ""
 #: model:ir.model,name:delivery_starshipit.model_stock_picking
 msgid "Transfer"
 msgstr "Lệnh chuyển hàng"
+
+#~ msgid "Please delete the order on Starshipit then try again."
+#~ msgstr "Vui lòng xóa đơn hàng trên Starshipit rồi thử lại."
+
+#~ msgid "Starshipit returned an error: %(message)s"
+#~ msgstr "Starshipit báo lỗi sau: %(message)s"
+
+#~ msgid ""
+#~ "The shipping label creation failed with the following error:\n"
+#~ "%(error)s"
+#~ msgstr ""
+#~ "Việc tạo nhãn vận chuyển không thành công với lỗi sau:\n"
+#~ "%(error)s"

@@ -6,14 +6,15 @@ import { DomainSelector } from "@web/core/domain_selector/domain_selector";
 import { DomainSelectorDialog } from "@web/core/domain_selector_dialog/domain_selector_dialog";
 import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
-import { components } from "@odoo/o-spreadsheet";
+import { components, constants } from "@odoo/o-spreadsheet";
 
 import { Component, onWillStart, onWillUpdateProps } from "@odoo/owl";
-const { Section } = components;
+const { ChartTerms } = constants;
+const { Section, ValidationMessages } = components;
 
 export class CommonOdooChartConfigPanel extends Component {
     static template = "spreadsheet_edition.CommonOdooChartConfigPanel";
-    static components = { IrMenuSelector, DomainSelector, Section };
+    static components = { IrMenuSelector, DomainSelector, Section, ValidationMessages };
     static props = {
         figureId: String,
         definition: Object,
@@ -21,14 +22,31 @@ export class CommonOdooChartConfigPanel extends Component {
         canUpdateChart: Function,
     };
 
+    chartTerms = ChartTerms;
+
     setup() {
         this.dialog = useService("dialog");
         const loadData = async (figureId) => {
             const dataSource = this.env.model.getters.getChartDataSource(figureId);
-            this.modelDisplayName = await dataSource.getModelLabel();
+            this.isModelValid = dataSource.isModelValid();
+            this.isDataLoaded = dataSource.isReady();
+            if (this.isModelValid) {
+                this.modelDisplayName = await dataSource.getModelLabel();
+            }
         };
         onWillStart(() => loadData(this.props.figureId));
         onWillUpdateProps((nextProps) => loadData(nextProps.figureId));
+    }
+
+    get invalidChartModel() {
+        const model = this.env.model.getters.getChartDefinition(this.props.figureId).metaData
+            .resModel;
+        return _t(
+            "The model (%(model)s) of this chart is not valid (it may have been renamed/deleted). Please re-insert a new chart.",
+            {
+                model,
+            }
+        );
     }
 
     get model() {
@@ -110,5 +128,9 @@ export class CommonOdooChartConfigPanel extends Component {
             chartId: this.props.figureId,
             odooMenuId: menu.xmlid || menu.id,
         });
+    }
+
+    delete() {
+        this.env.model.dispatch("DELETE_FIGURE", { figureId: this.props.figureId });
     }
 }

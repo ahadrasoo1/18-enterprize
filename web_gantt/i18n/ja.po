@@ -1,23 +1,27 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* web_gantt
-# 
+# * web_gantt
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Junko Augias, 2024
+#
+# "Junko Augias (juau)" <juau@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:29+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Japanese (https://app.transifex.com/odoo/teams/41243/ja/)\n"
+"POT-Creation-Date: 2026-05-22 17:59+0000\n"
+"PO-Revision-Date: 2026-05-06 21:41+0000\n"
+"Last-Translator: \"Junko Augias (juau)\" <juau@odoo.com>\n"
+"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-18/"
+"web_gantt/ja/>\n"
+"Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: ja\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 5.17\n"
 
 #. module: web_gantt
 #. odoo-javascript
@@ -44,12 +48,14 @@ msgstr "アクションウィンドウビュー"
 
 #. module: web_gantt
 #. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer_controls.js:0
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "Activate dense mode"
 msgstr "デンスモードを有効化する"
 
 #. module: web_gantt
 #. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer_controls.js:0
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "Activate sparse mode"
 msgstr "スパースモードを有効化する"
@@ -91,6 +97,12 @@ msgstr "編集"
 
 #. module: web_gantt
 #. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+msgid "Ending date cannot be before the starting date"
+msgstr "終了日は開始日より前の日付にすることはできません。"
+
+#. module: web_gantt
+#. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "Expand rows"
 msgstr "行を展開"
@@ -108,6 +120,12 @@ msgid "From"
 msgstr "from"
 
 #. module: web_gantt
+#. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer_controls.js:0
+msgid "From: %(from_date)s to: %(to_date)s"
+msgstr "開始日: %(from_date)s 終了日: %(to_date)s"
+
+#. module: web_gantt
 #: model:ir.model.fields.selection,name:web_gantt.selection__ir_actions_act_window_view__view_mode__gantt
 #: model:ir.model.fields.selection,name:web_gantt.selection__ir_ui_view__type__gantt
 msgid "Gantt"
@@ -123,7 +141,8 @@ msgstr "ガントビュー"
 #. odoo-python
 #: code:addons/web_gantt/models/ir_ui_view.py:0
 msgid "Gantt child can only be field or template, got %s"
-msgstr "ガントのchildはフィールドまたはテンプレートのみにできますが、%sを取得しました"
+msgstr ""
+"ガントのchildはフィールドまたはテンプレートのみにできますが、%sを取得しました"
 
 #. module: web_gantt
 #. odoo-python
@@ -144,7 +163,8 @@ msgid ""
 "Gantt must have a 'dependency_inverted_field' attribute once the "
 "'dependency_field' is specified"
 msgstr ""
-"'dependency_field' が指定されたら、ガントは 'dependency_inverted_field' を持つ必要があります。"
+"'dependency_field' が指定されたら、ガントは 'dependency_inverted_field' を持"
+"つ必要があります。"
 
 #. module: web_gantt
 #. odoo-javascript
@@ -183,7 +203,8 @@ msgid ""
 "Invalid attributes (%(invalid_attributes)s) in gantt view. Attributes must "
 "be in (%(valid_attributes)s)"
 msgstr ""
-"ガントビューの属性 (%(invalid_attributes)s)が無効です。属性は(%(valid_attributes)s)である必要があります。"
+"ガントビューの属性 (%(invalid_attributes)s)が無効です。属性は(%"
+"(valid_attributes)s)である必要があります。"
 
 #. module: web_gantt
 #. odoo-python
@@ -231,13 +252,19 @@ msgstr "計画"
 #. odoo-python
 #: code:addons/web_gantt/models/models.py:0
 msgid "Reschedule done successfully."
-msgstr ""
+msgstr "正常に再スケジュールされました。"
 
 #. module: web_gantt
 #. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_popover.xml:0
 msgid "Start"
 msgstr "開始"
+
+#. module: web_gantt
+#. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+msgid "Starting date cannot be after the ending date"
+msgstr "開始日は終了日より前の日付にすることはできません"
 
 #. module: web_gantt
 #. odoo-javascript
@@ -352,10 +379,4 @@ msgstr "か月"
 #. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "to"
-msgstr "から"
-
-#. module: web_gantt
-#. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_row_progress_bar.xml:0
-msgid "{{ props.progressBar.warning }}"
-msgstr "{{ props.progressBar.warning }}"
+msgstr "~"

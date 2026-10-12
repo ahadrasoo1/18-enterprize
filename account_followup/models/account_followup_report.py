@@ -7,7 +7,7 @@ from odoo import models, fields, api
 from odoo.exceptions import UserError
 from odoo.tools.misc import formatLang, format_date, get_lang
 from odoo.tools.translate import _
-from odoo.tools import DEFAULT_SERVER_DATE_FORMAT, html2plaintext, plaintext2html
+from odoo.tools import html2plaintext, plaintext2html
 
 
 class AccountFollowupReport(models.AbstractModel):
@@ -59,7 +59,7 @@ class AccountFollowupReport(models.AbstractModel):
         today = fields.Date.today()
         line_num = 0
         for l in partner.unreconciled_aml_ids.sorted().filtered(lambda aml: not aml.currency_id.is_zero(aml.amount_residual_currency)):
-            if l.company_id in self.env.company._accessible_branches():
+            if l.company_id in self.env.company.search([('id', 'child_of', self.env.context.get('allowed_company_ids', self.env.company.id))]):
                 currency = l.currency_id or l.company_id.currency_id
                 if currency not in res:
                     res[currency] = []
@@ -75,9 +75,9 @@ class AccountFollowupReport(models.AbstractModel):
                     'style': 'white-space:nowrap;text-align:left;',
                     'template': 'account_followup.line_template',
                 }
-                date_due = format_date(self.env, aml.date_maturity or aml.move_id.invoice_date or aml.date, lang_code=lang_code)
+                date_due = format_date(self.env, aml.date_maturity, lang_code=lang_code)
                 total += amount or 0
-                is_overdue = today > aml.date_maturity if aml.date_maturity else today > aml.date
+                is_overdue = today > aml.date_maturity if aml.date_maturity else False
                 is_payment = aml.payment_id
                 if is_overdue or is_payment:
                     total_issued += amount or 0
@@ -237,10 +237,11 @@ class AccountFollowupReport(models.AbstractModel):
         partner = self.env['res.partner'].browse(options.get('partner_id'))
         followup_line = options.get('followup_line', partner.followup_line_id)
         sms_template = options.get('sms_template') or followup_line.sms_template_id
-        template_src = sms_template.body
+        template_src = sms_template.with_context(lang=partner.lang or self.env.user.lang).body
 
         partner_followup_responsible_id = partner._get_followup_responsible()
         responsible_signature = html2plaintext(partner_followup_responsible_id.signature or partner_followup_responsible_id.name)
+        self = self.with_context(lang=partner.lang or self.env.user.lang)
         default_body = _("Dear client, we kindly remind you that you still have unpaid invoices. Please check them and take appropriate action. %s", responsible_signature)
 
         return self._get_rendered_body(partner.id, template_src, default_body, options={'post_process': True})
@@ -323,6 +324,23 @@ Best Regards,
 
         return self._get_rendered_body(partner.id, template_src, default_body, options={'post_process': True})
 
+    @api.model
+    def _get_email_recipients(self, options):
+        if options.get('email_recipient_ids'):
+            return options.get('email_recipient_ids')
+
+        partner = self.env['res.partner'].browse(options.get('partner_id'))
+        recipients = partner._get_all_followup_contacts() or partner
+        followup_line = options.get('followup_line', recipients.followup_line_id)
+        mail_template = options.get('mail_template', followup_line.mail_template_id)
+        if mail_template:
+            rendered_values = mail_template._generate_template_recipients(
+                [partner.id],
+                {'partner_to', 'email_cc', 'email_to'},
+                True)[partner.id]
+            recipients |= partner.browse(rendered_values.get('partner_ids'))
+        return recipients
+
     ####################################################
     # REPORT DATA
     ####################################################
@@ -371,19 +389,17 @@ Best Regards,
         Send by email the followup to the customer's followup contacts
         """
         partner = self.env['res.partner'].browse(options.get('partner_id'))
-        followup_contacts = partner._get_all_followup_contacts() or partner
-        followup_recipients = options.get('email_recipient_ids', followup_contacts)
         followup_line = options.get('followup_line', partner.followup_line_id)
         sent_at_least_once = False
-        for to_send_partner in followup_recipients:
+        for to_send_partner in self._get_email_recipients(options):
             email = to_send_partner.email
             if email and email.strip():
                 self = self.with_context(lang=partner.lang or self.env.user.lang)
                 body_html = self.with_context(mail=True).get_followup_report_html(options)
 
-                attachment_ids = options.get('attachment_ids', partner._get_invoices_to_print(options).message_main_attachment_id.ids)
-                partner_ledger_report = self.env.ref('account_reports.partner_ledger_report')
-                attachment_ids.append(partner._get_partner_account_report_attachment(partner_ledger_report).id)
+                # Should contain the followup report and invoice attachments if join_invoices is True.
+                attachment_ids = options.get('attachment_ids')
+
                 # If the follow-up was executed manually, the author_id will be set to the ID of the current logged-in user.
                 # Otherwise, if the follow-up is automatic, the author_id will be the followup responsible or OdooBot.
                 author_id = options.get('author_id', partner._get_followup_responsible().partner_id.id)
@@ -415,20 +431,7 @@ Best Regards,
 
         Returns a client action downloading this letter and closing the wizard.
         """
-        action = self.env.ref('account_followup.action_report_followup')
-        tz_date_str = format_date(self.env, fields.Date.today(), lang_code=self.env.user.lang or get_lang(self.env).code)
-        #to avoid having dots in the name of the file.
-        tz_date_str = tz_date_str.replace('.', '-')
-        followup_letter_name = _("Follow-up %(partner)s - %(date)s", partner=partner.display_name, date=tz_date_str)
-        followup_letter = action.with_context(lang=partner.lang or self.env.user.lang)._render_qweb_pdf('account_followup.report_followup_print_all', partner.id, data={'options': options or {}})[0]
-        attachment = self.env['ir.attachment'].create({
-            'name': followup_letter_name,
-            'raw': followup_letter,
-            'res_id': partner.id,
-            'res_model': 'res.partner',
-            'type': 'binary',
-            'mimetype': 'application/pdf',
-        })
+        attachment = partner._get_followup_report_attachment(options)
         partner.message_post(body=_('Follow-up letter generated'), attachment_ids=[attachment.id])
         return {
             'type': 'ir.actions.client',

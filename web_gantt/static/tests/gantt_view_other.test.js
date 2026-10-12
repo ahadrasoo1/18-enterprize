@@ -298,9 +298,9 @@ test("No progress bar when no option set.", async () => {
 });
 
 test("Progress bar rpc is triggered when option set.", async () => {
-    onRpc("get_gantt_data", async ({ kwargs, parent }) => {
-        const result = await parent();
-        expect.step("get_gantt_data");
+    onRpc("get_gantt_data", ({ kwargs, method, parent }) => {
+        const result = parent();
+        expect.step(method);
         expect(kwargs.progress_bar_fields).toEqual(["user_id"]);
         result.progress_bars.user_id = {
             1: { value: 50, max_value: 100 },
@@ -342,8 +342,8 @@ test("Progress bar component will not render when hovering cells of the same row
             onRendered(() => expect.step("rendering progress bar"));
         },
     });
-    onRpc("get_gantt_data", async ({ parent }) => {
-        const result = await parent();
+    onRpc("get_gantt_data", ({ parent }) => {
+        const result = parent();
         result.progress_bars.user_id = {
             1: { value: 50, max_value: 100 },
             2: { value: 25, max_value: 200 },
@@ -367,9 +367,9 @@ test("Progress bar component will not render when hovering cells of the same row
 });
 
 test("Progress bar when multilevel grouped.", async () => {
-    onRpc("get_gantt_data", async ({ kwargs, parent }) => {
-        const result = await parent();
-        expect.step("get_gantt_data");
+    onRpc("get_gantt_data", ({ kwargs, method, parent }) => {
+        const result = parent();
+        expect.step(method);
         expect(kwargs.progress_bar_fields).toEqual(["user_id"]);
         result.progress_bars.user_id = {
             1: { value: 50, max_value: 100 },
@@ -408,9 +408,9 @@ test("Progress bar when multilevel grouped.", async () => {
 });
 
 test("Progress bar warning when max_value is zero", async () => {
-    onRpc("get_gantt_data", async ({ kwargs, parent }) => {
-        const result = await parent();
-        expect.step("get_gantt_data");
+    onRpc("get_gantt_data", ({ kwargs, method, parent }) => {
+        const result = parent();
+        expect.step(method);
         expect(kwargs.progress_bar_fields).toEqual(["user_id"]);
         result.progress_bars.user_id = {
             1: { value: 50, max_value: 0 },
@@ -435,9 +435,9 @@ test("Progress bar warning when max_value is zero", async () => {
 });
 
 test("Progress bar when value less than hour", async () => {
-    onRpc("get_gantt_data", async ({ kwargs, parent }) => {
-        const result = await parent();
-        expect.step("get_gantt_data");
+    onRpc("get_gantt_data", ({ kwargs, method, parent }) => {
+        const result = parent();
+        expect.step(method);
         expect(kwargs.progress_bar_fields).toEqual(["user_id"]);
         result.progress_bars.user_id = {
             1: { value: 0.5, max_value: 100 },
@@ -459,9 +459,9 @@ test("Progress bar when value less than hour", async () => {
 });
 
 test("Progress bar danger when ratio > 100", async () => {
-    onRpc("get_gantt_data", async ({ kwargs, parent }) => {
-        const result = await parent();
-        expect.step("get_gantt_data");
+    onRpc("get_gantt_data", ({ kwargs, method, parent }) => {
+        const result = parent();
+        expect.step(method);
         expect(kwargs.progress_bar_fields).toEqual(["user_id"]);
         result.progress_bars.user_id = {
             1: { value: 150, max_value: 100 },
@@ -478,7 +478,7 @@ test("Progress bar danger when ratio > 100", async () => {
     });
     expect.verifySteps(["get_gantt_data"]);
     expect(SELECTORS.progressBar).toHaveCount(1);
-    expect(SELECTORS.progressBarBackground).toHaveStyle("100%");
+    expect(SELECTORS.progressBarBackground).toHaveStyle("width: 100%", { inline: true });
     expect(SELECTORS.progressBar).toHaveClass("o_gantt_group_danger");
     await hoverGridCell("16 W51 2018");
     expect(queryFirst(SELECTORS.progressBarForeground).parentElement).toHaveClass("text-bg-danger");
@@ -501,9 +501,9 @@ test("Falsy search field will return an empty rows", async () => {
 });
 
 test("Search field return rows with progressbar", async () => {
-    onRpc("get_gantt_data", async ({ kwargs, parent }) => {
-        const result = await parent();
-        expect.step("get_gantt_data");
+    onRpc("get_gantt_data", ({ kwargs, method, parent }) => {
+        const result = parent();
+        expect.step(method);
         expect(kwargs.progress_bar_fields).toEqual(["user_id"]);
         result.progress_bars.user_id = {
             2: { value: 25, max_value: 200 },
@@ -524,7 +524,7 @@ test("Search field return rows with progressbar", async () => {
     const { rows } = getGridContent();
     expect(rows.map((r) => r.title)).toEqual(["Project 1", "User 2"]);
     expect(SELECTORS.progressBar).toHaveCount(1);
-    expect(SELECTORS.progressBarBackground).toHaveStyle("12.5%");
+    expect(SELECTORS.progressBarBackground).toHaveStyle("width: 12.5%", { inline: true });
 });
 
 test("add record in empty gantt", async () => {
@@ -713,7 +713,7 @@ test("position of no content help in sample mode", async () => {
         domain: Domain.FALSE.toList(),
     });
     expect(".o_view_nocontent").toHaveCount(1);
-    expect(".o_gantt_row_header").not.toHaveClass("o_sample_data_disabled");
+    expect(".o_gantt_row_header:first").not.toHaveClass("o_sample_data_disabled");
     const noContentHelp = queryFirst(".o_view_nocontent");
     const noContentHelpTop = noContentHelp.getBoundingClientRect().top;
     const firstRowHeader = queryFirst(".o_gantt_row_header");
@@ -1729,7 +1729,7 @@ test("context in action should not override context added by the gantt view", as
     expect(".modal .o_field_many2one[name=user_id] input").toHaveValue("User 1");
 });
 
-test("The date and task should appear even if the pill is planned on 2 days but displayed in one day by the gantt view", async () => {
+test("The date shouldn't appear in the title if the pill is displayed on 2 days", async () => {
     mockDate("2024-01-01T08:00:00", +0);
 
     Tasks._records.push(
@@ -1748,7 +1748,6 @@ test("The date and task should appear even if the pill is planned on 2 days but 
             stop: "2024-01-03 02:00:00",
         },
         {
-            // will be displayed in 2 days
             id: 11,
             name: "Task 11",
             allocated_hours: 4,
@@ -1770,8 +1769,34 @@ test("The date and task should appear even if the pill is planned on 2 days but 
     });
     expect(".o_gantt_pill").toHaveCount(3, { message: "should have 3 pills in the gantt view" });
     expect(queryAllTexts(".o_gantt_pill_title")).toEqual([
-        "4:00 PM - 1:00 AM (4h) - Task 9",
-        "4:00 PM - 2:00 AM (4h) - Task 10",
+        "Task 9",
+        "Task 10",
         "Task 11",
     ]);
+});
+
+test("Gantt view should not crash when opening on a DST transition day (Asia/Beirut)", async () => {
+    // Beirut (Asia/Beirut) springs forward at midnight on the last Sunday of March,
+    // making that day only 23 hours long. diffColumn() used to return a float (e.g.
+    // 6.958 days for a 7-day week) because luxon's .diff() works in absolute time.
+    // Array(6.958) throws RangeError: Invalid array length, crashing the gantt view.
+    mockTimeZone("Asia/Beirut");
+    Tasks._records = [
+        {
+            id: 1,
+            name: "Beirut DST Task",
+            start: `${DST_DATES.winterToSummer.before} 08:00:00`,
+            stop: `${DST_DATES.winterToSummer.after} 17:00:00`,
+        },
+    ];
+    await mountGanttView({
+        resModel: "tasks",
+        arch: `<gantt date_start="start" date_stop="stop" default_scale="week"/>`,
+        context: {
+            initialDate: `${DST_DATES.winterToSummer.before} 08:00:00`,
+        },
+    });
+    const { columnHeaders, rows } = getGridContent();
+    expect(columnHeaders.length).toBeGreaterThan(0);
+    expect(rows[0].pills).toHaveLength(1);
 });

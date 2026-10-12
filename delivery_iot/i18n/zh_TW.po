@@ -1,23 +1,28 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* delivery_iot
-# 
+# * delivery_iot
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Tony Ng, 2025
+#
+# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Tony Ng (ngto)" <ngto@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:26+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Chinese (Taiwan) (https://app.transifex.com/odoo/teams/41243/zh_TW/)\n"
+"POT-Creation-Date: 2025-12-29 18:46+0000\n"
+"PO-Revision-Date: 2026-06-06 09:52+0000\n"
+"Last-Translator: \"Tony Ng (ngto)\" <ngto@odoo.com>\n"
+"Language-Team: Chinese (Traditional Han script) <https://translate.odoo.com/"
+"projects/odoo-18/delivery_iot/zh_Hant/>\n"
+"Language: zh_TW\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: zh_TW\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 2026.6.1\n"
 
 #. module: delivery_iot
 #: model:ir.actions.report,print_report_name:delivery_iot.action_report_shipping_docs
@@ -46,7 +51,7 @@ msgstr "貨運商標籤"
 msgid ""
 "Choose the scales you want to use for this operation type. Those scales can "
 "be used to weigh the packages created."
-msgstr "選擇要用於此操作類型的磅秤。這些磅秤可用於為建立的包裹進行秤重。"
+msgstr "選擇要用於此操作類型的磅秤。這些磅秤可用於為建立的貨件進行秤重。"
 
 #. module: delivery_iot
 #: model_terms:ir.ui.view,arch_db:delivery_iot.view_picking_type_form_inherit
@@ -56,7 +61,7 @@ msgstr "連接磅秤"
 #. module: delivery_iot
 #: model:ir.model,name:delivery_iot.model_choose_delivery_package
 msgid "Delivery Package Selection Wizard"
-msgstr "交貨包裹選擇嚮導"
+msgstr "交貨貨件選擇嚮導"
 
 #. module: delivery_iot
 #: model:ir.model.fields,field_description:delivery_iot.field_choose_delivery_package__iot_ip
@@ -81,15 +86,17 @@ msgstr "IOT 設備"
 #. module: delivery_iot
 #: model:ir.model.fields,field_description:delivery_iot.field_choose_delivery_package__iot_device_identifier
 msgid "Identifier"
-msgstr "標識"
+msgstr "識別碼"
 
 #. module: delivery_iot
 #: model:ir.model.fields,help:delivery_iot.field_stock_picking_type__auto_print_carrier_labels
 msgid ""
-"If this checkbox is ticked, Odoo will automatically print the carrier labels"
-" of the picking when they are created. Note this requires a printer to be "
+"If this checkbox is ticked, Odoo will automatically print the carrier labels "
+"of the picking when they are created. Note this requires a printer to be "
 "assigned to this report."
-msgstr "如果勾選此方格，Odoo 將在建立提貨時，自動列印提貨的貨運商標籤。請注意，這需要為此報告指派打印機。"
+msgstr ""
+"如果勾選此方格，Odoo 將在建立提貨時，自動列印提貨的貨運商標籤。請注意，這需要"
+"為此報告指派打印機。"
 
 #. module: delivery_iot
 #: model:ir.model.fields,help:delivery_iot.field_stock_picking_type__auto_print_export_documents
@@ -98,19 +105,22 @@ msgid ""
 "documents of the picking when they are created. Availability of export "
 "documents depends on the carrier and the destination. Note this requires a "
 "printer to be assigned to this report. "
-msgstr "如果勾選此方格，Odoo 將在建立提貨的匯出文件時，自動列印它們。匯出文件的可用性取決於貨運商及目的地。請注意，這需要為此報告指派打印機。"
+msgstr ""
+"如果勾選此方格，Odoo 將在建立提貨的匯出文件時，自動列印它們。匯出文件的可用性"
+"取決於貨運商及目的地。請注意，這需要為此報告指派打印機。"
 
 #. module: delivery_iot
 #: model_terms:ir.ui.view,arch_db:delivery_iot.view_picking_type_form_inherit
 msgid ""
 "If you connect your scales through the IoT App, the\n"
-"                            weight of the package will be set automatically when\n"
+"                            weight of the package will be set automatically "
+"when\n"
 "                            you do a \"Put in Pack\" operation.\n"
 "                            <br/>"
 msgstr ""
 "如果經物聯網應用程式連接磅秤，\n"
 "                            會在你執行「放入包裝」操作時，\n"
-"                            自動設定包裹的重量。\n"
+"                            自動設定貨件的重量。\n"
 "                            <br/>"
 
 #. module: delivery_iot
@@ -136,13 +146,28 @@ msgstr "作業類型"
 #. module: delivery_iot
 #: model:ir.model,name:delivery_iot.model_stock_picking_type
 msgid "Picking Type"
-msgstr "提貨類型"
+msgstr "揀貨類型"
 
 #. module: delivery_iot
 #. odoo-javascript
 #: code:addons/delivery_iot/static/src/field_many2one_iot_scale.xml:0
 msgid "Read weight"
 msgstr "讀取重量"
+
+#. module: delivery_iot
+#: model:ir.model,name:delivery_iot.model_ir_actions_report
+msgid "Report Action"
+msgstr "報表動作"
+
+#. module: delivery_iot
+#: model:ir.ui.menu,name:delivery_iot.iot_cached_printers_section
+msgid "Reporting"
+msgstr "報告"
+
+#. module: delivery_iot
+#: model:ir.ui.menu,name:delivery_iot.iot_cached_printers_action
+msgid "Reset Linked Printers"
+msgstr "重設已連結打印機"
 
 #. module: delivery_iot
 #: model:ir.model.fields,field_description:delivery_iot.field_choose_delivery_package__iot_device_id

@@ -3,19 +3,21 @@
 import { _t } from "@web/core/l10n/translation";
 import { ListRenderer } from "@web/views/list/list_renderer";
 
-import { useService, useBus } from "@web/core/utils/hooks";
+import { useService } from "@web/core/utils/hooks";
 import { FileUploadProgressContainer } from "@web/core/file_upload/file_upload_progress_container";
 import { FileUploadProgressDataRow } from "@web/core/file_upload/file_upload_progress_record";
 import { DocumentsDropZone } from "../helper/documents_drop_zone";
 import { DocumentsActionHelper } from "../helper/documents_action_helper";
 import { DocumentsFileViewer } from "../helper/documents_file_viewer";
+import { DocumentsRendererMixin } from "@documents/views/documents_renderer_mixin";
 import { DocumentsListRendererCheckBox } from "./documents_list_renderer_checkbox";
+import { DocumentsDetailsPanel } from "@documents/components/documents_details_panel/documents_details_panel";
 import { useCommand } from "@web/core/commands/command_hook";
-import { useRef, useState } from "@odoo/owl";
+import { useRef } from "@odoo/owl";
 import { getActiveHotkey } from "@web/core/hotkeys/hotkey_service";
 import { Chatter } from "@mail/chatter/web_portal/chatter";
 
-export class DocumentsListRenderer extends ListRenderer {
+export class DocumentsListRenderer extends DocumentsRendererMixin(ListRenderer) {
     static props = [...ListRenderer.props, "previewStore"];
     static template = "documents.DocumentsListRenderer";
     static recordRowTemplate = "documents.DocumentsListRenderer.RecordRow";
@@ -26,6 +28,7 @@ export class DocumentsListRenderer extends ListRenderer {
         DocumentsDropZone,
         DocumentsActionHelper,
         DocumentsFileViewer,
+        DocumentsDetailsPanel,
         Chatter,
     });
 
@@ -33,7 +36,6 @@ export class DocumentsListRenderer extends ListRenderer {
         super.setup();
         this.root = useRef("root");
         const { uploads } = useService("file_upload");
-        this.documentService = useService("document.document");
 
         this.documentUploads = uploads;
         useCommand(
@@ -50,16 +52,6 @@ export class DocumentsListRenderer extends ListRenderer {
                 hotkey: "control+a",
             }
         );
-
-        // TODO: clean that crap
-        this.chatterState = useState({ visible: this.documentService.isChatterVisible() });
-        useBus(this.env.documentsView.bus, "documents-toggle-chatter", (event) => {
-            this.chatterState.visible = !this.chatterState.visible;
-            this.documentService.setChatterVisible(this.chatterState.visible);
-        });
-        useBus(this.documentService.bus, "DOCUMENT_PREVIEWED", async (ev) => {
-            this.chatterState.previewedDocument = this.documentService.previewedDocument;
-        });
     }
 
     getDocumentsAttachmentViewerProps() {
@@ -70,7 +62,7 @@ export class DocumentsListRenderer extends ListRenderer {
      * Called when a keydown event is triggered.
      */
     onGlobalKeydown(ev) {
-        if (ev.key !== "Enter" && ev.key !== " ") {
+        if (ev.key !== "Enter" && ev.key !== " " || this.editedRecord) {
             return;
         }
         const row = ev.target.closest(".o_data_row");
@@ -78,54 +70,60 @@ export class DocumentsListRenderer extends ListRenderer {
         if (!record) {
             return;
         }
-        const options = {};
-        if (ev.key === "Enter") {
-            if (record.data.type === "folder") {
-                record.onRecordDoubleClick();
-            } else {
-                record.onClickPreview(ev);
-            }
-        } else if (ev.key === " ") {
-            options.isKeepSelection = true;
+        if (ev.key === "Enter" && record.data.type !== "folder") {
+            record.onClickPreview(ev);
         }
         ev.stopPropagation();
         ev.preventDefault();
-        record.onRecordClick(ev, options);
+        this.toggleRecordSelection(record);
     }
 
     /**
-     * There's a custom behavior on cell clicked as we (un)select the row (see record.onRecordClick)
+     * Upon clicking on a record, opens the folder/preview the file.
+     * If ctrl or shift key pressed, selects/unselects the record.
+     * If the column is editable, the record is selected and click
+     * without ctrl or shift pressed, edits the column.
      */
     onCellClicked(record, column, ev) {
-        if (record.selected && this.editableColumns.includes(column.name)) {
+        ev.stopPropagation();
+        const isSelectionKeyPressed = ev.ctrlKey || ev.metaKey || ev.shiftKey;
+        if (isSelectionKeyPressed) {
+            this.toggleRecordSelection(record);
+        } else if (record.selected && this.editableColumns.includes(column.name)) {
             return super.onCellClicked(...arguments);
+        } else if (record.data.type !== "folder") {
+            return record.onClickPreview(ev);
+        } else {
+            record.openFolder();
         }
-    }
-    get editableColumns() {
-        return ["name", "tag_ids", "partner_id", "owner_id", "company_id"];
     }
 
-    onCellDoubleClick(ev) {
-        const row = ev.target.closest(".o_data_row");
-        const record = row && this.props.list.records.find((rec) => rec.id === row.dataset.id);
-        if (record.data.type !== "folder") {
-            ev.stopPropagation();
-            record.onClickPreview(ev);
-            return;
-        }
-        record.onRecordDoubleClick();
+    get editableColumns() {
+        return ["name", "tag_ids", "partner_id", "owner_id", "company_id", "folder_id"];
     }
 
     /**
      * Called when a click event is triggered.
      */
     onGlobalClick(ev) {
+        this.props.list.leaveEditMode();
+
         // We have to check that we are indeed clicking in the list view as on mobile,
         // the inspector renders above the renderer but it still triggers this event.
         if (ev.target.closest(".o_data_row") || !ev.target.closest(".o_list_renderer")) {
             return;
         }
+        if (ev.target.closest(".o_documents_view thead")) {
+            return; // We then have to check that we are not clicking on the header
+        }
         this.props.list.selection.forEach((el) => el.toggleSelection(false));
+    }
+
+    getFolderInfo() {
+        return {
+            count: this.props.list.model.useSampleModel ? 0 : this.props.list.count,
+            fileSize: this.props.list.model.fileSize,
+        };
     }
 
     onCellKeydown(ev, group = null, record = null) {
@@ -142,15 +140,6 @@ export class DocumentsListRenderer extends ListRenderer {
 
     get isMobile() {
         return this.env.isSmall;
-    }
-
-    /**
-     * Records on which we will execute the actions / see the chatter.
-     */
-    get targetRecords() {
-        return this.chatterState.previewedDocument
-            ? [this.chatterState.previewedDocument.record]
-            : this.props.list.selection;
     }
 
     onDragEnter(ev) {

@@ -3,47 +3,54 @@
 # 	* documents_hr
 #
 # Translators:
-# דודי מלכה <Dudimalka6@gmail.com>, 2022
-# Martin Trigaux, 2022
-# Yihya Hugirat <hugirat@gmail.com>, 2022
-# ZVI BLONDER <ZVIBLONDER@gmail.com>, 2022
+# Orel Nahmany, 2024
+# ZVI BLONDER <ZVIBLONDER@gmail.com>, 2024
+# Martin Trigaux, 2024
+# Yihya Hugirat <hugirat@gmail.com>, 2024
+# or balmas, 2025
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 16.0beta+e\n"
+"Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-16 16:02+0000\n"
-"PO-Revision-Date: 2022-09-22 05:46+0000\n"
-"Last-Translator: ZVI BLONDER <ZVIBLONDER@gmail.com>, 2022\n"
+"POT-Creation-Date: 2026-02-27 18:47+0000\n"
+"PO-Revision-Date: 2024-09-25 09:44+0000\n"
+"Last-Translator: or balmas, 2025\n"
 "Language-Team: Hebrew (https://app.transifex.com/odoo/teams/41243/he/)\n"
 "Language: he\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % 1 == 0) ? 1: (n % 10 == 0 && n % 1 == 0 && n > 10) ? 2 : 3;\n"
+"Plural-Forms: nplurals=3; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % "
+"1 == 0) ? 1: 2;\n"
 
 #. module: documents_hr
-#: model_terms:ir.ui.view,arch_db:documents_hr.res_config_settings_view_form
-msgid ""
-"<span name=\"documents_hr_tags\" class=\"o_form_label\" invisible=\"1\" attrs=\"{'invisible' : [('documents_hr_settings', '=', False)]}\">\n"
-"                                Default tags\n"
-"                            </span>"
-msgstr ""
+#: model_terms:ir.ui.view,arch_db:documents_hr.documents_hr_portal_view
+msgid "<i class=\"fa fa-download fa-fw\"/> Download file"
+msgstr "<i class=\"fa fa-download fa-fw\"/>הורד מסמך"
 
 #. module: documents_hr
 #: model:mail.template,body_html:documents_hr.mail_template_document_folder_link
 msgid ""
-"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"width:100%; margin:0px auto;\"><tbody>\n"
-"        <tr><td valign=\"top\" style=\"text-align: left; font-size: 14px;\">\n"
-"            Dear <t t-esc=\"object.name\"></t>, your personal documents access link is available for you.<br><br>\n"
-"            You'll find all your personal HR documents in this folder.<br><br>\n"
-"            Please keep this link secure.<br><br>\n"
-"            <div style=\"text-align: center; padding: 16px 0px 16px 0px; font-size: 14px;\">\n"
-"                <a t-attf-href=\"{{ object.documents_share_id.full_url }}\" target=\"_blank\" style=\"background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;\">\n"
+"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"width:100%; "
+"margin:0px auto;\"><tbody>\n"
+"        <tr><td valign=\"top\" style=\"text-align: left; font-size: 14px;"
+"\">\n"
+"            Dear <t t-esc=\"object.name\"/>, your personal documents access "
+"link is available for you.<br/><br/>\n"
+"            You'll find all your personal HR documents in this folder.<br/"
+"><br/>\n"
+"            Please keep this link secure.<br/><br/>\n"
+"            <div style=\"text-align: center; padding: 16px 0px 16px 0px; "
+"font-size: 14px;\">\n"
+"                <a t-attf-href=\"{{ object._get_documents_link_url() }}\" "
+"target=\"_blank\" style=\"background-color: #875A7B; padding: 8px 16px 8px "
+"16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;"
+"\">\n"
 "                    Your Documents\n"
 "                </a>\n"
 "            </div>\n"
-"            Have a nice day,<br>\n"
+"            Have a nice day,<br/>\n"
 "            The HR Team\n"
 "        </td></tr>\n"
 "    </tbody></table>\n"
@@ -51,7 +58,7 @@ msgid ""
 msgstr ""
 
 #. module: documents_hr
-#: model:documents.tag,name:documents_hr.documents_hr_documents_absences
+#: model:documents.tag,name:documents_hr.documents_tag_absences
 msgid "Absences"
 msgstr "היעדרויות"
 
@@ -61,7 +68,7 @@ msgid "Centralize your employees' documents (contracts, payslips, etc.)"
 msgstr "רכז את מסמכי העובדים שלך (חוזים, תלושי שכר וכו')"
 
 #. module: documents_hr
-#: model:documents.tag,name:documents_hr.documents_hr_documents_Cerification
+#: model:documents.tag,name:documents_hr.documents_tag_certification
 msgid "Certifications"
 msgstr "תעודות"
 
@@ -73,7 +80,7 @@ msgstr "חברות"
 #. module: documents_hr
 #: model:ir.model,name:documents_hr.model_res_config_settings
 msgid "Config Settings"
-msgstr "הגדר הגדרות"
+msgstr "הגדרות תצורה"
 
 #. module: documents_hr
 #: model:ir.model,name:documents_hr.model_hr_departure_wizard
@@ -91,9 +98,11 @@ msgid "Document Count"
 msgstr "כמות מסמכים"
 
 #. module: documents_hr
-#. odoo-python
-#: code:addons/documents_hr/models/res_users.py:0
-#: model:documents.facet,name:documents_hr.documents_hr_documents
+#: model:ir.model,name:documents_hr.model_documents_redirect
+msgid "Document Redirect"
+msgstr "הפניית מסמך"
+
+#. module: documents_hr
 #: model:ir.model.fields,field_description:documents_hr.field_res_users__document_count
 #: model_terms:ir.ui.view,arch_db:documents_hr.hr_employee_view_form
 #: model_terms:ir.ui.view,arch_db:documents_hr.res_users_view_form
@@ -106,12 +115,13 @@ msgid "Documents Hr Settings"
 msgstr "הגדרות מסמכי משאבי אנוש"
 
 #. module: documents_hr
-#: model:ir.model.fields,field_description:documents_hr.field_hr_employee__documents_share_id
-msgid "Documents Share"
-msgstr "שיתוף מסמכים"
+#: model_terms:ir.ui.view,arch_db:documents_hr.documents_hr_portal_view
+msgid "Download file"
+msgstr "קובץ להורדה"
 
 #. module: documents_hr
 #: model:ir.model,name:documents_hr.model_hr_employee
+#: model:ir.model.fields,field_description:documents_hr.field_documents_redirect__employee_id
 msgid "Employee"
 msgstr "עובד"
 
@@ -124,25 +134,14 @@ msgid ""
 msgstr ""
 
 #. module: documents_hr
-#: model:documents.tag,name:documents_hr.documents_hr_documents_employees
+#: model:documents.tag,name:documents_hr.documents_tag_employees
 msgid "Employees Documents"
 msgstr "מסמכי עובדים"
 
 #. module: documents_hr
-#: model:documents.folder,name:documents_hr.documents_hr_folder
-msgid "HR"
-msgstr "משאבי אנוש"
-
-#. module: documents_hr
-#. odoo-python
-#: code:addons/documents_hr/models/hr_employee.py:0
-msgid "HR Documents: %s"
-msgstr ""
-
-#. module: documents_hr
 #: model:mail.template,name:documents_hr.mail_template_document_folder_link
 msgid "HR: Document Access Link"
-msgstr ""
+msgstr "משאבי אנוש : קישור גישה למסמך"
 
 #. module: documents_hr
 #: model:ir.model.fields,field_description:documents_hr.field_res_config_settings__documents_hr_settings
@@ -150,35 +149,49 @@ msgid "Human Resources"
 msgstr "משאבי אנוש"
 
 #. module: documents_hr
+#: model_terms:ir.ui.view,arch_db:documents_hr.documents_hr_portal_view
+msgid "My documents"
+msgstr "המסמכים שלי"
+
+#. module: documents_hr
 #: model:ir.model.fields,field_description:documents_hr.field_hr_departure_wizard__private_email
 msgid "Private Email"
-msgstr ""
+msgstr "דוא\"ל פרטי"
 
 #. module: documents_hr
 #: model:ir.model.fields,field_description:documents_hr.field_hr_departure_wizard__send_hr_documents_access_link
 msgid "Send Access Link"
-msgstr ""
+msgstr "שלח קישור גישה"
 
 #. module: documents_hr
 #: model:ir.actions.server,name:documents_hr.ir_actions_server_send_access_link
 msgid "Send HR Documents Access Link"
-msgstr ""
+msgstr "שלח קישור למסמכי משאבי אנוש"
 
 #. module: documents_hr
 #: model:ir.model.fields,help:documents_hr.field_hr_departure_wizard__send_hr_documents_access_link
-msgid "Send a share link to the private email of the employee with all the HR files he owns in Documents app"
+msgid ""
+"Send a share link to the private email of the employee with all the HR files "
+"he owns in Documents app"
 msgstr ""
+"שלח קישור שיתוף לכתובת האימייל הפרטית של העובד עם כל קבצי משאבי האנוש שהוא "
+"הבעלים שלהם באפליקציית המסמכים."
 
 #. module: documents_hr
 #: model:mail.template,description:documents_hr.mail_template_document_folder_link
 msgid "Sent manually when recording an employee departure"
-msgstr ""
+msgstr "שלח ידנית כאשר מתועדת עזיבה של עובד"
+
+#. module: documents_hr
+#: model_terms:ir.ui.view,arch_db:documents_hr.documents_hr_portal_view
+msgid "Size:"
+msgstr "גודל:"
 
 #. module: documents_hr
 #. odoo-python
 #: code:addons/documents_hr/models/hr_employee.py:0
 msgid "The access link has been sent to the employee."
-msgstr ""
+msgstr "הקישור גישה נשלח לעובד."
 
 #. module: documents_hr
 #: model:ir.model,name:documents_hr.model_res_users
@@ -193,8 +206,18 @@ msgstr "סביבת עבודה"
 #. module: documents_hr
 #. odoo-python
 #: code:addons/documents_hr/models/hr_employee.py:0
-msgid "You must set a private address on the Employee in order to use Document's features."
+msgid "You can not send the documents link to the employee."
+msgstr "אתה לא יכול לשלוח את הקישור גישה לעובד."
+
+#. module: documents_hr
+#. odoo-python
+#: code:addons/documents_hr/models/hr_employee.py:0
+msgid ""
+"You must set a work contact address on the Employee in order to use "
+"Document's features."
 msgstr ""
+"יש להגדיר התקשרות לעבודה עבור העובד על מנת להשתמש בפונקציות של אפליקציית "
+"המסמכים."
 
 #. module: documents_hr
 #: model:ir.model.fields,field_description:documents_hr.field_res_company__documents_hr_folder
@@ -209,4 +232,13 @@ msgstr "סביבת עבודה ברירת מחדל משאבי אנוש"
 #. module: documents_hr
 #: model:mail.template,subject:documents_hr.mail_template_document_folder_link
 msgid "{{ object.name }}, your personal documents access link is available"
-msgstr ""
+msgstr "{{ object.name }}, קישור הגישה למסמכים האישיים שלך זמין כעת"
+
+#~ msgid ""
+#~ "Employee's related user and private email must be set to use \"Send "
+#~ "Access Link\" function:\n"
+#~ "%s"
+#~ msgstr ""
+#~ "יש להגדיר את המשתמש המשויך לעובד ואת כתובת האימייל הפרטית כדי להשתמש "
+#~ "בפונקציה 'שלח קישור גישה':\n"
+#~ "%s"

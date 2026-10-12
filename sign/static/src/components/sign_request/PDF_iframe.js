@@ -4,7 +4,7 @@ import { _t } from "@web/core/l10n/translation";
 import { rpc } from "@web/core/network/rpc";
 import { renderToString } from "@web/core/utils/render";
 import { AlertDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
-import { normalizePosition, pinchService, isVisible } from "./utils";
+import { normalizePosition, isVisible } from "./utils";
 
 export class PDFIframe {
     /**
@@ -32,7 +32,9 @@ export class PDFIframe {
             return obj;
         }, {});
         this.radioSets = this.props.radioSets;
-        this.waitForPagesToLoad();
+        if (this.root) {
+            this.waitForPagesToLoad();
+        }
     }
 
     waitForPagesToLoad() {
@@ -82,8 +84,8 @@ export class PDFIframe {
             "#openFile",
             "#presentationMode",
             "#viewBookmark",
-            "#print",
-            "#download",
+            "#printButton",
+            "#downloadButton",
             "#secondaryOpenFile",
             "#secondaryPresentationMode",
             "#secondaryViewBookmark",
@@ -110,15 +112,16 @@ export class PDFIframe {
     addCanvasLayer() {
         const viewer = this.root.querySelector("#viewer");
         const layer = document.createElement("canvas");
+        const scale = this.getCanvasScale();
         layer.id = "canvas_layer_0";
-        layer.style.position = 'absolute';
-        layer.style.top = '0';
-        layer.style.left = '0';
+        layer.style.position = "absolute";
+        layer.style.top = "0";
+        layer.style.left = "0";
         layer.style.zIndex = 1;
         layer.style.width = viewer.offsetWidth + "px";
         layer.style.height = viewer.offsetHeight + "px";
-        layer.width = viewer.offsetWidth;
-        layer.height = viewer.offsetHeight;
+        layer.width = viewer.offsetWidth / scale;
+        layer.height = viewer.offsetHeight / scale;
         viewer.appendChild(layer);
     }
 
@@ -143,7 +146,7 @@ export class PDFIframe {
      * Renders connecting lines between radio items.
      */
 
-    renderAllConnectingLines(){}
+    renderAllConnectingLines() {}
 
     /**
      * register sign item events. in template edition, should be overwritten to add drag/drop events
@@ -152,11 +155,16 @@ export class PDFIframe {
 
     startPinchService() {
         const pinchTarget = this.root.querySelector("#viewerContainer #viewer");
-        const pinchServiceCleanup = pinchService(pinchTarget, {
-            decreaseDistanceHandler: () => this.root.querySelector("button#zoomIn").click(),
-            increaseDistanceHandler: () => this.root.querySelector("button#zoomOut").click(),
+        const handleTouchMove = (e) => {
+            if (e.touches.length == 2) {
+                // To allow zooming in pdf only.
+                e.preventDefault();
+            }
+        };
+        pinchTarget.addEventListener("touchmove", handleTouchMove);
+        this.cleanupFns.push(() => {
+            pinchTarget.removeEventListener("touchmove", handleTouchMove);
         });
-        this.cleanupFns.push(pinchServiceCleanup);
     }
 
     /**
@@ -198,16 +206,23 @@ export class PDFIframe {
             (responsible > 0 && responsible !== this.currentRole) ||
             !!signItem.value;
         const isCurrentRole = this.currentRole === parseInt(responsible);
+        const placeholder =
+            signItem.placeholder ||
+            (isCurrentRole && signItem.name) ||
+            (this.readonly && `${signItem.name}\n${signItem.responsible_name}`) ||
+            "";
         return Object.assign(signItem, {
             readonly: signItem.readonly ?? readonly,
             editMode: signItem.editMode ?? false,
             required: Boolean(signItem.required),
             responsible,
             type,
-            placeholder: signItem.placeholder || signItem.name || "",
-            classes: `${signItem.required && isCurrentRole ? "o_sign_sign_item_required" : ""} ${
-                readonly && isCurrentRole ? "o_readonly_mode" : ""
-            } ${this.readonly ? "o_sign_sign_item_pdfview" : ""}`,
+            placeholder: placeholder,
+            classes: `
+                ${isCurrentRole ? "o_sign_sign_item_default" : ""}
+                ${signItem.required && isCurrentRole ? "o_sign_sign_item_required" : ""}
+                ${readonly && isCurrentRole ? "o_readonly_mode" : ""}
+                ${this.readonly ? "o_sign_sign_item_pdfview" : ""}`,
             style: `top: ${normalizedPosY * 100}%; left: ${normalizedPosX * 100}%;
                     width: ${signItem.width * 100}%; height: ${signItem.height * 100}%;
                     text-align: ${signItem.alignment}`,
@@ -225,6 +240,11 @@ export class PDFIframe {
             for (const id in this.signItems[page]) {
                 const signItem = this.signItems[page][id].el;
                 signItem.classList.remove("d-none");
+                if (signItem && signItem.hasAttribute("data-signature")) {
+                    signItem.addEventListener("dragstart", (event) => {
+                        event.preventDefault();
+                    });
+                }
                 if (!signItem.parentElement || !signItem.parentElement.classList.contains("page")) {
                     pageContainer.append(signItem);
                 }
@@ -283,16 +303,16 @@ export class PDFIframe {
     }
 
     setInitialZoom() {
-        let button = this.root.querySelector("button#zoomIn");
+        let button = this.root.querySelector("button#zoomInButton");
         if (!this.env.isSmall) {
-            button = this.root.querySelector("button#zoomOut");
+            button = this.root.querySelector("button#zoomOutButton");
             button.click();
         }
         button.click();
     }
 
     postRender() {
-        const refreshSignItemsIntervalId = setInterval(() => this.refreshSignItems(), 2000);
+        const refreshSignItemsIntervalId = setInterval(() => this.refreshSignItems(), 1000);
         this.cleanupFns.push(() => clearInterval(refreshSignItemsIntervalId));
     }
 
@@ -361,5 +381,16 @@ export class PDFIframe {
      */
     getCanvas() {
         return this.root.querySelector("#canvas_layer_0");
+    }
+
+    /**
+     *
+     * @returns scale of the canvas if its height exceeds the maximum size, else 1.
+     */
+    getCanvasScale() {
+        //@see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas#maximum_canvas_size
+        const MAX_CANVAS_HEIGHT = 16384;
+        const viewer_height = this.root.querySelector("#viewer").offsetHeight;
+        return Math.ceil(viewer_height / MAX_CANVAS_HEIGHT);
     }
 }

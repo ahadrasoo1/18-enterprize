@@ -134,3 +134,30 @@ class TestReportSections(AccountTestInvoicingHttpCommon):
 
         with patch.object(type(self.env['account.report']), '_init_options_custom', patched_init_options_custom):
             self.start_tour("/odoo", 'account_reports_sections', login=self.env.user.login)
+
+    def test_exported_xlsx_unique_names(self):
+        composite_report = self.env['account.report'].create({
+            'name': "Composite",
+        })
+        for i in range(1, 13):
+            self.env['account.report'].create({
+                'name': "Comprehensive Monthly Analysis Report Q%d" % i,
+                'section_main_report_ids': [Command.set([composite_report.id])],
+            })
+
+        composite_report.export_to_xlsx(composite_report.get_options({}))
+
+    def test_composite_report_with_journal_report_pdf_export(self):
+        """
+        Test that exporting a composite report containing a journal report to PDF
+        works correctly.
+        """
+        journal_report = self.env.ref('account_reports.journal_report')
+        composite_with_journal = self.env['account.report'].create({
+            'name': 'Test Composite with Journal Report',
+            'section_report_ids': [Command.set([journal_report.id])],
+        })
+        options = composite_with_journal.get_options({})
+        result = composite_with_journal.export_to_pdf(options)
+        self.assertTrue(result.get('file_content'), 'PDF should be generated successfully')
+        self.assertEqual(result.get('file_type'), 'pdf', 'File type should be PDF')

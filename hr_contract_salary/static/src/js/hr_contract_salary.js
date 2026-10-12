@@ -9,11 +9,11 @@ import { rpc } from "@web/core/network/rpc";
 import { renderToElement } from "@web/core/utils/render";
 import { getDataURLFromFile } from "@web/core/utils/urls";
 import { attachComponent } from "@web_editor/js/core/owl_utils";
-import { SelectMenu } from "@web/core/select_menu/select_menu";
+import { HrContractSalarySelectMenu } from "./hr_contract_salary_select_menu" 
 
 class SelectMenuWrapper extends Component {
     static template = "hr_contract_salary.SelectMenuWrapper";
-    static components = { SelectMenu };
+    static components = { HrContractSalarySelectMenu };
     static props = {
         el: { optional: true, type: Object },
     };
@@ -21,11 +21,23 @@ class SelectMenuWrapper extends Component {
     setup() {
         this.state = useState({
             choices: [],
+            groups: [],
             value: this.props.el.value,
             disabled: false,
             required: this.props.el.required,
+            autoSort: false,
         });
-        this.state.choices = [...this.props.el.querySelectorAll("option")].filter((x) => x.value);
+
+        let optgroup = [...this.props.el.querySelectorAll("optgroup")]
+        if (optgroup.length){
+            this.state.groups = optgroup.map(x => ({
+                label: x.label,
+                choices: [...x.querySelectorAll("option")],
+            }));
+        } else {
+           this.state.choices = [...this.props.el.querySelectorAll("option")].filter((x) => x.value);
+        }
+
         this.props.el.classList.add("d-none");
     }
 
@@ -64,6 +76,12 @@ publicWidget.registry.SalaryPackageWidget = publicWidget.Widget.extend({
         const selectWrapperEls = document.querySelectorAll(
             "#hr_contract_salary select:not(.refuse-reason-select)"
         );
+        // Create a wrapper div to ensure the working schedule selection appears directly below the label TODO: remove master
+        const workingScheduleSelect = document.querySelector("#hr_contract_salary select[name='simulation_working_schedule']");
+        if (workingScheduleSelect) {
+            const wrapperDiv = workingScheduleSelect.parentNode.insertBefore(document.createElement("div"), workingScheduleSelect);
+            wrapperDiv.append(workingScheduleSelect);
+        }
 
         const promises = [];
         selectWrapperEls.forEach((el) => {
@@ -117,7 +135,7 @@ publicWidget.registry.SalaryPackageWidget = publicWidget.Widget.extend({
         $('input')
             .toArray()
             .forEach(async input => {
-                let dependentBenefits = $(input).data('benefit_ids-dependent');
+                let dependentBenefits = $(input).data('benefit_ids_dependent');
                 const requested_documents = $(input).data('requested_documents');
                 let mandatoryBenefitSelected;
                 if (dependentBenefits || requested_documents) {
@@ -461,6 +479,9 @@ publicWidget.registry.SalaryPackageWidget = publicWidget.Widget.extend({
 
     checkInputSelected(benefit) {
         const target = $("input[name='" + benefit + "']").toArray();
+        if (!target.length) {
+            return false;
+        }
         let type = target[0].type;
         let newValue;
         if (type === 'radio') {
@@ -495,7 +516,7 @@ publicWidget.registry.SalaryPackageWidget = publicWidget.Widget.extend({
     },
 
     async onchangeDocument(input) {
-        if (input.target.files) {
+        if (input.target.files && input.target.files.length > 0) {
             const testString = await getDataURLFromFile(input.target.files[0]);
             const regex = new RegExp(",(.{0,})", "g");
             const img_src = regex.exec(testString)[1];

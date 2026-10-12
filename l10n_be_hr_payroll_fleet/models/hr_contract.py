@@ -3,7 +3,6 @@
 
 from odoo import api, fields, models
 from odoo.osv import expression
-from odoo.addons.fleet.models.fleet_vehicle_model import FUEL_TYPES
 
 
 class HrContract(models.Model):
@@ -14,21 +13,12 @@ class HrContract(models.Model):
         domain = expression.AND([
             expression.OR([
                 [('company_id', '=', False)],
-                [('company_id', '=', self.company_id.id)]
+                [('company_id', '=', self.company_id.id)],
             ]),
-            expression.AND([
-                expression.AND([
-                    expression.OR([
-                        [('future_driver_id', '=', False)],
-                        [('future_driver_id', 'in', driver_ids.ids if driver_ids else [])],
-                    ]),
-                    [('model_id.vehicle_type', '=', vehicle_type)],
-                ]),
-                expression.OR([
-                    [('driver_id', '=', False)],
-                    [('driver_id', 'in', driver_ids.ids if driver_ids else [])],
-                    [('plan_to_change_car', '=', True)] if vehicle_type == 'car' else [('plan_to_change_bike', '=', True)]
-                ])
+            [('model_id.vehicle_type', '=', vehicle_type)],
+            expression.OR([
+                [(f'plan_to_change_{vehicle_type}', '=', True)],
+                [('future_driver_id', 'in', driver_ids.ids if driver_ids else [])],
             ]),
             [('write_off_date', '=', False)],
         ])
@@ -81,7 +71,7 @@ class HrContract(models.Model):
     max_unused_cars = fields.Integer(compute='_compute_max_unused_cars')
     acquisition_date = fields.Date(related='car_id.acquisition_date', readonly=False, groups="fleet.fleet_group_manager")
     car_value = fields.Float(related="car_id.car_value", readonly=False, groups="fleet.fleet_group_manager")
-    fuel_type = fields.Selection(selection=lambda self: FUEL_TYPES, compute="_compute_fuel_type", readonly=False, groups="fleet.fleet_group_manager")
+    fuel_type = fields.Selection(selection=lambda self: self.env['fleet.vehicle']._fields['fuel_type']._description_selection(self.env), compute="_compute_fuel_type", readonly=False, groups="fleet.fleet_group_manager")
     co2 = fields.Float(related="car_id.co2", readonly=False, groups="fleet.fleet_group_manager")
     driver_id = fields.Many2one('res.partner', related="car_id.driver_id", readonly=False, groups="fleet.fleet_group_manager")
     car_open_contracts_count = fields.Integer(compute='_compute_car_open_contracts_count', groups="fleet.fleet_group_manager")

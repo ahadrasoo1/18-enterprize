@@ -14,7 +14,7 @@ class Users(models.Model):
     @api.depends('partner_id')
     def _compute_documents(self):
         documents_read_group = dict(self.env['documents.document']._read_group(
-            [('partner_id', 'in', self.partner_id.ids)],
+            ['&', ('partner_id', 'in', self.env.user.partner_id.ids), '|', ('owner_id', '=', self.env.user.id), ('access_ids.partner_id', 'in', self.env.user.partner_id.ids)],
             ['partner_id'],
             ['id:array_agg'],
         ))
@@ -29,13 +29,9 @@ class Users(models.Model):
 
     def action_see_documents(self):
         self.ensure_one()
-        return {
-            'name': _('Documents'),
+        action = self.env['ir.actions.act_window']._for_xml_id('documents.document_action')
+        return action | {
             'domain': [('partner_id', '=', self.partner_id.id)],
-            'res_model': 'documents.document',
-            'type': 'ir.actions.act_window',
-            'views': [(False, 'kanban'), (False, 'list')],
-            'view_mode': 'kanban,list',
             'context': {
                 "default_partner_id": self.partner_id.id,
                 "searchpanel_default_folder_id": False

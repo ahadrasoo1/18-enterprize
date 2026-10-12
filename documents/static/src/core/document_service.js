@@ -1,7 +1,8 @@
 /* @odoo-module */
 
 import { Document } from "./document_model";
-import { EventBus } from "@odoo/owl";
+import { DocumentsManageVersions } from "@documents/components/documents_manage_versions_panel/documents_manage_versions_panel";
+import { EventBus, reactive } from "@odoo/owl";
 import { browser } from "@web/core/browser/browser";
 import { parseSearchQuery, router } from "@web/core/browser/router";
 import { _t } from "@web/core/l10n/translation";
@@ -10,6 +11,13 @@ import { rpc } from "@web/core/network/rpc";
 import { user } from "@web/core/user";
 import { debounce } from "@web/core/utils/timing";
 import { session } from "@web/session";
+import { formatFloat } from "@web/views/fields/formatters";
+import { memoize } from "@web/core/utils/functions";
+
+// Small hack, memoize uses the first argument as cache key, but we need the orm which will not be the same.
+const loadMaxUploadSize = memoize((_null, orm) =>
+    orm.call("documents.document", "get_document_max_upload_limit")
+);
 
 export class DocumentService {
     documentList;
@@ -21,11 +29,15 @@ export class DocumentService {
         this.orm = services["orm"];
         this.action = services["action"];
         this.notification = services["notification"];
+        this.dialog = services["dialog"];
+        this.fileUpload = services["file_upload"];
         this.logAccess = debounce(this._logAccess, 1000, false);
         this.currentFolderAccessToken = null;
-        this.userIsInternal = false;
         this.bus = new EventBus();
         this.userIsDocumentManager = false;
+        this.userIsDocumentUser = false;
+        this.userIsErpManager = false;
+        this.userIsInternal = false;
         // Init data
         const urlSearch = parseSearchQuery(browser.location.search);
         const { documents_init } = session;
@@ -35,7 +47,7 @@ export class DocumentService {
             Number(urlSearch.documents_init_document_id) || documents_init?.document_id;
         this.documentIdToRestoreOnce = documentId;
         const initFolderId = urlSearch.documents_init_folder_id;
-        const folderId = ['MY', 'COMPANY', 'SHARED'].includes(initFolderId) ?
+        const folderId = ['MY', 'COMPANY', 'SHARED', 'TRASH'].includes(initFolderId) ?
             initFolderId : Number(initFolderId) || documents_init?.folder_id;
         this._initData = { documentId, folderId, openPreview };
         if (this._initData.folderId) {
@@ -57,9 +69,24 @@ export class DocumentService {
     }
 
     async start() {
-        this.userIsInternal = await user.hasGroup("base.group_user");
-        this.userIsDocumentManager = await user.hasGroup("documents.group_documents_manager");
-        this.userIsDocumentUser = await user.hasGroup("documents.group_documents_user");
+        [
+            this.userIsDocumentManager,
+            this.userIsDocumentUser,
+            this.userIsErpManager,
+            this.userIsInternal,
+        ] = await Promise.all([
+            user.hasGroup("documents.group_documents_manager"),
+            user.hasGroup("documents.group_documents_user"),
+            user.hasGroup("base.group_erp_manager"),
+            user.hasGroup("base.group_user"),
+        ]);
+        const initialState = this.userIsInternal && JSON.parse(localStorage.getItem("documentsChatterVisible"));
+        this.chatterState = reactive({
+            visible: initialState,
+            isChatterVisible: initialState,
+        }, () => {
+            localStorage.setItem("documentsChatterVisible", this.chatterState.visible);
+        });
     }
 
     /**
@@ -96,17 +123,23 @@ export class DocumentService {
             this.store.Document.records[data.id] = document;
             // Get reactive version.
             document = this.store.Document.records[data.id];
+        } else {
+            // Document was renamed
+            if ("attachment" in data && data.name !== document.name) {
+                document.attachment = this.store.Attachment.insert(data.attachment);
+            }
         }
         // return reactive version
         return document;
     }
 
     canUploadInFolder(folder) {
-        // "All" (!folder.id) and "My Drive" ("MY") are only editable by internal user.
+        const userPermission = folder.target_user_permission || folder.user_permission;
         return (
             folder &&
-            ((typeof folder.id === "number" && folder.user_permission === "edit") ||
-                (this.userIsInternal && (folder.id === "MY" || !folder.id)))
+            ((typeof folder.id === "number" && userPermission === "edit") ||
+                (this.userIsInternal && ["MY", "RECENT", false].includes(folder.id)) ||
+                (this.userIsDocumentManager && folder.id === "COMPANY"))
         );
     }
 
@@ -124,7 +157,7 @@ export class DocumentService {
     }
 
     isFolderSharable(folder) {
-        return folder && typeof folder.id === "number" && !folder.shortcut_document_id;
+        return folder && typeof folder.id === "number";
     }
 
     async openDialogDetails(documentId, editable) {
@@ -156,6 +189,7 @@ export class DocumentService {
         return new Promise((resolve) => {
             this.action.doAction(
                 {
+                    name: _t("Rename"),
                     type: "ir.actions.act_window",
                     res_model: "documents.document",
                     res_id: documentId,
@@ -163,6 +197,7 @@ export class DocumentService {
                     target: "new",
                     context: {
                         active_id: documentId,
+                        dialog_size: "medium",
                         form_view_ref: "documents.document_view_form_rename",
                     },
                 },
@@ -172,6 +207,29 @@ export class DocumentService {
                     },
                 }
             );
+        });
+    }
+
+    async openDialogManageVersions(documentId) {
+        this.dialog.add(DocumentsManageVersions, { documentId });
+    }
+
+    async goToServerActionsView() {
+        const userHasAccessRight = await user.checkAccessRight("ir.actions.server", "create");
+        if (!userHasAccessRight) {
+            return this.notification.add(
+                _t("Contact your Administrator to get access if needed."),
+                {
+                    title: _t("Access to Server Actions"),
+                    type: "info",
+                }
+            );
+        }
+
+        return await this.action.doActionButton({
+            name: "action_open_documents_server_action_view",
+            type: "object",
+            resModel: "ir.actions.server",
         });
     }
 
@@ -185,10 +243,36 @@ export class DocumentService {
         await this.orm.call("documents.document", "action_create_shortcut", documentIds);
     }
 
+    async moveOrCreateShortcut(data, targetFolderId, forceShortcut) {
+        let message = "";
+        if (forceShortcut) {
+            await this.orm.call("documents.document", "action_create_shortcut", [
+                data.recordIds,
+                targetFolderId,
+            ]);
+            message =
+                data.recordIds.length == 1
+                    ? _t("A shortcut has been created.")
+                    : _t("%s shortcuts have been created.", data.recordIds.length);
+        } else {
+            if (data.movableRecordIds.length) {
+                await this.orm.call("documents.document", "action_move_documents", [data.movableRecordIds, targetFolderId]);
+                message =
+                    data.movableRecordIds.length == 1
+                        ? _t("The document has been moved.")
+                        : _t("%s documents have been moved.", data.movableRecordIds.length);
+            }
+            if (data.nonMovableRecordIds.length) {
+                await this.orm.call("documents.document", "action_create_shortcut", [data.nonMovableRecordIds, targetFolderId]);
+                message = _t("At least one document couldn't be moved due to access rights. Shortcuts have been created.");
+            }
+        }
+        this.notification.add(message, { type: "success" });
+    }
+
     async toggleFavorite(document) {
-        const [unlinkCmd, linkCmd] = [3, 4];
         await this.orm.write("documents.document", [document.id], {
-            favorited_ids: [[document.is_favorited ? unlinkCmd : linkCmd, user.userId, 0]],
+            is_favorited: !document.is_favorited,
         });
     }
 
@@ -246,7 +330,7 @@ export class DocumentService {
         if (!accessToken) {
             return;
         }
-        rpc(`/documents/touch/${accessToken}`);
+        return rpc(`/documents/touch/${encodeURIComponent(accessToken)}`);
     }
 
     /**
@@ -256,7 +340,7 @@ export class DocumentService {
      */
     async getActions(folderId) {
         if (!this.userIsInternal) {
-            return { actions: [] };
+            return [];
         }
         return await this.orm.call("documents.document", "get_documents_actions", [
             folderId,
@@ -272,13 +356,17 @@ export class DocumentService {
             actionId,
         ]);
     }
-
+    // todo: remove in master
     isChatterVisible() {
-        return this.userIsInternal && localStorage.getItem("documentsChatterVisible") === "true";
+        return this.chatterState.visible;
     }
 
-    setChatterVisible(visible) {
-        localStorage.setItem("documentsChatterVisible", visible);
+    // todo: remove in master
+    setChatterVisible(visible) {}
+
+    toggleChatterState() {
+        this.chatterState.visible = !this.chatterState.visible;
+        this.chatterState.isChatterVisible = !this.chatterState.isChatterVisible;
     }
 
     /**
@@ -288,10 +376,53 @@ export class DocumentService {
         this.previewedDocument = document;
         this.bus.trigger("DOCUMENT_PREVIEWED");
     }
+
+    async uploadDocument(files, accessToken, context) {
+        const fileArray = [...files];
+        const maxUploadSize = await loadMaxUploadSize(null, this.orm);
+        const validFiles = fileArray.filter((file) => file.size <= maxUploadSize);
+        if (validFiles.length !== 0) {
+            const encodedToken = encodeURIComponent(accessToken || "");
+            await this.fileUpload.upload(`/documents/upload/${encodedToken}`, validFiles, {
+                buildFormData: (formData) => {
+                    if (context) {
+                        for (const key of [
+                            "default_owner_id",
+                            "default_partner_id",
+                            "default_res_id",
+                            "default_res_model",
+                        ]) {
+                            if (context[key]) {
+                                formData.append(key.replace("default_", ""), context[key]);
+                            }
+                        }
+                        if (context.allowed_company_ids) {
+                            formData.append(
+                                "allowed_company_ids",
+                                JSON.stringify(context.allowed_company_ids)
+                            );
+                        }
+                        if (context.document_id) {
+                            formData.append("document_id", context.document_id);
+                        }
+                    }
+                },
+                displayErrorNotification: false,
+            });
+        }
+        if (validFiles.length >= fileArray.length) {
+            return;
+        }
+        const message = _t(
+            "Some files could not be uploaded (max size: %s).",
+            formatFloat(maxUploadSize, { humanReadable: true })
+        );
+        this.notification.add(message, { type: "danger" });
+    }
 }
 
 export const documentService = {
-    dependencies: ["action", "mail.store", "notification", "orm"],
+    dependencies: ["action", "mail.store", "notification", "orm", "dialog", "file_upload"],
     async start(env, services) {
         const service = new DocumentService(env, services);
         await service.start();

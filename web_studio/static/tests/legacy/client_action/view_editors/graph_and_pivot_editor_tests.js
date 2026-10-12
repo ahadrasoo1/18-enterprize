@@ -307,8 +307,8 @@ QUnit.module(
             async function (assert) {
                 serverData.models.product.fields = {
                     ...serverData.models.product.fields,
-                    m2o: { type: "many2one", store: true, relation: "partner" },
-                    coucou_id: { type: "many2one", store: true, relation: "coucou" },
+                    m2o: { type: "many2one", store: true, relation: "partner", groupable: true },
+                    coucou_id: { type: "many2one", store: true, relation: "coucou", groupable: true },
                     toughness: {
                         manual: true,
                         string: "toughness",
@@ -318,9 +318,10 @@ QUnit.module(
                             ["1", "Harder"],
                         ],
                         store: true,
+                        groupable: true
                     },
                 };
-                serverData.models.product.fields.display_name.store = true;
+                serverData.models.product.fields.display_name.groupable = true;
                 serverData.models.product.fields.display_name.string = "display_name";
 
                 serverData.models.partner.records = [

@@ -41,7 +41,7 @@ class RentalReport(models.Model):
 
     def _select(self):
         return """
-            sol.id,
+            row_number() over (order by sol.id, d.date) AS id,
             sol.order_id,
             sol.product_id,
             %s,
@@ -50,7 +50,7 @@ class RentalReport(models.Model):
             sol.salesman_id AS user_id,
             pt.categ_id,
             p.product_tmpl_id,
-            generate_series(so.rental_start_date::date, so.rental_return_date::date, '1 day'::interval)::date date,
+            d.date,
             %s AS price,
             sol.company_id,
             sol.state,
@@ -65,6 +65,11 @@ class RentalReport(models.Model):
             join product_template AS pt on p.product_tmpl_id=pt.id
             join uom_uom AS u on u.id=sol.product_uom
             join uom_uom AS u2 on u2.id=pt.uom_id
+            cross join lateral generate_series(
+                so.rental_start_date::date,
+                so.rental_return_date::date,
+                '1 day'::interval
+            ) AS d(date)
         """
 
     def _query(self):

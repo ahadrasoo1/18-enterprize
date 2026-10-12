@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 16.5alpha1+e\n"
+"Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-07 08:51+0000\n"
-"PO-Revision-Date: 2023-09-07 08:51+0000\n"
+"POT-Creation-Date: 2026-04-10 19:07+0000\n"
+"PO-Revision-Date: 2026-04-10 19:07+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -18,7 +18,6 @@ msgstr ""
 #. module: l10n_co_edi
 #. odoo-python
 #: code:addons/l10n_co_edi/models/account_edi_format.py:0
-#: code:addons/l10n_co_edi/models/account_edi_format.py:0
 msgid ""
 "'Obligaciones y Responsabilidades' on the Customer Fiscal Data section needs"
 " to be set for the partner %s."
@@ -28,12 +27,6 @@ msgstr ""
 #. odoo-python
 #: code:addons/l10n_co_edi/models/account_edi_format.py:0
 msgid "'Resolución DIAN' fields must be set on the journal %s"
-msgstr ""
-
-#. module: l10n_co_edi
-#: model_terms:ir.ui.view,arch_db:l10n_co_edi.electronic_invoice_body
-#: model_terms:ir.ui.view,arch_db:l10n_co_edi.electronic_invoice_vendor_document_body
-msgid "1.00"
 msgstr ""
 
 #. module: l10n_co_edi
@@ -1309,8 +1302,7 @@ msgstr ""
 #. module: l10n_co_edi
 #: model:ir.model.fields,field_description:l10n_co_edi.field_account_bank_statement_line__l10n_co_edi_cufe_cude_ref
 #: model:ir.model.fields,field_description:l10n_co_edi.field_account_move__l10n_co_edi_cufe_cude_ref
-#: model:ir.model.fields,field_description:l10n_co_edi.field_account_payment__l10n_co_edi_cufe_cude_ref
-msgid "CUFE/CUDE"
+msgid "CUFE/CUDE/CUDS"
 msgstr ""
 
 #. module: l10n_co_edi
@@ -1448,7 +1440,6 @@ msgstr ""
 #. module: l10n_co_edi
 #. odoo-python
 #: code:addons/l10n_co_edi/models/account_edi_format.py:0
-#: code:addons/l10n_co_edi/models/account_edi_format.py:0
 msgid "Colombian invoice UBL generated for the %s document."
 msgstr ""
 
@@ -1470,6 +1461,11 @@ msgid "Company Registry"
 msgstr ""
 
 #. module: l10n_co_edi
+#: model:ir.model.fields.selection,name:l10n_co_edi.selection__account_move__l10n_co_edi_operation_type__15
+msgid "Compra Divisas"
+msgstr ""
+
+#. module: l10n_co_edi
 #: model:ir.model.fields,field_description:l10n_co_edi.field_account_move_reversal__l10n_co_edi_description_code_credit
 msgid "Concepto"
 msgstr ""
@@ -1477,7 +1473,6 @@ msgstr ""
 #. module: l10n_co_edi
 #: model:ir.model.fields,field_description:l10n_co_edi.field_account_bank_statement_line__l10n_co_edi_description_code_credit
 #: model:ir.model.fields,field_description:l10n_co_edi.field_account_move__l10n_co_edi_description_code_credit
-#: model:ir.model.fields,field_description:l10n_co_edi.field_account_payment__l10n_co_edi_description_code_credit
 msgid "Concepto Nota de Credito"
 msgstr ""
 
@@ -1485,7 +1480,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_co_edi.field_account_bank_statement_line__l10n_co_edi_description_code_debit
 #: model:ir.model.fields,field_description:l10n_co_edi.field_account_debit_note__l10n_co_edi_description_code_debit
 #: model:ir.model.fields,field_description:l10n_co_edi.field_account_move__l10n_co_edi_description_code_debit
-#: model:ir.model.fields,field_description:l10n_co_edi.field_account_payment__l10n_co_edi_description_code_debit
 msgid "Concepto Nota de Débito"
 msgstr ""
 
@@ -1542,6 +1536,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_co_edi.field_l10n_co_edi_tax_type__create_date
 #: model:ir.model.fields,field_description:l10n_co_edi.field_l10n_co_edi_type_code__create_date
 msgid "Created on"
+msgstr ""
+
+#. module: l10n_co_edi
+#: model:ir.model.fields.selection,name:l10n_co_edi.selection__account_move__l10n_co_edi_type__91
+msgid "Credit Note"
 msgstr ""
 
 #. module: l10n_co_edi
@@ -1616,6 +1615,11 @@ msgid "DAGUA"
 msgstr ""
 
 #. module: l10n_co_edi
+#: model_terms:ir.ui.view,arch_db:l10n_co_edi.electronic_invoice_body
+msgid "DATOS ADICIONALES"
+msgstr ""
+
+#. module: l10n_co_edi
 #: model:res.city,name:l10n_co_edi.city_co_647
 msgid "DIBULLA"
 msgstr ""
@@ -1651,6 +1655,11 @@ msgid "DURANIA"
 msgstr ""
 
 #. module: l10n_co_edi
+#: model:ir.model.fields.selection,name:l10n_co_edi.selection__account_move__l10n_co_edi_type__92
+msgid "Debit Note"
+msgstr ""
+
+#. module: l10n_co_edi
 #: model:ir.model.fields,field_description:l10n_co_edi.field_l10n_co_edi_tax_type__description
 msgid "Descripción"
 msgstr ""
@@ -1658,6 +1667,18 @@ msgstr ""
 #. module: l10n_co_edi
 #: model:ir.model.fields,field_description:l10n_co_edi.field_l10n_co_edi_type_code__description
 msgid "Description"
+msgstr ""
+
+#. module: l10n_co_edi
+#: model:ir.model.fields.selection,name:l10n_co_edi.selection__account_move__l10n_co_edi_description_code_credit__5
+#: model:ir.model.fields.selection,name:l10n_co_edi.selection__account_move_reversal__l10n_co_edi_description_code_credit__5
+msgid "Descuento comercial por pronto pago"
+msgstr ""
+
+#. module: l10n_co_edi
+#: model:ir.model.fields.selection,name:l10n_co_edi.selection__account_move__l10n_co_edi_description_code_credit__6
+#: model:ir.model.fields.selection,name:l10n_co_edi.selection__account_move_reversal__l10n_co_edi_description_code_credit__6
+msgid "Descuento comercial por volumen de ventas"
 msgstr ""
 
 #. module: l10n_co_edi
@@ -1670,7 +1691,6 @@ msgstr ""
 #. module: l10n_co_edi
 #: model:ir.model.fields,field_description:l10n_co_edi.field_account_bank_statement_line__l10n_co_edi_is_direct_payment
 #: model:ir.model.fields,field_description:l10n_co_edi.field_account_move__l10n_co_edi_is_direct_payment
-#: model:ir.model.fields,field_description:l10n_co_edi.field_account_payment__l10n_co_edi_is_direct_payment
 msgid "Direct Payment from Colombia"
 msgstr ""
 
@@ -1679,11 +1699,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_co_edi.field_l10n_co_edi_tax_type__display_name
 #: model:ir.model.fields,field_description:l10n_co_edi.field_l10n_co_edi_type_code__display_name
 msgid "Display Name"
-msgstr ""
-
-#. module: l10n_co_edi
-#: model:ir.model.fields.selection,name:l10n_co_edi.selection__account_move__l10n_co_edi_type__3
-msgid "Documento electrónico de transmisión – tipo 03"
 msgstr ""
 
 #. module: l10n_co_edi
@@ -1950,6 +1965,11 @@ msgid "ESPINAL"
 msgstr ""
 
 #. module: l10n_co_edi
+#: model:ir.model,name:l10n_co_edi.model_account_tax
+msgid "ETA tax codes mixin"
+msgstr ""
+
+#. module: l10n_co_edi
 #: model:ir.model.fields,field_description:l10n_co_edi.field_res_company__l10n_co_edi_header_actividad_economica
 msgid "Economic Activity"
 msgstr ""
@@ -1957,15 +1977,18 @@ msgstr ""
 #. module: l10n_co_edi
 #: model:ir.model.fields,field_description:l10n_co_edi.field_account_bank_statement_line__l10n_co_edi_attachment_url
 #: model:ir.model.fields,field_description:l10n_co_edi.field_account_move__l10n_co_edi_attachment_url
-#: model:ir.model.fields,field_description:l10n_co_edi.field_account_payment__l10n_co_edi_attachment_url
 msgid "Electronic Invoice Attachment URL"
 msgstr ""
 
 #. module: l10n_co_edi
 #: model:ir.model.fields,field_description:l10n_co_edi.field_account_bank_statement_line__l10n_co_edi_type
 #: model:ir.model.fields,field_description:l10n_co_edi.field_account_move__l10n_co_edi_type
-#: model:ir.model.fields,field_description:l10n_co_edi.field_account_payment__l10n_co_edi_type
 msgid "Electronic Invoice Type"
+msgstr ""
+
+#. module: l10n_co_edi
+#: model:ir.model.fields.selection,name:l10n_co_edi.selection__account_move__l10n_co_edi_type__4
+msgid "Electronic Sales Invoice - type 04"
 msgstr ""
 
 #. module: l10n_co_edi
@@ -1975,8 +1998,18 @@ msgid "Electronic invoice submission succeeded. Message from Carvajal:"
 msgstr ""
 
 #. module: l10n_co_edi
+#: model:ir.model.fields.selection,name:l10n_co_edi.selection__account_move__l10n_co_edi_type__3
+msgid "Electronic transmission document - type 03"
+msgstr ""
+
+#. module: l10n_co_edi
 #: model:ir.model.fields.selection,name:l10n_co_edi.selection__account_move__l10n_co_edi_operation_type__10
 msgid "Estandar"
+msgstr ""
+
+#. module: l10n_co_edi
+#: model:ir.model.fields.selection,name:l10n_co_edi.selection__account_move__l10n_co_edi_type__96
+msgid "Event (Application Response)"
 msgstr ""
 
 #. module: l10n_co_edi
@@ -1991,6 +2024,16 @@ msgstr ""
 msgid ""
 "Every product on a line should at least have a product code (barcode, "
 "internal, UNSPSC) set."
+msgstr ""
+
+#. module: l10n_co_edi
+#: model:ir.model.fields.selection,name:l10n_co_edi.selection__account_move__l10n_co_edi_type__2
+msgid "Export Invoice"
+msgstr ""
+
+#. module: l10n_co_edi
+#: model_terms:ir.ui.view,arch_db:l10n_co_edi.electronic_invoice_body
+msgid "Exportación"
 msgstr ""
 
 #. module: l10n_co_edi
@@ -2118,21 +2161,6 @@ msgid "FUSAGASUGÁ"
 msgstr ""
 
 #. module: l10n_co_edi
-#: model:ir.model.fields.selection,name:l10n_co_edi.selection__account_move__l10n_co_edi_type__2
-msgid "Factura de exportación"
-msgstr ""
-
-#. module: l10n_co_edi
-#: model:ir.model.fields.selection,name:l10n_co_edi.selection__account_move__l10n_co_edi_type__1
-msgid "Factura de venta"
-msgstr ""
-
-#. module: l10n_co_edi
-#: model:ir.model.fields.selection,name:l10n_co_edi.selection__account_move__l10n_co_edi_type__4
-msgid "Factura electrónica de Venta - tipo 04"
-msgstr ""
-
-#. module: l10n_co_edi
 #: model:ir.model.fields,field_description:l10n_co_edi.field_account_journal__l10n_co_edi_dian_authorization_date
 msgid "Fecha de Resolución"
 msgstr ""
@@ -2146,6 +2174,14 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_co_edi.field_res_partner__l10n_co_edi_fiscal_regimen
 #: model:ir.model.fields,field_description:l10n_co_edi.field_res_users__l10n_co_edi_fiscal_regimen
 msgid "Fiscal Regimen"
+msgstr ""
+
+#. module: l10n_co_edi
+#: model:ir.model.fields,help:l10n_co_edi.field_product_product__l10n_co_edi_ref_nominal_tax
+#: model:ir.model.fields,help:l10n_co_edi.field_product_template__l10n_co_edi_ref_nominal_tax
+msgid ""
+"For IBUA tax: Volume in milliliters.\n"
+"For ICL tax: % of alcohol of the beverage."
 msgstr ""
 
 #. module: l10n_co_edi
@@ -3464,6 +3500,11 @@ msgid "Name"
 msgstr ""
 
 #. module: l10n_co_edi
+#: model_terms:ir.ui.view,arch_db:l10n_co_edi.electronic_invoice_body
+msgid "Ninguna"
+msgstr ""
+
+#. module: l10n_co_edi
 #: model:ir.model.fields.selection,name:l10n_co_edi.selection__res_partner__l10n_co_edi_fiscal_regimen__49
 #: model_terms:ir.ui.view,arch_db:l10n_co_edi.electronic_invoice_body
 msgid "No Aplica"
@@ -3493,7 +3534,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_co_edi.field_account_bank_statement_line__l10n_co_edi_debit_note
 #: model:ir.model.fields,field_description:l10n_co_edi.field_account_journal__l10n_co_edi_debit_note
 #: model:ir.model.fields,field_description:l10n_co_edi.field_account_move__l10n_co_edi_debit_note
-#: model:ir.model.fields,field_description:l10n_co_edi.field_account_payment__l10n_co_edi_debit_note
 msgid "Nota de Débito"
 msgstr ""
 
@@ -3589,24 +3629,20 @@ msgid "Obligaciones y Responsabilidades"
 msgstr ""
 
 #. module: l10n_co_edi
+#: model_terms:ir.ui.view,arch_db:l10n_co_edi.electronic_invoice_body
+msgid "Observaciones"
+msgstr ""
+
+#. module: l10n_co_edi
 #: model:ir.model.fields,field_description:l10n_co_edi.field_account_bank_statement_line__l10n_co_edi_operation_type
 #: model:ir.model.fields,field_description:l10n_co_edi.field_account_move__l10n_co_edi_operation_type
-#: model:ir.model.fields,field_description:l10n_co_edi.field_account_payment__l10n_co_edi_operation_type
 msgid "Operation Type (CO)"
 msgstr ""
 
 #. module: l10n_co_edi
 #: model:ir.model.fields.selection,name:l10n_co_edi.selection__account_debit_note__l10n_co_edi_description_code_debit__4
-#: model:ir.model.fields.selection,name:l10n_co_edi.selection__account_move__l10n_co_edi_description_code_credit__5
 #: model:ir.model.fields.selection,name:l10n_co_edi.selection__account_move__l10n_co_edi_description_code_debit__4
-#: model:ir.model.fields.selection,name:l10n_co_edi.selection__account_move_reversal__l10n_co_edi_description_code_credit__5
 msgid "Otros"
-msgstr ""
-
-#. module: l10n_co_edi
-#: model:ir.model.fields.selection,name:l10n_co_edi.selection__account_move__l10n_co_edi_description_code_credit__6
-#: model:ir.model.fields.selection,name:l10n_co_edi.selection__account_move_reversal__l10n_co_edi_description_code_credit__6
-msgid "Otros (Inactive)"
 msgstr ""
 
 #. module: l10n_co_edi
@@ -4128,7 +4164,6 @@ msgstr ""
 #. module: l10n_co_edi
 #: model:ir.model.fields,field_description:l10n_co_edi.field_account_bank_statement_line__l10n_co_edi_payment_option_id
 #: model:ir.model.fields,field_description:l10n_co_edi.field_account_move__l10n_co_edi_payment_option_id
-#: model:ir.model.fields,field_description:l10n_co_edi.field_account_payment__l10n_co_edi_payment_option_id
 #: model:ir.model.fields,field_description:l10n_co_edi.field_l10n_co_edi_payment_option__name
 msgid "Payment Option"
 msgstr ""
@@ -5265,15 +5300,25 @@ msgid "SUÁREZ"
 msgstr ""
 
 #. module: l10n_co_edi
+#: model:ir.model.fields.selection,name:l10n_co_edi.selection__account_move__l10n_co_edi_type__1
+msgid "Sales Invoice"
+msgstr ""
+
+#. module: l10n_co_edi
 #: model:ir.model.fields,field_description:l10n_co_edi.field_res_company__l10n_co_edi_header_autorretenedores
 msgid "Self-retainers"
+msgstr ""
+
+#. module: l10n_co_edi
+#: model:ir.model.fields,field_description:l10n_co_edi.field_product_product__l10n_co_edi_ref_nominal_tax
+#: model:ir.model.fields,field_description:l10n_co_edi.field_product_template__l10n_co_edi_ref_nominal_tax
+msgid "Specific Component Nominal Taxes"
 msgstr ""
 
 #. module: l10n_co_edi
 #: model:ir.model.fields,field_description:l10n_co_edi.field_account_bank_statement_line__l10n_co_edi_is_support_document
 #: model:ir.model.fields,field_description:l10n_co_edi.field_account_journal__l10n_co_edi_is_support_document
 #: model:ir.model.fields,field_description:l10n_co_edi.field_account_move__l10n_co_edi_is_support_document
-#: model:ir.model.fields,field_description:l10n_co_edi.field_account_payment__l10n_co_edi_is_support_document
 msgid "Support Document"
 msgstr ""
 
@@ -5599,11 +5644,6 @@ msgid "TVA retainers"
 msgstr ""
 
 #. module: l10n_co_edi
-#: model:ir.model,name:l10n_co_edi.model_account_tax
-msgid "Tax"
-msgstr ""
-
-#. module: l10n_co_edi
 #: model:ir.model.fields,field_description:l10n_co_edi.field_res_company__l10n_co_edi_test_mode
 #: model:ir.model.fields,field_description:l10n_co_edi.field_res_config_settings__l10n_co_edi_test_mode
 msgid "Test mode"
@@ -5659,8 +5699,8 @@ msgstr ""
 #. odoo-python
 #: code:addons/l10n_co_edi/models/account_edi_format.py:0
 msgid ""
-"The issue date can not be older than 5 days or more than 5 days in the "
-"future"
+"The issue date can not be older than 6 days or more than 6 days in the "
+"future."
 msgstr ""
 
 #. module: l10n_co_edi
@@ -5682,7 +5722,6 @@ msgstr ""
 #. module: l10n_co_edi
 #: model:ir.model.fields,field_description:l10n_co_edi.field_account_bank_statement_line__l10n_co_edi_transaction
 #: model:ir.model.fields,field_description:l10n_co_edi.field_account_move__l10n_co_edi_transaction
-#: model:ir.model.fields,field_description:l10n_co_edi.field_account_payment__l10n_co_edi_transaction
 msgid "Transaction ID (CO)"
 msgstr ""
 
@@ -5779,8 +5818,7 @@ msgstr ""
 #. module: l10n_co_edi
 #: model:ir.model.fields,help:l10n_co_edi.field_account_bank_statement_line__l10n_co_edi_cufe_cude_ref
 #: model:ir.model.fields,help:l10n_co_edi.field_account_move__l10n_co_edi_cufe_cude_ref
-#: model:ir.model.fields,help:l10n_co_edi.field_account_payment__l10n_co_edi_cufe_cude_ref
-msgid "Unique ID received by the government when the invoice is signed."
+msgid "Unique ID used by the DIAN to identify the invoice."
 msgstr ""
 
 #. module: l10n_co_edi
@@ -5981,6 +6019,11 @@ msgid "VITERBO"
 msgstr ""
 
 #. module: l10n_co_edi
+#: model:ir.model.fields.selection,name:l10n_co_edi.selection__account_move__l10n_co_edi_operation_type__16
+msgid "Venta Divisas"
+msgstr ""
+
+#. module: l10n_co_edi
 #: model:res.city,name:l10n_co_edi.city_co_931
 msgid "VÉLEZ"
 msgstr ""
@@ -5988,7 +6031,6 @@ msgstr ""
 #. module: l10n_co_edi
 #: model:ir.model.fields,help:l10n_co_edi.field_account_bank_statement_line__l10n_co_edi_attachment_url
 #: model:ir.model.fields,help:l10n_co_edi.field_account_move__l10n_co_edi_attachment_url
-#: model:ir.model.fields,help:l10n_co_edi.field_account_payment__l10n_co_edi_attachment_url
 msgid ""
 "Will be included in electronic invoice and can point to\n"
 "                                             e.g. a ZIP containing additional information about the invoice."
@@ -6067,7 +6109,9 @@ msgstr ""
 #. module: l10n_co_edi
 #. odoo-python
 #: code:addons/l10n_co_edi/models/account_journal.py:0
-msgid "You cannot change Nota de Débito on a journal that already has posted or cancelled entries"
+msgid ""
+"You cannot change Nota de Débito on a journal that already has posted or "
+"cancelled entries"
 msgstr ""
 
 #. module: l10n_co_edi
@@ -6080,6 +6124,13 @@ msgstr ""
 #. odoo-python
 #: code:addons/l10n_co_edi/models/account_edi_format.py:0
 msgid "You need to set the Electronic Invoice Type on the invoice."
+msgstr ""
+
+#. module: l10n_co_edi
+#. odoo-python
+#: code:addons/l10n_co_edi/models/account_edi_format.py:0
+msgid ""
+"You should set 'Volume in milliliters' on product: %s when using IBUA taxes."
 msgstr ""
 
 #. module: l10n_co_edi

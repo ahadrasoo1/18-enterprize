@@ -1,33 +1,40 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* hr_payroll_expense
-# 
+# * hr_payroll_expense
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Marianna Ciofani, 2025
+# Sergio Zanchetta <primes2h@gmail.com>, 2025
+# "Marianna Ciofani (cima)" <cima@odoo.com>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:26+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Italian (https://app.transifex.com/odoo/teams/41243/it/)\n"
+"POT-Creation-Date: 2025-12-29 18:46+0000\n"
+"PO-Revision-Date: 2025-10-27 22:30+0000\n"
+"Last-Translator: \"Marianna Ciofani (cima)\" <cima@odoo.com>\n"
+"Language-Team: Italian <https://translate.odoo.com/projects/odoo-18/"
+"hr_payroll_expense/it/>\n"
+"Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: it\n"
-"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=(n == 1) ? 0 : ((n != 0 && n % 1000000 == "
+"0) ? 1 : 2);\n"
+"X-Generator: Weblate 5.12.2\n"
 
 #. module: hr_payroll_expense
 #: model_terms:ir.ui.view,arch_db:hr_payroll_expense.view_account_payment_register_form_inherit_hr_payroll_expense
 msgid ""
 "<span class=\"fw-bold\">\n"
-"                            The expenses will already be reimbursed in a payslip. Make sure this payment is intended.\n"
+"                            The expenses will already be reimbursed in a "
+"payslip. Make sure this payment is intended.\n"
 "                        </span>"
 msgstr ""
 "<span class=\"fw-bold\">\n"
-"                            Le spese verranno già rimborsate nella busta paga. Assicurati che il pagamento sia voluto.\n"
+"                            Le spese verranno già rimborsate nella busta "
+"paga. Assicurati che il pagamento sia voluto.\n"
 "                        </span>"
 
 #. module: hr_payroll_expense
@@ -43,6 +50,20 @@ msgstr "Nota spese"
 #. module: hr_payroll_expense
 #. odoo-python
 #: code:addons/hr_payroll_expense/models/hr_expense_sheet.py:0
+msgid ""
+"Expense reimbursement rule needs to be configured to add expenses to "
+"payslips.\n"
+"Please create one salary rule with the \"%(code)s\" code on the relevant "
+"salary structures."
+msgstr ""
+"La regola del rimborso spese deve essere configurata per aggiungere le spese "
+"alle buste paga.\n"
+"Crea una regola retributiva con il codice \"%(code)s\" per le strutture di "
+"stipendio rilevanti. "
+
+#. module: hr_payroll_expense
+#. odoo-python
+#: code:addons/hr_payroll_expense/models/hr_expense_sheet.py:0
 msgid "Expense report (\"%(name)s\") was removed from the next payslip."
 msgstr ""
 "La nota spese (\"%(name)s\") è stata eliminata dalla busta paga successiva."
@@ -51,7 +72,8 @@ msgstr ""
 #. odoo-python
 #: code:addons/hr_payroll_expense/models/hr_expense_sheet.py:0
 msgid "Expense report (\"%(name)s\") will be added to the next payslip."
-msgstr "La nota spese (\"%(name)s\") verrà aggiunta alla busta paga successiva."
+msgstr ""
+"La nota spese (\"%(name)s\") verrà aggiunta alla busta paga successiva."
 
 #. module: hr_payroll_expense
 #: model:ir.model.fields,field_description:hr_payroll_expense.field_hr_payslip__expense_sheet_ids
@@ -75,6 +97,17 @@ msgid "Expenses to reimburse to employee."
 msgstr "Spese da rimborsare al dipendente."
 
 #. module: hr_payroll_expense
+#: model:ir.model,name:hr_payroll_expense.model_hr_payslip_employees
+msgid "Generate payslips for all selected employees"
+msgstr "Genera buste paga per tutti i dipendenti selezionati"
+
+#. module: hr_payroll_expense
+#. odoo-python
+#: code:addons/hr_payroll_expense/models/hr_expense_sheet.py:0
+msgid "Go to salary rules"
+msgstr "Vai alle regole retributive"
+
+#. module: hr_payroll_expense
 #: model:ir.model.fields,field_description:hr_payroll_expense.field_account_payment_register__is_already_paid_through_a_payslip
 msgid "Is Already Paid Through A Payslip"
 msgstr "Già pagato tramite busta paga"
@@ -89,13 +122,23 @@ msgstr "Registrazione contabile"
 #: code:addons/hr_payroll_expense/models/hr_payroll_structure.py:0
 msgid ""
 "No debit account found in the '%(rule_name)s' payslip salary rule. Please "
-"add a payable debit account to be able to create an accounting entry for the"
-" expense report linked to this payslip '%(expense_report_name)s'."
+"add a payable debit account to be able to create an accounting entry for the "
+"expense reports linked to this payslip."
 msgstr ""
-"Non è stato trovato nessun conto dare nella regola retributiva "
-"\"%(rule_name)s\". Aggiungi un conto dare per essere in grado di creare una "
-"registrazione contabile per il rendiconto spese collegata alla seguente "
-"busta paga \"%(expense_report_name)s\"."
+"Non è stato trovato nessun conto di debito nella regola retributiva \"%"
+"(rule_name)s\". Aggiungi un conto di addebito per essere in grado di creare "
+"una registrazione contabile per i rendiconti spese collegati a questa busta "
+"paga."
+
+#. module: hr_payroll_expense
+#. odoo-python
+#: code:addons/hr_payroll_expense/models/hr_payslip.py:0
+msgid ""
+"No salary rule was found to handle expenses in structure '%"
+"(structure_name)s'."
+msgstr ""
+"Non è stata trovata nessuna regola retributiva per gestire le spese nella "
+"struttura \"%(structure_name)s\"."
 
 #. module: hr_payroll_expense
 #. odoo-python
@@ -115,7 +158,7 @@ msgstr "Paga"
 #. module: hr_payroll_expense
 #: model:ir.model,name:hr_payroll_expense.model_hr_payslip
 msgid "Pay Slip"
-msgstr "Busta paga"
+msgstr "Cedolino paga"
 
 #. module: hr_payroll_expense
 #. odoo-python
@@ -144,7 +187,7 @@ msgstr "Elimina dalla busta paga"
 #: model:ir.actions.server,name:hr_payroll_expense.hr_expense_add_to_payslip_action_server
 #: model_terms:ir.ui.view,arch_db:hr_payroll_expense.hr_expense_sheet_view_form_inherit_payroll
 msgid "Report in Next Payslip"
-msgstr "Rapporto nella prossima busta paga"
+msgstr "Resoconto nella prossima busta paga"
 
 #. module: hr_payroll_expense
 #: model:ir.model,name:hr_payroll_expense.model_hr_payroll_structure
@@ -193,7 +236,8 @@ msgstr "Non sono stati selezionati fogli spese validi."
 #. odoo-python
 #: code:addons/hr_payroll_expense/models/hr_expense_sheet.py:0
 msgid ""
-"You cannot remove an expense from a payslip that has already been validated.\n"
+"You cannot remove an expense from a payslip that has already been "
+"validated.\n"
 "Expenses can only be removed from draft or canceled payslips."
 msgstr ""
 "Non è possibile eliminare una spese da una busta paga già validata.\n"
@@ -203,8 +247,8 @@ msgstr ""
 #. odoo-python
 #: code:addons/hr_payroll_expense/models/hr_payslip.py:0
 msgid ""
-"You don't have the access rights to link an expense report to a payslip. You"
-" need to be a payroll officer to do that."
+"You don't have the access rights to link an expense report to a payslip. You "
+"need to be a payroll officer to do that."
 msgstr ""
 "Non hai i diritti di accesso necessari per collegare un rendiconto spese ad "
 "una busta paga. È necessario essere un responsabile buste paga per farlo."

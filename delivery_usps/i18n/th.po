@@ -1,22 +1,22 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* delivery_usps
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
+"POT-Creation-Date: 2025-12-29 18:50+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
 "Last-Translator: Wil Odoo, 2024\n"
 "Language-Team: Thai (https://app.transifex.com/odoo/teams/41243/th/)\n"
+"Language: th\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: th\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. module: delivery_usps
@@ -38,8 +38,7 @@ msgstr "เลือกกล่องนี้หากบัญชีของ
 #. odoo-python
 #: code:addons/delivery_usps/models/usps_request.py:0
 msgid "Company phone number is invalid. Please insert a US phone number."
-msgstr ""
-"หมายเลขโทรศัพท์ของบริษัทไม่ถูกต้อง กรุณาใส่หมายเลขโทรศัพท์ในสหรัฐอเมริกา"
+msgstr "หมายเลขโทรศัพท์ของบริษัทไม่ถูกต้อง กรุณาใส่หมายเลขโทรศัพท์ในสหรัฐอเมริกา"
 
 #. module: delivery_usps
 #: model:ir.model.fields,field_description:delivery_usps.field_delivery_carrier__usps_content_type
@@ -224,10 +223,8 @@ msgstr "พัสดุ"
 
 #. module: delivery_usps
 #: model:ir.model.fields,help:delivery_usps.field_delivery_carrier__usps_machinable
-msgid ""
-"Please check on USPS website to ensure that your package is machinable."
-msgstr ""
-"โปรดตรวจสอบเว็บไซต์ USPS เพื่อให้แน่ใจว่าบรรจุภัณฑ์ของคุณสามารถแปรรูปได้"
+msgid "Please check on USPS website to ensure that your package is machinable."
+msgstr "โปรดตรวจสอบเว็บไซต์ USPS เพื่อให้แน่ใจว่าบรรจุภัณฑ์ของคุณสามารถแปรรูปได้"
 
 #. module: delivery_usps
 #. odoo-python
@@ -260,9 +257,7 @@ msgstr "โปรดระบุอย่างน้อยหนึ่งรา
 msgid ""
 "Please set country U.S.A in your company address, Service is only available "
 "for U.S.A"
-msgstr ""
-"โปรดตั้งค่าประเทศสหรัฐอเมริกาในที่อยู่บริษัทของคุณ "
-"บริการใช้ได้เฉพาะในสหรัฐอเมริกา"
+msgstr "โปรดตั้งค่าประเทศสหรัฐอเมริกาในที่อยู่บริษัทของคุณ บริการใช้ได้เฉพาะในสหรัฐอเมริกา"
 
 #. module: delivery_usps
 #: model:ir.model.fields.selection,name:delivery_usps.selection__delivery_carrier__usps_first_class_mail_type__postcard
@@ -379,7 +374,8 @@ msgstr ""
 #. odoo-python
 #: code:addons/delivery_usps/models/usps_request.py:0
 msgid ""
-"The estimated shipping price cannot be computed because the weight is missing for the following product(s): \n"
+"The estimated shipping price cannot be computed because the weight is "
+"missing for the following product(s): \n"
 " %s"
 msgstr ""
 "ไม่สามารถคำนวณราคาจัดส่งโดยประมาณได้เนื่องจากไม่มีน้ำหนักของสินค้าต่อไปนี้:\n"
@@ -424,8 +420,13 @@ msgstr "ประเภทของคอนเทนเนอร์"
 
 #. module: delivery_usps
 #: model:ir.model.fields.selection,name:delivery_usps.selection__delivery_carrier__delivery_type__usps
-msgid "USPS"
-msgstr "USPS"
+msgid "USPS (Legacy)"
+msgstr ""
+
+#. module: delivery_usps
+#: model:ir.model.fields,field_description:delivery_usps.field_delivery_carrier__usps_label_file_type
+msgid "USPS (Legacy) Label File Type"
+msgstr ""
 
 #. module: delivery_usps
 #: model_terms:ir.ui.view,arch_db:delivery_usps.view_delivery_carrier_form_with_provider_usps
@@ -445,8 +446,8 @@ msgid ""
 "USPS Domestic is used only to ship inside of the U.S.A. Please change the "
 "delivery method into USPS International."
 msgstr ""
-"USPS ภายในประเทศใช้สำหรับจัดส่งภายในสหรัฐอเมริกาเท่านั้น "
-"โปรดเปลี่ยนวิธีการจัดส่งเป็น USPS ระหว่างประเทศ"
+"USPS ภายในประเทศใช้สำหรับจัดส่งภายในสหรัฐอเมริกาเท่านั้น โปรดเปลี่ยนวิธีการจัดส่งเป็น USPS "
+"ระหว่างประเทศ"
 
 #. module: delivery_usps
 #: model:ir.model.fields,field_description:delivery_usps.field_delivery_carrier__usps_first_class_mail_type
@@ -466,13 +467,8 @@ msgid ""
 "USPS International is used only to ship outside of the U.S.A. Please change "
 "the delivery method into USPS Domestic."
 msgstr ""
-"USPS ระหว่างประเทศ ใช้สำหรับจัดส่งนอกสหรัฐอเมริกาเท่านั้น "
-"โปรดเปลี่ยนวิธีการจัดส่งเป็น USPS ภายในประเทศ"
-
-#. module: delivery_usps
-#: model:ir.model.fields,field_description:delivery_usps.field_delivery_carrier__usps_label_file_type
-msgid "USPS Label File Type"
-msgstr "ประเภทไฟล์ฉลาก USPS"
+"USPS ระหว่างประเทศ ใช้สำหรับจัดส่งนอกสหรัฐอเมริกาเท่านั้น โปรดเปลี่ยนวิธีการจัดส่งเป็น USPS "
+"ภายในประเทศ"
 
 #. module: delivery_usps
 #: model:ir.model.fields,field_description:delivery_usps.field_delivery_carrier__usps_mail_type
@@ -483,12 +479,6 @@ msgstr "ประเภทเมล USPS"
 #: model:ir.model.fields,field_description:delivery_usps.field_delivery_carrier__usps_service
 msgid "USPS Service"
 msgstr "บริการของ USPS"
-
-#. module: delivery_usps
-#: model_terms:ir.ui.view,arch_db:delivery_usps.res_config_settings_view_form_sale
-#: model_terms:ir.ui.view,arch_db:delivery_usps.res_config_settings_view_form_stock
-msgid "USPS Shipping Methods"
-msgstr "วิธีการการจัดส่ง USPS "
 
 #. module: delivery_usps
 #: model:ir.model.fields,field_description:delivery_usps.field_delivery_carrier__usps_username

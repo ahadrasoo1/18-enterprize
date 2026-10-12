@@ -1,17 +1,18 @@
-import { expect, test, describe } from "@odoo/hoot";
-import { queryAll, click } from "@odoo/hoot-dom";
+import { describe, expect, test } from "@odoo/hoot";
+import { click, queryAll } from "@odoo/hoot-dom";
 import { animationFrame } from "@odoo/hoot-mock";
 
+import { mailModels } from "@mail/../tests/mail_test_helpers";
 import {
-    models,
-    fields,
-    defineModels,
     defineActions,
+    defineModels,
+    fields,
+    getKwArgs,
     getService,
+    models,
     mountWithCleanup,
 } from "@web/../tests/web_test_helpers";
 import { WebClient } from "@web/webclient/webclient";
-import { mailModels } from "@mail/../tests/mail_test_helpers";
 
 import { definePlanningModels, planningModels } from "./planning_mock_models";
 
@@ -56,7 +57,6 @@ class ResourceTask extends models.Model {
                 <field name="resource_ids" widget="many2many_avatar_resource"/>
             </form>
         `,
-        search: `<search/>`,
     };
 }
 
@@ -104,6 +104,11 @@ class ResourceResource extends planningModels.ResourceResource {
             im_status: "online",
         },
     ];
+
+    get_avatar_card_data(ids, fields) {
+        const kwargs = getKwArgs(arguments, "ids", "fields");
+        return this.read(kwargs.ids, kwargs.fields);
+    }
 }
 
 class HrEmployee extends planningModels.HrEmployee {
@@ -149,7 +154,6 @@ defineActions([
         id: 1,
         name: "Resource Task",
         res_model: "resource.task",
-        type: "ir.actions.act_window",
         res_id: 1,
         views: [[false, "form"]],
     },

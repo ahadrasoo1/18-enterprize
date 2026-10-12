@@ -1,56 +1,73 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* sale_amazon
-# 
+# * sale_amazon
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Junko Augias, 2025
+#
+# "Junko Augias (juau)" <juau@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Japanese (https://app.transifex.com/odoo/teams/41243/ja/)\n"
+"POT-Creation-Date: 2025-12-29 18:45+0000\n"
+"PO-Revision-Date: 2026-02-07 10:31+0000\n"
+"Last-Translator: \"Junko Augias (juau)\" <juau@odoo.com>\n"
+"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-18/"
+"sale_amazon/ja/>\n"
+"Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: ja\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 5.14.3\n"
 
 #. module: sale_amazon
 #: model:mail.template,body_html:sale_amazon.order_sync_failure
 msgid ""
 "<div>\n"
-"            <p>The synchronization of the Amazon order with reference <t t-out=\"ctx.get('amazon_order_ref') or ''\">REF</t> encountered an error and was not completed.</p>\n"
-"            <p>Unless the order is canceled in SellerCentral, no other synchronization will be attempted.</p>\n"
-"            <p>To schedule a new synchronization attempt, proceed as follows:\n"
-"                <ol>\n"
+"            <p>The synchronization of the Amazon order with reference <t t-"
+"out=\"ctx.get('amazon_order_ref') or ''\">REF</t> encountered an error and "
+"was not completed.</p>\n"
+"            <p>Unless the order is canceled in SellerCentral, no other "
+"synchronization will be attempted.</p>\n"
+"            <p>To schedule a new synchronization attempt, proceed as "
+"follows:\n"
+"                </p><ol>\n"
 "                    <li>Enter the Developer Tools.</li>\n"
-"                    <li>Open the form of the Amazon Account on which the order was placed.</li>\n"
+"                    <li>Open the form of the Amazon Account on which the "
+"order was placed.</li>\n"
 "                    <li>Navigate to the Order Follow-up tab.</li>\n"
-"                    <li>Set a date for <em>Last Orders Sync</em> that is anterior to the last status update of the order.</li>\n"
-"                    <li>Save the changes and click on the <em>SYNC ORDERS</em> button.</li>\n"
+"                    <li>Set a date for <em>Last Orders Sync</em> that is "
+"anterior to the last status update of the order.</li>\n"
+"                    <li>Save the changes and click on the <em>SYNC ORDERS</"
+"em> button.</li>\n"
 "                </ol>\n"
-"            </p>\n"
-"            <p>If the problem persists, contact <a href=\"https://www.odoo.com/help/\">Odoo support</a>.</p>\n"
+"            \n"
+"            <p>If the problem persists, contact <a href=\"https://"
+"www.odoo.com/help/\">Odoo support</a>.</p>\n"
 "        </div>\n"
 "        "
 msgstr ""
 "<div>\n"
-"            <p>Amazonオーダ <t t-out=\"ctx.get('amazon_order_ref') or ''\">REF</t> の同期中にエラーが発生し完了できませんでした。</p>\n"
-"            <p>オーダがSellerCentralでキャンセルされない限り、他の同期を試みることはありません。</p>\n"
-"            <p>新しい同期の試行を予定するには以下を行います：\n"
-"                <ol>\n"
+"            <p>Amazonオーダ <t t-out=\"ctx.get('amazon_order_ref') or "
+"''\">REF</t> の同期中にエラーが発生し完了できませんでした。</p>\n"
+"            <p>オーダがSellerCentralでキャンセルされない限り、他の同期を試み"
+"ることはありません。</p>\n"
+"            <p>新しい同期の試行を予定するには以下を行います:\n"
+"                </p><ol>\n"
 "                    <li>ディベロッパーツールを入力する。</li>\n"
-"　                <li>注文したAmazonアカウントのフォームを開く。</li>\n"
+"                    <li>注文したAmazonアカウントのフォームを開く。</li>\n"
 "                    <li>注文フォローアップタブに移動します。</li>\n"
-"                    <li>以下の日付を設定： <em>最終オーダ</em>で、オーダの最後のステータス更新より前のものであるもの</li>\n"
-"                    <li>変更を保存し、以下をクリック<em>オーダを同期</em> ボタン</li>\n"
+"                    <li>以下の日付を設定: <em>最終オーダ同期</em> で、オーダ"
+"の最後のステータス更新より前のものであるもの。</li>\n"
+"                    <li>変更を保存し、以下をクリック <em>オーダを同期</em> ボ"
+"タン。</li>\n"
 "                </ol>\n"
-"            </p>\n"
-"            <p>問題が解決しない場合は、<a href=\"https://www.odoo.com/help/\">Odooサポート</a>にご連絡下さい。</p>\n"
+"            \n"
+"            <p>問題が解決しない場合は、 <a href=\"https://www.odoo.com/help/"
+"\">Odooサポート</a>にご連絡下さい。</p>\n"
 "        </div>\n"
 "        "
 
@@ -85,9 +102,12 @@ msgid ""
 "                    vertical-align: top;\n"
 "                }\n"
 "            </style>\n"
-"            <div>\n"
-"                <p>The synchronization of the delivery orders encountered some errors and was not completed.</p>\n"
-"                <p>Please correct the problem before manually synchronizing the delivery orders again, as no other synchronization will be attempted.</p>\n"
+"            <body><div>\n"
+"                <p>The synchronization of the delivery orders encountered "
+"some errors and was not completed.</p>\n"
+"                <p>Please correct the problem before manually synchronizing "
+"the delivery orders again, as no other synchronization will be attempted.</"
+"p>\n"
 "                <p>Here are the errors sent by Amazon: </p>\n"
 "                <table class=\"amz_table\">\n"
 "                    <thead>\n"
@@ -97,14 +117,20 @@ msgid ""
 "                        </tr>\n"
 "                    </thead>\n"
 "                    <tbody>\n"
-"                        <tr t-foreach=\"ctx.get('error_messages')\" t-as=\"error\">\n"
-"                            <th><t t-out=\"error['order_ref']\"></t></th>\n"
+"                        <tr t-foreach=\"ctx.get('error_messages')\" t-"
+"as=\"error\">\n"
+"                            <th><t t-out=\"error['order_ref']\"/></th>\n"
 "                            <td>\n"
-"                                <t t-if=\"error['message']\" t-out=\"error['message']\"></t>\n"
-"                                <t t-else=\"\">An unknown error occurred during the synchronisation with Amazon.\n"
-"                                    Unfortunately you need to manually check if the state of the order is correct or not.\n"
+"                                <t t-if=\"error['message']\" t-"
+"out=\"error['message']\"/>\n"
+"                                <t t-else=\"\">An unknown error occurred "
+"during the synchronisation with Amazon.\n"
+"                                    Unfortunately you need to manually check "
+"if the state of the order is correct or not.\n"
 "                                    You can find all information about this\n"
-"                                    <a href=\"https://www.odoo.com/documentation/latest/applications/sales/sales/amazon_connector/manage.html#manage_deliveries_errors\">\n"
+"                                    <a href=\"https://www.odoo.com/"
+"documentation/latest/applications/sales/sales/amazon_connector/"
+"manage.html#manage_deliveries_errors\">\n"
 "                                        in the documentation\n"
 "                                    </a>.</t>\n"
 "                            </td>\n"
@@ -112,7 +138,7 @@ msgid ""
 "                    </tbody>\n"
 "                </table>\n"
 "            </div>\n"
-"        "
+"        </body>"
 msgstr ""
 "<style>\n"
 "                .amz_table {\n"
@@ -142,11 +168,13 @@ msgstr ""
 "                    vertical-align: top;\n"
 "                }\n"
 "            </style>\n"
-"            <div>\n"
-"                <p>配送オーダの同期中にエラーが発生し完了できませんでした。</p>\n"
-"                <p>配送オーダを再度手動で同期する前に、問題を訂正して下さい。他に試行される同期はありません。</p>\n"
-"                <p>Amazonから送られたエラーは以下です： </p>\n"
-"                <table class=\"amz_table\">\n"
+"            <body><div>\n"
+"                <p>出荷オーダの同期中にエラーが発生し完了できませんでした。"
+"</p>\n"
+"                <p>出荷オーダを再度手動で同期する前に、問題を訂正して下さい。"
+"他に試行される同期はありません。</p>\n"
+"                <p>Amazonから送られたエラーは以下です:</p>\n"
+"　　　　<table class=\"amz_table\">\n"
 "                    <thead>\n"
 "                        <tr>\n"
 "                            <th>オーダ番号</th>\n"
@@ -154,21 +182,28 @@ msgstr ""
 "                        </tr>\n"
 "                    </thead>\n"
 "                    <tbody>\n"
-"                        <tr t-foreach=\"ctx.get('error_messages')\" t-as=\"error\">\n"
-"                            <th><t t-out=\"error['order_ref']\"></t></th>\n"
+"                        <tr t-foreach=\"ctx.get('error_messages')\" t-as="
+"\"error\">\n"
+"                            <th><t t-out=\"error['order_ref']\"/></th>\n"
 "                            <td>\n"
-"                                <t t-if=\"error['message']\" t-out=\"error['message']\"></t>\n"
-"                                <t t-else=\"\">Amazonとの同期中に不明なエラーが発生しました。\n"
-"                                   お手数ですが、オーダのステートの正誤をマニュアルで確認する必要があります。\n"
-"                                    これに関する情報は全て以下で見つけることができます                                    <a href=\"https://www.odoo.com/documentation/latest/applications/sales/sales/amazon_connector/manage.html#manage_deliveries_errors\">\n"
-"                                        ドキュメント\n"
-"                                    </a>.</t>\n"
+"                                <t t-if=\"error['message']\" t-out="
+"\"error['message']\"/>\n"
+"                                <t t-else=\"\">Amazonとの同期中に不明なエラー"
+"が発生しました。\n"
+"                                    お手数ですが、オーダのステートの正誤をマ"
+"ニュアルで確認する必要があります。\n"
+"                                    関連する情報はすべて以下をご確認下さい\n"
+"                                    <a href=\"https://www.odoo.com/"
+"documentation/latest/applications/sales/sales/amazon_connector/manage.html#"
+"manage_deliveries_errors\">\n"
+"                                       ドキュメンテーション\n"
+"                                    </a>。</t>\n"
 "                            </td>\n"
 "                        </tr>\n"
 "                    </tbody>\n"
 "                </table>\n"
 "            </div>\n"
-"        "
+"        </body>"
 
 #. module: sale_amazon
 #: model:mail.template,body_html:sale_amazon.inventory_sync_failure
@@ -201,9 +236,11 @@ msgid ""
 "                    vertical-align: top;\n"
 "                }\n"
 "            </style>\n"
-"            <div>\n"
-"                <p>The synchronization of the products availability for Amazon Account\n"
-"                    <b><t t-out=\"ctx.get('amazon_account') or ''\">REF</t></b>\n"
+"            <body><div>\n"
+"                <p>The synchronization of the products availability for "
+"Amazon Account\n"
+"                    <b><t t-out=\"ctx.get('amazon_account') or ''\">REF</t></"
+"b>\n"
 "                    encountered some errors and was not completed.</p>\n"
 "                <p>Here are the errors sent by Amazon: </p>\n"
 "                <table class=\"amz_table\">\n"
@@ -214,19 +251,23 @@ msgid ""
 "                        </tr>\n"
 "                    </thead>\n"
 "                    <tbody>\n"
-"                        <tr t-foreach=\"ctx.get('error_messages')\" t-as=\"error\">\n"
-"                            <th><t t-out=\"error['sku']\"></t></th>\n"
+"                        <tr t-foreach=\"ctx.get('error_messages')\" t-"
+"as=\"error\">\n"
+"                            <th><t t-out=\"error['sku']\"/></th>\n"
 "                            <td>\n"
-"                                <t t-if=\"error['message']\" t-out=\"error['message']\"></t>\n"
-"                                <t t-else=\"\">An unknown error occurred during the synchronisation with Amazon.\n"
-"                                    Unfortunately you need to manually check if the available quantity for the product is correct or not.\n"
+"                                <t t-if=\"error['message']\" t-"
+"out=\"error['message']\"/>\n"
+"                                <t t-else=\"\">An unknown error occurred "
+"during the synchronisation with Amazon.\n"
+"                                    Unfortunately you need to manually check "
+"if the available quantity for the product is correct or not.\n"
 "                                </t>\n"
 "                            </td>\n"
 "                        </tr>\n"
 "                    </tbody>\n"
 "                </table>\n"
 "            </div>\n"
-"        "
+"        </body>"
 msgstr ""
 "<style>\n"
 "                .amz_table {\n"
@@ -256,11 +297,12 @@ msgstr ""
 "                    vertical-align: top;\n"
 "                }\n"
 "            </style>\n"
-"            <div>\n"
+"            <body><div>\n"
 "                <p>Amazonアカウント用のプロダクト利用可能の同期中\n"
-"                    <b><t t-out=\"ctx.get('amazon_account') or ''\">REF</t></b>\n"
+"                    <b><t t-out=\"ctx.get('amazon_account') or ''\">REF</t></"
+"b>\n"
 "                    にエラーが発生し完了できませんでした。</p>\n"
-"                <p>以下、Amazonから送信されエラーです: </p>\n"
+"                <p>以下、Amazonから送信されエラーです:  </p>\n"
 "                <table class=\"amz_table\">\n"
 "                    <thead>\n"
 "                        <tr>\n"
@@ -269,18 +311,23 @@ msgstr ""
 "                        </tr>\n"
 "                    </thead>\n"
 "                    <tbody>\n"
-"                        <tr t-foreach=\"ctx.get('error_messages')\" t-as=\"error\">\n"
-"                            <th><t t-out=\"error['sku']\"></t></th>\n"
+"                        <tr t-foreach=\"ctx.get('error_messages')\" t-"
+"as=\"error\">\n"
+"                            <th><t t-out=\"error['sku']\"/></th>\n"
 "                            <td>\n"
-"                                <t t-if=\"error['message']\" t-out=\"error['message']\"></t>\n"
-"                                <t t-else=\"\">Amazonとの同期中に不明なエラーが発生しました。\n"
-"                                    お手数ですが、プロダクトの利用可能数が正しいか誤りかを手動で確認する必要があります。                                </t>\n"
+"                                <t t-if=\"error['message']\" t-"
+"out=\"error['message']\"/>\n"
+"                                <t t-else=\"\">Amazonとの同期中に不明なエラー"
+"が発生しました。\n"
+"                                    お手数ですが、プロダクトの利用可能数が正"
+"しいか誤りかを手動で確認する必要があります。\n"
+"                                </t>\n"
 "                            </td>\n"
 "                        </tr>\n"
 "                    </tbody>\n"
 "                </table>\n"
 "            </div>\n"
-"        "
+"        </body>"
 
 #. module: sale_amazon
 #: model:ir.model.fields,field_description:sale_amazon.field_amazon_marketplace__api_ref
@@ -291,29 +338,32 @@ msgstr "API識別子"
 #: model:ir.model.fields,field_description:sale_amazon.field_amazon_offer__account_id
 #: model_terms:ir.ui.view,arch_db:sale_amazon.amazon_account_view_search
 msgid "Account"
-msgstr "勘定科目"
+msgstr "アカウント"
 
 #. module: sale_amazon
 #: model_terms:ir.ui.view,arch_db:sale_amazon.amazon_account_view_form
 msgid "Account Name"
-msgstr "勘定科目名"
+msgstr "アカウント名"
 
 #. module: sale_amazon
 #: model:ir.model.fields,field_description:sale_amazon.field_amazon_account__active
 #: model_terms:ir.ui.view,arch_db:sale_amazon.amazon_account_view_search
 msgid "Active"
-msgstr "有効化"
+msgstr "有効"
 
 #. module: sale_amazon
 #: model_terms:ir.ui.view,arch_db:sale_amazon.amazon_account_view_form
 msgid ""
 "After validation of the credentials, the marketplaces\n"
-"                                                to which this account has access will be\n"
-"                                                synchronized and automatically made available."
+"                                                to which this account has "
+"access will be\n"
+"                                                synchronized and "
+"automatically made available."
 msgstr ""
 "認証情報の検証後、このアカウントがアクセスできる\n"
 "                                                マーケットプレイスが\n"
-"                                                同期され自動的に有効化されます。"
+"                                                同期され自動的に有効化されま"
+"す。"
 
 #. module: sale_amazon
 #: model:ir.model,name:sale_amazon.model_amazon_account
@@ -425,7 +475,8 @@ msgid ""
 "Since the current carrier doesn't automatically provide a tracking "
 "reference, you need to set one manually."
 msgstr ""
-"Amazonでは、配送のたびに追跡参照を提供する必要があります。現在ご利用の運送会社では自動的に追跡参照を提供しないため、手動で設定する必要があります。"
+"Amazonでは、配送のたびに追跡参照を提供する必要があります。現在ご利用の配送業"
+"者では自動的に追跡参照を提供しないため、手動で設定する必要があります。"
 
 #. module: sale_amazon
 #. odoo-python
@@ -433,7 +484,9 @@ msgstr ""
 msgid ""
 "Amazon requires that a tracking reference is provided with each delivery. "
 "You need to assign a carrier to this delivery."
-msgstr "Amazonでは、各配送物に追跡参照を付けることを義務付けています。配送業者を指定する必要があります。"
+msgstr ""
+"Amazonでは、各配送物に追跡参照を付けることを義務付けています。配送業者を指定"
+"する必要があります。"
 
 #. module: sale_amazon
 #: model:amazon.marketplace,name:sale_amazon.marketplace_AE
@@ -548,7 +601,7 @@ msgstr "Amazon: オファーの同期化に失敗した場合の利用可能在�
 #. module: sale_amazon
 #: model:mail.template,name:sale_amazon.picking_sync_failure
 msgid "Amazon: Delivery Order Synchronization Failure"
-msgstr "Amazon：配送オーダ同期失敗"
+msgstr "Amazon：出荷オーダ同期失敗"
 
 #. module: sale_amazon
 #: model:mail.template,name:sale_amazon.order_sync_failure
@@ -563,7 +616,7 @@ msgstr "Amazon: 利用可能な在庫の同期"
 #. module: sale_amazon
 #: model:ir.actions.server,name:sale_amazon.ir_cron_sync_amazon_pickings_ir_actions_server
 msgid "Amazon: sync delivery orders"
-msgstr "Amazon: 配送オーダ同期"
+msgstr "Amazon: 出荷オーダ同期"
 
 #. module: sale_amazon
 #: model:ir.actions.server,name:sale_amazon.ir_cron_sync_amazon_feeds_ir_actions_server
@@ -696,6 +749,12 @@ msgstr "エラー"
 
 #. module: sale_amazon
 #. odoo-python
+#: code:addons/sale_amazon/models/amazon_account.py:0
+msgid "Error (%(code)s): %(message)s"
+msgstr "エラー (%(code)s): %(message)s"
+
+#. module: sale_amazon
+#. odoo-python
 #: code:addons/sale_amazon/utils.py:0
 msgid "Error code: %(error_code)s; description: %(error_message)s"
 msgstr "エラーコード: %(error_code)s; 説明: %(error_message)s"
@@ -762,32 +821,40 @@ msgstr "ID"
 #: model:ir.model.fields,help:sale_amazon.field_amazon_account__active
 msgid ""
 "If made inactive, this account will no longer be synchronized with Amazon."
-msgstr "非有効化すると、このアカウントはアマゾンと同期されなくなります。"
+msgstr "無効化すると、このアカウントはアマゾンと同期されなくなります。"
 
 #. module: sale_amazon
 #. odoo-python
 #: code:addons/sale_amazon/models/amazon_account.py:0
 msgid ""
-"If the date is set in the past, orders placed on this Amazon Account before the first synchronization of the module might be synchronized with Odoo.\n"
-"If the date is set in the future, orders placed on this Amazon Account between the previous and the new date will not be synchronized with Odoo."
+"If the date is set in the past, orders placed on this Amazon Account before "
+"the first synchronization of the module might be synchronized with Odoo.\n"
+"If the date is set in the future, orders placed on this Amazon Account "
+"between the previous and the new date will not be synchronized with Odoo."
 msgstr ""
-"日付が過去に設定されている場合、このモジュールの最初の同期以前にこのAmazonアカウントで行われたオーダはOdooと同期される可能性があります。\n"
-"日付が未来に設定されている場合、以前の日付と新しい日付の間にこのAmazonアカウントで行われたオーダはOdooと同期されません。"
+"日付が過去に設定されている場合、このモジュールの最初の同期以前にこのAmazonア"
+"カウントで行われたオーダはOdooと同期される可能性があります。\n"
+"日付が未来に設定されている場合、以前の日付と新しい日付の間にこのAmazonアカウ"
+"ントで行われたオーダはOdooと同期されません。"
 
 #. module: sale_amazon
 #: model_terms:ir.ui.view,arch_db:sale_amazon.amazon_order_view_form
 msgid ""
 "If the sale is locked, you can not modify it anymore. However, you will "
 "still be able to invoice or deliver."
-msgstr "販売がロックされている場合は、これ以上修正することはできません。 ただし、引き続き請求や配達が可能です。"
+msgstr ""
+"販売がロックされている場合は、これ以上修正することはできません。 ただし、引き"
+"続き請求や配達が可能です。"
 
 #. module: sale_amazon
 #: model_terms:ir.ui.view,arch_db:sale_amazon.amazon_account_view_form
 msgid ""
-"If this account gained access to new marketplaces,"
-"                                         synchronize and add them to the "
-"current sync marketplaces"
-msgstr "このアカウントが新しいマーケットプレイスにアクセスできるようになった場合は、それらを同期して現在の同期マーケットプレイスに追加します。"
+"If this account gained access to new "
+"marketplaces,                                         synchronize and add "
+"them to the current sync marketplaces"
+msgstr ""
+"このアカウントが新しいマーケットプレイスにアクセスできるようになった場合は、"
+"それらを同期して現在の同期マーケットプレイスに追加します。"
 
 #. module: sale_amazon
 #: model_terms:ir.ui.view,arch_db:sale_amazon.picking_view_form
@@ -962,7 +1029,8 @@ msgid ""
 "the same package. Operations related to the product %s were not all "
 "confirmed at once."
 msgstr ""
-"Amazon顧客に配送するプロダクトは、それぞれの部品が同梱されている必要があります。プロダクトに関連する操作%sすべてが一度に確認されたわけではありません。"
+"Amazon顧客に配送するプロダクトは、それぞれの部品が同梱されている必要がありま"
+"す。プロダクトに関連する操作%sすべてが一度に確認されたわけではありません。"
 
 #. module: sale_amazon
 #: model_terms:ir.ui.view,arch_db:sale_amazon.recover_order_wizard_form
@@ -1049,7 +1117,8 @@ msgid ""
 "                                                was initially created."
 msgstr ""
 "はじめに出品者アカウントを作成した\n"
-"                                                マーケットプレイスを選択して下さい。"
+"                                                マーケットプレイスを選択して"
+"下さい。"
 
 #. module: sale_amazon
 #: model:ir.model.fields,field_description:sale_amazon.field_amazon_marketplace__seller_central_url
@@ -1112,7 +1181,7 @@ msgstr "Amazonオーダ {{ ctx.get('amazon_order_ref') }} の同期に失敗し�
 #. module: sale_amazon
 #: model:mail.template,subject:sale_amazon.picking_sync_failure
 msgid "Synchronization of delivery orders has failed"
-msgstr "配送オーダの同期に失敗しました"
+msgstr "出荷オーダの同期に失敗しました"
 
 #. module: sale_amazon
 #: model_terms:ir.ui.view,arch_db:sale_amazon.picking_view_form
@@ -1146,17 +1215,21 @@ msgstr "Amazonオーダの参照は3-7-7フォーマットである必要があ�
 msgid ""
 "The Amazon order with reference %(ref)s was not recovered because its "
 "currency was missing from the Amazon order data."
-msgstr "アマゾンのオーダデータから通貨が欠落していたため、参照%(ref)sのアマゾンのオーダは復元されません。"
+msgstr ""
+"アマゾンのオーダデータから通貨が欠落していたため、参照%(ref)sのアマゾンのオー"
+"ダは復元されません。"
 
 #. module: sale_amazon
 #. odoo-python
 #: code:addons/sale_amazon/models/amazon_account.py:0
 msgid ""
-"The Amazon order with reference %(ref)s was not recovered because its status"
-" (%(status)s) is not eligible for synchronization for its fulfillment "
-"channel (%(channel)s)."
+"The Amazon order with reference %(ref)s was not recovered because its status "
+"(%(status)s) is not eligible for synchronization for its fulfillment channel "
+"(%(channel)s)."
 msgstr ""
-"Amazonオーダ（参照%(ref)s）は回復できませんでした。そのステータス（%(status)s）がフルフィルメントチャネル（%(channel)s）の同期対象外であるためです。"
+"Amazonオーダ（参照%(ref)s）は回復できませんでした。そのステータス（%"
+"(status)s）がフルフィルメントチャネル（%(channel)s）の同期対象外であるためで"
+"す。"
 
 #. module: sale_amazon
 #: model:ir.model.fields,help:sale_amazon.field_amazon_marketplace__region
@@ -1164,7 +1237,8 @@ msgid ""
 "The Amazon region of the marketplace. Please refer to the Selling Partner "
 "API documentation to find the correct region."
 msgstr ""
-"マーケットプレイスのAmazonリージョン。正しいリージョンを見つけるには、Selling Partner APIドキュメントを参照してください。"
+"マーケットプレイスのAmazonリージョン。正しいリージョンを見つけるには、"
+"Selling Partner APIドキュメントを参照してください。"
 
 #. module: sale_amazon
 #: model:ir.model.fields,help:sale_amazon.field_sale_order_line__amazon_item_ref
@@ -1222,9 +1296,11 @@ msgstr "このアカウントのホームページ。認証のみに使用され
 #: model:ir.model.fields,help:sale_amazon.field_amazon_account__last_orders_sync
 msgid ""
 "The last synchronization date for orders placed on this account. Orders "
-"whose status has not changed since this date will not be created nor updated"
-" in Odoo."
-msgstr "このアカウントで発注されたオーダの最終同期日です。この日付以降にステータスが変更されていないオーダは、Odooで作成も更新もされません。"
+"whose status has not changed since this date will not be created nor updated "
+"in Odoo."
+msgstr ""
+"このアカウントで発注されたオーダの最終同期日です。この日付以降にステータスが"
+"変更されていないオーダは、Odooで作成も更新もされません。"
 
 #. module: sale_amazon
 #: model:ir.model.fields,help:sale_amazon.field_amazon_account__location_id
@@ -1272,7 +1348,9 @@ msgid ""
 "already been delivered. Please create a return for this order to adjust the "
 "stock."
 msgstr ""
-"プロダクトがすでに配送されているにもかかわらず、Amazonの顧客によってオーダがキャンセルされました。在庫を調整するために、このオーダの返品を作成して下さい。"
+"プロダクトがすでに配送されているにもかかわらず、Amazonの顧客によってオーダが"
+"キャンセルされました。在庫を調整するために、このオーダの返品を作成して下さ"
+"い。"
 
 #. module: sale_amazon
 #. odoo-python
@@ -1289,14 +1367,15 @@ msgstr "提供された参照が一致するAmazonオーダがありません。
 #. module: sale_amazon
 #: model:ir.model.fields,help:sale_amazon.field_amazon_recover_order_wizard__amazon_order_ref
 msgid "The reference to the Amazon order to recover, in 3-7-7 format"
-msgstr "回復のためのAmazonオーダの参照は 3-7-7 フォーマットである必要があります。"
+msgstr ""
+"回復のためのAmazonオーダの参照は 3-7-7 フォーマットである必要があります。"
 
 #. module: sale_amazon
 #. odoo-python
 #: code:addons/sale_amazon/models/stock_picking.py:0
 msgid ""
 "The sales order of this delivery order is not linked to an Amazon account."
-msgstr "この配送オーダの販売オーダはAmazonアカウントにリンクしていません。"
+msgstr "この出荷オーダの販売オーダはAmazonアカウントにリンクしていません。"
 
 #. module: sale_amazon
 #: model:ir.model.fields,help:sale_amazon.field_amazon_offer__account_id
@@ -1308,27 +1387,31 @@ msgstr "このプロダクトの管理に使用されている出品者アカウ
 msgid ""
 "The short-lived token used instead of the LWA Access Token to access "
 "restricted data"
-msgstr "制限されたデータにアクセスするために、LWAアクセストークンの代わりに使用される短命なトークン。"
+msgstr ""
+"制限されたデータにアクセスするために、LWAアクセストークンの代わりに使用される"
+"短命なトークン。"
 
 #. module: sale_amazon
 #: model:ir.model.fields,help:sale_amazon.field_amazon_account__access_token
 msgid "The short-lived token used to query Amazon API on behalf of a seller."
-msgstr "出品者に代わってAmazon APIにクエリーを行うために使用される短命なトークン。"
+msgstr ""
+"出品者に代わってAmazon APIにクエリーを行うために使用される短命なトークン。"
 
 #. module: sale_amazon
 #: model:ir.model.fields,help:sale_amazon.field_stock_picking__amazon_sync_status
 msgid ""
 "The synchronization status of the delivery order to Amazon:\n"
-"- Pending: The delivery order has been confirmed and will soon be synchronized.\n"
+"- Pending: The delivery order has been confirmed and will soon be "
+"synchronized.\n"
 "- Processing: The delivery details have been sent and are being processed.\n"
 "- Done: The delivery details have been processed.\n"
 "- Error: The synchronization of the delivery order failed."
 msgstr ""
-"Amazonへの配送オーダの同期ステータス：\n"
-"- 保留中： 配送オーダが確認され、まもなく同期されます。\n"
-"- 処理中： 配送の詳細が送信され、処理中です。\n"
-"- 完了： 配送の詳細が処理されました。\n"
-"- エラー： 配送オーダの同期に失敗しました。"
+"Amazonへの出荷オーダの同期ステータス：\n"
+"- 保留中： 出荷オーダが確認され、まもなく同期されます。\n"
+"- 処理中： 出荷の詳細が送信され、処理中です。\n"
+"- 完了： 出荷の詳細が処理されました。\n"
+"- エラー： 出荷オーダの同期に失敗しました。"
 
 #. module: sale_amazon
 #: model:ir.model.fields,help:sale_amazon.field_amazon_offer__amazon_sync_status
@@ -1349,7 +1432,9 @@ msgstr ""
 msgid ""
 "The synchronization with Amazon failed. Amazon gave us this information "
 "about the problem:"
-msgstr "Amazonとの同期に失敗しました。この問題に関して、Amazonは以下の情報を提供しています："
+msgstr ""
+"Amazonとの同期に失敗しました。この問題に関して、Amazonは以下の情報を提供して"
+"います："
 
 #. module: sale_amazon
 #: model:ir.model.fields,help:sale_amazon.field_amazon_account__name
@@ -1363,8 +1448,7 @@ msgstr "あるAPI識別子に対して存在できるマーケットプレイス
 
 #. module: sale_amazon
 #: model:ir.model.constraint,message:sale_amazon.constraint_sale_order_unique_amazon_order_ref
-msgid ""
-"There can only exist one sale order for a given Amazon Order Reference."
+msgid "There can only exist one sale order for a given Amazon Order Reference."
 msgstr "1つのAmazonオーダ参照に対して、1つの販売オーダしか存在できません。"
 
 #. module: sale_amazon
@@ -1380,14 +1464,18 @@ msgid ""
 "This Amazon partner was created with an invalid state (%s); please set the "
 "correct state manually."
 msgstr ""
+"このAmazon取引先は無効なステータス(%s)で作成されました。正しい状態を手動で設"
+"定して下さい。"
 
 #. module: sale_amazon
 #: model_terms:ir.ui.view,arch_db:sale_amazon.amazon_account_view_form
 msgid ""
-"This action will disconnect your account with Amazon and"
-"                                          cannot be undone. Are you sure you"
-" want to proceed?"
-msgstr "この操作を行うと、Amazonのアカウントとは切断され、元に戻すことはできません。本当によろしいですか？"
+"This action will disconnect your account with Amazon "
+"and                                          cannot be undone. Are you sure "
+"you want to proceed?"
+msgstr ""
+"この操作を行うと、Amazonのアカウントとは切断され、元に戻すことはできません。"
+"本当によろしいですか？"
 
 #. module: sale_amazon
 #: model:ir.model,name:sale_amazon.model_stock_picking
@@ -1407,7 +1495,7 @@ msgstr "リンク解除されたアカウント"
 #. module: sale_amazon
 #: model_terms:ir.ui.view,arch_db:sale_amazon.amazon_account_view_form
 msgid "Update Available Marketplaces"
-msgstr "利用可能なマーケットプレイスをアップデートする"
+msgstr "利用可能なマーケットプレイスを更新する"
 
 #. module: sale_amazon
 #: model_terms:ir.ui.view,arch_db:sale_amazon.amazon_offer_view_tree
@@ -1425,7 +1513,9 @@ msgstr "警告"
 msgid ""
 "Whether the available quantities of FBM products linked to this account are "
 "synchronized with Amazon."
-msgstr "このアカウントにリンクされているFBMプロダクトの利用可能数量がアマゾンと同期されているかどうか。"
+msgstr ""
+"このアカウントにリンクされているFBMプロダクトの利用可能数量がアマゾンと同期さ"
+"れているかどうか。"
 
 #. module: sale_amazon
 #: model:ir.model.fields,help:sale_amazon.field_amazon_marketplace__tax_included
@@ -1442,9 +1532,11 @@ msgstr "まずAmazonアカウント%sを許可する必要があります。"
 #. odoo-python
 #: code:addons/sale_amazon/utils.py:0
 msgid ""
-"You first need to set the marketplaces to synchronize for the Amazon account"
-" %s."
-msgstr "まずマーケットプレイスをAmazonアカウント%sと同期するよう設定する必要があります。"
+"You first need to set the marketplaces to synchronize for the Amazon account "
+"%s."
+msgstr ""
+"まずマーケットプレイスをAmazonアカウント%sと同期するよう設定する必要がありま"
+"す。"
 
 #. module: sale_amazon
 #. odoo-python

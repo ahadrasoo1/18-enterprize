@@ -20,7 +20,7 @@ class TestInterCompanyInvoice(TestInterCompanyRulesCommon):
         cls.env.user.company_id = cls.company_a
         cls.env['account.chart.template'].try_loading('generic_coa', cls.company_a, install_demo=False)
 
-    def _configure_analytic(self, product, company=None):
+    def _configure_analytic(self, product=None, company=None, partner=None):
         """
         Configure Analytic Distribution Model for company_a based on Product A
         return: analytic account
@@ -37,8 +37,9 @@ class TestInterCompanyInvoice(TestInterCompanyRulesCommon):
         })
         self.env['account.analytic.distribution.model'].create({
             'analytic_distribution': {analytic_account.id: 100},
-            'product_id': product.id,
+            'product_id': product and product.id,
             'company_id': company and company.id,
+            'partner_id': partner and partner.id,
         })
         return analytic_account
 
@@ -221,3 +222,76 @@ class TestInterCompanyInvoice(TestInterCompanyRulesCommon):
         supplier_invoice = self.env['account.move'].with_user(self.res_users_company_b).search([('move_type', '=', 'in_invoice')], limit=1)
         self.assertFalse(supplier_invoice.invoice_line_ids.product_id, "No product should be set")
         self.assertEqual(supplier_invoice.invoice_line_ids.name, self.product_a.name)
+
+    def test_analytic_distribution_model_partner(self):
+        """
+        If company B defines Company A as a partner in its distribution model, the distribution should be retrieved
+        """
+        inter_company_analytic_account = self._configure_analytic(product=self.product_b)
+        analytic_account_company_b = self._configure_analytic(company=self.company_b, partner=self.company_a.partner_id)
+        self._create_post_invoice(product_id=self.product_a.id, analytic_distribution={inter_company_analytic_account.id: 100})
+
+        supplier_invoice = self.env['account.move'].with_user(self.res_users_company_b).search([('move_type', '=', 'in_invoice')], limit=1)
+
+        expected_distribution = {
+            str(inter_company_analytic_account.id): 100,
+            str(analytic_account_company_b.id): 100
+        }
+        self.assertEqual(supplier_invoice.invoice_line_ids.analytic_distribution, expected_distribution)
+
+    def test_inter_company_attachment_with_contact_as_partner(self):
+        """
+        Test that when creating and printing an invoice in company A for an individual contact belonging to company B,
+        the corresponding bill in company B there is an attachment.
+        """
+        company_partner = self.env['res.partner'].create({
+            'name': 'company partner',
+            'parent_id': self.company_b.partner_id.id,
+        })
+
+        customer_invoice = self.env['account.move'].create({
+            'company_id': self.company_a.id,
+            'move_type': 'out_invoice',
+            'invoice_date': '2023-05-01',
+            'partner_id': company_partner.id,
+            'invoice_line_ids': [Command.create({
+                'product_id': self.product_a.id,
+                'price_unit': 100.0,
+                'quantity': 1.0,
+                'tax_ids': False,
+            })]
+        })
+
+        customer_invoice.action_post()
+
+        self.env['account.move.send.wizard'].with_context(active_model='account.move', active_ids=customer_invoice.id)._generate_and_send_invoices(customer_invoice)
+
+        bill = self.env['account.move'].search([('move_type', '=', 'in_invoice'), ('company_id', '=', self.company_b.id)], limit=1)
+        self.assertTrue(bill.attachment_ids)
+
+    def test_inter_company_with_contact_as_partner_same_company(self):
+        """
+        Test that when creating a bill in company A for an individual contact belonging to the same company A,
+        no invoice is created.
+        """
+        company_partner = self.env['res.partner'].create({
+            'name': 'company partner',
+            'parent_id': self.company_a.partner_id.id,
+        })
+
+        customer_expense_bill = self.env['account.move'].create({
+            'company_id': self.company_a.id,
+            'move_type': 'in_invoice',
+            'invoice_date': '2023-05-01',
+            'partner_id': company_partner.id,
+            'invoice_line_ids': [Command.create({
+                'product_id': self.product_a.id,
+                'price_unit': 100.0,
+                'quantity': 1.0,
+                'tax_ids': False,
+            })]
+        })
+
+        customer_expense_bill.action_post()
+        invoice = self.env['account.move'].search([('move_type', '=', 'out_invoice'), ('company_id', '=', self.company_a.id)], limit=1)
+        self.assertFalse(invoice)

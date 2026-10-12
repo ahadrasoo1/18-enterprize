@@ -1,22 +1,23 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* delivery_fedex
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Junko Augias, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
+"POT-Creation-Date: 2025-12-29 18:50+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
+"Last-Translator: Junko Augias, 2025\n"
 "Language-Team: Japanese (https://app.transifex.com/odoo/teams/41243/ja/)\n"
+"Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: ja\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. module: delivery_fedex
@@ -40,10 +41,12 @@ msgstr "<span class=\"o_form_label\">梱包長さ単位</span>"
 #: model_terms:ir.ui.view,arch_db:delivery_fedex.view_delivery_carrier_form_with_provider_fedex
 msgid ""
 "<span invisible=\"fedex_weight_unit != 'KG'\">CM</span>\n"
-"                                <span invisible=\"fedex_weight_unit != 'LB'\">IN</span>"
+"                                <span invisible=\"fedex_weight_unit != "
+"'LB'\">IN</span>"
 msgstr ""
 "<span invisible=\"fedex_weight_unit != 'KG'\">CM</span>\n"
-"                                <span invisible=\"fedex_weight_unit != 'LB'\">IN</span>"
+"                                <span invisible=\"fedex_weight_unit != "
+"'LB'\">IN</span>"
 
 #. module: delivery_fedex
 #: model_terms:ir.ui.view,arch_db:delivery_fedex.view_delivery_carrier_form_with_provider_fedex
@@ -117,18 +120,18 @@ msgstr "追加データ"
 
 #. module: delivery_fedex
 #: model:ir.model.fields,field_description:delivery_fedex.field_delivery_carrier__fedex_extra_data_rate_request
-msgid "Extra data for rate"
-msgstr "料金用追加データ"
+msgid "Extra data for rate (legacy)"
+msgstr "レート用の追加データ(レガシー)"
 
 #. module: delivery_fedex
 #: model:ir.model.fields,field_description:delivery_fedex.field_delivery_carrier__fedex_extra_data_return_request
-msgid "Extra data for return"
-msgstr "返品用追加データ"
+msgid "Extra data for return (legacy)"
+msgstr "返品用の追加データ(レガシー)"
 
 #. module: delivery_fedex
 #: model:ir.model.fields,field_description:delivery_fedex.field_delivery_carrier__fedex_extra_data_ship_request
-msgid "Extra data for ship"
-msgstr "発送用追加データ"
+msgid "Extra data for ship (legacy)"
+msgstr "配送用の追加データ(レガシー)"
 
 #. module: delivery_fedex
 #: model:ir.model.fields,field_description:delivery_fedex.field_delivery_carrier__fedex_label_file_type
@@ -173,7 +176,7 @@ msgstr "FEDEX_GROUND"
 #. module: delivery_fedex
 #: model:ir.model.fields.selection,name:delivery_fedex.selection__delivery_carrier__fedex_service_type__fedex_international_connect_plus
 msgid "FEDEX_INTERNATIONAL_CONNECT_PLUS"
-msgstr ""
+msgstr "FEDEX_INTERNATIONAL_CONNECT_PLUS"
 
 #. module: delivery_fedex
 #: model:ir.model.fields.selection,name:delivery_fedex.selection__delivery_carrier__fedex_service_type__fedex_international_priority
@@ -238,24 +241,18 @@ msgstr "FIRST_OVERNIGHT"
 #. module: delivery_fedex
 #: model:ir.model.fields.selection,name:delivery_fedex.selection__delivery_carrier__delivery_type__fedex
 #: model:ir.model.fields.selection,name:delivery_fedex.selection__stock_package_type__package_carrier_type__fedex
-msgid "FedEx"
-msgstr "FedEx"
+msgid "FedEx (Legacy)"
+msgstr "FedEx (レガシー)"
 
 #. module: delivery_fedex
 #: model:ir.model.fields,field_description:delivery_fedex.field_delivery_carrier__fedex_account_number
-msgid "FedEx Account Number"
-msgstr "FedExアカウント番号"
+msgid "FedEx Legacy Account Number"
+msgstr "FedEx レガシーアカウント番号"
 
 #. module: delivery_fedex
 #: model:ir.model.fields,field_description:delivery_fedex.field_delivery_carrier__fedex_saturday_delivery
 msgid "FedEx Saturday Delivery"
 msgstr "FedEx土曜配送"
-
-#. module: delivery_fedex
-#: model_terms:ir.ui.view,arch_db:delivery_fedex.res_config_settings_view_form_sale
-#: model_terms:ir.ui.view,arch_db:delivery_fedex.res_config_settings_view_form_stock
-msgid "FedEx Shipping Methods"
-msgstr "FedEx配送方法"
 
 #. module: delivery_fedex
 #: model_terms:ir.ui.view,arch_db:delivery_fedex.view_delivery_carrier_form_with_provider_fedex
@@ -276,7 +273,7 @@ msgstr "Fedexドキュメント"
 #. module: delivery_fedex
 #: model:ir.model.fields,field_description:delivery_fedex.field_delivery_carrier__fedex_droppoff_type
 msgid "Fedex Drop-Off Type"
-msgstr "Fedexドロップオフタイプ"
+msgstr "Fedex配送物受け渡し方法"
 
 #. module: delivery_fedex
 #: model:ir.model.fields,field_description:delivery_fedex.field_delivery_carrier__fedex_duty_payment
@@ -558,11 +555,11 @@ msgstr "発送番号#%sがキャンセルされました"
 #. odoo-python
 #: code:addons/delivery_fedex/models/delivery_fedex.py:0
 msgid ""
-"Shipment created into Fedex<br/><b>Tracking Numbers:</b> "
-"%(tracking_numbers)s<br/><b>Packages:</b> %(packages)s"
+"Shipment created into Fedex<br/><b>Tracking Numbers:</b> %"
+"(tracking_numbers)s<br/><b>Packages:</b> %(packages)s"
 msgstr ""
-"Fedexでの発送が作成されました<br/><b>追跡番号:</b> %(tracking_numbers)s<br/><b>梱包:</b> "
-"%(packages)s"
+"Fedexでの発送が作成されました<br/><b>追跡番号:</b> %(tracking_numbers)s<br/"
+"><b>梱包:</b> %(packages)s"
 
 #. module: delivery_fedex
 #: model:ir.model,name:delivery_fedex.model_delivery_carrier
@@ -582,7 +579,8 @@ msgid ""
 "(To Select Countries)"
 msgstr ""
 "特別サービス:土曜日配達は、次の日にリクエストすることができます。\n"
-"                                                                                 木曜日:\n"
+"                                                                                 木"
+"曜日:\n"
 "1.FEDEX_2_DAY.\n"
 "金曜日:\n"
 "1.PRIORITY_OVERNIGHT.\n"
@@ -606,24 +604,31 @@ msgstr "在庫梱包タイプ"
 #: model:ir.model.fields,help:delivery_fedex.field_delivery_carrier__fedex_extra_data_ship_request
 msgid ""
 "The extra data in FedEx is organized like the inside of a json file.\n"
-"This functionality is advanced/technical and should only be used if you know what you are doing.\n"
+"This functionality is advanced/technical and should only be used if you know "
+"what you are doing.\n"
 "\n"
 "Example of valid value: ```\n"
-"\"ShipmentDetails\": {\"Pieces\": {\"Piece\": {\"AdditionalInformation\": \"extra info\"}}}\n"
+"\"ShipmentDetails\": {\"Pieces\": {\"Piece\": {\"AdditionalInformation\": "
+"\"extra info\"}}}\n"
 "```\n"
 "\n"
-"With the above example, the AdditionalInformation of each piece will be updated.\n"
-"More info on https://www.fedex.com/en-us/developer/web-services/process.html#documentation"
+"With the above example, the AdditionalInformation of each piece will be "
+"updated.\n"
+"More info on https://www.fedex.com/en-us/developer/web-services/"
+"process.html#documentation"
 msgstr ""
 "FedEx内の追加データはjsonファイル内のように整理されます。\n"
-"この機能は高度/技術的なため、ご自身が行っていることを良く理解している場合にのみ使用して下さい。\n"
+"この機能は高度/技術的なため、ご自身が行っていることを良く理解している場合にの"
+"み使用して下さい。\n"
 "\n"
 "有効な値の例: ```\n"
-"\"ShipmentDetails\": {\"Pieces\": {\"Piece\": {\"AdditionalInformation\": \"extra info\"}}}\n"
+"\"ShipmentDetails\": {\"Pieces\": {\"Piece\": {\"AdditionalInformation\": "
+"\"extra info\"}}}\n"
 "```\n"
 "\n"
 "上記の場合は各品のAdditionalInformationが更新されます。\n"
-"詳しくは https://www.fedex.com/en-us/developer/web-services/process.html#documentation"
+"詳しくは https://www.fedex.com/en-us/developer/web-services/"
+"process.html#documentation"
 
 #. module: delivery_fedex
 #: model_terms:ir.ui.view,arch_db:delivery_fedex.view_delivery_carrier_form_with_provider_fedex
@@ -633,9 +638,11 @@ msgstr "最後のステップ:"
 #. module: delivery_fedex
 #: model_terms:ir.ui.view,arch_db:delivery_fedex.view_delivery_carrier_form_with_provider_fedex
 msgid ""
-"These certifications usually require that you contact the FedEx support team"
-" by email."
-msgstr "これらの認証には通常、FedExのサポートチームにEメールで連絡する必要があります。"
+"These certifications usually require that you contact the FedEx support team "
+"by email."
+msgstr ""
+"これらの認証には通常、FedExのサポートチームにEメールで連絡する必要がありま"
+"す。"
 
 #. module: delivery_fedex
 #. odoo-python

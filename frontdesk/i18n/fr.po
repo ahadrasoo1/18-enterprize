@@ -1,23 +1,28 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* frontdesk
-# 
+# * frontdesk
+#
 # Translators:
-# Wil Odoo, 2024
-# 
+# Manon Rondou, 2025
+# Wil Odoo, 2025
+#
+# "Manon Rondou (ronm)" <ronm@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:24+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: French (https://app.transifex.com/odoo/teams/41243/fr/)\n"
+"POT-Creation-Date: 2025-12-29 18:45+0000\n"
+"PO-Revision-Date: 2026-03-31 12:21+0000\n"
+"Last-Translator: \"Manon Rondou (ronm)\" <ronm@odoo.com>\n"
+"Language-Team: French <https://translate.odoo.com/projects/odoo-18/frontdesk/"
+"fr/>\n"
+"Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: fr\n"
-"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : ((n != 0 && n % "
+"1000000 == 0) ? 1 : 2);\n"
+"X-Generator: Weblate 5.16.2\n"
 
 #. module: frontdesk
 #. odoo-python
@@ -29,13 +34,13 @@ msgstr "%(name)s vient d'arriver. Boissons demandée : %(drink)s."
 #. odoo-python
 #: code:addons/frontdesk/models/frontdesk_visitor.py:0
 msgid "%(station)s Check-In: %(visitor)s"
-msgstr ""
+msgstr "%(station)s Check-In : %(visitor)s"
 
 #. module: frontdesk
 #. odoo-python
 #: code:addons/frontdesk/models/frontdesk_visitor.py:0
 msgid "%(station)s Check-In: %(visitor)s to meet %(host)s"
-msgstr ""
+msgstr "%(station)s Check-In : %(visitor)s pour rencontrer %(host)s"
 
 #. module: frontdesk
 #. odoo-python
@@ -51,19 +56,29 @@ msgstr "'Badge - %s' % (object.name).replace('/', '')"
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.print_visitor_badge
 msgid "22 Oct 24 14:20:10"
-msgstr ""
+msgstr "22 Oct 24 14:20:10"
 
 #. module: frontdesk
 #: model:mail.template,body_html:frontdesk.frontdesk_mail_template
 msgid ""
 "<div>\n"
-"                    <p>Hello <t t-if=\"ctx.get('host_name')\"><t t-out=\"ctx.get('host_name')\"></t>, </t><b><t t-out=\"object.name\"></t></b> <t t-if=\"object.phone\">(<t t-out=\"object.phone\"></t>)</t><t t-if=\"object.company\">, coming from <t t-out=\"object.company\"></t></t> is asking to meet you at <t t-out=\"object.station_id.name\"></t>. Please let them know you'll be there shortly.\n"
+"                    <p>Hello <t t-if=\"ctx.get('host_name')\"><t t-"
+"out=\"ctx.get('host_name')\"/>, </t><b><t t-out=\"object.name\"/></b> <t t-"
+"if=\"object.phone\">(<t t-out=\"object.phone\"/>)</t><t t-"
+"if=\"object.company\">, coming from <t t-out=\"object.company\"/></t> is "
+"asking to meet you at <t t-out=\"object.station_id.name\"/>. Please let them "
+"know you'll be there shortly.\n"
 "                    </p>\n"
 "                </div>\n"
 "            "
 msgstr ""
 "<div>\n"
-"                    <p>Bonjour <t t-if=\"ctx.get('host_name')\"><t t-out=\"ctx.get('host_name')\"></t>, </t><b><t t-out=\"object.name\"></t></b> <t t-if=\"object.phone\">(<t t-out=\"object.phone\"></t>)</t><t t-if=\"object.company\">, de <t t-out=\"object.company\"></t></t> demande à vous rencontrer à <t t-out=\"object.station_id.name\"></t>. Veuillez l'informer que vous serez là sous peu.\n"
+"                    <p>Bonjour <t t-if=\"ctx.get('host_name')\"><t t-"
+"out=\"ctx.get('host_name')\"/>, </t><b><t t-out=\"object.name\"/></b> <t t-"
+"if=\"object.phone\">(<t t-out=\"object.phone\"/>)</t><t t-"
+"if=\"object.company\">, de <t t-out=\"object.company\"/></t> demande à vous "
+"rencontrer à <t t-out=\"object.station_id.name\"/>. Veuillez l'informer que "
+"vous serez là sous peu.\n"
 "                    </p>\n"
 "                </div>\n"
 "            "
@@ -74,11 +89,13 @@ msgid ""
 "<span><b>Congratulations!!!</b> You have created your first visitor.\n"
 "        </span>"
 msgstr ""
+"<span><b>Félicitations !!!</b> Vous avez créé votre premier visiteur.\n"
+"        </span>"
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.print_visitor_badge
 msgid "<strong>Visiting:</strong>"
-msgstr ""
+msgstr "<strong>Visite :</strong>"
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_drink__active
@@ -424,19 +441,19 @@ msgstr "Invités présents"
 #: model:sms.template,body:frontdesk.frontdesk_sms_template
 msgid ""
 "Hello, Your visitor {{ object.name }} {{ '(%s)' % object.phone if "
-"object.phone else '' }} {{ '(%s)' % object.company if object.company else ''"
-" }} wants to meet you at {{ object.station_id.name }}. Please let them know "
-"you'll be there shortly."
+"object.phone else '' }} {{ '(%s)' % object.company if object.company else "
+"'' }} wants to meet you at {{ object.station_id.name }}. Please let them "
+"know you'll be there shortly."
 msgstr ""
 "Bonjour, Votre visiteur {{ object.name }} {{ '(%s)' % object.phone if "
-"object.phone else '' }} {{ '(%s)' % object.company if object.company else ''"
-" }} souhaite vous rencontrer à {{ object.station_id.name }}. Veuillez "
+"object.phone else '' }} {{ '(%s)' % object.company if object.company else "
+"'' }} souhaite vous rencontrer à {{ object.station_id.name }}. Veuillez "
 "l'informer que vous serez là sous peu."
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.print_visitor_badge
 msgid "Henry"
-msgstr ""
+msgstr "Henry"
 
 #. module: frontdesk
 #. odoo-javascript
@@ -479,6 +496,11 @@ msgid "Image"
 msgstr "Image"
 
 #. module: frontdesk
+#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_kanban
+msgid "Install"
+msgstr "Installer"
+
+#. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__is_favorite
 msgid "Is Favorite"
 msgstr "Est favori"
@@ -486,7 +508,7 @@ msgstr "Est favori"
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.print_visitor_badge
 msgid "Karen"
-msgstr ""
+msgstr "Karen"
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_kanban
@@ -559,7 +581,7 @@ msgstr ""
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.print_visitor_badge
 msgid "MY PVT LTD"
-msgstr ""
+msgstr "MY PVT LTD"
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__message
@@ -644,8 +666,7 @@ msgstr "Notifier l'hôte de l'arrivée de l'invité"
 #: model_terms:ir.actions.act_window,help:frontdesk.action_open_planned_visitor
 #: model_terms:ir.actions.act_window,help:frontdesk.action_open_station_visitor
 msgid "Odoo helps you to track all information related to your visitors."
-msgstr ""
-"Odoo vous aide à suivre toutes les informations liées à vos visiteurs."
+msgstr "Odoo vous aide à suivre toutes les informations liées à vos visiteurs."
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__drink_offer
@@ -733,7 +754,7 @@ msgstr "Imprimer le badge"
 #. module: frontdesk
 #: model:ir.actions.report,name:frontdesk.frontdesk_visitor_print_badge
 msgid "Print Visitor Badge"
-msgstr ""
+msgstr "Imprimer le badge du visiteur"
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__visitor_properties
@@ -839,8 +860,8 @@ msgstr "Séquence"
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
 msgid "Show a QR code on the welcome screen to check-in from mobile"
 msgstr ""
-"Afficher un code QR sur l'écran de bienvenue pour permettre l'enregistrement"
-" à partir d'un téléphone portable"
+"Afficher un code QR sur l'écran de bienvenue pour permettre l'enregistrement "
+"à partir d'un téléphone portable"
 
 #. module: frontdesk
 #: model:ir.model.fields,help:frontdesk.field_frontdesk_frontdesk__self_check_in
@@ -948,8 +969,8 @@ msgstr "Visiteurs"
 #. module: frontdesk
 #. odoo-javascript
 #: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
-msgid "Welcome"
-msgstr "Bienvenue"
+msgid "Welcome to"
+msgstr "Bienvenue chez"
 
 #. module: frontdesk
 #. odoo-javascript
@@ -1043,12 +1064,6 @@ msgstr "par ex. john@company.com"
 #: code:addons/frontdesk/static/src/end_page/end_page.xml:0
 msgid "has been informed."
 msgstr "a été informé(e)."
-
-#. module: frontdesk
-#. odoo-javascript
-#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
-msgid "to"
-msgstr "à"
 
 #. module: frontdesk
 #. odoo-javascript

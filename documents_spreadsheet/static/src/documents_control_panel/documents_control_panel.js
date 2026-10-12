@@ -41,4 +41,12 @@ patch(DocumentsControlPanel.prototype, {
             shortcut_document_id: record.shortcut_document_id,
         });
     },
+
+    get canManageVersions() {
+        return super.canManageVersions && !this.targetRecords[0].data.handler;
+    },
+
+    onInsertInSpreadsheet() {
+        this.env.bus.trigger("insert-list-spreadsheet");
+    },
 });

@@ -3,6 +3,7 @@
 
 import logging
 import time
+import math
 
 from datetime import date, datetime
 from dateutil.relativedelta import relativedelta
@@ -81,8 +82,28 @@ class TestPayslipValidation(AccountTestInvoicingCommon):
             ]],
         }])
 
+        # When exiting a query count assertion context, the registry is flushed,
+        # to optimize that process, the ORM tries batches writes as necessary.
+        # However, since we include the employee id/name in some of those templates,
+        # this causes some instability during flushing every time we add a new digit.
+        # (file size of pdf documents changes)
+        # The following view ensures the same file size regardless of employee id (up to 12 digits)
+        # and thus the same query count.
+        template_id = cls.env.ref('l10n_be_hr_payroll.report_281_10').id
+        cls.env['ir.ui.view'].create({
+            'name': 'patch_report_281_10',
+            'type': 'qweb',
+            'inherit_id': template_id,
+            'arch': """
+                <xpath expr="//div[hasclass('page')]/div[hasclass('row')][2]/div[1]" position="replace">
+                    <div class="col-4 border-end">
+                        <strong>1. Nr.</strong> <span t-esc="str(employee.id).zfill(12)"/>
+                    </div>
+                </xpath>
+            """
+        })
         cls.employees = cls.env['hr.employee'].create([{
-            'name': "Test Employee %i" % i,
+            'name': "Test Employee %.03d" % i,
             'private_street': 'Brussels Street',
             'private_city': 'Brussels',
             'private_zip': '2928',
@@ -195,10 +216,7 @@ class TestPayslipValidation(AccountTestInvoicingCommon):
     @warmup
     def test_performance_l10n_be_payroll_whole_flow(self):
         # Work entry generation
-        with self.assertQueryCount(admin=7674):
-            # Note 4408 requests are related to the db insertions
-            # i.e. self.env['hr.work.entry'].create(vals_list) and thus
-            # are not avoidable.
+        with self.assertQueryCount(admin=578):
             self.employees.generate_work_entries(self.date_from, self.date_to)
 
         structure = self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_employee_salary')
@@ -214,21 +232,21 @@ class TestPayslipValidation(AccountTestInvoicingCommon):
         } for i in range(self.EMPLOYEES_COUNT)]
 
         # Payslip Creation
-        with self.assertQueryCount(admin=1271):  # randomness
+        with self.assertQueryCount(admin=1149):  # randomness
             start_time = time.time()
             payslips = self.env['hr.payslip'].with_context(allowed_company_ids=self.company.ids).create(payslips_values)
             # --- 0.3016078472137451 seconds ---
             _logger.info("Payslips Creation: --- %s seconds ---", time.time() - start_time)
 
         # Payslip Computation
-        with self.assertQueryCount(admin=3321):
+        with self.assertQueryCount(admin=600):
             start_time = time.time()
             payslips.compute_sheet()
             # --- 9.298089027404785 seconds ---
             _logger.info("Payslips Computation: --- %s seconds ---", time.time() - start_time)
 
         # Payslip Validation
-        with self.assertQueryCount(admin=447):
+        with self.assertQueryCount(admin=400):
             start_time = time.time()
             payslips.action_payslip_done()
             # --- 6.975736618041992 seconds ---
@@ -264,14 +282,14 @@ class TestPayslipValidation(AccountTestInvoicingCommon):
         })
         declaration_281_10.action_generate_declarations()
         self.assertEqual(len(declaration_281_10.line_ids), self.EMPLOYEES_COUNT)
-        with self.assertQueryCount(admin=129):
+        with self.assertQueryCount(admin=250):
             start_time = time.time()
             declaration_281_10.action_generate_xml()
             # --- 0.0810704231262207 seconds ---
             _logger.info("Declaration 281.10 XML:--- %s seconds ---", time.time() - start_time)
         self.assertEqual(declaration_281_10.xml_validation_state, 'done', declaration_281_10.error_message)
 
-        with self.assertQueryCount(admin=1343):
+        with self.assertQueryCount(admin=1900):
             start_time = time.time()
             declaration_281_10.line_ids.write({
                 'pdf_to_generate': True,
@@ -287,14 +305,14 @@ class TestPayslipValidation(AccountTestInvoicingCommon):
         })
         declaration_281_45.action_generate_declarations()
         self.assertEqual(len(declaration_281_45.line_ids), self.EMPLOYEES_COUNT)
-        with self.assertQueryCount(admin=13):
+        with self.assertQueryCount(admin=5):
             start_time = time.time()
             declaration_281_45.action_generate_xml()
             # --- 0.027942657470703125 seconds ---
             _logger.info("Declaration 281.45:--- %s seconds ---", time.time() - start_time)
         self.assertEqual(declaration_281_45.xml_validation_state, 'done', declaration_281_45.error_message)
 
-        with self.assertQueryCount(admin=1228):
+        with self.assertQueryCount(admin=1525):
             start_time = time.time()
             declaration_281_45.line_ids.write({
                 'pdf_to_generate': True,
@@ -311,7 +329,7 @@ class TestPayslipValidation(AccountTestInvoicingCommon):
         })
         individual_accounts.action_generate_declarations()
         self.assertEqual(len(individual_accounts.line_ids), self.EMPLOYEES_COUNT)
-        with self.assertQueryCount(admin=1324):
+        with self.assertQueryCount(admin=1621):
             start_time = time.time()
             individual_accounts.line_ids.write({
                 'pdf_to_generate': True,
@@ -326,7 +344,7 @@ class TestPayslipValidation(AccountTestInvoicingCommon):
             'date_from': self.date_from + relativedelta(day=1, month=1),
             'date_to': self.date_from + relativedelta(day=31, month=12),
         })
-        with self.assertQueryCount(admin=113):
+        with self.assertQueryCount(admin=38):
             start_time = time.time()
             social_security_certificate.print_report()
             # --- 0.1080021858215332 seconds ---

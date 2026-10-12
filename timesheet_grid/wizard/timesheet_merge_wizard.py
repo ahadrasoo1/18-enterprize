@@ -66,15 +66,7 @@ class MergeTimesheets(models.TransientModel):
     def action_merge(self):
         self.ensure_one()
 
-        self.env['account.analytic.line'].create({
-            'name': self.name,
-            'date': self.date,
-            'unit_amount': self.unit_amount,
-            'encoding_uom_id': self.encoding_uom_id.id,
-            'project_id': self.project_id.id,
-            'task_id': self.task_id.id,
-            'employee_id': self.employee_id.id,
-        })
+        self.env['account.analytic.line'].create(self._prepare_merged_timesheet_values())
         self.timesheet_ids.unlink()
 
         return {
@@ -87,3 +79,14 @@ class MergeTimesheets(models.TransientModel):
                     'next': {'type': 'ir.actions.act_window_close'},
                 }
             }
+
+    def _prepare_merged_timesheet_values(self):
+        return {
+            'name': self.name,
+            'date': self.date,
+            'unit_amount': self.unit_amount,
+            'encoding_uom_id': self.encoding_uom_id.id,
+            'project_id': self.project_id.id,
+            'task_id': self.task_id.id,
+            'employee_id': self.employee_id.id,
+        }

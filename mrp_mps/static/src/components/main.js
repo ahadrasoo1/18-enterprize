@@ -91,7 +91,7 @@ export class MainComponent extends Component {
     }
 
     get lines() {
-        return this.model.data.production_schedule_ids;
+        return this.model.data.production_schedule_ids.slice(0, this.env.config.limit);
     }
 
     get manufacturingPeriods() {
@@ -106,6 +106,10 @@ export class MainComponent extends Component {
 
     get currentPeriodType() {
         return this.model.data.manufacturing_period;
+    }
+
+    get isInDefaultPeriod() {
+        return this.model.data.manufacturing_period === this.model.data.default_period;
     }
 
     async setScale(scale) {

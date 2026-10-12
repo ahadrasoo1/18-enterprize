@@ -518,6 +518,49 @@ QUnit.module(
             );
         });
 
+        QUnit.test("default value in sidebar according to field type", async function (assert) {
+            const arch = `<form><sheet>
+                    <group>
+                        <field name='display_name'/>
+                        <field name='priority' widget="radio"/>
+                    </group>
+                </sheet></form>`;
+            await createViewEditor({
+                serverData,
+                type: "form",
+                resModel: "coucou",
+                arch: arch,
+                mockRPC: {
+                    "/web_studio/get_default_value": (route, args) => {
+                        if (args.field_name === "priority") {
+                            return Promise.resolve({ default_value: "1" });
+                        }
+                    },
+                },
+            });
+
+            assert.containsN(target, '.o_field_widget[name="priority"] input[type="radio"]', 3);
+            await click(target.querySelector('.o_field_widget[name="priority"]'));
+            await click(
+                target.querySelector(
+                    ".o_web_studio_property_default_value .o_select_menu_toggler_slot"
+                )
+            );
+            assert.strictEqual(
+                target.querySelector(
+                    ".o_web_studio_property_default_value .o_select_menu_toggler_slot"
+                ).textContent,
+                "Low",
+                "the sidebar should display the correct default value"
+            );
+            assert.containsOnce(target, ".o-dropdown--menu");
+            assert.strictEqual(
+                target.querySelector(".o-dropdown--menu").textContent,
+                "HighLowMedium",
+                "the sidebar should have the right options"
+            );
+        });
+
         QUnit.test("default value for new field name", async function (assert) {
             assert.expect(2);
 
@@ -754,6 +797,53 @@ QUnit.module(
             );
 
             await click(target.querySelector(".o_web_studio_sidebar .o_web_studio_parameters"));
+        });
+
+        QUnit.test('click on the "More" Button in reified field', async function (assert) {
+            assert.expect(2);
+
+            serverData.models.coucou.fields.sel_groups_10 = {
+                string: "Group sel",
+                type: "selection",
+                manual: true,
+                selection: [
+                    ["1", "Low"],
+                    ["2", "Medium"],
+                    ["3", "High"],
+                ],
+            };
+
+            // the 'More' button is only available in debug mode
+            patchWithCleanup(odoo, { debug: true });
+
+            const arch = `
+            <form>
+                <sheet>
+                    <field name='display_name'/>
+                    <field name='sel_groups_10'/>
+                </sheet>
+            </form>`;
+
+            await createViewEditor({
+                serverData,
+                arch,
+                type: "form",
+                resModel: "coucou",
+            });
+
+            await click(target.querySelector('[name="sel_groups_10"]'));
+            assert.containsOnce(
+                target,
+                ".o_web_studio_sidebar .o_web_studio_parameters",
+                "there should be the button to go to the ir.ui.view form"
+            );
+
+            await click(target.querySelector(".o_web_studio_sidebar .o_web_studio_parameters"));
+            assert.strictEqual(
+                target.querySelector(".o_dialog .modal-body").textContent,
+                "You cannot perform this action on this field.",
+                "there should be a dialog preventing the users from accessing field properties"
+            );
         });
 
         QUnit.test("open xml editor of component view", async function (assert) {

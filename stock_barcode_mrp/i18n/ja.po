@@ -1,28 +1,30 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* stock_barcode_mrp
-# 
+#
 # Translators:
-# Wil Odoo, 2024
-# 
+# Junko Augias, 2025
+# Wil Odoo, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:28+0000\n"
+"POT-Creation-Date: 2025-12-29 18:49+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
+"Last-Translator: Wil Odoo, 2025\n"
 "Language-Team: Japanese (https://app.transifex.com/odoo/teams/41243/ja/)\n"
+"Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: ja\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. module: stock_barcode_mrp
 #: model_terms:ir.ui.view,arch_db:stock_barcode_mrp.res_config_settings_view_form
 msgid "<i class=\"fa fa-print\"/> Print barcode commands and operation types"
-msgstr "<i class=\"fa fa-print\"/> バーコードコマンドとオペレーションタイプを印刷"
+msgstr ""
+"<i class=\"fa fa-print\"/> バーコードコマンドとオペレーションタイプを印刷"
 
 #. module: stock_barcode_mrp
 #: model_terms:ir.ui.view,arch_db:stock_barcode_mrp.res_config_settings_view_form
@@ -87,7 +89,7 @@ msgstr "製品バーコードを設定"
 #: model_terms:ir.ui.view,arch_db:stock_barcode_mrp.mrp_barcode_form
 #: model_terms:ir.ui.view,arch_db:stock_barcode_mrp.mrp_product_selector
 msgid "Confirm"
-msgstr "確認"
+msgstr "確定"
 
 #. module: stock_barcode_mrp
 #: model:ir.model.fields,field_description:stock_barcode_mrp.field_stock_picking_type__count_mo_confirmed
@@ -195,7 +197,7 @@ msgstr "生産オーダを印刷"
 #. odoo-javascript
 #: code:addons/stock_barcode_mrp/static/src/models/barcode_mrp_model.js:0
 msgid "Produce"
-msgstr "製造"
+msgstr "生産"
 
 #. module: stock_barcode_mrp
 #. odoo-javascript
@@ -207,7 +209,7 @@ msgstr "全て生産"
 #. odoo-javascript
 #: code:addons/stock_barcode_mrp/static/src/components/header.xml:0
 msgid "Producing"
-msgstr ""
+msgstr "製造中"
 
 #. module: stock_barcode_mrp
 #: model_terms:ir.ui.view,arch_db:stock_barcode_mrp.mrp_product_selector
@@ -249,9 +251,13 @@ msgstr "プロダクトをスキャンしてオーダをフィルタする"
 
 #. module: stock_barcode_mrp
 #. odoo-javascript
-#: code:addons/stock_barcode_mrp/static/src/kanban/stock_barcode_kanban_renderer.xml:0
-msgid "Scan an"
-msgstr "スキャン："
+#: code:addons/stock_barcode_mrp/static/src/kanban/stock_barcode_kanban_renderer.js:0
+msgid ""
+"Scan an %(bold_start)s order %(bold_end)s or a %(bold_start)s product %"
+"(bold_end)s to filter your records"
+msgstr ""
+"%(bold_start)s オーダ %(bold_end)s または %(bold_start)s プロダクト %"
+"(bold_end)s をスキャンしてレコードをフィルタリングします"
 
 #. module: stock_barcode_mrp
 #. odoo-javascript
@@ -282,7 +288,9 @@ msgstr "製造オーダがキャンセルされました"
 msgid ""
 "The lines with a kit have been replaced with their components. Please check "
 "the picking before the final validation."
-msgstr "キットのある明細は構成品に置き換えられています。最終検証の前にピッキングを確認してください。"
+msgstr ""
+"キットのある明細は構成品に置き換えられています。最終検証の前にピッキングを確"
+"認してください。"
 
 #. module: stock_barcode_mrp
 #. odoo-javascript
@@ -326,11 +334,14 @@ msgstr "単位"
 #. module: stock_barcode_mrp
 #: model:ir.model.fields,help:stock_barcode_mrp.field_stock_move_line__manual_consumption
 msgid ""
-"When activated, then the registration of consumption for that component is recorded manually exclusively.\n"
-"If not activated, and any of the components consumption is edited manually on the manufacturing order, Odoo assumes manual consumption also."
+"When activated, then the registration of consumption for that component is "
+"recorded manually exclusively.\n"
+"If not activated, and any of the components consumption is edited manually "
+"on the manufacturing order, Odoo assumes manual consumption also."
 msgstr ""
 "有効になっている場合、その構成品の消費登録は手動のみで記録されます。\n"
-"有効でない場合、構成品の消費量が製造オーダ上で手動で編集されると、Odooは手動消費も想定します。"
+"有効でない場合、構成品の消費量が製造オーダ上で手動で編集されると、Odooは手動"
+"消費も想定します。"
 
 #. module: stock_barcode_mrp
 #: model:ir.model,name:stock_barcode_mrp.model_mrp_production_backorder
@@ -340,29 +351,11 @@ msgstr "完了済またはバックオーダを作成するウィザード"
 #. module: stock_barcode_mrp
 #. odoo-javascript
 #: code:addons/stock_barcode_mrp/static/src/models/barcode_mrp_model.js:0
+msgid "You are expected to scan one or more products."
+msgstr "1つ以上のプロダクトをスキャンする必要があります。"
+
+#. module: stock_barcode_mrp
+#. odoo-javascript
+#: code:addons/stock_barcode_mrp/static/src/models/barcode_mrp_model.js:0
 msgid "You can't add the final product of a MO as a byproduct."
 msgstr "製造オーダの最終プロダクトを副産品として追加することはできません。"
-
-#. module: stock_barcode_mrp
-#. odoo-javascript
-#: code:addons/stock_barcode_mrp/static/src/kanban/stock_barcode_kanban_renderer.xml:0
-msgid "or a"
-msgstr ""
-
-#. module: stock_barcode_mrp
-#. odoo-javascript
-#: code:addons/stock_barcode_mrp/static/src/kanban/stock_barcode_kanban_renderer.xml:0
-msgid "order"
-msgstr ""
-
-#. module: stock_barcode_mrp
-#. odoo-javascript
-#: code:addons/stock_barcode_mrp/static/src/kanban/stock_barcode_kanban_renderer.xml:0
-msgid "product"
-msgstr "プロダクト"
-
-#. module: stock_barcode_mrp
-#. odoo-javascript
-#: code:addons/stock_barcode_mrp/static/src/kanban/stock_barcode_kanban_renderer.xml:0
-msgid "to filter your records"
-msgstr ""

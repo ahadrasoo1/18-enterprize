@@ -112,3 +112,93 @@ class TestQuality(TransactionCase):
         move.unlink()
         self.assertFalse(move.exists())
         self.assertFalse(qc.exists())
+
+    def test_label_printed_qty(self):
+        """
+        Check that the label printing instructions print the expected quantities.
+        """
+        super_product = self.env['product.product'].create({
+            'name': 'Super Product',
+            'type': 'consu',
+            'is_storable': True,
+            'tracking': 'lot',
+        })
+        bom = self.env['mrp.bom'].create({
+            'product_id': super_product.id,
+            'product_tmpl_id': super_product.product_tmpl_id.id,
+            'product_uom_id': super_product.uom_id.id,
+            'product_qty': 1.0,
+            'operation_ids': [
+                Command.create({'name': 'print label', 'workcenter_id': self.workcenter_1.id})
+            ],
+            'type': 'normal',
+        })
+
+        self.env['quality.point'].create({
+            'title': 'Print Label',
+            'product_ids': [Command.link(super_product.id)],
+            'operation_id': bom.operation_ids.id,
+            'test_type_id': self.ref('mrp_workorder.test_type_print_label')
+        })
+        mo_form = Form(self.env['mrp.production'])
+        mo_form.bom_id = bom
+        mo_form.product_qty = 10
+        mo = mo_form.save()
+        mo.action_confirm()
+
+        self.assertEqual(mo.workorder_ids.current_quality_check_id._get_print_qty(), 10)
+        with Form(mo) as mo_form:
+            mo_form.qty_producing = 7.0
+        self.assertEqual(mo.workorder_ids.current_quality_check_id._get_print_qty(), 7)
+
+    def test_reordering_rule_updates_or_creates_mo_based_on_quality_checks(self):
+        """
+        Ensure that triggering a manufacturing reordering rule:
+        - Updates an existing MO if none of its quality check has been performed yet
+        - Creates a new MO if the last MO's product_qty cannot be updated due to a performed quality check
+        """
+        self.env['mrp.routing.workcenter'].create({
+            'name': 'Assembly2',
+            'workcenter_id': self.workcenter_1.id,
+            'bom_id': self.bom.id,
+        })
+        warehouse = self.env['stock.warehouse'].search([('company_id', '=', self.env.company.id)], limit=1)
+        route_manufacture = warehouse.manufacture_pull_id.route_id
+        self.product_1.route_ids = [Command.set([route_manufacture.id])]
+
+        self.env['quality.point'].create({
+            'title': 'QC',
+            'product_ids': [Command.link(self.product_1.id)],
+            'operation_id': self.bom.operation_ids[1].id,
+            'test_type_id': self.env.ref('quality.test_type_instructions').id,
+        })
+
+        orderpoint = self.env['stock.warehouse.orderpoint'].create({
+            'product_id': self.product_1.id,
+            'warehouse_id': warehouse.id,
+            'product_min_qty': 1,
+            'product_max_qty': 1,
+        })
+        orderpoint.action_replenish()
+
+        mo = self.env['mrp.production'].search([('orderpoint_id', '=', orderpoint.id)], limit=1)
+        self.assertRecordValues(mo, [
+            {'product_qty': 1.0, 'product_id': self.product_1.id, 'warehouse_id': warehouse.id},
+        ])
+
+        orderpoint.write({'product_min_qty': 2, 'product_max_qty': 2})
+        orderpoint.action_replenish()
+        self.assertRecordValues(mo, [
+            {'product_qty': 2.0, 'product_id': self.product_1.id, 'warehouse_id': warehouse.id},
+        ])
+
+        mo.workorder_ids[1].current_quality_check_id.action_next()
+
+        orderpoint.write({'product_min_qty': 3, 'product_max_qty': 3})
+        orderpoint.action_replenish()
+
+        mos = self.env['mrp.production'].search([('orderpoint_id', '=', orderpoint.id)], limit=2)
+        self.assertRecordValues(mos, [
+            {'product_qty': 2.0, 'product_id': self.product_1.id, 'warehouse_id': warehouse.id},
+            {'product_qty': 1.0, 'product_id': self.product_1.id, 'warehouse_id': warehouse.id},
+        ])

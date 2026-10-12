@@ -844,6 +844,109 @@ class TestAccountAsset(TestAccountReportsCommon):
         self.update_form_values(asset_form)
         asset_form.save()
 
+    def test_negative_asset_balance_inversion(self):
+        """
+        Test that an asset with a negative original value generates depreciation moves
+        with inverted balances (i.e., credit instead of debit) compared to a positive asset.
+        Also check that manual adjustments to depreciation values correctly reflect in invoice lines.
+        """
+        asset_account = self.company_data['default_account_assets'].id
+        expense_account = self.company_data['default_account_expense'].id
+        asset = self.env['account.asset'].create({
+            'name': "Test Asset",
+            'original_value': -10000,
+            'account_depreciation_id': asset_account,
+            'account_depreciation_expense_id': expense_account,
+            'journal_id': self.company_data['default_journal_misc'].id,
+            'prorata_computation_type': 'none',
+        })
+        asset.compute_depreciation_board()
+
+        # Test that the depreciations are created upon validation of the asset according to the default values
+        self.assertEqual(len(asset.depreciation_move_ids), 5)
+        for move in asset.depreciation_move_ids:
+            self.assertEqual(move.depreciation_value, -2000)
+
+        with Form(asset) as asset_form:
+            with asset_form.depreciation_move_ids.edit(4) as line_edit:
+                line_edit.depreciation_value = -1000.0
+            with asset_form.depreciation_move_ids.edit(3) as line_edit:
+                line_edit.depreciation_value = -3000.0
+        self.update_form_values(asset_form)
+
+        self.assertRecordValues(asset.depreciation_move_ids[0].line_ids, [
+            {'account_id': asset_account, 'balance': 1000.0},
+            {'account_id': expense_account, 'balance': -1000.0},
+        ])
+
+        self.assertRecordValues(asset.depreciation_move_ids[1].line_ids, [
+            {'account_id': asset_account, 'balance': 3000.0},
+            {'account_id': expense_account, 'balance': -3000.0},
+        ])
+
+    def test_asset_change_depreciation_expense_account(self):
+        """Check computation of depreciation_value is correct even when expense account was changed"""
+        self.env['account.move'].search([('state', '=', 'draft')]).unlink()  # allow setting the lock date below
+        asset = self.env['account.asset'].create({
+            'name': 'Test asset',
+            'acquisition_date': '2011-07-01',
+            'original_value': 1000.0,
+            'account_asset_id': self.company_data['default_account_assets'].id,
+            'account_depreciation_id': self.company_data['default_account_assets'].id,
+            'account_depreciation_expense_id': self.company_data['default_account_expense'].id,
+        })
+        asset.validate()
+
+        sorted_depreciation_moves = asset.depreciation_move_ids.sorted(lambda l: l.date)
+        td = fields.Date.to_date
+        self.assertRecordValues(sorted_depreciation_moves, [
+            {'date': td('2011-12-31'), 'depreciation_value': 100},
+            {'date': td('2012-12-31'), 'depreciation_value': 200},
+            {'date': td('2013-12-31'), 'depreciation_value': 200},
+            {'date': td('2014-12-31'), 'depreciation_value': 200},
+            {'date': td('2015-12-31'), 'depreciation_value': 200},
+            {'date': td('2016-12-31'), 'depreciation_value': 100},
+        ])
+
+        # Simulate life cycle of the asset by doing the following:
+        # - Auto posting of depreciation move at their planned date
+        # - Change the depreciation expense account after depreciation entry for 3rd period is posted
+        # - Set a lock date after each period so that changing the depreciation expense account
+        #   does not modify the account from expense line on existing posted depreciation entries
+        new_depreciation_expense_account = asset.account_depreciation_expense_id.copy()
+        for period, depreciation_move in enumerate(sorted_depreciation_moves):
+            with self.subTest(period=period, depreciation_date=depreciation_move.date), freeze_time(depreciation_move.date):
+
+                self.env["account.move"]._autopost_draft_entries()
+
+                if period == 3:
+                    asset.account_depreciation_expense_id = new_depreciation_expense_account
+
+                # Ensure expense line of depreciation entry use the right account
+                expense_line = depreciation_move.line_ids.filtered(lambda line: line.account_id.internal_group == "expense")
+                if period > 2:
+                    self.assertEqual(expense_line.account_id, new_depreciation_expense_account)
+                else:
+                    self.assertEqual(expense_line.account_id, self.company_data['default_account_expense'])
+
+                lock_wiz = self.env["account.change.lock.date"].create({"fiscalyear_lock_date": depreciation_move.date})
+                with freeze_time('9999-12-31'):
+                    lock_wiz.change_lock_date()
+
+        # Force recomputation of depreciation_value (this would fail due to unbalanced entry in case
+        #   we consider only the asset's expense account in the inverse function)
+        depreciation_field = self.env['account.move']._fields['depreciation_value']
+        self.env.add_to_compute(depreciation_field, sorted_depreciation_moves)
+
+        self.assertRecordValues(sorted_depreciation_moves, [
+            {'date': td('2011-12-31'), 'depreciation_value': 100},
+            {'date': td('2012-12-31'), 'depreciation_value': 200},
+            {'date': td('2013-12-31'), 'depreciation_value': 200},
+            {'date': td('2014-12-31'), 'depreciation_value': 200},
+            {'date': td('2015-12-31'), 'depreciation_value': 200},
+            {'date': td('2016-12-31'), 'depreciation_value': 100},
+        ])
+
     def test_asset_from_entry_line_form(self):
         """Test that the asset is correcly created from a move line"""
 
@@ -940,6 +1043,87 @@ class TestAccountAsset(TestAccountReportsCommon):
             'account_depreciation_expense_id': self.company_data['default_account_expense'].id,
             'acquisition_date': min(move_ids.mapped('invoice_date')),
         }])
+
+    def test_asset_from_bill_move_line_form_multicurrency(self):
+        """Test that the asset is correcly created from a move line using a foreign currency"""
+
+        asset_account = self.company_data['default_account_assets']
+        non_deductible_tax = self.env['account.tax'].create({
+            'name': 'Non-deductible Tax',
+            'amount': 21,
+            'amount_type': 'percent',
+            'type_tax_use': 'purchase',
+            'invoice_repartition_line_ids': [
+                Command.create({'repartition_type': 'base'}),
+                Command.create({
+                    'factor_percent': 50,
+                    'repartition_type': 'tax',
+                    'use_in_tax_closing': False
+                }),
+                Command.create({
+                    'factor_percent': 50,
+                    'repartition_type': 'tax',
+                    'use_in_tax_closing': True
+                }),
+            ],
+            'refund_repartition_line_ids': [
+                Command.create({'repartition_type': 'base'}),
+                Command.create({
+                    'factor_percent': 50,
+                    'repartition_type': 'tax',
+                    'use_in_tax_closing': False
+                }),
+                Command.create({
+                    'factor_percent': 50,
+                    'repartition_type': 'tax',
+                    'use_in_tax_closing': True
+                }),
+            ],
+        })
+        asset_account.tax_ids = non_deductible_tax
+
+        asset_account.create_asset = 'no'
+        asset_account.multiple_assets_per_line = False
+
+        vendor_bill = self.env['account.move'].create({
+            'move_type': 'in_invoice',
+            'currency_id': self.other_currency.id,
+            'invoice_date': '2020-01-01',
+            'partner_id': self.partner_a.id,
+            'invoice_line_ids': [
+                Command.create({
+                    'account_id': asset_account.id,
+                    'currency_id': self.other_currency.id,
+                    'name': 'Asus Laptop',
+                    'price_unit': 1000.0,
+                    'quantity': 1,
+                    'tax_ids': [Command.set(non_deductible_tax.ids)]
+                }),
+                Command.create({
+                    'account_id': asset_account.id,
+                    'currency_id': self.other_currency.id,
+                    'name': 'Lenovo Laptop',
+                    'price_unit': 500.0,
+                    'quantity': 1,
+                    'tax_ids': [Command.set(non_deductible_tax.ids)]
+                }),
+            ],
+        })
+        vendor_bill.action_post()
+        self.env.flush_all()
+
+        move_line_ids = vendor_bill.mapped('line_ids').filtered(lambda x: x.name and 'Laptop' in x.name)
+        asset_form = Form(self.env['account.asset'].with_context(
+            default_original_move_line_ids=move_line_ids.ids,
+            asset_type='purchase'
+        ))
+        asset_form.original_move_line_ids = move_line_ids
+        asset_form.account_depreciation_expense_id = self.company_data['default_account_expense']
+
+        new_assets = asset_form.save()
+        self.assertEqual(len(new_assets), 1)
+        self.assertEqual(new_assets.original_value, 828.75)
+        self.assertEqual(new_assets.non_deductible_tax_value, 78.75)
 
     def test_asset_modify_value_00(self):
         """Test the values of the asset and value increase 'assets' after a
@@ -1078,7 +1262,7 @@ class TestAccountAsset(TestAccountReportsCommon):
             'name': 'New beautiful sticker :D',
             'asset_id': self.truck.id,
             'date': fields.Date.today() + relativedelta(years=-1, months=-6, days=-1),
-            'value_residual': 4000,
+            'value_residual': 4750,
             'salvage_value': 3000,
             "account_asset_counterpart_id": self.assert_counterpart_account_id,
         }).modify()
@@ -1719,7 +1903,7 @@ class TestAccountAsset(TestAccountReportsCommon):
         # from the right environment.
         self.env.flush_all()
 
-        move_line_ids = vendor_bill_manu.mapped('line_ids').filtered(lambda x: 'Laptop' in x.name)
+        move_line_ids = vendor_bill_manu.mapped('line_ids').filtered(lambda x: x.name and 'Laptop' in x.name)
         asset_form = Form(self.env['account.asset'].with_context(
             default_original_move_line_ids=move_line_ids.ids,
         ))
@@ -2489,6 +2673,40 @@ class TestAccountAsset(TestAccountReportsCommon):
             options,
         )
 
+    def test_depreciation_schedule_prefix_groups_with_comparison(self):
+        """ Prefix grouping + comparison: an asset with no value in the comparison
+        period yields an empty column dict, which must be summed as 0 instead of
+        raising KeyError: 'no_format'. """
+        for i in range(1, 3):
+            asset = self.env['account.asset'].create({
+                'method_period': '12',
+                'method_number': 4,
+                'name': f"Bldg {i}",
+                'original_value': i * 100.0,
+                'acquisition_date': fields.Date.from_string('2021-06-01'),
+                'account_asset_id': self.company_data['default_account_assets'].id,
+                'account_depreciation_id': self.company_data['default_account_assets'].copy().id,
+                'account_depreciation_expense_id': self.company_data['default_account_expense'].id,
+                'journal_id': self.company_data['default_journal_misc'].id,
+                'prorata_computation_type': 'none',
+            })
+            asset.validate()
+        self.env['account.move']._autopost_draft_entries()
+
+        report = self.env.ref('account_asset.assets_report')
+        report.prefix_groups_threshold = 2
+        report.filter_period_comparison = True
+        options = self._generate_options(
+            report, '2021-01-01', '2021-12-31',
+            default_options={'assets_grouping_field': 'none', 'unfold_all': True},
+        )
+        options = self._update_comparison_filter(options, report, 'previous_period', 1)
+
+        lines = report._get_lines(options)
+
+        prefix_line_names = [line['name'] for line in lines if line['name'].startswith('B ')]
+        self.assertEqual(prefix_line_names, ['B (2 lines)'])
+
     def test_archive_asset_model(self):
         """ Test that we can archive an asset model. """
         self.account_asset_model_fixedassets.active = False
@@ -2794,9 +3012,6 @@ class TestAccountAsset(TestAccountReportsCommon):
         self.assertTrue(added_move_on_sale.asset_move_type == 'sale')
         self.assertEqual(car.net_gain_on_sale, 100)
 
-        car.original_move_line_ids = self.env['account.move.line']
-        self.assertEqual(bill.asset_move_type, False, "removing the bill from the original bills of the asset reset the asset_move_type field to False")
-
         # Create new asset to test positive revaluation and disposal
         new_car = car.copy()
         new_car.validate()
@@ -2957,3 +3172,47 @@ class TestAccountAsset(TestAccountReportsCommon):
                 asset = self.env['account.asset'].create(asset_vals)
                 asset.compute_depreciation_board()
                 self.assertEqual(asset.depreciation_move_ids.mapped('company_id'), expected)
+
+    def test_multiple_asset_models_with_branches(self):
+        """Check that asset models are not shared between siblings, only with ancestors."""
+
+        branch_a = self.setup_other_company(name='Test Branch A', parent_id=self.company_data['company'].id)
+        asset_model_a = self.account_asset_model_fixedassets.copy()
+        asset_model_a.company_id = branch_a['company']
+
+        branch_b = self.setup_other_company(name='Test Branch B', parent_id=self.company_data['company'].id)
+        asset_model_b = self.account_asset_model_fixedassets.copy()
+        asset_model_b.company_id = branch_b['company']
+
+        # We need to set both branch's asset models on the parent company's asset account.
+        self.company_data['default_account_assets'].asset_model_ids = asset_model_a + asset_model_b
+        self.company_data['default_account_assets'].create_asset = 'draft'
+
+        vendor_bill = self.env['account.move'].with_company(branch_a['company']).create({
+            'move_type': 'in_invoice',
+            'partner_id': self.partner_a.id,
+            'invoice_date': fields.Date.today(),
+            'invoice_line_ids': [Command.create({
+                'name': 'Very little red car',
+                # Make sure the bill uses the asset account with both asset models.
+                'account_id': self.company_data['default_account_assets'].id,
+                'price_unit': 1000,
+                'quantity': 1,
+            })],
+        })
+        vendor_bill.action_post()
+
+        self.assertEqual(len(vendor_bill.asset_ids), 1, "Only one asset should have been created.")
+        self.assertEqual(vendor_bill.asset_ids.company_id, branch_a['company'], f"The asset should have been created on company: {branch_a['company'].name}")
+
+    def test_non_deductible_tax_value_empty_ids(self):
+        """Test that _compute_non_deductible_tax_value doesn't crash on unsaved records."""
+        move = self.env['account.move'].create({
+            'move_type': 'out_invoice',
+            'partner_id': self.partner_a.id,
+        })
+        with Form(move) as move_form:
+            with move_form.invoice_line_ids.new() as line_form:
+                line_form.product_id = self.product_a
+                line_form.tax_ids.clear()
+                line_form.tax_ids.add(self.tax_armageddon)

@@ -42,7 +42,7 @@
                             invisible="count_linked_asset == 0 or not warning_count_assets">
                             <field string="Asset(s)" name="count_linked_asset" widget="statinfo"/>
                         </button>
-                        <button class="oe_stat_button" name="open_entries"  type="object" icon="fa-bars" data-hotkey="p">
+                        <button class="oe_stat_button" name="open_entries"  type="object" icon="fa-bars" data-hotkey="shift+p">
                             <field string="Posted Entries" name="depreciation_entries_count" widget="statinfo" />
                         </button>
                         <button class="oe_stat_button" name="open_increase"  type="object" icon="fa-chevron-circle-up" invisible="gross_increase_count == 0">
@@ -78,7 +78,7 @@
                             <field
                                 name="account_asset_id"
                                 domain="[
-                                    ('company_ids', 'in', company_id),
+                                    ('company_ids', 'parent_of', company_id),
                                     ('account_type', 'in', (
                                         'asset_fixed',
                                         'asset_non_current',
@@ -97,7 +97,7 @@
                             <field
                                 name="account_depreciation_id"
                                 domain="[
-                                    ('company_ids', 'in', company_id),
+                                    ('company_ids', 'parent_of', company_id),
                                     ('account_type', 'in', (
                                         'asset_fixed',
                                         'asset_non_current',
@@ -115,7 +115,7 @@
                             <field
                                 name="account_depreciation_expense_id"
                                 domain="[
-                                    ('company_ids', 'in', company_id),
+                                    ('company_ids', 'parent_of', company_id),
                                     ('account_type', 'in', (
                                         'expense_depreciation',
                                         'expense')
@@ -182,7 +182,7 @@
                                     <field
                                         name="account_asset_id"
                                         domain="[
-                                            ('company_ids', 'in', company_id),
+                                            ('company_ids', 'parent_of', company_id),
                                             ('account_type', 'in', (
                                                 'asset_fixed',
                                                 'asset_non_current',
@@ -200,7 +200,7 @@
                                     <field
                                         name="account_depreciation_id"
                                         domain="[
-                                            ('company_ids', 'in', company_id),
+                                            ('company_ids', 'parent_of', company_id),
                                             ('account_type', 'in', (
                                                 'asset_fixed',
                                                 'asset_non_current',
@@ -218,7 +218,7 @@
                                     <field
                                         name="account_depreciation_expense_id"
                                         domain="[
-                                            ('company_ids', 'in', company_id),
+                                            ('company_ids', 'parent_of', company_id),
                                             ('account_type', 'in', (
                                                 'expense_depreciation',
                                                 'expense')
@@ -244,7 +244,7 @@
                         </page>
                         <page string="Depreciation Board" name="depreciation_board" invisible="total_depreciation_entries_count == 0">
                             <field name="depreciation_move_ids" mode="list" options="{'reload_whole_on_button': true}" readonly="state not in ['draft', 'open', 'paused']">
-                                <list string="Depreciation Lines" decoration-info="state == 'draft'" create="0"  default_order="date asc, id asc" editable="top">
+                                <list string="Depreciation Lines" decoration-info="state == 'draft'" decoration-muted="state == 'cancel'" create="0"  default_order="date asc, id asc" editable="top">
                                     <field name="currency_id" column_invisible="True" readonly="state in ['cancel', 'posted']"/>
                                     <field name="date" string="Depreciation Date" readonly="state in ['cancel', 'posted']"/>
                                     <field name="ref" invisible="0"/>
@@ -252,7 +252,7 @@
                                     <field name="depreciation_value" widget="monetary" string="Depreciation" options="{'currency_field': 'currency_id'}" readonly="state == 'posted'"/>
                                     <field name="asset_depreciated_value" readonly="1" force_save="1" options="{'currency_field': 'currency_id'}"/>
                                     <field name="asset_remaining_value" readonly="1" widget="monetary" force_save="1" options="{'currency_field': 'currency_id'}"/>
-                                    <field name="name" readonly="1" string="Journal Entry"/>
+                                    <field name="name" readonly="1" string="Journal Entry" widget="open_move_widget"/>
                                     <field name="state" column_invisible="True"/>
                                 </list>
                             </field>
@@ -374,6 +374,7 @@
                 <field name="name"/>
                 <field name="account_asset_id" readonly="state == 'close'"/>
                 <field name="account_depreciation_id" readonly="state == 'close'"/>
+                <field name="account_depreciation_expense_id"/>
                 <field name="method" readonly="state not in ['draft', 'model']"/>
                 <field name="method_number" string="Number of Depreciations" readonly="state not in ['draft', 'model']"/>
                 <field name="method_period" string="Period length" readonly="state not in ['draft', 'model']"/>
@@ -489,7 +490,7 @@ if records:
         <field name="state">code</field>
         <field name="code">
 if records:
-    action = records.compute_depreciation_board()
+    action = records.filtered(lambda asset: asset.state == 'draft').compute_depreciation_board()
         </field>
     </record>
 

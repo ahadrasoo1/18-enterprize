@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-26 09:15+0000\n"
-"PO-Revision-Date: 2024-09-26 09:15+0000\n"
+"POT-Creation-Date: 2026-04-03 18:54+0000\n"
+"PO-Revision-Date: 2026-04-03 18:54+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -20,9 +20,9 @@ msgstr ""
 msgid ""
 "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"width:100%; margin:0px auto;\"><tbody>\n"
 "        <tr><td valign=\"top\" style=\"text-align: left; font-size: 14px;\">\n"
-"            Dear <t t-esc=\"object.name\"></t>, a new declaration file is available for you.<br><br>\n"
-"            Please find the PDF in your employee portal.<br><br>\n"
-"            Have a nice day,<br>\n"
+"            Dear <t t-esc=\"object.name\"/>, a new declaration file is available for you.<br/><br/>\n"
+"            Please find the PDF in your employee portal.<br/><br/>\n"
+"            Have a nice day,<br/>\n"
 "            The HR Team\n"
 "        </td></tr>\n"
 "    </tbody></table>\n"
@@ -83,9 +83,14 @@ msgid "Employee Contract"
 msgstr ""
 
 #. module: documents_hr_payroll
+#: model:hr.payroll.dashboard.warning,name:documents_hr_payroll.hr_payroll_dashboard_warning_employee_without_contact
+msgid "Employees Without Contacts"
+msgstr ""
+
+#. module: documents_hr_payroll
 #. odoo-python
 #: code:addons/documents_hr_payroll/models/hr_payroll_employee_declaration.py:0
-msgid "PDFs are gonna be posted in Documents shortly"
+msgid "PDFs are going to be posted in Documents shortly"
 msgstr ""
 
 #. module: documents_hr_payroll
@@ -122,6 +127,11 @@ msgstr ""
 #. module: documents_hr_payroll
 #: model:ir.model.fields,field_description:documents_hr_payroll.field_res_config_settings__documents_hr_payslips_tags
 msgid "Payslip"
+msgstr ""
+
+#. module: documents_hr_payroll
+#: model:ir.model,name:documents_hr_payroll.model_hr_payslip_run
+msgid "Payslip Batches"
 msgstr ""
 
 #. module: documents_hr_payroll

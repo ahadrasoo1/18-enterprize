@@ -1,23 +1,27 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* web_gantt
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Patricia Gutiérrez Capetillo <pagc@odoo.com>, 2024
+# Fernanda Alvarez, 2024
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:29+0000\n"
+"POT-Creation-Date: 2026-05-22 17:59+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Spanish (Latin America) (https://app.transifex.com/odoo/teams/41243/es_419/)\n"
+"Last-Translator: Fernanda Alvarez, 2024\n"
+"Language-Team: Spanish (Latin America) (https://app.transifex.com/odoo/teams/"
+"41243/es_419/)\n"
+"Language: es_419\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: es_419\n"
-"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? "
+"1 : 2;\n"
 
 #. module: web_gantt
 #. odoo-javascript
@@ -44,12 +48,14 @@ msgstr "Vista de acción de ventana"
 
 #. module: web_gantt
 #. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer_controls.js:0
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "Activate dense mode"
 msgstr "Activar modo denso"
 
 #. module: web_gantt
 #. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer_controls.js:0
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "Activate sparse mode"
 msgstr "Activar modo disperso"
@@ -91,6 +97,12 @@ msgstr "Editar"
 
 #. module: web_gantt
 #. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+msgid "Ending date cannot be before the starting date"
+msgstr "La fecha de finalización no puede ser anterior a la fecha de inicio."
+
+#. module: web_gantt
+#. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "Expand rows"
 msgstr "Expandir filas"
@@ -108,6 +120,12 @@ msgid "From"
 msgstr "Desde"
 
 #. module: web_gantt
+#. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer_controls.js:0
+msgid "From: %(from_date)s to: %(to_date)s"
+msgstr "Del %(from_date)s al %(to_date)s"
+
+#. module: web_gantt
 #: model:ir.model.fields.selection,name:web_gantt.selection__ir_actions_act_window_view__view_mode__gantt
 #: model:ir.model.fields.selection,name:web_gantt.selection__ir_ui_view__type__gantt
 msgid "Gantt"
@@ -117,7 +135,7 @@ msgstr "Gantt"
 #. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_arch_parser.js:0
 msgid "Gantt View"
-msgstr "Vista de gantt"
+msgstr "Vista de Gantt"
 
 #. module: web_gantt
 #. odoo-python
@@ -233,13 +251,19 @@ msgstr "Plan"
 #. odoo-python
 #: code:addons/web_gantt/models/models.py:0
 msgid "Reschedule done successfully."
-msgstr ""
+msgstr "Reprogramación realizada con éxito."
 
 #. module: web_gantt
 #. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_popover.xml:0
 msgid "Start"
 msgstr "Iniciar"
+
+#. module: web_gantt
+#. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+msgid "Starting date cannot be after the ending date"
+msgstr "La fecha de inicio no puede ser posterior a la fecha de finalización."
 
 #. module: web_gantt
 #. odoo-javascript
@@ -330,7 +354,7 @@ msgstr "No puede mover %(record)s a %(related_record)s."
 #. odoo-python
 #: code:addons/web_gantt/models/models.py:0
 msgid "You cannot reschedule %(main_record)s towards %(other_record)s."
-msgstr "No puede mover %(main_record)s a %(other_record)s."
+msgstr "No puede reprogramar %(main_record)s a %(other_record)s."
 
 #. module: web_gantt
 #. odoo-javascript
@@ -355,9 +379,3 @@ msgstr "meses"
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "to"
 msgstr "para"
-
-#. module: web_gantt
-#. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_row_progress_bar.xml:0
-msgid "{{ props.progressBar.warning }}"
-msgstr "{{ props.progressBar.warning }}"

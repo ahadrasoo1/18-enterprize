@@ -2,7 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo.exceptions import ValidationError
-from odoo.tests import tagged, Form
+from odoo.tests import tagged, Form, new_test_user
 from odoo.addons.sale_timesheet.tests.common import TestCommonSaleTimesheet
 
 
@@ -238,6 +238,26 @@ class TestSaleTimesheetInTicket(TestCommonSaleTimesheet):
         })
         self.assertEqual(timesheet.commercial_partner_id, ticket.commercial_partner_id)
 
+    def test_compute_display_sol(self):
+        project = self.env['project.project'].create({
+            'name': 'Test Project',
+            'privacy_visibility': 'followers',
+        })
+        timesheet = self.env['account.analytic.line'].create({
+            'name': 'Test Timesheet',
+            'project_id': project.id,
+            'employee_id': self.employee_user.id,
+        })
+        timesheet_manager_no_project_user = new_test_user(
+            self.env,
+            login='no_project_user',
+            groups='hr_timesheet.group_timesheet_manager'
+        )
+        self.assertFalse(
+            timesheet.with_user(timesheet_manager_no_project_user).display_sol,
+            "display_sol should be False"
+        )
+
     def test_allowing_service_product_type_sol_in_helpdesk(self):
         """ Test to validate allowing service product type in ticket """
 
@@ -264,3 +284,33 @@ class TestSaleTimesheetInTicket(TestCommonSaleTimesheet):
                 'partner_id': self.partner_a.id,
                 'sale_line_id': sale_order_line.id,
             })
+
+    def test_confirm_so_on_ticket_creation(self):
+        so1, so2 = self.env['sale.order'].create([{
+            'name': 'Sale Order 1',
+            'partner_id': self.partner_a.id,
+        }, {
+            'name': 'Sale Order 2',
+            'partner_id': self.partner_a.id,
+        }])
+        sol1, sol2 = self.env['sale.order.line'].create([{
+            'order_id': so1.id,
+            'product_id': self.product_delivery_timesheet1.id,
+        }, {
+            'order_id': so2.id,
+            'product_id': self.product_delivery_timesheet1.id,
+        }])
+        self.assertEqual(so1.state, 'draft')
+        self.assertEqual(so2.state, 'draft')
+
+        self.env['helpdesk.ticket'].create([{
+            'name': 'Test Ticket 1',
+            'team_id': self.helpdesk_team.id,
+            'sale_line_id': sol1.id,
+        }, {
+            'name': 'Test Ticket 2',
+            'team_id': self.helpdesk_team.id,
+            'sale_line_id': sol2.id,
+        }])
+        self.assertEqual(so1.state, 'sale')
+        self.assertEqual(so2.state, 'sale')

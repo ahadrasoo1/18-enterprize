@@ -9,6 +9,7 @@ import { Many2OneField } from "@web/views/fields/many2one/many2one_field";
 import { TabletImageField } from "@quality/tablet_image_field/tablet_image_field";
 import { useService, useBus } from "@web/core/utils/hooks";
 import { useState } from "@odoo/owl";
+import { HtmlField } from "@html_editor/fields/html_field";
 
 export class MrpQualityCheckConfirmationDialog extends ConfirmationDialog {
     static props = {
@@ -28,6 +29,7 @@ export class MrpQualityCheckConfirmationDialog extends ConfirmationDialog {
         FloatField,
         Many2OneField,
         TabletImageField,
+        HtmlField,
     };
 
     setup() {
@@ -84,12 +86,12 @@ export class MrpQualityCheckConfirmationDialog extends ConfirmationDialog {
         this.doActionAndClose("action_continue", !skipSave, true);
     }
 
-    async openWorksheet(){
-        this.state.disabled = true;
+    async openWorksheet() {
         const res = await this.props.record.model.orm.call(
             this.props.record.resModel,
-            "action_fill_sheet",
-            [this.props.record.resId]);
+            "action_quality_worksheet",
+            [this.props.record.resId]
+        );
         this.action.doAction(res);
     }
 
@@ -104,26 +106,32 @@ export class MrpQualityCheckConfirmationDialog extends ConfirmationDialog {
     }
 
     async doActionAndClose(action, saveModel = true, reloadChecks = false){
-        if (saveModel) {
-            await this.props.record.save();
-        }
-        const res = await this.props.record.model.orm.call(this.props.record.resModel, action, [this.props.record.resId]);
-        if (res) {
-            this.action.doAction(res, {
-                onClose: () => {
-                    this.props.reload(this.props.record);
-                },
-            });
-            if (res.type === "ir.actions.act_window") {
-                this.props.close();
-                return;
+        this.state.disabled = true;
+        try {
+            if (saveModel) {
+                await this.props.record.save();
             }
+            const res = await this.props.record.model.orm.call(this.props.record.resModel, action, [this.props.record.resId])
+            if (res) {
+                this.action.doAction(res, {
+                    onClose: () => {
+                        this.props.reload(this.props.record);
+                    },
+                });
+                if (res.type === "ir.actions.act_window") {
+                    this.props.close();
+                    return;
+                }
+            }
+            if (!reloadChecks) {
+                await this.props.record.load();
+            }
+            await this.props.qualityCheckDone(reloadChecks, this.props.record.data.quality_state);
+            this.props.close();
+        } catch (e) {
+            this.state.disabled = false;
+            throw e;
         }
-        if (!reloadChecks) {
-            await this.props.record.load();
-        }
-        await this.props.qualityCheckDone(reloadChecks, this.props.record.data.quality_state);
-        this.props.close();
     }
 
     async _onBarcodeScanned (barcode){
@@ -158,6 +166,7 @@ export class MrpQualityCheckConfirmationDialog extends ConfirmationDialog {
         return {
             name: "lot_id",
             record: this.props.record,
+            canQuickCreate: false,
             context: {
                 default_product_id: productId,
                 active_mo_id: this.recordData.production_id[0],
@@ -182,7 +191,18 @@ export class MrpQualityCheckConfirmationDialog extends ConfirmationDialog {
 
     get note() {
         const note = this.recordData.note;
-        return note && note !== "<p><br></p>" && note != "false" ? note : undefined;
+        return note && !["<p><br></p>", `<div><br></div>`].includes(note) && note != "false"
+            ? note
+            : undefined;
+    }
+
+    get htmlInfo() {
+        return {
+            name: "note",
+            record: this.props.record,
+            readonly: true,
+            embeddedComponents: true,
+        }
     }
 
     get picInfo() {

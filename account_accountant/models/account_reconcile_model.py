@@ -175,18 +175,20 @@ class AccountReconcileModel(models.Model):
         st_line_text_values = self._get_st_line_text_values_for_matching(st_line)
         significant_token_size = 4
         numerical_tokens = []
-        exact_tokens = []
+        exact_tokens = set()  # preventing duplicates
         text_tokens = []
         for text_value in st_line_text_values:
+            split_text = (text_value or '').split()
             # Exact tokens
-            exact_tokens.extend([
-                token for token in (text_value or '').split()
-                if len(token) >= significant_token_size]
+            exact_tokens.add(text_value)
+            exact_tokens.update(
+                token for token in split_text
+                if len(token) >= significant_token_size
             )
             # Text tokens
             tokens = [
                 ''.join(x for x in token if re.match(r'[0-9a-zA-Z\s]', x))
-                for token in (text_value or '').split()
+                for token in split_text
             ]
 
             # Numerical tokens
@@ -205,7 +207,7 @@ class AccountReconcileModel(models.Model):
 
                 numerical_tokens.append(formatted_token)
 
-        return numerical_tokens, exact_tokens, text_tokens
+        return numerical_tokens, list(exact_tokens), text_tokens
 
     def _get_invoice_matching_amls_candidates(self, st_line, partner):
         """ Returns the match candidates for the 'invoice_matching' rule, with respect to the provided parameters.
@@ -309,6 +311,10 @@ class AccountReconcileModel(models.Model):
                     'allow_auto_reconcile': True,
                     'amls': self.env['account.move.line'].browse(candidate_ids),
                 }
+            elif self.match_text_location_label or self.match_text_location_note or self.match_text_location_reference:
+                # In the case any of the Label, Note or Reference matching rule has been toggled, and the query didn't return
+                # any candidates, the model should not try to mount another aml instead.
+                return
 
         if not partner:
             st_line_currency = st_line.foreign_currency_id or st_line.journal_id.currency_id or st_line.company_currency_id
@@ -430,16 +436,7 @@ class AccountReconcileModel(models.Model):
             amls_values_list.append(aml_values)
 
             # Manage the early payment discount.
-            if aml.move_id.invoice_payment_term_id:
-                last_discount_date = aml.move_id.invoice_payment_term_id._get_last_discount_date(aml.move_id.date)
-            else:
-                last_discount_date = False
-            if same_currency_mode \
-                    and aml.move_id.move_type in ('out_invoice', 'out_receipt', 'in_invoice', 'in_receipt') \
-                    and not aml.matched_debit_ids \
-                    and not aml.matched_credit_ids \
-                    and last_discount_date \
-                    and st_line.date <= last_discount_date:
+            if aml.move_id._is_eligible_for_early_payment_discount(st_line_currency, st_line.date):
 
                 rate = abs(aml.amount_currency) / abs(aml.balance) if aml.balance else 1.0
                 amls_with_epd_values_list.append({

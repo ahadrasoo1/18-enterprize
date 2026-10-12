@@ -1,23 +1,29 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* pos_pricer
-# 
+# * pos_pricer
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Larissa Manderfeld, 2025
+#
+# "Larissa Manderfeld (lman)" <lman@odoo.com>, 2025.
+# "Noemi Pla Garcia (nopl)" <nopl@odoo.com>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Spanish (https://app.transifex.com/odoo/teams/41243/es/)\n"
+"POT-Creation-Date: 2025-12-29 18:45+0000\n"
+"PO-Revision-Date: 2025-12-05 16:26+0000\n"
+"Last-Translator: \"Noemi Pla Garcia (nopl)\" <nopl@odoo.com>\n"
+"Language-Team: Spanish <https://translate.odoo.com/projects/odoo-18/"
+"pos_pricer/es/>\n"
+"Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: es\n"
-"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=(n == 1) ? 0 : ((n != 0 && n % 1000000 == "
+"0) ? 1 : 2);\n"
+"X-Generator: Weblate 5.14.3\n"
 
 #. module: pos_pricer
 #: model:ir.model.constraint,message:pos_pricer.constraint_pricer_tag_name_unique
@@ -45,6 +51,11 @@ msgid "Christmas"
 msgstr "Navidad"
 
 #. module: pos_pricer
+#: model:ir.model,name:pos_pricer.model_res_partner
+msgid "Contact"
+msgstr "Contacto"
+
+#. module: pos_pricer
 #: model:ir.model.fields,field_description:pos_pricer.field_pricer_store__create_or_update_products_url
 msgid "Create Or Update Products Url"
 msgstr "Crear o actualizar URL de productos"
@@ -70,7 +81,7 @@ msgstr "Fecha y hora de la última sincronización con Pricer"
 #: model:ir.model.fields,field_description:pos_pricer.field_pricer_store__display_name
 #: model:ir.model.fields,field_description:pos_pricer.field_pricer_tag__display_name
 msgid "Display Name"
-msgstr "Nombre mostrado"
+msgstr "Nombre para mostrar"
 
 #. module: pos_pricer
 #. odoo-python
@@ -110,8 +121,8 @@ msgid ""
 "Invalid tag name. Should be 1 letter followed by 16 digits. Example: "
 "'N4081315789813275'"
 msgstr ""
-"Nombre de etiqueta no válido, debería ser 1 letra seguida de 16 dígitos, por"
-" ejemplo: 'N4081315789813275'"
+"Nombre de etiqueta no válido, debería ser 1 letra seguida de 16 dígitos, por "
+"ejemplo: 'N4081315789813275'"
 
 #. module: pos_pricer
 #: model:ir.model.fields,help:pos_pricer.field_pricer_tag__name
@@ -159,7 +170,7 @@ msgstr "No se encontró ningún producto para el código de barras '%s'"
 #. module: pos_pricer
 #: model:ir.model.fields,field_description:pos_pricer.field_product_product__on_sale_price
 msgid "On Sale Price"
-msgstr ""
+msgstr "Precio con descuento"
 
 #. module: pos_pricer
 #: model:ir.actions.server,name:pos_pricer.pricer_sync_cron_ir_actions_server
@@ -179,7 +190,7 @@ msgstr "Configuración del TPV"
 #. module: pos_pricer
 #: model:ir.model.fields,help:pos_pricer.field_product_product__on_sale_price
 msgid "Price after setting a Pricer Sales Pricelist"
-msgstr ""
+msgstr "Precio después de configurar una lista de precios venta de Pricer"
 
 #. module: pos_pricer
 #: model:ir.ui.menu,name:pos_pricer.pos_menu_pricer_configuration
@@ -215,7 +226,7 @@ msgstr "Producto de Pricer a vincular"
 #. module: pos_pricer
 #: model:ir.model.fields,field_description:pos_pricer.field_product_product__pricer_sale_pricelist_id
 msgid "Pricer Sales Pricelist"
-msgstr ""
+msgstr "Lista de precios de venta de Pricer"
 
 #. module: pos_pricer
 #: model:ir.model.fields,field_description:pos_pricer.field_product_product__pricer_store_id
@@ -349,6 +360,11 @@ msgid "Store Name"
 msgstr "Nombre de la tienda"
 
 #. module: pos_pricer
+#: model:ir.model,name:pos_pricer.model_product_supplierinfo
+msgid "Supplier Pricelist"
+msgstr "Lista de precios de proveedor"
+
+#. module: pos_pricer
 #. odoo-javascript
 #: code:addons/pos_pricer/static/src/views/pricer_quick_pairing_form_view.js:0
 msgid "Tag '%s' found"
@@ -377,17 +393,24 @@ msgstr ""
 "dígitos."
 
 #. module: pos_pricer
+#: model:ir.model,name:pos_pricer.model_account_tax
+msgid "Tax"
+msgstr "Impuesto"
+
+#. module: pos_pricer
 #: model:ir.model.fields,help:pos_pricer.field_product_product__pricer_sale_pricelist_id
 msgid ""
 "This pricelist will be used to set sales on Pricer tags for this product"
 msgstr ""
+"Esta lista de precios se usará para configurar las ventas en etiquetas de "
+"Pricer para este producto"
 
 #. module: pos_pricer
 #: model:ir.model.fields,help:pos_pricer.field_pricer_tag__pricer_store_id
 #: model:ir.model.fields,help:pos_pricer.field_product_product__pricer_store_id
 msgid ""
-"This product will be linked to and displayed on the Pricer tags of the store"
-" selected here"
+"This product will be linked to and displayed on the Pricer tags of the store "
+"selected here"
 msgstr ""
 "Este producto se vinculará y se mostrará en las etiquetas Pricer de la "
 "tienda que se seleccione aquí"
@@ -398,8 +421,8 @@ msgid ""
 "This product will be linked to and displayed on the Pricer tags with ids "
 "listed here. It is recommended to use a barcode scanner"
 msgstr ""
-"Este producto se vinculará y se mostrará en las etiquetas Pricer con los IDs"
-" enlistados aquí. Le recomendamos usar un lector de código de barras."
+"Este producto se vinculará y se mostrará en las etiquetas Pricer con los ID "
+"que se enumeran aquí. Le recomendamos usar un lector de código de barras"
 
 #. module: pos_pricer
 #: model_terms:ir.ui.view,arch_db:pos_pricer.pricer_pricer_store_view_list

@@ -121,6 +121,9 @@ QUnit.module("Knowledge - Articles Structure Command", (hooks) => {
                 if (args.method === 'web_search_read' && args.model === 'knowledge.article') {
                     return Promise.resolve(articlesStructureSearch);
                 }
+                if (route === '/web/dataset/call_kw/knowledge.article/has_access') {
+                    return Promise.resolve(true);
+                }
             }
         });
 
@@ -156,6 +159,9 @@ QUnit.module("Knowledge - Articles Structure Command", (hooks) => {
                             ])
                         });
                     }
+                }
+                if (route === '/web/dataset/call_kw/knowledge.article/has_access') {
+                    return Promise.resolve(true);
                 }
             }
         });
@@ -246,7 +252,12 @@ QUnit.module("Knowledge - External View Insertion", (hooks) => {
             resModel,
             serverData,
             arch,
-            resId: 1
+            resId: 1,
+            mockRPC(route, args){
+                if (route === '/web/dataset/call_kw/knowledge.article/has_access') {
+                    return Promise.resolve(true);
+                }
+            }
         });
 
         const editable = fixture.querySelector('.odoo-editor-editable');
@@ -529,6 +540,9 @@ QUnit.module("Knowledge - Ensure body save scenarios", (hooks) => {
                     }
                     writeCount += 1;
                 }
+                if (route === '/web/dataset/call_kw/knowledge.article/has_access') {
+                    return Promise.resolve(true);
+                }
             }
         });
         // Let the htmlField be mounted and recover the Component instance.
@@ -629,6 +643,11 @@ QUnit.module("Knowledge - Ensure body save scenarios", (hooks) => {
             serverData,
             arch,
             resId: 1,
+            mockRPC(route, args) {
+                if (route === '/web/dataset/call_kw/knowledge.article/has_access') {
+                    return Promise.resolve(true);
+                }
+            }
         });
         // Let the htmlField be mounted and recover the Component instance.
         htmlField = await htmlFieldPromise;
@@ -809,6 +828,11 @@ QUnit.module("Knowledge Table of Content", (hooks) => {
             serverData,
             arch,
             resId: 1,
+            mockRPC(route, args) {
+                if (route === '/web/dataset/call_kw/knowledge.article/has_access') {
+                    return Promise.resolve(true);
+                }
+            }
         });
 
         const editable = fixture.querySelector('.odoo-editor-editable');
@@ -844,6 +868,11 @@ QUnit.module("Knowledge Table of Content", (hooks) => {
             serverData,
             arch,
             resId: 2,
+            mockRPC(route, args) {
+                if (route === '/web/dataset/call_kw/knowledge.article/has_access') {
+                    return Promise.resolve(true);
+                }
+            }
         });
 
         const editable = fixture.querySelector('.odoo-editor-editable');
@@ -872,6 +901,11 @@ QUnit.module("Knowledge Table of Content", (hooks) => {
             serverData,
             arch,
             resId: 3,
+            mockRPC(route, args) {
+                if (route === '/web/dataset/call_kw/knowledge.article/has_access') {
+                    return Promise.resolve(true);
+                }
+            }
         });
 
         const editable = fixture.querySelector('.odoo-editor-editable');
@@ -941,6 +975,11 @@ QUnit.module("Knowledge - Silenced Failure Cases (Recoverable)", (hooks) => {
             serverData,
             arch,
             resId: 1,
+            mockRPC(route, args) {
+                if (route === '/web/dataset/call_kw/knowledge.article/has_access') {
+                    return Promise.resolve(true);
+                }
+            }
         });
         htmlField = await htmlFieldPromise;
         const editor = htmlField.wysiwyg.odooEditor;
@@ -1033,6 +1072,11 @@ QUnit.module("Knowledge - Silenced Failure Cases (Recoverable)", (hooks) => {
             serverData,
             arch,
             resId: 1,
+            mockRPC(route, args) {
+                if (route === '/web/dataset/call_kw/knowledge.article/has_access') {
+                    return Promise.resolve(true);
+                }
+            }
         });
         htmlField = await htmlFieldPromise;
         const editor = htmlField.wysiwyg.odooEditor;

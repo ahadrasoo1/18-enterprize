@@ -1,4 +1,5 @@
 import json
+import logging
 from datetime import timedelta
 
 from markupsafe import Markup
@@ -8,6 +9,7 @@ from odoo.exceptions import UserError
 from odoo.tools import LazyTranslate, _
 
 _lt = LazyTranslate(__name__)
+_logger = logging.getLogger(__name__)
 ENDPOINT = "https://l10n-fr-aspone.api.odoo.com"
 
 # Allows to translate the errors returned by IAP
@@ -61,32 +63,30 @@ class AccountReportAsyncExport(models.Model):
             full_logs = json.loads(report.step_1_logs or '[]') + json.loads(report.step_2_logs or '[]')
             msg = report._get_message(full_logs)
             if report.state == 'to_send':
-                report.message = ""
+                report.message = Markup("")
             elif report.state == 'accepted':
-                report.message = Markup("<b> ") + _("The report has been fully processed by the recipient") + Markup(" </b>") + msg
+                report.message = Markup("<b>%s</b>") % _("The report has been fully processed by the recipient") + msg
             elif report.state == 'rejected':
-                report.message = Markup("<b> ") + _("The report has been rejected") + Markup(" </b>") + msg
+                report.message = Markup("<b>%s</b>") % _("The report has been rejected") + msg
             else:
-                report.message = _(
-                    "<b> Warning, the report has not been fully processed by the recipient yet </b>") + msg
+                report.message = Markup("<b>%s</b>") % _("Warning, the report has not been fully processed by the recipient yet") + msg
 
     @api.model
     def _get_message(self, logs):
-        """ Recursively build the message from the logs. See '_collect_errors_in_history'. """
+        """Recursively build the message from the logs."""
         if not logs:
-            return ""
-        msg = "<ul>"
+            return ''
+        errstyle = Markup(" class='text-danger'")
+        msg = [Markup("<ul>")]
         for log in logs:
-            if log['is_error']:
-                msg += "<li style='color: red;'>"
-            else:
-                msg += "<li>"
-            msg += log['name'] + ": " + log['label'] + "</li>"
-            # handle details
-            if log.get('details'):
-                msg += self._get_message(log['details'])
-        msg += "</ul>"
-        return msg
+            msg.append(Markup("<li{style}>{name}: {label}{details}</li>").format(
+                style=errstyle if log['is_error'] else '',
+                name=log['name'],
+                label=log['label'],
+                details=self._get_message(details) if (details := log.get('details')) else '',
+            ))
+        msg.append(Markup("</ul>"))
+        return Markup().join(msg)
 
     @api.model
     def _cron_process_all_reports_async_export(self):
@@ -116,30 +116,48 @@ class AccountReportAsyncExport(models.Model):
         received a final state and was not in error).
         """
         for export in self:
-            # Avoid calling the first step again if its state is already final
-            first_step_state_final = False
-            if export.step_1_logs:
-                first_step_state_final = any(status['is_final'] for status in json.loads(export.step_1_logs))
+            try:
+                # Avoid calling the first step again if its state is already final
+                first_step_state_final = False
+                if export.step_1_logs:
+                    first_step_state_final = any(status['is_final'] for status in json.loads(export.step_1_logs))
 
-            # First step
-            if not first_step_state_final:
-                response = export._get_interchanges_by_deposit_id()
-                step_1_logs = export._process_interchanges_response(response)
-                export.step_1_logs = json.dumps(step_1_logs)
-                if any([status['is_error'] for status in step_1_logs]):
-                    export.state = 'rejected'
-                first_step_state_final = any([status['is_final'] for status in step_1_logs])
+                # First step
+                if not first_step_state_final:
+                    response = export._get_interchanges_by_deposit_id()
+                    step_1_logs = export._process_interchanges_response(response)
+                    export.step_1_logs = json.dumps(step_1_logs)
+                    if any(status['is_error'] for status in step_1_logs):
+                        export.state = 'rejected'
+                    first_step_state_final = any(status['is_final'] for status in step_1_logs)
 
-            # Second step
-            if first_step_state_final and export.state != 'rejected' and export.declaration_uid:
-                response = export._get_declaration_details()
-                step_2_logs = export._process_declaration_response(response)
+                # Second step
+                if first_step_state_final and export.state != 'rejected' and export.declaration_uid:
+                    response = export._get_declaration_details()
+                    step_2_logs = export._process_declaration_response(response)
 
-                export.step_2_logs = json.dumps(step_2_logs)
-                if any([status['is_error'] for status in step_2_logs]):
-                    export.state = 'rejected'
-                elif any([status['is_final'] for status in step_2_logs]):
-                    export.state = 'accepted'
+                    export.step_2_logs = json.dumps(step_2_logs)
+                    if any(status['is_error'] for status in step_2_logs):
+                        export.state = 'rejected'
+                    elif any(status['is_final'] for status in step_2_logs):
+                        export.state = 'accepted'
+            except Exception as e:  # noqa: BLE001
+                _logger.warning("Error while processing interchanges response: %s", e)
+
+            if export.state == 'rejected':
+                report_closing_entry = export.env['account.move'].search([
+                    ('tax_closing_report_id', '=', export.report_id.id),
+                    ('date', '=', export.date_to),
+                ])
+                period_desc = report_closing_entry._get_tax_period_description()
+                act_type_xmlid = 'account_reports.mail_activity_type_tax_report_error'
+                report_closing_entry.activity_reschedule(
+                    act_type_xmlids=[act_type_xmlid],
+                    date_deadline=fields.Date.context_today(report_closing_entry)
+                ) or report_closing_entry.activity_schedule(
+                    act_type_xmlid=act_type_xmlid,
+                    summary=_("Tax Report Error: %s", period_desc),
+                )
 
     # ------------------------------------------------------------
     # Buttons

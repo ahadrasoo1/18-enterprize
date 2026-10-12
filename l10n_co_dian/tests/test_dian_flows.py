@@ -1,6 +1,8 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from unittest.mock import patch
+from markupsafe import Markup
 
+from odoo import fields
 from odoo.tests import tagged, freeze_time
 from odoo.exceptions import UserError
 from .common import TestCoDianCommon
@@ -159,24 +161,53 @@ class TestDianFlows(TestCoDianCommon):
             'message': "<p>Error al parsear xml. Namespace prefix 'sts' is not defined.</p>",
         }])
 
-    def test_send_bill_sync_duplicated(self):
+    def test_send_bill_sync_duplicated_identifier_accepted(self):
         """ SendBillSync returning 'Regla: 90, Rechazo: Documento procesado anteriormente.'
         This means an invoice with the same CUFE has already been accepted by the DIAN.
+        The invoice on DIAN has the same partner and issue date than the one being sent,
+        therefore it is accepted.
         """
         error_raised = False
         try:
-            self._mock_send_and_print(move=self.invoice, response_file='SendBillSync_duplicated.xml')
-        except UserError as e:
+            xml = self._read_file('l10n_co_dian/tests/attachments/invoice_alcohol.xml', 'rb')
+            with patch(f'{self.document_path}._get_xml_by_document_key', return_value=xml):
+                self._mock_send_and_print(move=self.invoice, response_file='SendBillSync_duplicated.xml')
+        except UserError:
             error_raised = True
-            self.assertEqual(e.args[0], "Error(s) when sending the document to the DIAN:\n"
-                                        "- Regla: 90, Rechazo: Documento procesado anteriormente.")
+
+        self.assertFalse(error_raised)
+        self.assertRecordValues(self.invoice.l10n_co_dian_document_ids, [{
+            'zip_key': False,
+            'state': 'invoice_accepted',
+            'message': ("<p>Validación contiene errores en campos mandatorios.</p>"
+                        "<ul><li>Regla: 90, Rechazo: Documento procesado anteriormente.</li></ul>"),
+        }])
+
+    def test_send_bill_sync_duplicated_identifier_rejected(self):
+        """ SendBillSync returning 'Regla: 90, Rechazo: Documento procesado anteriormente.'
+        This means an invoice with the same CUFE has already been accepted by the DIAN.
+        The invoice on DIAN has the same partner but a different issue time than the one
+        being sent, therefore it is rejected.
+        """
+        error_raised = False
+        try:
+            xml = self._read_file('l10n_co_dian/tests/attachments/invoice_alcohol.xml', 'rb')
+            # change the issue time in the XML so that the invoice should be rejected
+            xml = xml.replace(
+                b'<cbc:IssueTime>19:00:00-05:00</cbc:IssueTime>',
+                b'<cbc:IssueTime>08:00:00-05:00</cbc:IssueTime>'
+            )
+            with patch(f'{self.document_path}._get_xml_by_document_key', return_value=xml):
+                self._mock_send_and_print(move=self.invoice, response_file='SendBillSync_duplicated.xml')
+        except UserError:
+            error_raised = True
 
         self.assertTrue(error_raised)
         self.assertRecordValues(self.invoice.l10n_co_dian_document_ids, [{
             'zip_key': False,
             'state': 'invoice_rejected',
-            'message': "<p>Validación contiene errores en campos mandatorios.</p>"
-                       "<ul><li>Regla: 90, Rechazo: Documento procesado anteriormente.</li></ul>",
+            'message': Markup("<p>Validación contiene errores en campos mandatorios.</p>"
+                              "<ul><li>Regla: 90, Rechazo: Documento procesado anteriormente.</li></ul>"),
         }])
 
     def test_send_bill_sync_second_attempt(self):
@@ -193,7 +224,7 @@ class TestDianFlows(TestCoDianCommon):
         }])
 
         # 2nd attempt (success without errors or warnings)
-        with patch(f'{self.document_path}._parse_errors', return_value=[]):
+        with self.patched_document('_parse_errors', []):
             self._mock_send_and_print(move=self.invoice, response_file='SendBillSync_warnings.xml')
 
         self.assertEqual(len(self.invoice.l10n_co_dian_document_ids), 1)  # no need to keep the rejected documents
@@ -229,7 +260,10 @@ class TestDianFlows(TestCoDianCommon):
             invoice_date=datetime.today(),
             journal_id=self.support_document_journal.id,
         )
-        with patch(f'{self.utils_path}._build_and_send_request', return_value=self._mocked_response('SendBillSync_warnings.xml', 200)):
+        with (
+            patch(f'{self.utils_path}._build_and_send_request', return_value=self._mocked_response('SendBillSync_warnings.xml', 200)),
+            self._disable_get_acquirer_call(),
+        ):
             bill.l10n_co_dian_action_send_bill_support_document()
 
         self.assertTrue(bill.l10n_co_dian_attachment_id)
@@ -240,3 +274,49 @@ class TestDianFlows(TestCoDianCommon):
                        "<ul><li>Regla: FAJ44b, Notificación: Nit o Documento de Identificación informado No BlaBlaBla.</li>"
                        "<li>Regla: FAJ43b, Notificación: Nombre informado No corresponde al registrado en el BlaBlaBla.</li></ul>",
         }])
+
+    def test_get_acquirer(self):
+        """ Get Partner Data """
+        partner = self._create_partner(
+            country_id=self.env.ref('base.co').id,
+            vat='213123432-1',
+            email='test@mail.com',
+        )
+
+        with patch(f'{self.utils_path}._build_and_send_request', return_value=self._mocked_response('GetAcquirer_partner.xml', 200)):
+            partner.button_l10n_co_dian_refresh_data()
+
+        self.assertTrue(partner.child_ids)
+        self.assertRecordValues(partner.child_ids[0], [{
+            'name': 'Real Company Name',
+            'email': 'company@mail.com',
+        }])
+
+    def test_get_aquirer_constraints(self):
+        """Refresh is rejected on a child contact and on a partner that already has an invoicing child."""
+        partner = self._create_partner(
+            country_id=self.env.ref('base.co').id,
+            vat='213123432-1',
+            email='test@mail.com',
+        )
+
+        self.env['res.partner'].create({
+            'name': 'Child Contact',
+            'parent_id': partner.id,
+            'type': 'invoice',
+            'email': 'existing@mail.com',
+        })
+        with patch(f'{self.utils_path}._build_and_send_request', return_value=self._mocked_response('GetAcquirer_partner.xml', 200)):
+            with self.assertRaisesRegex(UserError, "This contact has already been updated with DIAN information"):
+                partner.button_l10n_co_dian_refresh_data()
+
+    def test_invoice_date_constraints_dian(self):
+        """Test that invoices date older than 6 days or more than 6 days ahead trigger the constraint."""
+        bogota_today = fields.Date.context_today(self.env.user.with_context(tz='America/Bogota'))
+
+        valid_invoice = self._create_move(invoice_date=bogota_today - timedelta(days=6))
+        self._mock_send_and_print(move=valid_invoice, response_file='SendBillSync_warnings.xml')
+
+        invalid_invoice = self._create_move(invoice_date=bogota_today - timedelta(days=7))
+        with self.assertRaisesRegex(UserError, "The issue date can not be older than 6 days or more than 6 days in the future."):
+            self._mock_send_and_print(move=invalid_invoice, response_file='SendBillSync_warnings.xml')

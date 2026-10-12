@@ -1,6 +1,7 @@
 from collections import defaultdict
 from unittest.mock import patch
 
+from odoo import Command
 from odoo.exceptions import UserError, ValidationError, RedirectWarning
 from odoo.tests.common import tagged
 from odoo.modules.neutralize import get_neutralization_queries
@@ -23,6 +24,10 @@ class TestAccountAvalaraInternalCommon(TestAccountAvataxCommon):
             'amount_tax': 0.0,
         }])
         invoice.action_post()
+
+        tax_groups = invoice.tax_totals['subtotals'][0]['tax_groups']
+        self.assertEqual(len(tax_groups), 1, "There should be one tax group on the invoice containing all taxes.")
+        self.assertEqual(tax_groups[0]['group_name'], 'Taxes')
 
         if test_exact_response:
             self.assertRecordValues(invoice, [{
@@ -76,6 +81,20 @@ class TestAccountAvalaraInternal(TestAccountAvalaraInternalCommon):
         with patch('odoo.addons.account_avatax.models.account_external_tax_mixin.AccountExternalTaxMixin._uncommit_external_taxes') as mocked_uncommit:
             invoice.button_draft()
             mocked_uncommit.assert_called()
+
+    def test_03_odoo_invoice(self):
+        """Tax calculation with two SC SPECIAL 1% taxes on the same line."""
+        invoice, response = self._create_invoice_03_and_expected_response()
+        self.assertRecordValues(invoice, [{
+            'amount_total': 30.0,
+            'amount_untaxed': 30.0,
+            'amount_tax': 0.0,
+        }])
+
+        with self._capture_request(return_value=response):
+            invoice.action_post()
+
+        self.assertEqual(invoice.amount_total, 32.7, "Wrong total amount, it should be $30.00 + $2.70 of taxes.")
 
     def test_01_odoo_refund(self):
         invoice, response = self._create_invoice_01_and_expected_response()
@@ -160,12 +179,21 @@ class TestAccountAvalaraInternal(TestAccountAvalaraInternalCommon):
             'move_type': 'in_invoice',
             'invoice_date': '2017-01-01',
             'partner_id': self.partner.id,
-            'invoice_line_ids': [(0, 0, {'product_id': self.product_user.id, 'price_unit': 123.0, 'tax_ids': []})],
+            'invoice_line_ids': [
+                Command.create({
+                    'product_id': self.product_user.id,
+                    'price_unit': 100.0,
+                    'tax_ids': [self.tax_purchase_a.id],
+                })],
         })
+
+        tax_line = vendor_bill.line_ids.filtered('tax_line_id')
+        tax_line.balance += 5.0  # 15 -> 20
 
         with self._capture_request(return_value={'lines': [], 'summary': []}) as capture:
             vendor_bill.action_post()
             self.assertIsNone(capture.val, "Posting a vendor bill should not send anything to Avatax.")
+            self.assertEqual(vendor_bill.tax_totals['tax_amount_currency'], 20.0, "Manual tax override should not be recomputed from rate")
 
             vendor_bill.button_draft()
             self.assertIsNone(capture.val, "Resetting a vendor bill to draft should not send anything to Avatax.")
@@ -320,10 +348,185 @@ class TestAccountAvalaraInternal(TestAccountAvalaraInternalCommon):
         # --------------------------------------------------------------------------------
         #  CA STATE 4%                    |        -4.0        |   -2.0  |  0.0  |  2.0
         #  CA COUNTY 6%                   |         0.0        |    0.0  |  0.0  |  0.0
-        tax_line = invoice.line_ids.filtered(lambda l: l.tax_line_id.description == '<p>CA STATE TAX [06] (4.0000 %)</p>')
-        self.assertRecordValues(tax_line, [{'name': 'CA STATE 4%', 'amount_currency': -4.0, 'balance': -2.0, 'debit': 0.0, 'credit': 2.0}])
-        exempted_tax_line = invoice.line_ids.filtered(lambda l: l.tax_line_id.description == '<p>CA COUNTY TAX [075] (6.0000 %)</p>')
-        self.assertRecordValues(exempted_tax_line, [{'name': 'CA COUNTY 6%', 'amount_currency': 0.0, 'balance': 0.0, 'debit': 0.0, 'credit': 0.0}])
+        tax_line = invoice.line_ids.filtered(lambda l: l.tax_line_id.name == 'CA STATE 4%')
+        self.assertRecordValues(tax_line, [{'amount_currency': -4.0, 'balance': -2.0, 'debit': 0.0, 'credit': 2.0}])
+        exempted_tax_line = invoice.line_ids.filtered(lambda l: l.tax_line_id.name == 'CA COUNTY 6%')
+        self.assertRecordValues(exempted_tax_line, [{'amount_currency': 0.0, 'balance': 0.0, 'debit': 0.0, 'credit': 0.0}])
+
+    def test_invoice_multi_taxline(self):
+        """ Test that multiple tax lines having the same tax are not an issue for avatax computation"""
+        self.env['account.fiscal.position'].search([('is_avatax', '=', True)]).write({
+            'avatax_invoice_account_id': False,
+            'avatax_refund_account_id': False,
+        })
+
+        default_plan = self.env['account.analytic.plan'].create({'name': 'Default'})
+        analytic_account_a = self.env['account.analytic.account'].create({
+            'name': 'analytic_account_a',
+            'plan_id': default_plan.id,
+            'company_id': False,
+        })
+        analytic_account_b = self.env['account.analytic.account'].create({
+            'name': 'analytic_account_b',
+            'plan_id': default_plan.id,
+            'company_id': False,
+        })
+        invoice = self.env['account.move'].create({
+            'move_type': 'out_invoice',
+            'partner_id': self.partner.id,
+            'fiscal_position_id': self.fp_avatax.id,
+            'invoice_date': '2021-01-01',
+            'invoice_line_ids': [
+                Command.create({
+                    'product_id': self.product_accounting.id,
+                    'tax_ids': None,
+                    'price_unit': 295.00,
+                    'analytic_distribution': {
+                        analytic_account_a.id: 100,
+                    },
+                }),
+                Command.create({
+                    'product_id': self.product_accounting.id,
+                    'tax_ids': None,
+                    'price_unit': 295.00,
+                    'analytic_distribution': {
+                        analytic_account_b.id: 100,
+                    },
+                }),
+            ]
+        })
+        response = {
+            'lines': [{'details': [{'jurisCode': '06',
+                                    'rate': 0.06,
+                                    'taxName': 'CA STATE TAX'},
+                                   {'jurisCode': '075',
+                                    'rate': 0.0025,
+                                    'taxName': 'CA COUNTY TAX'},
+                                   {'jurisCode': 'EMAK0',
+                                    'rate': 0.03,
+                                    'taxName': 'CA SPECIAL TAX'},
+                                   {'jurisCode': 'EMTV0',
+                                    'rate': 0.01,
+                                    'taxName': 'CA SPECIAL TAX'}],
+                       'lineAmount': 295.0,
+                       'lineNumber': 'account.move.line,' + str(line.id),
+                       'tax': 30.24} for line in invoice.invoice_line_ids],
+            'summary': [{'jurisCode': '06',
+                         'nonTaxable': 0.0,
+                         'rate': 0.06,
+                         'tax': 35.4,
+                         'taxCalculated': 35.4,
+                         'taxName': 'CA STATE TAX',
+                         'taxable': 590.0},
+                        {'jurisCode': '075',
+                         'nonTaxable': 0.0,
+                         'rate': 0.0025,
+                         'tax': 1.48,
+                         'taxCalculated': 1.48,
+                         'taxName': 'CA COUNTY TAX',
+                         'taxable': 590.0}]}
+
+        with self._capture_request(return_value=response):
+            # ensure this doesn't raise:
+            # odoo.exceptions.ValidationError: Expected singleton:
+            invoice.button_external_tax_calculation()
+        tax_lines = invoice.line_ids.filtered(lambda l: l.tax_line_id.name == 'CA STATE 6%')
+        self.assertEqual(len(tax_lines), 2, "Multiple tax lines should have been created")
+        self.assertRecordValues(invoice, [{'amount_tax': 60.48, 'amount_total': 650.48, 'amount_untaxed': 590.0}])
+        self.assertRecordValues(tax_lines, [{'amount_currency': -17.7}, {'amount_currency': -17.7}])
+
+    def test_fully_discounted_invoice(self):
+        """By default, accounting removes tax lines that are $0. This results in incorrect journal items in case Avatax
+        doesn't calculate it as $0 and we have to set a tax amount."""
+        invoice = self.env['account.move'].create([{
+            'move_type': 'out_invoice',
+            'partner_id': self.partner.id,
+            'fiscal_position_id': self.fp_avatax.id,
+            'invoice_date': '2021-01-01',
+            'invoice_line_ids': [
+                Command.create({
+                    'product_id': self.product_accounting.id,
+                    'tax_ids': None,
+                    'price_unit': 295.00,
+                }),
+                Command.create({
+                    'product_id': self.product_user_discound.id,
+                    'tax_ids': None,
+                    'price_unit': -295.00,
+                }),
+            ]
+        }])
+        self.assertEqual(invoice.amount_total, 0.00, "Invoice should be $0 before tax calculation.")
+
+        response = {
+            'lines': [{'details': [{'jurisCode': '06',
+                                    'rate': 0.06,
+                                    'taxName': 'CA STATE TAX'},
+                                   {'jurisCode': '075',
+                                    'rate': 0.0025,
+                                    'taxName': 'CA COUNTY TAX'},
+                                   {'jurisCode': 'EMAK0',
+                                    'rate': 0.03,
+                                    'taxName': 'CA SPECIAL TAX'},
+                                   {'jurisCode': 'EMTV0',
+                                    'rate': 0.01,
+                                    'taxName': 'CA SPECIAL TAX'}],
+                       'lineAmount': 295.0,
+                       'lineNumber': f'account.move.line,{invoice.invoice_line_ids[0].id}',
+                       'tax': 30.24},
+                      {'details': [{'jurisCode': '06',
+                                    'rate': 0.06,
+                                    'taxName': 'CA STATE TAX'},
+                                   {'jurisCode': '075',
+                                    'rate': 0.0025,
+                                    'taxName': 'CA COUNTY TAX'},
+                                   {'jurisCode': 'EMAK0',
+                                    'rate': 0.03,
+                                    'taxName': 'CA SPECIAL TAX'},
+                                   {'jurisCode': 'EMTV0',
+                                    'rate': 0.01,
+                                    'taxName': 'CA SPECIAL TAX'}],
+                       'lineAmount': -295.0,
+                       'lineNumber': f'account.move.line,{invoice.invoice_line_ids[1].id}',
+                       'tax': 0.00}],  # This discount is tax-exempt.
+            'summary': [{'jurisCode': '06',
+                         'rate': 0.06,
+                         'tax': 17.7,
+                         'taxName': 'CA STATE TAX',
+                         'taxable': 295.0},
+                        {'jurisCode': '075',
+                         'rate': 0.0025,
+                         'tax': 0.74,
+                         'taxName': 'CA COUNTY TAX',
+                         'taxable': 295.0},
+                        {'jurisCode': 'EMAK0',
+                         'rate': 0.03,
+                         'tax': 8.85,
+                         'taxName': 'CA SPECIAL TAX',
+                         'taxable': 295.0},
+                        {'jurisCode': 'EMAK0',
+                         'rate': 0.01,
+                         'tax': 2.95,
+                         'taxName': 'CA SPECIAL TAX',
+                         'taxable': 295.0},
+                        ]}
+
+        with self._capture_request(return_value=response):
+            invoice.button_external_tax_calculation()
+
+        self.assertRecordValues(
+            invoice.line_ids,
+            [
+                {'name': 'Accounting', 'balance': -295.00},  # Income account
+                {'name': 'Odoo User Initial Discount', 'balance': 295.00},  # Income account
+                {'name': False, 'balance': sum(t['tax'] for t in response['summary'])},  # AR
+                {'name': 'CA STATE 6%', 'balance': -17.7},
+                {'name': 'CA COUNTY 0.25%', 'balance': -0.74},
+                {'name': 'CA SPECIAL 3%', 'balance': -8.85},
+                {'name': 'CA SPECIAL 1%', 'balance': -2.95},
+            ]
+        )
+
 
 @tagged("external_l10n", "external", "-at_install", "post_install", "-standard")
 class TestAccountAvalaraInternalIntegration(TestAccountAvalaraInternalCommon):

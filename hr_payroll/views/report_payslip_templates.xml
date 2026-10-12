@@ -52,7 +52,7 @@
                                     <span t-field="o.employee_id.children"/>
                                 </div>
                                 <div id="employee_private_address" t-if="o.employee_id.private_street and o.employee_id.private_city">
-                                    <strong class="me-2">Private Address:</strong>
+                                    <strong class="me-2">Address:</strong>
                                     <span t-field="o.employee_id.private_street"/>,
                                     <span t-field="o.employee_id.private_street2" t-if="o.employee_id.private_street2" class="ms-2"/><span t-if="o.employee_id.private_street2">,</span>
                                     <span t-field="o.employee_id.private_city" class="ms-2"/>
@@ -61,8 +61,8 @@
                                 </div>
                             </td>
                             <td id="other_infos">
-                                <div id="wage">
-                                    <strong class="me-2">Contract Wage (<span class="text-capitalize" t-out="o.contract_id.wage_type"/>):</strong>
+                                <div id="wage" t-if="not o.struct_id.hide_basic_on_pdf">
+                                    <strong class="me-2">Contract Wage (<span class="text-capitalize" t-out="o.contract_id.schedule_pay if o.contract_id.wage_type == 'monthly' else o.contract_id.wage_type"/>):</strong>
                                     <span t-out="o.contract_id._get_contract_wage()" t-options="{'widget': 'monetary', 'display_currency': o.company_id.currency_id}" style="color:#875A7B" class="fw-bold"/>
                                 </div>
                                 <div id="pay_period">
@@ -87,20 +87,25 @@
                                 </div>
                                 <div id="working_schedule">
                                     <strong class="me-2">Working Schedule:</strong>
-                                    <span t-field="o.employee_id.contract_id.hours_per_week"/> Hours / Week
+                                    <t t-if="o.employee_id.contract_id.resource_calendar_id.flexible_hours">
+                                        <span t-field="o.employee_id.contract_id.resource_calendar_id.full_time_required_hours"/> Hours / Week
+                                    </t>
+                                    <t t-else="">
+                                        <span t-field="o.employee_id.contract_id.hours_per_week"/> Hours / Week
+                                    </t>
                                 </div>
                             </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-            <div id="worked_days_table">
+            <div id="worked_days_table" t-if="o.use_worked_day_lines">
                 <table class="table table-sm table-borderless">
                     <thead class="o_black_border">
                         <tr>
-                            <th id="work_days_header_name">Name</th>
-                            <th id="work_days_header_hours" class="text-end">Number of Hours</th>
-                            <th id="work_days_header_days" class="text-end">Number of Days</th>
+                            <th id="work_days_header_name">Earnings</th>
+                            <th id="work_days_header_hours" class="text-end">Hours</th>
+                            <th id="work_days_header_days" class="text-end">Days</th>
                             <th id="work_days_header_amount" class="text-end">Amount</th>
                             <th id="work_days_header_ytd" t-if="o.ytd_computation" class="text-end">YTD</th>
                         </tr>

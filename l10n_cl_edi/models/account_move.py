@@ -16,12 +16,20 @@ from psycopg2 import OperationalError
 
 from odoo import fields, models
 from odoo.addons.l10n_cl_edi.models.l10n_cl_edi_util import UnexpectedXMLResponse, InvalidToken
-from odoo.exceptions import UserError
-from odoo.tools import _, LazyTranslate
+from odoo.exceptions import UserError, ValidationError
+from odoo.tools import float_compare
+from odoo.tools.misc import formatLang
+from odoo.tools.translate import _, LazyTranslate
 from odoo.tools.float_utils import float_repr
 
 _lt = LazyTranslate(__name__)
 _logger = logging.getLogger(__name__)
+
+XML_NAMESPACES = {
+    'ns0': 'http://www.sii.cl/SiiDte',
+    'ns1': 'http://www.w3.org/2000/09/xmldsig#',
+    'xml_schema': 'http://www.sii.cl/XMLSchema'
+}
 
 try:
     import pdf417gen
@@ -86,8 +94,8 @@ services reception has been received as well.
         ('NCA', 'Reception of Cancellation that References Document'),
     ], string='Claim', copy=False, help='The reason why the DTE was accepted or claimed by the customer')
     l10n_cl_claim_description = fields.Char(string='Claim Detail', readonly=True, copy=False)
-    l10n_cl_sii_send_file = fields.Many2one('ir.attachment', string='SII Send file', copy=False)
-    l10n_cl_dte_file = fields.Many2one('ir.attachment', string='DTE file', copy=False)
+    l10n_cl_sii_send_file = fields.Many2one('ir.attachment', string='SII Send file', copy=False, groups='base.group_system', index='btree_not_null')
+    l10n_cl_dte_file = fields.Many2one('ir.attachment', string='DTE file', copy=False, groups='base.group_system', index='btree_not_null')
     l10n_cl_sii_send_ident = fields.Text(string='SII Send Identification(Track ID)', copy=False, tracking=True)
     l10n_cl_journal_point_of_sale_type = fields.Selection(related='journal_id.l10n_cl_point_of_sale_type')
     l10n_cl_reference_ids = fields.One2many('l10n_cl.account.invoice.reference', 'move_id', string='Reference Records')
@@ -160,7 +168,7 @@ services reception has been received as well.
                     'datas': base64.b64encode(dte_signed.encode('ISO-8859-1', 'replace')),
                     'type': 'binary',
                 })
-                move.l10n_cl_sii_send_file = attachment.id
+                move.sudo().l10n_cl_sii_send_file = attachment.id
                 move.with_context(no_new_invoice=True).message_post(
                     body=_('DTE has been created%s', msg_demo),
                     attachment_ids=attachment.ids)
@@ -193,6 +201,29 @@ services reception has been received as well.
                 }, ], ]
         return reverse_moves
 
+    def _compute_l10n_latam_document_type(self):
+        """
+        Extension to ensure the document type for customer invoices is computed based on the partner's taxpayer type and allows
+        the SII, the fiscal authority of Chile, to properly validate the record.
+        """
+        taxpayer_moves = self.filtered(lambda m: m.partner_id.l10n_cl_sii_taxpayer_type in ['1', '3', '4'] and m.move_type == 'out_invoice')
+        grouped_doc_types = {doc_type.code: doc_type for doc_type in self.l10n_latam_available_document_type_ids._origin}
+        for move in taxpayer_moves:
+            taxpayer_type = move.partner_id.l10n_cl_sii_taxpayer_type
+            if taxpayer_type == '1':
+                if move.debit_origin_id:
+                    move.l10n_latam_document_type_id = grouped_doc_types.get('56', False)
+                else:
+                    move.l10n_latam_document_type_id = grouped_doc_types.get('33', False)
+            elif taxpayer_type == '3':
+                move.l10n_latam_document_type_id = grouped_doc_types.get('39', False)
+            else:
+                if move.debit_origin_id:
+                    move.l10n_latam_document_type_id = grouped_doc_types.get('111', False)
+                else:
+                    move.l10n_latam_document_type_id = grouped_doc_types.get('110', False)
+        super(AccountMove, self - taxpayer_moves)._compute_l10n_latam_document_type()
+
     # SII Customer Invoice Buttons
 
     def l10n_cl_send_dte_to_sii(self, retry_send=True):
@@ -222,8 +253,8 @@ services reception has been received as well.
         response = self._send_xml_to_sii_rest(
             self.company_id.l10n_cl_dte_service_provider,
             self.company_id.vat,
-            self.l10n_cl_sii_send_file.name,
-            base64.b64decode(self.l10n_cl_sii_send_file.datas),
+            self.sudo().l10n_cl_sii_send_file.name,
+            base64.b64decode(self.sudo().l10n_cl_sii_send_file.datas),
             digital_signature_sudo,
         )
         if not response:
@@ -250,17 +281,27 @@ services reception has been received as well.
             return None
         _logger.info('Sending DTE for invoice with ID %s (name: %s)', self.id, self.name)
         digital_signature_sudo = self.company_id.sudo()._get_digital_signature(user_id=self.env.user.id)
+        if not digital_signature_sudo.subject_serial_number:
+            raise UserError(_("Please set the subject serial number in the certificate: %s", digital_signature_sudo.name))
         if self.company_id.l10n_cl_dte_service_provider == 'SIIDEMO':
             self.message_post(body=_('This DTE has been generated in DEMO Mode. It is considered as accepted and '
                                      'it won\'t be sent to SII.'))
             self.l10n_cl_dte_status = 'accepted'
             return None
+        params = {
+            'rutSender': digital_signature_sudo.subject_serial_number[:-2],
+            'dvSender': digital_signature_sudo.subject_serial_number[-1],
+            'rutCompany': self._l10n_cl_format_vat(self.company_id.vat)[:-2],
+            'dvCompany': self._l10n_cl_format_vat(self.company_id.vat)[-1],
+            'archivo': (
+                self.sudo().l10n_cl_sii_send_file.name,
+                base64.b64decode(self.sudo().l10n_cl_sii_send_file.datas),
+                'application/xml'),
+        }
         response = self._send_xml_to_sii(
             self.company_id.l10n_cl_dte_service_provider,
             self.company_id.website,
-            self.company_id.vat,
-            self.l10n_cl_sii_send_file.name,
-            base64.b64decode(self.l10n_cl_sii_send_file.datas),
+            params,
             digital_signature_sudo
         )
         if not response:
@@ -449,7 +490,7 @@ services reception has been received as well.
             'type': 'binary',
             'datas': base64.b64encode(bytes(signed_response, 'utf-8')),
         })
-        self.l10n_cl_dte_file = dte_attachment.id
+        self.sudo().l10n_cl_dte_file = dte_attachment.id
         # If we are sending a reception of goods or services we must use an envelope and sign it the same
         # way we do with the invoice (DTE / EnvioDTE) in this case we use the tags: DocumentoRecibo / EnvioRecibos
         email_template = self.env.ref('l10n_cl_edi.%s' % status_types[status_type].email_template)
@@ -469,7 +510,7 @@ services reception has been received as well.
         by email to the vendor.
         """
         attch_name = 'DTE_{}.xml'.format(self.l10n_latam_document_number)
-        dte_attachment = self.l10n_cl_dte_file
+        dte_attachment = self.sudo().l10n_cl_dte_file
         if not dte_attachment:
             raise Exception(_('DTE attachment not found => %s') % attch_name)
         xml_dte = base64.b64decode(dte_attachment.datas).decode('utf-8')
@@ -539,7 +580,7 @@ services reception has been received as well.
         except InvalidToken:
             digital_signature_sudo = self.company_id.sudo()._get_digital_signature(user_id=self.env.user.id)
             digital_signature_sudo.last_token = None
-            return self.l10n_cl_accept_document()
+            return self._l10n_cl_action_response(status_type)
         if not response:
             return None
         try:
@@ -582,6 +623,25 @@ services reception has been received as well.
         self._l10n_cl_action_response('claimed')
 
     # DTE creation
+    def _get_last_sequence(self, relaxed=False, with_prefix=None):
+        """
+        This method extends the base sequence retrieval to handle Chilean electronic documents.
+        It checks if there's an available CAF (Código de Autorización de Folios)
+        for the current folio number and adjusts the sequence accordingly.
+        """
+        res = super()._get_last_sequence(relaxed=relaxed, with_prefix=with_prefix)
+        if res and self.country_code == "CL" and self.is_sale_document() and self.l10n_latam_document_type_id:
+            match = re.search(r'(\d+)$', res)
+            if match:
+                folio = int(match.group(1))
+                available_caf = self.env['l10n_cl.dte.caf'].sudo().search([
+                ('final_nb', '>=', folio), ('start_nb', '<=', folio), ('l10n_latam_document_type_id', '=', self.l10n_latam_document_type_id.id),
+                ('status', '=', 'in_use'), ('company_id', '=', self.company_id.id)], limit=1)
+                if not available_caf:
+                    start_nb = self.l10n_latam_document_type_id._get_start_number()
+                    if start_nb:
+                        res = f"{self.l10n_latam_document_type_id.doc_code_prefix} {start_nb - 1:06d}"
+        return res
 
     def _l10n_cl_create_dte(self):
         folio = int(self.l10n_latam_document_number)
@@ -613,7 +673,7 @@ services reception has been received as well.
             'type': 'binary',
             'datas': base64.b64encode(signed_dte.encode('ISO-8859-1', 'replace'))
         })
-        self.l10n_cl_dte_file = dte_attachment.id
+        self.sudo().l10n_cl_dte_file = dte_attachment.id
 
     def _l10n_cl_create_partner_dte(self):
         dte_signed, file_name = self._l10n_cl_create_dte_envelope(
@@ -635,7 +695,7 @@ services reception has been received as well.
         digital_signature_sudo = self.company_id.sudo()._get_digital_signature(user_id=self.env.user.id)
         template = self.l10n_latam_document_type_id._is_doc_type_voucher() and self.env.ref(
             'l10n_cl_edi.envio_boleta') or self.env.ref('l10n_cl_edi.envio_dte')
-        dte = self.l10n_cl_dte_file.raw.decode('ISO-8859-1')
+        dte = self.sudo().l10n_cl_dte_file.raw.decode('ISO-8859-1')
         dte = Markup(dte.replace('<?xml version="1.0" encoding="ISO-8859-1" ?>', ''))
         dte_rendered = self.env['ir.qweb']._render(template.id, {
             'move': self,
@@ -697,15 +757,19 @@ services reception has been received as well.
             raise UserError(_(
                 'There are no activity codes configured in your company. This is mandatory for electronic '
                 'invoicing. Please go to your company and set the correct activity codes (www.sii.cl - Mi SII)'))
+        if len(self.company_id.l10n_cl_company_activity_ids) > 4:
+            raise UserError(self.env._(
+                'The maximum amount of Activities Names is 4. Please go to your company and select only 4 or less options.'))
         if not self.company_id.l10n_cl_sii_regional_office:
             raise UserError(_(
                 'There is no SII Regional Office configured in your company. This is mandatory for electronic '
                 'invoicing. Please go to your company and set the regional office, according to your company '
                 'address (www.sii.cl - Mi SII)'))
         if self.l10n_latam_document_type_id.code == '39':
-            cid = self.company_id.id
             if self.line_ids.filtered(lambda x: x.tax_group_id.id in [
-                    self.env.ref(f'account.{cid}_tax_group_ila').id, self.env.ref(f'account.{cid}_tax_group_retenciones').id]):
+                self.env['account.chart.template'].with_company(self.company_id).ref('tax_group_ila').id,
+                self.env['account.chart.template'].with_company(self.company_id).ref('tax_group_retenciones').id,
+            ]):
                 raise UserError(_('Receipts with withholding taxes are not allowed'))
             if self.company_id.currency_id != self.currency_id:
                 raise UserError(_('It is not allowed to create receipts in a different currency than CLP'))
@@ -896,7 +960,7 @@ services reception has been received as well.
 
     def _l10n_cl_ask_claim_status(self):
         for move in self.search([('l10n_cl_dte_acceptation_status', 'in', ['accepted', 'claimed']),
-                                 ('move_type', 'in', ['out_invoice', 'out_refund']),
+                                 ('move_type', '=', 'out_invoice'),
                                  ('l10n_cl_claim', '=', False)]):
             if move.company_id.l10n_cl_dte_service_provider in ['SIITEST', 'SIIDEMO']:
                 continue
@@ -932,3 +996,126 @@ services reception has been received as well.
         for record in self.search([('l10n_cl_dte_status', '=', 'not_sent')]):
             record.with_context(cron_skip_connection_errs=True).l10n_cl_send_dte_to_sii()
             self.env.cr.commit()
+
+    def _get_edi_decoder(self, file_data, new=True):
+        # EXTENDS 'account'
+        if (
+            self.country_code == 'CL'
+            and new
+            and file_data['type'] == 'xml'
+            and etree.fromstring(file_data['content']).xpath('//ns0:DTE', namespaces=XML_NAMESPACES)
+        ):
+            return self._l10n_cl_process_attachment_content
+        return super()._get_edi_decoder(file_data, new=new)
+
+    def _l10n_cl_process_attachment_content(self, invoice, file_data, new=True):
+        """
+        A modification of the fetchmail method chain to be used for manual vendor bill uploads
+        """
+        origin_type = self.env['fetchmail.server']._get_xml_origin_type(etree.fromstring(file_data['content']))
+        if origin_type == 'not_classified':
+            invoice.message_post(body=_('Failed to determine origin type of the attached document, attempting to process as a vendor bill'))
+        for move in self._l10n_cl_create_document_from_attachment(file_data['content'], file_data['attachment'], self.company_id, invoice):
+            if move.partner_id:
+                try:
+                    move._l10n_cl_send_receipt_acknowledgment()
+                except Exception as error:
+                    move.message_post(body=str(error))
+
+    def _l10n_cl_create_document_from_attachment(self, att_content, att_name, company_id, invoice):
+        """
+        A modification of the fetchmail method chain to be used for manual vendor bill uploads
+        """
+        moves = []
+        xml_content = etree.fromstring(att_content)
+        cl_country_id = self.env.ref('base.cl').id
+        cl_id_type_id = self.env.ref('l10n_cl.it_RUT').id
+        for dte_xml in xml_content.xpath('//ns0:DTE', namespaces=XML_NAMESPACES):
+            document_number = self.env['fetchmail.server']._get_document_number(dte_xml)
+            document_type_code = self.env['fetchmail.server']._get_document_type_from_xml(dte_xml)
+            xml_total_amount = float(dte_xml.findtext('.//ns0:MntTotal', namespaces=XML_NAMESPACES))
+            document_type = self.env['l10n_latam.document.type'].search(
+                [('code', '=', document_type_code), ('country_id.code', '=', 'CL')], limit=1)
+            if not document_type:
+                _logger.info('DTE has been discarded! Document type %s not found', document_type_code)
+                continue
+            if document_type and document_type.internal_type not in ['invoice', 'debit_note', 'credit_note']:
+                _logger.info('DTE has been discarded! The document type %s is not a vendor bill', document_type_code)
+                continue
+
+            issuer_vat = self.env['fetchmail.server']._get_dte_issuer_vat(dte_xml)
+            partner = self.env['fetchmail.server']._get_partner(issuer_vat, company_id.id)
+            if partner and self.env['fetchmail.server']._check_document_number_exists(partner.id, document_number, document_type, company_id.id) \
+                    or (not partner and self.env['fetchmail.server']._check_document_number_exists_no_partner(document_number, document_type,
+                                                                                      company_id.id, issuer_vat)):
+                _logger.info('E-invoice already exist: %s', document_number)
+                continue
+
+            partner_dict = {
+                'name': self.env['fetchmail.server']._get_dte_partner_name(xml_content),
+                'vat': self.env['fetchmail.server']._get_dte_issuer_vat(xml_content),
+                'street': self.env['fetchmail.server']._get_dte_issuer_address(xml_content),
+                'country_id': cl_country_id,
+                'l10n_latam_identification_type_id': cl_id_type_id,
+                'l10n_cl_sii_taxpayer_type': '1'
+            }
+            if not partner and partner_dict['name'] and partner_dict['vat'] and partner_dict['street']:
+                try:
+                    partner = self.env['res.partner'].create(partner_dict)
+                    _logger.info('Partner %s automatically generated from vendor bill', partner.name)
+                except ValidationError:
+                    _logger.info('Partner could not be automatically generated from vendor bill')
+
+            msgs = []
+            try:
+                invoice_form = self.env['fetchmail.server']._l10n_cl_fill_invoice_form(
+                    company_id.id, partner, dte_xml, document_number, document_type, invoice)
+
+            except Exception as error:
+                _logger.info(error)
+                msgs.append(str(error))
+                invoice.partner_id = partner
+                invoice.l10n_latam_document_type_id = document_type
+                invoice.l10n_latam_document_number = document_number
+
+            if not partner:
+                invoice_form.narration = issuer_vat or ''
+            move = invoice_form
+
+            self.env['fetchmail.server']._l10n_cl_adjust_manual_taxes(move, dte_xml)
+            dte_attachment = self.env['ir.attachment'].create({
+                'name': 'DTE_{}.xml'.format(document_number),
+                'res_model': move._name,
+                'res_id': move.id,
+                'type': 'binary',
+                'datas': base64.b64encode(etree.tostring(dte_xml))
+            })
+            move.sudo().l10n_cl_dte_file = dte_attachment.id
+
+            for msg in msgs:
+                move.with_context(no_new_invoice=True).message_post(body=msg)
+
+            msg = _('Vendor Bill DTE has been generated for the following vendor:') if partner else \
+                  _('Vendor not found: You can generate this vendor manually with the following information:')
+            msg += Markup('<br/>')
+            move.with_context(no_new_invoice=True).message_post(
+                body=msg + Markup("<li><b>%(name_l)s</b>: %(name)s</li><li><b>%(rut_l)s</b>: %(rut)s</li><li><b>%(address_l)s</b>: %(address)s</li>") % {
+                    'name_l': _("Name"), 'name': partner_dict['name'] or '',
+                    'rut_l': _("RUT"), 'rut': partner_dict['vat'] or '',
+                    'address_l': _("Address"), 'address': partner_dict['street'] or ''},
+                attachment_ids=[dte_attachment.id])
+
+            if not move.currency_id.is_zero(move.amount_total - xml_total_amount):
+                move.message_post(
+                    body=Markup("<strong> %s </strong> %s") % (
+                            _("Warning:"),
+                            _("The total amount of the DTE\'s XML is %(xml_amount)s and the total amount calculated by Odoo is %(move_amount)s. Typically this is caused by additional lines in the detail or by unidentified taxes, please check if a manual correction is needed.",
+                                xml_amount=formatLang(self.env, xml_total_amount, currency_obj=move.currency_id),
+                                move_amount=formatLang(self.env, move.amount_total, currency_obj=move.currency_id)
+                            )
+                        )
+                    )
+            move.l10n_cl_dte_acceptation_status = 'received'
+            moves.append(move)
+            _logger.info('Draft move with id: %s has been filled from DTE %s', move.id, att_name)
+        return moves

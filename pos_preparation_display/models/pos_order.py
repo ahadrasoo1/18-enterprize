@@ -13,10 +13,27 @@ class PosOrder(models.Model):
         if len(orders) > 0:
             orders = self.browse([o['id'] for o in data["pos.order"]])
             for order in orders:
-                if order.state == 'paid':
+                if order.state == 'paid' and not order.config_id.module_pos_restaurant:
                     self.env['pos_preparation_display.order'].process_order(order.id)
 
+        # When preparation context is defined only one order is available in data
+        if self.env.context.get('preparation'):
+            params = self.env.context.get('preparation').get('process_order')
+            order = self.browse(data["pos.order"][0]['id'])
+            self.env['pos_preparation_display.order'].process_order(order.id, *params)
+            order.config_id.notify_synchronisation(order.config_id.current_session_id.id, self.env.context.get('login_number', 0))
+
         return data
+
+    def action_pos_order_cancel(self):
+        orders = super().action_pos_order_cancel()
+        if not self.env.context.get('active_ids'):
+            return orders
+        # When an order is cancelled from the backend UI, ensure the preparation display
+        # is updated to reflect the cancellation
+        for order in orders['pos.order']:
+            self.env['pos_preparation_display.order'].process_order(order['id'], cancelled=True)
+        return orders
 
     def _process_preparation_changes(self, cancelled=False, general_note=None, note_history=None):
         self.ensure_one()
@@ -36,6 +53,7 @@ class PosOrder(models.Model):
         if cancelled:
             for line in pdis_lines:
                 line.product_cancelled = line.product_quantity
+                category_ids.update(line.product_id.pos_categ_ids.ids)
             return {'change': True, 'sound': False, 'category_ids': category_ids}
 
         # create a dictionary with the key as a tuple of product_id, internal_note and attribute_value_ids
@@ -49,6 +67,7 @@ class PosOrder(models.Model):
                     'product_id': pdis_line.product_id.id,
                     'display': line_qty,
                     'order': 0,
+                    'uuid': pdis_line.pos_order_line_uuid,
                 }
             else:
                 quantity_data[key]['display'] += line_qty
@@ -64,6 +83,7 @@ class PosOrder(models.Model):
                     'product_id': line.product_id.id,
                     'display': 0,
                     'order': line.qty,
+                    'uuid': line.uuid,
                 }
             else:
                 quantity_data[key]['order'] += line.qty
@@ -73,7 +93,7 @@ class PosOrder(models.Model):
             for line in pdis_lines[::-1]:
                 product_id = str(line.product_id.id)
                 for note in note_history.get(product_id, []):
-                    if note["uuid"] == line.pos_order_line_uuid and line.internal_note == note['old'] and note['qty'] > 0 and line.product_quantity <= note['qty'] - note.get('used_qty', 0):
+                    if note["uuid"] == line.pos_order_line_uuid and line.internal_note == note['old'] and 'qty' in note and note['qty'] > 0 and line.product_quantity <= note['qty'] - note.get('used_qty', 0):
                         if not note.get('used_qty'):
                             note['used_qty'] = line.product_quantity
                         else:
@@ -93,10 +113,13 @@ class PosOrder(models.Model):
                                 'product_id': line.product_id.id,
                                 'display': 0,
                                 'order': 0,
+                                'uuid': line.pos_order_line_uuid,
                             }
 
                         # Merge the two lines, so that if the quantity was changed it's also applied
                         old_quantity = quantity_data.pop(key, None)
+                        if not old_quantity:
+                            continue
                         quantity_data[key_new]["display"] += old_quantity["display"]
                         quantity_data[key_new]["order"] += old_quantity["order"]
 
@@ -117,7 +140,7 @@ class PosOrder(models.Model):
             product = product_ids.filtered(lambda p: p.id == product_id)
             if data['order'] > data['display']:
                 missing_qty = data['order'] - data['display']
-                filtered_lines = self.lines.filtered(lambda li: li.product_id.id == product_id and (li.note or "") == data['note'] and li.attribute_value_ids.ids == data['attribute_value_ids'])
+                filtered_lines = self.lines.filtered(lambda li: li.uuid == data['uuid'])
                 line_qty = 0
 
                 for line in filtered_lines:
@@ -146,7 +169,7 @@ class PosOrder(models.Model):
                         })
             elif data['order'] < data['display']:
                 qty_to_cancel = data['display'] - data['order']
-                for line in pdis_lines.filtered(lambda li: li.product_id.id == product_id and li.internal_note == data['note'] and li.attribute_value_ids.ids == data['attribute_value_ids']):
+                for line in pdis_lines.filtered(lambda li: li.product_id.id == product_id and li.internal_note == data['note'] and li.attribute_value_ids.ids == data['attribute_value_ids'] and li.pos_order_line_uuid == data['uuid']):
                     flag_change = True
                     line_qty = 0
                     pdis_qty = line.product_quantity - line.product_cancelled

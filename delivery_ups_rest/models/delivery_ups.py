@@ -124,16 +124,24 @@ class ProviderUPS(models.Model):
         if picking.sale_id and picking.sale_id.incoterm:
             terms_of_shipment = picking.sale_id.incoterm
 
+        currency_code = self.env.company.currency_id.name
+        if picking.sale_id:
+            currency_code = picking.sale_id.currency_id.name
+
         shipment_info = {
             'require_invoice': picking._should_generate_commercial_invoice(),
             'invoice_date': fields.Date.today().strftime('%Y%m%d'),
             'description': picking.origin or picking.name,
             'total_qty': sum(sml.quantity for sml in picking.move_line_ids),
+            'freight_charge': sum(sol.price_total for sol in picking.sale_id.order_line.filtered(lambda l: l.is_delivery)),
             'ilt_monetary_value': '%d' % sum(sml.sale_price for sml in picking.move_line_ids),
-            'itl_currency_code': self.env.company.currency_id.name,
+            'itl_currency_code': currency_code,
             'phone': picking.partner_id.mobile or picking.partner_id.phone or picking.sale_id.partner_id.mobile or picking.sale_id.partner_id.phone,
             'terms_of_shipment': terms_of_shipment.code if terms_of_shipment else None,
             'purchase_order_number': picking.sale_id.name if picking.sale_id else None,
+            'reference_number': [
+                {'Code': 'BM', 'Value': picking.name},  # BM is used for Bill of Lading, cf. https://developer.ups.com/api/reference/shipping/appendix2?loc=en_BE
+            ],
         }
         if picking.sale_id and picking.sale_id.carrier_id != picking.carrier_id:
             ups_service_type = picking.carrier_id.ups_default_service_type or self.ups_default_service_type
@@ -222,7 +230,7 @@ class ProviderUPS(models.Model):
             raise UserError(check_value)
 
         result = ups._send_shipping(
-            shipment_info=shipment_info, packages=packages, carrier=self, shipper=picking.partner_id, ship_from=picking.partner_id,
+            shipment_info=shipment_info, packages=packages, carrier=self, shipper=picking.company_id.partner_id, ship_from=picking.partner_id,
             ship_to=picking.picking_type_id.warehouse_id.partner_id, service_type=ups_service_type, duty_payment='RECIPIENT', saturday_delivery=picking.carrier_id.ups_saturday_delivery,
             cod_info=cod_info, label_file_type=self.ups_label_file_type, ups_carrier_account=ups_carrier_account, is_return=True)
 
@@ -281,3 +289,10 @@ class ProviderUPS(models.Model):
             return weight_uom_id._compute_quantity(weight, self.env.ref('uom.product_uom_lb'), round=False)
         else:
             raise ValueError
+
+    def _get_delivery_type(self):
+        """ Override of delivery to return the ups delivery type."""
+        res = super()._get_delivery_type()
+        if self.delivery_type != 'ups_rest':
+            return res
+        return 'ups'

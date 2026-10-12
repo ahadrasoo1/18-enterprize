@@ -19,7 +19,9 @@ class HrPayslip(models.Model):
 
     def _compute_input_line_ids(self):
         super()._compute_input_line_ids()
-        self._update_expense_input_line_ids_without_linking()
+        # Else it would generate lines for expenses of another payslip
+        if not self.env.context.get('payslip_batch_creation'):
+            self._update_expense_input_line_ids_without_linking()
 
     @api.depends('expense_sheet_ids')
     def _compute_expenses_count(self):
@@ -45,9 +47,14 @@ class HrPayslip(models.Model):
 
     def _create_account_move(self, values):
         # EXTENDS hr_payroll
-        if self.filtered('expense_sheet_ids').struct_id.rule_ids.filtered(
-            lambda rule: rule.code == 'EXPENSES' and not (rule.account_debit and rule.account_debit.account_type == 'liability_payable')
-        ):
+        expense_rules = self.filtered('expense_sheet_ids').struct_id.rule_ids.filtered(lambda rule: rule.code == 'EXPENSES')
+        if self.expense_sheet_ids and not expense_rules:
+            raise UserError(_(
+                "No salary rule was found to handle expenses in structure '%(structure_name)s'.",
+                structure_name=self.struct_id.name
+            ))
+
+        if expense_rules and not expense_rules.filtered(lambda rule: rule.account_debit and rule.account_debit.account_type == 'liability_payable'):
             raise UserError(_(
                 "The salary rules with the code 'EXPENSES' must have a debit account set to be able to properly "
                 "reimburse the linked expenses. This must be an account of type 'Payable'."
@@ -94,11 +101,16 @@ class HrPayslip(models.Model):
         # group by employee
         sheets_by_employee = sheets_sudo.grouped('employee_id')
         for slip_sudo in self.sudo():
-            payslip_sheets = sheets_by_employee.get(slip_sudo.employee_id, self.env['hr.payslip'])
-            if slip_sudo.expense_sheet_ids and clear_existing:
-                slip_sudo.expense_sheet_ids = [Command.set(payslip_sheets.ids)]
-            elif payslip_sheets:
-                slip_sudo.expense_sheet_ids = [Command.link(sheet.id) for sheet in payslip_sheets]
+            employee_sudo = slip_sudo.employee_id
+            if employee_sudo in sheets_by_employee:
+                if not slip_sudo.struct_id.rule_ids.filtered(lambda rule: rule.code == 'EXPENSES'):
+                    continue
+                payslip_sheets = sheets_by_employee[employee_sudo]
+                if slip_sudo.expense_sheet_ids and clear_existing:
+                    slip_sudo.expense_sheet_ids = [Command.set(payslip_sheets.ids)]
+                elif payslip_sheets:
+                    slip_sudo.expense_sheet_ids = [Command.link(sheet.id) for sheet in payslip_sheets]
+                del sheets_by_employee[employee_sudo]  # To avoid double assignations
 
     def _update_expense_input_line_ids(self):
         expense_type = self.env.ref('hr_payroll_expense.expense_other_input', raise_if_not_found=False)
@@ -129,6 +141,8 @@ class HrPayslip(models.Model):
         sheets_sudo = self._get_employee_sheets_to_refund_in_payslip()
         sheets_by_employee = sheets_sudo.grouped('employee_id')
         for slip_sudo in self.sudo():
+            if not slip_sudo.struct_id.rule_ids.filtered(lambda rule: rule.code == 'EXPENSES'):
+                continue
             payslip_sheets = slip_sudo.expense_sheet_ids or \
                 sheets_by_employee.get(slip_sudo.employee_id, self.env['hr.expense.sheet'])
             total = sum(payslip_sheets.mapped('total_amount'))

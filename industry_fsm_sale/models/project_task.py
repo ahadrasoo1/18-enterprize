@@ -27,7 +27,7 @@ class Task(models.Model):
                         ('order_id.partner_shipping_id', '=?', unquote('partner_id')),
             ],
         ])
-        return str(domain)
+        return domain
 
     allow_material = fields.Boolean(related='project_id.allow_material', export_string_translation=False)
     allow_quotations = fields.Boolean(related='project_id.allow_quotations', export_string_translation=False)
@@ -42,6 +42,7 @@ class Task(models.Model):
     invoice_count = fields.Integer("Number of invoices", related='sale_order_id.invoice_count')
     pricelist_id = fields.Many2one('product.pricelist', compute="_compute_pricelist_id", export_string_translation=False)
     under_warranty = fields.Boolean('Under Warranty',
+        copy=False,
         help='If ticked, the time and materials used for this task will not be billed to the customer. '
             'However, the inventory of consumed materials will still be updated.')
 
@@ -164,7 +165,7 @@ class Task(models.Model):
                 is_not_timesheet_line = is_not_timesheet_line and sale_line_id.product_id.id not in employee_mapping_product_ids
             is_not_empty = sale_line_id.product_uom_qty != 0
             is_not_service_from_so = sale_line_id != task.sale_line_id
-            is_task_related = sale_line_id.task_id == (task or task._origin)
+            is_task_related = sale_line_id.task_id == (task._origin or task)
             return all([is_not_timesheet_line, is_not_empty, is_not_service_from_so, is_task_related])
 
         employee_mapping_read_group = self.env['project.sale.line.employee.map'].sudo()._read_group(
@@ -262,6 +263,15 @@ class Task(models.Model):
         return super()._compute_partner_id() # Call to super will reset partner_id for non-billable tasks
 
     def action_create_invoice(self):
+        if not self.sale_order_id:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _("Tasks need to be linked to a sales order to be invoiced."),
+                    'type': 'danger',
+                },
+            }
         # ensure the SO exists before invoicing, then confirm it
         so_to_confirm = self.filtered(
             lambda task: task.sale_order_id and task.sale_order_id.state in ['draft', 'sent']
@@ -314,6 +324,7 @@ class Task(models.Model):
                 'res_id': invoices.id,
                 'context': {
                     'create': False,
+                    'default_move_type': 'out_invoice',
                 }
             }
         return {
@@ -325,13 +336,14 @@ class Task(models.Model):
             'domain': [('id', 'in', invoices.ids)],
             'context': {
                 'create': False,
+                'default_move_type': 'out_invoice',
             }
         }
 
     def action_project_sharing_view_invoices(self):
         """ Action used only in project sharing feature """
         return {
-            "name": "Portal Invoices",
+            "name": self.env._("Portal Invoices"),
             "type": "ir.actions.act_url",
             "url":
                 self.env['account.move'].search([('id', 'in', self.sale_order_id.sudo().invoice_ids.ids)], limit=1).get_portal_url()
@@ -376,7 +388,7 @@ class Task(models.Model):
         """ Action used only in project sharing feature """
         self.ensure_one()
         return {
-            "name": "Portal Quotations",
+            "name": self.env._("Portal Quotations"),
             "type": "ir.actions.act_url",
             "url":
                 self.env['sale.order'].search([('task_id', '=', self.id)], limit=1).get_portal_url()
@@ -462,14 +474,17 @@ class Task(models.Model):
         self.ensure_one()
         if not self.sale_order_id:
             self._fsm_create_sale_order()
-        if not self.sale_order_id.project_id:
-            self.sale_order_id.project_id = self.project_id
+        sale_order = self.sale_order_id
+        if self.env.user.has_group('project.group_project_user'):
+            sale_order = self.sale_order_id.sudo()
+        if not sale_order.project_id:
+            sale_order.project_id = self.project_id
         return self.sale_order_id
 
     def _prepare_sale_order_values(self, team):
         vals = {
             'partner_id': self.partner_id.id,
-            'company_id': self.company_id.id,
+            'company_id': self.company_id.id or self.partner_id.company_id.id or self.env.company.id,
             'project_id': self.project_id.id,
             'team_id': team.id if team else False,
             'origin': _("%(project_name)s - %(task_name)s", project_name=self.project_id.name, task_name=self.name),
@@ -582,7 +597,7 @@ class Task(models.Model):
             existing_service_sols = self.sudo().sale_order_id.order_line.filtered('is_service')
             sols_by_product_and_price_dict = defaultdict(lambda: self.env['sale.order.line'])  # key: (product_id, price_unit), value: sales order items
             for sol in existing_service_sols:  # classify the SOLs to easily find the ones that we want.
-                sols_by_product_and_price_dict[sol.product_id.id, sol.price_unit] |= sol
+                sols_by_product_and_price_dict.setdefault((sol.product_id.id, sol.price_unit), sol)
 
             task_values = defaultdict()  # values to update the current task
             update_timesheet_commands = []  # used to update the so_line field of each timesheet in the current task.
@@ -597,6 +612,7 @@ class Task(models.Model):
                 sol = sols_by_product_and_price_dict.get((timesheet_product_id, price_unit))  # get the existing SOL with the product and the correct price unit
                 mapping_uom = self.env['uom.uom'].browse(uom_id)
                 total_amount = 0
+                timesheet_product = self.env['product.product'].browse(timesheet_product_id)
                 for timesheet in timesheets:
                     if timesheet.product_uom_category_id == mapping_uom.category_id and timesheet.product_uom_id != mapping_uom:
                         total_amount += timesheet.product_uom_id._compute_quantity(timesheet.unit_amount, mapping_uom, rounding_method='HALF-UP')
@@ -606,14 +622,14 @@ class Task(models.Model):
                     order = self.sale_order_id
                     sol_vals = {
                         **self._get_sale_order_line_vals(),
-                        'price_unit': 0.0 if self.under_warranty else self.env['product.product'].browse(timesheet_product_id)._get_tax_included_unit_price(
+                        'price_unit': 0.0 if self.under_warranty else timesheet_product._get_tax_included_unit_price(
                             order.company_id,
                             order.currency_id,
                             order.date_order,
                             'sale',
                             fiscal_position=order.fiscal_position_id,
                             product_price_unit=price_unit,
-                            product_currency=order.currency_id
+                            product_currency=timesheet_product.currency_id
                         ),
                         'product_id': timesheet_product_id,
                         'product_uom_qty': total_amount,
@@ -635,11 +651,20 @@ class Task(models.Model):
             # Check if there is a SOL containing the default product of the project before to create a new one.
             sale_order_line = self.sale_order_id and self.sudo().sale_order_id.order_line.filtered(lambda sol: sol.product_id == self.project_id.timesheet_product_id)[:1]
             if not sale_order_line:
+                quantity = sum(timesheet_id.unit_amount for timesheet_id in not_billed_timesheets)
+                price_unit = self.timesheet_product_id.lst_price
+                if self.under_warranty:
+                    price_unit = 0.0
+                elif price_list := self.sale_order_id.pricelist_id:
+                    product_rule = self.env['product.pricelist.item'].browse(price_list._get_product_rule(self.timesheet_product_id, quantity))
+                    if not (product_rule and product_rule._show_discount()):
+                        price_unit = price_list._get_product_price(self.timesheet_product_id, quantity)
+
                 sol_vals = {
                     **self._get_sale_order_line_vals(),
-                    'price_unit': 0.0 if self.under_warranty else self.timesheet_product_id.lst_price,
+                    'price_unit': price_unit,
                     'product_id': self.timesheet_product_id.id,
-                    'product_uom_qty': sum(timesheet_id.unit_amount for timesheet_id in not_billed_timesheets),
+                    'product_uom_qty': quantity,
                 }
                 sale_order_line = self.env['sale.order.line'].sudo().create(sol_vals)
             self.sudo().write({  # We need to sudo in case the user cannot see all timesheets in the current task.
@@ -647,6 +672,33 @@ class Task(models.Model):
                 # assign SOL to timesheets
                 'timesheet_ids': [fields.Command.update(timesheet.id, {'so_line': sale_order_line.id}) for timesheet in not_billed_timesheets if not timesheet.is_so_line_edited]
             })
+
+    def write(self, vals):
+        res = super().write(vals)
+
+        if 'under_warranty' in vals:
+            line = self.env['sale.order.line']
+            for task in self:
+                if task.fsm_done or not task.sale_order_id or task.sale_order_id.locked:
+                    continue
+                line |= task.sale_order_id.order_line.filtered(
+                    lambda l: l.task_id.id == task.id and l.qty_invoiced == 0)
+            if vals['under_warranty']:
+                line.sudo().write({'price_unit': 0, 'technical_price_unit': 0})
+            else:
+                line.with_context(force_price_recomputation=True).sudo()._compute_price_unit()
+
+        return res
+
+    def copy_data(self, default=None):
+        vals_list = super(Task, self).copy_data(default)
+        for task, vals in zip(self, vals_list):
+            if task.is_fsm and not task.recurring_task:
+                vals.update({
+                    'sale_order_id': False,
+                    'sale_line_id': False,
+                })
+        return vals_list
 
     def _prepare_materials_delivery(self):
         # While industry_fsm_stock is not installed then we automatically deliver materials

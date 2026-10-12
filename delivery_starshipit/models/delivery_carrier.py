@@ -1,9 +1,14 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-import time
 
-from odoo import fields, models, _
+from time import sleep
+import logging
+
+from odoo import _, fields, models
 from odoo.exceptions import UserError, ValidationError
+
 from .starshipit_service import Starshipit
+
+_logger = logging.getLogger(__name__)
 
 CARRIER_SUPPORTING_RETURNS = [
     'AusPost',
@@ -112,36 +117,7 @@ class DeliveryCarrier(models.Model):
             order_id = order['order_id']
             picking.starshipit_parcel_reference = order_id
 
-            # The 'total_shipping_price' is required in order to get the exact_price.
-            # It seems that this is computed by starshipit asynchronously and that we could need to wait a bit to get it.
-            # We cannot delete the order once it has been labelled, so we need to ensure that this exists before moving forward.
-            # To that end, we will loop and try up to 3 times before labelling.
-            total_shipping_price = None
-            tries = 0
-
-            while not total_shipping_price and tries < 3:
-                tries += 1
-                order_data = starshipit._get_order_details(order_id)
-                total_shipping_price = order_data['order'].get('total_shipping_price', None)
-                if total_shipping_price:
-                    break
-                time.sleep(1)
-
-            # If we still couldn't get it after three tries (unlikely), we will ask the user to try again.
-            if not total_shipping_price:
-                error_messages = [_('There was an issue when creating the order, please try again')]
-                try:
-                    starshipit._delete_order(order_id)
-                except UserError:
-                    error_messages.append(_(' after deleting the order on Starshipit'))
-                finally:
-                    raise UserError(''.join(error_messages))
-
-            order_result = {
-                'exact_price': total_shipping_price,
-            }
-
-            label_data = self._create_label_for_order(order_id)
+            label_data = self._create_label_for_order(order_id, starshipit_order_number)
 
             tracking_number = ', '.join(tracking_number for tracking_number in label_data['tracking_numbers'] if tracking_number is not None)
             picking.carrier_tracking_ref = tracking_number
@@ -165,11 +141,18 @@ class DeliveryCarrier(models.Model):
                     'res_id': picking.id,
                 })
             attachment_ids = self.env['ir.attachment'].create(attachment_data)
-            # Before continuing, get the order info and check if it was automatically manifested.
+
             order_data = starshipit._get_order_details(order_id)
+            total_shipping_price = order_data['order'].get('total_shipping_price', 0.0)
+
+            if not total_shipping_price:
+                picking.message_post(body=_('The exact price could not be retrieved. It will be updated by a scheduled action.'))
+
+            order_result = {
+                'exact_price': total_shipping_price,
+                'tracking_number': tracking_number,
+            }
             manifested = order_data['order']['manifested']
-            # Get the final rate from the order information.
-            order_result['tracking_number'] = tracking_number
             res.append(order_result)
             if attachment_ids:
                 picking.message_post(body=_('Labels were generated for the order %s', picking.name), attachment_ids=attachment_ids.ids)
@@ -177,14 +160,23 @@ class DeliveryCarrier(models.Model):
             if self.prod_environment:
                 if not manifested:
                     result = starshipit._manifest_orders([picking.starshipit_parcel_reference])
-                    attachment_id = self.env['ir.attachment'].create({
-                        'name': f'{self._get_delivery_doc_prefix()}-manifest-report-{picking.name.replace("/", "_").lower()}.pdf',
-                        'datas': result['pdf'],
-                        'type': 'binary',
-                        'res_model': picking._name,
-                        'res_id': picking.id,
-                    })
-                    picking.message_post(body=_('Order %s was sent to the carrier.', picking.name), attachment_ids=attachment_id.ids)
+                    # Starshipit API doesn't return a PDF for TNT service
+                    datas = result.get('pdf')
+                    pdf_name = f'{self._get_delivery_doc_prefix()}-manifest-report-{picking.name.replace("/", "_").lower()}.pdf'
+                    if datas:
+                        attachment_id = self.env['ir.attachment'].create({
+                            'name': pdf_name,
+                            'datas': datas,
+                            'type': 'binary',
+                            'res_model': picking._name,
+                            'res_id': picking.id,
+                        })
+                        picking.message_post(body=_('Order %s was sent to the carrier.', picking.name), attachment_ids=attachment_id.ids)
+                    else:
+                        picking.message_post(body=_(
+                            'Error: %(file_name)s file could not be obtained for order %(order_name)s.',
+                            file_name=pdf_name, order_name=picking.name
+                        ))
                 else:
                     picking.message_post(body=_('Order %(order)s was already sent to the carrier during label creation.\n'
                                                 'Manifest number: %(manifest_number)s',
@@ -199,6 +191,69 @@ class DeliveryCarrier(models.Model):
                 self.starshipit_cancel_shipment(picking)
                 picking.message_post(body=_('Order %s was archived.', picking.name))
         return res
+
+    def get_starshipit_price_update(self, pickings_to_update):
+        """
+        Called by the cron job to fetch prices for a batch of pickings.
+        This method updates the picking's carrier_price and triggers SO update.
+        """
+        self.ensure_one()
+        starshipit = self._get_starshipit()
+
+        for picking in pickings_to_update:
+            starshipit_order_id = picking.starshipit_parcel_reference
+            try:
+                order_data = starshipit._get_order_details(starshipit_order_id)
+                total_shipping_price = order_data.get('order', {}).get('total_shipping_price')
+
+                if total_shipping_price is not None:
+                    final_carrier_price = self.with_context(order=picking.sale_id)._apply_margins(total_shipping_price)
+
+                    picking.write({
+                        'carrier_price': final_carrier_price,
+                    })
+
+                    if self.invoice_policy == 'real' and picking.sale_id:
+                        if picking.sale_id.invoice_status == 'invoiced':
+                            picking.sale_id.message_post(body=_(
+                                "Starshipit: Exact shipping cost for delivery %(picking_name)s is now %(final_carrier_price)s. This sale order is already invoiced, please review if a manual adjustment to the invoice is needed.",
+                                picking_name=picking.name, final_carrier_price=final_carrier_price
+                            ))
+                        else:
+                            try:
+                                picking._add_delivery_cost_to_so()
+                                picking.sale_id.message_post(body=_(
+                                    "Starshipit: Delivery cost re-evaluated on Sales Order based on updated exact price (%(final_carrier_price)s) from transfer %(picking_name)s.",
+                                    final_carrier_price=final_carrier_price,
+                                    picking_name=picking.name
+                                ))
+                                self.env['mail.activity'].create({
+                                    'res_model_id': self.env['ir.model']._get_id('sale.order'),
+                                    'res_id': picking.sale_id.id,
+                                    'user_id': picking.sale_id.user_id.id,
+                                    'activity_type_id': self.env.ref('mail.mail_activity_data_todo').id,
+                                    'note': _('Shipping Cost has been updated from Starshipit. The Sales Order can now be invoiced.'),
+                                    'summary': _('Starshipit: Shipping Cost updated'),
+                                    'automated': True,
+                                })
+                            except Exception as e_so:
+                                _logger.exception("Starshipit Price Update: Error updating SO %s for picking %s", picking.sale_id.name, picking.name)
+                                picking.message_post(body=_(
+                                    "Starshipit: Exact shipping cost for delivery %(picking_name)s is now %(final_carrier_price)s, but automatic sale order delivery cost re-evaluation failed: %(e_so)s",
+                                    picking_name=picking.name,
+                                    final_carrier_price=final_carrier_price,
+                                    e_so=e_so
+                                ))
+                else:
+                    _logger.info("Starshipit Price Update: Price still not available from Starshipit for Order ID %s (Picking %s). Will retry in next cron run.", starshipit_order_id, picking.name)
+
+                # Sleep for 1 second to avoid hitting the Starshipit API rate limit.
+                sleep(1)
+
+            except Exception as e:
+                picking.message_post(body=_("Starshipit Price Update Cron: System Error fetching price: %s", str(e)))
+                _logger.exception("Starshipit Price Update: System Error for Picking %s (Starshipit ID %s)", picking.name, starshipit_order_id)
+        return True
 
     def starshipit_get_tracking_link(self, picking):
         """ Get the tracking link for the given picking.
@@ -226,7 +281,20 @@ class DeliveryCarrier(models.Model):
         if self.delivery_type != 'starshipit':
             raise ValidationError(_('This action requires a Starshipit carrier.'))
         starshipit = self._get_starshipit()
-        available_services = starshipit._get_delivery_services(self.starshipit_origin_address)
+        order_vals = self.env.context.get('order_vals', {})
+        order = self.env['sale.order'].browse(order_vals.get('order_id'))
+        origin_partner = order.warehouse_id.partner_id or self.starshipit_origin_address
+
+        if order_vals.get('destination_partner_id'):
+            available_services = starshipit._get_delivery_services_with_destination(
+                origin_partner,
+                self.env['res.partner'].browse(order_vals.get('destination_partner_id')),
+                order_vals.get('total_weight', None),
+            )
+        else:
+            available_services = starshipit._get_delivery_services(
+                origin_partner
+            )
         if not available_services.get('services'):
             raise UserError(_("There are no shipping services available, please verify the shipping address or activate suitable carriers in your starshipit account."))
 
@@ -238,6 +306,8 @@ class DeliveryCarrier(models.Model):
             'res_model': 'starshipit.shipping.wizard',
             'target': 'new',
             'context': {
+                'create_new_carrier': self.env.context.get('create_new_carrier', False),
+                'order_vals': order_vals,
                 'default_carrier_id': self.id,
                 'default_available_services': available_services['services'],
                 'default_selected_service_code': self.starshipit_service_code,
@@ -256,7 +326,8 @@ class DeliveryCarrier(models.Model):
             order = starshipit._create_orders(self, picking, True)['orders'].get(starshipit_order_number)
 
         order_id = order['order_id']
-        label_data = self._create_label_for_order(order_id)
+        order_number = order['order_number']
+        label_data = self._create_label_for_order(order_id, order_number)
 
         # if picking is not a return means we are pre-generating the return label on delivery
         # thus we save the returned parcel id in a separate field
@@ -285,14 +356,23 @@ class DeliveryCarrier(models.Model):
         if self.prod_environment:
             if not manifested:
                 result = starshipit._manifest_orders([picking.starshipit_parcel_reference])
-                attachment_id = self.env['ir.attachment'].create({
-                    'name': f'{self._get_delivery_doc_prefix()}-{picking.name.replace("/", "_").lower()}.pdf',
-                    'datas': result['pdf'],
-                    'type': 'binary',
-                    'res_model': picking._name,
-                    'res_id': picking.id,
-                })
-                picking.message_post(body=_('Return order %s was sent to the carrier.', picking.name), attachment_ids=attachment_id.ids)
+                # Starshipit API doesn't return a PDF for TNT service
+                datas = result.get('pdf')
+                pdf_name = f'{self._get_delivery_doc_prefix()}-{picking.name.replace("/", "_").lower()}.pdf'
+                if datas:
+                    attachment_id = self.env['ir.attachment'].create({
+                        'name': pdf_name,
+                        'datas': datas,
+                        'type': 'binary',
+                        'res_model': picking._name,
+                        'res_id': picking.id,
+                    })
+                    picking.message_post(body=_('Return order %s was sent to the carrier.', picking.name), attachment_ids=attachment_id.ids)
+                else:
+                    picking.message_post(body=_(
+                        'Error: %(file_name)s file could not be obtained for order %(order_name)s.',
+                        file_name=pdf_name, order_name=picking.name
+                    ))
             else:
                 picking.message_post(body=_('Return order %(order)s was already sent to the carrier during label creation.\n'
                                             'Manifest number: %(manifest_number)s',
@@ -307,27 +387,26 @@ class DeliveryCarrier(models.Model):
             self.starshipit_cancel_shipment(picking)
             picking.message_post(body=_('Return order %s was archived.', picking.name))
 
-    def _create_label_for_order(self, order_id):
+    def _create_label_for_order(self, order_id, order_number=None):
         starshipit = self._get_starshipit()
-
-        label_creation_failed = False
-        label_data = False
-        label_creation_errors = []
         try:
-            label_data = starshipit._create_label(order_id)
-        except UserError as e:
-            label_creation_failed = True
-            label_creation_errors.append(_('The shipping label creation failed with the following error:\n%(error)s',
-                                           error=e))
+            return starshipit._create_label(order_id)
 
-        if label_creation_failed:
-            try:
-                starshipit._delete_order(order_id)
-            except UserError:
-                label_creation_errors.append(_('Please delete the order on Starshipit then try again.'))
-            finally:
-                raise UserError('\n'.join(label_creation_errors))
-        return label_data
+        except UserError as e:
+            if order_number:
+                order_info = _("The order '%(order_number)s' has been created!\n", order_number=order_number)
+            else:
+                order_info = _("The order has been created!\n")
+
+            error_message = _(
+                "%(order_info)s"
+                "However, the shipping label creation failed with the following error:\n%(error)s\n\n"
+                "Please either continue the configuration or delete the order in Starshipit "
+                "before trying again.",
+                order_info=order_info,
+                error=e,
+            )
+            raise UserError(error_message)
 
     # API HELPERS #
 
@@ -391,5 +470,5 @@ class DeliveryCarrier(models.Model):
         return Starshipit(
             self.starshipit_api_key,
             self.starshipit_subscription_key,
-            self.log_xml
+            self.log_xml,
         )

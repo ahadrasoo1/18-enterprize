@@ -11,7 +11,7 @@ import { objectToString } from "@web/views/form/form_compiler";
 
 const interestingSelector = [
     ":not(field) sheet", // A hook should be present to add elements in the sheet
-    ":not(field) field", // should be clickable and draggable
+    ":not(field) field:not([data-used-by])", // should be clickable and draggable
     ":not(field) notebook", // should be able to add pages
     ":not(field) page", // should be clickable
     ":not(field) button", // should be clickable
@@ -43,15 +43,28 @@ export class FormEditorCompiler extends formView.Compiler {
         };
         this.avatars = [];
 
+        const mainSheet = xml.querySelector("sheet:not(field sheet)");
+        const isSheetEmpty = !mainSheet || !mainSheet.firstElementChild;
+
         const compiled = super.compile(key, params);
 
         const sheetBg = compiled.querySelector(".o_form_sheet_bg");
         if (sheetBg) {
-            const studioHook = createElement("StudioHook", {
-                xpath: `"${sheetBg.getAttribute("studioXpath")}"`,
-                position: "'inside'",
-                type: "'insideSheet'",
-            });
+            let studioHook;
+            if (isSheetEmpty) {
+                studioHook = createElement("StudioHook", {
+                    xpath: `"${sheetBg.getAttribute("studioXpath")}"`,
+                    position: "'inside'",
+                    type: "'insideSheet'",
+                });
+            } else {
+                studioHook = createElement("StudioHook", {
+                    xpath: `"${sheetBg.getAttribute("studioXpath")}/*[1]"`,
+                    position: "'before'",
+                    type: "'insideSheet'",
+                });
+            }
+
             sheetBg.querySelector(".o_form_sheet").prepend(studioHook);
         }
 
@@ -87,17 +100,18 @@ export class FormEditorCompiler extends formView.Compiler {
         // re-add it to the form view
         const buttonBoxXml = xml.querySelector("div[name='button_box']:not(field div)");
         let buttonBox;
-        const buttonBoxContainer = createElement("div", {
-            class: "d-flex justify-content-end my-2",
-        });
         if (buttonBoxXml) {
+            for (const child of [...buttonBoxXml.children]) {
+                if (child.matches("span,field")) {
+                    buttonBoxXml.removeChild(child);
+                }
+            }
             buttonBox = this.compileNode(buttonBoxXml, params);
         } else {
             buttonBox = createElement("ButtonBox");
         }
-        buttonBoxContainer.append(buttonBox);
         const el = compiled.querySelector(".o_form_sheet_bg") || compiled;
-        el.prepend(buttonBoxContainer);
+        el.prepend(buttonBox);
 
         const buttonHook = createElement(
             "t",
@@ -153,6 +167,9 @@ export class FormEditorCompiler extends formView.Compiler {
     }
 
     compileNode(node, params = {}, evalInvisible = true) {
+        if (node.tagName === "field" && node.hasAttribute("data-used-by")) {
+            return;
+        }
         const nodeType = node.nodeType;
         // Put a xpath on the currentSlot containing the future compiled element.
         // Do it early not to be bothered by recursive call to compileNode.
@@ -229,7 +246,11 @@ export class FormEditorCompiler extends formView.Compiler {
                 this.avatars.push(compiled);
             }
 
-            if (node.classList.contains("o_td_label") && !node.children.length && !node.textContent.trim()) {
+            if (
+                node.classList.contains("o_td_label") &&
+                !node.children.length &&
+                !node.textContent.trim()
+            ) {
                 compiled.classList.add("o-web-studio-editor--element-clickable");
                 const xpath = node.getAttribute("studioXpath");
                 compiled.setAttribute(

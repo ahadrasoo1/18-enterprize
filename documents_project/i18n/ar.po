@@ -1,49 +1,50 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* documents_project
-# 
+#
 # Translators:
-# Wil Odoo, 2024
-# 
+# Malaz Abuidris <msea@odoo.com>, 2025
+# Wil Odoo, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-26 09:15+0000\n"
+"POT-Creation-Date: 2025-12-29 18:47+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
+"Last-Translator: Wil Odoo, 2025\n"
 "Language-Team: Arabic (https://app.transifex.com/odoo/teams/41243/ar/)\n"
+"Language: ar\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: ar\n"
-"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
+"&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
 
 #. module: documents_project
 #: model:ir.actions.server,name:documents_project.ir_actions_server_tag_add_draft
-#: model:ir.actions.server,name:documents_project.ir_actions_server_tag_remove_draft
 msgid "Add Tag Draft"
-msgstr ""
+msgstr "إضافة مسودة علامة تصنيف "
 
 #. module: documents_project
 #: model:ir.actions.server,name:documents_project.ir_actions_server_tag_add_to_validate
 msgid "Add Tag To Validate"
-msgstr ""
+msgstr "إضافة علامة تصنيف لما تم تصديقه "
 
 #. module: documents_project
 #: model:ir.actions.server,name:documents_project.ir_actions_server_tag_add_validated
 msgid "Add Tag Validated"
-msgstr ""
+msgstr "إضافة علامة تصنيف لما تم تصديقه "
 
 #. module: documents_project
 #: model:ir.actions.server,name:documents_project.ir_actions_server_ask_for_validation_code
 msgid "Ask For Validation - Check conditions"
-msgstr ""
+msgstr "طلب التصديق - تحقق من الشروط "
 
 #. module: documents_project
 #: model:ir.actions.server,name:documents_project.ir_actions_server_ask_for_validation
 msgid "Ask for validation"
-msgstr ""
+msgstr "اطلب التحقق "
 
 #. module: documents_project
 #: model:ir.model,name:documents_project.model_ir_attachment
@@ -76,7 +77,7 @@ msgstr "إهمال "
 #. module: documents_project
 #: model:ir.actions.server,name:documents_project.ir_actions_server_deprecate_code
 msgid "Deprecate - Check conditions"
-msgstr ""
+msgstr "إبطال - تحقق من الشروط "
 
 #. module: documents_project
 #: model:ir.model,name:documents_project.model_documents_document
@@ -85,6 +86,7 @@ msgstr "المستند"
 
 #. module: documents_project
 #. odoo-python
+#: code:addons/documents_project/controllers/portal.py:0
 #: code:addons/documents_project/models/project_project.py:0
 #: model:ir.actions.act_window,name:documents_project.action_view_documents_project_project
 #: model:ir.actions.act_window,name:documents_project.action_view_documents_project_task
@@ -109,7 +111,7 @@ msgstr "المستندات والتحليلات "
 #. odoo-python
 #: code:addons/documents_project/models/documents_document.py:0
 msgid "Documents already linked to a task."
-msgstr ""
+msgstr "المستندات مرتبطة بمهمة بالفعل. "
 
 #. module: documents_project
 #: model:ir.model.fields,field_description:documents_project.field_project_project__documents_folder_id
@@ -124,12 +126,24 @@ msgid ""
 "All of the attachments of your tasks will be automatically added as "
 "documents in this workspace as well."
 msgstr ""
+"المجلد الذي سيتم وضع كافة المستندات في فئات فيه. ستتم إضافة كافة مرفقات "
+"مهامك تلقائياً كمستندات في مساحة العمل هذه أيضاً. "
 
 #. module: documents_project
 #. odoo-python
 #: code:addons/documents_project/models/documents_document.py:0
 msgid "Impossible to create a task on a deprecated document"
+msgstr "لا يمكن إنشاء مهمة في مستند مهمل "
+
+#. module: documents_project
+#. odoo-python
+#: code:addons/documents_project/models/documents_document.py:0
+msgid ""
+"Impossible to update write `res_id` without `access_internal` for records "
+"with different `res_models` when some are linked to projects or tasks."
 msgstr ""
+"لا يمكن تحديث كتابة `res_id` دون `access_internal` للسجلات ذات `res_models` "
+"المختلفة عندما يكون بعضها مرتبطاً بمشاريع أو مهام. "
 
 #. module: documents_project
 #. odoo-python
@@ -146,12 +160,12 @@ msgstr "بحث المهمة غير صحيح "
 #. module: documents_project
 #: model:ir.actions.server,name:documents_project.ir_actions_server_mark_as_draft_code
 msgid "Mark As Draft - Check conditions"
-msgstr ""
+msgstr "تعيين كمسودة - تحقق من الشروط "
 
 #. module: documents_project
 #: model:ir.actions.server,name:documents_project.ir_actions_server_mark_as_draft
 msgid "Mark as draft"
-msgstr ""
+msgstr "التعيين كمسودة "
 
 #. module: documents_project
 #. odoo-python
@@ -171,14 +185,24 @@ msgid "Projects"
 msgstr "المشاريع "
 
 #. module: documents_project
+#: model:ir.actions.server,name:documents_project.ir_actions_server_tag_remove_draft
+msgid "Remove Tag Draft"
+msgstr "إزالة مسودة علامة التصنيف "
+
+#. module: documents_project
 #: model:ir.actions.server,name:documents_project.ir_actions_server_tag_remove_to_validate
 msgid "Remove Tag To Validate"
-msgstr ""
+msgstr "إزالة علامة التصنيف \"بانتظار التصديق\" "
 
 #. module: documents_project
 #: model:ir.actions.server,name:documents_project.ir_actions_server_tag_remove_validated
 msgid "Remove Tag Validated"
-msgstr ""
+msgstr "إزالة علامة التصنيف \"تم التصديق\" "
+
+#. module: documents_project
+#: model:ir.model,name:documents_project.model_documents_tag
+msgid "Tag"
+msgstr "علامة تصنيف "
 
 #. module: documents_project
 #: model:ir.model,name:documents_project.model_project_task
@@ -211,33 +235,67 @@ msgid ""
 "The \"%(folder)s\" folder should either be in the \"%(company)s\" company "
 "like this project or be open to all companies."
 msgstr ""
+"يجب أن يكون المجلد \"%(folder)s\" إما في الشركة \"%(company)s\" التي فيها "
+"المشروع، أو مفتوحاً لكافة الشركات. "
 
 #. module: documents_project
 #. odoo-python
 #: code:addons/documents_project/models/documents_document.py:0
 msgid ""
-"The \"%s\" folder is required by the Project application and cannot be "
+"The \"%s\" workspace is required by the Project application and cannot be "
+"archived."
+msgstr "مساحة العمل \"%s\" مطلوبة من قِبَل تطبيق المشروع ولا يمكن أرشفتها. "
+
+#. module: documents_project
+#. odoo-python
+#: code:addons/documents_project/models/documents_document.py:0
+msgid ""
+"The \"%s\" workspace is required by the Project application and cannot be "
 "deleted."
-msgstr ""
+msgstr "مساحة العمل \"%s\" مطلوبة من قِبَل تطبيق المشروع ولا يمكن حذفها. "
 
 #. module: documents_project
 #. odoo-python
 #: code:addons/documents_project/models/documents_document.py:0
 msgid ""
-"This folder should remain in the same company as the \"%(project)s\" project"
-" to which it is linked. Please update the company of the \"%(project)s\" "
+"This action can't be performed, as it would remove the workspaces used by "
+"the following projects:\n"
+"%(projects)s\n"
+"To continue, choose different workspaces or turn off the Documents feature "
+"for these projects."
+msgstr ""
+"لا يمكن تنفيذ هذا الإجراء، لأنه سيؤدي إلى إزالة مساحات العمل التي تستخدمها "
+"المشاريع التالية:\n"
+"%(projects)s\n"
+"للمتابعة، اختر مساحات عمل مختلفة أو قم بإيقاف تشغيل خاصية المستندات لهذه "
+"المشاريع. "
+
+#. module: documents_project
+#. odoo-python
+#: code:addons/documents_project/models/documents_document.py:0
+msgid ""
+"This folder should remain in the same company as the \"%(project)s\" project "
+"to which it is linked. Please update the company of the \"%(project)s\" "
 "project, or leave the company of this workspace empty."
 msgstr ""
+"يجب أن يبقى هذا المجلد في نفس شركة المشروع \"%(project)s\" المرتبط به. يرجى "
+"تحديث شركة المشروع \"%(project)s\"، أو ترك شركة مساحة العمل هذه فارغة. "
 
 #. module: documents_project
 #. odoo-python
 #: code:addons/documents_project/models/documents_document.py:0
 msgid ""
-"This folder should remain in the same company as the following projects to which it is linked:\n"
+"This folder should remain in the same company as the following projects to "
+"which it is linked:\n"
 "%s\n"
 "\n"
-"Please update the company of those projects, or leave the company of this workspace empty."
+"Please update the company of those projects, or leave the company of this "
+"workspace empty."
 msgstr ""
+"يجب أن يبقى هذا المجلد في نفس شركة المشروع التالي المرتبط به:\n"
+"%s\n"
+"\n"
+"يرجى تحديث شركة تلك المشاريع  أو ترك شركة مساحة العمل هذه فارغة. "
 
 #. module: documents_project
 #: model_terms:ir.actions.act_window,help:documents_project.action_view_documents_project_project
@@ -262,33 +320,39 @@ msgstr "تصديق "
 #. module: documents_project
 #: model:ir.actions.server,name:documents_project.ir_actions_server_validate_code
 msgid "Validate - Check conditions"
-msgstr ""
+msgstr "تصديق - تحقق من الشروط "
 
 #. module: documents_project
 #. odoo-python
 #: code:addons/documents_project/models/project_project.py:0
 msgid ""
-"You cannot change the company of this project, because its workspace is linked to the other following projects that are still in the \"%(other_company)s\" company:\n"
+"You cannot change the company of this project, because its workspace is "
+"linked to the other following projects that are still in the \"%"
+"(other_company)s\" company:\n"
 "%(other_workspaces)s\n"
 "\n"
-"Please update the company of all projects so that they remain in the same company as their workspace, or leave the company of the \"%(workspace)s\" workspace blank."
+"Please update the company of all projects so that they remain in the same "
+"company as their workspace, or leave the company of the \"%(workspace)s\" "
+"workspace blank."
 msgstr ""
-"لا يمكنك تغيير شركة هذا المشروع، لأن مساحة عمله مرتبطة بالمشاريع الأخرى التالية التي لا تزال في الشركة \"%(other_company)s\":\n"
+"لا يمكنك تغيير شركة هذا المشروع، لأن مساحة عمله مرتبطة بالمشاريع الأخرى "
+"التالية التي لا تزال في الشركة \"%(other_company)s\":\n"
 "%(other_workspaces)s\n"
 "\n"
-"يرجى تحديث الشركة في كافة المشاريع حتى تبقى في نفس الشركة التي بها مساحة العمل، أو اترك شركة مساحة العمل \"%(workspace)s\" فارغة. "
+"يرجى تحديث الشركة في كافة المشاريع حتى تبقى في نفس الشركة التي بها مساحة "
+"العمل، أو اترك شركة مساحة العمل \"%(workspace)s\" فارغة. "
 
 #. module: documents_project
 #. odoo-python
 #: code:addons/documents_project/models/documents_document.py:0
 msgid "You cannot create a task from a folder."
-msgstr ""
+msgstr "لا يمكنك إنشاء مهمة من مجلد. "
 
 #. module: documents_project
 #. odoo-python
 #: code:addons/documents_project/models/documents_document.py:0
 msgid "You cannot set a company on the %s folder."
-msgstr ""
+msgstr "لا يمكنك تعيين شركة في مجلد %s. "
 
 #. module: documents_project
 #. odoo-python

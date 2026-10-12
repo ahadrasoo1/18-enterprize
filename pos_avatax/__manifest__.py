@@ -10,5 +10,8 @@
         'point_of_sale._assets_pos': [
             'pos_avatax/static/src/**/*',
         ],
+        'web.assets_tests': [
+            'pos_avatax/static/tests/tours/**/*',
+        ],
     },
 }

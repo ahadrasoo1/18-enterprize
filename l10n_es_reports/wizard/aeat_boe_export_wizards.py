@@ -2,10 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import models, fields, api, _
-
-from odoo.exceptions import ValidationError, UserError
-
-import json
+from odoo.exceptions import RedirectWarning, UserError, ValidationError
 
 import re
 
@@ -99,6 +96,12 @@ class Mod303BOEWizard(models.TransientModel):
 
     MODELO_NUMBER = 303
 
+    def _default_exempted_from_mod_390_available(self):
+        report = self.env.ref('l10n_es.mod_303')
+        options = self.env.context.get('l10n_es_reports_report_options', {})
+        period = self.env[report.custom_handler_model_name]._get_mod_period_and_year(options)[0]
+        return period in ('12', '4T')
+
     monthly_return = fields.Boolean(string="In Monthly Return Register")
     declaration_type = fields.Selection(
         selection_add=[
@@ -118,15 +121,8 @@ class Mod303BOEWizard(models.TransientModel):
         },
     )
     using_sii = fields.Boolean(string="Using SII Voluntarily", default=False)
-    exempted_from_mod_390 = fields.Boolean(string="Exempted From Modelo 390", default=False)
-    exempted_from_mod_390_available = fields.Boolean(compute='_compute_show_exempted_from_mod_390', help="Technical field used to only make exempted_from_mod_390 avilable in the last period (12 or 4T)")
-
-    def _compute_show_exempted_from_mod_390(self):
-        report = self.env.ref('l10n_es.mod_303')
-        options = self.env.context.get('l10n_es_reports_report_options', {})
-        period = self.env[report.custom_handler_model_name]._get_mod_period_and_year(options)[0]
-        for record in self:
-            record.exempted_from_mod_390_available = period in ('12', '4T')
+    exempted_from_mod_390 = fields.Boolean(string="Exonerated From Modelo 390", default=False)
+    exempted_from_mod_390_available = fields.Boolean(default=_default_exempted_from_mod_390_available, help="Technical field used to only make exempted_from_mod_390 available in the last period (12 or 4T)")
 
     @api.constrains('partner_bank_id')
     def validate_bic(self):
@@ -194,7 +190,7 @@ class Mod390BOEWizard(models.TransientModel):
 
     MODELO_NUMBER = 390
 
-    physical_person_name = fields.Char(string="Natural Person - Name", required=True)
+    physical_person_name = fields.Char(string="Natural Person - Name")
     monthly_return = fields.Boolean(string="Monthly return record in some period of the fiscal year")
 
     # The group number is not related to the NIF and must be completed if the company is in a group of entities.
@@ -211,13 +207,13 @@ class Mod390BOEWizard(models.TransientModel):
     previous_decl_number = fields.Char(string="Previous declaration no.")
 
     principal_activity = fields.Char(string="Principal activity", required=True)
-    principal_iae_epigrafe = fields.Char(string="Principal activity - Epígrafe", required=True)
+    principal_iae_epigrafe = fields.Char(string="Principal activity - Epígrafe")
     principal_code_activity = fields.Char(string="Principal activity - Activity Code", required=True)
 
-    judicial_person_name = fields.Char(string="Representative - Name and Surname", required=True)
-    judicial_person_nif = fields.Char(string="Representative - NIF", required=True)
-    judicial_person_procuration_date = fields.Date(string="Representative - Power of Attorney Date", required=True)
-    judicial_person_notary = fields.Char(string="Representative - Notary", required=True)
+    judicial_person_name = fields.Char(string="Representative - Name and Surname")
+    judicial_person_nif = fields.Char(string="Representative - NIF")
+    judicial_person_procuration_date = fields.Date(string="Representative - Power of Attorney Date")
+    judicial_person_notary = fields.Char(string="Representative - Notary")
 
     def _compute_is_in_tax_unit(self):
         options = self.env.context.get('l10n_es_reports_report_options', {})

@@ -52,6 +52,16 @@ class AccountJournal(models.Model):
             else:
                 record.expiring_synchronization_due_day = 0
 
+    def _fill_bank_cash_dashboard_data(self, dashboard_data):
+        super()._fill_bank_cash_dashboard_data(dashboard_data)
+        # Caching data to avoid one call per journal
+        self.browse(list(dashboard_data.keys())).fetch(['type', 'account_online_account_id'])
+        for journal_id, journal_data in dashboard_data.items():
+            journal = self.browse(journal_id)
+            journal_data['display_connect_bank_in_dashboard'] = journal.type in ('bank', 'credit') \
+                                                                and not journal.account_online_account_id \
+                                                                and journal.company_id.id == self.env.company.id
+
     @api.constrains('account_online_account_id')
     def _check_account_online_account_id(self):
         for journal in self:
@@ -74,7 +84,7 @@ class AccountJournal(models.Model):
         self.ensure_one()
         timeout = int(self.env['ir.config_parameter'].sudo().get_param('account_online_synchronization.request_timeout')) or 60
         endpoint_url = self.env['account.online.link']._get_odoofin_url('/proxy/v1/get_dashboard_institutions')
-        params = {'country': self.company_id.account_fiscal_country_id.code, 'limit': 28}
+        params = {'country': self.sudo().company_id.account_fiscal_country_id.code, 'limit': 28}
         try:
             resp = requests.post(endpoint_url, json=params, timeout=timeout)
             resp_dict = resp.json()['result']
@@ -100,8 +110,7 @@ class AccountJournal(models.Model):
         limit_time = tools.config['limit_time_real_cron'] or -1
         if limit_time <= 0:
             limit_time = tools.config['limit_time_real'] or 120
-        journals = self.search([(
-            'account_online_account_id', '!=', False),
+        journals = self.search([
             '|',
                 ('online_sync_fetching_status', 'in', ('planned', 'waiting')),
                 '&',
@@ -164,7 +173,12 @@ class AccountJournal(models.Model):
         Extend the consent of the user by redirecting him to update his credentials
         """
         self.ensure_one()
-        return self.account_online_link_id.action_update_credentials()
+        return self.account_online_link_id._open_iframe(
+            mode='updateCredentials',
+            include_param={
+                'account_online_identifier': self.account_online_account_id.online_identifier,
+            },
+        )
 
     def action_reconnect_online_account(self):
         self.ensure_one()
@@ -306,13 +320,15 @@ class AccountJournal(models.Model):
 
     def _get_journal_dashboard_data_batched(self):
         dashboard_data = super()._get_journal_dashboard_data_batched()
-        for journal in self.filtered('account_online_link_id'):
-            if journal.company_id.id not in self.env.companies.ids:
-                continue
-            connection_state_details = journal.account_online_link_id._get_connection_state_details(journal=journal)
-            if not connection_state_details and journal.account_online_account_id.fetching_status in ('waiting', 'processing'):
-                connection_state_details = {'status': 'fetching'}
-            dashboard_data[journal.id]['connection_state_details'] = connection_state_details
+        for journal in self.filtered(lambda j: j.type in ('bank', 'credit')):
+            if journal.account_online_account_id:
+                if journal.company_id.id not in self.env.companies.ids:
+                    continue
+                connection_state_details = journal.account_online_link_id._get_connection_state_details(journal=journal)
+                if not connection_state_details and journal.account_online_account_id.fetching_status in ('waiting', 'processing'):
+                    connection_state_details = {'status': 'fetching'}
+                dashboard_data[journal.id]['connection_state_details'] = connection_state_details
+                dashboard_data[journal.id]['show_sync_actions'] = journal.account_online_link_id.show_sync_actions
         return dashboard_data
 
     def get_related_connection_state_details(self):
@@ -356,3 +372,9 @@ class AccountJournal(models.Model):
         # Extends 'account_accountant'
         self._consume_connection_state_details()
         return super().action_open_bank_transactions()
+
+    @api.model
+    def _toggle_asynchronous_fetching_cron(self):
+        cron = self.env.ref('account_online_synchronization.online_sync_cron_waiting_synchronization', raise_if_not_found=False)
+        if cron:
+            cron.sudo().toggle(model=self._name, domain=[('account_online_account_id', '!=', False)])

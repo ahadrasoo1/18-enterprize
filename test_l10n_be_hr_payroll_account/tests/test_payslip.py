@@ -6,11 +6,11 @@ from odoo.tests import common
 
 
 class TestPayslipBase(common.TransactionCase):
-
-    def setUp(self):
-        super(TestPayslipBase, self).setUp()
-        self.env.company.country_id = self.env.ref('base.be')
-        self.employee = self.env['hr.employee'].create({
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.env.company.country_id = cls.env.ref('base.be')
+        cls.employee = cls.env['hr.employee'].create({
             'name': 'employee',
         })
 
@@ -32,10 +32,11 @@ class TestPayslipBase(common.TransactionCase):
             'mobile': False,
         })
 
-    def create_payslip(self, contract, structure, date_start, date_end=False):
-        return self.env['hr.payslip'].create({
-            'name': '%s for %s' % (structure, self.employee),
-            'employee_id': self.employee.id,
+    @classmethod
+    def create_payslip(cls, contract, structure, date_start, date_end=False):
+        return cls.env['hr.payslip'].create({
+            'name': '%s for %s' % (structure, cls.employee),
+            'employee_id': cls.employee.id,
             'date_from': date_start,
             'date_to': date_end,
             'struct_id': structure.id,

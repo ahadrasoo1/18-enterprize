@@ -7,11 +7,11 @@ import logging
 import mimetypes
 import re
 
-from odoo.tools.pdf import PdfFileReader  # bt: core PDF layer (core no longer patches PyPDF2)
 
 from odoo import http, models, tools, Command, _, fields
 from odoo.http import request, content_disposition
-from odoo.tools import consteq
+from odoo.tools import consteq, format_date
+from odoo.tools.pdf import PdfFileReader
 from odoo.addons.iap.tools import iap_tools
 from odoo.exceptions import UserError
 
@@ -107,6 +107,7 @@ class Sign(http.Controller):
             'sign_item_select_options': sign_request.template_id.sign_item_ids.mapped('option_ids'),
             'portal': post.get('portal'),
             'company_id': (sign_request.communication_company_id or sign_request.create_uid.company_id).id,
+            'today_formatted_date': format_date(http.request.env, fields.Date.today(), lang_code=sign_request.communication_company_id.partner_id.lang),
         }
 
     # -------------
@@ -178,7 +179,7 @@ class Sign(http.Controller):
         elif download_type == "completed":
             document = sign_request.completed_document
             if not document:
-                if sign_request._check_is_encrypted():# if the document is completed but the document is encrypted
+                if sign_request._check_requires_password():  # if the document is completed but the document requires a password to download
                     return request.redirect('/sign/password/%(request_id)s/%(access_token)s' % {'request_id': request_id, 'access_token': token})
                 sign_request._generate_completed_document()
                 document = sign_request.completed_document
@@ -276,6 +277,10 @@ class Sign(http.Controller):
     @http.route(["/sign/get_document/<int:request_id>/<token>"], type='json', auth='user')
     def get_document(self, request_id, token):
         context = self.get_document_qweb_context(request_id, token)
+        if not isinstance(context, dict):
+            # context contains a rendered QWeb template (not found, deleted sign request, ...)
+            # TODO MASTER clean return type of get_document_qweb_context
+            return context
         return {
             'html': request.env['ir.qweb']._render('sign._doc_sign', context),
             'context': {
@@ -292,8 +297,7 @@ class Sign(http.Controller):
         if not allowed or signature_type not in ['sign_signature', 'sign_initials'] or not user:
             return False
         user[signature_type] = datas[datas.find(',') + 1:]
-        if frame_datas:
-            user[signature_type+'_frame'] = frame_datas[frame_datas.find(',') + 1:]
+        user[signature_type+'_frame'] = frame_datas[frame_datas.find(',') + 1:] if frame_datas else False
         return True
 
     @http.route(['/sign/new_partners'], type='json', auth='user')
@@ -379,9 +383,12 @@ class Sign(http.Controller):
         if not request_item_sudo or request_item_sudo.sign_request_id.validity and request_item_sudo.sign_request_id.validity < fields.Date.today():
             return {'success': False}
 
-        result = {'success': True}
+        sign_request = request_item_sudo.sign_request_id
+        company = sign_request.communication_company_id or sign_request.create_uid.company_id
+        result = {'success': True, 'company_country_code': company.country_id.code}
         if request_item_sudo.role_id.auth_method:
             result = self._validate_auth_method(request_item_sudo, sms_token=sms_token)
+            result['company_country_code'] = company.country_id.code
             if not result.get('success'):
                 return result
 
@@ -514,6 +521,7 @@ class Sign(http.Controller):
             domain=[
                 ('partner_id', '=', request.env.user.partner_id.id),
                 ('state', '=', 'sent'),
+                ('sign_request_id.state', '=', 'sent'),
             ],
             fields=['access_token', 'sign_request_id', 'create_uid', 'create_date'],
             order='create_date DESC',
@@ -526,16 +534,36 @@ class Sign(http.Controller):
             'token': item['access_token'],
             'requestId': item['sign_request_id'][0],
             'name': item['sign_request_id'][1],
-            'userId': item['create_uid'][0],
-            'user': item['create_uid'][1],
+            'userId': item['create_uid'][0] if item['create_uid'] else False,
+            'user': item['create_uid'][1] if item['create_uid'] else False,
             'date': item['create_date'].date(),
         } for item in items]
+
+    @http.route(['/sign/sign_confirm_cancel/<int:item_id>'], type='http', auth='public')
+    def confirm_cancel_sign_request_item(self, item_id, access_token=None):
+        sign_request_item = request.env['sign.request.item'].sudo().browse(item_id)
+        if sign_request_item and consteq(sign_request_item.access_token, access_token):
+            sign_request_item.sign_request_id.with_context(default_sign_request_item_id=sign_request_item.id).cancel()
+            message_post = _("The signature has been canceled by %(partner)s(%(role)s)", partner=sign_request_item.partner_id.name, role=sign_request_item.role_id.name)
+            sign_request_item.sign_request_id.message_post(body=message_post)
+            return http.request.render('sign.canceled_sign_request_item')
+        else:
+            return http.request.not_found()
 
     @http.route(['/sign/sign_cancel/<int:item_id>/<token>'], type='http', auth='public')
     def cancel_sign_request_item_from_mail(self, item_id, token):
         sign_request_item = request.env['sign.request.item'].sudo().browse(item_id)
         if sign_request_item and consteq(sign_request_item.access_token, token):
-            sign_request_item.sign_request_id.cancel()
+            if request.env.ref('sign.cancel_sign_request_item_with_confirmation', raise_if_not_found=False):
+                return http.request.render('sign.cancel_sign_request_item_with_confirmation', {
+                    'record': sign_request_item,
+                })
+            # Mail scanners can send HEAD requests to link contained in emails, it shouldn't cancel the request.
+            if request.httprequest.method == 'HEAD':
+                return http.request.render('sign.canceled_sign_request_item')
+            sign_request_item.sign_request_id.with_context(default_sign_request_item_id=sign_request_item.id).cancel()
+            message_post = _("The signature has been canceled by %(partner)s(%(role)s)", partner=sign_request_item.partner_id.name, role=sign_request_item.role_id.name)
+            sign_request_item.sign_request_id.message_post(body=message_post)
             return http.request.render('sign.canceled_sign_request_item')
         else:
             return http.request.not_found()

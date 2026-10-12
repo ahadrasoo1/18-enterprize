@@ -2,7 +2,7 @@
 
 from odoo import models, api, _
 from odoo.tools import html2plaintext, is_html_empty
-from odoo.exceptions import UserError
+from odoo.exceptions import ValidationError
 
 
 class StockPicking(models.Model):
@@ -68,8 +68,8 @@ class StockPicking(models.Model):
         """
         self.ensure_one()
         return_picking = self.with_context(active_model='stock.picking', active_id=self.id).env['stock.return.picking'].create({})
-        if sum(return_picking.product_return_moves.mapped('quantity')) <= 0:
-            raise UserError(_("All products have been returned already"))
+        for line in return_picking.product_return_moves:
+            line.quantity = line.move_id.quantity
         new_picking = return_picking._create_return()
         return new_picking.action_open_picking_client_action()
 
@@ -101,7 +101,7 @@ class StockPicking(models.Model):
         source_locations = self.env['stock.location'].search([('id', 'child_of', self.location_id.ids)])
         destination_locations = self.env['stock.location'].search([('id', 'child_of', self.location_dest_id.ids)])
         package_locations = self.env['stock.location'].search([('id', 'child_of', self.location_dest_id.ids), ('usage', '!=', 'customer')])
-        locations = move_lines.location_id | move_lines.location_dest_id | source_locations | destination_locations
+        locations = self.location_id | self.location_dest_id |  move_lines.location_id | move_lines.location_dest_id | source_locations | destination_locations
 
         # Fetch `stock.quant.package` and `stock.package.type` if group_tracking_lot.
         packages = self.env['stock.quant.package']
@@ -136,7 +136,7 @@ class StockPicking(models.Model):
             picking['note'] = False if is_html_empty(picking['note']) else html2plaintext(picking['note'])
 
         data['config'] = self.picking_type_id._get_barcode_config()
-        if self.return_id:
+        if self._should_ignore_backorders():
             data['config']['create_backorder'] = 'never'
         data['line_view_id'] = self.env.ref('stock_barcode.stock_move_line_product_selector').id
         data['form_view_id'] = self.env.ref('stock_barcode.stock_picking_barcode').id
@@ -200,12 +200,15 @@ class StockPicking(models.Model):
         barcode_type = None
         nomenclature = self.env.company.nomenclature_id
         if nomenclature.is_gs1_nomenclature:
-            parsed_results = nomenclature.parse_barcode(barcode)
+            try:
+                parsed_results = nomenclature.parse_barcode(barcode)
+            except ValidationError:
+                parsed_results = False
             if parsed_results:
                 # filter with the last feasible rule
                 for result in parsed_results[::-1]:
-                    if result['rule'].type in ('product', 'package', 'lot'):
-                        barcode_type = result['rule'].type
+                    if result['type'] in ('product', 'package', 'lot'):
+                        barcode_type = result['type']
                         break
 
         active_id = self.env.context.get('active_id')
@@ -231,7 +234,7 @@ class StockPicking(models.Model):
         if self.env.user.has_group('stock.group_production_lot') and (barcode_type == 'lot' or (not barcode_type and not picking_nums)):
             lot = self.env['stock.lot'].search([
                 ('name', '=', barcode),
-                ('company_id', '=', picking_type.company_id.id),
+                '|', ('company_id', '=', False), ('company_id', '=', picking_type.company_id.id),
             ], limit=1)
             if lot:
                 lot_domain = [('move_line_ids.lot_id', '=', lot.id)]

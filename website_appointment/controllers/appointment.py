@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import http
+from odoo import _, http
 from odoo.http import request
 
 from odoo.addons.base.models.ir_qweb import keep_query
 from odoo.addons.appointment.controllers.appointment import AppointmentController
+from odoo.exceptions import UserError
 from odoo.osv import expression
 
 
@@ -31,6 +32,7 @@ class WebsiteAppointment(AppointmentController):
             search=kwargs.get('search'),
             invite_token=kwargs.get('invite_token'),
             additional_domain=self._appointment_website_domain(),
+            filter_countries=True,
         )
         available_appointment_types = self._fetch_and_check_private_appointment_types(
             kwargs.get('filter_appointment_type_ids'),
@@ -61,6 +63,15 @@ class WebsiteAppointment(AppointmentController):
                     **kwargs
                 )
             )
+
+    # ----------------------------------------------------------------
+    # APPOINTMENT SUBMISSION : RECAPTCHA CHECK
+    # ---------------------------------------------------------------- 
+    @http.route()
+    def appointment_form_submit(self, *args, **kwargs):
+        if not request.env['ir.http']._verify_request_recaptcha_token('appointment_form_submission'):
+            raise UserError(_('Suspicious activity detected by Google reCaptcha.'))
+        return super().appointment_form_submit(*args, **kwargs)
 
     # ----------------------------------------------------------------
     # APPOINTMENT TYPE PAGE VIEW : WITH NEW OPERATOR SELECTION VIEW
@@ -118,7 +129,7 @@ class WebsiteAppointment(AppointmentController):
         values['skip_resource_selection'] = skip_resource_selection
         if skip_resource_selection:
             values['user_selected'] = values['user_default'] = request.env['res.users']
-            values['resource_selected'] = request.env['appointment.resource']
+            values['resource_selected'] = values['resource_default'] = request.env['appointment.resource']
         else:
             resource_or_user_selected = values['user_selected'] if appointment_type.schedule_based_on == 'users' else values['resource_selected']
             values['hide_select_dropdown'] = values['hide_select_dropdown'] or (
@@ -181,7 +192,7 @@ class WebsiteAppointment(AppointmentController):
         return country
 
     @classmethod
-    def _appointments_base_domain(cls, filter_appointment_type_ids, search=False, invite_token=False, additional_domain=None):
-        domain = super()._appointments_base_domain(filter_appointment_type_ids, search, invite_token, additional_domain)
+    def _appointments_base_domain(cls, filter_appointment_type_ids, search=False, invite_token=False, additional_domain=None, filter_countries=False):
+        domain = super()._appointments_base_domain(filter_appointment_type_ids, search, invite_token, additional_domain, filter_countries)
         domain = expression.AND([domain, ['|', ('website_id', '=', request.website.id), ('website_id', '=', False)]])
         return domain

@@ -16,6 +16,7 @@
                 togglerClass="'p-2'"
                 searchable="choices.length > 8"
                 required="props.childProps.required !== false"
+                disabled="props.isReadonly"
             />
         </div>
 
@@ -38,7 +39,7 @@
                 <t t-slot="default" />
                 <sup t-if="props.tooltip" class="text-info p-1" t-att-data-tooltip="props.tooltip" t-esc="'?'"/>
             </label>
-            <span t-if="props.isReadonly" t-att-name="props.name" t-esc="props.value" />
+            <span t-if="props.isReadonly" t-att-name="props.name" t-esc="props.value" class="ps-2" />
             <input
                 t-else=""
                 t-att="props.inputAttributes"
@@ -56,7 +57,7 @@
                 <t t-slot="default" />
                 <sup t-if="props.tooltip" class="text-info p-1" t-att-data-tooltip="props.tooltip" t-esc="'?'"/>
             </label>
-            <span t-if="props.isReadonly" t-att-name="props.name" t-esc="props.value" class="text-white mb-1 ps-1" />
+            <span t-if="props.isReadonly" t-att-name="props.name" t-esc="props.value" class="ps-2" />
             <input
                 t-else=""
                 t-att-name="props.name"

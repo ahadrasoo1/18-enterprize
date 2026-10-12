@@ -63,10 +63,11 @@ class Applicant(models.Model):
 
     def _inverse_ref_user_id(self):
         for applicant in self:
-            applicant.source_id = applicant.ref_user_id.utm_source_id
+            if applicant.ref_user_id:
+                applicant.source_id = applicant.ref_user_id.utm_source_id
 
     def check_field_access_rights(self, operation, field_names):
-        referral_fields = {'name', 'partner_name', 'job_id', 'referral_points_ids', 'earned_points', 'max_points', 'active', 'response_id',
+        referral_fields = {'partner_name', 'job_id', 'referral_points_ids', 'earned_points', 'max_points', 'active', 'response_id',
                            'shared_item_infos', 'referral_state', 'user_id', 'friend_id', 'write_date', 'ref_user_id', 'id'}
 
         result = super().check_field_access_rights(operation, field_names)
@@ -120,34 +121,26 @@ class Applicant(models.Model):
                     applicant.last_valuable_stage_id = applicant.stage_id
         return applicants
 
-    def archive_applicant(self):
-        for applicant in self:
-            if applicant.ref_user_id:
-                applicant._send_notification(
-                    body=_("Sorry, your referral %s has been refused in the recruitment process.", applicant.name),
-                    action_value='hr_referral.action_hr_refused_applicant_employee_referral'
-                )
-        self.write({'referral_state': 'closed'})
-        return super(Applicant, self).archive_applicant()
-
     def _send_notification(self, body, action_value='hr_referral.action_hr_applicant_employee_referral'):
-        if self.partner_name:
-            subject = _('Referral: %(partner)s (%(applicant)s)', partner=self.partner_name, applicant=self.display_name)
-        else:
-            subject = _('Referral: %s', self.display_name)
-        action_url = f'/odoo/action-{action_value}?active_model={self._name}'
-        body = Markup("<a class='o_document_link' href=%s>%s</a><br>%s") % (action_url, subject, body)
-        odoobot = self.env.ref('base.partner_root')
-        # Do *not* notify on `self` as it will lead to unintended behavior.
-        # See opw-3285752
-        self.env['mail.thread'].sudo().message_notify(
-            model=self._name,
-            subject=subject,
-            body=body,
-            author_id=odoobot.id,
-            partner_ids=[self.ref_user_id.partner_id.id],
-            email_layout_xmlid='mail.mail_notification_light',
-        )
+        if referrer := self.ref_user_id:
+            if self.partner_name:
+                subject = _('Referral: %(partner)s (%(applicant)s)', partner=self.partner_name, applicant=self.display_name)
+            else:
+                subject = _('Referral: %s', self.display_name)
+            action_url = f'/odoo/action-{action_value}?active_model={self._name}'
+            body = Markup("<a class='o_document_link' href=%s>%s</a><br>%s") % (action_url, subject, body)
+            odoobot = self.env.ref('base.partner_root')
+            # Do *not* notify on `self` as it will lead to unintended behavior.
+            # See opw-3285752 -> we attach it on the referrer's user
+            self.env['mail.thread'].sudo().message_notify(
+                model=referrer._name,
+                res_id=referrer.id,
+                subject=subject,
+                body=body,
+                author_id=odoobot.id,
+                partner_ids=[self.ref_user_id.partner_id.id],
+                email_layout_xmlid='mail.mail_notification_light',
+            )
 
     def _update_points(self, new_state_id, old_state_id):
         if not self.company_id:
@@ -273,14 +266,14 @@ class Applicant(models.Model):
 
         applicant = self.sudo().search([('ref_user_id', '=', user_id.id), ('company_id', 'in', self.env.companies.ids)])
         applicants_hired = applicant.filtered(lambda r: r.referral_state == 'hired')
-        applicant_name = {applicant_hired.friend_id.id: applicant_hired.partner_name or applicant_hired.name for applicant_hired in applicants_hired}
+        applicant_name = {applicant_hired.friend_id.id: applicant_hired.partner_name for applicant_hired in applicants_hired}
         applicant_without_friend = applicants_hired.filtered(lambda r: not r.friend_id)
 
         # If there are applicant hired without friend and available friends.
         available_friend_count = self.env['hr.referral.friend'].search_count([])
         if bool(applicant_without_friend) and (len(applicants_hired) - len(applicant_without_friend) < available_friend_count):
             result['choose_new_friend'] = True
-            result['new_friend_name'] = applicant_without_friend[0].partner_name or applicant_without_friend[0].name
+            result['new_friend_name'] = applicant_without_friend[0].partner_name
             result['new_friend_id'] = applicant_without_friend[0].id
 
             result['friends'] = self._get_friends_head(applicant_name)
@@ -351,6 +344,11 @@ class Applicant(models.Model):
         ], order='points asc', limit=1)
         if next_referral_level:
             user_id.write({'hr_referral_level_id': next_referral_level.id})
+
+    def reset_applicant(self):
+        """ Reset the applicant state to progress """
+        super().reset_applicant()
+        self.write({'referral_state': 'progress'})
 
 
 class RecruitmentStage(models.Model):

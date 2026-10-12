@@ -39,8 +39,9 @@ class L10nMXTrialBalanceCustomHandler(models.AbstractModel):
         options['date']['string'] = '%s, %s' % (_('Month 13'), last_day_of_fiscalyear.year)
 
         # Retrieve the options dictionaries corresponding to each column group.
+        num_of_distinct_expression_labels = len({column['expression_label'] for column in options['columns']})
         initial_col_group_key = options['columns'][0]['column_group_key']
-        current_col_group_key = options['columns'][2]['column_group_key']
+        current_col_group_key = options['columns'][num_of_distinct_expression_labels]['column_group_key']
 
         initial_col_group_data = options['column_groups'][initial_col_group_key]
         current_col_group_data = options['column_groups'][current_col_group_key]

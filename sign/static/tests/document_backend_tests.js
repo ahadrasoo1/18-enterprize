@@ -177,4 +177,23 @@ QUnit.module("document_backend_tests", ({ beforeEach }) => {
             "should have correct download URL"
         );
     });
+
+    QUnit.test("do not crash when loading with false create_uid or state", async (assert) => {
+        assert.expect(2);
+
+        config.actionContext = {
+            create_uid: false,
+            state: false
+        }
+
+        const webClient = await createDocumentWebClient(config, serverData);
+        await doAction(webClient, actionId);
+    
+        assert.containsOnce(target, ".o_last_breadcrumb_item");
+        assert.strictEqual(
+            target.querySelector(".o_last_breadcrumb_item").innerText.trim(),
+            "A Client Action",
+            "should display document name"
+        );
+    });
 });

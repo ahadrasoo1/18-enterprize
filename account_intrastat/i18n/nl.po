@@ -1,29 +1,34 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* account_intrastat
-# 
+# * account_intrastat
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Erwin van der Ploeg <erwin@odooexperts.nl>, 2025
+# Manon Rondou, 2025
+# Weblate <noreply-mt-weblate@weblate.org>, 2026.
+# Bren Driesen <brdri@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:26+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Dutch (https://app.transifex.com/odoo/teams/41243/nl/)\n"
+"POT-Creation-Date: 2026-05-29 17:48+0000\n"
+"PO-Revision-Date: 2026-06-26 07:47+0000\n"
+"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"Language-Team: Dutch <https://translate.odoo.com/projects/odoo-18/"
+"account_intrastat/nl/>\n"
+"Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: nl\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 2026.6.1\n"
 
 #. module: account_intrastat
 #. odoo-javascript
 #: code:addons/account_intrastat/static/src/components/intrastat_report/warnings.xml:0
 msgid ", which cannot be reported."
-msgstr ""
+msgstr "die niet gerapporteerd kan worden."
 
 #. module: account_intrastat
 #: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__1_000_kwh
@@ -124,11 +129,6 @@ msgid "Commodity Code"
 msgstr "Goederencode"
 
 #. module: account_intrastat
-#: model:ir.model.fields,field_description:account_intrastat.field_product_product__intrastat_code_id
-msgid "Commodity code"
-msgstr "Goederencode"
-
-#. module: account_intrastat
 #: model:ir.model,name:account_intrastat.model_res_company
 msgid "Companies"
 msgstr "Bedrijven"
@@ -141,7 +141,7 @@ msgstr "Land bedrijf"
 #. module: account_intrastat
 #: model:ir.model,name:account_intrastat.model_res_config_settings
 msgid "Config Settings"
-msgstr "Configuratie instellingen"
+msgstr "Configuratie-instellingen"
 
 #. module: account_intrastat
 #: model:account.report.column,name:account_intrastat.intrastat_report_column_country_code
@@ -212,12 +212,30 @@ msgid "Intrastat"
 msgstr "Intrastat"
 
 #. module: account_intrastat
+#: model:account.report,name:account_intrastat.intrastat_report
+msgid "Intrastat (Goods)"
+msgstr "Intrastat (Goederen)"
+
+#. module: account_intrastat
 #: model:ir.actions.act_window,name:account_intrastat.action_report_intrastat_code_tree
 #: model:ir.model,name:account_intrastat.model_account_intrastat_code
+#: model:ir.model.fields,field_description:account_intrastat.field_product_product__intrastat_code_id
 #: model:ir.ui.menu,name:account_intrastat.menu_report_intrastat_code
 #: model_terms:ir.ui.view,arch_db:account_intrastat.view_report_intrastat_code_form
 msgid "Intrastat Code"
 msgstr "Intrastat-code"
+
+#. module: account_intrastat
+#: model:ir.model.fields,field_description:account_intrastat.field_product_product__intrastat_code_domain
+#: model:ir.model.fields,field_description:account_intrastat.field_product_template__intrastat_code_domain
+msgid "Intrastat Code Domain"
+msgstr "Intrastat code domein"
+
+#. module: account_intrastat
+#: model:ir.model.fields,field_description:account_intrastat.field_product_product__valid_intrastat_code_ids
+#: model:ir.model.fields,field_description:account_intrastat.field_product_template__valid_intrastat_code_ids
+msgid "Intrastat Code IDs"
+msgstr "Intrastat Code-ID's"
 
 #. module: account_intrastat
 #: model:ir.model.fields,field_description:account_intrastat.field_account_bank_statement_line__intrastat_country_id
@@ -226,7 +244,6 @@ msgid "Intrastat Country"
 msgstr "Intrastat-land"
 
 #. module: account_intrastat
-#: model:account.report,name:account_intrastat.intrastat_report
 #: model:ir.actions.client,name:account_intrastat.action_account_report_intrastat
 #: model:ir.ui.menu,name:account_intrastat.menu_action_account_report_intrastat
 msgid "Intrastat Report"
@@ -282,6 +299,12 @@ msgstr "Intrastat-transactiecode"
 
 #. module: account_intrastat
 #. odoo-python
+#: code:addons/account_intrastat/models/product.py:0
+msgid "Invalid Intrastat Code"
+msgstr "Ongeldige Intrastat-code"
+
+#. module: account_intrastat
+#. odoo-python
 #: code:addons/account_intrastat/models/account_intrastat_report.py:0
 msgid "Invalid commodity intrastat code products."
 msgstr "Ongeldige producten met intrastat-code voor goederen."
@@ -328,7 +351,7 @@ msgstr "Ontbrekend land van herkomst"
 #. odoo-python
 #: code:addons/account_intrastat/models/account_intrastat_report.py:0
 msgid "Missing product"
-msgstr ""
+msgstr "Ontbrekend product"
 
 #. module: account_intrastat
 #: model:res.country,name:account_intrastat.xi
@@ -336,10 +359,20 @@ msgid "Northern Ireland"
 msgstr "Noord-Ierland"
 
 #. module: account_intrastat
+#. odoo-python
+#: code:addons/account_intrastat/models/product.py:0
+msgid ""
+"Note that the selected commodity code is invalid based on its start or "
+"expiry date. You can still select it."
+msgstr ""
+"Let op: de geselecteerde goederencode is ongeldig op basis van de start- of "
+"vervaldatum. Je kunt deze code wel nog steeds selecteren."
+
+#. module: account_intrastat
 #. odoo-javascript
 #: code:addons/account_intrastat/static/src/components/intrastat_report/filters/filter_intrastat_report.xml:0
 msgid "Only with VAT numbers"
-msgstr "Enkel met BTW nummers"
+msgstr "Enkel met btw-nummers"
 
 #. module: account_intrastat
 #: model_terms:ir.ui.view,arch_db:account_intrastat.report_invoice_document_intrastat_2019
@@ -354,7 +387,7 @@ msgstr "Oorsprong land"
 #. module: account_intrastat
 #: model:account.report.column,name:account_intrastat.intrastat_report_column_partner_vat
 msgid "Partner VAT"
-msgstr "BTW relatie"
+msgstr "Btw partner"
 
 #. module: account_intrastat
 #. odoo-javascript
@@ -446,14 +479,36 @@ msgstr "TJ"
 #. module: account_intrastat
 #: model:ir.model.fields,help:account_intrastat.field_res_config_settings__company_country_id
 msgid "The country to use the tax reports from for this company"
+msgstr "Het land waarvandaan de btw-aangiften voor dit bedrijf worden gebruikt"
+
+#. module: account_intrastat
+#. odoo-python
+#: code:addons/account_intrastat/models/account_intrastat_report.py:0
+msgid "The date range must be a full month"
+msgstr "Het datumbereik moet een volledige maand zijn"
+
+#. module: account_intrastat
+#. odoo-python
+#: code:addons/account_intrastat/models/account_intrastat_report.py:0
+msgid "The date range must be a full month or a full quarter."
 msgstr ""
-"Het land waarvandaan de BTW-aangiften voor dit bedrijf worden gebruikt"
+"Het datumbereik moet een volledige maand of een volledig kwartaal zijn."
 
 #. module: account_intrastat
 #: model:ir.model.fields,help:account_intrastat.field_product_product__intrastat_supplementary_unit_amount
 #: model:ir.model.fields,help:account_intrastat.field_product_template__intrastat_supplementary_unit_amount
 msgid "The number of supplementary units per product quantity."
-msgstr "Het aantal aanvullende eenheden per producthoeveelheid."
+msgstr "Het aantal aanvullende eenheden per productaantal."
+
+#. module: account_intrastat
+#. odoo-python
+#: code:addons/account_intrastat/models/product.py:0
+msgid ""
+"The product template has no products/variants. At least one variant is "
+"required to set the Intrastat values."
+msgstr ""
+"Het productsjabloon bevat geen producten/varianten. Er is ten minste één "
+"variant vereist om de Intrastat-waarden in te stellen."
 
 #. module: account_intrastat
 #. odoo-javascript
@@ -497,9 +552,14 @@ msgid "Value"
 msgstr "Waarde"
 
 #. module: account_intrastat
+#: model:account.report.column,name:account_intrastat.intrastat_report_column_value_currency
+msgid "Value Currency"
+msgstr "Valutawaarde"
+
+#. module: account_intrastat
 #: model:account.report.column,name:account_intrastat.intrastat_report_column_weight
 msgid "Weight (kg)"
-msgstr ""
+msgstr "Gewicht (kg)"
 
 #. module: account_intrastat
 #: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__c/k
@@ -526,6 +586,12 @@ msgid "ct/l"
 msgstr "ct/l"
 
 #. module: account_intrastat
+#: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__g
+#: model:ir.model.fields.selection,name:account_intrastat.selection__product_template__intrastat_supplementary_unit__g
+msgid "g"
+msgstr "g"
+
+#. module: account_intrastat
 #: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__gi_f_/_s
 #: model:ir.model.fields.selection,name:account_intrastat.selection__product_template__intrastat_supplementary_unit__gi_f_/_s
 msgid "gi F / S"
@@ -535,7 +601,7 @@ msgstr "gi F / S"
 #. odoo-javascript
 #: code:addons/account_intrastat/static/src/components/intrastat_report/warnings.xml:0
 msgid "journals items with no product"
-msgstr ""
+msgstr "boekingen zonder product"
 
 #. module: account_intrastat
 #: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__kg_90_%_sdt
@@ -565,7 +631,7 @@ msgstr "kg KOH"
 #: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__kg_n
 #: model:ir.model.fields.selection,name:account_intrastat.selection__product_template__intrastat_supplementary_unit__kg_n
 msgid "kg N"
-msgstr "kg Nee"
+msgstr "kg N"
 
 #. module: account_intrastat
 #: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__kg_naoh
@@ -598,10 +664,22 @@ msgid "kg/net eda"
 msgstr "kg/netto eda"
 
 #. module: account_intrastat
+#: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__l
+#: model:ir.model.fields.selection,name:account_intrastat.selection__product_template__intrastat_supplementary_unit__l
+msgid "l"
+msgstr "l"
+
+#. module: account_intrastat
 #: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__l_alc__100_%
 #: model:ir.model.fields.selection,name:account_intrastat.selection__product_template__intrastat_supplementary_unit__l_alc__100_%
 msgid "l alc. 100 %"
 msgstr "ik alc. 100 %"
+
+#. module: account_intrastat
+#: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__m
+#: model:ir.model.fields.selection,name:account_intrastat.selection__product_template__intrastat_supplementary_unit__m
+msgid "m"
+msgstr "m"
 
 #. module: account_intrastat
 #: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__m2
@@ -625,7 +703,7 @@ msgstr "p/st"
 #: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__pa
 #: model:ir.model.fields.selection,name:account_intrastat.selection__product_template__intrastat_supplementary_unit__pa
 msgid "pa"
-msgstr "vader"
+msgstr "pa"
 
 #. module: account_intrastat
 #: model_terms:ir.ui.view,arch_db:account_intrastat.product_product_tree_view_account_intrastat_supplementary_unit

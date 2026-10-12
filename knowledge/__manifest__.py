@@ -104,8 +104,11 @@
             'knowledge/static/src/portal_webclient/**/*',
             'web/static/src/start.js',
         ],
+        'web.assets_web_print': [
+            ('include', 'knowledge.assets_knowledge_print'),
+        ],
         'knowledge.assets_knowledge_print': [
             'knowledge/static/src/scss/knowledge_print.scss',
-        ]
+        ],
     },
 }

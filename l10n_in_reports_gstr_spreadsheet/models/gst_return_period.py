@@ -31,6 +31,21 @@ class L10nInGSTReturnPeriod(models.Model):
             'number': workbook.add_format({'font_size': 8, 'num_format': '0.00'}),
         }
 
+    def _prepare_sheet_values(self, gstr1_json, workbook, cell_formats):
+        self._prepare_b2b_sheet(gstr1_json.get('b2b', {}), workbook, cell_formats)
+        self._prepare_b2cl_sheet(gstr1_json.get('b2cl', {}), workbook, cell_formats)
+        self._prepare_b2cs_sheet(gstr1_json.get('b2cs', {}), workbook, cell_formats)
+        self._prepare_cdnr_sheet(gstr1_json.get('cdnr', {}), workbook, cell_formats)
+        self._prepare_cdnur_sheet(gstr1_json.get('cdnur', {}), workbook, cell_formats)
+        self._prepare_exp_sheet(gstr1_json.get('exp', {}), workbook, cell_formats)
+        self._prepare_nil_sheet(gstr1_json.get('nil', {}), workbook, cell_formats)
+        hsn_json = gstr1_json.get('hsn', {})
+        if 'data' in hsn_json:
+            self._prepare_hsn_sheet(hsn_json, workbook, cell_formats)
+        else:
+            self._prepare_hsn_sheet(hsn_json, workbook, cell_formats, 'hsn_b2b')
+            self._prepare_hsn_sheet(hsn_json, workbook, cell_formats, 'hsn_b2c')
+
     def generate_gstr1_spreadsheet(self):
         gstr1_json = self._get_gstr1_json()
         if self.gstr1_spreadsheet:
@@ -39,16 +54,7 @@ class L10nInGSTReturnPeriod(models.Model):
         output = io.BytesIO()
         workbook = xlsxwriter.Workbook(output, {'in_memory': True})
         cell_formats = self._get_gstr1_cell_formats(workbook)
-        self._prepare_b2b_sheet(gstr1_json.get('b2b', {}), workbook, cell_formats)
-        self._prepare_b2cl_sheet(gstr1_json.get('b2cl', {}), workbook, cell_formats)
-        self._prepare_b2cs_sheet(gstr1_json.get('b2cs', {}), workbook, cell_formats)
-        self._prepare_cdnr_sheet(gstr1_json.get('cdnr', {}), workbook, cell_formats)
-        self._prepare_cdnur_sheet(gstr1_json.get('cdnur', {}), workbook, cell_formats)
-        self._prepare_exp_sheet(gstr1_json.get('exp', {}), workbook, cell_formats)
-        self._prepare_nil_sheet(gstr1_json.get('nil', {}), workbook, cell_formats)
-        self._prepare_hsn_sheet(gstr1_json.get('hsn', {}), workbook, cell_formats)
-        # self._prepare_supeco_sheet(gstr1_json.get('supeco', {}), 'clttx', workbook, cell_formats) # Table 14(a) u/s 52(TCS)
-        # self._prepare_supeco_sheet(gstr1_json.get('supeco', {}), 'paytx', workbook, cell_formats) # Table 14 (b) u/s 9(5)
+        self._prepare_sheet_values(gstr1_json, workbook, cell_formats)
         workbook.close()
         xlsx_data = output.getvalue()
         xlsx_doc = self.env['documents.document'].create({
@@ -63,6 +69,20 @@ class L10nInGSTReturnPeriod(models.Model):
     def _get_gstr_document_folder(self):
         xml_id = 'l10n_in_reports_gstr_spreadsheet.%s_gstr_folder' % self.company_id.id
         gstr_folder = self.env.ref(xml_id, raise_if_not_found=False)
+
+        def _get_account_manager_access_ids():
+            return [
+                Command.create({'partner_id': partner.id, 'role': 'edit'})
+                for partner in self.env.ref('account.group_account_manager').users.partner_id
+            ]
+
+        user = self.env.user
+        if (
+            gstr_folder
+            and user.has_group('account.group_account_manager')
+            and user.partner_id not in gstr_folder.sudo().access_ids.partner_id
+        ):
+            gstr_folder.sudo().access_ids = [Command.clear()] + _get_account_manager_access_ids()
         if not gstr_folder:
             gstr_folder = self.env['documents.document'].create({
                 'type': 'folder',
@@ -70,8 +90,7 @@ class L10nInGSTReturnPeriod(models.Model):
                 'company_id': self.company_id.id,
                 'access_internal': 'none',
                 'access_via_link': 'none',
-                'access_ids': [Command.create({'partner_id': partner.id, 'role': 'edit'})
-                               for partner in self.env.ref('account.group_account_manager').users.partner_id]
+                'access_ids': _get_account_manager_access_ids()
             })
             self.env['ir.model.data']._update_xmlids([{
                 'xml_id': xml_id,
@@ -464,13 +483,14 @@ class L10nInGSTReturnPeriod(models.Model):
             row_count += 1
         self._set_spreadsheet_row(worksheet, totals_row_data, totals_val_row, cell_formats.get('regular'))
 
-    def _prepare_hsn_sheet(self, hsn_json, workbook, cell_formats):
+    def _prepare_hsn_sheet(self, hsn_json, workbook, cell_formats, hsn_section='data'):
         primary_header_row = 2
         secondary_header_row = 4
         totals_val_row = 3
         row_count = 5
-        worksheet = workbook.add_worksheet('hsn')
-        worksheet.write('A1', 'Summary For HSN(12)', cell_formats.get('primary_header'))
+        summary_hsn_label = 'HSN' if hsn_section == 'data' else hsn_section
+        worksheet = workbook.add_worksheet(summary_hsn_label)
+        worksheet.write('A1', f'Summary For {summary_hsn_label.replace("_", " ").upper()}(12)', cell_formats.get('primary_header'))
         primary_headers = [
            {'val': 'No. of HSN', 'column': 'A'},
            {'val': 'Total Value', 'column': 'D'},
@@ -507,7 +527,7 @@ class L10nInGSTReturnPeriod(models.Model):
         worksheet.set_row(secondary_header_row - 1, None, cell_formats.get('secondary_header'))
         worksheet.set_column('A:A', 30)
         worksheet.set_column('B:J', 20)
-        for item in hsn_json.get('data', {}):
+        for item in hsn_json.get(hsn_section, {}):
             total_val = item['txval'] + item['iamt'] + item['samt'] + item['camt'] + item['csamt']
             row_data = [
                 {'val': item['hsn_sc'], 'column': 'A'},

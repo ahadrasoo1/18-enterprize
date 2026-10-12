@@ -1,23 +1,29 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* helpdesk
-# 
+# * helpdesk
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Martin Trigaux, 2024
+# Junko Augias, 2025
+#
+# "Junko Augias (juau)" <juau@odoo.com>, 2025, 2026.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Japanese (https://app.transifex.com/odoo/teams/41243/ja/)\n"
+"POT-Creation-Date: 2026-05-01 17:46+0000\n"
+"PO-Revision-Date: 2026-06-06 09:50+0000\n"
+"Last-Translator: \"Junko Augias (juau)\" <juau@odoo.com>\n"
+"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-18/"
+"helpdesk/ja/>\n"
+"Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: ja\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 2026.6.1\n"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__answered_customer_message_count
@@ -88,13 +94,15 @@ msgstr "８時間以内に完了"
 #. module: helpdesk
 #: model_terms:digest.tip,tip_description:helpdesk.digest_tip_helpdesk_0
 msgid "<b class=\"tip_title\">Tip: Create tickets from incoming emails</b>"
-msgstr "<b class=\"tip_title\">ヒント：受信したメールからチケットを作成する</b>"
+msgstr ""
+"<b class=\"tip_title\">ヒント：受信したメールからチケットを作成する</b>"
 
 #. module: helpdesk
 #. odoo-javascript
 #: code:addons/helpdesk/static/src/js/tours/helpdesk.js:0
 msgid "<b>Drag &amp; drop</b> the card to change the stage of your ticket."
-msgstr "カードを<b>ドラッグ&amp; ドロップ</b>してチケットのステージを変更します。"
+msgstr ""
+"カードを<b>ドラッグ&amp; ドロップ</b>してチケットのステージを変更します。"
 
 #. module: helpdesk
 #. odoo-javascript
@@ -104,81 +112,94 @@ msgid ""
 "persons you specifically tag). Use <b>@ mentions</b> to ping a colleague or "
 "<b># mentions</b> to contact a group of people."
 msgstr ""
-"<b>ログメモ</b>内部コミュニケーション用(特にタグ付けした人たちだけに通知されます)同僚をピンするには<b>@ "
-"mentions</b>を使用またはグループに連絡を取るには <b># mentions</b>を使用して下さい。"
+"<b>ログメモ</b>内部コミュニケーション用(特にタグ付けした人たちだけに通知され"
+"ます)同僚をピンするには<b>@ mentions</b>を使用またはグループに連絡を取るには "
+"<b># mentions</b>を使用して下さい。"
 
 #. module: helpdesk
 #: model:mail.template,body_html:helpdesk.solved_ticket_request_email_template
 msgid ""
 "<div>\n"
-"        Dear <t t-out=\"object.sudo().partner_id.name or 'Madam/Sir'\">Madam/Sir</t>,<br><br>\n"
-"        We would like to inform you that we have closed your ticket (reference <t t-out=\"object.id or ''\">15</t>). \n"
-"        We trust that the services provided have met your expectations and that you have found a satisfactory resolution to your issue.<br><br>\n"
-"        However, if you have any further questions or comments, please do not hesitate to reply to this email to re-open your ticket. \n"
-"        Our team is always here to help you and we will be happy to assist you with any further concerns you may have.<br><br>\n"
-"        Thank you for choosing our services and for your cooperation throughout this process. We truly value your business and appreciate the opportunity to serve you.<br><br>\n"
-"        Kind regards,<br><br>\n"
+"        Dear <t t-out=\"object.sudo().partner_id.name or 'Madam/Sir'\">Madam/"
+"Sir</t>,<br/><br/>\n"
+"        We would like to inform you that we have closed your ticket "
+"(reference <t t-out=\"object.ticket_ref or ''\">15</t>).\n"
+"        We trust that the services provided have met your expectations and "
+"that you have found a satisfactory resolution to your issue.<br/><br/>\n"
+"        However, if you have any further questions or comments, please do "
+"not hesitate to reply to this email to re-open your ticket. \n"
+"        Our team is always here to help you and we will be happy to assist "
+"you with any further concerns you may have.<br/><br/>\n"
+"        Thank you for choosing our services and for your cooperation "
+"throughout this process. We truly value your business and appreciate the "
+"opportunity to serve you.<br/><br/>\n"
+"        Kind regards,<br/><br/>\n"
 "        <t t-out=\"object.team_id.name or 'Helpdesk'\">Helpdesk</t> Team.\n"
 "    </div>\n"
 "        "
 msgstr ""
-"<div>\n"
-"         <t t-out=\"object.sudo().partner_id.name or 'Madam/Sir'\">お客様</t>、<br><br>\n"
-"        以下のお客様のチケットをクローズ致しましたことをお知らせ致します: (参照<t t-out=\"object.id or ''\">15</t>) \n"
-"        ご提供したサービスがお客様のご期待に沿い、ご満足頂ける問題解決につながったことを確信しております。<br><br>\n"
-"        しかし、さらにご質問やご意見がある場合は、遠慮なくこのメールにご返信頂き、チケットを再開して下さい。\n"
-"        当社チームはお客様に何かお困りのことがございましたら、いつでもお客様のお手伝い・サポートを頂きます。<br><br>\n"
-"　　当社のサービスをお選び頂き、またご協力頂きまして誠にありがとうございました。お客様の素晴らしいビジネスのお手伝いする機会を頂いたことに感謝しております。<br><br>\n"
-"        今後とも宜しくお願い致します。<br><br>\n"
-"        <t t-out=\"object.team_id.name or 'Helpdesk'\">ヘルプデスク</t>チーム\n"
-"    </div>\n"
-"        "
 
 #. module: helpdesk
 #: model:mail.template,body_html:helpdesk.rating_ticket_request_email_template
 msgid ""
 "<div>\n"
-"    <t t-set=\"access_token\" t-value=\"object._rating_get_access_token()\"></t>\n"
-"    <t t-set=\"partner\" t-value=\"object._rating_get_partner()\"></t>\n"
-"    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"width:100%; margin:0;\">\n"
+"    <t t-set=\"access_token\" t-value=\"object._rating_get_access_token()\"/"
+">\n"
+"    <t t-set=\"partner\" t-value=\"object._rating_get_partner()\"/>\n"
+"    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"style=\"width:100%; margin:0;\">\n"
 "    <tbody>\n"
 "        <tr><td valign=\"top\" style=\"font-size: 14px;\">\n"
 "            <t t-if=\"partner.name\">\n"
-"                Hello <t t-out=\"partner.name or ''\">Brandon Freeman</t>,<br><br>\n"
+"                Hello <t t-out=\"partner.name or ''\">Brandon Freeman</t>,"
+"<br/><br/>\n"
 "            </t>\n"
 "            <t t-else=\"\">\n"
-"                Hello,<br>\n"
+"                Hello,<br/>\n"
 "            </t>\n"
-"            Please take a moment to rate our services related to the ticket \"<strong t-out=\"object.name or ''\">Table legs are unbalanced</strong>\"\n"
+"            Please take a moment to rate our services related to the ticket "
+"\"<strong t-out=\"object.name or ''\">Table legs are unbalanced</strong>\"\n"
 "            <t t-if=\"object._rating_get_operator().name\">\n"
-"                assigned to <strong t-out=\"object._rating_get_operator().name or ''\">Mitchell Admin</strong>.<br>\n"
+"                assigned to <strong t-"
+"out=\"object._rating_get_operator().name or ''\">Mitchell Admin</strong>.<br/"
+">\n"
 "            </t>\n"
 "            <t t-else=\"\">\n"
-"                .<br><br>\n"
+"                .<br/><br/>\n"
 "            </t>\n"
 "        </td></tr>\n"
 "        <tr><td style=\"text-align: center;\">\n"
-"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"width:100%; margin: 32px 0px 32px 0px; display: inline-table;\">\n"
+"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"style=\"width:100%; margin: 32px 0px 32px 0px; display: inline-table;\">\n"
 "                <tr><td style=\"font-size: 14px; text-align:center;\">\n"
-"                    <strong>Tell us how you feel about our services</strong><br>\n"
-"                    <span style=\"text-color: #888888\">(click on one of these smileys)</span>\n"
+"                    <strong>Tell us how you feel about our services</"
+"strong><br/>\n"
+"                    <span style=\"text-color: #888888\">(click on one of "
+"these smileys)</span>\n"
 "                </td></tr>\n"
 "                <tr><td style=\"font-size: 14px;\">\n"
-"                    <table style=\"width:100%;text-align:center;margin-top:2rem;\">\n"
+"                    <table style=\"width:100%;text-align:center;margin-"
+"top:2rem;\">\n"
 "                        <tr>\n"
 "                            <td>\n"
-"                                <a t-attf-href=\"/rate/{{ access_token }}/5\" t-att-class=\"'pe-none' if object._rating_get_operator() else ''\">\n"
-"                                    <img alt=\"Satisfied\" src=\"/rating/static/src/img/rating_5.png\" title=\"Satisfied\">\n"
+"                                <a t-attf-href=\"/rate/{{ access_token }}/"
+"5\" t-att-class=\"'pe-none' if object._rating_get_operator() else ''\">\n"
+"                                    <img alt=\"Satisfied\" src=\"/rating/"
+"static/src/img/rating_5.png\" title=\"Satisfied\"/>\n"
 "                                </a>\n"
 "                            </td>\n"
 "                            <td>\n"
-"                                <a t-attf-href=\"/rate/{{ access_token }}/3\" t-att-class=\"'pe-none' if object._rating_get_operator() else ''\">\n"
-"                                    <img alt=\"Okay\" src=\"/rating/static/src/img/rating_3.png\" title=\"Okay\">\n"
+"                                <a t-attf-href=\"/rate/{{ access_token }}/"
+"3\" t-att-class=\"'pe-none' if object._rating_get_operator() else ''\">\n"
+"                                    <img alt=\"Okay\" src=\"/rating/static/"
+"src/img/rating_3.png\" title=\"Okay\"/>\n"
 "                                </a>\n"
 "                            </td>\n"
 "                            <td>\n"
-"                                <a t-attf-href=\"/rate/{{ access_token }}/1\" t-att-class=\"'pe-none' if object._rating_get_operator() else ''\">\n"
-"                                    <img alt=\"Dissatisfied\" src=\"/rating/static/src/img/rating_1.png\" title=\"Dissatisfied\">\n"
+"                                <a t-attf-href=\"/rate/{{ access_token }}/"
+"1\" t-att-class=\"'pe-none' if object._rating_get_operator() else ''\">\n"
+"                                    <img alt=\"Dissatisfied\" src=\"/rating/"
+"static/src/img/rating_1.png\" title=\"Dissatisfied\"/>\n"
 "                                </a>\n"
 "                            </td>\n"
 "                        </tr>\n"
@@ -188,96 +209,239 @@ msgid ""
 "        </td></tr>\n"
 "        <tr><td valign=\"top\" style=\"font-size: 14px;\">\n"
 "            We appreciate your feedback. It helps us improve continuously.\n"
-"            <br><br><span style=\"margin: 0px 0px 0px 0px; font-size: 12px; opacity: 0.5; color: #454748;\">This customer survey has been sent because your ticket has been moved to the stage <b t-out=\"object.stage_id.name or ''\">In Progress</b>.</span>\n"
+"            <br/><br/><span style=\"margin: 0px 0px 0px 0px; font-size: "
+"12px; opacity: 0.5; color: #454748;\">This customer survey has been sent "
+"because your ticket has been moved to the stage <b t-"
+"out=\"object.stage_id.name or ''\">In Progress</b>.</span>\n"
 "        </td></tr>\n"
 "    </tbody>\n"
 "    </table>\n"
 "</div>\n"
 "        "
 msgstr ""
+"<div>\n"
+"    <t t-set=\"access_token\" t-value=\"object._rating_get_access_token()\"/"
+">\n"
+"    <t t-set=\"partner\" t-value=\"object._rating_get_partner()\"/>\n"
+"    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"style=\"width:100%; margin:0;\">\n"
+"    <tbody>\n"
+"        <tr><td valign=\"top\" style=\"font-size: 14px;\">\n"
+"            <t t-if=\"partner.name\">\n"
+"                <t t-out=\"partner.name or ''\">Brandon Freeman</t>様<br/"
+"><br/>\n"
+"            </t>\n"
+"            <t t-else=\"\">\n"
+"                いつもご利用いただき、誠にありがとうございます。<br/>\n"
+"            </t>\n"
+"            当社のサービスに対するご感想をお聞かせください。\"<strong t-"
+"out=\"object.name or ''\">テーブルの脚が不均衡な件\"</strong>\n"
+"            <t t-if=\"object._rating_get_operator().name\">\n"
+"                担当: <strong t-out=\"object._rating_get_operator().name or "
+"''\">Mitchell Admin</strong><br/>\n"
+"            </t>\n"
+"            <t t-else=\"\">\n"
+"                .<br/><br/>\n"
+"            </t>\n"
+"        </td></tr>\n"
+"        <tr><td style=\"text-align: center;\">\n"
+"            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
+"style=\"width:100%; margin: 32px 0px 32px 0px; display: inline-table;\">\n"
+"                <tr><td style=\"font-size: 14px; text-align:center;\">\n"
+"                    <strong>当社のサービスに関するご感想をお聞かせ下さい</"
+"strong><br/>\n"
+"                    <span style=\"text-color: #888888\">(以下から一つを選択し"
+"て下さい)</span>\n"
+"                </td></tr>\n"
+"                <tr><td style=\"font-size: 14px;\">\n"
+"                    <table style=\"width:100%;text-align:center;margin-"
+"top:2rem;\">\n"
+"                        <tr>\n"
+"                            <td>\n"
+"                                <a t-attf-href=\"/rate/{{ access_token }}/"
+"5\" t-att-class=\"'pe-none' if object._rating_get_operator() else ''\">\n"
+"                                    <img alt=\"Satisfied\" src=\"/rating/"
+"static/src/img/rating_5.png\" title=\"Satisfied\"/>\n"
+"                                </a>\n"
+"                            </td>\n"
+"                            <td>\n"
+"                                <a t-attf-href=\"/rate/{{ access_token }}/"
+"3\" t-att-class=\"'pe-none' if object._rating_get_operator() else ''\">\n"
+"                                    <img alt=\"Okay\" src=\"/rating/static/"
+"src/img/rating_3.png\" title=\"Okay\"/>\n"
+"                                </a>\n"
+"                            </td>\n"
+"                            <td>\n"
+"                                <a t-attf-href=\"/rate/{{ access_token }}/"
+"1\" t-att-class=\"'pe-none' if object._rating_get_operator() else ''\">\n"
+"                                    <img alt=\"Dissatisfied\" src=\"/rating/"
+"static/src/img/rating_1.png\" title=\"Dissatisfied\"/>\n"
+"                                </a>\n"
+"                            </td>\n"
+"                        </tr>\n"
+"                    </table>\n"
+"                </td></tr>\n"
+"            </table>\n"
+"        </td></tr>\n"
+"        <tr><td valign=\"top\" style=\"font-size: 14px;\">\n"
+"            フィードバックをもとに引き続き改善に努めて参りますので、ご協力の"
+"ほどお願いいたします。\n"
+"            <br/><br/><span style=\"margin: 0px 0px 0px 0px; font-size: "
+"12px; opacity: 0.5; color: #454748;\">本アンケートは、チケットがステージ <b "
+"t-out=\"object.stage_id.name or ''\">進行中</b>に移動したため、自動で送信され"
+"ました。</span>\n"
+"        </td></tr>\n"
+"    </tbody>\n"
+"    </table>\n"
+"</div>\n"
+"        "
 
 #. module: helpdesk
 #: model:mail.template,body_html:helpdesk.new_ticket_request_email_template
+#, fuzzy
 msgid ""
 "<div>\n"
-"    Dear <t t-out=\"object.sudo().partner_id.name or object.sudo().partner_name or 'Madam/Sir'\">Madam/Sir</t>,<br><br>\n"
+"    Dear <t t-out=\"object.sudo().partner_id.name or "
+"object.sudo().partner_name or 'Madam/Sir'\">Madam/Sir</t>,<br/><br/>\n"
 "    Your request\n"
-"    <t t-if=\"hasattr(object.team_id, 'website_id') and object.get_portal_url()\">\n"
-"        <a t-attf-href=\"{{ object.team_id.website_id.domain }}/my/ticket/{{ object.id }}/{{ object.access_token }}\" t-out=\"object.name or ''\">Table legs are unbalanced</a>\n"
+"    <t t-if=\"hasattr(object.team_id, 'website_id') and "
+"object.get_portal_url()\">\n"
+"        <a t-attf-href=\"{{ object.team_id.website_id.domain }}/my/ticket/"
+"{{ object.id }}/{{ object.access_token }}\" t-out=\"object.name or "
+"''\">Table legs are unbalanced</a>\n"
 "    </t>\n"
-"    has been received and is being reviewed by our <t t-out=\"object.team_id.name or ''\">VIP Support</t> team.<br><br>\n"
-"    The reference for your ticket is <strong><t t-out=\"object.ticket_ref or ''\">15</t></strong>.<br><br>\n"
+"    has been received and is being reviewed by our <t t-"
+"out=\"object.team_id.name or ''\">VIP Support</t> team.<br/><br/>\n"
+"    The reference for your ticket is <strong><t t-out=\"object.ticket_ref or "
+"''\">15</t></strong>.<br/><br/>\n"
 "\n"
-"    To provide any additional information, simply reply to this email.<br><br>\n"
+"    To provide any additional information, simply reply to this email.<br/"
+"><br/>\n"
 "    <t t-if=\"object.team_id.show_knowledge_base\">\n"
-"        Don't hesitate to visit our <a t-attf-href=\"{{ object.team_id.get_knowledge_base_url() }}\">Help Center</a>. You might find the answer to your question.\n"
-"        <br><br>\n"
+"        Don't hesitate to visit our <a t-attf-"
+"href=\"{{ object.team_id.get_knowledge_base_url() }}\">Help Center</a>. You "
+"might find the answer to your question.\n"
+"        <br/><br/>\n"
 "    </t>\n"
 "    <t t-if=\"object.team_id.allow_portal_ticket_closing\">\n"
-"        Feel free to close your ticket if our help is no longer needed. Thank you for your collaboration.<br><br>\n"
+"        Feel free to close your ticket if our help is no longer needed. "
+"Thank you for your collaboration.<br/><br/>\n"
 "    </t>\n"
 "\n"
 "    <div style=\"text-align: center; padding: 16px 0px 16px 0px;\">\n"
-"        <t t-if=\"hasattr(object.team_id, 'website_id') and object.team_id.use_website_helpdesk_form\">\n"
-"            <a style=\"background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size: 13px;\" t-att-href=\"'%s%s' % (object.team_id.website_id.domain or '', object.get_portal_url())\" target=\"_blank\">View Ticket</a>\n"
+"        <t t-if=\"hasattr(object.team_id, 'website_id') and "
+"object.team_id.use_website_helpdesk_form\">\n"
+"            <a class=\"btn btn-fill-primary btn-sm\" style=\"background-"
+"color: rgb(113, 75, 103); padding: 3px 8px; text-decoration: none; color: "
+"#fff; border-radius: 3px; font-size: 13px;\" t-att-href=\"'%s%s' % "
+"(object.team_id.website_id.domain or '', object.get_portal_url())\" "
+"target=\"_blank\">View Ticket</a>\n"
 "        </t>\n"
 "        <t t-else=\"\">\n"
-"            <a style=\"background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;\" t-att-href=\"object.get_portal_url()\" target=\"_blank\">View Ticket</a>\n"
+"            <a class=\"btn btn-fill-primary btn-sm\" style=\"background-"
+"color: rgb(113, 75, 103); padding: 3px 8px; text-decoration: none; color: "
+"#fff; border-radius: 3px; font-size: 13px;\" t-att-"
+"href=\"object.get_portal_url()\" target=\"_blank\">View Ticket</a>\n"
 "        </t>\n"
-"        <t t-if=\"hasattr(object.team_id, 'website_id') and object.team_id.allow_portal_ticket_closing\">\n"
-"            <a style=\"background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;\" t-att-href=\"'%s/my/ticket/close/%s/%s' % (object.team_id.website_id.domain or '', object.id, object.access_token)\" target=\"_blank\">Close Ticket</a>\n"
+"        <t t-if=\"hasattr(object.team_id, 'website_id') and "
+"object.team_id.allow_portal_ticket_closing\">\n"
+"            <a class=\"btn btn-fill-primary btn-sm\" style=\"background-"
+"color: rgb(113, 75, 103); padding: 3px 8px; text-decoration: none; color: "
+"#fff; border-radius: 3px; font-size: 13px;\" t-att-href=\"'%s/my/ticket/"
+"close/%s/%s' % (object.team_id.website_id.domain or '', object.id, "
+"object.access_token)\" target=\"_blank\">Close Ticket</a>\n"
 "        </t>\n"
 "        <t t-elif=\"object.team_id.allow_portal_ticket_closing\">\n"
-"            <a style=\"background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;\" t-att-href=\"'/my/ticket/close/%s/%s' % (object.id, object.access_token)\" target=\"_blank\">Close Ticket</a>\n"
+"            <a class=\"btn btn-fill-primary btn-sm\" style=\"background-"
+"color: rgb(113, 75, 103); padding: 3px 8px; text-decoration: none; color: "
+"#fff; border-radius: 3px; font-size: 13px;\" t-att-href=\"'/my/ticket/close/"
+"%s/%s' % (object.id, object.access_token)\" target=\"_blank\">Close Ticket</"
+"a>\n"
 "        </t>\n"
-"        <t t-if=\"object.team_id.use_website_helpdesk_forum or object.team_id.use_website_helpdesk_knowledge or object.team_id.use_website_helpdesk_slides\">\n"
-"            <a style=\"background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;\" t-att-href=\"object.team_id.feature_form_url\" target=\"_blank\">Visit Help Center</a>\n"
-"        </t><br><br>\n"
+"        <t t-if=\"object.team_id.use_website_helpdesk_forum or "
+"object.team_id.use_website_helpdesk_knowledge or "
+"object.team_id.use_website_helpdesk_slides\">\n"
+"            <a class=\"btn btn-fill-primary btn-sm\" style=\"background-"
+"color: rgb(113, 75, 103); padding: 3px 8px; text-decoration: none; color: "
+"#fff; border-radius: 3px; font-size: 13px;\" t-att-"
+"href=\"object.team_id.feature_form_url\" target=\"_blank\">Visit Help "
+"Center</a>\n"
+"        </t><br/><br/>\n"
 "    </div>\n"
 "\n"
-"    Best regards,<br><br>\n"
+"    Best regards,<br/><br/>\n"
 "    <t t-out=\"object.team_id.name or 'Helpdesk'\">Helpdesk</t> Team\n"
 "</div>\n"
 "        "
 msgstr ""
 "<div>\n"
-"    <t t-out=\"object.sudo().partner_id.name or object.sudo().partner_name or 'Madam/Sir'\">お客様</t>、<br><br>\n"
+"    <t t-out=\"object.sudo().partner_id.name or object.sudo().partner_name "
+"or 'Madam/Sir'\">お客様</t>、<br/><br/>\n"
 "    お客様にリクエスト頂いた\n"
-"    <t t-if=\"hasattr(object.team_id, 'website_id') and object.get_portal_url()\">\n"
-"        <a t-attf-href=\"{{ object.team_id.website_id.domain }}/my/ticket/{{ object.id }}/{{ object.access_token }}\" t-out=\"object.name or ''\">テーブルの脚が不均衡な件</a>\n"
+"    <t t-if=\"hasattr(object.team_id, 'website_id') and "
+"object.get_portal_url()\">\n"
+"        <a t-attf-href=\"{{ object.team_id.website_id.domain }}/my/ticket/"
+"{{ object.id }}/{{ object.access_token }}\" t-out=\"object.name or ''\">テー"
+"ブルの脚が不均衡な件</a>\n"
 "    </t>\n"
-"    を受け付けました。現在、弊社の <t t-out=\"object.team_id.name or ''\">VIPサポート</t>チームで確認しております。<br><br>\n"
-"お客様のチケット番号は <strong><t t-out=\"object.ticket_ref or ''\">15</t></strong>です。<br><br>\n"
+"    を受け付けました。現在、弊社の <t t-out=\"object.team_id.name or ''\">VIP"
+"サポート</t> チームで確認しております。<br/><br/>\n"
+"    お客様のチケット番号は <strong><t t-out=\"object.ticket_ref or ''\">15</"
+"t></strong>です。<br/><br/>\n"
 "\n"
-"    何か追加で情報をご提供頂く場合には、本メールにご返信下さい。<br><br>\n"
+"    何か追加で情報をご提供頂ける場合には、本メールにご返信下さい。<br/><br/"
+">\n"
 "    <t t-if=\"object.team_id.show_knowledge_base\">\n"
-"        当社の <a t-attf-href=\"{{ object.team_id.get_knowledge_base_url() }}\">ヘルプセンター</a>をご確認頂くことをお勧めします。お客様のご質問に対する回答が掲載されている場合があります。\n"
-"<br><br>\n"
+"        当社の <a t-attf-href=\"{{ object.team_id.get_knowledge_base_url() }}"
+"\">ヘルプセンター</a>をご確認下さい。 お客様のご質問に対する回答が掲載されて"
+"いる場合があります。\n"
+"        <br/><br/>\n"
 "    </t>\n"
 "    <t t-if=\"object.team_id.allow_portal_ticket_closing\">\n"
-"        サポートが不要になった場合には、チケットをクローズして下さい。ご協力ありがとうございました。<br><br>\n"
+"        サポートが不要になった場合には、チケットをクローズして下さい。ご協力"
+"ありがとうございました。<br/><br/>\n"
 "    </t>\n"
 "\n"
 "    <div style=\"text-align: center; padding: 16px 0px 16px 0px;\">\n"
-"        <t t-if=\"hasattr(object.team_id, 'website_id') and object.team_id.use_website_helpdesk_form\">\n"
-"            <a style=\"background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size: 13px;\" t-att-href=\"'%s%s' % (object.team_id.website_id.domain or '', object.get_portal_url())\" target=\"_blank\">チケットを見る</a>\n"
+"        <t t-if=\"hasattr(object.team_id, 'website_id') and "
+"object.team_id.use_website_helpdesk_form\">\n"
+"            <a style=\"background-color: #875A7B; padding: 8px 16px 8px "
+"16px; text-decoration: none; color: #fff; border-radius: 5px; font-size: "
+"13px;\" t-att-href=\"'%s%s' % (object.team_id.website_id.domain or '', "
+"object.get_portal_url())\" target=\"_blank\">チケットを見る</a>\n"
 "        </t>\n"
 "        <t t-else=\"\">\n"
-"            <a style=\"background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;\" t-att-href=\"object.get_portal_url()\" target=\"_blank\">チケットを見る</a>\n"
+"            <a style=\"background-color: #875A7B; padding: 8px 16px 8px "
+"16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;"
+"\" t-att-href=\"object.get_portal_url()\" target=\"_blank\">チケットを見る</"
+"a>\n"
 "        </t>\n"
-"        <t t-if=\"hasattr(object.team_id, 'website_id') and object.team_id.allow_portal_ticket_closing\">\n"
-"            <a style=\"background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;\" t-att-href=\"'%s/my/ticket/close/%s/%s' % (object.team_id.website_id.domain or '', object.id, object.access_token)\" target=\"_blank\">チケットをクローズする</a>\n"
+"        <t t-if=\"hasattr(object.team_id, 'website_id') and "
+"object.team_id.allow_portal_ticket_closing\">\n"
+"            <a style=\"background-color: #875A7B; padding: 8px 16px 8px "
+"16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;"
+"\" t-att-href=\"'%s/my/ticket/close/%s/%s' % "
+"(object.team_id.website_id.domain or '', object.id, object.access_token)\" "
+"target=\"_blank\">チケットをクローズする</a>\n"
 "        </t>\n"
 "        <t t-elif=\"object.team_id.allow_portal_ticket_closing\">\n"
-"            <a style=\"background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;\" t-att-href=\"'/my/ticket/close/%s/%s' % (object.id, object.access_token)\" target=\"_blank\">チケットをクローズする</a>\n"
+"            <a style=\"background-color: #875A7B; padding: 8px 16px 8px "
+"16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;"
+"\" t-att-href=\"'/my/ticket/close/%s/%s' % (object.id, object.access_token)"
+"\" target=\"_blank\">チケットをクローズする</a>\n"
 "        </t>\n"
-"        <t t-if=\"object.team_id.use_website_helpdesk_forum or object.team_id.use_website_helpdesk_knowledge or object.team_id.use_website_helpdesk_slides\">\n"
-"            <a style=\"background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;\" t-att-href=\"object.team_id.feature_form_url\" target=\"_blank\">ヘルプセンターを見る</a>\n"
-"        </t><br><br>\n"
+"        <t t-if=\"object.team_id.use_website_helpdesk_forum or "
+"object.team_id.use_website_helpdesk_knowledge or "
+"object.team_id.use_website_helpdesk_slides\">\n"
+"            <a style=\"background-color: #875A7B; padding: 8px 16px 8px "
+"16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;"
+"\" t-att-href=\"object.team_id.feature_form_url\" target=\"_blank\">ヘルプセ"
+"ンターを見る</a>\n"
+"        </t><br/><br/>\n"
 "    </div>\n"
 "\n"
-"    宜しくお願い致します。<br><br>\n"
-"    <t t-out=\"object.team_id.name or 'Helpdesk'\">ヘルプデスク</t>チーム\n"
+"    宜しくお願い致します。<br/><br/>\n"
+"    <t t-out=\"object.team_id.name or 'Helpdesk'\">ヘルプデスク</t> チーム\n"
 "</div>\n"
 "        "
 
@@ -294,13 +458,21 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_ticket_view_form
 msgid ""
-"<i class=\"fa fa-fw o_button_icon fa-smile-o text-success\" invisible=\"rating_avg &lt; 3.66\" title=\"Satisfied\"/>\n"
-"                            <i class=\"fa fa-fw o_button_icon fa-meh-o text-warning\" invisible=\"rating_avg &lt; 2.33 or rating_avg &gt;= 3.66\" title=\"Okay\"/>\n"
-"                            <i class=\"fa fa-fw o_button_icon fa-frown-o text-danger\" invisible=\"rating_avg &gt;= 2.33\" title=\"Dissatisfied\"/>"
+"<i class=\"fa fa-fw o_button_icon fa-smile-o text-success\" "
+"invisible=\"rating_avg &lt; 3.66\" title=\"Satisfied\"/>\n"
+"                            <i class=\"fa fa-fw o_button_icon fa-meh-o text-"
+"warning\" invisible=\"rating_avg &lt; 2.33 or rating_avg &gt;= 3.66\" "
+"title=\"Okay\"/>\n"
+"                            <i class=\"fa fa-fw o_button_icon fa-frown-o "
+"text-danger\" invisible=\"rating_avg &gt;= 2.33\" title=\"Dissatisfied\"/>"
 msgstr ""
-"<i class=\"fa fa-fw o_button_icon fa-smile-o text-success\" invisible=\"rating_avg &lt; 3.66\" title=\"Satisfied\"/>\n"
-"                            <i class=\"fa fa-fw o_button_icon fa-meh-o text-warning\" invisible=\"rating_avg &lt; 2.33 or rating_avg &gt;= 3.66\" title=\"Okay\"/>\n"
-"                            <i class=\"fa fa-fw o_button_icon fa-frown-o text-danger\" invisible=\"rating_avg &gt;= 2.33\" title=\"Dissatisfied\"/>"
+"<i class=\"fa fa-fw o_button_icon fa-smile-o text-success\" "
+"invisible=\"rating_avg &lt; 3.66\" title=\"Satisfied\"/>\n"
+"                            <i class=\"fa fa-fw o_button_icon fa-meh-o text-"
+"warning\" invisible=\"rating_avg &lt; 2.33 or rating_avg &gt;= 3.66\" "
+"title=\"Okay\"/>\n"
+"                            <i class=\"fa fa-fw o_button_icon fa-frown-o "
+"text-danger\" invisible=\"rating_avg &gt;= 2.33\" title=\"Dissatisfied\"/>"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_ticket_view_form
@@ -315,33 +487,44 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 msgid ""
 "<i class=\"fa fa-lightbulb-o\" role=\"img\"/><span class=\"ms-2\">To use an "
-"email alias, the first step is to configure an Alias Domain. You can achieve"
-" this by navigating to the General Settings and configuring the "
-"corresponding field.</span>"
+"email alias, the first step is to configure an Alias Domain. You can achieve "
+"this by navigating to the General Settings and configuring the corresponding "
+"field.</span>"
 msgstr ""
-"<i class=\"fa fa-lightbulb-o\" role=\"img\"/><span "
-"class=\"ms-2\">メールエイリアスを使用するには、まずエイリアスドメインを設定します。一般設定に移動し、対応するフィールドを構成することで設定できます。</span>"
+"<i class=\"fa fa-lightbulb-o\" role=\"img\"/><span class=\"ms-2\">メールエイ"
+"リアスを使用するには、まずエイリアスドメインを設定します。一般設定に移動し、"
+"対応するフィールドを構成することで設定できます。</span>"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 msgid ""
 "<i class=\"fa fa-lightbulb-o\"/>\n"
-"                                    <span class=\"ms-2\">A rating request will automatically be sent by email to the customer when their ticket reaches the corresponding stage with the email template set.</span>"
+"                                    <span class=\"ms-2\">A rating request "
+"will automatically be sent by email to the customer when their ticket "
+"reaches the corresponding stage with the email template set.</span>"
 msgstr ""
+"<i class=\"fa fa-lightbulb-o\"/>\n"
+"                                    <span class=\"ms-2\">チケットが該当する段"
+"階に達すると、設定されたEメールテンプレートに従って、顧客に自動的に評価依頼が"
+"Eメールで送信されます。</span>"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 msgid ""
 "<i class=\"fa fa-lightbulb-o\"/>\n"
 "                                <span class=\"ms-2\">\n"
-"                                    Type <b>/ticket</b> to create tickets<br/>\n"
-"                                    Type <b>/search_tickets</b> to find tickets<br/>\n"
+"                                    Type <b>/ticket</b> to create tickets<br/"
+">\n"
+"                                    Type <b>/search_tickets</b> to find "
+"tickets<br/>\n"
 "                                </span>"
 msgstr ""
 "<i class=\"fa fa-lightbulb-o\"/>\n"
 "                                <span class=\"ms-2\">\n"
-"                                    入力 <b>/チケット</b> チケットを作成<br/>\n"
-"                                    入力 <b>/search_tickets</b> チケットを検索<br/>\n"
+"                                    入力 <b>/チケット</b> チケットを作成<br/"
+">\n"
+"                                    入力 <b>/search_tickets</b> チケットを検"
+"索<br/>\n"
 "                                </span>"
 
 #. module: helpdesk
@@ -357,7 +540,7 @@ msgstr "<i class=\"fa fa-warning\"/>&amp;nbsp;"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 msgid "<i class=\"oi oi-arrow-right\"/> Set an Alias Domain"
-msgstr ""
+msgstr "<i class=\"oi oi-arrow-right\"/> エイリアスドメインを設定"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.tickets_followup
@@ -398,7 +581,7 @@ msgstr "<span class=\"m-1\"/>数"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_sla_view_form
 msgid "<span class=\"o_field_widget o_readonly_modifier\">Working Hours</span>"
-msgstr "<span class=\"o_field_widget o_readonly_modifier\">労働時間</span>"
+msgstr "<span class=\"o_field_widget o_readonly_modifier\">対応時間</span>"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_ticket_view_form
@@ -433,23 +616,23 @@ msgstr "<span class=\"o_stat_text\">評価</span>"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_kanban
-msgid "<span class=\"text-muted\">Failed</span>"
-msgstr "<span class=\"text-muted\">失敗</span>"
+msgid "<span class=\"text-muted text-nowrap\">Failed</span>"
+msgstr "<span class=\"text-muted text-nowrap\">失敗</span>"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_kanban
-msgid "<span class=\"text-muted\">Open</span>"
-msgstr "<span class=\"text-muted\">オープン</span>"
+msgid "<span class=\"text-muted text-nowrap\">Open</span>"
+msgstr "<span class=\"text-muted text-nowrap\">オープン</span>"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_kanban
-msgid "<span class=\"text-muted\">Unassigned</span>"
-msgstr "<span class=\"text-muted\">未割当</span>"
+msgid "<span class=\"text-muted text-nowrap\">Unassigned</span>"
+msgstr "<span class=\"text-muted text-nowrap\">割当解除</span>"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_kanban
-msgid "<span class=\"text-muted\">Urgent</span>"
-msgstr "<span class=\"text-muted\">緊急</span>"
+msgid "<span class=\"text-muted text-nowrap\">Urgent</span>"
+msgstr "<span class=\"text-muted text-nowrap\">緊急</span>"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
@@ -486,7 +669,8 @@ msgstr "<span>閲覧</span>"
 msgid ""
 "<span>Your ticket has successfully been closed. Thank you for your "
 "collaboration.</span>"
-msgstr "<span>チケットは正常にクローズしました。ご協力ありがとうございました。</span>"
+msgstr ""
+"<span>チケットは正常にクローズしました。ご協力ありがとうございました。</span>"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
@@ -503,6 +687,8 @@ msgstr "<strong class=\"col-lg-3\">報告日</strong>"
 msgid ""
 "<strong><b>Good job!</b> You walked through all steps of this tour.</strong>"
 msgstr ""
+"<strong><b>Good job!</b> このツアーのすべてのステップを通過しました。</"
+"strong>"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
@@ -519,7 +705,9 @@ msgstr "<strong>エイリアス</strong>"
 msgid ""
 "A Python dictionary that will be evaluated to provide default values when "
 "creating new records for this alias."
-msgstr "このエイリアスの新しいレコードを作成する時にデフォルト値を与えるためのPython辞書です。"
+msgstr ""
+"このエイリアスの新しいレコードを作成する時にデフォルト値を与えるためのPython"
+"辞書です。"
 
 #. module: helpdesk
 #: model:ir.model.constraint,message:helpdesk.constraint_helpdesk_tag_name_uniq
@@ -555,7 +743,7 @@ msgstr "要アクション"
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__active
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket_report_analysis__active
 msgid "Active"
-msgstr "有効化"
+msgstr "有効"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__activity_ids
@@ -565,7 +753,7 @@ msgstr "活動"
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__activity_exception_decoration
 msgid "Activity Exception Decoration"
-msgstr "例外活動文字装飾"
+msgstr "例外の活動を示す装飾"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__activity_state
@@ -575,7 +763,7 @@ msgstr "活動状態"
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__activity_type_icon
 msgid "Activity Type Icon"
-msgstr "活動種別アイコン"
+msgstr "活動タイプアイコン"
 
 #. module: helpdesk
 #: model:ir.actions.act_window,name:helpdesk.mail_activity_type_action_config_helpdesk
@@ -587,30 +775,34 @@ msgstr "活動タイプ"
 #. odoo-javascript
 #: code:addons/helpdesk/static/src/js/tours/helpdesk.js:0
 msgid ""
-"Adapt your <b>pipeline</b> to your workflow by adding <b>stages</b> <i>(e.g."
-" Awaiting Customer Feedback, etc.).</i>"
+"Adapt your <b>pipeline</b> to your workflow by adding <b>stages</b> <i>(e.g. "
+"Awaiting Customer Feedback, etc.).</i>"
 msgstr ""
-"<b>パイプライン</b>をワークフローに合わせるため、<b>ステージ</b><i>（例：顧客からのフィードバック待ちなど）を追加しましょう。</i>"
+"<b>パイプライン</b>をワークフローに合わせるため、<b>ステージ</b><i>（例：顧客"
+"からのフィードバック待ちなど）を追加しましょう。</i>"
 
 #. module: helpdesk
 #: model_terms:ir.actions.act_window,help:helpdesk.helpdesk_stage_action
 #: model_terms:ir.actions.act_window,help:helpdesk.helpdesk_stage_team_action
 msgid ""
 "Adapt your pipeline to your workflow and track the progress of your tickets."
-msgstr "パイプラインをワークフローに適応させて、チケットの進捗を追跡しましょう。"
+msgstr ""
+"パイプラインをワークフローに適応させて、チケットの進捗を追跡しましょう。"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_ticket_view_form
 msgid "Add details about this ticket..."
-msgstr ""
+msgstr "このチケットに詳細を追加します..."
 
 #. module: helpdesk
 #. odoo-javascript
 #: code:addons/helpdesk/static/src/js/tours/helpdesk.js:0
 msgid ""
-"Add your stage and place it at the right step of your workflow by dragging &"
-" dropping it."
-msgstr "ステージを追加し、ドラッグ＆ドロップでワークフローの適正なステップに配置します。"
+"Add your stage and place it at the right step of your workflow by dragging & "
+"dropping it."
+msgstr ""
+"ステージを追加し、ドラッグ＆ドロップでワークフローの適正なステップに配置しま"
+"す。"
 
 #. module: helpdesk
 #: model:res.groups,name:helpdesk.group_helpdesk_manager
@@ -689,7 +881,9 @@ msgstr "全ての内部ユーザ（会社）"
 msgid ""
 "Allow customers to help each other on a forum. Share answers from your "
 "tickets directly."
-msgstr "フォーラムで顧客同士がサポートするのを許可しましょう。チケットの回答を直接共有できます。"
+msgstr ""
+"フォーラムで顧客同士がサポートするのを許可しましょう。チケットの回答を直接共"
+"有できます。"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
@@ -724,12 +918,6 @@ msgstr "本当に続けますか？"
 #: model_terms:ir.ui.view,arch_db:helpdesk.view_helpdesk_stage_delete_wizard
 msgid "Are you sure you want to delete these stages?"
 msgstr "本当にこれらのステージを削除しますか？"
-
-#. module: helpdesk
-#. odoo-javascript
-#: code:addons/helpdesk/static/src/js/tours/helpdesk.js:0
-msgid "Assign the ticket to a <b>member of your team</b>."
-msgstr "<b>チームのメンバー</b>にチケットを割り当てます。"
 
 #. module: helpdesk
 #. odoo-python
@@ -776,7 +964,9 @@ msgid ""
 "that is not publicly available, or there is no customer associated with the "
 "ticket."
 msgstr ""
-"現時点では、表示可能な顧客プレビューはありません。現在のチケットは、一般公開されていないヘルプデスクチームに属しているか、チケットに関連付けられている顧客がいないため、顧客はアクセスできません。"
+"現時点では、表示可能な顧客プレビューはありません。現在のチケットは、一般公開"
+"されていないヘルプデスクチームに属しているか、チケットに関連付けられている顧"
+"客がいないため、顧客はアクセスできません。"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_team__message_attachment_count
@@ -794,7 +984,9 @@ msgstr "自動割り当て"
 msgid ""
 "Automate the assignment of new tickets to the right people, and make sure "
 "all tickets are being handled"
-msgstr "新しいチケットの適切な担当者への割り当てを自動化し、すべてのチケットを確実に処理します。"
+msgstr ""
+"新しいチケットの適切な担当者への割り当てを自動化し、すべてのチケットを確実に"
+"処理します。"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_team__auto_assignment
@@ -838,7 +1030,7 @@ msgstr "平均評価（％）"
 #. odoo-javascript
 #: code:addons/helpdesk/static/src/components/helpdesk_team_dashboard/helpdesk_team_dashboard.xml:0
 msgid "Average Rating for the Past 7 Days"
-msgstr ""
+msgstr "過去7日間の平均評価"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_kanban
@@ -862,18 +1054,18 @@ msgstr "平均評価：満足"
 #. odoo-javascript
 #: code:addons/helpdesk/static/src/components/helpdesk_team_target/helpdesk_team_target.js:0
 msgid "Average rating daily target"
-msgstr ""
+msgstr "平均評価 日次目標"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_kanban
 msgid "Average rating for the last 7 days"
-msgstr "最近7日間の平均評価"
+msgstr "直近７日の平均評価"
 
 #. module: helpdesk
 #. odoo-javascript
 #: code:addons/helpdesk/static/src/components/helpdesk_team_dashboard/helpdesk_team_dashboard.xml:0
 msgid "Avg Last 7 days"
-msgstr "過去７日間平均"
+msgstr "直近７日平均"
 
 #. module: helpdesk
 #. odoo-javascript
@@ -902,7 +1094,7 @@ msgstr "チケットに使われた時間を顧客に請求"
 #: model:ir.model.fields.selection,name:helpdesk.selection__helpdesk_ticket__kanban_state__blocked
 #: model_terms:ir.ui.view,arch_db:helpdesk.portal_helpdesk_ticket
 msgid "Blocked"
-msgstr "不許可"
+msgstr "ブロック中"
 
 #. module: helpdesk
 #: model:helpdesk.tag,name:helpdesk.tag_crm
@@ -929,7 +1121,9 @@ msgstr "返信定型文"
 msgid ""
 "Centralize, manage, share and grow your knowledge library. Allow customers "
 "to search your articles in the help center for answers to their questions."
-msgstr "ナレッジライブラリを一元化、管理、共有、成長させます。顧客がヘルプセンターで記事を検索し、質問への回答を得ることができます。"
+msgstr ""
+"ナレッジライブラリを一元化、管理、共有、成長させます。顧客がヘルプセンターで"
+"記事を検索し、質問への回答を得ることができます。"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
@@ -940,7 +1134,7 @@ msgstr "チャネル"
 #. odoo-javascript
 #: code:addons/helpdesk/static/src/components/helpdesk_team_target/helpdesk_team_target.js:0
 msgid "Click to Set Your Daily Rating Target"
-msgstr ""
+msgstr " クリックして日次評価目標を設定"
 
 #. module: helpdesk
 #. odoo-javascript
@@ -967,7 +1161,7 @@ msgstr "クローズ日"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 msgid "Close inactive tickets automatically"
-msgstr "アクティブでないチケットを自動的にクローズ"
+msgstr "有効でないチケットを自動的にクローズ"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.tickets_followup
@@ -1008,7 +1202,7 @@ msgstr "取引先によりクローズ済"
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_sla_report_analysis__close_date
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket_report_analysis__close_date
 msgid "Closing Date"
-msgstr "締切日"
+msgstr "完了日"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_team__allow_portal_ticket_closing
@@ -1073,7 +1267,7 @@ msgstr "設定"
 #: model_terms:ir.ui.view,arch_db:helpdesk.view_helpdesk_stage_delete_confirmation_wizard
 #: model_terms:ir.ui.view,arch_db:helpdesk.view_helpdesk_stage_unarchive_wizard
 msgid "Confirm"
-msgstr "確認"
+msgstr "確定"
 
 #. module: helpdesk
 #. odoo-python
@@ -1113,7 +1307,9 @@ msgstr "新しいテンプレートを作成"
 msgid ""
 "Create teams to organize your tickets by expertise or geographical region, "
 "and define a different workflow for each team."
-msgstr "チームを作成して、専門分野や地域ごとにチケットを整理し、チームごとに異なるワークフローを定義します。"
+msgstr ""
+"チームを作成して、専門分野や地域ごとにチケットを整理し、チームごとに異なる"
+"ワークフローを定義します。"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
@@ -1352,7 +1548,9 @@ msgstr "不満"
 #. odoo-python
 #: code:addons/helpdesk/models/digest.py:0
 msgid "Do not have access, skip this data for user's digest email"
-msgstr "アクセス権がありません。ユーザのダイジェストメールにこのデータをスキップしてください"
+msgstr ""
+"アクセス権がありません。ユーザのダイジェストメールにこのデータをスキップして"
+"ください"
 
 #. module: helpdesk
 #: model:ir.model.fields.selection,name:helpdesk.selection__helpdesk_team__assign_method__balanced
@@ -1384,13 +1582,17 @@ msgstr "メールテンプレート"
 #. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_stage__template_id
 msgid ""
-"Email automatically sent to the customer when the ticket reaches this stage.\n"
-"By default, the email will be sent from the email alias of the helpdesk team.\n"
-"Otherwise it will be sent from the company's email address, or from the catchall (as defined in the System Parameters)."
+"Email automatically sent to the customer when the ticket reaches this "
+"stage.\n"
+"By default, the email will be sent from the email alias of the helpdesk "
+"team.\n"
+"Otherwise it will be sent from the company's email address, or from the "
+"catchall (as defined in the System Parameters)."
 msgstr ""
 "チケットがこのステージに達した際にEメールが自動的に顧客に送付されます。\n"
 "デフォルトでは、ＥメールはヘルプデスクチームのEメールから送信されます。\n"
-"そうでない場合は、会社のEメールアドレス、または（システム・パラメータで定義された）キャッチオールアドレスから送信されます。"
+"そうでない場合は、会社のEメールアドレス、または（システム・パラメータで定義さ"
+"れた）キャッチオールアドレスから送信されます。"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__email_cc
@@ -1409,9 +1611,10 @@ msgstr "以下に送信されたEメール："
 
 #. module: helpdesk
 #: model_terms:digest.tip,tip_description:helpdesk.digest_tip_helpdesk_0
-msgid ""
-"Emails sent to a Helpdesk Team alias generate tickets in your pipeline."
-msgstr "ヘルプデスクチームのエイリアスに送信されたメールは、パイプラインにチケットを生成します。"
+msgid "Emails sent to a Helpdesk Team alias generate tickets in your pipeline."
+msgstr ""
+"ヘルプデスクチームのエイリアスに送信されたメールは、パイプラインにチケットを"
+"生成します。"
 
 #. module: helpdesk
 #: model:mail.template,description:helpdesk.rating_ticket_request_email_template
@@ -1424,7 +1627,9 @@ msgstr "ヘルプデスクチームで「顧客評価」機能を有効にする
 msgid ""
 "Enter the <b>subject</b> of your ticket <br/><i>(e.g. Problem with my "
 "installation, Wrong order, etc.).</i>"
-msgstr "チケットの <b>件名</b>を入力して下さい。 <br/><i>（例：設置の問題、注文違い、など)</i>"
+msgstr ""
+"チケットの <b>件名</b>を入力して下さい。 <br/><i>（例：設置の問題、注文違い、"
+"など)</i>"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_sla_status__exceeded_hours
@@ -1444,7 +1649,7 @@ msgstr "追加情報"
 #. module: helpdesk
 #: model:ir.model.fields.selection,name:helpdesk.selection__helpdesk_sla_status__status__failed
 msgid "Failed"
-msgstr "不合格"
+msgstr "失敗"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__sla_fail
@@ -1482,7 +1687,7 @@ msgstr "初回割当日"
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_stage__fold
 msgid "Folded in Kanban"
-msgstr "かんばんで折り込む"
+msgstr "かんばんで折りたたむ"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
@@ -1527,7 +1732,9 @@ msgstr "今後の活動"
 msgid ""
 "Get in touch with your website visitors, and engage them with scripted "
 "chatbot conversations. Create and search tickets from your conversations."
-msgstr "ウェブサイトの訪問者と連絡を取り、スクリプト化されたチャットボットの会話で彼らを魅了しましょう。会話からチケットを作成し、検索します。"
+msgstr ""
+"ウェブサイトの訪問者と連絡を取り、スクリプト化されたチャットボットの会話で彼"
+"らを魅了しましょう。会話からチケットを作成し、検索します。"
 
 #. module: helpdesk
 #: model_terms:ir.actions.act_window,help:helpdesk.helpdesk_ticket_analysis_action
@@ -1555,17 +1762,21 @@ msgid ""
 "followers. Employees automatically get access to the tickets they are "
 "assigned to."
 msgstr ""
-"従業員をフォロワーとして追加することで、ヘルプデスクチームまたはチケットへのアクセスを許可します。従業員は自動的に割り当てられたチケットにアクセスできるようになります。"
+"従業員をフォロワーとして追加することで、ヘルプデスクチームまたはチケットへの"
+"アクセスを許可します。従業員は自動的に割り当てられたチケットにアクセスできる"
+"ようになります。"
 
 #. module: helpdesk
 #. odoo-python
 #: code:addons/helpdesk/models/helpdesk_team.py:0
 msgid ""
-"Grant portal users access to your helpdesk team or tickets by adding them as"
-" followers. Customers automatically get access to their tickets in their "
+"Grant portal users access to your helpdesk team or tickets by adding them as "
+"followers. Customers automatically get access to their tickets in their "
 "portal."
 msgstr ""
-"ポータルユーザーをフォロワーとして追加することで、ヘルプデスクチームまたはチケットへのアクセスを許可します。顧客は自動的にポータル内のチケットにアクセスできるようになります。"
+"ポータルユーザーをフォロワーとして追加することで、ヘルプデスクチームまたはチ"
+"ケットへのアクセスを許可します。顧客は自動的にポータル内のチケットにアクセス"
+"できるようになります。"
 
 #. module: helpdesk
 #: model:ir.model.fields.selection,name:helpdesk.selection__helpdesk_sla_report_analysis__kanban_state__done
@@ -1735,7 +1946,7 @@ msgstr "ヘルプデスク: チケット受領"
 #: code:addons/helpdesk/static/src/components/helpdesk_team_dashboard/helpdesk_team_dashboard.xml:0
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_tickets_view_search_base
 msgid "High Priority"
-msgstr "優先度が高い"
+msgstr "高優先度"
 
 #. module: helpdesk
 #: model:ir.model.fields.selection,name:helpdesk.selection__helpdesk_sla__priority__2
@@ -1743,7 +1954,7 @@ msgstr "優先度が高い"
 #: model:ir.model.fields.selection,name:helpdesk.selection__helpdesk_ticket__priority__2
 #: model:ir.model.fields.selection,name:helpdesk.selection__helpdesk_ticket_report_analysis__priority__2
 msgid "High priority"
-msgstr "優先度高"
+msgstr "高優先度"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.tickets_followup
@@ -1780,9 +1991,11 @@ msgstr "ID"
 #. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_team__alias_parent_thread_id
 msgid ""
-"ID of the parent record holding the alias (example: project holding the task"
-" creation alias)"
-msgstr "エイリアスを保持する親レコードのID(例：プロジェクトは、タスク作成エイリアスを保持)"
+"ID of the parent record holding the alias (example: project holding the task "
+"creation alias)"
+msgstr ""
+"エイリアスを保持する親レコードのID(例：プロジェクトは、タスク作成エイリアスを"
+"保持)"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__activity_exception_icon
@@ -1813,7 +2026,9 @@ msgstr "チェックした場合は、一部のメッセージに配信エラー
 msgid ""
 "If set, this content will automatically be sent out to unauthorized users "
 "instead of the default message."
-msgstr "設定されている場合、このコンテンツはデフォルトのメッセージではなく、許可されていないユーザーに自動的に送信されます。"
+msgstr ""
+"設定されている場合、このコンテンツはデフォルトのメッセージではなく、許可され"
+"ていないユーザーに自動的に送信されます。"
 
 #. module: helpdesk
 #. odoo-python
@@ -1877,14 +2092,14 @@ msgstr "かんばん ブロック説明"
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__legend_normal
 msgid "Kanban Ongoing Explanation"
-msgstr "かんばん 進行中の説明"
+msgstr "かんばん 対応中の説明"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_sla_report_analysis__kanban_state
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__kanban_state
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket_report_analysis__kanban_state
 msgid "Kanban State"
-msgstr "かんばん状態"
+msgstr "かんばん ステータス"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__kanban_state_label
@@ -1904,7 +2119,7 @@ msgstr "ナレッジ"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.team_rating_data
 msgid "Last 3 months"
-msgstr "過去3か月"
+msgstr "直近3か月"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_tickets_view_search_base
@@ -1919,17 +2134,17 @@ msgstr "過去30日間"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_tickets_view_search_base
 msgid "Last 365 Days"
-msgstr "過去365日"
+msgstr "直近365日"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_tickets_view_search_base
 msgid "Last 7 Days"
-msgstr "過去7日"
+msgstr "直近７日"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.team_rating_data
 msgid "Last 7 days"
-msgstr "過去7日間"
+msgstr "直近７日"
 
 #. module: helpdesk
 #. odoo-python
@@ -1964,7 +2179,7 @@ msgstr "最終更新日"
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_ticket_view_search_analysis_closed
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_tickets_view_search
 msgid "Late Activities"
-msgstr "遅れた活動"
+msgstr "期限超過の活動"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.team_rating_data
@@ -1994,7 +2209,7 @@ msgstr "<b>チームのチケット</b>を見ましょう。"
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_team__use_website_helpdesk_livechat
 msgid "Live Chat"
-msgstr "Webチャット"
+msgstr "ライブチャット"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_team__alias_incoming_local
@@ -2018,7 +2233,8 @@ msgstr "優先度低"
 #: model_terms:ir.actions.act_window,help:helpdesk.helpdesk_sla_action
 msgid ""
 "Make sure tickets are handled in a timely manner by using SLA Policies.<br>"
-msgstr "SLA ポリシーを使用して、チケットがタイムリーに処理されるようにします。<br>"
+msgstr ""
+"SLA ポリシーを使用して、チケットがタイムリーに処理されるようにします。<br>"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
@@ -2035,14 +2251,17 @@ msgstr "チケットはSLAポリシーを使って必ず期限内に処理する
 msgid ""
 "Maximum number of working hours a ticket should take to reach the target "
 "stage, starting from the date it was created."
-msgstr "チケットが作成された日から、目標ステージに到達するまでに要する最大作業時間です。"
+msgstr ""
+"チケットが作成された日から、目標ステージに到達するまでに要する最大作業時間で"
+"す。"
 
 #. module: helpdesk
 #: model_terms:ir.actions.act_window,help:helpdesk.rating_rating_action_helpdesk
 msgid ""
 "Measure your customer satisfaction by sending rating requests when your "
 "tickets are solved."
-msgstr "チケットの解決時に評価リクエストを送信することで、顧客満足度を測定できます。"
+msgstr ""
+"チケットの解決時に評価リクエストを送信することで、顧客満足度を測定できます。"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__medium_id
@@ -2162,7 +2381,9 @@ msgstr "新規"
 msgid ""
 "New tickets will automatically be assigned to the team members that are "
 "available, according to their working hours and their time off."
-msgstr "新しいチケットは、勤務時間や休みに合わせて、利用可能なチームメンバーに自動的に割り当てられます。"
+msgstr ""
+"新しいチケットは、勤務時間や休みに合わせて、利用可能なチームメンバーに自動的"
+"に割り当てられます。"
 
 #. module: helpdesk
 #. odoo-python
@@ -2330,7 +2551,7 @@ msgstr "保留"
 #. module: helpdesk
 #: model:ir.model.fields.selection,name:helpdesk.selection__helpdesk_sla_status__status__ongoing
 msgid "Ongoing"
-msgstr "処理中"
+msgstr "対応中"
 
 #. module: helpdesk
 #. odoo-python
@@ -2352,12 +2573,20 @@ msgid "Open Time (hours)"
 msgstr "オープン時間（時間）"
 
 #. module: helpdesk
+#. odoo-javascript
+#: code:addons/helpdesk/static/src/js/tours/helpdesk.js:0
+msgid "Open the ticket."
+msgstr "チケットをオープン。"
+
+#. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_team__alias_force_thread_id
 msgid ""
 "Optional ID of a thread (record) to which all incoming messages will be "
 "attached, even if they did not reply to it. If set, this will disable the "
 "creation of new records completely."
-msgstr "すべての受信メッセージに添付されるスレッド(レコード)のオプションIDです。設定した場合は新しいレコードの作成を無効にします。"
+msgstr ""
+"すべての受信メッセージに添付されるスレッド(レコード)のオプションIDです。設定"
+"した場合は新しいレコードの作成を無効にします。"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.portal_my_home_menu_helpdesk
@@ -2382,11 +2611,13 @@ msgstr "親レコードスレッドID"
 #. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_team__alias_parent_model_id
 msgid ""
-"Parent model holding the alias. The model holding the alias reference is not"
-" necessarily the model given by alias_model_id (example: project "
+"Parent model holding the alias. The model holding the alias reference is not "
+"necessarily the model given by alias_model_id (example: project "
 "(parent_model) and task (model))"
 msgstr ""
-"エイリアスを保持する親モデル。エイリアスの参照を保持しているモデルは、必ずしもalias_model_idによって与えられたモデルではありません(例：プロジェクト(parent_model)とタスク(model))"
+"エイリアスを保持する親モデル。エイリアスの参照を保持しているモデルは、必ずし"
+"もalias_model_idによって与えられたモデルではありません(例：プロジェクト"
+"(parent_model)とタスク(model))"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__partner_ticket_ids
@@ -2399,23 +2630,38 @@ msgstr "取引先チケット"
 msgid ""
 "People to whom this helpdesk team and its tickets will be visible.\n"
 "\n"
-"- Invited internal users: internal users can access the team and the tickets they are following. This access can be modified on each ticket individually by adding or removing the user as follower.\n"
-"A user with the helpdesk > administrator access right level can still access this team and its tickets, even if they are not explicitely part of the followers.\n"
+"- Invited internal users: internal users can access the team and the tickets "
+"they are following. This access can be modified on each ticket individually "
+"by adding or removing the user as follower.\n"
+"A user with the helpdesk > administrator access right level can still access "
+"this team and its tickets, even if they are not explicitely part of the "
+"followers.\n"
 "\n"
-"- All internal users: all internal users can access the team and all of its tickets without distinction.\n"
+"- All internal users: all internal users can access the team and all of its "
+"tickets without distinction.\n"
 "\n"
-"- Invited portal users and all internal users: all internal users can access the team and all of its tickets without distinction.\n"
-"Portal users can only access the tickets they are following. This access can be modified on each ticket individually by adding or removing the portal user as follower."
+"- Invited portal users and all internal users: all internal users can access "
+"the team and all of its tickets without distinction.\n"
+"Portal users can only access the tickets they are following. This access can "
+"be modified on each ticket individually by adding or removing the portal "
+"user as follower."
 msgstr ""
 "このヘルプデスクチームとそのチケットが表示される人々。\n"
 "\n"
-"- 招待された内部ユーザ： 内部ユーザはチームと彼らがフォローしているチケットにアクセスできます。このアクセス権は、ユーザをフォロワーとして追加または削除することで、チケットごとに個別に変更できます。\n"
-"ヘルプデスク > 管理者のアクセス権レベルを持つユーザは、フォロワーに明示的に加わっていなくても、このチームとそのチケットにアクセスできます。\n"
+"- 招待された内部ユーザ： 内部ユーザはチームと彼らがフォローしているチケットに"
+"アクセスできます。このアクセス権は、ユーザをフォロワーとして追加または削除す"
+"ることで、チケットごとに個別に変更できます。\n"
+"ヘルプデスク > 管理者のアクセス権レベルを持つユーザは、フォロワーに明示的に加"
+"わっていなくても、このチームとそのチケットにアクセスできます。\n"
 "\n"
-"- すべての内部ユーザ：すべての内部ユーザは、区別なくチームとそのすべてのチケットにアクセスできます。\n"
+"- すべての内部ユーザ：すべての内部ユーザは、区別なくチームとそのすべてのチ"
+"ケットにアクセスできます。\n"
 "\n"
-"- 招待されたポータルユーザとすべての内部ユーザ：全ての内部ユーザは、区別なくチームとその全てのチケットにアクセスできます。\n"
-"ポータルユーザは、自分がフォローしているチケットにのみアクセスできます。このアクセス権は、ポータルユーザをフォロワーとして追加または削除することで、チケットごとに個別に変更できます。"
+"- 招待されたポータルユーザとすべての内部ユーザ：全ての内部ユーザは、区別なく"
+"チームとその全てのチケットにアクセスできます。\n"
+"ポータルユーザは、自分がフォローしているチケットにのみアクセスできます。この"
+"アクセス権は、ポータルユーザをフォロワーとして追加または削除することで、チ"
+"ケットごとに個別に変更できます。"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
@@ -2436,9 +2682,11 @@ msgstr "SLAに反することなくクローズされたチケットの割合。
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_kanban
 msgid ""
-"Percentage of tickets whose SLAs have successfully been reached on time over"
-" the total number of tickets closed within the past 7 days."
-msgstr "過去7日以内にクローズされたチケットの総数に対する、SLAが期限内に達成されたチケットの割合。"
+"Percentage of tickets whose SLAs have successfully been reached on time over "
+"the total number of tickets closed within the past 7 days."
+msgstr ""
+"過去7日以内にクローズされたチケットの総数に対する、SLAが期限内に達成されたチ"
+"ケットの割合。"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
@@ -2465,7 +2713,7 @@ msgstr "電話"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 msgid "Plan onsite interventions"
-msgstr "現場での介入を計画"
+msgstr "オンサイト対応を計画"
 
 #. module: helpdesk
 #. odoo-javascript
@@ -2489,7 +2737,7 @@ msgstr "正の値を入力して下さい。"
 #. odoo-javascript
 #: code:addons/helpdesk/static/src/components/helpdesk_team_target/helpdesk_team_target.js:0
 msgid "Please enter a value less than or equal to 5."
-msgstr ""
+msgstr "5以下の数値を入力して下さい。"
 
 #. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_team__alias_contact
@@ -2497,12 +2745,14 @@ msgid ""
 "Policy to post a message on the document using the mailgateway.\n"
 "- everyone: everyone can post\n"
 "- partners: only authenticated partners\n"
-"- followers: only followers of the related document or members of following channels\n"
+"- followers: only followers of the related document or members of following "
+"channels\n"
 msgstr ""
 "メールゲートウェイを使用したメッセージドキュメント投稿のポリシー\n"
-"- everyone: 誰にでも投稿可能\n"
-"- partners: 許可されたパートナーのみ\n"
-"- followers: 関連ドキュメントのフォロワーか、フォローしているチャンネルのメンバーのみ\n"
+"- 全員: 誰でも投稿可能\n"
+"- 取引先: 認証済みの取引先のみ\n"
+"- フォロワー: 関連ドキュメントのフォロワーか、フォローしているチャネルのメン"
+"バーのみ\n"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__access_url
@@ -2618,9 +2868,11 @@ msgstr "準備完了"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 msgid ""
-"Receive notifications whenever tickets are created, rated or discussed on in"
-" this team"
-msgstr "このチームでチケットが作成されたり、評価されたり、議論されたりすると、通知を受け取ります。"
+"Receive notifications whenever tickets are created, rated or discussed on in "
+"this team"
+msgstr ""
+"このチームでチケットが作成されたり、評価されたり、議論されたりすると、通知を"
+"受け取ります。"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_team__alias_force_thread_id
@@ -2765,6 +3017,7 @@ msgstr "SLAステージ"
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_sla_report_analysis__sla_status_ids
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__sla_status_ids
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket_report_analysis__sla_status_ids
+#: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_sla_report_analysis_view_search
 msgid "SLA Status"
 msgstr "SLAステータス"
 
@@ -2846,6 +3099,12 @@ msgstr "満足"
 #. module: helpdesk
 #. odoo-javascript
 #: code:addons/helpdesk/static/src/js/tours/helpdesk.js:0
+msgid "Save this ticket and the modifications you've made to it."
+msgstr "このチケットとそれに加えた変更を保存します。"
+
+#. module: helpdesk
+#. odoo-javascript
+#: code:addons/helpdesk/static/src/js/tours/helpdesk.js:0
 msgid "Schedule your <b>activity</b>."
 msgstr "<b>活動</b>をスケジュールします。"
 
@@ -2918,7 +3177,10 @@ msgid ""
 "team. Automatically send an email to customers when a ticket reaches a "
 "specific stage in a helpdesk team by setting this template on that stage."
 msgstr ""
-"ヘルプデスクチケットが受信され、現在ヘルプデスクチームによってレビューされていることを通知する確認メールを顧客に送信します。チケットがヘルプデスクチーム内の特定のステージに達したときに、そのステージにこのテンプレートを設定することで、自動的に顧客にメールを送信します。"
+"ヘルプデスクチケットが受信され、現在ヘルプデスクチームによってレビューされて"
+"いることを通知する確認メールを顧客に送信します。チケットがヘルプデスクチーム"
+"内の特定のステージに達したときに、そのステージにこのテンプレートを設定するこ"
+"とで、自動的に顧客にメールを送信します。"
 
 #. module: helpdesk
 #: model:helpdesk.tag,name:helpdesk.tag_service
@@ -2935,7 +3197,9 @@ msgstr "ステージにメールテンプレートを設定"
 msgid ""
 "Set this template on a project's stage to automate email when tasks reach "
 "stages"
-msgstr "このテンプレートをプロジェクトのステージに設定すると、タスクがステージに到達したときにメールが自動送信されます。"
+msgstr ""
+"このテンプレートをプロジェクトのステージに設定すると、タスクがステージに到達"
+"したときにメールが自動送信されます。"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_kanban
@@ -2951,9 +3215,11 @@ msgstr "チケットの共有"
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
 msgid ""
 "Share presentations and videos, and organize them into courses. Allow "
-"customers to search your eLearning courses in the help center for answers to"
-" their questions."
-msgstr "プレゼンテーションや動画を共有し、コースにまとめましょう。顧客がヘルプセンターでeラーニングコースを検索し、質問に答えられるようにします。"
+"customers to search your eLearning courses in the help center for answers to "
+"their questions."
+msgstr ""
+"プレゼンテーションや動画を共有し、コースにまとめましょう。顧客がヘルプセン"
+"ターでeラーニングコースを検索し、質問に答えられるようにします。"
 
 #. module: helpdesk
 #: model:res.groups,name:helpdesk.group_use_rating
@@ -2984,7 +3250,7 @@ msgstr "解決済"
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__source_id
 msgid "Source"
-msgstr "情報源"
+msgstr "流入元"
 
 #. module: helpdesk
 #. odoo-python
@@ -3026,7 +3292,9 @@ msgstr "削除するステージ"
 msgid ""
 "Stages the team will use. This team's tickets will only be able to be in "
 "these stages."
-msgstr "チームが使用するステージ。このチームのチケットは、これらの段階にしか参加できません。"
+msgstr ""
+"チームが使用するステージ。このチームのチケットは、これらの段階にしか参加でき"
+"ません。"
 
 #. module: helpdesk
 #. odoo-python
@@ -3046,7 +3314,7 @@ msgid ""
 "Planned: Future activities."
 msgstr ""
 "活動に基づくステータス\n"
-"遅延: 期限が既に過ぎています\n"
+"期限超過：期限日がすでに過ぎています\n"
 "今日: 活動日は今日です\n"
 "予定: 将来の活動。"
 
@@ -3126,7 +3394,7 @@ msgstr "チームメンバ"
 #. module: helpdesk
 #: model:ir.actions.act_window,name:helpdesk.helpdesk_stage_team_action
 msgid "Team Stages"
-msgstr ""
+msgstr "チームステージ"
 
 #. module: helpdesk
 #: model:ir.actions.act_window,name:helpdesk.email_template_action_helpdesk
@@ -3134,20 +3402,30 @@ msgid "Templates"
 msgstr "テンプレート"
 
 #. module: helpdesk
+#. odoo-python
+#: code:addons/helpdesk/models/helpdesk_ticket.py:0
+msgid "The customer cannot belong to a different company than the ticket."
+msgstr "顧客は、そのチケットとは異なる会社に所属することはできません。"
+
+#. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_team__alias_model_id
 msgid ""
-"The model (Odoo Document Kind) to which this alias corresponds. Any incoming"
-" email that does not reply to an existing record will cause the creation of "
-"a new record of this model (e.g. a Project Task)"
+"The model (Odoo Document Kind) to which this alias corresponds. Any incoming "
+"email that does not reply to an existing record will cause the creation of a "
+"new record of this model (e.g. a Project Task)"
 msgstr ""
-"このエイリアスに対応した(Odooドキュメント種別)モデル。既存のレコードに返信しない任意の受信メールは、このモデルの新しいレコード(例えば、プロジェクトタスク)の作成を引き起こします"
+"このエイリアスに対応した(Odooドキュメント種別)モデル。既存のレコードに返信し"
+"ない任意の受信メールは、このモデルの新しいレコード(例えば、プロジェクトタス"
+"ク)の作成を引き起こします"
 
 #. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_team__alias_name
 msgid ""
 "The name of the email alias, e.g. 'jobs' if you want to catch emails for "
 "<jobs@example.odoo.com>"
-msgstr "eメールのエイリアス.例えば<jobs@example.odoo.com>のメールを受け取りたい場合'jobs’を選択"
+msgstr ""
+"eメールのエイリアス.例えば<jobs@example.odoo.com>のメールを受け取りたい場"
+"合'jobs’を選択"
 
 #. module: helpdesk
 #. odoo-python
@@ -3166,9 +3444,11 @@ msgstr "これらのステージに費やされた時間はSLAの計算には含
 #. odoo-python
 #: code:addons/helpdesk/models/helpdesk_team.py:0
 msgid ""
-"The visibility of the team needs to be set as \"Invited portal users and all"
-" internal users\" in order to use the website form."
-msgstr "ウェブサイトのフォームを使用するには、チームの可視性を「招待されたポータルユーザと全ての内部ユーザ」に設定する必要があります。"
+"The visibility of the team needs to be set as \"Invited portal users and all "
+"internal users\" in order to use the website form."
+msgstr ""
+"ウェブサイトのフォームを使用するには、チームの可視性を「招待されたポータル"
+"ユーザと全ての内部ユーザ」に設定する必要があります。"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.portal_helpdesk_ticket
@@ -3183,16 +3463,18 @@ msgstr "この"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_sla_view_form
 msgid ""
-"This SLA Policy will apply to tickets matching ALL of the following "
-"criteria:"
-msgstr "このSLAポリシーは、以下のすべての条件に一致するチケットに適用されます："
+"This SLA Policy will apply to tickets matching ALL of the following criteria:"
+msgstr ""
+"このSLAポリシーは、以下のすべての条件に一致するチケットに適用されます："
 
 #. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_ticket__campaign_id
 msgid ""
-"This is a name that helps you keep track of your different campaign efforts,"
-" e.g. Fall_Drive, Christmas_Special"
-msgstr "これは、Fall_Drive、Christmas_Specialなど、さまざまなキャンペーンの取り組みを追跡するのに役立つ名前です。"
+"This is a name that helps you keep track of your different campaign efforts, "
+"e.g. Fall_Drive, Christmas_Special"
+msgstr ""
+"これは、Fall_Drive、Christmas_Specialなど、さまざまなキャンペーンの取り組みを"
+"追跡するのに役立つ名前です。"
 
 #. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_ticket__medium_id
@@ -3204,7 +3486,9 @@ msgstr "これは、はがき、電子メール、バナー広告などの配信
 msgid ""
 "This is the source of the link, e.g. Search Engine, another domain, or name "
 "of email list"
-msgstr "これはリンクのソースです。たとえば、検索エンジン、別のドメイン、またはメーリングリストの名前です。"
+msgstr ""
+"これはリンクのソースです。たとえば、検索エンジン、別のドメイン、またはメーリ"
+"ングリストの名前です。"
 
 #. module: helpdesk
 #. odoo-python
@@ -3223,14 +3507,18 @@ msgstr "SLA期限の %s時間前にこのチケットは正常にクローズし
 msgid ""
 "This will archive the stages and all of the tickets they contain from the "
 "following teams:"
-msgstr "これにより、以下のチームのステージと、そのステージに含まれる全てのチケットがアーカイブされます:"
+msgstr ""
+"これにより、以下のチームのステージと、そのステージに含まれる全てのチケットが"
+"アーカイブされます:"
 
 #. module: helpdesk
 #: model_terms:ir.actions.act_window,help:helpdesk.mail_activity_type_action_config_helpdesk
 msgid ""
 "Those represent the different categories of things you have to do (e.g. "
 "\"Call\" or \"Send email\")."
-msgstr "これらは、やるべきことの様々なカテゴリを表します(例:'電話する'や'Eメールを送る')"
+msgstr ""
+"これらは、やるべきことの様々なカテゴリを表します(例:'電話する'や'Eメールを送"
+"る')"
 
 #. module: helpdesk
 #. odoo-javascript
@@ -3268,8 +3556,10 @@ msgstr "終了済チケット"
 
 #. module: helpdesk
 #: model:mail.template,subject:helpdesk.solved_ticket_request_email_template
-msgid "Ticket Closed - Reference {{ object.id if object.id else 15 }}"
-msgstr "チケットがクローズされました - 参照{{ object.id if object.id else 15 }}"
+msgid ""
+"Ticket Closed - Reference {{ object.ticket_ref if object.ticket_ref else "
+"15 }}"
+msgstr ""
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_sla__ticket_count
@@ -3319,7 +3609,7 @@ msgstr "チケットSLAステータス"
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.quick_create_ticket_form
 msgid "Ticket Title"
-msgstr "チケットタイトル"
+msgstr "チケット件名"
 
 #. module: helpdesk
 #. odoo-python
@@ -3386,7 +3676,7 @@ msgstr "チケット検索"
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_stage__fold
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_ticket__fold
 msgid "Tickets in a folded stage are considered as closed."
-msgstr "折畳済ステージにあるチケットは終了済とみなされます"
+msgstr "折りたたまれたステージにあるチケットは、クローズ(完了)と見なされます。"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_team__use_helpdesk_sale_timesheet
@@ -3421,7 +3711,8 @@ msgstr "ヒント：受信したメールからチケットを作成する"
 #: model_terms:ir.actions.act_window,help:helpdesk.helpdesk_ticket_action_unassigned
 msgid ""
 "To get things done, plan activities and use the ticket status.<br>\n"
-"                Collaborate efficiently by chatting in real-time or via email."
+"                Collaborate efficiently by chatting in real-time or via "
+"email."
 msgstr ""
 "業務を完了させるために、活動を計画し、チケットステータスを使用します。<br>\n"
 "リアルタイムチャットやEメールを使って、効率的に協力しましょう。"
@@ -3438,13 +3729,13 @@ msgstr "今日"
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_ticket_view_search_analysis_closed
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_tickets_view_search
 msgid "Today Activities"
-msgstr "本日の活動"
+msgstr "今日の活動"
 
 #. module: helpdesk
 #. odoo-javascript
 #: code:addons/helpdesk/static/src/components/helpdesk_team_dashboard/helpdesk_team_dashboard.xml:0
 msgid "Today's Average Rating"
-msgstr ""
+msgstr "今日の平均評価"
 
 #. module: helpdesk
 #: model:ir.model.fields,field_description:helpdesk.field_helpdesk_ticket__total_response_hours
@@ -3467,7 +3758,9 @@ msgstr "チケットに関する顧客満足度の追跡"
 msgid ""
 "Track the performance of your teams, the success rate of your tickets, and "
 "how quickly you reach your service level agreements (SLAs)."
-msgstr "チームのパフォーマンス、チケットの成功率、サービス・レベル・アグリーメント（SLA）の達成率を追跡します。"
+msgstr ""
+"チームのパフォーマンス、チケットの成功率、サービス・レベル・アグリーメント"
+"（SLA）の達成率を追跡します。"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.helpdesk_team_view_form
@@ -3483,13 +3776,13 @@ msgstr "2つ星、最高値は３"
 #. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_ticket__activity_exception_decoration
 msgid "Type of the exception activity on record."
-msgstr "記録上の例外活動の種類。"
+msgstr "レコード上の例外の活動タイプ。"
 
 #. module: helpdesk
 #. odoo-python
 #: code:addons/helpdesk/models/helpdesk_stage.py:0
 msgid "Unarchive Tickets"
-msgstr "チケットのアーカイブ取消"
+msgstr "チケットのアーカイブ解除"
 
 #. module: helpdesk
 #. odoo-javascript
@@ -3548,7 +3841,8 @@ msgid ""
 "customers. Add new people to the followers' list to make them aware of the "
 "progress of this ticket."
 msgstr ""
-"チャターを使用して<b>メールを送信</b>し、顧客と効率的にやり取りしましょう。フォロワリストに新しい人を追加して、このチケットの進捗を知らせましょう。"
+"チャターを使用して<b>メールを送信</b>し、顧客と効率的にやり取りしましょう。"
+"フォロワリストに新しい人を追加して、このチケットの進捗を知らせましょう。"
 
 #. module: helpdesk
 #: model:ir.model,name:helpdesk.model_res_users
@@ -3577,25 +3871,32 @@ msgstr "可視性 &amp; 割当"
 msgid ""
 "Want to <b>boost your customer satisfaction</b>?<br/><i>Click Helpdesk to "
 "start.</i>"
-msgstr "をしたい <b>お客様の満足度を高める</b>?<br/><i>開始するにはヘルプデスクをクリックしてください。</i>"
+msgstr ""
+"をしたい <b>お客様の満足度を高める</b>?<br/><i>開始するにはヘルプデスクをク"
+"リックしてください。</i>"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.tickets_followup
 msgid ""
-"We hope to have addressed your request satisfactorily. If you no longer need"
-" our assistance, please close this ticket. Thank you for your collaboration."
+"We hope to have addressed your request satisfactorily. If you no longer need "
+"our assistance, please close this ticket. Thank you for your collaboration."
 msgstr ""
-"お客様のご要望に十分お答えできましたでしょうか。これ以上、サポートが必要でない場合は、本チケットをクローズして下さい。ご協力ありがとうございました。"
+"お客様のご要望に十分お答えできましたでしょうか。これ以上、サポートが必要でな"
+"い場合は、本チケットをクローズして下さい。ご協力ありがとうございました。"
 
 #. module: helpdesk
 #: model_terms:helpdesk.team,description:helpdesk.helpdesk_team1
 #: model_terms:helpdesk.team,description:helpdesk.helpdesk_team3
 msgid ""
-"We provide 24/7 support, Monday through Friday. Ticket responses are usually provided within 2 working days.<br>\n"
-"            Support is mainly provided in English. We can also assist in Spanish, French, and Dutch."
+"We provide 24/7 support, Monday through Friday. Ticket responses are usually "
+"provided within 2 working days.<br>\n"
+"            Support is mainly provided in English. We can also assist in "
+"Spanish, French, and Dutch."
 msgstr ""
-"月曜日から金曜日まで、24時間365日サポートを提供しています。チケットの回答は、通常2営業日以内に提供されます。<br>\n"
-"            サポートは主に英語で提供されます。スペイン語、フランス語、オランダ語でのサポートも可能です。"
+"月曜日から金曜日まで、24時間365日サポートを提供しています。チケットの回答は、"
+"通常2営業日以内に提供されます。<br>\n"
+"            サポートは主に英語で提供されます。スペイン語、フランス語、オラン"
+"ダ語でのサポートも可能です。"
 
 #. module: helpdesk
 #: model:helpdesk.tag,name:helpdesk.tag_website
@@ -3656,7 +3957,9 @@ msgstr "SLA締切りまでの労働時間"
 msgid ""
 "Working hours exceeded for reached SLAs compared with deadline. Positive "
 "number means the SLA was reached after the deadline."
-msgstr "到達したSLAについて、期限と比較して超過した労働時間。正の数値は、SLAが期限後に達成されたことを意味します。"
+msgstr ""
+"到達したSLAについて、期限と比較して超過した労働時間。正の数値は、SLAが期限後"
+"に達成されたことを意味します。"
 
 #. module: helpdesk
 #: model:ir.model.fields,help:helpdesk.field_helpdesk_team__resource_calendar_id
@@ -3668,21 +3971,30 @@ msgstr "SLAポリシーの期限を決定するために使用される労働時
 msgid ""
 "Would you like to unarchive all of the tickets contained in these stages as "
 "well?"
-msgstr "これらのステージに含まれる全てのチケットもアーカイブ取消しますか？"
+msgstr "これらのステージに含まれる全てのチケットもアーカイブ解除しますか？"
+
+#. module: helpdesk
+#: model:ir.model.fields,field_description:helpdesk.field_helpdesk_team__use_twitter
+msgid "X"
+msgstr "X"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.view_helpdesk_stage_delete_wizard
 msgid ""
 "You cannot delete stages containing tickets. You can either archive them or "
 "first delete all of their tickets."
-msgstr "チケットを含むステージは削除できません。アーカイブするか、最初に全てのチケットを削除して下さい。"
+msgstr ""
+"チケットを含むステージは削除できません。アーカイブするか、最初に全てのチケッ"
+"トを削除して下さい。"
 
 #. module: helpdesk
 #: model_terms:ir.ui.view,arch_db:helpdesk.view_helpdesk_stage_delete_wizard
 msgid ""
 "You cannot delete stages containing tickets. You should first delete all of "
 "their tickets."
-msgstr "チケットを含むステージは削除できません。最初に全てのチケットを削除して下さい。"
+msgstr ""
+"チケットを含むステージは削除できません。最初に全てのチケットを削除して下さ"
+"い。"
 
 #. module: helpdesk
 #: model:ir.model.constraint,message:helpdesk.constraint_res_users_target_closed_not_zero
@@ -3690,6 +4002,16 @@ msgstr "チケットを含むステージは削除できません。最初に全
 #: model:ir.model.constraint,message:helpdesk.constraint_res_users_target_success_not_zero
 msgid "You cannot have negative targets"
 msgstr "ターゲットをマイナスにすることはできません。"
+
+#. module: helpdesk
+#. odoo-python
+#: code:addons/helpdesk/models/res_partner.py:0
+msgid ""
+"You cannot update the company of this partner because it would lead to "
+"inconsistency with some of its tickets."
+msgstr ""
+"この取引先の会社情報は更新できません。更新すると、関連するチケットとの整合性"
+"が失われる可能性があります。"
 
 #. module: helpdesk
 #: model_terms:ir.actions.act_window,help:helpdesk.helpdesk_ticket_action_sla
@@ -3772,11 +4094,11 @@ msgstr "チケット"
 #. module: helpdesk
 #: model:mail.template,subject:helpdesk.rating_ticket_request_email_template
 msgid ""
-"{{ object.company_id.name or object.user_id.company_id.name or 'Helpdesk' "
-"}}: Service Rating Request"
+"{{ object.company_id.name or object.user_id.company_id.name or "
+"'Helpdesk' }}: Service Rating Request"
 msgstr ""
-"{{ object.company_id.name or object.user_id.company_id.name or 'Helpdesk' "
-"}}: Service Rating Request"
+"{{ object.company_id.name or object.user_id.company_id.name or "
+"'Helpdesk' }}: Service Rating Request"
 
 #. module: helpdesk
 #: model:mail.template,subject:helpdesk.new_ticket_request_email_template
@@ -3787,3 +4109,48 @@ msgstr "{{ object.name }}"
 #: model_terms:ir.ui.view,arch_db:helpdesk.team_rating_data
 msgid "{{rating.res_name if t['is_helpdesk_user'] else ''}}"
 msgstr "{{rating.res_name if t['is_helpdesk_user'] else ''}}"
+
+#~ msgid ""
+#~ "<div>\n"
+#~ "        Dear <t t-out=\"object.sudo().partner_id.name or 'Madam/"
+#~ "Sir'\">Madam/Sir</t>,<br/><br/>\n"
+#~ "        We would like to inform you that we have closed your ticket "
+#~ "(reference <t t-out=\"object.id or ''\">15</t>). \n"
+#~ "        We trust that the services provided have met your expectations "
+#~ "and that you have found a satisfactory resolution to your issue.<br/><br/"
+#~ ">\n"
+#~ "        However, if you have any further questions or comments, please do "
+#~ "not hesitate to reply to this email to re-open your ticket. \n"
+#~ "        Our team is always here to help you and we will be happy to "
+#~ "assist you with any further concerns you may have.<br/><br/>\n"
+#~ "        Thank you for choosing our services and for your cooperation "
+#~ "throughout this process. We truly value your business and appreciate the "
+#~ "opportunity to serve you.<br/><br/>\n"
+#~ "        Kind regards,<br/><br/>\n"
+#~ "        <t t-out=\"object.team_id.name or 'Helpdesk'\">Helpdesk</t> "
+#~ "Team.\n"
+#~ "    </div>\n"
+#~ "        "
+#~ msgstr ""
+#~ "<div>\n"
+#~ "        <t t-out=\"object.sudo().partner_id.name or 'Madam/Sir'\">お客様</"
+#~ "t>、<br/><br/>\n"
+#~ "        以下のお客様のチケットをクローズ致しましたことをお知らせ致します: "
+#~ "(参照番号 <t t-out=\"object.id or ''\">15</t>) \n"
+#~ "        ご提供したサービスがお客様のご期待に沿い、ご満足頂ける問題解決につ"
+#~ "ながれば幸いです。<br/><br/>\n"
+#~ "        さらにご質問やご意見がある場合は、ご遠慮なくこのメールにご返信頂"
+#~ "き、チケットを再開して下さい。\n"
+#~ "        何かお困りのことがございましたら、いつでも当社のチームがお手伝い・"
+#~ "サポートをさせて頂きます。<br/><br/>\n"
+#~ "        当社のサービスをご愛顧頂き、誠にありがとうございました。お客様のビ"
+#~ "ジネスをサポートする機会を頂いたことに感謝しております。<br/><br/>\n"
+#~ "        今後ともよろしくお願い致します。<br/><br/>\n"
+#~ "        <t t-out=\"object.team_id.name or 'Helpdesk'\">ヘルプデスク</t> "
+#~ "チーム\n"
+#~ "    </div>\n"
+#~ "        "
+
+#~ msgid "Ticket Closed - Reference {{ object.id if object.id else 15 }}"
+#~ msgstr ""
+#~ "チケットがクローズされました - 参照{{ object.id if object.id else 15 }}"

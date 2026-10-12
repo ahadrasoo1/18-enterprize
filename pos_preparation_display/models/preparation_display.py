@@ -24,7 +24,21 @@ class PosPreparationDisplay(models.Model):
 
     @api.model
     def _load_pos_data_domain(self, data):
-        return ['|', ('pos_config_ids', '=', data['pos.config']['data'][0]['id']), ('pos_config_ids', '=', False)]
+        return [
+            (
+                "id",
+                "in",
+                [
+                    display.id
+                    for display in self.env["pos_preparation_display.display"]
+                    .search([])
+                    .filtered(
+                        lambda d: not d.pos_config_ids
+                        or data["pos.config"]["data"][0]["id"] in d.pos_config_ids.ids
+                    )
+                ],
+            )
+        ]
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -58,7 +72,10 @@ class PosPreparationDisplay(models.Model):
         self.ensure_one()
         PosPreparationDisplayOrder = self.env['pos_preparation_display.order']
         open_orders = self.env['pos_preparation_display.order.stage']._read_group(
-            domain=[('preparation_display_id', '=', self.id)],
+            domain=[
+                ('preparation_display_id', '=', self.id),
+                ('order_id.pos_order_id.session_id.state', 'not in', ['closed', 'closing_control']),
+            ],
             groupby=['order_id'],
             having=[('done:bool_or', '=', False)],
         )
@@ -184,6 +201,9 @@ class PosPreparationDisplay(models.Model):
         for preparation_display in self:
             if len(preparation_display.stage_ids) == 0:
                 raise ValidationError(_("A preparation display must have a minimum of one step."))
+            # If any session is open, the stages cannot be modified.
+            if any(preparation_display.pos_config_ids.mapped('session_ids').filtered(lambda s: s.state =='opened')):
+                raise ValidationError(_("You cannot modify the stages of a preparation display that has an active sessions."))
 
     @api.depends('pos_config_ids')
     def _compute_contains_bar_restaurant(self):

@@ -56,7 +56,8 @@ class StudioApprovalRule(models.Model):
         try:
             return int(str_action)
         except ValueError:
-            return self.env.ref(str_action).id
+            action = self.env.ref(str_action, raise_if_not_found=False)
+            return action and action.id
 
     def _group_expand_notification_order(self, options, domain):
         return sorted(set(options).union({'1', '2', '3', '4'}))
@@ -324,6 +325,7 @@ class StudioApprovalRule(models.Model):
                 "model": "base.automation",
                 "res_id": base_auto.id,
                 "module": "web_studio",
+                "noupdate": True,
             })
             server_action = self_sudo.env.ref(get_base_action_server_xml_id(model), raise_if_not_found=False)
             if server_action:
@@ -341,12 +343,20 @@ class StudioApprovalRule(models.Model):
                 })
 
         for server_action in self_sudo.env["ir.actions.server"].create(actions_server_data):
-            xml_ids_data.append({
-                "name": get_base_action_server_xml_id(server_action.model_id.model, module_prefix=""),
-                "model": "ir.actions.server",
-                "res_id": server_action.id,
-                "module": "web_studio",
-            })
+            model_data_name = get_base_action_server_xml_id(server_action.model_id.model, module_prefix="")
+            xml_ids_data.extend([{
+                    "name": model_data_name,
+                    "model": "ir.actions.server",
+                    "res_id": server_action.id,
+                    "module": "web_studio",
+                    "noupdate": True,
+                }, {
+                    "name": model_data_name,
+                    "model": "ir.actions.server",
+                    "res_id": server_action.id,
+                    "module": "__cloc_exclude__",
+                }
+            ])
 
         self_sudo.env["ir.model.data"].create(xml_ids_data)
 
@@ -621,6 +631,8 @@ class StudioApprovalRule(models.Model):
         ruleSudo = self.sudo()
         domain = self._get_rule_domain(ruleSudo.model_name, ruleSudo.method, ruleSudo.action_id)
         all_rule_ids = tuple(ruleSudo.search(domain).ids)
+        if not all_rule_ids:
+            return None
         self.env.cr.execute('SELECT id FROM studio_approval_rule WHERE id IN %s FOR UPDATE NOWAIT', (all_rule_ids,))
         # NOTE: despite the 'NOWAIT' modifier, the query will actually be retried by
         # Odoo itself (not PG); the NOWAIT ensures that no deadlock will happen

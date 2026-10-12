@@ -69,7 +69,7 @@
                             data-hotkey="shift+g"
                             class="oe_stat_button"
                             icon="fa-pencil"
-                            invisible="state != 'half_signed'">
+                            invisible="state != 'half_signed' or not sign_request_ids">
                             <div class="o_field_widget o_stat_info">
                                 <span class="o_stat_text">Requested Signature</span>
                             </div>
@@ -98,6 +98,9 @@
                         <group name="group_offer">
                             <field name="contract_template_id"/>
                             <field name="final_yearly_costs"/>
+                            <!-- TODO Drop those 2 fields in master -->
+                            <field name="contract_type_id" invisible="1"/>
+                            <field name="contract_type_id" invisible="1"/>
                             <field name="job_title"/>
                             <field name="employee_job_id"/>
                             <field name="department_id"/>

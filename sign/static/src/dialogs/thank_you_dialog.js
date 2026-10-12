@@ -8,6 +8,7 @@ import { rpc } from "@web/core/network/rpc";
 import { useService } from "@web/core/utils/hooks";
 import { EncryptedDialog } from "./encrypted_dialog";
 import { Component, onWillStart, useState } from "@odoo/owl";
+import { isMobileOS } from "@web/core/browser/feature_detection";
 
 export class ThankYouDialog extends Component {
     static template = "sign.ThankYouDialog";
@@ -43,13 +44,19 @@ export class ThankYouDialog extends Component {
             buttons: [],
         });
         this.redirectURL = this.processURL(this.props.redirectURL);
-        this.message =
-            this.props.message || _t("You will receive the final signed document by email.");
+        let defaultMessage = _t("You will get the signed document by email.");
+        if (this.signInfo.get("companyCountryCode") === "US") {
+            // U.S. signers may request a paper copy in addition to the electronic document,
+            // as required by the ESIGN Act.
+            defaultMessage = _t("You will get the signed document by email. You may also request a paper copy from the sender.");
+        }
+        this.message = this.props.message || defaultMessage;
         onWillStart(this.willStart);
+        this.isMobileOS = isMobileOS();
     }
 
     get suggestSignUp() {
-        return user.userId === false;
+        return !user.userId;
     }
 
     get dialogProps() {
@@ -80,7 +87,7 @@ export class ThankYouDialog extends Component {
             ]);
             this.closeAction = result.action;
             this.closeLabel = result.label;
-            const closeContext = result.custom_action ? {} : { clearBreadcrumbs: true };
+            const closeContext = result.custom_action ? { stackPosition: "replacePreviousAction" } : { clearBreadcrumbs: true };
             this.closeContext = closeContext;
         }
         if (!this.suggestSignUp && !session.is_website_user) {
@@ -94,7 +101,7 @@ export class ThankYouDialog extends Component {
                         id: doc.id,
                         name: doc.name,
                         date: doc.date,
-                        user: doc.user,
+                        user: doc.user || _t("Deleted User"),
                         accessToken: doc.token,
                         requestId: doc.requestId,
                         canceled: false,
@@ -113,41 +120,24 @@ export class ThankYouDialog extends Component {
                 click: () => {
                     window.location.assign(this.redirectURL);
                 },
+                classes: 'o_sign_thankyou_redirect_button',
             });
         }
-
-        if (this.signRequestState === "signed") {
-            this.state.buttons.push({
-                name: _t("Download Document"),
-                click: this.downloadDocument,
-            });
-        }
-
-        if (this.suggestSignUp) {
-            this.message += _t(" You can safely close this window.");
-            this.state.buttons.push({
-                name: _t("Sign Up for free"),
-                classes: "btn btn-link ms-auto",
-                ignored: true,
-                click: () => {
-                    window.open(
-                        "https://www.odoo.com/trial?selected_app=sign&utm_source=db&utm_medium=sign",
-                        "_blank"
-                    );
-                },
-            });
-        } else {
+        if (!this.redirectURL) {
             this.state.buttons.push({
                 name: this.closeLabel,
                 click: () => {
+                    if (this.suggestSignUp) {
+                        window.open(`https://odoo.com/app/sign`);
+                    }
                     if (session.is_frontend) {
-                        const signatureRequestId = this.signInfo.get("documentId");
-                        window.location.assign(`/my/signature/${signatureRequestId}`);
+                        window.location.assign(`/my/signatures`);
                     } else {
                         this.props.close();
                         this.env.services.action.doAction(this.closeAction, this.closeContext);
                     }
                 },
+                classes: 'o_sign_thankyou_close_button'
             });
         }
 
@@ -155,7 +145,7 @@ export class ThankYouDialog extends Component {
             if (this.state.buttons[i].ignored) {
                 continue;
             }
-            const buttonClass = i === 0 ? "btn btn-primary" : "btn btn-secondary";
+            const buttonClass = "btn btn-secondary";
             this.state.buttons[i].classes = `${this.state.buttons[i].classes} ${buttonClass}`;
         }
     }
@@ -181,7 +171,7 @@ export class ThankYouDialog extends Component {
     }
 
     async clickNextCancel(doc) {
-        await this.orm.call("sign.request", "cancel", [doc.requestID]);
+        await this.orm.call("sign.request", "cancel", [doc.requestId]);
         this.state.nextDocuments = this.state.nextDocuments.map((nextDoc) => {
             if (nextDoc.id === doc.id) {
                 return {

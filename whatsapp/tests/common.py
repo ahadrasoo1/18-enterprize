@@ -1,11 +1,13 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-
 import hashlib
 import hmac
 import json
+import re
 import time
+import random
+import werkzeug
 
-from contextlib import contextmanager
+from contextlib import contextmanager, nullcontext
 from unittest.mock import patch
 
 from odoo.addons.base.models.res_partner import Partner
@@ -22,7 +24,7 @@ class MockOutgoingWhatsApp(common.BaseCase):
     when contacting it. """
 
     @contextmanager
-    def mockWhatsappGateway(self):
+    def mockWhatsappGateway(self, exp_json_data=None):
         self._init_wa_mock()
         wa_msg_origin = WhatsAppMessage.create
         partner_create_origin = Partner.create
@@ -40,14 +42,21 @@ class MockOutgoingWhatsApp(common.BaseCase):
                     return tmpl
             return {}
 
-        def _send_whatsapp(number, *, send_vals, **kwargs):
+        def _get_whatsapp_document(document_id):
+            return self._wa_document_store.get(document_id, "abcd")
+
+        def _send_whatsapp_to_identifier(bsuid, number, message_type=None, send_vals=None, parent_message_id=False):
             if send_vals:
-                msg_uid = f'test_wa_{time.time():.9f}'
+                msg_uid = f'test_wa_{time.time() + len(self._wa_msg_sent):.9f}'
                 self._wa_msg_sent.append(msg_uid)
-                return msg_uid
+                self._wa_msg_sent_vals.append(send_vals)
+                self._wa_msg_sent_recipients.append({'bsuid': bsuid, 'number': number})
+                return {'msg_uid': msg_uid, 'wa_id': number or bsuid}
             raise WhatsAppError("Please make sure to define a template before proceeding.")
 
         def _submit_template_new(json_data):
+            if exp_json_data:
+                self.assertDictEqual(json.loads(json_data), exp_json_data)
             if json_data:
                 return {
                     "id": f"{time.time():.15f}",
@@ -63,6 +72,7 @@ class MockOutgoingWhatsApp(common.BaseCase):
 
         def _upload_whatsapp_document(attachment):
             if attachment:
+                self._wa_uploaded_document_count += 1
                 return {
                     "messaging_product": "whatsapp",
                     "contacts": [{
@@ -70,7 +80,7 @@ class MockOutgoingWhatsApp(common.BaseCase):
                             "wa_id": "1234567890",
                         }],
                     "messages": [{
-                        "id": "qwertyuiop0987654321",
+                        "id": str(self._wa_uploaded_document_count),
                     }]
                 }
             raise WhatsAppError("Please ensure you are using the correct file type and try again.")
@@ -98,12 +108,14 @@ class MockOutgoingWhatsApp(common.BaseCase):
             with patch.object(Partner, 'create', autospec=True, wraps=Partner, side_effect=_res_partner_create), \
                  patch.object(WhatsAppApi, '_get_all_template', side_effect=_get_all_template), \
                  patch.object(WhatsAppApi, '_get_template_data', side_effect=_get_template_data), \
+                 patch.object(WhatsAppApi, '_get_whatsapp_document', side_effect=_get_whatsapp_document), \
                  patch.object(WhatsAppApi, '_upload_demo_document', side_effect=_upload_demo_document), \
                  patch.object(WhatsAppApi, '_upload_whatsapp_document', side_effect=_upload_whatsapp_document), \
-                 patch.object(WhatsAppApi, '_send_whatsapp', side_effect=_send_whatsapp), \
+                 patch.object(WhatsAppApi, '_send_whatsapp_to_identifier', side_effect=_send_whatsapp_to_identifier), \
                  patch.object(WhatsAppApi, '_submit_template_new', side_effect=_submit_template_new), \
                  patch.object(WhatsAppApi, '_get_header_data_from_handle', side_effect=_get_header_data_from_handle), \
-                 patch.object(WhatsAppMessage, 'create', autospec=True, wraps=WhatsAppMessage, side_effect=_wa_message_create):
+                 patch.object(WhatsAppMessage, 'create', autospec=True, wraps=WhatsAppMessage, side_effect=_wa_message_create) as mock_wa_msg_create:
+                self._mock_wa_msg_create = mock_wa_msg_create
                 yield
         finally:
             pass
@@ -112,6 +124,28 @@ class MockOutgoingWhatsApp(common.BaseCase):
         self._new_partners = self.env['res.partner'].sudo()
         self._new_wa_msg = self.env['whatsapp.message'].sudo()
         self._wa_msg_sent = []
+        self._wa_msg_sent_vals = []
+        self._wa_document_store = {}
+        self._wa_uploaded_document_count = 0
+        self._wa_msg_sent_vals = []
+        self._wa_msg_sent_recipients = []
+
+    @contextmanager
+    def patchWhatsappCronTrigger(self):
+        """ Call the cron code immediately in the current thread when whatsapp
+        related crons are triggered. Useful when you care about the result of
+        the actual sending step of a batch of messages. """
+        IrCron = self.registry['ir.cron']
+        trigger_orig = IrCron._trigger
+
+        def mock_trigger(cron, *args, **kwargs):
+            if cron == self.env.ref('whatsapp.ir_cron_send_whatsapp_queue'):
+                cron.sudo().method_direct_trigger(*args, **kwargs)
+                return self.env['ir.cron.trigger']
+            return trigger_orig(cron, *args, **kwargs)
+
+        with patch.object(IrCron, '_trigger', autospec=True, side_effect=mock_trigger):
+            yield
 
 
 class MockIncomingWhatsApp(common.HttpCase):
@@ -191,22 +225,61 @@ class MockIncomingWhatsApp(common.HttpCase):
             }
         )
 
-    def _receive_whatsapp_message(self, account, body, sender_phone_number, additional_message_values=None):
+    def _receive_whatsapp_message(
+        self, account, body, sender_phone_number='', message_type="text",
+        additional_message_values=None, content_values=None, sender_name='',
+        sender_bsuid='',
+    ):
+        body = body or ""
+        cnt = self.env['whatsapp.message'].sudo().search_count([])
+        additional_message_values = additional_message_values or {}
+        content_values = content_values or {}
+        message_vals = {
+            "id": f"test_wa_{cnt}_{time.time():.9f}",
+            "from": sender_phone_number,
+            "timestamp": f"{time.time():.0f}",
+            "type": message_type,
+        }
+        if sender_bsuid:
+            message_vals["from_user_id"] = sender_bsuid
+        match message_type:
+            case "text":
+                message_vals.update(text={"body": body} | content_values)
+            case "audio":
+                message_vals.update(audio={
+                    "mime_type": "audio/ogg; codecs=opus",
+                    "sha256": "cNkcfuFnXxg3WcBOc4A+nw8SBV0+2LyWkZ+0ZbeKPG0=",
+                    "id": f"{time.time():.0f}",
+                    "voice": True,
+                } | content_values)
+            case "image":
+                message_vals.update(image={
+                    "caption": body,
+                    "mime_type": "image/jpeg",
+                    "sha256": "GToZ5lsWaujMRC7kjueZsKxnNVXo/29NbHJmO6OZa+M=",
+                    "id": f"{time.time():.0f}",
+                } | content_values)
+            case _:
+                raise Exception(f"Unsupported whatsapp message type {message_type}")
+        message_vals.update(additional_message_values)
+        contact_val = {"profile": {"name": sender_name}}
+        if sender_phone_number:
+            # In production wa_id is the customer's phone number without the '+'
+            # (it's stored as a string by WhatsApp). Match that so wa_id-based routing works.
+            contact_val["wa_id"] = sender_phone_number.lstrip('+')
+        if sender_bsuid:
+            contact_val["user_id"] = sender_bsuid
         message_data = json.dumps({
+            "object": "whatsapp_business_account",
             "entry": [{
                 "id": account.account_uid,
                 "changes": [{
                     "field": "messages",
                     "value": {
-                        "metadata": {"phone_number_id": account.phone_uid},
-                        "messages": [
-                            dict({
-                                "id": f"test_wa_{time.time():.9f}",
-                                "from": sender_phone_number,
-                                "type": "text",
-                                "text": {"body": body}
-                            }, **(additional_message_values or {}))
-                        ],
+                        "messaging_product": "whatsapp",
+                        "metadata": {"phone_number_id": account.phone_uid, "display_phone_number": "12345678912"},
+                        "contacts": [contact_val],
+                        "messages": [message_vals],
                     }
                 }]
             }]
@@ -336,9 +409,102 @@ class WhatsAppCase(MockOutgoingWhatsApp):
             wa_msg_count=exp_wa_msg_count,
         )
 
+    def whatsapp_answer_with_records(self, records, body=None, mock=False):
+        # if mock is used -> internal wa_msgs is reset, prepare beforehand
+        wa_msgs = []
+        for record in records:
+            wa_msgs.append(self._find_wa_msg_wrecord(record))
+        with self.mockWhatsappGateway() if mock else nullcontext(), \
+                self.patchWhatsappCronTrigger() if mock else nullcontext():
+            for record, wa_msg in zip(records, wa_msgs):
+                self.assertTrue(wa_msg)
+                self._receive_whatsapp_message(
+                    self.whatsapp_account,
+                    body or "Hello, it's reply",
+                    wa_msg.mobile_number_formatted or wa_msg.mobile_number,
+                    additional_message_values={
+                        'context': {'id': wa_msg.msg_uid},
+                    },
+                )
+
+    def whatsapp_msg_bounce_with_records(self, records, error_code=131026):
+        """ Simulate a 'bounce' message event through webhook """
+        for record in records:
+            wa_msg = self._find_wa_msg_wrecord(record)
+            self.assertTrue(wa_msg)
+            self._receive_message_update(
+                account=self.whatsapp_account,
+                display_phone_number=wa_msg.mobile_number,
+                extra_value={
+                    "statuses": [{
+                        "id": wa_msg.msg_uid,
+                        "status": "failed",
+                        "errors": [{
+                            "code": error_code,
+                            "title": "Message failed to send due to an unknown error."
+                        }],
+                    }],
+                },
+            )
+
+    def whatsapp_msg_click_with_records(self, records, body=False, button_index=None):
+        """ Simulate a 'read' message event through webhook """
+        for record in records:
+            wa_msg = self._find_wa_msg_wrecord(record)
+            self.assertTrue(wa_msg)
+            wa_sent_vals = self._find_sent_wa_wuid(wa_msg.msg_uid)
+            self.assertTrue(wa_sent_vals)
+            btn = next(
+                (c for c in wa_sent_vals['components'] if c['type'] == 'button' and c['index'] == button_index),
+                False
+            )
+            self.assertTrue(btn)
+            parsed_url = werkzeug.urls.url_parse(btn['parameters'][0]['text'])
+            path_items = parsed_url.path.split('/')
+            # FIXME: incoherent, sometimes complete url, sometimes right part of url only ?
+            if len(path_items) == 4:
+                code, wa_msg_id = path_items[1], int(path_items[3])
+            elif len(path_items) == 5:
+                code, wa_msg_id = path_items[2], int(path_items[4])
+            self.env['link.tracker.click'].sudo().add_click(
+                code,
+                ip='100.200.300.%3f' % random.random(),
+                country_code='BE',
+                whatsapp_message_id=wa_msg_id,
+            )
+
+    def whatsapp_msg_read_with_records(self, records):
+        """ Simulate a 'read' message event through webhook """
+        for record in records:
+            wa_msg = self._find_wa_msg_wrecord(record)
+            self.assertTrue(wa_msg)
+            self._receive_message_update(
+                account=self.whatsapp_account,
+                display_phone_number=wa_msg.mobile_number,
+                extra_value={
+                    "statuses": [{
+                        "id": wa_msg.msg_uid,
+                        "status": "read",
+                    }],
+                },
+            )
+
     # ------------------------------------------------------------
     # MESSAGE FIND AND ASSERTS
     # ------------------------------------------------------------
+
+    def _find_sent_wa_wuid(self, msg_uid):
+        """ Find a sent WA message through gateway, based on 'mobile_number' """
+        for wa_sent, wa_sent_msg in zip(self._wa_msg_sent, self._wa_msg_sent_vals, strict=True):
+            if wa_sent == msg_uid:
+                return wa_sent_msg
+        debug_info = '\n'.join(
+            f'UID: {wa_sent})'
+            for wa_sent in self._wa_msg_sent
+        )
+        raise AssertionError(
+            f'Sent whatsapp message not found for msg_uid {msg_uid}\n{debug_info})'
+        )
 
     def _find_wa_msg_wnumber(self, mobile_number):
         """ Find a WA message, based on 'mobile_number' """
@@ -398,11 +564,16 @@ class WhatsAppCase(MockOutgoingWhatsApp):
             wa_message.state, status,
             f'whatsapp.message invalid status: found {wa_message.state}, expected {status}')
 
+        def normalize(value):
+            if isinstance(value, str):
+                return re.sub(r'\s+', ' ', value)
+            return value
         # check message content
         for fname, fvalue in (fields_values or {}).items():
             with self.subTest(fname=fname, fvalue=fvalue):
                 self.assertEqual(
-                    wa_message[fname], fvalue,
+                    normalize(wa_message[fname]),
+                    normalize(fvalue),
                     f'whatsapp.message: expected {fvalue} for {fname}, got {wa_message[fname]}'
                 )
 
@@ -410,7 +581,8 @@ class WhatsAppCase(MockOutgoingWhatsApp):
         for fname, fvalue in (mail_message_values or {}).items():
             with self.subTest(fname=fname, fvalue=fvalue):
                 self.assertEqual(
-                    wa_message.mail_message_id[fname], fvalue,
+                    normalize(wa_message.mail_message_id[fname]),
+                    normalize(fvalue),
                     f'whatsapp.message mail_message_id: expected {fvalue} for {fname}, got {wa_message.mail_message_id[fname]}'
                 )
 
@@ -420,7 +592,7 @@ class WhatsAppCase(MockOutgoingWhatsApp):
             # only support one attachment for whatsapp messages
             self.assertEqual(len(attachment), 1)
 
-            for fname, fvalue in (attachment_values).items():
+            for fname, fvalue in attachment_values.items():
                 with self.subTest(fname=fname, fvalue=fvalue):
                     attachment_value = attachment[fname]
                     self.assertEqual(
@@ -676,6 +848,19 @@ class WhatsAppCommon(MailCommon, WhatsAppCase):
                 'token': 'token_2',
             }
         ])
+        cls.simple_whatsapp_template = cls.env['whatsapp.template'].create({
+            'body': 'Howdy Partner',
+            'model_id': cls.env['ir.model']._get_id('res.partner'),
+            'name': '{{1}}',
+            'quality': 'green',
+            'status': 'approved',
+            'template_name': 'simple_whatsapp_template',
+            'variable_ids': [
+                (0, 0, {'name': '{{1}}', 'line_type': 'body', 'field_type': 'free_text', 'demo_value': 'Simple Whatsapp Template'}),
+            ],
+            'wa_account_id': cls.whatsapp_account.id,
+            'wa_template_uid': 'simple_whatsapp_template',
+        })
         # Test customer (In)
         cls.whatsapp_customer = cls.env['res.partner'].create({
             'country_id': cls.env.ref('base.in').id,
@@ -695,6 +880,8 @@ class WhatsAppCommon(MailCommon, WhatsAppCase):
                       "AAAAAQAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAABidWR0"
                       "YQAAAFptZXRhAAAAAAAAACFoZGxyAAAAAAAAAABtZGlyYXBwbAAAAAAAAAAAAAAAAC1pbHN0AAAA"
                       "Jal0b28AAAAdZGF0YQAAAAEAAAAATGF2ZjU3LjQxLjEwMA==")
+        audio_data = '/+MYxAAAAANIAAAAAExBTUUzLjk4LjIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+
         documents = cls.env['ir.attachment'].with_user(cls.user_employee).create([
             {'name': 'Document.pdf', 'datas': pdf_data},
             {'name': 'Image.jpg', 'datas': image_data},
@@ -707,8 +894,9 @@ class WhatsAppCommon(MailCommon, WhatsAppCase):
             {'name': 'Image.jpg', 'datas': image_data},
             {'name': 'Video.mpg', 'datas': video_data},
             {'name': 'Payload.wasm', 'datas': "AGFzbQEAAAA=", 'mimetype': 'application/octet-stream'},
+            {'name': 'Audio.mp3', 'datas': audio_data},
         ])
-        cls.document_attachment_wa_admin, cls.image_attachment_wa_admin, cls.video_attachment_wa_admin, cls.invalid_attachment_wa_admin = documents_wa_admin
+        cls.document_attachment_wa_admin, cls.image_attachment_wa_admin, cls.video_attachment_wa_admin, cls.invalid_attachment_wa_admin, cls.audio_attachment_wa_admin = documents_wa_admin
 
     @classmethod
     def _setup_share_users(cls):

@@ -24,12 +24,19 @@ export class FileViewer extends WebFileViewer {
             );
         });
     }
+    get currentFolderId() {
+        return this.env.searchModel.getSelectedFolderId();
+    }
     get hasSplitPdf() {
+        if (!this.documentService.userIsInternal) {
+            return false;
+        }
         if (this.documentService.documentList?.initialRecordSelectionLength === 1) {
-            return this.documentService.documentList.selectedDocument.attachment.isPdf;
+            return this.documentService.documentList.selectedDocument.attachment.isPdf &&
+                this.documentService.documentList.selectedDocument?.record?.data?.user_permission === 'edit';
         }
         return this.documentService.documentList?.documents.every(
-            (document) => document.attachment.isPdf
+            (document) => document.attachment.isPdf && document.record?.data?.user_permission === 'edit'
         );
     }
     get withDownload() {

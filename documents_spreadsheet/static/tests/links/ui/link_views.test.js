@@ -1,9 +1,12 @@
-import { defineDocumentSpreadsheetModels } from "@documents_spreadsheet/../tests/helpers/data";
+import {
+    defineDocumentSpreadsheetModels,
+    getBasicData,
+} from "@documents_spreadsheet/../tests/helpers/data";
+import { makeDocumentsSpreadsheetMockEnv } from "@documents_spreadsheet/../tests/helpers/model";
 import { beforeEach, describe, expect, getFixture, test } from "@odoo/hoot";
 import { animationFrame } from "@odoo/hoot-mock";
 import * as spreadsheet from "@odoo/o-spreadsheet";
-import { Partner, getBasicData } from "@spreadsheet/../tests/helpers/data";
-import { makeDocumentsSpreadsheetMockEnv } from "@documents_spreadsheet/../tests/helpers/model";
+import { Partner } from "@spreadsheet/../tests/helpers/data";
 import { makeFakeSpreadsheetService } from "@spreadsheet_edition/../tests/helpers/collaborative_helpers";
 import { InsertViewSpreadsheet } from "@spreadsheet_edition/assets/insert_action_link_menu/insert_action_link_menu";
 import {
@@ -12,6 +15,7 @@ import {
     mockService,
     mountWithCleanup,
     patchWithCleanup,
+    preloadBundle,
     toggleMenu,
     toggleMenuItem,
     toggleSearchBarMenu,
@@ -25,6 +29,7 @@ const { Grid } = spreadsheet.components;
 const favoriteMenuRegistry = registry.category("favoriteMenu");
 
 defineDocumentSpreadsheetModels();
+preloadBundle("web.fullcalendar_lib");
 describe.current.tags("desktop");
 
 let serverData;
@@ -97,7 +102,7 @@ beforeEach(() => {
             views: [
                 [1, "list"],
                 [2, "kanban"],
-                [3, "graph"],
+                [false, "graph"],
                 [4, "calendar"],
                 [5, "pivot"],
                 [6, "map"],
@@ -225,10 +230,10 @@ test("graph view with custom chart type and order", async function () {
     await toggleMenuItem("Count");
     await insertInSpreadsheetAndClickLink(target);
     const action = getCurrentAction(webClient);
-    expect(action.context.graph_mode).toEqual("pie", {
+    expect(action.context.graph_mode).toBe("pie", {
         message: "It should be a pie chart",
     });
-    expect(action.context.graph_measure).toEqual("__count", {
+    expect(action.context.graph_measure).toBe("__count", {
         message: "It should have the custom measures",
     });
     expect(".fa-pie-chart.active").toHaveCount(1);

@@ -3,6 +3,8 @@ from datetime import datetime
 
 from odoo.tests.common import TransactionCase
 
+from odoo.addons.mail.tests.common import mail_new_test_user
+
 
 class TestCommonPlanning(TransactionCase):
     def get_by_employee(self, employee):
@@ -35,6 +37,9 @@ class TestCommonPlanning(TransactionCase):
             'create_date': '2015-01-01 00:00:00',
         })
         cls.resource_janice = cls.employee_janice.resource_id
+        cls.planning_manager_user = mail_new_test_user(
+            cls.env, login='planning_manager_user', groups='planning.group_planning_manager', name='Planning Manager User'
+        )
 
     @classmethod
     def setUpDates(cls):
@@ -57,3 +62,26 @@ class TestCommonPlanning(TransactionCase):
                 'flexible_hours': True,
             },
         ])
+
+        cls.company_calendar = cls.env['resource.calendar'].create({
+            'name': 'Classic 40h/week',
+            'tz': 'UTC',
+            'hours_per_day': 8.0,
+            'attendance_ids': [
+                (0, 0, {'name': 'Monday Morning', 'dayofweek': '0', 'hour_from': 8, 'hour_to': 12, 'day_period': 'morning'}),
+                (0, 0, {'name': 'Monday Lunch', 'dayofweek': '0', 'hour_from': 12, 'hour_to': 13, 'day_period': 'lunch'}),
+                (0, 0, {'name': 'Monday Afternoon', 'dayofweek': '0', 'hour_from': 13, 'hour_to': 17, 'day_period': 'afternoon'}),
+                (0, 0, {'name': 'Tuesday Morning', 'dayofweek': '1', 'hour_from': 8, 'hour_to': 12, 'day_period': 'morning'}),
+                (0, 0, {'name': 'Tuesday Lunch', 'dayofweek': '1', 'hour_from': 12, 'hour_to': 13, 'day_period': 'lunch'}),
+                (0, 0, {'name': 'Tuesday Afternoon', 'dayofweek': '1', 'hour_from': 13, 'hour_to': 17, 'day_period': 'afternoon'}),
+                (0, 0, {'name': 'Wednesday Morning', 'dayofweek': '2', 'hour_from': 8, 'hour_to': 12, 'day_period': 'morning'}),
+                (0, 0, {'name': 'Wednesday Lunch', 'dayofweek': '2', 'hour_from': 12, 'hour_to': 13, 'day_period': 'lunch'}),
+                (0, 0, {'name': 'Wednesday Afternoon', 'dayofweek': '2', 'hour_from': 13, 'hour_to': 17, 'day_period': 'afternoon'}),
+                (0, 0, {'name': 'Thursday Morning', 'dayofweek': '3', 'hour_from': 6, 'hour_to': 12, 'day_period': 'morning'}),
+                (0, 0, {'name': 'Thursday Lunch', 'dayofweek': '3', 'hour_from': 12, 'hour_to': 13, 'day_period': 'lunch'}),
+                (0, 0, {'name': 'Thursday Afternoon', 'dayofweek': '3', 'hour_from': 13, 'hour_to': 15, 'day_period': 'afternoon'}),
+                (0, 0, {'name': 'Friday Morning', 'dayofweek': '4', 'hour_from': 8, 'hour_to': 12, 'day_period': 'morning'}),
+                (0, 0, {'name': 'Friday Lunch', 'dayofweek': '4', 'hour_from': 12, 'hour_to': 13, 'day_period': 'lunch'}),
+                (0, 0, {'name': 'Friday Afternoon', 'dayofweek': '4', 'hour_from': 13, 'hour_to': 17, 'day_period': 'afternoon'})
+            ]
+        })

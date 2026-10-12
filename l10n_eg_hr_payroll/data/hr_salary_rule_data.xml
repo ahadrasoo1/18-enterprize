@@ -102,9 +102,8 @@ result = (compensation/30) * (contract.l10n_eg_total_number_of_days)
         <field name="sequence">120</field>
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
-low = payslip._rule_parameter('l10n_eg_lower_boundary')
-high = payslip._rule_parameter('l10n_eg_upper_boundary')
-result = (GROSSY - low) if (GROSSY &lt; high) else GROSSY
+personal_exemption = payslip._rule_parameter('l10n_eg_lower_boundary')
+result = max(0, GROSSY - personal_exemption)
         </field>
         <field name="struct_id" ref="l10n_eg_hr_payroll.hr_payroll_structure_eg_employee_salary"/>
     </record>

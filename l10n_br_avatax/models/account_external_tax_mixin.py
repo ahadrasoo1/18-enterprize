@@ -59,21 +59,24 @@ class AccountExternalTaxMixinL10nBR(models.AbstractModel):
         for record in self:
             record.l10n_br_cnae_code_id = self.company_id.l10n_br_cnae_code_id
 
-    @api.depends('l10n_br_is_avatax')
+    @api.depends('country_code', 'fiscal_position_id')
     def _compute_l10n_br_goods_operation_type_id(self):
         """Set the default operation type which is standardSales. Should be overridden to determine
         the document type for the model."""
         for record in self:
-            record.l10n_br_goods_operation_type_id = self.env.ref("l10n_br_avatax.operation_type_1") if record.l10n_br_is_avatax else False
+            record.l10n_br_goods_operation_type_id = self.env.ref("l10n_br_avatax.operation_type_1") if record._l10n_br_is_avatax() else False
 
     @api.depends('country_code', 'fiscal_position_id')
     def _compute_l10n_br_is_avatax(self):
         for record in self:
-            record.l10n_br_is_avatax = record.country_code == 'BR' and record.fiscal_position_id.l10n_br_is_avatax
+            record.l10n_br_is_avatax = record._l10n_br_is_avatax()
 
     def _compute_is_tax_computed_externally(self):
         super()._compute_is_tax_computed_externally()
         self.filtered(lambda record: record.l10n_br_is_avatax).is_tax_computed_externally = True
+
+    def _l10n_br_is_avatax(self):
+        return self.country_code == 'BR' and self.fiscal_position_id.l10n_br_is_avatax
 
     def _l10n_br_avatax_log(self):
         self.env['account.external.tax.mixin']._enable_external_tax_logging(ICP_LOG_NAME)
@@ -133,12 +136,15 @@ class AccountExternalTaxMixinL10nBR(models.AbstractModel):
         errors = []
         for line in lines:
             product = line['tempProduct']
+            cean = line['itemDescriptor']['cean']
             if not product:
                 errors.append(_('- A product is required on each line when using Avatax.'))
             elif not product.l10n_br_ncm_code_id:
                 errors.append(_('- Please configure a Mercosul NCM Code on %s.', product.display_name))
             elif line['lineAmount'] < 0:
                 errors.append(_("- Avatax Brazil doesn't support negative lines."))
+            elif cean and (not cean.isdigit() or not (len(cean) == 8 or 12 <= len(cean) <= 14)):
+                errors.append(_("- The barcode of %s must have either 8, or 12 to 14 digits when using Avatax.", product.display_name))
 
         service_lines, consumable_lines = partition(
             lambda line: line["tempProduct"].product_tmpl_id._l10n_br_is_only_allowed_on_service_invoice(), lines
@@ -164,8 +170,6 @@ class AccountExternalTaxMixinL10nBR(models.AbstractModel):
                         products=format_list(self.env, [line["tempProduct"].display_name for line in consumable_lines]),
                     )
                 )
-
-            errors = []
 
             partner = self.partner_shipping_id
             city = partner.city_id
@@ -208,8 +212,7 @@ class AccountExternalTaxMixinL10nBR(models.AbstractModel):
             'numberOfItems': qty,
             'itemDescriptor': {
                 'description': product.display_name or '',
-                # The periods in the code work during tax calculation, but not EDI. Removing them works in both.
-                'hsCode': (product.l10n_br_ncm_code_id.code or '').replace('.', ''),
+                'cean': product.barcode or '',
             },
             'tempTransportCostType': product.l10n_br_transport_cost_type,
             'tempProduct': product,
@@ -225,6 +228,7 @@ class AccountExternalTaxMixinL10nBR(models.AbstractModel):
             line['benefitsAbroad'] = self.partner_shipping_id.country_id.code != 'BR'
             descriptor['serviceCodeOrigin'] = product.l10n_br_property_service_code_origin_id.code
             descriptor['withLaborAssignment'] = product.l10n_br_labor
+            descriptor['hsCode'] = product.l10n_br_ncm_code_id.code or ''
 
             # Explicitly filter on company, this can be called via controllers which run as superuser and bypass record rules.
             service_codes = product.product_tmpl_id.l10n_br_service_code_ids.filtered(lambda code: code.company_id == self.env.company)
@@ -236,6 +240,7 @@ class AccountExternalTaxMixinL10nBR(models.AbstractModel):
             descriptor['cest'] = product.l10n_br_cest_code or ''
             descriptor['source'] = product.l10n_br_source_origin or ''
             descriptor['productType'] = product.l10n_br_sped_type or ''
+            descriptor['hsCode'] = (product.l10n_br_ncm_code_id.code or '').replace('.', '')
 
         return line
 
@@ -422,6 +427,7 @@ class AccountExternalTaxMixinL10nBR(models.AbstractModel):
 
     def _l10n_br_get_line_total(self, line_result):
         """The service API already accounts for the discount in the net figure."""
+        self.ensure_one()
         if self.l10n_br_is_service_transaction:
             return line_result["lineNetFigure"]
         else:
@@ -502,14 +508,12 @@ class AccountExternalTaxMixinL10nBR(models.AbstractModel):
                 record_id = line_result['lineCode']
                 record = self.env[self._l10n_br_line_model_name()].browse(int(record_id))
                 details[record] = {}
-                details[record]['total'] = self._l10n_br_get_line_total(line_result)
+                details[record]['total'] = document._l10n_br_get_line_total(line_result)
                 details[record]['tax_amount'] = 0
                 details[record]['tax_ids'] = self.env['account.tax']
                 for detail in line_result['taxDetails']:
-                    if detail['taxImpact']['impactOnNetAmount'] != 'Informative':
+                    if detail['taxImpact']['impactOnNetAmount'] != 'Informative' and not (detail['taxType'] == 'icmsDeson' and detail['taxImpact']['accounting'] == 'none'):
                         tax_amount = detail['tax']
-                        if is_return:
-                            tax_amount = -tax_amount
 
                         if detail['taxImpact']['impactOnNetAmount'] == 'Subtracted':
                             tax_amount = -tax_amount

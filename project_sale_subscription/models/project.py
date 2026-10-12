@@ -66,7 +66,7 @@ class Project(models.Model):
         profitability_items = super()._get_profitability_items(with_action)
         subscription_read_group = self.env['sale.order'].sudo()._read_group(
             [('project_id.account_id', 'in', self.account_id.ids),
-             ('subscription_state', 'not in', ['1_draft', '5_renewed']),
+             ('subscription_state', '!=', '1_draft'),
              ('is_subscription', '=', True),
             ],
             ['sale_order_template_id', 'subscription_state', 'currency_id'],
@@ -147,7 +147,7 @@ class Project(models.Model):
             ('is_subscription', '=', True),
         ])
         display_load_more = False
-        subscriptions_lines = self.env['sale.order.line'].search(offset=offset, limit=limit + 1, domain=[('order_id', 'in', all_subscription_ids)])
+        subscriptions_lines = self.env['sale.order.line'].search(offset=offset, limit=limit + 1, domain=[('order_id', 'in', all_subscription_ids), ('display_type', '=', False)])
         if len(subscriptions_lines) > limit:
             subscriptions_lines = subscriptions_lines - subscriptions_lines[limit]
             display_load_more = True

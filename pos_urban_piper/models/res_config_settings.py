@@ -1,5 +1,5 @@
 from odoo import fields, models, _
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, RedirectWarning
 
 from .pos_urban_piper_request import UrbanPiperClient
 
@@ -8,7 +8,7 @@ class ResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
 
     urbanpiper_username = fields.Char(
-        string='Username',
+        string='UrbanPiper Username',
         config_parameter='pos_urban_piper.urbanpiper_username',
         help='The username for the UrbanPiper account.'
     )
@@ -60,6 +60,26 @@ class ResConfigSettings(models.TransientModel):
         help='The delivery providers used for online delivery through UrbanPiper.'
     )
 
+    def urbanpiper_create_store(self):
+        """
+        Create the store in UrbanPiper.
+        """
+        self.pos_config_id._check_required_request_params()
+        if not self.pos_config_id.company_id.city:
+            msg = _('Your company %s needs to have a correct city in order create the store.', self.pos_config_id.company_id.name)
+            action = {
+                'view_mode': 'form',
+                'res_model': 'res.company',
+                'type': 'ir.actions.act_window',
+                'res_id': self.pos_config_id.company_id.id,
+                'views': [[self.env.ref('base.view_company_form').id, 'form']],
+            }
+            raise RedirectWarning(msg, action, _('Go to Company configuration'))
+        up = UrbanPiperClient(self.pos_config_id)
+        up.configure_webhook()
+        response_json = up.request_store_create()
+        return self.pos_config_id._urbanpiper_handle_response(response_json)
+
     def urbanpiper_sync_menu(self):
         """
         Sync the menu with UrbanPiper. This will update the menu items and categories in UrbanPiper.
@@ -80,7 +100,20 @@ class ResConfigSettings(models.TransientModel):
         return self.pos_config_id._urbanpiper_handle_response(response_json)
 
     def action_refresh_webhooks(self):
+        """
+        If a webhook already exists on Atlas, refresh it; otherwise, create a new one.
+        and products become available for syncing again as fresh entries.
+        """
+        self.pos_config_id._reset_urbanpiper_product_linkages()
         self.pos_config_id._check_required_request_params()
         up = UrbanPiperClient(self.pos_config_id)
         response_json = up.request_refresh_webhooks()
         return self.pos_config_id._urbanpiper_handle_response(response_json)
+
+    def action_flush_and_sync_menu(self):
+        """
+        Resets all existing UrbanPiper product linkages and performs a fresh menu sync.
+        """
+        self.ensure_one()
+        self.pos_config_id._reset_urbanpiper_product_linkages()
+        return self.with_context(flush=True).urbanpiper_sync_menu()

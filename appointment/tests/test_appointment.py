@@ -230,6 +230,39 @@ class AppointmentTest(AppointmentCommon, HttpCaseWithUserDemo):
                 is_available
             )
 
+    @freeze_time('2025-05-19')
+    def test_appointment_not_blocked_by_nextday_allday_event(self):
+        """Ensure Monday 7-8:30 PM (local) is not blocked by a Tuesday all-day event,
+            even if both overlap on May 20 UTC due to time zone conversion.
+        """
+        self.staff_user_bxls.tz = 'America/Chicago'
+        local_tz = pytz.timezone(self.staff_user_bxls.tz)
+
+        # Monday 7:00 PM → 8:30 PM (local) converted to UTC - start time is Tuesday 0:0 UTC and end time is 1:30 UTC
+        slot_start_utc = local_tz.localize(datetime(2025, 5, 19, 19, 0)).astimezone(pytz.utc).replace(tzinfo=None)
+        slot_end_utc = local_tz.localize(datetime(2025, 5, 19, 20, 30)).astimezone(pytz.utc).replace(tzinfo=None)
+
+        busy_day = datetime(2025, 5, 20, 0, 0)  # 2025-5-20 is the following Tuesday
+        self.env['calendar.event'].create({
+            'name': "All-Day Tuesday",
+            'start': busy_day,
+            'stop': busy_day + timedelta(days=1),
+            'allday': True,
+            'show_as': 'busy',
+            'partner_ids': [self.staff_user_bxls.partner_id.id],
+            'user_id': self.staff_user_bxls.id,
+            'attendee_ids': [Command.create({
+                'state': 'accepted',
+                'availability': 'busy',
+                'partner_id': self.staff_user_bxls.partner_id.id,
+                }),
+            ],
+        })
+        self.assertTrue(
+            self.staff_user_bxls.partner_id.with_context(tz='America/Chicago').calendar_verify_availability(slot_start_utc, slot_end_utc),
+            "Time slots should not be blocked by next-day all-day events."
+        )
+
     @users('apt_manager')
     def test_appointment_type_create_anytime(self):
         # Any Time: only 1 / employee
@@ -1370,7 +1403,7 @@ class AppointmentTest(AppointmentCommon, HttpCaseWithUserDemo):
         self.assertSlots(
             slots,
             [{'name_formated': 'February 2022',
-              'month_date': datetime(2022, 2, 1),
+              'month_date': date(2022, 2, 1),
               'weeks_count': 5,  # 31/01 -> 28/02 (06/03)
               }
              ],
@@ -1378,9 +1411,36 @@ class AppointmentTest(AppointmentCommon, HttpCaseWithUserDemo):
              'startdate': self.reference_now_monthweekstart,
              'slots_start_hours': [],
              # first Monday after reference_now
-             'slots_startdate': self.reference_monday + timedelta(days=7),
+             'slots_startdate': self.reference_monday.date() + timedelta(days=7),
              # only test that day
-             'slots_enddate': self.reference_monday + timedelta(days=14),
+             'slots_enddate': self.reference_monday.date() + timedelta(days=14),
              'slots_day_specific': {date(2022, 2, 28): [{'start':1}]}
              }
         )
+
+    def test_no_activity_creation_on_apt_booking(self):
+        """ Test that no activity is created on appointment booking. """
+        apt_type = self.apt_type_bxls_2days
+        self.env['calendar.event'].with_user(self.apt_manager).with_context(
+            default_res_model=apt_type._name,
+            default_res_id=apt_type.id,
+        ).create({
+            'name': 'Appointment Meeting',
+            'start': datetime(2022, 2, 1, 10, 0, 0),
+            'stop': datetime(2022, 2, 1, 11, 0, 0),
+            'appointment_type_id': apt_type.id,
+        })
+        self.assertEqual(len(apt_type.activity_ids), 0)
+        # Ensure that activities are created if model is not appointment.type
+        test_record = self.env['res.partner'].create({
+            'name': 'User 0',
+        })
+        self.env['calendar.event'].with_user(self.user_demo).with_context(
+            default_res_model=test_record._name,
+            default_res_id=test_record.id,
+        ).create({
+            'name': 'Normal Meeting',
+            'start': datetime(2022, 2, 1, 11, 0, 0),
+            'stop': datetime(2022, 2, 1, 12, 0, 0),
+        })
+        self.assertEqual(len(test_record.activity_ids), 1)

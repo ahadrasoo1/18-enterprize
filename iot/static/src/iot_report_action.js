@@ -7,6 +7,7 @@ import { DeviceController } from "@iot/device_controller";
 import {
     IOT_REPORT_PREFERENCE_LOCAL_STORAGE_KEY,
     removeIoTReportIdFromBrowserLocalStorage,
+    setReportIdInBrowserLocalStorage,
 } from "./client_action/delete_local_storage";
 
 /**
@@ -34,6 +35,10 @@ async function getDevicesFromIds(orm, stored_content) {
     ]);
 }
 
+function printSuccess(notification, name) {
+    notification.add(_t("Successfully printed on %s", name), { type: "success" });
+}
+
 /**
  * Send the report to the IoT device using longpolling
  * @param env The environment
@@ -56,12 +61,22 @@ async function longpolling(env, orm, args, stored_device_ids) {
         false, // Do not use websocket
     ]);
     for (const job of jobs) {
-        const [ ip, identifier, name, document ] = job;
+        const [ ip, identifier, name, document, iot_idempotent_id ] = job;
         const longpollingHasFallback = true; // Prevent `IoTConnectionErrorDialog`
         env.services.notification.add(_t("Sending to printer %s...", name), { type: "info" });
 
         const iotDevice = new DeviceController(env.services.iot_longpolling, { iot_ip: ip, identifier });
-        await iotDevice.action({ document, print_id: uuid }, longpollingHasFallback);
+        iotDevice.addListener((result) => {
+            if (result.status === "success") {
+                printSuccess(env.services.notification, name);
+            }
+        });
+        try {
+            await iotDevice.action({ iot_idempotent_id, document, print_id: uuid }, longpollingHasFallback);
+        } catch (e) {
+            iotDevice.removeListener();
+            throw e;
+        }
     }
 }
 
@@ -82,8 +97,13 @@ export async function handleIoTConnectionFallbacks(env, orm, args, stored_device
         try {
             await connectionType();
             return;
-        } catch {
-            console.debug("Send print request failed, attempting another protocol.")
+        } catch (error) {
+            if (error.type == "server") {
+                removeIoTReportIdFromBrowserLocalStorage(args[0]); // args[0] = report_id
+                env.services.ui.unblock();
+                throw error;
+            }
+            console.debug("Send print request failed, attempting another protocol.");
         }
     }
 
@@ -92,29 +112,63 @@ export async function handleIoTConnectionFallbacks(env, orm, args, stored_device
     removeIoTReportIdFromBrowserLocalStorage(args[0]);  // args[0] = report_id
 }
 
+export async function getSelectedPrintersForReport(reportId, env) {
+    const { orm, action, ui } = env.services;
+    const selectedPrintersByReportId = JSON.parse(browser.localStorage.getItem(IOT_REPORT_PREFERENCE_LOCAL_STORAGE_KEY));
+    const selectedPrinters = selectedPrintersByReportId?.[reportId];
+
+    if (selectedPrinters) {
+        return selectedPrinters;
+    }
+
+    // Open IoT devices selection wizard
+    const openDeviceSelectionWizard = await orm.call("ir.actions.report", "get_action_wizard", [reportId]);
+    await action.doAction(openDeviceSelectionWizard);
+
+    // If the UI is currently blocked, we need to temporarily unblock it or the user won't be able to select the printer
+    const uiWasBlocked = ui.isBlocked;
+    if (uiWasBlocked) {
+        ui.unblock();
+    }
+
+    // Wait for the popup to be closed and a printer selected
+    return new Promise((resolve) => {
+        const onPrinterSelected = (event) => {
+            if (event.detail.reportId === reportId) {
+                const selectedPrinters = event.detail.selectedPrinterIds;
+                if (selectedPrinters) {
+                    setReportIdInBrowserLocalStorage(reportId, selectedPrinters);
+                }
+                resolve(selectedPrinters);
+                env.bus.removeEventListener("printer-selected", onPrinterSelected);
+                if (uiWasBlocked) {
+                    ui.block();
+                }
+            }
+        };
+        env.bus.addEventListener("printer-selected", onPrinterSelected);
+    });
+}
+
 async function iotReportActionHandler(action, options, env) {
     if (action.device_ids && action.device_ids.length) {
         const orm = env.services.orm;
         action.data = action.data || {};
-        action.data["device_ids"] = action.device_ids;
         const args = [action.id, action.context.active_ids, action.data, uuid()];
-        const report_id = action.id;
-        const local_lists = JSON.parse(browser.localStorage.getItem(IOT_REPORT_PREFERENCE_LOCAL_STORAGE_KEY));
-        const onClose = options.onClose;
-        const stored_device_ids = local_lists ? local_lists[report_id] : undefined;
-        if (!stored_device_ids) {
-            // Open IoT devices selection wizard
-            const action_wizard = await orm.call("ir.actions.report", "get_action_wizard", args);
-            await env.services.action.doAction(action_wizard);
-        } else {
-            // Try longpolling then websocket
-            await handleIoTConnectionFallbacks(env, orm, args, stored_device_ids);
+        const reportId = action.id;
+        const printerIds = await getSelectedPrintersForReport(reportId, env);
 
-            // We close here to prevent premature closure if the device selection modal is displayed.
-            env.services.action.doAction({ type: "ir.actions.act_window_close" }, { onClose });
+        if (!printerIds) {
+            // If the user does not select any printer, fall back to normal printing
+            return false;
         }
 
-        onClose?.();
+        env.services.ui.block();
+        // Try longpolling then websocket
+        await handleIoTConnectionFallbacks(env, orm, args, printerIds);
+        env.services.ui.unblock();
+
+        options.onClose?.();
         return true;
     }
 }

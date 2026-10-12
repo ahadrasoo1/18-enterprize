@@ -14,7 +14,6 @@ function fail(errorMessage) {
 
 const SHEETNAME = "Res Partner Test Spreadsheet";
 registry.category("web_tour.tours").add("spreadsheet_open_pivot_sheet", {
-    test: true,
     steps: () => [
         {
             trigger: '.o_app[data-menu-xmlid="documents.menu_root"]',
@@ -22,13 +21,17 @@ registry.category("web_tour.tours").add("spreadsheet_open_pivot_sheet", {
             run: "click",
         },
         {
-            trigger: 'li[title="Test folder"] header',
-            content: "Open the test folder (in company folder)",
+            trigger: '.o_documents_title:contains("Folders")',
+            content: "check if the folders are loaded",
+        },
+        {
+            trigger: 'li[title="Company"] header button',
+            content: "Open the company folder",
             run: "click",
         },
         {
-            trigger: `div[title="${SHEETNAME}"]`,
-            content: "Select Test Sheet",
+            trigger: "span.o_search_panel_label_title:contains('Test Folder')",
+            content: "Open the test folder (in company folder)",
             run: "click",
         },
         {
@@ -39,7 +42,7 @@ registry.category("web_tour.tours").add("spreadsheet_open_pivot_sheet", {
         {
             trigger: `.o_data_cell:contains("${SHEETNAME}")`,
             content: "Open the sheet",
-            run: "dblclick",
+            run: "click",
         },
         {
             trigger: "div.o_topbar_filter_icon",

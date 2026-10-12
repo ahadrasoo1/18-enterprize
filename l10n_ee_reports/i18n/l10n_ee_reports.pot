@@ -4,16 +4,40 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 16.0+e\n"
+"Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-27 09:47+0000\n"
-"PO-Revision-Date: 2023-03-27 09:47+0000\n"
+"POT-Creation-Date: 2026-04-03 19:13+0000\n"
+"PO-Revision-Date: 2026-04-03 19:13+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
+
+#. module: l10n_ee_reports
+#. odoo-javascript
+#: code:addons/l10n_ee_reports/static/src/components/tax_report/warnings.xml:0
+msgid "'Account - Allow updating tax grids'"
+msgstr ""
+
+#. module: l10n_ee_reports
+#. odoo-javascript
+#: code:addons/l10n_ee_reports/static/src/components/tax_report/warnings.xml:0
+msgid "'Estonia - Accounting'"
+msgstr ""
+
+#. module: l10n_ee_reports
+#. odoo-javascript
+#: code:addons/l10n_ee_reports/static/src/components/tax_report/warnings.xml:0
+msgid "'Estonia - Rounding'"
+msgstr ""
+
+#. module: l10n_ee_reports
+#. odoo-javascript
+#: code:addons/l10n_ee_reports/static/src/components/tax_report/warnings.xml:0
+msgid "A new version of the"
+msgstr ""
 
 #. module: l10n_ee_reports
 #: model:account.report.line,name:l10n_ee_reports.account_financial_report_bs_assets
@@ -41,6 +65,16 @@ msgstr ""
 #: model:account.report.line,name:l10n_ee_reports.account_financial_report_bs_bio_assets
 #: model:account.report.line,name:l10n_ee_reports.account_financial_report_bs_lt_bio_assets
 msgid "Biological Assets"
+msgstr ""
+
+#. module: l10n_ee_reports
+#: model:account.report.column,name:l10n_ee_reports.kmd_inf_a_report_buyer_name
+msgid "Buyer Name"
+msgstr ""
+
+#. module: l10n_ee_reports
+#: model:account.report.column,name:l10n_ee_reports.kmd_inf_a_report_buyer_reg_code
+msgid "Buyer Register Code"
 msgstr ""
 
 #. module: l10n_ee_reports
@@ -77,14 +111,27 @@ msgstr ""
 
 #. module: l10n_ee_reports
 #. odoo-python
-#: code:addons/l10n_ee_reports/models/account_report.py:0
 #: code:addons/l10n_ee_reports/models/account_sales_report.py:0
 msgid "Company Settings"
 msgstr ""
 
 #. module: l10n_ee_reports
+#. odoo-python
+#: code:addons/l10n_ee_reports/models/account_report.py:0
+msgid "Company: %s"
+msgstr ""
+
+#. module: l10n_ee_reports
 #: model:account.report.column,name:l10n_ee_reports.account_financial_report_ec_sales_country
 msgid "Country Code"
+msgstr ""
+
+#. module: l10n_ee_reports
+#. odoo-python
+#: code:addons/l10n_ee_reports/models/account_report.py:0
+msgid ""
+"Currency %s, used for a threshold in this report, is either nonexistent or "
+"inactive. Please create or activate it."
 msgstr ""
 
 #. module: l10n_ee_reports
@@ -146,6 +193,12 @@ msgid "Finished Goods"
 msgstr ""
 
 #. module: l10n_ee_reports
+#. odoo-python
+#: code:addons/l10n_ee_reports/models/account_report.py:0
+msgid "Go to Company"
+msgstr ""
+
+#. module: l10n_ee_reports
 #: model:account.report.line,name:l10n_ee_reports.account_financial_report_bs_goods_resale
 msgid "Goods for Resale"
 msgstr ""
@@ -177,8 +230,9 @@ msgid "Income Taxes"
 msgstr ""
 
 #. module: l10n_ee_reports
-#: model:account.report.column,name:l10n_ee_reports.kmd_inf_report_vat_in_period
-msgid "Input VAT on KMD"
+#: model:account.report.column,name:l10n_ee_reports.kmd_inf_b_report_vat_in_period
+msgid ""
+"Input VAT Amount Presented in Field 5 of Form KMD for the Taxation Period"
 msgstr ""
 
 #. module: l10n_ee_reports
@@ -207,18 +261,25 @@ msgid "Investments in Subsidiaries and Affiliates"
 msgstr ""
 
 #. module: l10n_ee_reports
-#: model:account.report.column,name:l10n_ee_reports.kmd_inf_report_invoice_date
+#: model:account.report.column,name:l10n_ee_reports.kmd_inf_a_report_invoice_date
+#: model:account.report.column,name:l10n_ee_reports.kmd_inf_b_report_invoice_date
 msgid "Invoice Date"
 msgstr ""
 
 #. module: l10n_ee_reports
-#: model:account.report.column,name:l10n_ee_reports.kmd_inf_report_invoice_number
+#: model:account.report.column,name:l10n_ee_reports.kmd_inf_a_report_invoice_number
+#: model:account.report.column,name:l10n_ee_reports.kmd_inf_b_report_invoice_number
 msgid "Invoice Number"
 msgstr ""
 
 #. module: l10n_ee_reports
-#: model:account.report.column,name:l10n_ee_reports.kmd_inf_report_invoice_total
-msgid "Invoice Total"
+#: model:account.report.column,name:l10n_ee_reports.kmd_inf_b_report_invoice_sum_vat
+msgid "Invoice Total with VAT"
+msgstr ""
+
+#. module: l10n_ee_reports
+#: model:account.report.column,name:l10n_ee_reports.kmd_inf_a_report_invoice_sum
+msgid "Invoice Total without VAT"
 msgstr ""
 
 #. module: l10n_ee_reports
@@ -251,6 +312,18 @@ msgstr ""
 #. module: l10n_ee_reports
 #: model:account.report.line,name:l10n_ee_reports.account_financial_report_pl_1_misc_op_exp
 msgid "Miscellaneous Operating Expenses"
+msgstr ""
+
+#. module: l10n_ee_reports
+#. odoo-python
+#: code:addons/l10n_ee_reports/models/account_report.py:0
+msgid "Missing partners"
+msgstr ""
+
+#. module: l10n_ee_reports
+#. odoo-python
+#: code:addons/l10n_ee_reports/models/account_report.py:0
+msgid "Modules"
 msgstr ""
 
 #. module: l10n_ee_reports
@@ -342,29 +415,25 @@ msgid "Own Shares"
 msgstr ""
 
 #. module: l10n_ee_reports
-#: model:account.report.line,name:l10n_ee_reports.kmd_inf_report_a_line
+#: model:account.report.line,name:l10n_ee_reports.kmd_inf_report_a
 msgid "Part A - Invoices Issued"
 msgstr ""
 
 #. module: l10n_ee_reports
-#: model:account.report.line,name:l10n_ee_reports.kmd_inf_report_b_line
+#: model:account.report.line,name:l10n_ee_reports.kmd_inf_report_b
 msgid "Part B - Invoices Received"
-msgstr ""
-
-#. module: l10n_ee_reports
-#: model:account.report.column,name:l10n_ee_reports.kmd_inf_report_partner_name
-msgid "Partner Name"
-msgstr ""
-
-#. module: l10n_ee_reports
-#: model:account.report.column,name:l10n_ee_reports.kmd_inf_report_partner_reg_code
-msgid "Partner Reg Code"
 msgstr ""
 
 #. module: l10n_ee_reports
 #: model:account.report.line,name:l10n_ee_reports.account_financial_report_bs_lt_pay_prep
 #: model:account.report.line,name:l10n_ee_reports.account_financial_report_bs_pay_prep
 msgid "Payables and Prepayments"
+msgstr ""
+
+#. module: l10n_ee_reports
+#. odoo-javascript
+#: code:addons/l10n_ee_reports/static/src/components/tax_report/warnings.xml:0
+msgid "Please install the"
 msgstr ""
 
 #. module: l10n_ee_reports
@@ -454,6 +523,16 @@ msgid "Sales Revenue"
 msgstr ""
 
 #. module: l10n_ee_reports
+#: model:account.report.column,name:l10n_ee_reports.kmd_inf_b_report_seller_name
+msgid "Seller Name"
+msgstr ""
+
+#. module: l10n_ee_reports
+#: model:account.report.column,name:l10n_ee_reports.kmd_inf_b_report_seller_reg_code
+msgid "Seller Register Code"
+msgstr ""
+
+#. module: l10n_ee_reports
 #: model:account.report.line,name:l10n_ee_reports.account_financial_report_bs_share_cap
 msgid "Share Capital (Nominal Value)"
 msgstr ""
@@ -479,7 +558,8 @@ msgid "Significant Impairment of Current Assets"
 msgstr ""
 
 #. module: l10n_ee_reports
-#: model:account.report.column,name:l10n_ee_reports.kmd_inf_report_comments
+#: model:account.report.column,name:l10n_ee_reports.kmd_inf_a_report_comments
+#: model:account.report.column,name:l10n_ee_reports.kmd_inf_b_report_comments
 msgid "Special Code"
 msgstr ""
 
@@ -500,13 +580,13 @@ msgid "Tax Provisions"
 msgstr ""
 
 #. module: l10n_ee_reports
-#: model:account.report.column,name:l10n_ee_reports.kmd_inf_report_tax_rate
+#: model:account.report.column,name:l10n_ee_reports.kmd_inf_a_report_tax_rate
 msgid "Tax Rate"
 msgstr ""
 
 #. module: l10n_ee_reports
-#: model:account.report.column,name:l10n_ee_reports.kmd_inf_report_sum_for_rate_in_period
-msgid "Taxable Supply on KMD"
+#: model:account.report.column,name:l10n_ee_reports.kmd_inf_a_report_sum_for_rate_in_period
+msgid "Taxable Supply for the Taxation Period"
 msgstr ""
 
 #. module: l10n_ee_reports
@@ -523,6 +603,20 @@ msgstr ""
 #: model:account.report.line,name:l10n_ee_reports.account_financial_report_bs_lt_tax_pay
 #: model:account.report.line,name:l10n_ee_reports.account_financial_report_bs_tax_pay
 msgid "Taxes Payable"
+msgstr ""
+
+#. module: l10n_ee_reports
+#. odoo-python
+#: code:addons/l10n_ee_reports/models/account_report.py:0
+msgid ""
+"This version of the KMD INF report is deprecated. Upgrade the module "
+"'Estonia - Accounting' to have access to the updated report."
+msgstr ""
+
+#. module: l10n_ee_reports
+#. odoo-javascript
+#: code:addons/l10n_ee_reports/static/src/components/tax_report/warnings.xml:0
+msgid "To adjust existing moves, manually update taxes grids or use the"
 msgstr ""
 
 #. module: l10n_ee_reports
@@ -572,6 +666,16 @@ msgid "VAT Report Annex (KMD INF)"
 msgstr ""
 
 #. module: l10n_ee_reports
+#: model:account.report,name:l10n_ee_reports.kmd_inf_report_part_a
+msgid "VAT Report Annex KMD INF Part A"
+msgstr ""
+
+#. module: l10n_ee_reports
+#: model:account.report,name:l10n_ee_reports.kmd_inf_report_part_b
+msgid "VAT Report Annex KMD INF Part B"
+msgstr ""
+
+#. module: l10n_ee_reports
 #: model:account.report.line,name:l10n_ee_reports.account_financial_report_bs_lt_warr_prov
 #: model:account.report.line,name:l10n_ee_reports.account_financial_report_bs_warr_prov
 msgid "Warranty Provisions"
@@ -585,18 +689,65 @@ msgstr ""
 #. module: l10n_ee_reports
 #. odoo-python
 #: code:addons/l10n_ee_reports/models/account_report.py:0
-#: code:addons/l10n_ee_reports/models/account_report.py:0
-#: code:addons/l10n_ee_reports/models/account_sales_report.py:0
 #: code:addons/l10n_ee_reports/models/account_sales_report.py:0
 msgid "XML"
 msgstr ""
 
 #. module: l10n_ee_reports
-#: model_terms:ir.ui.view,arch_db:l10n_ee_reports.vat_report_xml
-msgid "false"
+#. odoo-javascript
+#: code:addons/l10n_ee_reports/static/src/components/kmd_inf_report/warnings.xml:0
+msgid "You have"
 msgstr ""
 
 #. module: l10n_ee_reports
-#: model_terms:ir.ui.view,arch_db:l10n_ee_reports.vat_report_xml
-msgid "true"
+#. odoo-javascript
+#: code:addons/l10n_ee_reports/static/src/components/kmd_inf_report/warnings.xml:0
+msgid "here"
+msgstr ""
+
+#. module: l10n_ee_reports
+#. odoo-javascript
+#: code:addons/l10n_ee_reports/static/src/components/tax_report/warnings.xml:0
+msgid ""
+"module is available, offering improved KMD and KMD INF reports. Note: Tax "
+"grids are updated."
+msgstr ""
+
+#. module: l10n_ee_reports
+#. odoo-javascript
+#: code:addons/l10n_ee_reports/static/src/components/tax_report/warnings.xml:0
+msgid ""
+"module to have access to the rounding features for the Estonian tax report."
+msgstr ""
+
+#. module: l10n_ee_reports
+#. odoo-javascript
+#: code:addons/l10n_ee_reports/static/src/components/tax_report/warnings.xml:0
+msgid "module."
+msgstr ""
+
+#. module: l10n_ee_reports
+#. odoo-javascript
+#: code:addons/l10n_ee_reports/static/src/components/kmd_inf_report/warnings.xml:0
+msgid "to see the list."
+msgstr ""
+
+#. module: l10n_ee_reports
+#. odoo-javascript
+#: code:addons/l10n_ee_reports/static/src/components/kmd_inf_report/warnings.xml:0
+msgid "transaction partner"
+msgstr ""
+
+#. module: l10n_ee_reports
+#. odoo-javascript
+#: code:addons/l10n_ee_reports/static/src/components/kmd_inf_report/warnings.xml:0
+msgid "transaction partners"
+msgstr ""
+
+#. module: l10n_ee_reports
+#. odoo-javascript
+#: code:addons/l10n_ee_reports/static/src/components/kmd_inf_report/warnings.xml:0
+msgid ""
+"with eligible invoices in the selected period who are not included in the "
+"report due to a missing tax number or missing country. Click"
 msgstr ""

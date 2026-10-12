@@ -29,7 +29,7 @@ export class MrpMenuDialog extends Component {
         this.state = useState({ menu: "main"});
     }
 
-    async callAction(method) {
+    async callAction(method, props = {}) {
         const action = await this.orm.call(this.props.record.resModel, method,
             [
                 [this.props.record.resId],
@@ -42,8 +42,17 @@ export class MrpMenuDialog extends Component {
             onClose: async () => {
                 await this.props.reload(this.props.record);
             },
+            props,
         });
         this.props.close();
+    }
+
+    async callAddComponentAction() {
+        return this.callAction("action_add_component", {
+            onCatalogUpdated: async () => {
+                await this.props.reload(this.props.record);
+            },
+        });
     }
 
     moveToWorkcenter() {
@@ -68,24 +77,14 @@ export class MrpMenuDialog extends Component {
     }
 
     openMO() {
-        // remove potentially previously set "workcenter_id" key in the action context
-        delete this.action.currentController.action.context['workcenter_id'];
-
         const id = this.props.record.resModel === 'mrp.production' ?
             this.props.record.resId : this.props.record.data.production_id[0];
-
-        if (this.props.record.resModel === 'mrp.workorder') {
-            const val = this.props.params.isMyWO ? -1 : this.props.record.data.workcenter_id[0];
-            this.action.currentController.action.context.workcenter_id = val;
-        }
-
         this.action.doAction({
             'type': 'ir.actions.act_window',
             'res_model': 'mrp.production',
             'views': [[false, 'form']],
             'res_id': id,
         });
-
         this.props.close();
     }
 

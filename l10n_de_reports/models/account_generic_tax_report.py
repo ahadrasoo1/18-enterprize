@@ -94,14 +94,9 @@ class GermanTaxReportCustomHandler(models.AbstractModel):
                     elem.text = float_repr(int(line_value), 0)
                 elif line_code in ("66", "61", "62", "67", "63", "59", "64",):
                     # These are taxes that are on the wrong sign on the report compared to what should be exported
-                    elem.text = float_repr(- line_value, 2).replace('.', ',')
+                    elem.text = float_repr(- line_value, 2)
                 else:
-                    elem.text = float_repr(line_value, 2).replace('.', ',')
-
-            # "kz83" must be supplied with 0.00 if it doesn't have balance
-            elif line_code == "83":
-                elem = etree.SubElement(taxes, "Kz" + line_code)
-                elem.text = "0,00"
+                    elem.text = float_repr(line_value, 2)
 
         return {
             'file_name': report.get_default_report_filename(options, 'xml'),

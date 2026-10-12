@@ -4,7 +4,7 @@ import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { ControlPanel } from "@web/search/control_panel/control_panel";
 
-import { Component, onWillStart, useState, useSubEnv } from "@odoo/owl";
+import { Component, onWillDestroy, onWillStart, useRef, useState, useSubEnv } from "@odoo/owl";
 
 import { AccountReportController } from "@account_reports/components/account_report/controller";
 import { AccountReportButtonsBar } from "@account_reports/components/account_report/buttons_bar/buttons_bar";
@@ -41,8 +41,9 @@ export class AccountReport extends Component {
     static defaultComponentsMap = [];
 
     setup() {
-
+        this.rootRef = useRef("root");
         useSetupAction({
+            rootRef: this.rootRef,
             getLocalState: () => {
                 return {
                     keep_journal_groups_options: true,  // used when using the breadcrumb
@@ -59,13 +60,18 @@ export class AccountReport extends Component {
         this.orm = useService("orm");
         this.actionService = useService("action");
         this.controller = useState(new AccountReportController(this.props.action));
-        this.initialQuery = this.props.action.context?.default_filter_accounts;
+        this.initialQuery = this.props.action.context.default_filter_accounts || '';
 
         for (const customizableComponent of AccountReport.customizableComponents)
             AccountReport.defaultComponentsMap[customizableComponent.name] = customizableComponent;
 
         onWillStart(async () => {
             await this.controller.load(this.env);
+        });
+
+        onWillDestroy(() => {
+            // Since the controller is preloading the sections using a setTimeout, it's never stopped unless we explicitly tell it.
+            this.controller.destroyed = true;
         });
 
         useSubEnv({
@@ -110,9 +116,7 @@ export class AccountReport extends Component {
     get tableClasses() {
         let classes = "";
 
-        if (this.controller.hasBudgetColumn) {
-            classes += " budget-striped";
-        } else if (this.controller.options.columns.length > 1) {
+        if (this.controller.options.columns.length > 1) {
             classes += " striped";
         }
 

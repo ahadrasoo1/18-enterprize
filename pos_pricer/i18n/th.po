@@ -1,23 +1,27 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* pos_pricer
-# 
+# * pos_pricer
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Rasareeyar Lappiam, 2024
+#
+# Weblate <noreply-mt-weblate@weblate.org>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Thai (https://app.transifex.com/odoo/teams/41243/th/)\n"
+"POT-Creation-Date: 2025-12-29 18:45+0000\n"
+"PO-Revision-Date: 2025-11-17 14:19+0000\n"
+"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"Language-Team: Thai <https://translate.odoo.com/projects/odoo-18/pos_pricer/"
+"th/>\n"
+"Language: th\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: th\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 5.12.2\n"
 
 #. module: pos_pricer
 #: model:ir.model.constraint,message:pos_pricer.constraint_pricer_tag_name_unique
@@ -43,6 +47,11 @@ msgstr "Auth Url"
 #: model:product.pricelist,name:pos_pricer.pricer_demo_pricelist
 msgid "Christmas"
 msgstr "คริสต์มาส"
+
+#. module: pos_pricer
+#: model:ir.model,name:pos_pricer.model_res_partner
+msgid "Contact"
+msgstr "รายชื่อผู้ติดต่อ"
 
 #. module: pos_pricer
 #: model:ir.model.fields,field_description:pos_pricer.field_pricer_store__create_or_update_products_url
@@ -88,9 +97,7 @@ msgstr "ข้อผิดพลาด: ตรวจสอบข้อมูล�
 #. odoo-python
 #: code:addons/pos_pricer/models/pricer_store.py:0
 msgid "Failed to unlink Pricer tag %(pricer_tag)s at API url %(api_url)s"
-msgstr ""
-"ไม่สามารถยกเลิกการเชื่อมโยงแท็ก Pricer %(pricer_tag)s ที่ API url "
-"%(api_url)s"
+msgstr "ไม่สามารถยกเลิกการเชื่อมโยงแท็ก Pricer %(pricer_tag)s ที่ API url %(api_url)s"
 
 #. module: pos_pricer
 #: model:ir.model.fields,field_description:pos_pricer.field_pricer_store__id
@@ -109,7 +116,7 @@ msgstr "ตัวระบุร้านค้าในระบบ Pricer"
 msgid ""
 "Invalid tag name. Should be 1 letter followed by 16 digits. Example: "
 "'N4081315789813275'"
-msgstr ""
+msgstr "ชื่อแท็กไม่ถูกต้อง ควรเป็น 1 ตัวอักษรตามด้วย 16 หลัก ตัวอย่าง: 'N4081315789813275'"
 
 #. module: pos_pricer
 #: model:ir.model.fields,help:pos_pricer.field_pricer_tag__name
@@ -233,9 +240,7 @@ msgstr "รหัสร้านค้า Pricer"
 msgid ""
 "Pricer Store ID must only contain lowercase a-z, 0-9 or '-' and not start "
 "with '-'"
-msgstr ""
-"รหัสร้านค้าของ Pricer ต้องมีเฉพาะตัวพิมพ์เล็ก a-z, 0-9 หรือ '-' "
-"และไม่ขึ้นต้นด้วย '-'"
+msgstr "รหัสร้านค้าของ Pricer ต้องมีเฉพาะตัวพิมพ์เล็ก a-z, 0-9 หรือ '-' และไม่ขึ้นต้นด้วย '-'"
 
 #. module: pos_pricer
 #: model:ir.model.fields,help:pos_pricer.field_pricer_store__name
@@ -309,7 +314,7 @@ msgstr "ตัวแปรสินค้า"
 #. module: pos_pricer
 #: model:ir.model.fields,field_description:pos_pricer.field_pricer_store__dummy_prod_barcode
 msgid "Product barcode"
-msgstr ""
+msgstr "บาร์โค้ดสินค้า"
 
 #. module: pos_pricer
 #: model:ir.model.fields,field_description:pos_pricer.field_pricer_store__product_ids
@@ -347,6 +352,11 @@ msgid "Store Name"
 msgstr "ชื่อร้านค้า"
 
 #. module: pos_pricer
+#: model:ir.model,name:pos_pricer.model_product_supplierinfo
+msgid "Supplier Pricelist"
+msgstr "รายการราคาซัพพลายเออร์"
+
+#. module: pos_pricer
 #. odoo-javascript
 #: code:addons/pos_pricer/static/src/views/pricer_quick_pairing_form_view.js:0
 msgid "Tag '%s' found"
@@ -370,21 +380,25 @@ msgstr ""
 msgid ""
 "Tag id should be a 17 characters string composed of a letter followed by 16 "
 "digits"
-msgstr ""
-"รหัสแท็กควรเป็นสตริงอักขระ 17 ตัวที่ประกอบด้วยตัวอักษรตามด้วยตัวเลข 16 หลัก"
+msgstr "รหัสแท็กควรเป็นสตริงอักขระ 17 ตัวที่ประกอบด้วยตัวอักษรตามด้วยตัวเลข 16 หลัก"
+
+#. module: pos_pricer
+#: model:ir.model,name:pos_pricer.model_account_tax
+msgid "Tax"
+msgstr "ภาษี"
 
 #. module: pos_pricer
 #: model:ir.model.fields,help:pos_pricer.field_product_product__pricer_sale_pricelist_id
 msgid ""
 "This pricelist will be used to set sales on Pricer tags for this product"
-msgstr ""
+msgstr "รายการราคานี้จะใช้เพื่อกำหนดยอดขายบนแท็ก Pricer สำหรับผลิตภัณฑ์นี้"
 
 #. module: pos_pricer
 #: model:ir.model.fields,help:pos_pricer.field_pricer_tag__pricer_store_id
 #: model:ir.model.fields,help:pos_pricer.field_product_product__pricer_store_id
 msgid ""
-"This product will be linked to and displayed on the Pricer tags of the store"
-" selected here"
+"This product will be linked to and displayed on the Pricer tags of the store "
+"selected here"
 msgstr "สินค้านี้จะเชื่อมโยงและแสดงบนแท็กราคาของร้านค้าที่เลือกที่นี่"
 
 #. module: pos_pricer
@@ -393,8 +407,7 @@ msgid ""
 "This product will be linked to and displayed on the Pricer tags with ids "
 "listed here. It is recommended to use a barcode scanner"
 msgstr ""
-"สินค้านี้จะเชื่อมโยงและแสดงบนแท็กราคาพร้อมรหัสที่แสดงไว้ที่นี่ "
-"ขอแนะนำให้ใช้เครื่องสแกนบาร์โค้ด"
+"สินค้านี้จะเชื่อมโยงและแสดงบนแท็กราคาพร้อมรหัสที่แสดงไว้ที่นี่ ขอแนะนำให้ใช้เครื่องสแกนบาร์โค้ด"
 
 #. module: pos_pricer
 #: model_terms:ir.ui.view,arch_db:pos_pricer.pricer_pricer_store_view_list

@@ -4,8 +4,6 @@
 import re
 import base64
 import io
-
-from odoo.tools.pdf import PdfFileReader  # bt: core PDF layer (core no longer patches PyPDF2)
 from collections import defaultdict
 from random import randint
 
@@ -13,6 +11,7 @@ from odoo import api, fields, models, Command, _
 from odoo.exceptions import UserError, AccessError, ValidationError
 from odoo.osv import expression
 from odoo.tools import pdf
+from odoo.tools.pdf import PdfFileReader
 
 
 class SignTemplate(models.Model):
@@ -39,7 +38,7 @@ class SignTemplate(models.Model):
     color = fields.Integer()
     redirect_url = fields.Char(string="Redirect Link", default="",
         help="Optional link for redirection after signature")
-    redirect_url_text = fields.Char(string="Link Label", default="Open Link", translate=True,
+    redirect_url_text = fields.Char(string="Link Label", default="Close", translate=True,
         help="Optional text to display on the button link")
     signed_count = fields.Integer(compute='_compute_signed_in_progress_template')
     in_progress_count = fields.Integer(compute='_compute_signed_in_progress_template')
@@ -140,6 +139,10 @@ class SignTemplate(models.Model):
             self.attachment_id.check('read')
         return res
 
+    @api.onchange("attachment_id")
+    def _onchange_attachment_id(self):
+        self.attachment_id.check('read')
+
     def copy_data(self, default=None):
         vals_list = super().copy_data(default=default)
         for template, vals in zip(self, vals_list):
@@ -166,7 +169,7 @@ class SignTemplate(models.Model):
     @api.model
     def _get_pdf_number_of_pages(self, pdf_data):
         file_pdf = PdfFileReader(io.BytesIO(pdf_data), strict=False, overwriteWarnings=False)
-        return file_pdf.getNumPages()
+        return len(file_pdf.pages)
 
     def go_to_custom_template(self, sign_directly_without_mail=False):
         self.ensure_one()
@@ -362,7 +365,8 @@ class SignTemplate(models.Model):
         if template.has_sign_requests:
             template = template.copy({
                 'favorited_ids': [Command.link(self.env.user.id)],
-                'active': False
+                'active': False,
+                'sign_item_ids': False,
             })
         return {
             'type': 'ir.actions.client',
@@ -464,6 +468,8 @@ class SignItem(models.Model):
             self.env['sign.item.radio.set'].create([{
                 'radio_items': hanging_radio_items,
             }])
+
+        res.template_id.check_access('write')
         return res
 
     def copy_data(self, default=None):
@@ -476,6 +482,12 @@ class SignItem(models.Model):
         for item in vals_list:
             item['radio_set_id'] = radio_set_map.get(item['radio_set_id'])
         return vals_list
+
+    def write(self, vals):
+        res = super().write(vals)
+        if 'template_id' in vals:
+            self.template_id.check_access('write')
+        return res
 
 
 class SignItemType(models.Model):

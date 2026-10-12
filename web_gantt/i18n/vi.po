@@ -1,22 +1,23 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* web_gantt
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Thi Huong Nguyen, 2024
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:29+0000\n"
+"POT-Creation-Date: 2026-05-22 17:59+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
+"Last-Translator: Thi Huong Nguyen, 2024\n"
 "Language-Team: Vietnamese (https://app.transifex.com/odoo/teams/41243/vi/)\n"
+"Language: vi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: vi\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. module: web_gantt
@@ -44,12 +45,14 @@ msgstr "Chế độ xem cửa sổ tác vụ"
 
 #. module: web_gantt
 #. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer_controls.js:0
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "Activate dense mode"
 msgstr "Kích hoạt dense mode"
 
 #. module: web_gantt
 #. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer_controls.js:0
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "Activate sparse mode"
 msgstr "Kích hoạt sparse mode"
@@ -91,6 +94,12 @@ msgstr "Chỉnh sửa"
 
 #. module: web_gantt
 #. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+msgid "Ending date cannot be before the starting date"
+msgstr "Ngày kết thúc không được trước ngày bắt đầu"
+
+#. module: web_gantt
+#. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "Expand rows"
 msgstr "Mở rộng hàng"
@@ -106,6 +115,12 @@ msgstr "Tiêu điểm hôm nay"
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "From"
 msgstr "Từ"
+
+#. module: web_gantt
+#. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer_controls.js:0
+msgid "From: %(from_date)s to: %(to_date)s"
+msgstr "Từ: %(from_date)s đến: %(to_date)s"
 
 #. module: web_gantt
 #: model:ir.model.fields.selection,name:web_gantt.selection__ir_actions_act_window_view__view_mode__gantt
@@ -184,8 +199,8 @@ msgid ""
 "Invalid attributes (%(invalid_attributes)s) in gantt view. Attributes must "
 "be in (%(valid_attributes)s)"
 msgstr ""
-"Thuộc tính không hợp lệ (%(invalid_attributes)s) trong chế độ xem gantt. Các"
-" thuộc tính phải có dạng (%(valid_attributes)s)"
+"Thuộc tính không hợp lệ (%(invalid_attributes)s) trong chế độ xem gantt. Các "
+"thuộc tính phải có dạng (%(valid_attributes)s)"
 
 #. module: web_gantt
 #. odoo-python
@@ -233,13 +248,19 @@ msgstr "Kế hoạch"
 #. odoo-python
 #: code:addons/web_gantt/models/models.py:0
 msgid "Reschedule done successfully."
-msgstr ""
+msgstr "Đã lên lịch lại thành công."
 
 #. module: web_gantt
 #. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_popover.xml:0
 msgid "Start"
 msgstr "Bắt đầu"
+
+#. module: web_gantt
+#. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+msgid "Starting date cannot be after the ending date"
+msgstr "Ngày bắt đầu không được sau ngày kết thúc"
 
 #. module: web_gantt
 #. odoo-javascript
@@ -355,9 +376,3 @@ msgstr "tháng"
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "to"
 msgstr "đến"
-
-#. module: web_gantt
-#. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_row_progress_bar.xml:0
-msgid "{{ props.progressBar.warning }}"
-msgstr "{{ props.progressBar.warning }}"

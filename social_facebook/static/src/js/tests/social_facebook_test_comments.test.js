@@ -306,7 +306,7 @@ QUnit.module('Facebook Comments', (hooks) => {
     });
 
     QUnit.test('Check accounts statistics', async function (assert) {
-        assert.expect(7);
+        assert.expect(8);
 
         await makeView({
             type: "form",
@@ -335,9 +335,9 @@ QUnit.module('Facebook Comments', (hooks) => {
         assert.containsN(target, ".o_social_stream_stat_box", 2,
             "Kanban View should contain exactly 2 lines of account statistics.");
 
-        // 3 because '50%' counts as a match (and 60M, and -20%)
-        // so if we want to check that there are no actual 0%, it means we want only 3 times "contains 0%"
-        assert.containsN(target, ".o_social_stream_stat_box small:contains('0%')", 3,
+        // 2 because '50%' and `60%` counts as a match
+        // so if we want to check that there are no actual 0%, it means we want only 2 times "contains 0%"
+        assert.containsN(target, ".o_social_stream_stat_box small:contains('0%')", 2,
             "Accounts with has_trends = false should not display trends.");
 
         assert.containsOnce(target, ".o_social_stream_stat_box b:contains('519')",
@@ -345,6 +345,9 @@ QUnit.module('Facebook Comments', (hooks) => {
 
         assert.containsOnce(target, ".o_social_stream_stat_box small:contains('50%')",
             "Audience trend is correctly displayed.");
+
+        assert.containsOnce(target, ".o_social_stream_stat_box small:contains('60%')",
+            "Engagement trend is correctly displayed.");
     });
 
     QUnit.test('Check messages display', async function (assert) {

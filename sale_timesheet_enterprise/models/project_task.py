@@ -30,41 +30,30 @@ class ProjectTask(models.Model):
 
     @api.depends('allocated_hours')
     def _compute_project_sharing_timesheets(self):
-        is_portal_user = self.env.user._is_portal()
-        timesheets_per_task = None
-        if is_portal_user:
-            subtask_ids_per_task_id = self.sudo().with_context(active_test=False)._get_subtask_ids_per_task_id()
-            # Say `self.ids` is [1, 2, 3] and `_get_subtask_ids_per_task_id()` returns {1: [2, 4], 2: [4], 3: []}.
-            # We want to merge all subtask ids and add `self.ids` to it.
-            # Unpacking `subtask_ids_per_task_id` values in `set.union` seems to be the appropriate method:
-            # >>> set.union({}, [2, 4], [4], [], [1, 2, 3]) = {2, 4, 1, 3}
-            all_task_ids = set.union(set(), *subtask_ids_per_task_id.values(), self.ids)
-            timesheet_read_group = self.env['account.analytic.line'].sudo()._read_group(
-                [
-                    ('project_id', '!=', False),
-                    ('task_id', 'in', list(all_task_ids)),
-                    ('validated', 'in', [True, self.env['ir.config_parameter'].sudo().get_param('sale.invoiced_timesheet', DEFAULT_INVOICED_TIMESHEET) == 'approved'])
-                ],
-                ['task_id'],
-                ['unit_amount:sum'],
-            )
-            timesheets_per_task = {task.id: unit_amount_sum for task, unit_amount_sum in timesheet_read_group}
+        subtask_ids_per_task_id = self.sudo().with_context(active_test=False)._get_subtask_ids_per_task_id()
+        # Say `self.ids` is [1, 2, 3] and `_get_subtask_ids_per_task_id()` returns {1: [2, 4], 2: [4], 3: []}.
+        # We want to merge all subtask ids and add `self.ids` to it.
+        # Unpacking `subtask_ids_per_task_id` values in `set.union` seems to be the appropriate method:
+        # >>> set.union({}, [2, 4], [4], [], [1, 2, 3]) = {2, 4, 1, 3}
+        all_task_ids = set.union(set(), *subtask_ids_per_task_id.values(), self.ids)
+        timesheet_read_group = self.env['account.analytic.line'].sudo()._read_group(
+            [
+                ('project_id', '!=', False),
+                ('task_id', 'in', list(all_task_ids)),
+                ('validated', 'in', [True, self.env['ir.config_parameter'].sudo().get_param('sale.invoiced_timesheet', DEFAULT_INVOICED_TIMESHEET) == 'approved'])
+            ],
+            ['task_id'],
+            ['unit_amount:sum'],
+        )
+        timesheets_per_task = {task.id: unit_amount_sum for task, unit_amount_sum in timesheet_read_group}
         for task in self:
-            remaining_hours = effective_hours = total_hours_spent = subtask_effective_hours = progress = 0.0
-            if not is_portal_user:
-                remaining_hours = task.remaining_hours
-                effective_hours = task.effective_hours
-                total_hours_spent = task.total_hours_spent
-                subtask_effective_hours = task.subtask_effective_hours
-                progress = task.progress
-            elif timesheets_per_task:
-                effective_hours = timesheets_per_task.get(task.id, 0.0)
-                subtask_effective_hours = sum(timesheets_per_task.get(subtask_id, 0.0) for subtask_id in subtask_ids_per_task_id.get(task.id, []))
-                total_hours_spent = effective_hours + subtask_effective_hours
-                remaining_hours = task.allocated_hours - total_hours_spent
-                if task.allocated_hours > 0:
-                    progress = 1 if max(total_hours_spent - task.allocated_hours, 0) else round(total_hours_spent / task.allocated_hours, 2)
-            task.portal_remaining_hours = remaining_hours
+            progress = 0.0
+            effective_hours = timesheets_per_task.get(task.id, 0.0)
+            subtask_effective_hours = sum(timesheets_per_task.get(subtask_id, 0.0) for subtask_id in subtask_ids_per_task_id.get(task.id, []))
+            total_hours_spent = effective_hours + subtask_effective_hours
+            if task.allocated_hours > 0:
+                progress = 1 if max(total_hours_spent - task.allocated_hours, 0) else round(total_hours_spent / task.allocated_hours, 2)
+            task.portal_remaining_hours = task.allocated_hours - total_hours_spent
             task.portal_effective_hours = effective_hours
             task.portal_subtask_effective_hours = subtask_effective_hours
             task.portal_total_hours_spent = total_hours_spent
@@ -76,7 +65,7 @@ class ProjectTask(models.Model):
             Then we need to give the id of timesheets which is validated.
         """
         result = super().read(fields=fields, load=load)
-        if fields and 'timesheet_ids' in fields and self.env.user._is_portal():
+        if fields and 'timesheet_ids' in fields and (self.env.user._is_portal() or 'project_sharing_id' in self.env.context):
             # We need to check if configuration
             param_invoiced_timesheet = self.env['ir.config_parameter'].sudo().get_param('sale.invoiced_timesheet', DEFAULT_INVOICED_TIMESHEET)
             if param_invoiced_timesheet == 'approved':
@@ -94,16 +83,16 @@ class ProjectTask(models.Model):
         if not self.env['sale.order.line'].has_access('read'):
             return {}
         uom_hour = self.env.ref('uom.product_uom_hour')
-        planned_hours_per_sol = self.env['project.task']._read_group([
+        allocated_hours_per_sol = self.env['project.task']._read_group([
             ('sale_line_id', 'in', res_ids),
-        ], ['sale_line_id'], ['planned_hours:sum'])
-        planned_hours_per_sol_mapped = {
-            sale_line.id: planned_hours_sum
-            for sale_line, planned_hours_sum in planned_hours_per_sol
+        ], ['sale_line_id'], ['allocated_hours:sum'])
+        allocated_hours_per_sol_mapped = {
+            sale_line.id: allocated_hours_sum
+            for sale_line, allocated_hours_sum in allocated_hours_per_sol
         }
         return {
             sol.id: {
-                'value': planned_hours_per_sol_mapped.get(sol.id, 0.0),
+                'value': allocated_hours_per_sol_mapped.get(sol.id, 0.0),
                 'max_value': sol.product_uom._compute_quantity(sol.product_uom_qty, uom_hour),
             }
             for sol in self.env['sale.order.line'].search([('id', 'in', res_ids)])

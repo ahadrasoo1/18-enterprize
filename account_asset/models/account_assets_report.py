@@ -75,6 +75,8 @@ class AssetsReportCustomHandler(models.AbstractModel):
 
         # construct the lines, 1 at a time
         lines = []
+        company_currency = self.env.company.currency_id
+        column_expression = self.env['account.report.expression']
         for (account_id, asset_id, asset_group_id), col_group_totals in all_lines_data.items():
             all_columns = []
             for column_data in options['columns']:
@@ -87,7 +89,7 @@ class AssetsReportCustomHandler(models.AbstractModel):
                 col_value = col_group_totals[col_group_key][expr_label]
                 col_data = None if col_value is None else column_data
 
-                all_columns.append(report._build_column_dict(col_value, col_data, options=options))
+                all_columns.append(report._build_column_dict(col_value, col_data, options=options, column_expression=column_expression, currency=company_currency))
 
                 # add to the total line
                 if column_data['figure_type'] == 'monetary':
@@ -290,12 +292,16 @@ class AssetsReportCustomHandler(models.AbstractModel):
                 (None, 'account.asset', res_id)
             ])
 
+            is_parent_in_unfolded_lines = any(
+                report._get_model_info_from_id(unfolded_line_id) == (parent_model, parent_id)
+                for unfolded_line_id in options.get('unfolded_lines')
+            )
             line_vals_per_grouping_field_id.setdefault(parent_id, {
                 # We don't assign a name to the line yet, so that we can batch the browsing of the parent objects
                 'id': report._build_line_id([(None, parent_model, parent_id)]),
                 'columns': [], # Filled later
                 'unfoldable': True,
-                'unfolded': options.get('unfold_all', False),
+                'unfolded': is_parent_in_unfolded_lines or options.get('unfold_all'),
                 'level': 1,
 
                 # This value is stored here for convenience; it will be removed from the result
@@ -373,7 +379,7 @@ class AssetsReportCustomHandler(models.AbstractModel):
         if analytic_account_ids:
             query.add_where(SQL('%s && %s', analytic_account_ids, self.env['account.asset']._query_analytic_accounts('asset')))
 
-        selected_journals = tuple(journal['id'] for journal in options.get('journals') if journal['model'] == 'account.journal' and journal['selected'])
+        selected_journals = tuple(journal['id'] for journal in options.get('journals', []) if journal['model'] == 'account.journal' and journal['selected'])
         if selected_journals:
             query.add_where(SQL("asset.journal_id in %s", selected_journals))
 

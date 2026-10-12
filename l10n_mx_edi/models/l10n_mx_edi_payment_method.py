@@ -31,3 +31,5 @@ class PaymentMethod(models.Model):
         default=True,
         help='If this payment way is not used by the company could be '
         'deactivated.')
+
+    _sql_constraints = [('code_unique', 'unique(code)', 'A payment method with the same code already exists.')]

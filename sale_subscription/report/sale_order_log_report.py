@@ -66,7 +66,7 @@ class SaleOrderLogReport(models.Model):
         self.currency_id = self.env.company.currency_id
 
     def _with(self):
-        companies = self.env['res.company'].search([], order='id asc')
+        companies = self.env['res.company'].search([('active', '=', True)], order='id asc')
         main_company_id = companies[:1]
         return f"""
         rate_query AS(

@@ -1,23 +1,27 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* delivery_dhl
-# 
+# * delivery_dhl
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Malaz Abuidris <msea@odoo.com>, 2025
+# Weblate <noreply-mt-weblate@weblate.org>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Arabic (https://app.transifex.com/odoo/teams/41243/ar/)\n"
+"POT-Creation-Date: 2025-12-29 18:50+0000\n"
+"PO-Revision-Date: 2025-11-13 16:24+0000\n"
+"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"Language-Team: Arabic <https://translate.odoo.com/projects/odoo-18/"
+"delivery_dhl/ar/>\n"
+"Language: ar\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: ar\n"
-"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
+"&& n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
+"X-Generator: Weblate 5.12.2\n"
 
 #. module: delivery_dhl
 #: model_terms:ir.ui.view,arch_db:delivery_dhl.view_delivery_carrier_form_with_provider_dhl
@@ -182,8 +186,8 @@ msgstr "D - إكسبريس لكافة أنحاء العالم "
 #. module: delivery_dhl
 #: model:ir.model.fields.selection,name:delivery_dhl.selection__delivery_carrier__delivery_type__dhl
 #: model:ir.model.fields.selection,name:delivery_dhl.selection__stock_package_type__package_carrier_type__dhl
-msgid "DHL"
-msgstr "DHL"
+msgid "DHL (Legacy)"
+msgstr "DHL (Legacy)"
 
 #. module: delivery_dhl
 #: model:ir.model.fields,field_description:delivery_dhl.field_delivery_carrier__dhl_account_number
@@ -214,11 +218,6 @@ msgid "DHL EU -> International"
 msgstr "DHL أوروبا -> دولي "
 
 #. module: delivery_dhl
-#: model:ir.model.fields,field_description:delivery_dhl.field_delivery_carrier__dhl_default_package_type_id
-msgid "DHL Package Type"
-msgstr "نوع حزمة DHL "
-
-#. module: delivery_dhl
 #: model:ir.model.fields,field_description:delivery_dhl.field_delivery_carrier__dhl_password
 msgid "DHL Password"
 msgstr "كلمة مرور DHL"
@@ -227,12 +226,6 @@ msgstr "كلمة مرور DHL"
 #: model:ir.model.fields,field_description:delivery_dhl.field_delivery_carrier__dhl_product_code
 msgid "DHL Product"
 msgstr "منتج DHL"
-
-#. module: delivery_dhl
-#: model_terms:ir.ui.view,arch_db:delivery_dhl.res_config_settings_view_form_sale
-#: model_terms:ir.ui.view,arch_db:delivery_dhl.res_config_settings_view_form_stock
-msgid "DHL Shipping Methods"
-msgstr "طرق شحن DHL "
 
 #. module: delivery_dhl
 #. odoo-python
@@ -275,6 +268,11 @@ msgstr "لا يدعم DHL المنتجات ذات الأسماء الأطول م
 #: code:addons/delivery_dhl/models/dhl_request.py:0
 msgid "DHL password is missing, please modify your delivery method settings."
 msgstr "كلمة مرور DHL مفقودة. الرجاء تعديل إعدادات طريقة التسليم الخاصة بك. "
+
+#. module: delivery_dhl
+#: model:ir.model.fields,field_description:delivery_dhl.field_delivery_carrier__dhl_default_package_type_id
+msgid "DHLxw Package Type"
+msgstr "نوع طرد DHLxw "
 
 #. module: delivery_dhl
 #: model:ir.model.fields,field_description:delivery_dhl.field_delivery_carrier__dhl_duty_payment
@@ -509,7 +507,8 @@ msgstr ""
 #. odoo-python
 #: code:addons/delivery_dhl/models/dhl_request.py:0
 msgid ""
-"The address of your company warehouse is missing or wrong (Missing field(s) :\n"
+"The address of your company warehouse is missing or wrong (Missing "
+"field(s) :\n"
 " %s)"
 msgstr ""
 "عنوان شركتك/مستودعك غير موجود أو غير صحيح (الحقل (الحقول) المفقودة: \n"
@@ -519,18 +518,22 @@ msgstr ""
 #: model:ir.model.fields,help:delivery_dhl.field_delivery_carrier__dhl_custom_data_request
 msgid ""
 "The custom data in DHL is organized like the inside of a json file.\n"
-"        There are 3 possible keys: 'rate', 'ship', 'return', to which you can add your custom data.\n"
+"        There are 3 possible keys: 'rate', 'ship', 'return', to which you "
+"can add your custom data.\n"
 "        More info on https://xmlportal.dhl.com/"
 msgstr ""
 "يتم تنظيم البيانات المخصصة في DHL كما في داخل ملف json.\n"
-"        توجد 3 مفاتيح محتملة: 'تقييم'، 'شحن'، 'إرجاع'، والتي يمكنك إضافة بياناتك المخصصة إليها.\n"
-"        للمزيد من المعلومات، يرجى زيارة الرابط التالي https://xmlportal.dhl.com/ "
+"        توجد 3 مفاتيح محتملة: 'تقييم'، 'شحن'، 'إرجاع'، والتي يمكنك إضافة "
+"بياناتك المخصصة إليها.\n"
+"        للمزيد من المعلومات، يرجى زيارة الرابط التالي https://"
+"xmlportal.dhl.com/ "
 
 #. module: delivery_dhl
 #. odoo-python
 #: code:addons/delivery_dhl/models/dhl_request.py:0
 msgid ""
-"The estimated shipping price cannot be computed because the weight is missing for the following product(s): \n"
+"The estimated shipping price cannot be computed because the weight is "
+"missing for the following product(s): \n"
 " %s"
 msgstr ""
 "تعذر احتساب سعر الشحن لعدم تحديد الوزن للمنتج (المنتجات) التالية: \n"

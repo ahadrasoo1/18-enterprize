@@ -90,6 +90,12 @@
     .btn {
         @include barcode-btn-tap-dimension;
     }
+
+    .o-mail-Chatter-topbar {
+        .btn:not(.btn-link) {
+            min-width: auto;
+        }
+    }
 }
 
 // Target any barcode kanbanView
@@ -176,6 +182,9 @@
         .o_breadcrumb {
             width: 100%;
         }
+    }
+    .o_kanban_renderer {
+        position: relative;
     }
 }
 

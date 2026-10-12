@@ -30,13 +30,15 @@ export function _getLineOrFail (lineOrIndex, errorClue="No line found") {
  */
 export function _prepareSelector(selector, description) {
     const { barcode, selected, completed } = description;
+    const dataPackage = description.package;
     if (selected !== undefined) {
         selector += selected ? ".o_selected" : ":not(.o_selected)";
     }
     if (completed !== undefined) {
         selector += completed ? ".o_line_completed" : ":not(.o_line_completed)";
     }
-    selector += barcode ? `[data-barcode="${barcode}"]`: "";
+    selector += barcode ? `[data-barcode="${barcode}"]` : "";
+    selector += dataPackage ? `[data-package="${dataPackage}"]` : "";
     description.selector = selector;
     return selector;
 }
@@ -214,6 +216,43 @@ export function assertLineProduct(lineOrIndex, productName) {
     assert(lineProduct, productName, "Not the expected product");
 }
 
+/**
+ * Checks the package assigned to a line. The expected package can be let
+ * empty to check there is no package assigned on the line.
+ * @param {(HTMLElement|integer)} lineOrIndex @see _getLineOrFail
+ * @param {string} [expectedPackageName]
+ */
+export function assertLinePackage(lineOrIndex, expectedPackageName) {
+    const line = _getLineOrFail(lineOrIndex, "Can't check the line's package");
+    const packageEl = line.querySelector("div[name='package'] > .package");
+    if (!packageEl) {
+        if (expectedPackageName) {
+            fail(`There is no package: ${expectedPackageName} expected`);
+        }
+    } else {
+        const linePackageName = packageEl.innerText;
+        assert(linePackageName, expectedPackageName, "Not the expected line's package");
+    }
+}
+
+/**
+ * Checks the result package assigned to a line. The expected package can be let
+ * empty to check there is no result package assigned on the line.
+ * @param {(HTMLElement|integer)} lineOrIndex @see _getLineOrFail
+ * @param {string} [expectedPackageName]
+ */
+export function assertLineResultPackage(lineOrIndex, expectedPackageName = false) {
+    const line = _getLineOrFail(lineOrIndex, "Can't check the line's result package");
+    const resultPackageEl = line.querySelector(".result-package");
+    if (!resultPackageEl) {
+        if (expectedPackageName) {
+            fail(`There is no result package: ${expectedPackageName} expected`);
+        }
+    } else {
+        const linePackageName = resultPackageEl.innerText;
+        assert(linePackageName, expectedPackageName, "Not the expected result package");
+    }
+}
 
 /**
  * Checks the quantity. It will get the done/counted quantity and will also

@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 17.2alpha1+e\n"
+"Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-21 09:42+0000\n"
-"PO-Revision-Date: 2024-03-21 09:42+0000\n"
+"POT-Creation-Date: 2026-02-20 19:04+0000\n"
+"PO-Revision-Date: 2026-02-20 19:04+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -1061,7 +1061,6 @@ msgstr ""
 
 #. module: l10n_ro_saft
 #: model:ir.model.fields,help:l10n_ro_saft.field_account_tax__l10n_ro_saft_tax_code
-#: model:ir.model.fields,help:l10n_ro_saft.field_account_tax_template__l10n_ro_saft_tax_code
 msgid ""
 "A 6-digit number defined by ANAF to precisely identify taxes in the D.406 "
 "export (e.g. 310309 for domestic 19% VAT)"
@@ -1078,8 +1077,8 @@ msgid "Accessory constructions for road, air, naval transport"
 msgstr ""
 
 #. module: l10n_ro_saft
-#: model:ir.model,name:l10n_ro_saft.model_account_report
-msgid "Accounting Report"
+#: model:ir.model,name:l10n_ro_saft.model_account_chart_template
+msgid "Account Chart Template"
 msgstr ""
 
 #. module: l10n_ro_saft
@@ -1272,7 +1271,7 @@ msgstr ""
 
 #. module: l10n_ro_saft
 #: model:ir.model,name:l10n_ro_saft.model_l10n_ro_saft_account_asset_category
-msgid "Asset categories for l10n_ro"
+msgid "Asset categories for Romania's saft"
 msgstr ""
 
 #. module: l10n_ro_saft
@@ -1468,7 +1467,6 @@ msgstr ""
 #. module: l10n_ro_saft
 #: model:ir.model.fields,help:l10n_ro_saft.field_account_bank_statement_line__l10n_ro_is_self_invoice
 #: model:ir.model.fields,help:l10n_ro_saft.field_account_move__l10n_ro_is_self_invoice
-#: model:ir.model.fields,help:l10n_ro_saft.field_account_payment__l10n_ro_is_self_invoice
 msgid ""
 "Check this box to indicate that this bill is a self-invoice made to register"
 " a VAT event in the absence of an invoice received from a supplier."
@@ -1746,11 +1744,6 @@ msgid "Cots for corn storage."
 msgstr ""
 
 #. module: l10n_ro_saft
-#: model:ir.model.fields,field_description:l10n_ro_saft.field_account_asset__company_country_code
-msgid "Country Code"
-msgstr ""
-
-#. module: l10n_ro_saft
 #: model:l10n_ro_saft.tax.type,description:l10n_ro_saft.l10n_ro_saft_tax_type_924
 msgid "Court fines"
 msgstr ""
@@ -1863,6 +1856,11 @@ msgstr ""
 #: model:l10n_ro_saft.tax.type,description:l10n_ro_saft.l10n_ro_saft_tax_type_510
 msgid ""
 "Duty for organizing and operating gambling activities due until 01.01.2014"
+msgstr ""
+
+#. module: l10n_ro_saft
+#: model:ir.model,name:l10n_ro_saft.model_account_tax
+msgid "ETA tax codes mixin"
 msgstr ""
 
 #. module: l10n_ro_saft
@@ -2352,17 +2350,6 @@ msgstr ""
 #. module: l10n_ro_saft
 #: model:l10n_ro_saft.tax.type,description:l10n_ro_saft.l10n_ro_saft_tax_type_503
 msgid "Gambling social stamp tax"
-msgstr ""
-
-#. module: l10n_ro_saft
-#: model:ir.model,name:l10n_ro_saft.model_account_general_ledger_report_handler
-msgid "General Ledger Custom Handler"
-msgstr ""
-
-#. module: l10n_ro_saft
-#. odoo-python
-#: code:addons/l10n_ro_saft/models/account_general_ledger.py:0
-msgid "Generate SAF-T"
 msgstr ""
 
 #. module: l10n_ro_saft
@@ -2973,6 +2960,24 @@ msgid "Interest tax"
 msgstr ""
 
 #. module: l10n_ro_saft
+#. odoo-python
+#: code:addons/l10n_ro_saft/models/account_general_ledger.py:0
+msgid "Invalid Company/ies"
+msgstr ""
+
+#. module: l10n_ro_saft
+#. odoo-python
+#: code:addons/l10n_ro_saft/models/account_general_ledger.py:0
+msgid "Invalid Partner(s)"
+msgstr ""
+
+#. module: l10n_ro_saft
+#. odoo-python
+#: code:addons/l10n_ro_saft/models/account_general_ledger.py:0
+msgid "Invalid Product(s)"
+msgstr ""
+
+#. module: l10n_ro_saft
 #: model_terms:ir.ui.view,arch_db:l10n_ro_saft.view_move_form_l10n_ro
 msgid "Is self invoice (RO)?"
 msgstr ""
@@ -2980,7 +2985,6 @@ msgstr ""
 #. module: l10n_ro_saft
 #: model:ir.model.fields,field_description:l10n_ro_saft.field_account_bank_statement_line__l10n_ro_is_self_invoice
 #: model:ir.model.fields,field_description:l10n_ro_saft.field_account_move__l10n_ro_is_self_invoice
-#: model:ir.model.fields,field_description:l10n_ro_saft.field_account_payment__l10n_ro_is_self_invoice
 msgid "Is self invoice?"
 msgstr ""
 
@@ -3000,18 +3004,8 @@ msgid "Knitting machines; to braid, crochet and knot."
 msgstr ""
 
 #. module: l10n_ro_saft
-#: model:ir.model.fields,field_description:l10n_ro_saft.field_account_asset__l10n_ro_saft_account_asset_category_warning
-msgid "L10N Ro Saft Account Asset Category Warning"
-msgstr ""
-
-#. module: l10n_ro_saft
 #: model:l10n_ro_saft.account.asset.category,description:l10n_ro_saft.l10n_ro_saft_2_2_6_1
 msgid "Laboratory equipment and accessories made of glass."
-msgstr ""
-
-#. module: l10n_ro_saft
-#: model:ir.model.fields,field_description:l10n_ro_saft.field_l10n_ro_saft_tax_type____last_update
-msgid "Last Modified on"
 msgstr ""
 
 #. module: l10n_ro_saft
@@ -3665,11 +3659,6 @@ msgid ""
 msgstr ""
 
 #. module: l10n_ro_saft
-#: model:ir.model,name:l10n_ro_saft.model_account_report_file_download_error_wizard
-msgid "Manage the file generation errors from report exports."
-msgstr ""
-
-#. module: l10n_ro_saft
 #: model:l10n_ro_saft.account.asset.category,description:l10n_ro_saft.l10n_ro_saft_2_3_3_6
 msgid "Marine pilings."
 msgstr ""
@@ -4201,6 +4190,24 @@ msgid ""
 msgstr ""
 
 #. module: l10n_ro_saft
+#. odoo-python
+#: code:addons/l10n_ro_saft/models/account_general_ledger.py:0
+msgid "Partners should have a country"
+msgstr ""
+
+#. module: l10n_ro_saft
+#. odoo-python
+#: code:addons/l10n_ro_saft/models/account_general_ledger.py:0
+msgid "Partners should have their city."
+msgstr ""
+
+#. module: l10n_ro_saft
+#. odoo-python
+#: code:addons/l10n_ro_saft/models/account_general_ledger.py:0
+msgid "Partners' VAT prefix should correspond to their country."
+msgstr ""
+
+#. module: l10n_ro_saft
 #: model:l10n_ro_saft.tax.type,description:l10n_ro_saft.l10n_ro_saft_tax_type_810
 msgid "Payments from legal persons for unqualified disabled people"
 msgstr ""
@@ -4341,18 +4348,16 @@ msgid "Please set the company Tax Accounting Basis."
 msgstr ""
 
 #. module: l10n_ro_saft
-#. odoo-python
-#: code:addons/l10n_ro_saft/models/account_general_ledger.py:0
-msgid ""
-"Please set the company Tax Accounting Basis in the Accounting Settings."
-msgstr ""
-
-#. module: l10n_ro_saft
 #: model:l10n_ro_saft.account.asset.category,description:l10n_ro_saft.l10n_ro_saft_2_3_3_8
 msgid ""
 "Pleasure boats (pleasure boats, pleasure canoes, gigs, sandolins and hydro-"
 "bicycles). River and fishing boats (mahogany boats, vivier boats, feed "
 "boats, barges and buoys)."
+msgstr ""
+
+#. module: l10n_ro_saft
+#: model:ir.model,name:l10n_ro_saft.model_account_general_ledger_report_handler
+msgid "Polish JPK KR PD Custom Handler"
 msgstr ""
 
 #. module: l10n_ro_saft
@@ -4373,6 +4378,12 @@ msgstr ""
 #. module: l10n_ro_saft
 #: model:l10n_ro_saft.account.asset.category,description:l10n_ro_saft.l10n_ro_saft_2_1_27
 msgid "Production accessories."
+msgstr ""
+
+#. module: l10n_ro_saft
+#. odoo-python
+#: code:addons/l10n_ro_saft/models/account_general_ledger.py:0
+msgid "Products with no commodity code"
 msgstr ""
 
 #. module: l10n_ro_saft
@@ -4525,14 +4536,12 @@ msgstr ""
 
 #. module: l10n_ro_saft
 #: model:ir.model.fields,field_description:l10n_ro_saft.field_account_tax__l10n_ro_saft_tax_code
-#: model:ir.model.fields,field_description:l10n_ro_saft.field_account_tax_template__l10n_ro_saft_tax_code
 msgid "Romanian SAF-T Tax Code"
 msgstr ""
 
 #. module: l10n_ro_saft
 #: model:ir.model,name:l10n_ro_saft.model_l10n_ro_saft_tax_type
 #: model:ir.model.fields,field_description:l10n_ro_saft.field_account_tax__l10n_ro_saft_tax_type_id
-#: model:ir.model.fields,field_description:l10n_ro_saft.field_account_tax_template__l10n_ro_saft_tax_type_id
 msgid "Romanian SAF-T Tax Type"
 msgstr ""
 
@@ -4590,19 +4599,13 @@ msgstr ""
 #. module: l10n_ro_saft
 #. odoo-python
 #: code:addons/l10n_ro_saft/models/account_general_ledger.py:0
-msgid "Set Bank Account"
-msgstr ""
-
-#. module: l10n_ro_saft
-#. odoo-python
-#: code:addons/l10n_ro_saft/models/account_general_ledger.py:0
-msgid "SAF-T"
-msgstr ""
-
-#. module: l10n_ro_saft
-#. odoo-python
-#: code:addons/l10n_ro_saft/models/account_general_ledger.py:0
 msgid "Set asset categories"
+msgstr ""
+
+#. module: l10n_ro_saft
+#. odoo-python
+#: code:addons/l10n_ro_saft/models/account_general_ledger.py:0
+msgid "Settings"
 msgstr ""
 
 #. module: l10n_ro_saft
@@ -4757,16 +4760,21 @@ msgstr ""
 #. odoo-python
 #: code:addons/l10n_ro_saft/models/account_general_ledger.py:0
 msgid ""
-"Some partners have missing or invalid CUI numbers in `Company Registry`. "
-"Example of a valid CUI: 18547290"
+"Some partners have invalid VAT numbers. Example of a valid VAT: RO18547290"
+msgstr ""
+
+#. module: l10n_ro_saft
+#. odoo-python
+#: code:addons/l10n_ro_saft/models/account_general_ledger.py:0
+msgid "Some partners have missing VAT numbers."
 msgstr ""
 
 #. module: l10n_ro_saft
 #. odoo-python
 #: code:addons/l10n_ro_saft/models/account_general_ledger.py:0
 msgid ""
-"Some partners have missing or invalid VAT numbers. Example of a valid VAT: "
-"RO18547290"
+"Some partners have missing or invalid CUI numbers in `Company Registry`. "
+"Example of a valid CUI: 18547290"
 msgstr ""
 
 #. module: l10n_ro_saft
@@ -4855,11 +4863,6 @@ msgstr ""
 #. module: l10n_ro_saft
 #: model:l10n_ro_saft.account.asset.category,description:l10n_ro_saft.l10n_ro_saft_1_5_10
 msgid "Tanks, reservoirs, drums and barrels for storing drinks."
-msgstr ""
-
-#. module: l10n_ro_saft
-#: model:ir.model,name:l10n_ro_saft.model_account_tax
-msgid "Tax"
 msgstr ""
 
 #. module: l10n_ro_saft
@@ -5122,15 +5125,16 @@ msgid "Tax on prospecting, exploration, resource exploitation"
 msgstr ""
 
 #. module: l10n_ro_saft
+#. odoo-python
+#: code:addons/l10n_ro_saft/models/account_general_ledger.py:0
+msgid "Taxes missing Tax Type or Tax Code (RO)"
+msgstr ""
+
+#. module: l10n_ro_saft
 #: model:l10n_ro_saft.account.asset.category,description:l10n_ro_saft.l10n_ro_saft_3_2_2
 msgid ""
 "Telecommunications devices for the office: telephones, fax machines, telex "
 "machines, radio command installations, pagers, etc."
-msgstr ""
-
-#. module: l10n_ro_saft
-#: model:ir.model,name:l10n_ro_saft.model_account_tax_template
-msgid "Templates for Taxes"
 msgstr ""
 
 #. module: l10n_ro_saft
@@ -5142,13 +5146,6 @@ msgid ""
 msgstr ""
 
 #. module: l10n_ro_saft
-#: model:ir.model.fields,help:l10n_ro_saft.field_account_asset__company_country_code
-msgid ""
-"The ISO country code in two chars. \n"
-"You can use this field for quick search."
-msgstr ""
-
-#. module: l10n_ro_saft
 #. odoo-python
 #: code:addons/l10n_ro_saft/models/account_general_ledger.py:0
 msgid "The Intrastat code isn't set on some products."
@@ -5157,7 +5154,9 @@ msgstr ""
 #. module: l10n_ro_saft
 #. odoo-python
 #: code:addons/l10n_ro_saft/models/account_general_ledger.py:0
-msgid "The VAT number for your company is incorrect."
+msgid ""
+"The SAF-T Asset Declaration cannot be generated if the currency of the "
+"company is not RON"
 msgstr ""
 
 #. module: l10n_ro_saft
@@ -5171,6 +5170,11 @@ msgstr ""
 #: model:ir.model.fields,help:l10n_ro_saft.field_res_config_settings__l10n_ro_saft_tax_accounting_basis
 #: model_terms:ir.ui.view,arch_db:l10n_ro_saft.res_config_settings_form_inherit_l10n_ro_saft
 msgid "The accounting regulations and Chart of Accounts used by this company"
+msgstr ""
+
+#. module: l10n_ro_saft
+#: model:ir.model.constraint,message:l10n_ro_saft.constraint_l10n_ro_saft_account_asset_category_code_unique
+msgid "The code of the asset category must be unique !"
 msgstr ""
 
 #. module: l10n_ro_saft
@@ -5192,28 +5196,6 @@ msgid "The employer's contribution to the Guarantee Fund for salary payment"
 msgstr ""
 
 #. module: l10n_ro_saft
-#. odoo-python
-#: code:addons/l10n_ro_saft/models/account_general_ledger.py:0
-msgid "The following products have no `Internal Reference`:"
-msgstr ""
-
-#. module: l10n_ro_saft
-#. odoo-python
-#: code:addons/l10n_ro_saft/models/account_general_ledger.py:0
-msgid ""
-"The following taxes are missing the \"Romanian SAF-T Tax Type\" and/or "
-"\"Romanian SAF-T Tax Code\" field(s):"
-msgstr ""
-
-#. module: l10n_ro_saft
-#. odoo-python
-#: code:addons/l10n_ro_saft/models/account_general_ledger.py:0
-msgid ""
-"The follwing products have duplicated `Internal Reference`, please make them"
-" unique:"
-msgstr ""
-
-#. module: l10n_ro_saft
 #: model:l10n_ro_saft.tax.type,description:l10n_ro_saft.l10n_ro_saft_tax_type_471
 msgid ""
 "The individual contribution for the social health insurance due by the "
@@ -5232,13 +5214,6 @@ msgstr ""
 #. module: l10n_ro_saft
 #: model:l10n_ro_saft.account.asset.category,description:l10n_ro_saft.l10n_ro_saft_2_4_2_9
 msgid "The rickets."
-msgstr ""
-
-#. module: l10n_ro_saft
-#. odoo-python
-#: code:addons/l10n_ro_saft/models/account_general_ledger.py:0
-msgid ""
-"The intrastat code isn't set on the follwing products:"
 msgstr ""
 
 #. module: l10n_ro_saft
@@ -5269,19 +5244,7 @@ msgstr ""
 #. module: l10n_ro_saft
 #. odoo-python
 #: code:addons/l10n_ro_saft/models/account_general_ledger.py:0
-msgid "These partner addresses are missing the city:"
-msgstr ""
-
-#. module: l10n_ro_saft
-#. odoo-python
-#: code:addons/l10n_ro_saft/models/account_general_ledger.py:0
-msgid "These partner addresses are missing the country:"
-msgstr ""
-
-#. module: l10n_ro_saft
-#. odoo-python
-#: code:addons/l10n_ro_saft/models/account_general_ledger.py:0
-msgid "These partners have a VAT prefix that differs from their country:"
+msgid "These partners are missing a name:"
 msgstr ""
 
 #. module: l10n_ro_saft
@@ -5307,37 +5270,13 @@ msgid ""
 msgstr ""
 
 #. module: l10n_ro_saft
-#: model:l10n_ro_saft.account.asset.category,description:l10n_ro_saft.l10n_ro_saft_1_3_6
-msgid "Track devices."
-msgstr ""
-
-#. module: l10n_ro_saft
-#. odoo-python
-#: code:addons/l10n_ro_saft/models/account_general_ledger.py:0
-msgid ""
-"Tools, devices, instruments for the movement of goods, containment and "
-"trans-containment."
-msgstr ""
-
-#. module: l10n_ro_saft
 #: model:l10n_ro_saft.account.asset.category,description:l10n_ro_saft.l10n_ro_saft_2_1_19
 msgid "Tools, devices, tools and specialized tool kits used in industry."
 msgstr ""
 
 #. module: l10n_ro_saft
-#. odoo-python
-#: code:addons/l10n_ro_saft/models/account_general_ledger.py:0
-msgid ""
-"These partners have missing or invalid CUI numbers in `Company Registry`. "
-"Example of a valid CUI: 18547290"
-msgstr ""
-
-#. module: l10n_ro_saft
-#. odoo-python
-#: code:addons/l10n_ro_saft/models/account_general_ledger.py:0
-msgid ""
-"These partners have missing or invalid VAT numbers. Example of a valid VAT: "
-"RO18547290"
+#: model:l10n_ro_saft.account.asset.category,description:l10n_ro_saft.l10n_ro_saft_1_3_6
+msgid "Track devices."
 msgstr ""
 
 #. module: l10n_ro_saft
@@ -5424,9 +5363,19 @@ msgstr ""
 #. module: l10n_ro_saft
 #. odoo-python
 #: code:addons/l10n_ro_saft/models/account_general_ledger.py:0
-msgid ""
-"While preparing the data for the SAF-T export, we noticed the following "
-"missing or incorrect data."
+msgid "View Company/ies"
+msgstr ""
+
+#. module: l10n_ro_saft
+#. odoo-python
+#: code:addons/l10n_ro_saft/models/account_general_ledger.py:0
+msgid "View Partners"
+msgstr ""
+
+#. module: l10n_ro_saft
+#. odoo-python
+#: code:addons/l10n_ro_saft/models/account_general_ledger.py:0
+msgid "View Product(s)"
 msgstr ""
 
 #. module: l10n_ro_saft
@@ -5444,6 +5393,11 @@ msgstr ""
 #. module: l10n_ro_saft
 #: model:l10n_ro_saft.account.asset.category,description:l10n_ro_saft.l10n_ro_saft_2_4_2_3
 msgid "Walnut plantations"
+msgstr ""
+
+#. module: l10n_ro_saft
+#: model:ir.model.fields,field_description:l10n_ro_saft.field_account_asset__l10n_ro_saft_account_asset_category_warning
+msgid "Warning on account asset category"
 msgstr ""
 
 #. module: l10n_ro_saft
@@ -5473,7 +5427,6 @@ msgstr ""
 
 #. module: l10n_ro_saft
 #. odoo-python
-#: code:addons/l10n_ro_saft/models/account_general_ledger.py:0
 #: code:addons/l10n_ro_saft/models/account_general_ledger.py:0
 msgid "XML"
 msgstr ""

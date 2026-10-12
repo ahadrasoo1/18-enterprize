@@ -9,7 +9,7 @@ class ProjectTaskCreateTimesheet(models.TransientModel):
     _inherit = 'project.task.create.timesheet'
 
     def save_timesheet(self):
-        if self.task_id.project_id.is_fsm:
+        if self.task_id.is_fsm:
             date = fields.Datetime.context_timestamp(self, datetime.now())
             self.task_id.message_post(
                 body=_(

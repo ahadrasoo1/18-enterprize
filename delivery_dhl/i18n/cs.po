@@ -1,23 +1,24 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* delivery_dhl
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
+"POT-Creation-Date: 2025-12-29 18:50+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
 "Last-Translator: Wil Odoo, 2024\n"
 "Language-Team: Czech (https://app.transifex.com/odoo/teams/41243/cs/)\n"
+"Language: cs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: cs\n"
-"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
+"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n "
+"<= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
 
 #. module: delivery_dhl
 #: model_terms:ir.ui.view,arch_db:delivery_dhl.view_delivery_carrier_form_with_provider_dhl
@@ -182,8 +183,8 @@ msgstr "D - Express Worldwide"
 #. module: delivery_dhl
 #: model:ir.model.fields.selection,name:delivery_dhl.selection__delivery_carrier__delivery_type__dhl
 #: model:ir.model.fields.selection,name:delivery_dhl.selection__stock_package_type__package_carrier_type__dhl
-msgid "DHL"
-msgstr "DHL"
+msgid "DHL (Legacy)"
+msgstr ""
 
 #. module: delivery_dhl
 #: model:ir.model.fields,field_description:delivery_dhl.field_delivery_carrier__dhl_account_number
@@ -214,11 +215,6 @@ msgid "DHL EU -> International"
 msgstr "DHL EU -> Mezinárodní"
 
 #. module: delivery_dhl
-#: model:ir.model.fields,field_description:delivery_dhl.field_delivery_carrier__dhl_default_package_type_id
-msgid "DHL Package Type"
-msgstr "Typ balíčku DHL"
-
-#. module: delivery_dhl
 #: model:ir.model.fields,field_description:delivery_dhl.field_delivery_carrier__dhl_password
 msgid "DHL Password"
 msgstr "DHL Heslo"
@@ -227,12 +223,6 @@ msgstr "DHL Heslo"
 #: model:ir.model.fields,field_description:delivery_dhl.field_delivery_carrier__dhl_product_code
 msgid "DHL Product"
 msgstr "DHL Produkty"
-
-#. module: delivery_dhl
-#: model_terms:ir.ui.view,arch_db:delivery_dhl.res_config_settings_view_form_sale
-#: model_terms:ir.ui.view,arch_db:delivery_dhl.res_config_settings_view_form_stock
-msgid "DHL Shipping Methods"
-msgstr "Přepravní možnosti DHL"
 
 #. module: delivery_dhl
 #. odoo-python
@@ -276,6 +266,11 @@ msgstr "DHL nepodporuje produkty s názvem delší než 75 znaků."
 #: code:addons/delivery_dhl/models/dhl_request.py:0
 msgid "DHL password is missing, please modify your delivery method settings."
 msgstr "Heslo DHL chybí, upravte prosím nastavení způsobu doručení."
+
+#. module: delivery_dhl
+#: model:ir.model.fields,field_description:delivery_dhl.field_delivery_carrier__dhl_default_package_type_id
+msgid "DHLxw Package Type"
+msgstr ""
 
 #. module: delivery_dhl
 #: model:ir.model.fields,field_description:delivery_dhl.field_delivery_carrier__dhl_duty_payment
@@ -510,7 +505,8 @@ msgstr ""
 #. odoo-python
 #: code:addons/delivery_dhl/models/dhl_request.py:0
 msgid ""
-"The address of your company warehouse is missing or wrong (Missing field(s) :\n"
+"The address of your company warehouse is missing or wrong (Missing "
+"field(s) :\n"
 " %s)"
 msgstr ""
 "Adresa skladu vaší společnosti chybí nebo je nesprávná.\n"
@@ -521,21 +517,25 @@ msgstr ""
 #: model:ir.model.fields,help:delivery_dhl.field_delivery_carrier__dhl_custom_data_request
 msgid ""
 "The custom data in DHL is organized like the inside of a json file.\n"
-"        There are 3 possible keys: 'rate', 'ship', 'return', to which you can add your custom data.\n"
+"        There are 3 possible keys: 'rate', 'ship', 'return', to which you "
+"can add your custom data.\n"
 "        More info on https://xmlportal.dhl.com/"
 msgstr ""
 "Vlastní data v DHL jsou organizována jako uvnitř souboru json.\n"
-"        Existují 3 možné klíče: 'rate', 'ship', 'return', do kterých můžete přidat svá vlastní data.\n"
+"        Existují 3 možné klíče: 'rate', 'ship', 'return', do kterých můžete "
+"přidat svá vlastní data.\n"
 "        Více informací na https://xmlportal.dhl.com/"
 
 #. module: delivery_dhl
 #. odoo-python
 #: code:addons/delivery_dhl/models/dhl_request.py:0
 msgid ""
-"The estimated shipping price cannot be computed because the weight is missing for the following product(s): \n"
+"The estimated shipping price cannot be computed because the weight is "
+"missing for the following product(s): \n"
 " %s"
 msgstr ""
-"Odhadovanou cenu dopravy nelze vypočítat, protože u následujících produktů chybí hmotnost:\n"
+"Odhadovanou cenu dopravy nelze vypočítat, protože u následujících produktů "
+"chybí hmotnost:\n"
 " %s"
 
 #. module: delivery_dhl

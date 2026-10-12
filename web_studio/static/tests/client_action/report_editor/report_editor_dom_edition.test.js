@@ -9,32 +9,31 @@ import { registry } from "@web/core/registry";
 before(() => {
     const services = registry.category("services");
     for (const [name] of services.getEntries()) {
-        if (name.startsWith("mail.") || name.startsWith("discuss.")) {
+        if (
+            name.startsWith("mail.") ||
+            name.startsWith("discuss.") ||
+            ["bus.connection_alert", "bus.monitoring_service"].includes(name)
+        ) {
             services.remove(name);
         }
     }
 
     const main_components = registry.category("main_components");
     for (const [name] of main_components.getEntries()) {
-        if (name.startsWith("mail.") || name.startsWith("discuss.")) {
+        if (name.startsWith("mail.") || name.startsWith("discuss.") || name.startsWith("bus.")) {
             main_components.remove(name);
         }
     }
 });
 
-import { QWebPlugin } from "@html_editor/others/qweb_plugin";
-import { MAIN_PLUGINS } from "@html_editor/plugin_sets";
-import { QWebTablePlugin } from "@web_studio/client_action/report_editor/report_editor_wysiwyg/qweb_table_plugin";
-
-const REPORT_EDITOR_PLUGINS = [...MAIN_PLUGINS, QWebPlugin, QWebTablePlugin];
-const baseConfig = {
-    Plugins: REPORT_EDITOR_PLUGINS,
-    classList: ["odoo-editor-qweb"],
-};
+import { getReportEditorPlugins } from "@web_studio/client_action/report_editor/report_editor_wysiwyg/report_editor_wysiwyg";
 
 function getEditorOptions() {
     return {
-        config: { ...baseConfig },
+        config: {
+            Plugins: getReportEditorPlugins(),
+            classList: ["odoo-editor-qweb"],
+        },
         props: {
             iframe: true,
             copyCss: true,
@@ -80,25 +79,90 @@ test("add column", async () => {
         <q-table>
             <q-thead>
                 <q-tr>
-                    <q-th>HEAD1</q-th><q-th><p><br></p></q-th>
+                    <q-th>HEAD1</q-th><q-th><div><br></div></q-th>
                     <q-th>HEAD2</q-th>
                 </q-tr>
             </q-thead>
             <q-tbody>
                 <q-tr>
                     <t t-if="true">
-                        <q-td>1</q-td><q-td><p><br></p></q-td>
+                        <q-td>1</q-td><q-td><div><br></div></q-td>
                         <q-td>2</q-td>
                     </t>
                     <t t-else="">
-                        <q-td>3</q-td><q-td><p><br></p></q-td>
+                        <q-td>3</q-td><q-td><div><br></div></q-td>
                         <q-td>4</q-td>
                     </t>
                 </q-tr>
                 <q-tr>
-                    <q-td>5</q-td><q-td><p><br></p></q-td>
+                    <q-td>5</q-td><q-td><div><br></div></q-td>
                     <q-td>6</q-td>
                 </q-tr>
+            </q-tbody>
+        </q-table>`);
+});
+
+test("add column non-matching conditionals", async () => {
+    const { editor } = await setupEditor(
+        `<div style="width: 100px; margin-top: 50px; margin-left: 50px;">
+        <q-table>
+            <q-thead>
+                <q-tr>
+                    <q-th>HEAD1</q-th>
+                    <q-th t-if="true">HEAD2</q-th>
+                    <q-th t-else="">HEAD3</q-th>
+                    <q-th>HEAD4</q-th>
+                </q-tr>
+            </q-thead>
+            <q-tbody>
+                <t t-if="true">
+                    <q-tr>
+                        <q-td>1</q-td>
+                        <q-td>2</q-td>
+                        <q-td>4</q-td>
+                    </q-tr>
+                </t>
+                <t t-else="">
+                    <q-tr>
+                        <q-td>1</q-td>
+                        <q-td>3</q-td>
+                        <q-td>4</q-td>
+                    </q-tr>
+                </t>
+            </q-tbody>
+        </q-table></div>`,
+        getEditorOptions()
+    );
+
+    await hover(queryFirst(":iframe q-th:last-child"));
+    await contains(".o-overlay-container .o-we-table-menu").click();
+    await contains(".o-dropdown-item:contains(Insert Right)").click();
+
+    expect(getContent(editor.getElContent().firstElementChild)).toBe(`
+        <q-table>
+            <q-thead>
+                <q-tr>
+                    <q-th>HEAD1</q-th>
+                    <q-th t-if="true">HEAD2</q-th>
+                    <q-th t-else="">HEAD3</q-th>
+                    <q-th>HEAD4</q-th><q-th><div><br></div></q-th>
+                </q-tr>
+            </q-thead>
+            <q-tbody>
+                <t t-if="true">
+                    <q-tr>
+                        <q-td>1</q-td>
+                        <q-td>2</q-td>
+                        <q-td>4</q-td><q-td><div><br></div></q-td>
+                    </q-tr>
+                </t>
+                <t t-else="">
+                    <q-tr>
+                        <q-td>1</q-td>
+                        <q-td>3</q-td>
+                        <q-td>4</q-td><q-td><div><br></div></q-td>
+                    </q-tr>
+                </t>
             </q-tbody>
         </q-table>`);
 });
@@ -159,6 +223,44 @@ ${"                        "}
                 <q-tr>
 ${"                    "}
                     <q-td>6</q-td>
+                </q-tr>
+            </q-tbody>
+        </q-table>`);
+});
+
+test("remove last column does not crash", async () => {
+    const { editor } = await setupEditor(
+        `<div style="width: 100px; margin-top: 50px; margin-left: 50px;">
+        <q-table>
+            <q-thead>
+                <q-tr>
+                    <q-th>HEAD1</q-th>
+                </q-tr>
+            </q-thead>
+            <q-tbody>
+                <q-tr>
+                    <q-td>1[]</q-td>
+                </q-tr>
+            </q-tbody>
+        </q-table></div>`,
+        getEditorOptions()
+    );
+
+    await hover(queryFirst(":iframe q-th"));
+    await contains(".o-overlay-container .o-we-table-menu").click();
+    await contains(".o-dropdown-item:contains(Delete)").click();
+
+    const el = editor.getElContent();
+    expect(getContent(el.firstElementChild)).toBe(`
+        <q-table>
+            <q-thead>
+                <q-tr>
+${"                    "}
+                </q-tr>
+            </q-thead>
+            <q-tbody>
+                <q-tr>
+${"                    "}
                 </q-tr>
             </q-tbody>
         </q-table>`);
@@ -342,4 +444,10 @@ test("move outside table menu shouldn't remove it if the menu is close, we shoul
     await animationFrame();
     expect(".o-overlay-container .o-we-table-menu").toHaveCount(0);
     expect(".o-dropdown-item").toHaveCount(0);
+});
+
+test("theme colors are not available", async () => {
+    await setupEditor(`<div><span>some [text]</span></div>`, getEditorOptions());
+    await contains(".o-we-toolbar .o-select-color-foreground").click();
+    expect(".o_colorpicker_section").toHaveInnerHTML("");
 });

@@ -2,6 +2,7 @@ import copy
 import json
 import logging
 import re
+from contextlib import contextmanager
 from difflib import SequenceMatcher
 from stdnum.eu.vat import guess_country
 
@@ -70,7 +71,7 @@ class AccountMove(models.Model):
     extract_partner_name = fields.Char("Extract Detected Partner Name", readonly=True)
 
     def action_reload_ai_data(self):
-        self = self.with_context(skip_is_manually_modified=True)  # noqa: PLW0642
+        self = self.with_context(skip_is_manually_modified=True, from_ocr=True)  # noqa: PLW0642
         try:
             with self._get_edi_creation() as move_form:
                 # The OCR doesn't overwrite the fields, so it's necessary to reset them
@@ -153,7 +154,7 @@ class AccountMove(models.Model):
         self.extract_attachment_id = self.message_main_attachment_id
 
     def is_indian_taxes(self):
-        l10n_in = self.env['ir.module.module'].search([('name', '=', 'l10n_in')])
+        l10n_in = self.env['ir.module.module'].sudo().search([('name', '=', 'l10n_in')])
         return self.company_id.country_id.code == "IN" and l10n_in and l10n_in.state == 'installed'
 
     def _get_user_infos(self):
@@ -331,10 +332,6 @@ class AccountMove(models.Model):
                 partner = self._create_supplier_from_vat(vat)
                 if partner and self.is_purchase_document():
                     self.partner_id = partner
-                    bank_vals = (self.extract_prefill_data or {}).get('bank_ids', [{}])[0]
-                    if bank_vals:
-                        bank_vals['partner_id'] = partner.id
-                        self.partner_bank_id = self.with_context(clean_context(self.env.context)).env['res.partner.bank'].create(bank_vals)
                 return [partner.id, self.partner_bank_id.id] if partner else False
 
         if word.field == "supplier":
@@ -366,20 +363,21 @@ class AccountMove(models.Model):
         return None
 
     def _find_partner_id_with_vat(self, vat_number_ocr):
+        rank_field = 'supplier_rank' if self.is_purchase_document() else 'customer_rank'
         partner_vat = self.env["res.partner"].search([
             *self.env['res.partner']._check_company_domain(self.company_id),
             ("vat", "=ilike", vat_number_ocr),
-        ], limit=1)
+        ], order=f'{rank_field} desc', limit=1)
         if not partner_vat:
             partner_vat = self.env["res.partner"].search([
                 *self.env['res.partner']._check_company_domain(self.company_id),
                 ("vat", "=ilike", vat_number_ocr[2:]),
-            ], limit=1)
+            ], order=f'{rank_field} desc', limit=1)
         if not partner_vat:
             for partner in self.env["res.partner"].search([
                 *self.env['res.partner']._check_company_domain(self.company_id),
                 ("vat", "!=", False),
-            ], limit=1000):
+            ], order=f'{rank_field} desc', limit=1000):
                 vat = partner.vat.upper()
                 vat_cleaned = vat.replace("BTW", "").replace("MWST", "").replace("ABN", "")
                 vat_cleaned = re.sub(r'[^A-Z0-9]', '', vat_cleaned)
@@ -393,10 +391,9 @@ class AccountMove(models.Model):
             return None
 
         try:
-            response, error = self.env['iap.autocomplete.api']._request_partner_autocomplete(
-                action='enrich',
-                params={'vat': vat_number},
-            )
+            response, error = self.env['iap.autocomplete.api']._request_partner_autocomplete('enrich_by_vat', {
+                'vat': vat_number,
+            })
             if error:
                 raise Exception(error)
             if 'credit_error' in response and response['credit_error']:
@@ -408,19 +405,19 @@ class AccountMove(models.Model):
             _logger.error('Check VAT error: %s' % str(exception))
             return None
 
-        if response and response.get('company_data'):
-            country_id = self.env['res.country'].search([('code', '=', response.get('company_data').get('country_code',''))])
-            state_id = self.env['res.country.state'].search([('name', '=', response.get('company_data').get('state_name',''))])
-            resp_values = response.get('company_data')
+        if response and response.get('data'):
+            country_id = self.env['res.country'].search([('code', '=', response.get('data').get('country_code',''))])
+            resp_values = response.get('data')
 
-            values = {field: resp_values[field] for field in ('name', 'vat', 'street', 'city', 'zip', 'phone', 'email', 'partner_gid') if field in resp_values}
+            values = {field: resp_values[field] for field in ('name', 'vat', 'street', 'city', 'zip', 'phone', 'email') if field in resp_values}
             values['is_company'] = True
-
-            if 'bank_ids' in resp_values:
-                values['bank_ids'] = [(0, 0, vals) for vals in resp_values['bank_ids']]
 
             if country_id:
                 values['country_id'] = country_id.id
+                state_id = self.env['res.country.state'].search([
+                    ('name', '=', response.get('data').get('state_name','')),
+                    ('country_id', '=', country_id.id),
+                ], limit = 1)
                 if state_id:
                     values['state_id'] = state_id.id
             return values
@@ -432,7 +429,7 @@ class AccountMove(models.Model):
             return False
 
         for field, val in (self.extract_prefill_data or {}).items():
-            if field not in values and field != 'bank_ids':
+            if field not in values:
                 values[field] = val
         return self.env["res.partner"].with_context(clean_context(self.env.context)).create(values)
 
@@ -440,10 +437,11 @@ class AccountMove(models.Model):
         if not partner_name:
             return 0
 
+        rank_field = 'supplier_rank' if self.is_purchase_document() else 'customer_rank'
         partner = self.env["res.partner"].search([
             *self.env['res.partner']._check_company_domain(self.company_id),
             ("name", "=", partner_name),
-        ], order='supplier_rank desc', limit=1)
+        ], order=f'{rank_field} desc', limit=1)
         if partner:
             return partner.id if partner.id != self.company_id.partner_id.id else 0
 
@@ -451,7 +449,7 @@ class AccountMove(models.Model):
             *self.env['res.partner']._check_company_domain(self.company_id),
             ('active', '=', True),
             ('name', '!=', False),
-            ('supplier_rank', '>', 0),
+            (rank_field, '>', 0),
         ]).select('res_partner.id', 'res_partner.name'))
 
         partners_dict = {name.lower().replace('-', ' '): partner_id for partner_id, name in self.env.cr.fetchall()}
@@ -692,7 +690,7 @@ class AccountMove(models.Model):
         return vals
 
     def _fill_document_with_results(self, ocr_results):
-        self = self.with_context(skip_is_manually_modified=True)  # noqa: PLW0642
+        self = self.with_context(skip_is_manually_modified=True, from_ocr=True)  # noqa: PLW0642
         if self.state != 'draft' or ocr_results is None:
             return
 
@@ -716,7 +714,6 @@ class AccountMove(models.Model):
         SWIFT_code_ocr = json.loads(self._get_ocr_selected_value(ocr_results, 'SWIFT_code', "{}"))
         self.extract_prefill_data = {
             'country_id': self.env['res.country'].search([('code', '=', country_code)], limit=1).id,
-            'bank_ids': [self._get_bank_account_vals(iban_ocr, SWIFT_code_ocr)] if iban_ocr else None,
             'email': get_first_value_without('email', (self.company_id.email,)),
             'website': get_first_value_without('website', (self.company_id.website,)),
             'phone': get_first_value_without('phone', (self.company_id.phone,)),
@@ -764,7 +761,7 @@ class AccountMove(models.Model):
 
     def _save_form(self, ocr_results):
         # Avoid marking is_manually_modified as True when posting an invoice
-        self = self.with_context(skip_is_manually_modified=True)  # noqa: PLW0642
+        self = self.with_context(skip_is_manually_modified=True, from_ocr=True)  # noqa: PLW0642
 
         date_ocr = self._get_ocr_selected_value(ocr_results, 'date', "")
         due_date_ocr = self._get_ocr_selected_value(ocr_results, 'due_date', "")
@@ -787,17 +784,12 @@ class AccountMove(models.Model):
                 if partner_id:
                     move_form.partner_id = partner_id
                     if created and iban_ocr and not move_form.partner_bank_id and self.is_purchase_document():
-                        bank_account = self.env['res.partner.bank'].search([
-                            *self.env['res.partner.bank']._check_company_domain(self.company_id),
-                            ('acc_number', '=ilike', iban_ocr),
-                        ])
-                        if bank_account:
-                            if bank_account.partner_id == move_form.partner_id.id:
-                                move_form.partner_bank_id = bank_account
-                        else:
-                            bank_vals = self._get_bank_account_vals(iban_ocr, SWIFT_code_ocr)
-                            bank_vals['partner_id'] = move_form.partner_id.id
-                            move_form.partner_bank_id = self.with_context(clean_context(self.env.context)).env['res.partner.bank'].create(bank_vals)
+                        move_form.partner_bank_id = self.env['res.partner.bank']._find_or_create_bank_account(
+                            account_number=iban_ocr,
+                            partner=move_form.partner_id,
+                            company=self.company_id,
+                            extra_create_vals=self._get_bank_account_vals(iban_ocr, SWIFT_code_ocr),
+                        )
 
             if qr_bill_ocr:
                 qr_content_list = qr_bill_ocr.splitlines()
@@ -836,13 +828,16 @@ class AccountMove(models.Model):
 
                 if self.is_purchase_document():
                     iban = qr_content_list[3]
-                    if iban and not self.env['res.partner.bank'].search_count([('acc_number', '=ilike', iban)], limit=1):
-                        move_form.partner_bank_id = self.with_context(clean_context(self.env.context)).env['res.partner.bank'].create({
-                            'acc_number': iban,
-                            'company_id': move_form.company_id.id,
-                            'currency_id': move_form.currency_id.id,
-                            'partner_id': partner.id,
-                        })
+                    if iban:
+                        move_form.partner_bank_id = self.env['res.partner.bank']._find_or_create_bank_account(
+                            account_number=iban,
+                            partner=partner,
+                            company=move_form.company_id,
+                            extra_create_vals={
+                                'company_id': move_form.company_id.id,
+                                'currency_id': move_form.currency_id.id,
+                            },
+                        )
 
             due_date_move_form = move_form.invoice_date_due  # remember the due_date, as it could be modified by the onchange() of invoice_date
             context_create_date = fields.Date.context_today(self, self.create_date)
@@ -918,15 +913,17 @@ class AccountMove(models.Model):
             if not move_form.currency_id.is_zero(tax_amount_rounding_error) and self.is_indian_taxes():
                 fixed_rounding_error = total_ocr - total_tax_amount_ocr - self.tax_totals['base_amount_currency']
                 tax_totals = self.tax_totals
-                tax_groups = tax_totals['groups_by_subtotal']['Untaxed Amount']
-                if move_form.currency_id.is_zero(fixed_rounding_error) and tax_groups:
-                    tax = total_tax_amount_ocr / len(tax_groups)
-                    for tax_total in tax_groups:
-                        tax_total.update({
-                            'tax_group_amount': tax,
-                            'formatted_tax_group_amount': formatLang(self.env, tax, currency_obj=self.currency_id),
-                        })
-                    self.tax_totals = tax_totals
+                if move_form.currency_id.is_zero(fixed_rounding_error) and tax_totals['has_tax_groups']:
+                    max_tax_group = max(
+                        [
+                            tax_group
+                            for subtotal in tax_totals['subtotals']
+                            for tax_group in subtotal['tax_groups']
+                        ],
+                        key=lambda tax_group: tax_group['tax_amount_currency'],
+                    )
+                    max_tax_group['tax_amount_currency'] += fixed_rounding_error
+                self.tax_totals = tax_totals
 
             # Set the imported flag after taxes have been computed
             move_form.invoice_line_ids.is_imported = True
@@ -943,10 +940,18 @@ class AccountMove(models.Model):
 
     @api.model
     def _import_invoice_ocr(self, invoice, file_data, new=False):
-        with invoice._get_edi_creation() as invoice:
+        with invoice.with_context(from_ocr=True)._get_edi_creation() as invoice:
             invoice._message_set_main_attachment_id(file_data['attachment'], force=True, filter_xml=False)
             invoice._send_batch_for_digitization()
         return True
+
+    @contextmanager
+    def _disable_discount_precision(self):
+        if self.env.context.get('from_ocr', False):  # Don't disable discount precision if OCR is used
+            yield
+        else:
+            with super()._disable_discount_precision():
+                yield
 
     def _get_edi_decoder(self, file_data, new=False):
         # EXTENDS 'account'

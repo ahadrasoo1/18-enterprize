@@ -6,6 +6,7 @@ import { REINSERT_LIST_CHILDREN } from "../list/list_actions";
 import {
     REINSERT_DYNAMIC_PIVOT_CHILDREN,
     REINSERT_STATIC_PIVOT_CHILDREN,
+    REINSERT_PIVOT_CELL_CHILDREN,
 } from "../pivot/pivot_actions";
 import { getListHighlights } from "../list/list_highlight_helpers";
 const { topbarMenuRegistry } = registries;
@@ -66,9 +67,10 @@ topbarMenuRegistry.addChild("download_as_json", ["file"], {
     icon: "o-spreadsheet-Icon.DOWNLOAD_AS_JSON",
 });
 
-topbarMenuRegistry.addChild("data_sources_data", ["data"], (env) => {
-    let sequence = 1000;
-    const lists_items = env.model.getters.getListIds().map((listId, index) => {
+topbarMenuRegistry.addChild("list_data_sources", ["data"], (env) => {
+    const sequence = 53;
+    const numberOfLists = env.model.getters.getListIds().length;
+    return env.model.getters.getListIds().map((listId, index) => {
         const highlightProvider = {
             get highlights() {
                 return getListHighlights(env.model.getters, listId);
@@ -77,7 +79,7 @@ topbarMenuRegistry.addChild("data_sources_data", ["data"], (env) => {
         return {
             id: `item_list_${listId}`,
             name: env.model.getters.getListDisplayName(listId),
-            sequence: sequence++,
+            sequence: sequence + index / numberOfLists,
             execute: (env) => {
                 env.openSidePanel("LIST_PROPERTIES_PANEL", { listId });
             },
@@ -91,11 +93,16 @@ topbarMenuRegistry.addChild("data_sources_data", ["data"], (env) => {
                     : undefined,
         };
     });
-    const charts_items = env.model.getters.getOdooChartIds().map((chartId, index) => {
+});
+
+topbarMenuRegistry.addChild("chart_data_sources", ["data"], (env) => {
+    const sequence = 56;
+    const numberOfCharts = env.model.getters.getOdooChartIds().length;
+    return env.model.getters.getOdooChartIds().map((chartId, index) => {
         return {
             id: `item_chart_${chartId}`,
             name: env.model.getters.getOdooChartDisplayName(chartId),
-            sequence: sequence++,
+            sequence: sequence + index / numberOfCharts,
             execute: (env) => {
                 env.model.dispatch("SELECT_FIGURE", { id: chartId });
                 env.openSidePanel("ChartPanel");
@@ -104,24 +111,23 @@ topbarMenuRegistry.addChild("data_sources_data", ["data"], (env) => {
             separator: index === env.model.getters.getOdooChartIds().length - 1,
         };
     });
-    return lists_items.concat(charts_items).concat([
-        {
-            id: "refresh_all_data",
-            name: _t("Refresh all data"),
-            sequence: sequence++,
-            execute: (env) => {
-                env.model.dispatch("REFRESH_ALL_DATA_SOURCES");
-            },
-            separator: true,
-            icon: "o-spreadsheet-Icon.REFRESH_DATA",
-        },
-    ]);
+});
+
+topbarMenuRegistry.addChild("refresh_data_sources", ["data"], {
+    id: "refresh_all_data",
+    name: _t("Refresh all data"),
+    sequence: 58,
+    execute: (env) => {
+        env.model.dispatch("REFRESH_ALL_DATA_SOURCES");
+    },
+    separator: true,
+    icon: "o-spreadsheet-Icon.REFRESH_DATA",
 });
 
 const reinsertDynamicPivotMenu = {
     id: "reinsert_dynamic_pivot",
     name: _t("Re-insert dynamic pivot"),
-    sequence: 1020,
+    sequence: 60,
     children: [REINSERT_DYNAMIC_PIVOT_CHILDREN],
     isVisible: (env) =>
         env.model.getters.getPivotIds().some((id) => env.model.getters.getPivot(id).isValid()),
@@ -130,8 +136,18 @@ const reinsertDynamicPivotMenu = {
 const reinsertStaticPivotMenu = {
     id: "reinsert_static_pivot",
     name: _t("Re-insert static pivot"),
-    sequence: 1021,
+    sequence: 70,
     children: [REINSERT_STATIC_PIVOT_CHILDREN],
+    isVisible: (env) =>
+        env.model.getters.getPivotIds().some((id) => env.model.getters.getPivot(id).isValid()),
+    icon: "o-spreadsheet-Icon.INSERT_PIVOT",
+};
+
+const reinsertPivotCell = {
+    id: "reinsert_pivot_cell",
+    name: _t("Re-insert pivot cell"),
+    sequence: 72,
+    children: [REINSERT_PIVOT_CELL_CHILDREN],
     isVisible: (env) =>
         env.model.getters.getPivotIds().some((id) => env.model.getters.getPivot(id).isValid()),
     icon: "o-spreadsheet-Icon.INSERT_PIVOT",
@@ -140,9 +156,12 @@ const reinsertStaticPivotMenu = {
 const reInsertListMenu = {
     id: "reinsert_list",
     name: _t("Re-insert list"),
-    sequence: 1021,
+    sequence: 74,
     children: [REINSERT_LIST_CHILDREN],
-    isVisible: (env) => env.model.getters.getListIds().length,
+    isVisible: (env) =>
+        env.model.getters
+            .getListIds()
+            .some((id) => env.model.getters.getListDataSource(id).isModelValid()),
     icon: "o-spreadsheet-Icon.INSERT_LIST",
 };
 
@@ -162,3 +181,4 @@ topbarMenuRegistry.addChild("reinsert_dynamic_pivot", ["data"], reinsertDynamicP
 topbarMenuRegistry.addChild("reinsert_static_pivot", ["data"], reinsertStaticPivotMenu, {
     force: true,
 });
+topbarMenuRegistry.addChild("reinsert_pivot_cell", ["data"], reinsertPivotCell);

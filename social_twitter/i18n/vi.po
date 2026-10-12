@@ -1,23 +1,27 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* social_twitter
-# 
+# * social_twitter
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Thi Huong Nguyen, 2024
+#
+# Weblate <noreply-mt-weblate@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:28+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Vietnamese (https://app.transifex.com/odoo/teams/41243/vi/)\n"
+"POT-Creation-Date: 2026-04-10 18:52+0000\n"
+"PO-Revision-Date: 2026-04-11 18:34+0000\n"
+"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"Language-Team: Vietnamese <https://translate.odoo.com/projects/odoo-18/"
+"social_twitter/vi/>\n"
+"Language: vi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: vi\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 5.16.2\n"
 
 #. module: social_twitter
 #. odoo-python
@@ -58,6 +62,11 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:social_twitter.social_stream_post_view_kanban
 msgid "<i class=\"fa fa-retweet me-1\" title=\"Repost a post\"/>"
 msgstr "<i class=\"fa fa-retweet me-1\" title=\"Đăng lại một bài viết\"/>"
+
+#. module: social_twitter
+#: model_terms:ir.ui.view,arch_db:social_twitter.twitter_preview
+msgid "@x ·"
+msgstr ""
 
 #. module: social_twitter
 #. odoo-python
@@ -111,7 +120,7 @@ msgstr "Cài đặt cấu hình"
 #. module: social_twitter
 #: model_terms:ir.ui.view,arch_db:social_twitter.res_config_settings_view_form
 msgid "Consumer Key"
-msgstr "Mã khoá người dùng"
+msgstr "Khoá người dùng"
 
 #. module: social_twitter
 #: model_terms:ir.ui.view,arch_db:social_twitter.res_config_settings_view_form
@@ -185,8 +194,8 @@ msgstr ""
 #. odoo-python
 #: code:addons/social_twitter/models/social_stream_post.py:0
 msgid ""
-"Failed to fetch the posts in the same thread: '%(text)s' using the account "
-"%(account)s."
+"Failed to fetch the posts in the same thread: '%(text)s' using the account %"
+"(account)s."
 msgstr ""
 "Không tìm nạp được các bài viết trong cùng một luồng: '%(text)s' bằng tài "
 "khoản %(account)s."
@@ -206,7 +215,7 @@ msgstr "Danh sách yêu thích của"
 #: model:ir.model.fields,field_description:social_twitter.field_social_post__has_twitter_account
 #: model:ir.model.fields,field_description:social_twitter.field_social_post_template__has_twitter_account
 msgid "Has X Account"
-msgstr ""
+msgstr "Có Tài khoản X"
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_twitter_account__id
@@ -284,7 +293,7 @@ msgstr "Vui lòng chọn một tài khoản X cho loại luồng này."
 #. odoo-python
 #: code:addons/social_twitter/models/social_post_template.py:0
 msgid "Please specify either an X Message or upload some X Images."
-msgstr ""
+msgstr "Vui lòng viết nội dung X hoặc tải lên một vài hình ảnh X."
 
 #. module: social_twitter
 #. odoo-javascript
@@ -339,8 +348,7 @@ msgstr "Đọc thêm về tài khoản X"
 #: code:addons/social_twitter/models/social_stream_post.py:0
 msgid "Replies from posts older than 7 days must be accessed on Twitter.com"
 msgstr ""
-"Câu trả lời từ các bài viết cũ hơn 7 ngày phải được truy cập trên "
-"Twitter.com"
+"Câu trả lời từ các bài viết cũ hơn 7 ngày phải được truy cập trên Twitter.com"
 
 #. module: social_twitter
 #: model_terms:ir.ui.view,arch_db:social_twitter.social_stream_post_view_kanban
@@ -419,8 +427,8 @@ msgstr "Tài khoản mạng xã hội X"
 #. odoo-python
 #: code:addons/social_twitter/models/social_stream.py:0
 msgid ""
-"The keyword you've typed in does not look valid. Please try again with other"
-" words."
+"The keyword you've typed in does not look valid. Please try again with other "
+"words."
 msgstr ""
 "Từ khóa bạn đã nhập có vẻ không hợp lệ. Vui lòng thử lại với các từ khác."
 
@@ -431,8 +439,8 @@ msgid ""
 "The url that this service requested returned an error. Please contact the "
 "author of the app."
 msgstr ""
-"Url mà dịch vụ này yêu cầu đã trả về lỗi. Vui lòng liên hệ với người tạo ứng"
-" dụng."
+"Url mà dịch vụ này yêu cầu đã trả về lỗi. Vui lòng liên hệ với người tạo ứng "
+"dụng."
 
 #. module: social_twitter
 #. odoo-python
@@ -522,7 +530,13 @@ msgstr ""
 #: model:ir.model.fields,help:social_twitter.field_social_post__twitter_image_ids
 #: model:ir.model.fields,help:social_twitter.field_social_post_template__twitter_image_ids
 msgid "Will attach images to your posts."
-msgstr ""
+msgstr "Sẽ đính kèm hình ảnh vào bài viết của bạn."
+
+#. module: social_twitter
+#: model:ir.model.fields.selection,name:social_twitter.selection__social_media__media_type__twitter
+#: model:social.media,name:social_twitter.social_media_twitter
+msgid "X"
+msgstr "X"
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_stream_post__twitter_author_id
@@ -532,7 +546,7 @@ msgstr "ID tác giả X"
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_res_config_settings__twitter_consumer_key
 msgid "X Consumer Key"
-msgstr "Mã khoá người dùng X"
+msgstr "Khoá người dùng X"
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_res_config_settings__twitter_consumer_secret_key
@@ -558,7 +572,7 @@ msgstr "ID X"
 #: model:ir.model.fields,field_description:social_twitter.field_social_post__twitter_image_ids
 #: model:ir.model.fields,field_description:social_twitter.field_social_post_template__twitter_image_ids
 msgid "X Images"
-msgstr ""
+msgstr "Hình ảnh"
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_stream_post__twitter_likes_count
@@ -569,7 +583,7 @@ msgstr "Lượt thích X"
 #: model:ir.model.fields,field_description:social_twitter.field_social_post__twitter_message
 #: model:ir.model.fields,field_description:social_twitter.field_social_post_template__twitter_message
 msgid "X Message"
-msgstr ""
+msgstr "Nội dung"
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_account__twitter_oauth_token
@@ -683,10 +697,12 @@ msgstr "Bạn không thể lưu cùng một bài viết hai lần trên cùng m�
 #: code:addons/social_twitter/models/social_stream.py:0
 msgid ""
 "You cannot create a Stream from this X account.\n"
-"It may be because it's protected. To solve this, please make sure you follow it before trying again."
+"It may be because it's protected. To solve this, please make sure you follow "
+"it before trying again."
 msgstr ""
 "Bạn không thể tạo Luồng từ tài khoản X này.\n"
-"Nguyên nhân có thể là do nó được bảo vệ. Để giải quyết vấn đề này, hãy đảm bảo bạn theo dõi trước khi thử lại."
+"Nguyên nhân có thể là do nó được bảo vệ. Để giải quyết vấn đề này, hãy đảm "
+"bảo bạn theo dõi trước khi thử lại."
 
 #. module: social_twitter
 #. odoo-python
@@ -698,8 +714,7 @@ msgstr "Bạn không có đăng ký đang hoạt động. Hãy mua tại đây: 
 #. odoo-python
 #: code:addons/social_twitter/models/social_media.py:0
 msgid ""
-"You need to add the following callback URL to your X application settings: "
-"%s"
+"You need to add the following callback URL to your X application settings: %s"
 msgstr "Bạn cần thêm URL gọi lại sau vào cài đặt ứng dụng X của mình: %s"
 
 #. module: social_twitter

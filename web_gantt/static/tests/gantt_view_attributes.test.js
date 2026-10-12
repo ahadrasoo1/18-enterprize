@@ -195,7 +195,27 @@ test("default_scale attribute", async () => {
     });
     expect(getActiveScale()).toBe(5); // day scale
     const { columnHeaders, range } = getGridContent();
-    expect(range).toBe("From: 12/20/2018 to: 12/22/2018");
+    expect(range).toBe("12/20/2018 -> 12/22/2018");
+    expect(columnHeaders).toHaveLength(38);
+});
+
+test("default_scale attribute excluded from scales", async () => {
+    await mountGanttView({
+        resModel: "tasks",
+        arch: `<gantt date_start="start" date_stop="stop" default_scale="day" scales="week"/>`,
+    });
+    const { columnHeaders, range } = getGridContent();
+    expect(range).toBe("12/20/2018 -> 12/22/2018");
+    expect(columnHeaders).toHaveLength(38);
+});
+
+test("default_scale omitted, scales provided", async () => {
+    await mountGanttView({
+        resModel: "tasks",
+        arch: `<gantt date_start="start" date_stop="stop" scales="day,week"/>`,
+    });
+    const { columnHeaders, range } = getGridContent();
+    expect(range).toBe("12/20/2018 -> 12/22/2018");
     expect(columnHeaders).toHaveLength(38);
 });
 
@@ -260,22 +280,15 @@ test("progress attribute", async () => {
 
 test("form_view_id attribute", async () => {
     Tasks._views[["form", 42]] = `<form><field name="name"/></form>`;
-    onRpc("get_views", ({ kwargs }) => expect.step(["get_views", kwargs.views]));
     await mountGanttView({
         resModel: "tasks",
         arch: `<gantt string="Tasks" date_start="start" date_stop="stop" form_view_id="42"/>`,
         groupBy: ["project_id"],
     });
+    onRpc("get_views", ({ kwargs }) => expect.step(["get_views", kwargs.views]));
     await contains(queryFirst(SELECTORS.addButton + ":visible")).click();
     expect(".modal .o_form_view").toHaveCount(1);
     expect.verifySteps([
-        [
-            "get_views",
-            [
-                [123456789, "gantt"],
-                [987654321, "search"],
-            ],
-        ], // initial get_views
         ["get_views", [[42, "form"]]], // get_views when form view dialog opens
     ]);
 });
@@ -387,7 +400,7 @@ test("consolidation feature (single level)", async () => {
     });
 
     const { rows, range } = getGridContent();
-    expect(range).toBe("From: 12/01/2018 to: 02/28/2019");
+    expect(range).toBe("12/01/2018 -> 02/28/2019");
     expect(".o_gantt_button_expand_rows").toHaveCount(1);
     expect(rows).toEqual([
         {
@@ -506,8 +519,8 @@ test(`Today style with unavailabilities ("week": "day:half")`, async () => {
         },
     ];
 
-    onRpc("get_gantt_data", async ({ parent }) => {
-        const result = await parent();
+    onRpc("get_gantt_data", ({ parent }) => {
+        const result = parent();
         result.unavailabilities.__default = { false: unavailabilities };
         return result;
     });
@@ -542,9 +555,9 @@ test("Today style of group rows", async () => {
     ];
     Tasks._records = [Tasks._records[3]]; // id: 4
 
-    onRpc("get_gantt_data", async ({ parent }) => {
+    onRpc("get_gantt_data", ({ parent }) => {
         expect.step("get_gantt_data");
-        const result = await parent();
+        const result = parent();
         result.unavailabilities.project_id = { 1: unavailabilities };
         return result;
     });
@@ -728,7 +741,7 @@ test("offset attribute", async () => {
     });
 
     const { range } = getGridContent();
-    expect(range).toBe("From: 12/16/2018 to: 12/18/2018", {
+    expect(range).toBe("12/16/2018 -> 12/18/2018", {
         message: "gantt view should be set to 4 days before initial date",
     });
 });
@@ -944,9 +957,9 @@ test("consolidation and unavailabilities", async () => {
             stop: "2018-12-20 14:00:00",
         },
     ];
-    onRpc("get_gantt_data", async ({ parent, kwargs }) => {
+    onRpc("get_gantt_data", ({ parent, kwargs }) => {
         expect.step("get_gantt_data");
-        const result = await parent();
+        const result = parent();
         expect(kwargs.unavailability_fields).toEqual(["user_id"]);
         result.unavailabilities.user_id = { 1: unavailabilities };
         return result;
@@ -983,4 +996,13 @@ test("consolidation and unavailabilities", async () => {
         "--Gantt__DayOff-background-color",
         "--Gantt__DayOffToday-background-color",
     ]);
+});
+
+test("default_range not in scales", async () => {
+    await mountGanttView({
+        resModel: "tasks",
+        arch: `<gantt date_start="start" date_stop="stop" scales="month" default_range="year"/>`,
+    });
+    const { range } = getGridContent();
+    expect(range).toBe("2018");
 });

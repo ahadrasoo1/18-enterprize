@@ -1,20 +1,23 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* l10n_mx_edi_pos
+# * l10n_mx_edi_pos
 #
+# Weblate <noreply-mt-weblate@weblate.org>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.1alpha1+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-01 10:51+0000\n"
-"PO-Revision-Date: 2023-08-02 11:55+0000\n"
-"Last-Translator: \n"
-"Language-Team: \n"
+"POT-Creation-Date: 2025-12-29 19:03+0000\n"
+"PO-Revision-Date: 2025-11-07 22:23+0000\n"
+"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"Language-Team: Spanish (Latin America) <https://translate.odoo.com/projects/"
+"odoo-18-l10n/l10n_mx_edi_pos/es_419/>\n"
 "Language: es_419\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Plural-Forms: \n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.12.2\n"
 
 #. module: l10n_mx_edi_pos
 #: model:ir.model.fields.selection,name:l10n_mx_edi_pos.selection__pos_order__l10n_mx_edi_usage__g01
@@ -23,8 +26,8 @@ msgstr "Adquisición de mercancías"
 
 #. module: l10n_mx_edi_pos
 #. odoo-javascript
-#: code:addons/l10n_mx_edi_pos/static/src/overrides/components/partner_details_edit/partner_details_edit.xml:0
-msgid "Additional invoicing information"
+#: code:addons/l10n_mx_edi_pos/static/src/app/add_info_popup/add_info_popup.xml:0
+msgid "Additional Invoicing Information"
 msgstr "Información adicional sobre la facturación"
 
 #. module: l10n_mx_edi_pos
@@ -69,6 +72,11 @@ msgid "Constructions"
 msgstr "Construcciones"
 
 #. module: l10n_mx_edi_pos
+#: model:ir.model,name:l10n_mx_edi_pos.model_res_partner
+msgid "Contact"
+msgstr "Contacto"
+
+#. module: l10n_mx_edi_pos
 #: model:ir.model.fields,field_description:l10n_mx_edi_pos.field_pos_payment_method__country_code
 msgid "Country Code"
 msgstr "Código de país"
@@ -84,6 +92,12 @@ msgstr "Crear factura global"
 #: model:ir.model,name:l10n_mx_edi_pos.model_l10n_mx_edi_global_invoice_create
 msgid "Create a global invoice"
 msgstr "Crear una factura global"
+
+#. module: l10n_mx_edi_pos
+#. odoo-python
+#: code:addons/l10n_mx_edi_pos/models/pos_config.py:0
+msgid "Credit Card"
+msgstr "Tarjeta de Crédito"
 
 #. module: l10n_mx_edi_pos
 #: model:ir.model.fields.selection,name:l10n_mx_edi_pos.selection__pos_order__l10n_mx_edi_usage__d09
@@ -108,8 +122,18 @@ msgid "Download"
 msgstr "Descargar"
 
 #. module: l10n_mx_edi_pos
+#. odoo-python
+#: code:addons/l10n_mx_edi_pos/models/pos_config.py:0
+msgid ""
+"Ensure that there is an existing bank journal. Check if chart of accounts is "
+"installed in your company."
+msgstr ""
+"Asegúrese de que haya un diario bancario existente. Verifique si el plan de "
+"cuentas está instalado en su empresa."
+
+#. module: l10n_mx_edi_pos
 #. odoo-javascript
-#: code:addons/l10n_mx_edi_pos/static/src/overrides/models/order.js:0
+#: code:addons/l10n_mx_edi_pos/static/src/overrides/models/pos_store.js:0
 #: model:ir.model.fields.selection,name:l10n_mx_edi_pos.selection__pos_order__l10n_mx_edi_cfdi_sat_state__error
 msgid "Error"
 msgstr "Error"
@@ -124,12 +148,6 @@ msgstr "No fue posible distribuir algunas líneas negativas."
 #: model:ir.model.fields,field_description:l10n_mx_edi_pos.field_pos_order__l10n_mx_edi_cfdi_uuid
 msgid "Fiscal Folio"
 msgstr "Folio fiscal"
-
-#. module: l10n_mx_edi_pos
-#. odoo-javascript
-#: code:addons/l10n_mx_edi_pos/static/src/overrides/components/partner_details_edit/partner_details_edit.xml:0
-msgid "Fiscal Regime"
-msgstr "Régimen fiscal"
 
 #. module: l10n_mx_edi_pos
 #: model:ir.model.fields,help:l10n_mx_edi_pos.field_pos_order__l10n_mx_edi_cfdi_uuid
@@ -171,6 +189,11 @@ msgstr ""
 #: code:addons/l10n_mx_edi_pos/static/src/overrides/components/payment_screen/payment_screen.xml:0
 msgid "Invoice to public:"
 msgstr "Factura a público en general:"
+
+#. module: l10n_mx_edi_pos
+#: model:ir.model,name:l10n_mx_edi_pos.model_account_move
+msgid "Journal Entry"
+msgstr "Asiento contable"
 
 #. module: l10n_mx_edi_pos
 #: model:ir.model.fields,field_description:l10n_mx_edi_pos.field_pos_order__l10n_mx_edi_document_ids
@@ -219,12 +242,6 @@ msgid "No"
 msgstr "No"
 
 #. module: l10n_mx_edi_pos
-#. odoo-javascript
-#: code:addons/l10n_mx_edi_pos/static/src/overrides/components/partner_details_edit/partner_details_edit.xml:0
-msgid "No Tax Breakdown"
-msgstr "No hay desglose de impuestos"
-
-#. module: l10n_mx_edi_pos
 #: model:ir.model.fields.selection,name:l10n_mx_edi_pos.selection__pos_order__l10n_mx_edi_cfdi_sat_state__not_defined
 msgid "Not Defined"
 msgstr "Sin definir"
@@ -244,21 +261,6 @@ msgstr "Inversión en mobiliario y equipo de oficina"
 #: code:addons/l10n_mx_edi_pos/static/src/app/add_info_popup/add_info_popup.xml:0
 msgid "Ok"
 msgstr "De acuerdo"
-
-#. module: l10n_mx_edi_pos
-#. odoo-python
-#: code:addons/l10n_mx_edi_pos/models/pos_order.py:0
-msgid "On %s: %s"
-msgstr "En %s: %s"
-
-#. module: l10n_mx_edi_pos
-#. odoo-python
-#: code:addons/l10n_mx_edi_pos/models/pos_order.py:0
-msgid ""
-"Order lines having a negative amount are not allowed to generate the CFDI."
-msgstr ""
-"Las líneas de la orden que tengan un importe negativo no tienen autorización "
-"para generar el CFDI."
 
 #. module: l10n_mx_edi_pos
 #. odoo-python
@@ -293,6 +295,11 @@ msgid "Payments for educational services (Colegiatura)"
 msgstr "Pagos por servicios educativos (colegiaturas)"
 
 #. module: l10n_mx_edi_pos
+#: model:ir.model,name:l10n_mx_edi_pos.model_pos_config
+msgid "Point of Sale Configuration"
+msgstr "Configuración del punto de venta"
+
+#. module: l10n_mx_edi_pos
 #: model:ir.model,name:l10n_mx_edi_pos.model_pos_order_line
 msgid "Point of Sale Order Lines"
 msgstr "Líneas de orden del Punto de venta"
@@ -324,6 +331,12 @@ msgid "Real interest effectively paid for mortgage loans (room house)"
 msgstr ""
 "Intereses reales efectivamente pagados por créditos hipotecarios (casa "
 "habitación)"
+
+#. module: l10n_mx_edi_pos
+#. odoo-javascript
+#: code:addons/l10n_mx_edi_pos/static/src/overrides/components/ticket_screen/ticket_screen.js:0
+msgid "Refund Amount Exceeds Original Order"
+msgstr ""
 
 #. module: l10n_mx_edi_pos
 #: model_terms:ir.ui.view,arch_db:l10n_mx_edi_pos.pos_order_form_inherit_l10n_mx_edi
@@ -395,7 +408,7 @@ msgstr ""
 #. odoo-javascript
 #. odoo-python
 #: code:addons/l10n_mx_edi_pos/models/pos_order.py:0
-#: code:addons/l10n_mx_edi_pos/static/src/overrides/models/order.js:0
+#: code:addons/l10n_mx_edi_pos/static/src/overrides/models/pos_store.js:0
 msgid ""
 "The amount of the order must be positive for a sale and negative for a "
 "refund."
@@ -410,6 +423,14 @@ msgid ""
 "recipient."
 msgstr ""
 "El código que corresponde al uso que el destinatario le dará a la factura."
+
+#. module: l10n_mx_edi_pos
+#. odoo-javascript
+#: code:addons/l10n_mx_edi_pos/static/src/overrides/components/ticket_screen/ticket_screen.js:0
+msgid ""
+"The refund amount exceeds the original order total. You are probably "
+"forgetting to include a discount."
+msgstr ""
 
 #. module: l10n_mx_edi_pos
 #: model:ir.model.fields.selection,name:l10n_mx_edi_pos.selection__pos_order__l10n_mx_edi_usage__i03
@@ -459,6 +480,26 @@ msgstr "Sí"
 #: code:addons/l10n_mx_edi_pos/models/pos_order.py:0
 msgid "You can only process orders sharing the same company."
 msgstr "Solo puede procesar órdenes que comparten la misma empresa."
+
+#. module: l10n_mx_edi_pos
+#. odoo-python
+#: code:addons/l10n_mx_edi_pos/models/pos_order.py:0
+msgid "You can only process orders sharing the same currency."
+msgstr ""
+
+#. module: l10n_mx_edi_pos
+#. odoo-python
+#: code:addons/l10n_mx_edi_pos/models/pos_order.py:0
+msgid "You cannot create a global invoice as your company is not Mexican."
+msgstr ""
+
+#. module: l10n_mx_edi_pos
+#. odoo-python
+#: code:addons/l10n_mx_edi_pos/models/pos_order.py:0
+msgid ""
+"You cannot create a global invoice for POS orders that use different "
+"journals with different issuing addresses."
+msgstr ""
 
 #. module: l10n_mx_edi_pos
 #. odoo-python

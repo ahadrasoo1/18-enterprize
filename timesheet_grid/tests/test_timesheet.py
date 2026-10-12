@@ -1,5 +1,6 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
+
+import re
 
 from datetime import date, datetime, timedelta
 from dateutil.relativedelta import relativedelta
@@ -8,7 +9,7 @@ from odoo import fields, Command
 from odoo.osv import expression
 from odoo.tools.float_utils import float_compare
 
-from odoo.addons.mail.tests.common import MockEmail
+from odoo.addons.mail.tests.common import MockEmail, mail_new_test_user
 from odoo.addons.hr_timesheet.tests.test_timesheet import TestCommonTimesheet
 from odoo.exceptions import AccessError, UserError
 from odoo.tests import Form, freeze_time
@@ -21,21 +22,21 @@ except ImportError:
 
 @freeze_time(datetime(2021, 4, 1) + timedelta(hours=12, minutes=21))
 class TestTimesheetValidation(TestCommonTimesheet, MockEmail):
-
-    def setUp(self):
-        super(TestTimesheetValidation, self).setUp()
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
         today = fields.Date.today()
-        self.timesheet1 = self.env['account.analytic.line'].with_user(self.user_employee).create({
+        cls.timesheet1 = cls.env['account.analytic.line'].with_user(cls.user_employee).create({
             'name': "my timesheet 1",
-            'project_id': self.project_customer.id,
-            'task_id': self.task1.id,
+            'project_id': cls.project_customer.id,
+            'task_id': cls.task1.id,
             'date': today - timedelta(days=1),
             'unit_amount': 2.0,
         })
-        self.timesheet2 = self.env['account.analytic.line'].with_user(self.user_employee).create({
+        cls.timesheet2 = cls.env['account.analytic.line'].with_user(cls.user_employee).create({
             'name': "my timesheet 2",
-            'project_id': self.project_customer.id,
-            'task_id': self.task2.id,
+            'project_id': cls.project_customer.id,
+            'task_id': cls.task2.id,
             'date': today - timedelta(days=1),
             'unit_amount': 3.11,
         })
@@ -319,15 +320,39 @@ class TestTimesheetValidation(TestCommonTimesheet, MockEmail):
 
     def test_timesheet_reminder(self):
         """ Reminder mail will be sent to both manager Administrator and User Officer to validate the timesheet """
-        date = datetime(2022, 3, 3, 8, 8, 15)
-        now = datetime(2022, 3, 1, 8, 8, 15)
-        self._test_next_date(now, date, -3, "weeks")
+        date = datetime(2022, 3, 2, 8, 8, 15)
+
         user = self.env.ref('base.user_admin')
+        self.user_employee.company_id.timesheet_mail_nextdate = date
+        self.user_employee.employee_id.timesheet_manager_id = self.user_manager.id
 
         with freeze_time(date), self.mock_mail_gateway():
             self.env['res.company']._cron_timesheet_reminder()
-            self.assertEqual(len(self._new_mails.filtered(lambda x: x.res_id == user.employee_id.id)), 1, "An email sent to the 'Administrator Manager'")
-            self.assertEqual(len(self._new_mails.filtered(lambda x: x.res_id == self.empl_manager.id)), 1, "An email sent to the 'User Empl Officer'")
+            self.assertEqual(
+                len(self._new_mails.filtered(lambda x: x.res_id == user.employee_id.id)), 0,
+                "No email should be sent to the 'Administrator Manager' since he has no timesheet to validate")
+            self.assertEqual(
+                len(self._new_mails.filtered(lambda x: x.res_id == self.empl_manager.id)), 0,
+                "No email should be sent to the 'User Empl Officer' since he has no timesheet to validate")
+
+            self.user_employee.company_id.timesheet_mail_nextdate = date
+            Timesheet = self.env['account.analytic.line']
+            timesheet_vals = {
+                'name': "my timesheet",
+                'project_id': self.project_customer.id,
+                'task_id': self.task1.id,
+                'date': datetime(2022, 2, 25, 8, 8, 15),
+                'unit_amount': 8.0,
+            }
+            Timesheet.with_user(self.user_employee).create({**timesheet_vals})
+            self.env['res.company']._cron_timesheet_reminder()
+            mails = self._new_mails.filtered(lambda x: x.res_id == self.empl_manager.id)
+            self.assertEqual(
+                len(mails), 1,
+                "An email should be sent to the 'User Empl Officer' since he has a timesheet to validate")
+            # Check that the action contained within the template
+            action = self.env.ref(re.search(r"action-([a-zA-Z_\.]+)\?", mails.body_html).group(1), raise_if_not_found=True)
+            self.assertEqual(action, self.env.ref('timesheet_grid.timesheet_grid_to_validate_action'))
 
     def test_timesheet_employee_reminder(self):
         """ Reminder mail will be sent to each Users' Employee """
@@ -399,6 +424,38 @@ class TestTimesheetValidation(TestCommonTimesheet, MockEmail):
         self.assertEqual(Timesheet.search_count([('employee_id', '=', self.empl_employee.id)]), sheet_count + 1,
                          "Should create new timesheet instead of updating validated timesheet in cell")
 
+    def test_grid_update_cell_uses_default_name_from_context(self):
+        """ grid_update_cell should use the description from context (default_name)
+            so the new timesheet stays in the same group as the original one.
+        """
+        Timesheet = self.env['account.analytic.line']
+        description = "Development work"
+        today = fields.Date.today()
+
+        timesheet = Timesheet.with_user(self.user_manager).create({
+            'name': description,
+            'project_id': self.project_customer.id,
+            'task_id': self.task1.id,
+            'employee_id': self.empl_manager.id,
+            'unit_amount': 2.0,
+        })
+        timesheet.with_user(self.user_manager).action_validate_timesheet()
+
+        Timesheet.with_user(self.user_manager).with_context(
+            default_name=description,
+        ).grid_update_cell([('id', '=', timesheet.id)], 'unit_amount', 1.0)
+
+        new_timesheet = Timesheet.search([
+            ('employee_id', '=', self.empl_manager.id),
+            ('date', '=', today),
+            ('id', '!=', timesheet.id),
+        ])
+        self.assertEqual(len(new_timesheet), 1)
+        self.assertEqual(
+            new_timesheet.name, description,
+            "New timesheet should use the description from context, not '/'",
+        )
+
     def test_get_last_week(self):
         """Test the get_last_week method. It should return grid_anchor (GA), last_week (LW),
             where last_week is first Sunday before GA - 7 days. Example:
@@ -411,6 +468,52 @@ class TestTimesheetValidation(TestCommonTimesheet, MockEmail):
             grid_anchor = datetime(2023, 1, d)
             dummy, last_week = AnalyticLine.with_context(grid_anchor=grid_anchor)._get_last_week()
             self.assertEqual(last_week, date(2023, 1, ((d - 1) // 7 - 1) * 7 + 1))
+
+    def test_get_daily_working_hours(self):
+        """
+        Check number of daily working hours for different timezones.
+        """
+        employee = self.user_employee.employee_id
+        employee.resource_calendar_id = self.env['resource.calendar'].create({
+            'name': 'Employee calendar',
+            'tz': 'Etc/GMT+12',
+            'attendance_ids': [
+                (0, 0, {'name': 'Monday early morning', 'dayofweek': '0', 'hour_from': 0.5, 'hour_to': 4.5, 'day_period': 'morning'}),
+                (0, 0, {'name': 'Monday lunch', 'dayofweek': '0', 'hour_from': 12, 'hour_to': 13, 'day_period': 'lunch'}),
+                (0, 0, {'name': 'Tuesday early morning', 'dayofweek': '1', 'hour_from': 0.5, 'hour_to': 2.5, 'day_period': 'morning'}),
+                (0, 0, {'name': 'Tuesday late evening', 'dayofweek': '1', 'hour_from': 21.5, 'hour_to': 23.5, 'day_period': 'afternoon'}),
+                (0, 0, {'name': 'Friday late evening', 'dayofweek': '4', 'hour_from': 19.5, 'hour_to': 23.5, 'day_period': 'afternoon'}),
+            ]
+        })
+        self.user_employee.tz = 'Etc/GMT+12'
+        working_hours_gmt_plus_12 = self.user_employee.with_user(self.user_employee).get_daily_working_hours('2021-3-22', '2021-3-26')
+
+        self.user_employee.tz = employee.resource_calendar_id.tz = 'Etc/GMT-12'
+        working_hours_gmt_minus_12 = self.user_employee.with_user(self.user_employee).get_daily_working_hours('2021-3-22', '2021-3-26')
+
+        expected_hours = {
+            '2021-03-22': 4.0,
+            '2021-03-23': 4.0,
+            '2021-03-24': 0,
+            '2021-03-25': 0,
+            '2021-03-26': 4.0,
+        }
+        self.assertEqual(working_hours_gmt_plus_12, expected_hours)
+        self.assertEqual(working_hours_gmt_minus_12, expected_hours)
+
+        # test that we get correct daily hours with flexible schedules
+        employee.resource_calendar_id.flexible_hours = True
+        employee.resource_calendar_id.hours_per_day = 2
+
+        flexible_expected_hours = {
+            '2021-03-22': 2.0,
+            '2021-03-23': 2.0,
+            '2021-03-24': 2.0,
+            '2021-03-25': 2.0,
+            '2021-03-26': 2.0,
+        }
+        flexible_daily_hours = self.user_employee.with_user(self.user_employee).get_daily_working_hours('2021-3-22', '2021-3-26')
+        self.assertEqual(flexible_expected_hours, flexible_daily_hours)
 
     def test_action_start_timer_on_old_timesheet(self):
         """ Test start timer in timesheet with a date before the current one.
@@ -505,7 +608,14 @@ class TestTimesheetValidation(TestCommonTimesheet, MockEmail):
         timesheet = self.timesheet1.with_user(self.timesheet1.user_id)
         timesheet.action_timer_start()
         self.assertTrue(timesheet.is_timer_running)
-        self.assertDictEqual(timesheet._get_timesheet_timer_data(), {'id': timesheet.id})
+        self.assertDictEqual(
+            timesheet._get_timesheet_timer_data(),
+            {
+                'id': timesheet.id,
+                'project_id': timesheet.project_id.id,
+                'task_id': timesheet.task_id.id,
+            },
+        )
 
         project_with_no_company, project_other_company = self.env['project.project'].create([
             {
@@ -523,7 +633,11 @@ class TestTimesheetValidation(TestCommonTimesheet, MockEmail):
             'project_id': project_with_no_company.id,
             'task_id': False,
         })
-        self.assertDictEqual(timesheet._get_timesheet_timer_data(), {'id': timesheet.id})
+        self.assertDictEqual(timesheet._get_timesheet_timer_data(), {
+            'id': timesheet.id,
+            'project_id': timesheet.project_id.id,
+            'task_id': timesheet.task_id.id,
+        })
 
         timesheet.write({
             'project_id': project_other_company.id,
@@ -661,3 +775,175 @@ class TestTimesheetValidation(TestCommonTimesheet, MockEmail):
         task_2.with_user(self.env.user).write({'project_id': non_tracked_project.id})
         warning = task_2._onchange_project_id()
         self.assertFalse(warning, "No warning should be raised when the task's timesheets are validated.")
+
+    def test_return_value_action_timer_stop(self):
+
+        self.timesheet1.date = fields.Date.today()
+        timesheet = self.timesheet1.with_user(self.timesheet1.user_id)
+        timesheet.action_timer_start()
+        self.assertTrue(timesheet.is_timer_running)
+        amount = timesheet.action_timer_stop()
+        self.assertEqual(amount, 0.25, 2)
+        self.assertFalse(timesheet.is_timer_running)
+
+        timesheet.action_timer_start()
+        self.assertTrue(timesheet.is_timer_running)
+        amount = timesheet.action_timer_stop()
+        self.assertEqual(amount, 0.25, 2)
+        self.assertEqual(timesheet.unit_amount, 2.50, 2)
+        self.assertFalse(timesheet.is_timer_running)
+
+    @freeze_time('2025-06-03 00:00:00')
+    def test_timer_start_with_different_timezone(self):
+        """
+        Ensure action_timer_start avoids infinite recursion caused by timezone differences
+        between the user and timesheet date by using a context flag.
+        """
+        self.user_employee.tz = 'America/Adak'
+        AccountAnalyticLine = self.env['account.analytic.line']
+        timesheet = AccountAnalyticLine.with_user(self.user_employee).create({
+            'name': "My_timesheet",
+            'project_id': self.project_customer.id,
+            'task_id': self.task2.id,
+            'date': datetime.now() + timedelta(days=2),
+            'unit_amount': 10.0,
+        })
+        count = AccountAnalyticLine.search_count([('name', '=', 'My_timesheet')])
+        self.assertEqual(count, 1)
+        timesheet.with_user(self.user_employee).action_timer_start()
+        self.assertFalse(timesheet.with_user(self.user_employee).is_timer_running)
+        timer_timesheet = AccountAnalyticLine.with_user(self.user_employee).search([('is_timer_running', '=', True)])
+        self.assertNotEqual(timesheet, timer_timesheet)
+        self.assertEqual(timer_timesheet.date, datetime.today().date())
+        timer_timesheet.with_user(self.user_employee).action_timer_stop()
+        count = AccountAnalyticLine.with_user(self.user_employee).search_count([('task_id', '=', self.task2.id)])
+        self.assertEqual(count, 2, "There should be two entries for timesheet.")
+
+    def test_timesheet_timer_timezone_resilience(self):
+        """
+        Test that recording time on a timesheet via the timer adds time to the
+        client's local Date's timesheet entry. This specifically checks that
+        the Date of the timesheet entry matches the Date of the timer
+        recording.
+
+        Note that if a timesheet entry already exists for the Date of the timer
+        "stop", we will just add time to that entry. We can test that time is
+        _only_ added to the local Date's entry by creating entries one day
+        before and one day after the local Date. If time was added to those
+        entries instead of the local Date's entry, this test should fail.
+
+        This is to prevent Datetime versus Date storage/logic issues.
+        """
+        # This user is AHEAD of UTC. Used to test "off by -1" errors.
+        new_zealand_user = mail_new_test_user(
+            self.env,
+            name='Billy Butcher',
+            login='butcher',
+            email='butcher@theboys.com',
+            groups='hr_timesheet.group_hr_timesheet_user',
+            tz='Pacific/Auckland',
+        )
+        new_zealand_employee = self.env['hr.employee'].create({
+            'name': 'Billy Butcher',
+            'user_id': new_zealand_user.id,
+        })
+        # This user is BEHIND UTC. Used to test "off by +1" errors.
+        united_states_user = mail_new_test_user(
+            self.env,
+            name='Homelander',
+            login='homelander',
+            email='homelander@theboys.com',
+            groups='hr_timesheet.group_hr_timesheet_user',
+            tz='America/New_York',
+        )
+        united_states_employee = self.env['hr.employee'].create({
+            'name': 'Homelander',
+            'user_id': united_states_user.id,
+        })
+
+        Timesheet = self.env['account.analytic.line']
+        # Setting the timesheet rounding here so that we don't rely on the
+        # settings configured, and possibly changed, in other tests.
+        self.env['res.config.settings'].create({
+            'timesheet_encode_method': 'hours',
+            'timesheet_min_duration': 60,  # Minimum timesheet time is 1 hour
+            'timesheet_rounding': 60,      # Round to nearest hour
+        }).execute()
+
+        # Note that the below time is in UTC. This time falls on August 19th
+        # in the Pacific/Auckland timezone.
+        @freeze_time('2025-08-18 15:00:00')
+        def test_off_by_minus_one():
+            yesterday_timesheet, today_timesheet = \
+                Timesheet.with_user(new_zealand_user).create([
+                    {
+                        'name': '/',
+                        'project_id': self.project_customer.id,
+                        'task_id': self.task1.id,
+                        'employee_id': new_zealand_employee.id,
+                        'unit_amount': 2.0,
+                        'date': date.today(),  # August 18th, timezone-agnostic
+                    },
+                    {
+                        'name': '/',
+                        'project_id': self.project_customer.id,
+                        'task_id': self.task1.id,
+                        'employee_id': new_zealand_employee.id,
+                        'unit_amount': 0.0,
+                    }
+                ])
+            # This timer is being started on August 19th from the perspective
+            # of somebody in the Pacific/Auckland timezone.
+            today_timesheet.with_user(new_zealand_user).action_timer_start()
+            with freeze_time(datetime.now() + timedelta(hours=1)):
+                # Simulate stopping the timer as if the "stop" button was pressed
+                # by the user. Stopping on August 19th in New Zealand.
+                today_timesheet.with_user(new_zealand_user).action_timer_stop(try_to_match=True)
+            self.assertEqual(
+                yesterday_timesheet.unit_amount, 2.0,
+                "Yesterday's timesheet entry should not have been updated.",
+            )
+            self.assertEqual(
+                today_timesheet.unit_amount, 1.0,
+                "Today's timesheet should have been updated.",
+            )
+
+        # Again, this time is in UTC. This time falls on August 18th in the
+        # America/New_York timezone.
+        @freeze_time('2025-08-19 02:00:00')
+        def test_off_by_positive_one():
+            tomorrow_timesheet, today_timesheet = \
+                Timesheet.with_user(united_states_user).create([
+                    {
+                        'name': '/',
+                        'project_id': self.project_customer.id,
+                        'task_id': self.task1.id,
+                        'employee_id': united_states_employee.id,
+                        'unit_amount': 2.0,
+                        'date': date.today(),  # August 19th, timezone-agnostic
+                    },
+                    {
+                        'name': '/',
+                        'project_id': self.project_customer.id,
+                        'task_id': self.task1.id,
+                        'employee_id': united_states_employee.id,
+                        'unit_amount': 0.0,
+                    }
+                ])
+            # This timer is being started on August 18th from the perspective
+            # of somebody in the America/New_York timezone.
+            today_timesheet.with_user(united_states_user).action_timer_start()
+            with freeze_time(datetime.now() + timedelta(hours=1)):
+                # Stopping on August 18th in New York.
+                today_timesheet.with_user(united_states_user).action_timer_stop(try_to_match=True)
+            self.assertEqual(
+                tomorrow_timesheet.unit_amount, 2.0,
+                "Tomorrow's timesheet entry should not have been updated.",
+            )
+            self.assertEqual(
+                today_timesheet.unit_amount, 1.0,
+                "Today's timesheet should have been updated.",
+            )
+
+        test_off_by_minus_one()
+        test_off_by_positive_one()

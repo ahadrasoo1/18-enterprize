@@ -1,10 +1,11 @@
 /** @odoo-module **/
 
 import { _t } from "@web/core/l10n/translation";
+import { escape } from "@web/core/utils/strings";
 import { FileUploader } from "@web/views/fields/file_handler";
 import { useAutofocus, useService } from "@web/core/utils/hooks";
 import { useEmojiPicker } from "@web/core/emoji_picker/emoji_picker";
-import { Component, useState, useRef } from "@odoo/owl";
+import { Component, useState, useRef, markup, onMounted } from "@odoo/owl";
 
 export class StreamPostCommentsReply extends Component {
     static template = "social.StreamPostCommentsReply";
@@ -41,6 +42,9 @@ export class StreamPostCommentsReply extends Component {
         useEmojiPicker(useRef("emoji-picker"), {
             onSelect: (str) => this._onAddEmoji(str),
             onClose: () => this.state.autofocus++,
+        });
+        onMounted(() => {
+            this.inputRef.el.value = this.initialValue || "";
         });
     }
 
@@ -96,7 +100,8 @@ export class StreamPostCommentsReply extends Component {
             // convert to base 64 encoded file into a Blob object
             // (with the correct Content-Type)
             const base64Response = await fetch(this.state.attachmentSrc);
-            const file = new File([await base64Response.blob()], "attachment");
+            const blob = await base64Response.blob();
+            const file = new File([blob], "attachment", { type: blob.type });
             formData.set("attachment", file);
         }
         const existingAttachmentId = textarea.dataset.existingAttachmentId;
@@ -112,7 +117,11 @@ export class StreamPostCommentsReply extends Component {
             }
             if (comment.error) {
                 this.notification.add(
-                    _t("Something went wrong while posting the comment. \n%s", comment.error),
+                    markup(
+                        _t("Something went wrong while posting the comment.") +
+                            "<br/><br/>" +
+                            escape(comment.error)
+                    ),
                     { type: "danger" }
                 );
             } else {

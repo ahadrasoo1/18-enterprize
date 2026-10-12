@@ -20,6 +20,7 @@ class AccountMove(models.Model):
         for company_sudo, invoices in invoices_map.items():
             context = dict(self.env.context, default_company_id=company_sudo.id)
             context.pop('default_journal_id', None)
+            context.pop('default_invoice_payment_term_id', None)
             invoices.with_user(company_sudo.intercompany_user_id.id).with_context(context).with_company(company_sudo.id)._inter_company_create_invoices()
         return posted
 
@@ -41,7 +42,16 @@ class AccountMove(models.Model):
                 invoice_vals['invoice_line_ids'].append((0, 0, line._inter_company_prepare_invoice_line_data()))
 
             inv_new = inv.with_context(default_move_type=invoice_vals['move_type']).new(invoice_vals)
-            for line in inv_new.invoice_line_ids.filtered(lambda l: l.display_type not in ('line_note', 'line_section')):
+            if inv_new.fiscal_position_id:
+                impacted_countries = inv_new.invoice_line_ids.tax_ids.country_id
+                if (
+                    impacted_countries
+                    and impacted_countries != inv_new.tax_country_id
+                    and impacted_countries != inv_new.fiscal_position_id.country_id
+                ):
+                    inv_new.fiscal_position_id = False
+
+            for line in inv_new.invoice_line_ids.filtered(lambda l: l.display_type not in ('line_section', 'line_note')):
                 # We need to adapt the taxes following the fiscal position, but we must keep the
                 # price unit.
                 price_unit = line.price_unit
@@ -131,11 +141,12 @@ class AccountMoveLine(models.Model):
             })
 
         company_b = self.env['res.company']._find_company_from_partner(self.move_id.partner_id.id)
+        company_a_partner = self.company_id.partner_id
         company_b_default_distribution = self.env['account.analytic.distribution.model']._get_distribution({
             "product_id": self.product_id.id,
             "product_categ_id": self.product_id.categ_id.id,
-            "partner_id": self.partner_id.id,
-            "partner_category_id": self.partner_id.category_id.ids,
+            "partner_id": company_a_partner.id,
+            "partner_category_id": company_a_partner.category_id.ids,
             "account_prefix": self.account_id.code,
             "company_id": company_b.id,
         })

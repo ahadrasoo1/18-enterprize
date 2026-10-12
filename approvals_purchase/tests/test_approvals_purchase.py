@@ -294,9 +294,10 @@ class TestApprovalsPurchase(TestApprovalsCommon):
         self.assertEqual(purchase_order_2.order_line.product_qty, 10)
         self.assertEqual(purchase_order_2.order_line.price_unit, 230)
 
-    def test_purchase_05_convert_price_currency(self):
-        """ Checks the price is correclty set when create a purchase order line
-        for a product (currency conversion). """
+    def test_purchase_05_create_purchase_using_vendor_currency(self):
+        """ Checks that the created purchase order uses the currency
+        set on the vendor of the product, rather than the currency of
+        the company. """
         date_now = datetime.datetime.now()
         currency_a = self.env['res.currency'].create({
             'name': 'ZEN',
@@ -360,14 +361,64 @@ class TestApprovalsPurchase(TestApprovalsCommon):
         request_purchase.action_confirm()
         request_purchase.with_user(user_approver_2).action_approve()
         request_purchase.action_create_purchase_orders()
-        # Compare prices.
+        # Ensure that purchase order uses currency of vendor (currency_b).
         purchase_order = self.get_purchase_order(request_purchase, 0)
         self.assertEqual(
-            purchase_order.order_line[0].price_unit, 2, "Price must be adapted."
+            purchase_order.currency_id, currency_b, "Must use the vendor's currency."
+        )
+        self.assertEqual(
+            purchase_order.order_line[0].price_unit, 5, "Price must match vendor price."
         )
         # Resets the company.
         self.env.user.company_id = current_company
         self.env.user.company_ids -= new_company
+
+    def test_create_rfq_with_inaccessible_vendor(self):
+        """
+        Ensure an RFQ approval can be created when one of the product vendors
+        belongs to a company inaccessible to the current user.
+        """
+        vendors = accessible_vendor, inaccessible_vendor = self.env['res.partner'].create([
+            {'name': 'accessible vendor'},
+            {'name': 'inaccessible vendor'},
+        ])
+        self.product_mouse.seller_ids = [Command.create({
+            'partner_id': v.id,
+            'min_qty': 1,
+            'price': 5,
+        }) for v in vendors]
+        alt_company = self.env['res.company'].create({'name': 'Alternative Company'})
+        inaccessible_vendor.company_id = alt_company
+
+        request_form = self.create_request_form(approver=self.user_approver)
+        with request_form.product_line_ids.new() as line:
+            line.product_id = self.product_mouse
+            line.quantity = 1
+            line.seller_id = self.product_mouse.seller_ids.filtered(lambda s: s.partner_id == accessible_vendor)
+        request = request_form.save()
+
+        self.assertEqual(
+            request.product_line_ids.seller_id.partner_id,
+            accessible_vendor,
+        )
+
+    def test_purchase_06_prevent_multiple_create_purchase(self):
+        """ Check that creating RFQs can't be performed more than once. """
+        request_form = self.create_request_form(approver=self.user_approver)
+        with request_form.product_line_ids.new() as line:
+            line.product_id = self.product_earphone
+            line.quantity = 30
+        request_purchase = request_form.save()
+        request_purchase.action_confirm()
+        request_purchase.with_user(self.user_approver).action_approve()
+        request_purchase.action_create_purchase_orders()
+        request_purchase.action_create_purchase_orders()
+
+        purchase_order = self.get_purchase_order(request_purchase, 0)
+        self.assertEqual(
+            purchase_order.order_line[0].product_qty, 30,
+            "Must have 30 units."
+        )
 
     def test_uom_01_create_purchase(self):
         """ Check the amount of product is correctly set, regarding the UoM of
@@ -488,3 +539,23 @@ class TestApprovalsPurchase(TestApprovalsCommon):
         self.assertEqual(approval.product_line_ids[0].seller_id.partner_id, self.partner_seller_1)
         self.assertTrue(approval.product_line_ids[1].has_no_seller)
         self.assertFalse(approval.product_line_ids[1].seller_id)
+
+    def test_product_line_add_seller(self):
+        product_without_vendor = self.product_mouse
+        request_form = self.create_request_form(approver=self.user_approver)
+        with request_form.product_line_ids.new() as line:
+            line.product_id = product_without_vendor
+            line.quantity = 1
+        request_purchase = request_form.save()
+        request_purchase.action_confirm()
+        request_purchase.with_user(self.user_approver).action_approve()
+        with self.assertRaises(UserError):  # No vendor on the product should block the RFQ generation
+            request_purchase.action_create_purchase_orders()
+
+        seller = self.env['product.supplierinfo'].create({
+            'partner_id': self.partner_seller_1.id,
+            'min_qty': 1,
+            'price': 250,
+        })
+        product_without_vendor.seller_ids = [(6, 0, [seller.id])]
+        request_purchase.action_create_purchase_orders()  # Should not raise any error as we added a vendor

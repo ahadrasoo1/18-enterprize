@@ -3,6 +3,7 @@
 import { _t } from "@web/core/l10n/translation";
 import { ArticleSelectionDialog } from "../../components/article_selection_dialog/article_selection_dialog";
 import { ArticleTemplatePickerDialog } from "@knowledge/components/article_template_picker_dialog/article_template_picker_dialog";
+import { browser } from '@web/core/browser/browser'
 import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 import {
     KnowledgeSidebarFavoriteSection,
@@ -10,6 +11,7 @@ import {
     KnowledgeSidebarSharedSection,
     KnowledgeSidebarWorkspaceSection
 } from "./sidebar_section";
+import { localization } from "@web/core/l10n/localization";
 import { user } from "@web/core/user";
 import { throttleForAnimation } from "@web/core/utils/timing";
 import { useNestedSortable } from "@web/core/utils/nested_sortable";
@@ -27,6 +29,7 @@ export const SORTABLE_TOLERANCE = 10;
  * The articles are stored in the state and have the following shape:
  * - {string} category,
  * - {array} child_ids,
+ * - {boolean} children_loaded,
  * - {string} icon,
  * - {boolean} is_article_item,
  * - {boolean} is_locked,
@@ -515,6 +518,7 @@ export class KnowledgeSidebar extends Component {
             this.state.articles[article.id] = {
                 ...article,
                 child_ids: children[article.id] ? children[article.id] : [],
+                children_loaded: false,
             };
             // Items could be shown in the favorite tree as root articles, but
             // they should not be shown as children of other articles
@@ -563,8 +567,8 @@ export class KnowledgeSidebar extends Component {
                 'order': 'sequence, id',
             }
         );
+        article.child_ids = children.map((child) => child.id);
         for (const child of children) {
-            article.child_ids.push(child.id);
             if (this.getArticle(child.id)) {
                 // Article was already loaded (if it is in the favorites)
                 continue;
@@ -573,11 +577,13 @@ export class KnowledgeSidebar extends Component {
                 ...child,
                 parent_id: article.id,
                 child_ids: [],
+                children_loaded: false,
                 category: article.category,
                 is_article_item: false,
                 is_user_favorite: false,
             };
         }
+        article.children_loaded = true;
     }
 
     /**
@@ -597,7 +603,7 @@ export class KnowledgeSidebar extends Component {
      */
     async moveArticle(article, currentPosition, newPosition) {
         const confirmMove = async (article, position) => {
-            if (this.props.record.resId === article.id && await this.props.record.isDirty()) {
+            if (await this.props.record.isDirty()) {
                 await this.props.record.save();
             }
             try {
@@ -618,7 +624,7 @@ export class KnowledgeSidebar extends Component {
                 throw error;
             }
             // Reload the current article as the move will impact its data
-            await this.props.record.model.load();
+            await this.props.record.load();
         };
 
         // Move the article in the sidebar
@@ -844,13 +850,19 @@ export class KnowledgeSidebar extends Component {
      */
     resetUnfoldedArticles() {
         this.unfoldedArticlesIds.forEach(id => {
-            if (!this.getArticle(id)) {
+            const article = this.getArticle(id);
+            if (!article) {
                 this.unfoldedArticlesIds.delete(id);
+            } else {
+                article.children_loaded = true;
             }
         });
         this.unfoldedFavoritesIds.forEach(id => {
-            if (!this.getArticle(id)) {
+            const article = this.getArticle(id);
+            if (!article) {
                 this.unfoldedFavoritesIds.delete(id);
+            } else {
+                article.children_loaded = true;
             }
         });
     }
@@ -859,15 +871,18 @@ export class KnowledgeSidebar extends Component {
      * Resize the sidebar horizontally.
      */
     resize() {
+        const isRtl = localization.direction === "rtl";
         const onPointerMove = throttleForAnimation(event => {
             event.preventDefault();
-            this.state.sidebarSize = event.pageX;
+            this.state.sidebarSize = isRtl ? document.documentElement.clientWidth - event.pageX : event.pageX;
+            browser.dispatchEvent(new Event("resize"));
         });
         const onPointerUp = () => {
             document.removeEventListener('pointermove', onPointerMove);
             document.body.style.cursor = "auto";
             document.body.style.userSelect = "auto";
             localStorage.setItem(this.storageKeys.size, this.state.sidebarSize);
+            browser.dispatchEvent(new Event("resize"));
         };
         // Add style to root element because resizing has a transition delay,
         // meaning that the cursor is not always on top of the resizer.
@@ -896,8 +911,8 @@ export class KnowledgeSidebar extends Component {
      */        
     async unfold(articleId, isFavorite) {
         const article = this.getArticle(articleId);
-        // Load the children of the article if it has not been unfolded yet
-        if (article.has_article_children && !article.child_ids.length) {
+        // Load the children of the article if they have not been loaded yet
+        if (article.has_article_children && !article.children_loaded) {
             await this.loadChildren(article);
         }
         if (isFavorite) {

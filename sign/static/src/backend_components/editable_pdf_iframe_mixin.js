@@ -146,16 +146,20 @@ export const EditablePDFIframeMixin = (pdfClass) =>
             this.scrollCleanup();
             // Make sign item visible again after dragging ends. It is a mandatory step when
             // moving items out of bounds since in that flow the items don't get re-rendered.
-            let signItem = e.currentTarget.parentElement.parentElement;
+            let signItem = e.currentTarget.parentElement.parentElement.parentElement;
             if (signItem)
                 signItem.style.visibility = "visible";
             this.setCanvasVisibility("visible");
         }
 
         onSidebarDragStart(e) {
+            const firstPage = this.root.querySelector('.page[data-page-number="1"]');
+            if (!firstPage) {
+                e.preventDefault();
+                return;
+            }
             this.setCanvasVisibility("hidden");
             const signTypeElement = e.currentTarget;
-            const firstPage = this.root.querySelector('.page[data-page-number="1"]');
             firstPage.insertAdjacentHTML(
                 "beforeend",
                 renderToString(
@@ -164,6 +168,8 @@ export const EditablePDFIframeMixin = (pdfClass) =>
                 )
             );
             this.ghostSignItem = firstPage.lastChild;
+            const itemData = this.signItemTypesById[signTypeElement.dataset.itemTypeId];
+            this.updateSignItemFontSize({el: this.ghostSignItem, data: {type: itemData.item_type}});
             e.dataTransfer.setData("typeId", signTypeElement.dataset.itemTypeId);
             e.dataTransfer.setDragImage(this.ghostSignItem, 0, 0);
             this.scrollCleanup = startSmoothScroll(
@@ -183,7 +189,9 @@ export const EditablePDFIframeMixin = (pdfClass) =>
         onSidebarDragEnd() {
             this.scrollCleanup();
             const firstPage = this.root.querySelector('.page[data-page-number="1"]');
-            firstPage.removeChild(this.ghostSignItem);
+            if (firstPage.contains(this.ghostSignItem)) {
+                firstPage.removeChild(this.ghostSignItem);
+            }
             this.ghostSignItem = false;
             this.setCanvasVisibility("visible");
         }
@@ -197,6 +205,7 @@ export const EditablePDFIframeMixin = (pdfClass) =>
             e.preventDefault();
             const page = e.currentTarget;
             const textLayer = page.querySelector(".textLayer");
+            if (!textLayer) return;
             const targetPage = Number(page.dataset.pageNumber);
 
             const { top, left } = offset(textLayer);
@@ -258,8 +267,6 @@ export const EditablePDFIframeMixin = (pdfClass) =>
                     left: `${posX * 100}%`,
                     visibility: "visible",
                 });
-                // Re-bind updated signItem to the resize function.
-                startResize(signItem, this.onResizeItem.bind(this));
             } else {
                 return;
             }

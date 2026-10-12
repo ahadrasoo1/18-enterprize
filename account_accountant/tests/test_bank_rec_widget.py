@@ -509,6 +509,88 @@ class TestBankRecWidget(TestBankRecWidgetCommon):
             {'flag': 'aml',             'amount_currency': 0.0,         'currency_id': self.other_currency.id,              'balance': -600.0},
         ])
 
+    def test_validation_income_exchange_difference_with_rounding(self):
+        # 1000.0 comp_curr = 3000.0 foreign_curr in 2016 (rate 1:3)
+        # However divided in 3 invoices + rounding we have 333.33333 ≃ 333.33 comp_curr = 1000.0 foreign_curr
+        # this implies that the full amount has been used in foreign_curr but there is 0.01 in comp_curr
+        st_line = self._create_st_line(
+            1000.0,
+            date='2016-01-01',
+        )
+
+        # 1500 comp_curr = 3000.0 foreign_curr in 2017 (rate 1:2)
+        inv_line_1 = self._create_invoice_line(
+            'out_invoice',
+            currency_id=self.other_currency.id,
+            invoice_date='2017-01-01',
+            invoice_line_ids=[{'price_unit': 1000.0}],
+        )
+
+        inv_line_2 = self._create_invoice_line(
+            'out_invoice',
+            currency_id=self.other_currency.id,
+            invoice_date='2017-01-01',
+            invoice_line_ids=[{'price_unit': 1000.0}],
+        )
+
+        inv_line_3 = self._create_invoice_line(
+            'out_invoice',
+            currency_id=self.other_currency.id,
+            invoice_date='2017-01-01',
+            invoice_line_ids=[{'price_unit': 1000.0}],
+        )
+
+        wizard = self.env['bank.rec.widget'].with_context(default_st_line_id=st_line.id).new({})
+        wizard._action_add_new_amls(inv_line_1 + inv_line_2 + inv_line_3)
+
+        self.assertRecordValues(wizard.line_ids, [
+            # pylint: disable=C0326
+            {'flag': 'liquidity',       'amount_currency': 1000.0,      'currency_id': self.company_data['currency'].id,    'balance': 1000.0},
+            {'flag': 'new_aml',         'amount_currency': -1000.0,     'currency_id': self.other_currency.id,   'balance': -500.0},
+            {'flag': 'exchange_diff',   'amount_currency': 0.0,         'currency_id': self.other_currency.id,   'balance': 166.67},
+            {'flag': 'new_aml',         'amount_currency': -1000.0,     'currency_id': self.other_currency.id,   'balance': -500.0},
+            {'flag': 'exchange_diff',   'amount_currency': 0.0,         'currency_id': self.other_currency.id,   'balance': 166.67},
+            {'flag': 'new_aml',         'amount_currency': -1000.0,     'currency_id': self.other_currency.id,   'balance': -500.0},
+            {'flag': 'exchange_diff',   'amount_currency': 0.0,         'currency_id': self.other_currency.id,   'balance': 166.67},
+            {'flag': 'auto_balance',    'amount_currency': -0.01,       'currency_id': self.company_data['currency'].id,    'balance': -0.01},
+        ])
+
+        # Remove 0.01 cent in the balance of first exchange line
+        first_exchange_line = wizard.line_ids.filtered(lambda x: x.flag == 'exchange_diff')[:1]
+        wizard._js_action_mount_line_in_edit(first_exchange_line.index)
+        first_exchange_line.balance = 166.66
+        wizard._line_value_changed_balance(first_exchange_line)
+
+        # Every line balance so no 'auto_balance' is generated
+        self.assertRecordValues(wizard.line_ids, [
+            # pylint: disable=C0326
+            {'flag': 'liquidity',       'amount_currency': 1000.0,      'currency_id': self.company_data['currency'].id,    'balance': 1000.0},
+            {'flag': 'new_aml',         'amount_currency': -1000.0,     'currency_id': self.other_currency.id,   'balance': -500.0},
+            {'flag': 'exchange_diff',   'amount_currency': 0.0,         'currency_id': self.other_currency.id,   'balance': 166.66},
+            {'flag': 'new_aml',         'amount_currency': -1000.0,     'currency_id': self.other_currency.id,   'balance': -500.0},
+            {'flag': 'exchange_diff',   'amount_currency': 0.0,         'currency_id': self.other_currency.id,   'balance': 166.67},
+            {'flag': 'new_aml',         'amount_currency': -1000.0,     'currency_id': self.other_currency.id,   'balance': -500.0},
+            {'flag': 'exchange_diff',   'amount_currency': 0.0,         'currency_id': self.other_currency.id,   'balance': 166.67},
+        ])
+
+        self.assertRecordValues(wizard, [{'state': 'valid'}])
+
+        wizard._action_validate()
+
+        # Check that the first line with exchange has -0.01 compared to others
+        self.assertRecordValues(st_line.line_ids, [
+            # pylint: disable=C0326
+            {'account_id': st_line.journal_id.default_account_id.id,    'amount_currency': 1000.0,      'currency_id': self.company_data['currency'].id,    'balance': 1000.0,   'reconciled': False},
+            {'account_id': inv_line_1.account_id.id,                    'amount_currency': -1000.0,     'currency_id': self.other_currency.id,   'balance': -333.34,  'reconciled': True},
+            {'account_id': inv_line_2.account_id.id,                    'amount_currency': -1000.0,     'currency_id': self.other_currency.id,   'balance': -333.33,  'reconciled': True},
+            {'account_id': inv_line_3.account_id.id,                    'amount_currency': -1000.0,     'currency_id': self.other_currency.id,   'balance': -333.33,  'reconciled': True},
+        ])
+
+        self.assertRecordValues(st_line, [{'is_reconciled': True}])
+        self.assertRecordValues(inv_line_1.move_id, [{'payment_state': 'paid'}])
+        self.assertRecordValues(inv_line_2.move_id, [{'payment_state': 'paid'}])
+        self.assertRecordValues(inv_line_3.move_id, [{'payment_state': 'paid'}])
+
     def test_validation_exchange_diff_multiple(self):
         income_exchange_account = self.env.company.income_currency_exchange_account_id
         foreign_currency = self.setup_other_currency('AED', rates=[('2016-01-01', 6.0), ('2017-01-01', 5.0)])
@@ -1132,6 +1214,115 @@ class TestBankRecWidget(TestBankRecWidgetCommon):
             {'flag': 'new_aml',         'amount_currency': 112.7,       'balance': 105.49},
             {'flag': 'exchange_diff',   'amount_currency': 0.0,         'balance': -1.25},
         ])
+
+    def test_validation_new_aml_from_partially_reconciled_invoice(self):
+        """ In this scenario, the invoice we are reconciling with is already partially reconciled.
+            We need to make sure the new aml's balance is computed using a rate computed from the
+            invoice's balance / amount_currency rather than the invoice's amount_residual / amount_residual_currency.
+        """
+        self.env['res.currency.rate'].create([
+            {
+                'name': '2017-02-01',
+                'rate': 1 / 19.839,
+                'currency_id': self.other_currency.id,
+                'company_id': self.env.company.id,
+            },
+            {
+                'name': '2017-03-01',
+                'rate': 1 / 19.9338,
+                'currency_id': self.other_currency.id,
+                'company_id': self.env.company.id,
+            },
+        ])
+
+        # 600000 comp_curr
+        st_line = self._create_st_line(
+            600000,
+            date='2017-03-01',
+        )
+        liquidity_line, suspense_line, _other_lines = st_line._seek_for_lines()
+        outstanding_account = suspense_line.account_id
+
+        # 23664 curr1 = 469470.10 comp_curr
+        inv_line = self._create_invoice_line(
+            'out_invoice',
+            currency_id=self.other_currency.id,
+            invoice_date='2017-02-01',
+            invoice_line_ids=[{'price_unit': 23664}],
+        )
+
+        # Register a partial payment on the invoice at the same date as the invoice.
+        payment = self.env['account.payment.register'].with_context(active_model='account.move', active_ids=inv_line.move_id.ids).create({
+            'amount': 9.0,
+            'payment_difference_handling': 'open',
+            'currency_id': self.other_currency.id,
+            'payment_method_line_id': self.inbound_payment_method_line.id,
+        })._create_payments()
+
+        # Sanity check that the residuals on the invoice are as expected
+        self.assertRecordValues(inv_line, [{
+            'balance': 469470.1,
+            'amount_currency': 23664.0,
+            'amount_residual': 469291.55,
+            'amount_residual_currency': 23655.0,
+        }])
+
+        # Create the wizard
+        wizard = self.env['bank.rec.widget'].with_context(default_st_line_id=st_line.id).new({})
+        wizard._action_add_new_amls(inv_line)
+
+        self.assertRecordValues(wizard.line_ids, [
+            # pylint: disable=C0326
+            {'flag': 'liquidity',       'amount_currency': 600000,      'balance': 600000.0},
+            {'flag': 'new_aml',         'amount_currency': -23655.0,    'balance': -469291.55},
+            {'flag': 'exchange_diff',   'amount_currency': 0.0,         'balance': -2242.49},
+            {'flag': 'auto_balance',    'amount_currency': -128465.96,  'balance': -128465.96},
+        ])
+
+        # Custom amount_currency.
+        line = wizard.line_ids.filtered(lambda x: x.flag == 'new_aml')
+        wizard._js_action_mount_line_in_edit(line.index)
+        line.amount_currency = -6954.76
+        wizard._line_value_changed_amount_currency(line)
+
+        # Check that the new aml is adjusted according to the invoice rate rather than the invoice residuals' rate.
+        self.assertRecordValues(wizard.line_ids, [
+            # pylint: disable=C0326
+            {'flag': 'liquidity',       'amount_currency': 600000,      'balance': 600000.0},
+            {'flag': 'new_aml',         'amount_currency': -6954.76,    'balance': -137975.48},
+            {'flag': 'exchange_diff',   'amount_currency': 0.0,         'balance': -659.31},
+            {'flag': 'auto_balance',    'amount_currency': -461365.21,  'balance': -461365.21},
+        ])
+
+        # Check that after reconciling, the new aml has 0 residual.
+        wizard._action_validate()
+        self.assertRecordValues(st_line.line_ids, [
+            {
+                'account_id': st_line.journal_id.default_account_id.id,
+                'amount_currency': 600000.0,
+                'balance': 600000.0,
+                'currency_id': self.company_data['currency'].id,
+                'reconciled': False,
+            },
+            {
+                'account_id': inv_line.account_id.id,
+                'amount_currency': -6954.76,
+                'balance': -138634.79,
+                'currency_id': self.other_currency.id,
+                'reconciled': True,
+            },
+            {
+                'account_id': outstanding_account.id,
+                'amount_currency': -461365.21,
+                'currency_id': self.company_data['currency'].id,
+                'balance': -461365.21,
+                'reconciled': False,
+            },
+        ])
+        self.assertRecordValues(inv_line.move_id, [{
+            'payment_state': 'partial',
+            'amount_residual': 16700.24,
+        }])
 
     def test_validation_with_partner(self):
         partner = self.partner_a.copy()
@@ -2430,6 +2621,36 @@ class TestBankRecWidget(TestBankRecWidgetCommon):
             {'amount_currency': 1000.0, 'tax_ids': [],                  'tax_tag_ids': [],              'tax_tag_invert': False},
         ])
 
+    def test_early_payment_eligibility_date(self):
+        inv_line = self._create_invoice_line(
+            'out_invoice',
+            partner_id=self.partner_a.id,
+            invoice_payment_term_id=self.early_payment_term.id,
+            invoice_date='2017-01-01',
+            invoice_line_ids=[
+                {
+                    'price_unit': 1000.0,
+                    'account_id': self.account_revenue1.id,
+                },
+            ]
+        )
+        st_line = self._create_st_line(900.0, partner_id=self.partner_a.id, date='2017-01-10')
+
+        self.early_payment_term.discount_days = 5
+
+        liquidity_acc = st_line.journal_id.default_account_id
+        receivable_acc = self.company_data['default_account_receivable']
+        early_pay_acc = self.env.company.account_journal_early_pay_discount_loss_account_id
+
+        wizard = self.env['bank.rec.widget'].with_context(default_st_line_id=st_line.id).new({})
+        wizard._action_add_new_amls(inv_line)
+        self.assertRecordValues(wizard.line_ids, [
+            # pylint: disable=bad-whitespace
+            {'flag': 'liquidity',       'amount_currency': 900.0,       'balance': 900.0,       'account_id': liquidity_acc.id},
+            {'flag': 'new_aml',         'amount_currency': -1000.0,     'balance': -1000.0,     'account_id': receivable_acc.id},
+            {'flag': 'early_payment',   'amount_currency': 100.0,       'balance': 100.0,       'account_id': early_pay_acc.id},
+        ])
+
     def test_multi_currencies_with_custom_rate(self):
         self.company_data['default_journal_bank'].currency_id = self.other_currency
         st_line = self._create_st_line(1200.0) # rate 1:2
@@ -2609,12 +2830,12 @@ class TestBankRecWidget(TestBankRecWidgetCommon):
 
     @freeze_time('2019-01-01')
     def test_button_apply_reco_model(self):
-        st_line = self._create_st_line(-1000.0, partner_id=self.partner_a.id)
         inv_line = self._create_invoice_line(
             'in_invoice',
-            invoice_date=st_line.date,
+            invoice_date='2019-01-01',
             invoice_line_ids=[{'price_unit': 980.0}],
         )
+        st_line = self._create_st_line(-1000.0, partner_id=self.partner_a.id, date=inv_line.date, payment_ref=inv_line.move_name)
 
         reco_model = self.env['account.reconcile.model'].create({
             'name': "test_apply_taxes_with_reco_model",
@@ -3149,3 +3370,385 @@ class TestBankRecWidget(TestBankRecWidgetCommon):
         })
         move = self.create_test_reco_invoice(st_line, reco_model_invoice_regex)
         self.assert_reco_invoice_values(move, st_line, 'out_invoice', 150.0)
+
+    def test_unreconciled_with_other_lines(self):
+        """Test that other lines are shown in the widget if they exist."""
+        st_line = self._create_st_line(
+            1000.0,
+            date='2017-01-01',
+        )
+
+        # Edit the associated move to partially reconcile some of the suspense amount; i.e. we add another line
+        liquidity_line, suspense_line, other_line = st_line._seek_for_lines()
+        other_account = st_line.journal_id.company_id.default_cash_difference_income_account_id
+        self.assertFalse(other_line)
+        move = st_line.move_id
+        move.button_draft()
+        move.write({'line_ids': [
+            Command.create({'account_id': other_account.id, 'credit': 100.0}),
+            Command.update(suspense_line.id, {'credit': 900.0}),
+        ]})
+        move.action_post()
+        liquidity_line, suspense_line, other_line = st_line._seek_for_lines()
+        self.assertTrue(other_line)
+
+        # Check that the wizard displays the new line
+        wizard = self.env['bank.rec.widget'].with_context(default_st_line_id=st_line.id).new({})
+        self.assertRecordValues(wizard.line_ids, [
+            # pylint: disable=C0326
+            {'flag': 'liquidity',      'account_id': liquidity_line.account_id.id,   'amount_currency': 1000.0},
+            {'flag': 'aml',            'account_id': other_line.account_id.id,       'amount_currency': -100.0},
+            {'flag': 'auto_balance',   'account_id': suspense_line.account_id.id,    'amount_currency': -900.0},
+        ])
+
+    def test_caba_reconcile_account_multi_currency(self):
+        self.env.company.tax_exigibility = True
+        cash_basis_transfer_account = self.env['account.account'].create({
+            'code': 'cash.basis.transfer.account',
+            'name': 'cash_basis_transfer_account',
+            'account_type': 'income',
+            'reconcile': True,
+        })
+        tax_account = self.env['account.account'].create({
+            'code': 'cash.basis.tax.account',
+            'name': 'cash_basis_tax_account',
+            'account_type': 'income',
+        })
+        caba_tax = self.env['account.tax'].create({
+            'name': 'tax_caba',
+            'amount': 15.0,
+            'cash_basis_transition_account_id': cash_basis_transfer_account.id,
+            'tax_exigibility': 'on_payment',
+            'invoice_repartition_line_ids': [
+                Command.create({'repartition_type': 'base'}),
+                Command.create({
+                    'repartition_type': 'tax',
+                    'account_id': tax_account.id,
+                }),
+            ],
+            'refund_repartition_line_ids': [
+                Command.create({'repartition_type': 'base'}),
+                Command.create({
+                    'repartition_type': 'tax',
+                    'account_id': tax_account.id,
+                }),
+            ],
+        })
+
+        currency = self.other_currency
+        inv_line = self._create_invoice_line(
+            'out_invoice',
+            currency_id=currency.id,
+            invoice_date='2016-01-01',
+            invoice_line_ids=[{'price_unit': 1200.0, 'tax_ids': [Command.set(caba_tax.ids)]}],
+        )
+        inv = inv_line.move_id
+        st_line = self._create_st_line(
+            690.0,
+            date='2017-01-01',
+            foreign_currency_id=currency.id,
+            amount_currency=1380.0,
+        )
+        wizard = self.env['bank.rec.widget'].with_context(default_st_line_id=st_line.id).new({})
+        wizard._action_add_new_amls(inv_line)
+
+        self.assertRecordValues(wizard.line_ids, [
+            {'flag': 'liquidity',       'balance': 690.0,   'amount_currency': 690.0,   'currency_id': self.env.company.currency_id.id},
+            {'flag': 'new_aml',         'balance': -460.0,  'amount_currency': -1380.0, 'currency_id': currency.id},
+            {'flag': 'exchange_diff',   'balance': -230.0,  'amount_currency': 0.0,     'currency_id': currency.id},
+        ])
+
+        line = wizard.line_ids.filtered(lambda x: x.flag == 'exchange_diff')
+        wizard._js_action_mount_line_in_edit(line.index)
+        line.balance = -240.0
+        wizard._line_value_changed_balance(line)
+
+        self.assertRecordValues(wizard.line_ids, [
+            {'flag': 'liquidity',       'balance': 690.0,   'amount_currency': 690.0,   'currency_id': self.env.company.currency_id.id},
+            {'flag': 'new_aml',         'balance': -460.0,  'amount_currency': -1380.0, 'currency_id': currency.id},
+            {'flag': 'exchange_diff',   'balance': -240.0,  'amount_currency': 0.0,     'currency_id': currency.id},
+            {'flag': 'auto_balance',    'balance': 10.0,    'amount_currency': 0.0,     'currency_id': currency.id},
+        ])
+
+        wizard._action_validate()
+
+        self.assertRecordValues(st_line.line_ids, [
+            {'balance': 690.0,  'amount_currency': 690.0,   'currency_id': self.env.company.currency_id.id},
+            {'balance': -700.0, 'amount_currency': -1380.0, 'currency_id': currency.id},
+            {'balance': 10.0,   'amount_currency': 0.0,     'currency_id': currency.id},
+        ])
+
+        caba_move = inv.tax_cash_basis_created_move_ids
+        product_account = self.company_data['default_account_revenue']
+        self.assertRecordValues(caba_move.line_ids, [
+            {'balance': 608.7,      'amount_currency': 1200.0,  'currency_id': currency.id,     'account_id': product_account.id},
+            {'balance': -608.7,     'amount_currency': -1200.0, 'currency_id': currency.id,     'account_id': product_account.id},
+            {'balance': 91.3,       'amount_currency': 180.0,   'currency_id': currency.id,     'account_id': cash_basis_transfer_account.id},
+            {'balance': -91.3,      'amount_currency': -180.0,  'currency_id': currency.id,     'account_id': tax_account.id},
+        ])
+
+        tax_line = inv.line_ids.filtered('tax_repartition_line_id')
+        _liquidity_line, _suspense_line, other_line = st_line._seek_for_lines()
+        self.assertRecordValues(caba_move.line_ids + inv_line + tax_line + other_line, [
+            {'amount_residual': 0.0,  'amount_residual_currency': 0.0},
+        ] * 7)
+
+        exchange_diff_moves = self.env['account.move'].search([('journal_id', '=', self.env.company.currency_exchange_journal_id.id)])
+        self.assertRecordValues(exchange_diff_moves.line_ids, [
+            # Exchange diff CABA entry with invoice for the tax line ((180 / 2) - (180 / 3) = 90 - 60 = 30):
+            {'balance': -31.3,  'amount_currency': 0.0, 'currency_id': currency.id},
+            {'balance': 31.3,   'amount_currency': 0.0, 'currency_id': currency.id},
+            # Exchange diff st_line with invoice ((1380 / 2) - (1380 / 3) = 690 - 430 = 230):
+            {'balance': 240.0,  'amount_currency': 0.0, 'currency_id': currency.id},
+            {'balance': -240.0, 'amount_currency': 0.0, 'currency_id': currency.id},
+        ])
+
+    def test_reconciliation_with_branch(self):
+        """
+        Test the reconciliation flow with different configurations of company with a branch
+        """
+        company = self.company_data['company']
+        branch = self.env['res.company'].create({
+            'name': "Branch A",
+            'parent_id': company.id,
+        })
+        # Load CoA
+        self.cr.precommit.run()
+
+        partner_branch = self.env['res.partner'].create({
+            'name': 'Partner Branch',
+            'company_id': branch.id,
+        })
+
+        aml_branch = self._create_invoice_line(
+            'out_invoice',
+            company_id=branch.id,
+            partner_id=partner_branch.id,
+            invoice_date='2019-01-01',
+            invoice_line_ids=[{'name': 'Test reco', 'quantity': 1, 'price_unit': 1000}],
+        )
+        st_line_main = self._create_st_line(
+            1000.0,
+            company_id=company.id,
+            date='2019-01-01',
+            payment_ref='Test reco',
+        )
+        st_line_branch = self._create_st_line(
+            1000.0,
+            company_id=branch.id,
+            date='2019-01-01',
+            payment_ref='Test reco2',
+            partner_id=partner_branch.id,
+        )
+
+        # Case 1: reconciliation with st_line on the main company + aml on the branch
+        wizard = self.env['bank.rec.widget'].with_context(default_st_line_id=st_line_main.id).new({})
+        wizard._action_add_new_amls(aml_branch)
+        wizard._action_validate()
+
+        # Assert that the partner is not set to avoid "Incompatible companies on records" error
+        self.assertFalse(st_line_main.partner_id)
+
+        st_line_main.action_undo_reconciliation()
+
+        # Case 2: reconciliation with both st_line and aml on the branch
+        wizard_branch = self.env['bank.rec.widget'].with_context(default_st_line_id=st_line_branch.id).new({})
+        wizard_branch._action_add_new_amls(aml_branch)
+        wizard_branch._action_validate()
+
+        # Assert that the partner remains set on the transaction
+        self.assertEqual(st_line_branch.partner_id, partner_branch, "The partner should remain set on the transaction for the branch company.")
+
+        st_line_branch.action_undo_reconciliation()
+
+        # Case 3: reconciliation with both st_line and aml on the branch, no partner on the st_line
+        st_line_branch.partner_id = False
+        wizard_branch = self.env['bank.rec.widget'].with_context(default_st_line_id=st_line_branch.id).new({})
+        wizard_branch._action_add_new_amls(aml_branch)
+        wizard_branch._action_validate()
+
+        # Assert that the partner is set from the aml on the transaction
+        self.assertEqual(st_line_branch.partner_id, partner_branch, "The partner should be automatically set on the transaction for the branch company if it's set on the aml.")
+
+    def test_analytic_distribution_for_early_payment_statement(self):
+        """
+        Test that the analytic is applied for statement with early discount
+        """
+        early_payment_term = self.env['account.payment.term'].create({
+            'name': "early_payment_term",
+            'company_id': self.company_data['company'].id,
+            'early_pay_discount_computation': 'included',
+            'early_discount': True,
+            'discount_percentage': 2,
+            'discount_days': 7,
+            'line_ids': [
+                Command.create({
+                    'value': 'percent',
+                    'value_amount': 100.0,
+                    'nb_days': 30,
+                }),
+            ],
+        })
+
+        analytic_plan = self.env['account.analytic.plan'].create({
+            'name': 'existential plan',
+        })
+        analytic_account = self.env['account.analytic.account'].create({
+            'name': 'positive_account',
+            'plan_id': analytic_plan.id,
+        })
+
+        cash_discount_account = self.company_data['company'].account_journal_early_pay_discount_loss_account_id
+        self.env['account.analytic.distribution.model'].create({
+            'account_prefix': cash_discount_account.code,
+            'analytic_distribution': {analytic_account.id: 100.0},
+        })
+
+        invoice = self.env['account.move'].create([{
+            'move_type': 'out_invoice',
+            'partner_id': self.partner_a.id,
+            'date': '2017-01-01',
+            'invoice_date': '2017-01-01',
+            'invoice_payment_term_id': early_payment_term.id,
+            'invoice_line_ids': [Command.create({
+                'name': 'line',
+                'price_unit': 100.0,
+            })]
+        }])
+        invoice.action_post()
+
+        statement = self.env['account.bank.statement.line'].create({
+            'date': '2017-01-01',
+            'payment_ref': invoice.payment_reference,
+            'partner_id': self.partner_b.id,
+            'amount': 98.0,
+            'journal_id': self.company_data['default_journal_bank'].id,
+        })
+
+        wizard = self.env['bank.rec.widget'].with_context(default_st_line_id=statement.id).new({})
+        receivable_line = invoice.line_ids.filtered(lambda l: l.account_id.account_type == 'asset_receivable')
+        wizard._action_add_new_amls(receivable_line)
+        wizard._action_validate()
+
+        early_payment_line = statement.line_ids.filtered(lambda p: p.balance == 2.0)
+        self.assertTrue(early_payment_line.analytic_distribution)
+
+    def test_reconcile_no_caba_move_on_bank_journal_entry(self):
+        """ Test that no cash basis move is created for a bank reconciliation journal entry. """
+        self.env.company.tax_exigibility = True
+        cash_basis_transfer_account = self.env['account.account'].create({
+            'code': 'cash.basis.transfer.account',
+            'name': 'cash_basis_transfer_account',
+            'account_type': 'income',
+            'reconcile': True,
+        })
+        tax_account = self.env['account.account'].create({
+            'code': 'cash.basis.tax.account',
+            'name': 'cash_basis_tax_account',
+            'account_type': 'income',
+        })
+        caba_tax = self.env['account.tax'].create({
+            'name': 'tax_caba',
+            'amount': 15.0,
+            'cash_basis_transition_account_id': cash_basis_transfer_account.id,
+            'tax_exigibility': 'on_payment',
+            'invoice_repartition_line_ids': [
+                Command.create({'repartition_type': 'base'}),
+                Command.create({
+                    'repartition_type': 'tax',
+                    'account_id': tax_account.id,
+                }),
+            ],
+            'refund_repartition_line_ids': [
+                Command.create({'repartition_type': 'base'}),
+                Command.create({
+                    'repartition_type': 'tax',
+                    'account_id': tax_account.id,
+                }),
+            ],
+        })
+
+        inv_line = self._create_invoice_line(
+            'out_invoice',
+            invoice_date='2017-01-01',
+            invoice_line_ids=[{'price_unit': 200.0, 'tax_ids': caba_tax}],
+        )
+        inv = inv_line.move_id
+        st_line = self._create_st_line(200.0, date='2017-01-01')
+
+        wizard = self.env['bank.rec.widget'].with_context(default_st_line_id=st_line.id).new({})
+        wizard._action_add_new_amls(inv_line)
+
+        self.assertRecordValues(wizard.line_ids, [
+            {'flag': 'liquidity',     'balance': 200.0},
+            {'flag': 'new_aml',       'balance': -200.0},
+        ])
+
+        # Switch to a full reconciliation.
+        new_line = wizard.line_ids.filtered(lambda x: x.flag == 'new_aml')
+        wizard._js_action_mount_line_in_edit(new_line.index)
+        wizard._js_action_apply_line_suggestion(new_line.index)
+
+        self.assertRecordValues(wizard.line_ids, [
+            {'flag': 'liquidity',        'balance': 200.0},
+            {'flag': 'new_aml',          'balance': -230.0},
+            {'flag': 'auto_balance',     'balance': 30.0},
+        ])
+
+        # Add the CABA tax to the auto-balance line
+        auto_balance_line = wizard.line_ids.filtered(lambda x: x.flag == 'auto_balance')
+        wizard._js_action_mount_line_in_edit(auto_balance_line.index)
+        auto_balance_line.account_id = self.company_data['default_account_expense']
+        wizard._line_value_changed_account_id(auto_balance_line)
+        auto_balance_line.tax_ids = [Command.link(caba_tax.id)]
+        wizard._line_value_changed_tax_ids(auto_balance_line)
+
+        self.assertRecordValues(wizard.line_ids, [
+            {'flag': 'liquidity',     'balance': 200.0},
+            {'flag': 'new_aml',       'balance': -230.0},
+            {'flag': 'manual',        'balance': 26.09},
+            {'flag': 'tax_line',      'balance': 3.91},
+        ])
+
+        wizard._action_validate()
+        # Cash basis move should be created for the invoice
+        caba_move = inv.tax_cash_basis_created_move_ids
+        product_account = self.company_data['default_account_revenue']
+
+        self.assertRecordValues(caba_move.line_ids, [
+            {'balance': 200.0,      'account_id': product_account.id},
+            {'balance': -200.0,     'account_id': product_account.id},
+            {'balance': 30.0,       'account_id': cash_basis_transfer_account.id},
+            {'balance': -30.0,      'account_id': tax_account.id},
+        ])
+
+        # No cash basis move should be created for the bank journal entry
+        self.assertFalse(st_line.move_id.tax_cash_basis_created_move_ids)
+
+    def test_early_payment_discount_multi_bill_statement(self):
+        if self.env['ir.module.module']._get('accountant').state != 'installed':
+            self.skipTest("Accountant module is not installed")
+
+        self.company_data['default_journal_bank'].outbound_payment_method_line_ids.payment_account_id = False
+        payment_terms = self.env['account.payment.term'].create({
+            'name': "2/7 Net 30",
+            'company_id': self.company_data['company'].id,
+            'discount_percentage': 2,
+            'discount_days': 7,
+            'early_discount': True,
+        })
+
+        inv_line_with_epd = self._create_invoice_line('in_invoice',
+            invoice_date='2017-01-10',
+            invoice_payment_term_id=payment_terms.id,
+            invoice_line_ids=[{'price_unit': 100.0, 'tax_ids': []}],
+        )
+        payment = self.env['account.payment.register'].with_context(active_model='account.move', active_ids=inv_line_with_epd.move_id.ids).create({
+            'payment_date': '2017-01-10',
+        })._create_payments()
+
+        st_line = self._create_st_line(-100.0, date='2017-01-11')
+        wizard = self.env['bank.rec.widget'].with_context(default_st_line_id=st_line.id).new({})
+        wizard._action_add_new_amls(inv_line_with_epd)
+        wizard._action_validate()
+        self.assertEqual(payment.state, 'paid')

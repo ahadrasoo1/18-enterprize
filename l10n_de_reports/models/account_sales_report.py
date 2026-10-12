@@ -5,6 +5,7 @@ import tempfile
 import zipfile
 
 from odoo import _, api, models
+from odoo.tools.float_utils import float_round
 
 
 class GermanECSalesReportCustomHandler(models.AbstractModel):
@@ -59,9 +60,12 @@ class GermanECSalesReportCustomHandler(models.AbstractModel):
         line_chunks = []
         chunks = [lines[i * 1000:(i + 1) * 1000] for i in range(math.ceil(len(lines) / 1000))]
         for chunk in chunks:
-            content = 'Länderkennzeichen,USt-IdNr.,Betrag (Euro),Art der Leistung\n'
-            for val in chunk:
-                content += ','.join([val[0], val[1], str(val[3]), val[2]]) + '\n'
+            # version strings and headers
+            content = '#v3.0\n#ve3.2.1\n'
+            content += 'Umsatzsteuer-Identifikationsnummer (USt-IdNr.),Betrag (Euro),Art der Leistung\n'
+            for vat_country_code, vat_number, service_type, amount, *vals in chunk:
+                full_vat_number = f'{vat_country_code}{vat_number}' if vat_country_code and vat_number else ''
+                content += f'{full_vat_number},{int(float_round(amount, 0))},{service_type}\n'
             line_chunks.append(content)
         return line_chunks
 

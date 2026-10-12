@@ -1,23 +1,25 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* industry_fsm
-# 
+#
 # Translators:
-# Wil Odoo, 2024
-# Chloe Wang, 2024
-# 
+# 何彬 <vnsoft.he@gmail.com>, 2024
+# Chloe Wang, 2025
+# Wil Odoo, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
+"POT-Creation-Date: 2026-04-10 18:47+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Chloe Wang, 2024\n"
-"Language-Team: Chinese (China) (https://app.transifex.com/odoo/teams/41243/zh_CN/)\n"
+"Last-Translator: Wil Odoo, 2025\n"
+"Language-Team: Chinese (China) (https://app.transifex.com/odoo/teams/41243/"
+"zh_CN/)\n"
+"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: zh_CN\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. module: industry_fsm
@@ -35,22 +37,12 @@ msgstr "%(partner)s同时有%(number)s个任务。"
 #: model:ir.actions.report,print_report_name:industry_fsm.task_custom_report
 msgid ""
 "'Field Service Report - %s - %s' % (object.name, object.partner_id.name)"
-msgstr "'现场服务报告 - %s - %s' % (object.name, object.partner_id.name)"
+msgstr "'现场服务报表 - %s - %s' % (object.name, object.partner_id.name)"
 
 #. module: industry_fsm
 #: model_terms:ir.ui.view,arch_db:industry_fsm.worksheet_custom_page
 msgid "10 days"
 msgstr "10天"
-
-#. module: industry_fsm
-#: model_terms:ir.ui.view,arch_db:industry_fsm.worksheet_custom_page
-msgid "10:00"
-msgstr "10:00"
-
-#. module: industry_fsm
-#: model_terms:ir.ui.view,arch_db:industry_fsm.worksheet_custom_page
-msgid "2023-01-01"
-msgstr "2023-01-01"
 
 #. module: industry_fsm
 #: model_terms:ir.ui.view,arch_db:industry_fsm.worksheet_custom_page
@@ -61,43 +53,58 @@ msgstr "5天"
 #: model:mail.template,body_html:industry_fsm.mail_template_data_intervention_details
 msgid ""
 "<div>\n"
-"    <t t-set=\"date_begin\" t-value=\"format_datetime(object.planned_date_begin, tz=object.partner_id.tz, lang_code=object.partner_id.lang)\"></t>\n"
+"    <t t-set=\"date_begin\" t-"
+"value=\"format_datetime(object.planned_date_begin, tz=object.partner_id.tz, "
+"lang_code=object.partner_id.lang)\"/>\n"
 "\n"
-"    <t t-set=\"date_end\" t-value=\"format_datetime(object.date_deadline, tz=object.partner_id.tz, lang_code=object.partner_id.lang)\"></t>\n"
+"    <t t-set=\"date_end\" t-value=\"format_datetime(object.date_deadline, "
+"tz=object.partner_id.tz, lang_code=object.partner_id.lang)\"/>\n"
 "\n"
-"    Dear <t t-out=\"object.partner_id.name or 'customer'\">customer</t>,<br><br>\n"
+"    Dear <t t-out=\"object.partner_id.name or 'customer'\">customer</t>,<br/"
+"><br/>\n"
 "    <t t-if=\"date_begin and date_end\">\n"
-"        Your <t t-out=\"object.name or ''\">Boiler maintenance</t> intervention is scheduled from the <t t-out=\"date_begin or ''\">05/31/2021 12:30:00</t> to the <t t-out=\"date_end or ''\">05/31/2021 14:30:00</t>.\n"
+"        Your <t t-out=\"object.name or ''\">Boiler maintenance</t> "
+"intervention is scheduled from the <t t-out=\"date_begin or ''\">05/31/2021 "
+"12:30:00</t> to the <t t-out=\"date_end or ''\">05/31/2021 14:30:00</t>.\n"
 "    </t>\n"
 "    <t t-else=\"\">\n"
-"        Your <t t-out=\"object.name or ''\">Boiler maintenance</t> intervention is scheduled.\n"
+"        Your <t t-out=\"object.name or ''\">Boiler maintenance</t> "
+"intervention is scheduled.\n"
 "    </t>\n"
-"    <br><br>\n"
+"    <br/><br/>\n"
 "    Best regards,\n"
-"    <t t-if=\"user.signature\">\n"
-"        <br>\n"
-"        <t t-out=\"user.signature or ''\">--<br>Mitchell Admin</t>\n"
+"    <t t-if=\"user.signature\" data-o-mail-quote-container=\"1\">\n"
+"        <br/>\n"
+"        <t t-out=\"user.signature or ''\" data-o-mail-quote=\"1\">--<br data-"
+"o-mail-quote=\"1\"/>Mitchell Admin</t>\n"
 "    </t>\n"
 "</div>\n"
 "        "
 msgstr ""
 "<div>\n"
-"   <t t-set=\"date_begin\" t-value=\"format_datetime(object.planned_date_begin, tz=object.partner_id.tz, lang_code=object.partner_id.lang)\"></t>\n"
+"    <t t-set=\"date_begin\" t-"
+"value=\"format_datetime(object.planned_date_begin, tz=object.partner_id.tz, "
+"lang_code=object.partner_id.lang)\"/>\n"
 "\n"
-"    <t t-set=\"date_end\" t-value=\"format_datetime(object.date_deadline, tz=object.partner_id.tz, lang_code=object.partner_id.lang)\"></t>\n"
+"    <t t-set=\"date_end\" t-value=\"format_datetime(object.date_deadline, "
+"tz=object.partner_id.tz, lang_code=object.partner_id.lang)\"/>\n"
 "\n"
-"    亲爱的<t t-out=\"object.partner_id.name or 'customer'\">顾客</t><br><br>\n"
-"   <t t-if=\"date_begin and date_end\">\n"
-"        您的<t t-out=\"object.name or ''\">锅炉维护</t>工作定于<t t-out=\"date_begin or ''\">2021 年 5 月 31 日 12:30:00</t>至<t t-out=\"date_end or ''\">2021 年 5 月 31 日 14</t>:<t t-out=\"date_begin or ''\">30:00</t>。\n"
-"   </t>\n"
-"   <t t-else=\"\">\n"
-"        您的<t t-out=\"object.name or ''\">锅炉维护</t>干预计划。\n"
-"   </t>\n"
-"   <br><br>\n"
-"    致以最诚挚的问候\n"
-"    <t t-if=\"user.signature\">\n"
-"        <br>\n"
-"        <t t-out=\"user.signature or ''\">--<br>米歇尔 管理员</t>\n"
+"    亲爱的 <t t-out=\"object.partner_id.name or '客戶'\">客户</t>：<br/><br/"
+">\n"
+"    <t t-if=\"date_begin and date_end\">\n"
+"        您的 “<t t-out=\"object.name or ''\">锅炉维修</t>” 工作已排期，将于 "
+"<t t-out=\"date_begin or ''\">05/31/2021 12:30:00</t> 至 <t t-out=\"date_end "
+"or ''\">05/31/2021 14:30:00</t> 进行。\n"
+"    </t>\n"
+"    <t t-else=\"\">\n"
+"        您的 “<t t-out=\"object.name or ''\">锅炉维修</t>” 工作已排期。\n"
+"    </t>\n"
+"    <br/><br/>\n"
+"    顺祝  安康\n"
+"    <t t-if=\"user.signature\" data-o-mail-quote-container=\"1\">\n"
+"        <br/>\n"
+"        <t t-out=\"user.signature or ''\" data-o-mail-quote=\"1\">--<br data-"
+"o-mail-quote=\"1\"/>Mitchell Admin</t>\n"
 "    </t>\n"
 "</div>\n"
 "        "
@@ -105,24 +112,29 @@ msgstr ""
 #. module: industry_fsm
 #: model_terms:ir.ui.view,arch_db:industry_fsm.portal_task_sign_button
 msgid "<i class=\"fa fa-check me-1\"/>Sign Report"
-msgstr "<i class=\"fa fa-check me-1\"/>签署报告"
+msgstr "<i class=\"fa fa-check me-1\"/>签署报表"
 
 #. module: industry_fsm
 #: model:mail.template,body_html:industry_fsm.mail_template_data_task_report
 msgid ""
 "<p>\n"
-"                Dear <t t-out=\"object.partner_id.name or 'Customer'\">Customer</t>,<br><br>\n"
-"                Please find attached the field service report for our onsite operation. <br><br>\n"
-"                Feel free to contact us if you have any questions.<br><br>\n"
-"                Best regards,<br><br>\n"
+"                Dear <t t-out=\"object.partner_id.name or "
+"'Customer'\">Customer</t>,<br/><br/>\n"
+"                Please find attached the field service report for our onsite "
+"operation. <br/><br/>\n"
+"                Feel free to contact us if you have any questions.<br/><br/"
+">\n"
+"                Best regards,<br/><br/>\n"
 "            </p>\n"
 "        "
 msgstr ""
 "<p>\n"
-"                亲爱的<t t-out=\"object.partner_id.name or 'Customer'\">客户</t><br><br>\n"
-"                随函附上我们现场操作的现场服务报告。<br><br>\n"
-"                如有任何问题，请随时与我们联系。<br><br>\n"
-"                致以最诚挚的问候、<br><br>\n"
+"                亲爱的 <t t-out=\"object.partner_id.name or '客戶'\">客户</"
+"t>：<br/><br/>\n"
+"                附上我们早前到现场进行操作的外勤服务报告，供您参阅。<br/><br/"
+">\n"
+"                如有疑问，欢迎联络我们。<br/><br/>\n"
+"                顺祝 安康<br/><br/>\n"
 "            </p>\n"
 "        "
 
@@ -140,11 +152,29 @@ msgstr ""
 #. module: industry_fsm
 #: model_terms:ir.ui.view,arch_db:industry_fsm.worksheet_custom_page
 msgid ""
-"<span style=\"                             font-size: 10px;                             color: #fff;                             text-transform: uppercase;                             text-align: center;                             font-weight: bold; line-height: 20px;                             transform: rotate(45deg);                             width: 100px; height: auto; display: block;                             background: green;                             position: absolute;                             top: 19px; right: -21px; left: auto;                             padding: 0;\">\n"
+"<span style=\"                             font-size: "
+"10px;                             color: #fff;                             "
+"text-transform: uppercase;                             text-align: "
+"center;                             font-weight: bold; line-height: "
+"20px;                             transform: "
+"rotate(45deg);                             width: 100px; height: auto; "
+"display: block;                             background: "
+"green;                             position: "
+"absolute;                             top: 19px; right: -21px; left: "
+"auto;                             padding: 0;\">\n"
 "                            Signed\n"
 "                        </span>"
 msgstr ""
-"<span style=\"                             font-size: 10px;                             color: #fff;                             text-transform: uppercase;                             text-align: center;                             font-weight: bold; line-height: 20px;                             transform: rotate(45deg);                             width: 100px; height: auto; display: block;                             background: green;                             position: absolute;                             top: 19px; right: -21px; left: auto;                             padding: 0;\">\n"
+"<span style=\"                             font-size: "
+"10px;                             color: #fff;                             "
+"text-transform: uppercase;                             text-align: "
+"center;                             font-weight: bold; line-height: "
+"20px;                             transform: "
+"rotate(45deg);                             width: 100px; height: auto; "
+"display: block;                             background: "
+"green;                             position: "
+"absolute;                             top: 19px; right: -21px; left: "
+"auto;                             padding: 0;\">\n"
 "                            已签署\n"
 "                        </span>"
 
@@ -181,7 +211,7 @@ msgstr "FSM 项目必须受公司限制"
 #. module: industry_fsm
 #: model:ir.model.fields,field_description:industry_fsm.field_report_project_task_user_fsm__active
 msgid "Active"
-msgstr "已启用"
+msgstr "有效"
 
 #. module: industry_fsm
 #: model:ir.ui.menu,name:industry_fsm.mail_activity_plan_menu_config_task
@@ -209,7 +239,7 @@ msgstr "所有任务"
 #. module: industry_fsm
 #: model:ir.actions.server,name:industry_fsm.project_task_all_fsm_server_action
 msgid "All Tasks Server Action"
-msgstr ""
+msgstr "所有任务服务器操作"
 
 #. module: industry_fsm
 #: model:ir.model.fields,field_description:industry_fsm.field_report_project_task_user_fsm__allocated_hours
@@ -218,14 +248,13 @@ msgstr "已分配时间"
 
 #. module: industry_fsm
 #: model_terms:ir.actions.act_window,help:industry_fsm.project_task_user_action_report_fsm
-msgid ""
-"Analyze the progress of your tasks and the performance of your workers."
+msgid "Analyze the progress of your tasks and the performance of your workers."
 msgstr "分析您的任务进度和您员工的表现。"
 
 #. module: industry_fsm
 #: model:ir.model.fields,field_description:industry_fsm.field_report_project_task_user_fsm__user_ids
 msgid "Assignees"
-msgstr "受托人"
+msgstr "受指派人"
 
 #. module: industry_fsm
 #: model:ir.model.fields,field_description:industry_fsm.field_report_project_task_user_fsm__date_assign
@@ -240,7 +269,7 @@ msgstr "平均评分（1-5）"
 #. module: industry_fsm
 #: model:ir.model.fields,field_description:industry_fsm.field_report_project_task_user_fsm__dependent_ids
 msgid "Block"
-msgstr "阻塞"
+msgstr "阻止"
 
 #. module: industry_fsm
 #: model:ir.ui.menu,name:industry_fsm.project_task_menu_planning_by_location_fsm
@@ -304,7 +333,9 @@ msgstr "确认"
 msgid ""
 "Confirm the <b>time spent</b> on your task. <i>Tip: note that the duration "
 "has automatically been rounded to 15 minutes.</i>"
-msgstr "确认你的任务<b>所花费的时间</b>。<i>提示：注意，持续时间已自动四舍五入为15分钟。</i>"
+msgstr ""
+"确认你的任务<b>所花费的时间</b>。<i>提示：注意，持续时间已自动四舍五入为15分"
+"钟。</i>"
 
 #. module: industry_fsm
 #: model:ir.model,name:industry_fsm.model_res_partner
@@ -422,7 +453,7 @@ msgstr "描述"
 msgid ""
 "Design tailored worksheet templates for various interventions, and analyze "
 "collected intervention data."
-msgstr ""
+msgstr "为各种干预措施设计量身定制的工作表模板，并分析收集到的干预数据。"
 
 #. module: industry_fsm
 #: model_terms:ir.ui.view,arch_db:industry_fsm.project_project_view_form_simplified_footer_fsm
@@ -455,7 +486,7 @@ msgstr "您想停止运行的计时器吗？"
 #. module: industry_fsm
 #: model:mail.template,description:industry_fsm.mail_template_data_task_report
 msgid "Email sent when clicking on \"send report\" in a task"
-msgstr "在任务中点击“发送报告”时发送电子邮件"
+msgstr "在任务中点击“发送报表”时发送电子邮件"
 
 #. module: industry_fsm
 #: model:ir.model.fields,field_description:industry_fsm.field_report_project_task_user_fsm__date_end
@@ -488,22 +519,22 @@ msgstr "现场服务"
 #. module: industry_fsm
 #: model:ir.actions.report,name:industry_fsm.task_custom_report
 msgid "Field Service Report"
-msgstr "现场服务报告"
+msgstr "现场服务报表"
 
 #. module: industry_fsm
 #: model:mail.template,subject:industry_fsm.mail_template_data_task_report
 msgid "Field Service Report - {{ object.name }}"
-msgstr "现场服务报告 - {{ object.name }}"
+msgstr "现场服务报表 - {{ object.name }}"
 
 #. module: industry_fsm
 #: model_terms:ir.ui.view,arch_db:industry_fsm.worksheet_custom_page
 msgid "Field Service Report:"
-msgstr "现场服务报告："
+msgstr "现场服务报表："
 
 #. module: industry_fsm
 #: model:mail.template,name:industry_fsm.mail_template_data_task_report
 msgid "Field Service: Field Service Report"
-msgstr "外勤服务外勤服务报告"
+msgstr "现场服务：现场服务报表"
 
 #. module: industry_fsm
 #: model:mail.template,name:industry_fsm.mail_template_data_intervention_details
@@ -539,6 +570,11 @@ msgid ""
 "Give it a <b>title</b> <i>(e.g. Boiler maintenance, Air-conditioning "
 "installation, etc.).</i>"
 msgstr "给它一个<b>标题</b><i>（例如：锅炉维修、空调安装等。)</i>"
+
+#. module: industry_fsm
+#: model:ir.model.fields,field_description:industry_fsm.field_report_project_task_user_fsm__total_hours_spent
+msgid "Hours By Task (Including Subtasks)"
+msgstr "总花费工时，按任务划分（包括子任务）"
 
 #. module: industry_fsm
 #: model:ir.model.fields,field_description:industry_fsm.field_project_task_stop_timers_wizard__id
@@ -625,7 +661,9 @@ msgstr "启动计时器，<b>跟踪</b>你的任务<b>所花费的时间</b>。"
 msgid ""
 "Let's <b>mark your task as done!</b> <i>Tip: when doing so, your stock will "
 "automatically be updated, and your task will be closed.</i>"
-msgstr "让我们<b>把您的任务标记为完成</b> <i>提示：这么做您的库存将自动更新，您的任务将被关闭。</i>"
+msgstr ""
+"让我们<b>把您的任务标记为完成</b> <i>提示：这么做您的库存将自动更新，您的任务"
+"将被关闭。</i>"
 
 #. module: industry_fsm
 #. odoo-javascript
@@ -658,7 +696,7 @@ msgstr "地图"
 #. module: industry_fsm
 #: model:ir.actions.server,name:industry_fsm.project_task_fsm_map_server_action
 msgid "Map Server Action"
-msgstr ""
+msgstr "地图服务器操作"
 
 #. module: industry_fsm
 #: model_terms:ir.ui.view,arch_db:industry_fsm.worksheet_custom_page
@@ -668,7 +706,7 @@ msgstr "马克-迪莫"
 #. module: industry_fsm
 #: model_terms:ir.ui.view,arch_db:industry_fsm.view_task_form2_inherit
 msgid "Mark as done"
-msgstr "完成"
+msgstr "标记为完成"
 
 #. module: industry_fsm
 #: model:ir.model,name:industry_fsm.model_ir_ui_menu
@@ -689,7 +727,7 @@ msgstr "里程碑"
 #. odoo-python
 #: code:addons/industry_fsm/controllers/webmanifest.py:0
 msgid "My Calendar"
-msgstr ""
+msgstr "我的日历"
 
 #. module: industry_fsm
 #. odoo-python
@@ -703,12 +741,12 @@ msgstr "我的任务"
 #. module: industry_fsm
 #: model:ir.actions.server,name:industry_fsm.project_task_fsm_server_action
 msgid "My Tasks Server Action"
-msgstr ""
+msgstr "我的任务服务器操作"
 
 #. module: industry_fsm
 #: model:ir.actions.server,name:industry_fsm.project_task_fsm_mobile_server_action
 msgid "My Tasks in mobile Server Action"
-msgstr ""
+msgstr "移动服务器操作中的我的任务"
 
 #. module: industry_fsm
 #: model_terms:ir.ui.view,arch_db:industry_fsm.view_partner_address_form_industry_fsm
@@ -719,7 +757,7 @@ msgstr "导航到"
 #. odoo-python
 #: code:addons/industry_fsm/controllers/webmanifest.py:0
 msgid "New task"
-msgstr ""
+msgstr "新任务"
 
 #. module: industry_fsm
 #: model_terms:ir.actions.act_window,help:industry_fsm.project_task_user_action_report_fsm
@@ -756,6 +794,11 @@ msgid "No tasks found. Let's create one!"
 msgstr "找不到任务。 让我们创建一个！"
 
 #. module: industry_fsm
+#: model:ir.model.fields,field_description:industry_fsm.field_report_project_task_user_fsm__overtime
+msgid "Overtime"
+msgstr "延时"
+
+#. module: industry_fsm
 #: model:ir.model.fields,field_description:industry_fsm.field_report_project_task_user_fsm__parent_id
 msgid "Parent Task"
 msgstr "上级任务"
@@ -789,7 +832,7 @@ msgstr "按位置规划"
 #. module: industry_fsm
 #: model:ir.actions.server,name:industry_fsm.project_task_fsm_planning_groupby_location_server_action
 msgid "Planning by Location Server Action"
-msgstr ""
+msgstr "按位置服务器操作进行规划"
 
 #. module: industry_fsm
 #: model:ir.actions.act_window,name:industry_fsm.project_task_action_fsm_planning_groupby_project
@@ -800,7 +843,7 @@ msgstr "按项目规划"
 #. module: industry_fsm
 #: model:ir.actions.server,name:industry_fsm.project_task_fsm_planning_groupby_project_server_action
 msgid "Planning by Project Server Action"
-msgstr ""
+msgstr "按项目服务器操作进行规划"
 
 #. module: industry_fsm
 #: model:ir.actions.act_window,name:industry_fsm.project_task_action_fsm_planning_groupby_user
@@ -811,7 +854,7 @@ msgstr "按用户计划"
 #. module: industry_fsm
 #: model:ir.actions.server,name:industry_fsm.project_task_fsm_planning_groupby_user_server_action
 msgid "Planning by User Action"
-msgstr ""
+msgstr "按用户操作进行规划"
 
 #. module: industry_fsm
 #: model:ir.model.fields,field_description:industry_fsm.field_report_project_task_user_fsm__priority
@@ -851,12 +894,12 @@ msgstr "准备好<b>管理你的现场干预</b>了吗？<i>点击现场服务�
 #. module: industry_fsm
 #: model:ir.model,name:industry_fsm.model_ir_actions_report
 msgid "Report Action"
-msgstr "报告操作"
+msgstr "报表操作"
 
 #. module: industry_fsm
 #: model:ir.ui.menu,name:industry_fsm.fsm_menu_reporting
 msgid "Reporting"
-msgstr "报告"
+msgstr "报表"
 
 #. module: industry_fsm
 #: model_terms:ir.actions.act_window,help:industry_fsm.project_task_action_fsm_planning_groupby_location
@@ -885,12 +928,12 @@ msgstr "为您的任务选择<b>客户</b>。"
 #. odoo-python
 #: code:addons/industry_fsm/models/project_task.py:0
 msgid "Send Field Service Report"
-msgstr "发送现场服务报告"
+msgstr "发送现场服务报表"
 
 #. module: industry_fsm
 #: model_terms:ir.ui.view,arch_db:industry_fsm.view_task_form2_inherit
 msgid "Send Report"
-msgstr "发送报告"
+msgstr "发送报表"
 
 #. module: industry_fsm
 #: model:mail.template,description:industry_fsm.mail_template_data_intervention_details
@@ -913,13 +956,13 @@ msgstr "显示下一操作日期早于今天的所有记录"
 #. module: industry_fsm
 #: model_terms:ir.ui.view,arch_db:industry_fsm.portal_task_sign_modal
 msgid "Sign Field Service Report"
-msgstr "签署现场服务报告"
+msgstr "签署现场服务报表"
 
 #. module: industry_fsm
 #: model_terms:ir.ui.view,arch_db:industry_fsm.portal_task_sign_modal
 #: model_terms:ir.ui.view,arch_db:industry_fsm.view_task_form2_inherit
 msgid "Sign Report"
-msgstr "签署报告"
+msgstr "签署报表"
 
 #. module: industry_fsm
 #: model:ir.model.fields,field_description:industry_fsm.field_project_task__worksheet_signature
@@ -947,8 +990,8 @@ msgstr "技能"
 #. module: industry_fsm
 #: model_terms:ir.ui.view,arch_db:industry_fsm.view_task_stop_timer_wizard_form
 msgid ""
-"Some employees are still running their timer for this task. Are you sure you"
-" want to continue?"
+"Some employees are still running their timer for this task. Are you sure you "
+"want to continue?"
 msgstr "有些员工仍在运行这个任务的计时器，您确定要继续吗？"
 
 #. module: industry_fsm
@@ -1036,7 +1079,7 @@ msgstr "任务阶段"
 #. module: industry_fsm
 #: model:ir.model,name:industry_fsm.model_report_industry_fsm_worksheet_custom
 msgid "Task Worksheet Custom Report"
-msgstr "任务工作表自定义报告"
+msgstr "任务工作表自定义报表"
 
 #. module: industry_fsm
 #: model:ir.model,name:industry_fsm.model_project_task_stop_timers_wizard
@@ -1068,7 +1111,7 @@ msgstr "任务分析"
 #. odoo-python
 #: code:addons/industry_fsm/controllers/portal.py:0
 msgid "The field service report has been signed by the customer."
-msgstr "客户已在现场服务报告上签字。"
+msgstr "客户已在现场服务报表上签字。"
 
 #. module: industry_fsm
 #. odoo-python
@@ -1088,7 +1131,7 @@ msgstr "工作表没有处于需要客户签名的状态。"
 #. odoo-python
 #: code:addons/industry_fsm/models/project_task.py:0
 msgid "There are no reports to send."
-msgstr "没有报告可发送。"
+msgstr "没有报表可发送。"
 
 #. module: industry_fsm
 #. odoo-python
@@ -1165,7 +1208,7 @@ msgstr "计划安排"
 #. module: industry_fsm
 #: model:ir.actions.server,name:industry_fsm.project_task_to_schedule_fsm_server_action
 msgid "To Schedule Server Action"
-msgstr ""
+msgstr "安排服务器操作"
 
 #. module: industry_fsm
 #: model_terms:ir.ui.view,arch_db:industry_fsm.project_task_view_search_fsm
@@ -1177,7 +1220,8 @@ msgstr "计划/指派"
 #: model_terms:ir.actions.act_window,help:industry_fsm.project_task_action_all_fsm2
 msgid ""
 "To get things done, plan activities and use the task status.<br>\n"
-"                Collaborate efficiently by chatting in real-time or via email."
+"                Collaborate efficiently by chatting in real-time or via "
+"email."
 msgstr ""
 "要完成任务，请计划活动并使用任务状态。<br>\n"
 "                通过实时聊天或通过电子邮件高效协作。"
@@ -1200,11 +1244,6 @@ msgstr "今天"
 #: model_terms:ir.ui.view,arch_db:industry_fsm.project_task_view_search_fsm
 msgid "Today Activities"
 msgstr "今日活动"
-
-#. module: industry_fsm
-#: model:ir.model.fields,field_description:industry_fsm.field_report_project_task_user_fsm__total_hours_spent
-msgid "Total Time Spent"
-msgstr "花费总时数"
 
 #. module: industry_fsm
 #: model_terms:ir.actions.act_window,help:industry_fsm.project_task_type_action_fsm
@@ -1271,8 +1310,8 @@ msgid ""
 "format_datetime(object.date_deadline, tz=object.partner_id.tz, "
 "lang_code=object.partner_id.lang) or '' }}"
 msgstr ""
-"您的干预计划 {{ object.planned_date_begin 和 object.date_deadline 以及 '从 ' + "
-"format_datetime(object.planned_date_begin, tz=object.partner_id.tz, "
+"您的干预计划 {{ object.planned_date_begin 和 object.date_deadline 以及 '从 ' "
+"+ format_datetime(object.planned_date_begin, tz=object.partner_id.tz, "
 "lang_code=object.partner_id.lang) + ' 到 ' + "
 "format_datetime(object.date_deadline, tz=object.partner_id.tz, "
 "lang_code=object.partner_id.lang) 或 '' }}"
@@ -1297,3 +1336,9 @@ msgstr "是 FSM 吗？"
 #: model:ir.actions.server,name:industry_fsm.fsm_customer_ratings_server_action
 msgid "project.project.fsm"
 msgstr "project.project.fsm"
+
+#~ msgid "10:00"
+#~ msgstr "10:00"
+
+#~ msgid "2023-01-01"
+#~ msgstr "2023-01-01"

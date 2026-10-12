@@ -1,77 +1,59 @@
 import { DocumentsSearchPanel } from "@documents/views/search/documents_search_panel";
+import { basicDocumentsKanbanArch } from "@documents/../tests/helpers/views/kanban";
+import { getDocumentsTestServerData } from "@documents/../tests/helpers/data";
 import {
     defineDocumentSpreadsheetModels,
-    getBasicPermissionPanelData,
+    getMySpreadsheetPermissionPanelData,
 } from "@documents_spreadsheet/../tests/helpers/data";
+import { makeDocumentsSpreadsheetMockEnv } from "@documents_spreadsheet/../tests/helpers/model";
 import { mockActionService } from "@documents_spreadsheet/../tests/helpers/spreadsheet_test_utils";
 import { XLSX_MIME_TYPES } from "@documents_spreadsheet/helpers";
 import { beforeEach, describe, expect, getFixture, test } from "@odoo/hoot";
+import { waitFor, waitForNone } from "@odoo/hoot-dom";
 import { animationFrame } from "@odoo/hoot-mock";
 import { Model } from "@odoo/o-spreadsheet";
-import { makeDocumentsSpreadsheetMockEnv } from "@documents_spreadsheet/../tests/helpers/model";
-import { contains, mountView, onRpc, patchWithCleanup } from "@web/../tests/web_test_helpers";
-import { loadBundle } from "@web/core/assets";
+import {
+    contains,
+    mountView,
+    onRpc,
+    patchWithCleanup,
+    preloadBundle,
+    serverState,
+} from "@web/../tests/web_test_helpers";
 import { browser } from "@web/core/browser/browser";
 import { download } from "@web/core/network/download";
 import { deepEqual } from "@web/core/utils/objects";
 import { SearchPanel } from "@web/search/search_panel/search_panel";
-import { getEnrichedSearchArch } from "../helpers/document_helpers";
+import { getEnrichedSearchArch } from "@documents/../tests/helpers/views/search";
 
 describe.current.tags("desktop");
 defineDocumentSpreadsheetModels();
+preloadBundle("spreadsheet.o_spreadsheet");
 
 let target;
 
-const basicDocumentKanbanArch = /* xml */ `
-<kanban js_class="documents_kanban">
-    <templates>
-        <field name="id"/>
-        <field name="available_embedded_actions_ids"/>
-        <field name="access_token"/>
-        <field name="mimetype"/>
-        <field name="folder_id"/>
-        <field name="active"/>
-        <field name="type"/>
-        <field name="attachment_id"/>
-        <t t-name="card">
-            <div>
-                <div name="document_preview" class="o_kanban_image_wrapper">a thumbnail</div>
-                <i class="fa fa-circle o_record_selector" />
-                <field name="name" />
-                <field name="handler" />
-            </div>
-        </t>
-    </templates>
-</kanban>
-`;
+const basicDocumentKanbanArch = basicDocumentsKanbanArch.replace(
+    `<field name="name"/>`,
+    `<field name="name"/><field name="handler"/>`
+);
 
 /**
  * @returns {Object}
  */
 function getTestServerData(spreadsheetData = {}) {
-    return {
-        models: {
-            "documents.document": {
-                records: [
-                    {
-                        id: 1,
-                        name: "Workspace1",
-                        type: "folder",
-                        available_embedded_actions_ids: [],
-                    },
-                    {
-                        id: 2,
-                        name: "My spreadsheet",
-                        spreadsheet_data: JSON.stringify(spreadsheetData),
-                        is_favorited: false,
-                        folder_id: 1,
-                        handler: "spreadsheet",
-                        access_token: "accessTokenMyspreadsheet",
-                    },
-                ],
-            },
+    return getDocumentsTestServerData([
+        {
+            id: 2,
+            name: "My spreadsheet",
+            display_name: "My spreadsheet",
+            spreadsheet_data: JSON.stringify(spreadsheetData),
+            is_favorited: false,
+            folder_id: 1,
+            handler: "spreadsheet",
+            access_token: "accessTokenMyspreadsheet",
+            owner_id: serverState.userId,
         },
-    };
+    ]);
 }
 
 beforeEach(() => {
@@ -115,7 +97,9 @@ test("download frozen spreadsheet", async function () {
         searchViewArch: getEnrichedSearchArch(),
     });
 
-    await contains(".o_kanban_record:contains(My spreadsheet) .o_record_selector").click();
+    await contains(".o_kanban_record:contains(My spreadsheet) .o_record_selector").click({
+        ctrlKey: true,
+    });
     await contains("button:contains(Download)").click();
     await animationFrame();
     expect.verifySteps(["/documents/content/accessTokenMyspreadsheet"]);
@@ -127,8 +111,8 @@ test("share a spreadsheet", async function () {
     const serverData = getTestServerData();
     patchWithCleanup(browser.navigator.clipboard, {
         writeText: async (url) => {
-            expect.step("share url copied");
-            expect(url).toBe("http://localhost:8069/share/url/132465");
+            expect.step("Document url copied");
+            expect(url).toBe("https://localhost:8069/odoo/documents/accessTokenMyspreadsheet");
         },
     });
     await makeDocumentsSpreadsheetMockEnv({
@@ -137,7 +121,7 @@ test("share a spreadsheet", async function () {
             if (args.method === "permission_panel_data") {
                 expect(args.args[0]).toEqual(spreadsheetId);
                 expect.step("permission_panel_data");
-                return getBasicPermissionPanelData({ handler: "spreadsheet" });
+                return getMySpreadsheetPermissionPanelData();
             }
             if (args.method === "can_upload_traceback") {
                 return false;
@@ -151,11 +135,13 @@ test("share a spreadsheet", async function () {
         searchViewArch: getEnrichedSearchArch(),
     });
     expect(target.querySelector(".spreadsheet_share_dropdown")).toBe(null);
-    await contains(".o_kanban_record:contains(My spreadsheet) .o_record_selector").click();
+    await contains(".o_kanban_record:contains(My spreadsheet) .o_record_selector").click({
+        ctrlKey: true,
+    });
     await contains("button:contains(Share)").click();
 
     await contains(".o_clipboard_button", { timeout: 1500 }).click();
-    expect.verifySteps(["permission_panel_data", "share url copied"]);
+    expect.verifySteps(["permission_panel_data", "Document url copied"]);
 });
 
 test("Freeze&Share a spreadsheet", async function () {
@@ -169,8 +155,8 @@ test("Freeze&Share a spreadsheet", async function () {
     );
     patchWithCleanup(browser.navigator.clipboard, {
         writeText: async (url) => {
-            expect.step("share url copied");
-            expect(url).toBe("http://localhost:8069/share/url/132465");
+            expect.step("Document url copied");
+            expect(url).toBe("https://localhost:8069/odoo/documents/accessTokenMyspreadsheet");
         },
     });
     await makeDocumentsSpreadsheetMockEnv({
@@ -189,7 +175,7 @@ test("Freeze&Share a spreadsheet", async function () {
             if (args.method === "permission_panel_data") {
                 expect(args.args[0]).toEqual(frozenSpreadsheetId);
                 expect.step("permission_panel_data");
-                return getBasicPermissionPanelData({ handler: "spreadsheet" });
+                return getMySpreadsheetPermissionPanelData();
             }
             if (args.method === "can_upload_traceback") {
                 return false;
@@ -203,70 +189,27 @@ test("Freeze&Share a spreadsheet", async function () {
         searchViewArch: getEnrichedSearchArch(),
     });
     expect(target.querySelector(".spreadsheet_share_dropdown")).toBe(null);
-    await contains(".o_kanban_record:contains(My spreadsheet) .o_record_selector").click();
+    await contains(".o_kanban_record:contains(My spreadsheet) .o_record_selector").click({
+        ctrlKey: true,
+    });
     await contains("button:contains(Freeze and share)").click();
     await contains(".o_clipboard_button", { timeout: 1500 }).click();
-    expect.verifySteps(["spreadsheet_shared", "permission_panel_data", "share url copied"]);
-});
-
-test.skip("share the full workspace from the share button", async function () {
-    const model = new Model();
-    const serverData = getTestServerData(model.exportData());
-    await makeDocumentsSpreadsheetMockEnv({
-        serverData,
-        mockRPC: async (route, args) => {
-            if (args.method === "web_save") {
-                expect.step("spreadsheet_shared");
-                const shareVals = args.kwargs.context;
-                expect(args.model).toBe("documents.share");
-                expect(shareVals.default_folder_id).toBe(1);
-                expect(shareVals.default_type).toBe("domain");
-                expect(shareVals.default_domain).toEqual([["folder_id", "=", 1]]);
-                expect(shareVals.default_spreadsheet_shares).toEqual(
-                    JSON.stringify([
-                        {
-                            spreadsheet_data: JSON.stringify(model.exportData()),
-                            excel_files: JSON.parse(JSON.stringify(model.exportXLSX().files)),
-                            document_id: 1,
-                        },
-                    ])
-                );
-            }
-        },
-    });
-    await loadBundle("spreadsheet.o_spreadsheet");
-    await mountView({
-        type: "kanban",
-        resModel: "documents.document",
-        arch: basicDocumentKanbanArch,
-        searchViewArch: getEnrichedSearchArch(),
-    });
-    patchWithCleanup(navigator.clipboard, {
-        async writeText() {
-            expect.step("copy");
-        },
-    });
-
-    const menu = target.querySelector(".o_control_panel .d-inline-flex");
-    await contains(menu.querySelector(".dropdown-toggle")).click();
-    await contains(menu.querySelector(".o_documents_kanban_share_domain")).click();
-    expect.verifySteps([]);
-    await contains(".o_form_button_save").click();
-    expect.verifySteps(["spreadsheet_shared", "copy"]);
+    expect.verifySteps(["spreadsheet_shared", "permission_panel_data", "Document url copied"]);
 });
 
 test("open xlsx converts to o-spreadsheet, clone it and opens the spreadsheet", async function () {
-    const spreadsheetId = 1;
+    const spreadsheetId = 10;
     const spreadsheetCopyId = 99;
     const serverData = getTestServerData();
-    serverData.models["documents.document"].records = [
-        {
-            id: spreadsheetId,
-            name: "My excel file",
-            mimetype: XLSX_MIME_TYPES[0],
-            thumbnail_status: "present",
-        },
-    ];
+    serverData.models["ir.attachment"] = { records: [{ id: 1 }] };
+    serverData.models["documents.document"].records.push({
+        id: spreadsheetId,
+        name: "My excel file",
+        mimetype: XLSX_MIME_TYPES[0],
+        thumbnail_status: "present",
+        type: "binary",
+        attachment_id: 1, // Necessary to not be considered as a request
+    });
     await makeDocumentsSpreadsheetMockEnv({
         serverData,
         mockRPC: async (route, args) => {
@@ -288,7 +231,7 @@ test("open xlsx converts to o-spreadsheet, clone it and opens the spreadsheet", 
         expect.step(action.tag);
         expect(action.params.spreadsheet_id).toEqual(spreadsheetCopyId);
     });
-    await contains(".o_kanban_image_wrapper").click();
+    await contains(".o_kanban_record:contains('My excel file') .o_kanban_image_wrapper").click();
 
     // confirm conversion to o-spreadsheet
     await contains(".modal-content .btn.btn-primary").click();
@@ -296,17 +239,19 @@ test("open xlsx converts to o-spreadsheet, clone it and opens the spreadsheet", 
 });
 
 test("open WPS-marked xlsx converts to o-spreadsheet, clone it and opens the spreadsheet", async function () {
-    const spreadsheetId = 1;
+    const spreadsheetId = 10;
     const spreadsheetCopyId = 99;
     const serverData = getTestServerData();
-    serverData.models["documents.document"].records = [
-        {
-            id: spreadsheetId,
-            name: "My excel file",
-            mimetype: XLSX_MIME_TYPES[1],
-            thumbnail_status: "present",
-        },
-    ];
+    serverData.models["ir.attachment"] = { records: [{ id: 1 }] };
+    serverData.models["documents.document"].records.push({
+        id: spreadsheetId,
+        folder_id: 1,
+        name: "My excel file",
+        mimetype: XLSX_MIME_TYPES[1],
+        thumbnail_status: "present",
+        type: "binary",
+        attachment_id: 1, // Necessary to not be considered as a request
+    });
     await makeDocumentsSpreadsheetMockEnv({
         serverData,
         mockRPC: async (route, args) => {
@@ -328,7 +273,7 @@ test("open WPS-marked xlsx converts to o-spreadsheet, clone it and opens the spr
         expect.step(action.tag);
         expect(action.params.spreadsheet_id).toEqual(spreadsheetCopyId);
     });
-    await contains(".oe_kanban_previewer").click();
+    await contains(".o_kanban_record:contains('My excel file') .oe_kanban_previewer").click();
 
     // confirm conversion to o-spreadsheet
     await contains(".modal-content .btn.btn-primary").click();
@@ -345,7 +290,7 @@ test("download a frozen spreadsheet document while selecting requested document"
             name: "My spreadsheet",
             raw: "{}",
             is_favorited: false,
-            folder_id: 1,
+            folder_id: false,
             handler: "frozen_spreadsheet",
             type: "binary",
             access_token: "accessTokenMyspreadsheet",
@@ -353,7 +298,7 @@ test("download a frozen spreadsheet document while selecting requested document"
         },
         {
             name: "Request",
-            folder_id: 1,
+            folder_id: false,
             type: "binary",
             access_token: "accessTokenRequest",
         },
@@ -374,8 +319,8 @@ test("download a frozen spreadsheet document while selecting requested document"
         searchViewArch: getEnrichedSearchArch(),
     });
 
-    await contains(".o_kanban_record:nth-of-type(1) .o_record_selector").click();
-    await contains(".o_kanban_record:nth-of-type(2) .o_record_selector").click();
+    await contains(".o_kanban_record:nth-of-type(1) .o_record_selector").click({ ctrlKey: true });
+    await contains(".o_kanban_record:nth-of-type(2) .o_record_selector").click({ ctrlKey: true });
     await contains("button:contains(Download)").click();
     // The request is ignored and only the spreadsheet is downloaded.
     expect.verifySteps(["/documents/content/accessTokenMyspreadsheet"]);
@@ -383,26 +328,30 @@ test("download a frozen spreadsheet document while selecting requested document"
 
 test("can open spreadsheet while multiple documents are selected along with it", async function () {
     const serverData = getTestServerData();
+    serverData.models["ir.attachment"] = {
+        records: [{ id: 1 }, { id: 2 }, { id: 3 }],
+    };
     serverData.models["documents.document"].records = [
         { id: 1, name: "demo-workspace", type: "folder" },
-    ];
-    serverData.models["documents.document"].records = [
         {
             name: "test-spreadsheet",
             raw: "{}",
             folder_id: 1,
             handler: "spreadsheet",
             thumbnail_status: "present",
+            attachment_id: 1,
         },
         {
             folder_id: 1,
             mimetype: "image/png",
             name: "test-image-1",
+            attachment_id: 2,
         },
         {
             folder_id: 1,
             mimetype: "image/png",
             name: "test-image-2",
+            attachment_id: 3,
         },
     ];
     await makeDocumentsSpreadsheetMockEnv({ serverData });
@@ -417,11 +366,14 @@ test("can open spreadsheet while multiple documents are selected along with it",
         expect.step(action.tag);
     });
     const fixture = getFixture();
+    await contains(".o_kanban_record:contains('demo-workspace')").click();
+    await animationFrame();
+
     const records = fixture.querySelectorAll(".o_kanban_record");
     await contains(records[0].querySelector(".o_record_selector")).click();
-    await contains(records[1].querySelector(".o_record_selector")).click();
-    await contains(records[2].querySelector(".o_record_selector")).click();
-    await contains(".oe_kanban_previewer").click();
+    await contains(records[1].querySelector(".o_record_selector")).click({ ctrlKey: true });
+    await contains(records[2].querySelector(".o_record_selector")).click({ ctrlKey: true });
+    await contains(".o_kanban_record:contains('spreadsheet') .oe_kanban_previewer").click();
     expect(".o-FileViewer").toHaveCount(0);
     expect.verifySteps(["action_open_spreadsheet"]);
 });
@@ -479,4 +431,111 @@ test("spreadsheet should be skipped while toggling the preview in the FileViewer
     expect(".o-FileViewer-header div:first()").toHaveText("pug");
     await contains(".o-FileViewer-navigation[aria-label='Next']").click();
     expect(".o-FileViewer-header div:first()").toHaveText("chihuahua");
+});
+
+test("Cannot download spreadsheets", async function () {
+    const serverData = getDocumentsTestServerData([
+        {
+            folder_id: 1,
+            id: 2,
+            name: "Request",
+        },
+        {
+            attachment_id: 1,
+            id: 3,
+            folder_id: 1,
+            name: "Binary",
+        },
+        {
+            attachment_id: 2,
+            folder_id: 1,
+            handler: "spreadsheet",
+            id: 4,
+            name: "Spreadsheet",
+        },
+        {
+            folder_id: 1,
+            type: "url",
+            id: 5,
+            name: "Hurle",
+        },
+    ]);
+    serverData.models["ir.attachment"] = {
+        records: [
+            { id: 1, name: "binary" },
+            { id: 2, name: "spreadsheet" },
+        ],
+    };
+    const { name: folder1Name } = serverData.models["documents.document"].records[0];
+    await makeDocumentsSpreadsheetMockEnv({ serverData });
+    await mountView({
+        type: "kanban",
+        resModel: "documents.document",
+        arch: basicDocumentKanbanArch,
+        searchViewArch: getEnrichedSearchArch(),
+    });
+    await contains(`.o_kanban_record:contains(${folder1Name})`).click({ ctrlKey: true });
+    // Folder should be downloadable
+    await waitFor(".o_control_panel_actions:contains('Download')");
+    await contains(`.o_kanban_record:contains('Request')`).click();
+    // Request should not be downloadable
+    await waitForNone(".o_control_panel_actions:contains('Download')");
+    // Binary should be downloadable
+    await contains(".o_kanban_record:contains('Binary')").click();
+    await waitFor(".o_control_panel_actions:contains('Download')");
+    // Spreadsheet should not be downloadable
+    await contains(`.o_kanban_record:contains('Spreadsheet')`).click();
+    await waitForNone(".o_control_panel_actions:contains('Download')");
+    // Multiple documents can be downloaded
+    await contains(`.o_kanban_record:contains(${folder1Name})`).click({ ctrlKey: true });
+    await waitFor(".o_control_panel_actions:contains('Download')");
+    // Button should remain even if some records are not downloadable
+    await contains(`.o_kanban_record:contains('Spreadsheet')`).click({ ctrlKey: true });
+    await waitFor(".o_control_panel_actions:contains('Download')");
+    // Spreadsheet with url should not be downloadable
+    await contains(`.o_kanban_record:contains('Spreadsheet')`).click();
+    await contains(`.o_kanban_record:contains('Hurle')`).click({ ctrlKey: true });
+    await waitForNone(".o_control_panel_actions:contains('Download')");
+});
+
+test("Restoring trashed XLSX without folder should not set localStorage variable to undefined", async () => {
+    const spreadsheetId = 77;
+    const serverData = getTestServerData();
+    serverData.models["ir.attachment"] = { records: [{ id: 1 }] };
+    serverData.models["documents.document"].records.push({
+        id: spreadsheetId,
+        name: "Trashed XLSX File",
+        mimetype: XLSX_MIME_TYPES[0],
+        type: "binary",
+        active: false,
+        attachment_id: 1,
+    });
+
+    await makeDocumentsSpreadsheetMockEnv({
+        serverData,
+        mockRPC: async (route, args) => {
+            if (args.method === "action_unarchive") {
+                expect.step("spreadsheet_restored");
+                expect(args.model).toBe("documents.document");
+                expect(args.args).toEqual([spreadsheetId]);
+            }
+            return null;
+        },
+    });
+
+    await mountView({
+        type: "kanban",
+        resModel: "documents.document",
+        arch: basicDocumentKanbanArch,
+        searchViewArch: getEnrichedSearchArch(),
+    });
+
+    await contains(".o_search_panel_label_title:contains('Trash')").click();
+    await contains(".o_kanban_record:contains('Trashed XLSX File') .oe_kanban_previewer").click();
+    await contains(".modal-content .btn.btn-primary:contains('Restore')").click();
+
+    expect.verifySteps(["spreadsheet_restored"]);
+
+    const lsValue = browser.localStorage.getItem("searchpanel_documents_document");
+    expect(lsValue).not.toBe("undefined");
 });

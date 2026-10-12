@@ -100,9 +100,11 @@ Let your customers follow the signature process easily.
             'sign/static/tests/**/*',
             ('remove', 'sign/static/tests/tours/**/*'),
             ('remove', 'sign/static/tests/mock_server/**/*'),
+            ('remove', 'sign/static/tests/document_signable.test.js'),
         ],
         'web.assets_unit_tests': [
             'sign/static/tests/mock_server/**/*',
+            'sign/static/tests/document_signable.test.js',
         ],
         'sign.assets_public_sign': [
             ('include', 'web._assets_helpers'),
@@ -156,6 +158,8 @@ Let your customers follow the signature process easily.
             'sign/static/src/dialogs/**/*',
             'sign/static/src/services/**/*',
 
+            'sign/static/tests/tours/**/*', 
+            'sign/static/src/js/tours/tour_utils.js',
             'web_tour/static/src/tour_pointer/**/*',
             'web_tour/static/src/tour_service/**/*',
             'web/static/lib/hoot-dom/**/*',

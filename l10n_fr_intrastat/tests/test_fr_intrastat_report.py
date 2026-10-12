@@ -96,11 +96,12 @@ class TestFRIntrastatReport(TestAccountReportsCommon):
         cls.outwards_customer_invoice.action_post()
         cls.outwards_customer_invoice2.action_post()
 
-    def _generate_options(self, wizard_options):
+    def _generate_options(self, report, wizard_options=None):
         # EXTENDS account_intrastat
-        options = super()._generate_options(self.report, date_from='2023-10-01', date_to='2023-10-31')
-        wizard = self.env['l10n_fr_intrastat.export.wizard'].create(wizard_options)
-        options['l10n_fr_intrastat_wizard_id'] = wizard.id
+        options = super()._generate_options(report, date_from='2023-10-01', date_to='2023-10-31')
+        if wizard_options:
+            wizard = self.env['l10n_fr_intrastat.export.wizard'].create(wizard_options)
+            options['l10n_fr_intrastat_wizard_id'] = wizard.id
         arrivals, dispatches = options['intrastat_type']
         arrivals['selected'], dispatches['selected'] = arrivals, dispatches
         return options
@@ -112,7 +113,7 @@ class TestFRIntrastatReport(TestAccountReportsCommon):
     def test_fr_intrastat_export_both_export_types_and_flows(self):
         """ Test generating an XML export when the export type contains both documents (statistical survey and
         vat summary statement) and both export flow for the EMEBI export (arrivals and dispatches)"""
-        options = self._generate_options({
+        options = self._generate_options(self.report, {
             'export_type': 'statistical_survey_and_vat_summary_statement',
             'emebi_flow': 'arrivals_and_dispatches',
         })
@@ -122,7 +123,7 @@ class TestFRIntrastatReport(TestAccountReportsCommon):
     def test_fr_intrastat_export_statistical_survey_with_arrival_emebi(self):
         """ Test generating an XML export when the export type contains only the statistical survey and the export
         flow for the EMEBI export is only arrivals"""
-        options = self._generate_options({
+        options = self._generate_options(self.report, {
             'export_type': 'statistical_survey',
             'emebi_flow': 'arrivals',
         })
@@ -131,7 +132,7 @@ class TestFRIntrastatReport(TestAccountReportsCommon):
 
     def test_fr_intrastat_export_vat_summary_stmt(self):
         """ Test generating an XML export when the export type contains only the vat summary statement"""
-        options = self._generate_options({
+        options = self._generate_options(self.report, {
             'export_type': 'vat_summary_statement',
             'emebi_flow': 'arrivals_and_dispatches',  # Does not matter in case of vat_summary_statement
         })
@@ -150,7 +151,7 @@ class TestFRIntrastatReport(TestAccountReportsCommon):
             'siret': False,
             'intrastat_region_id': False,
         })
-        options = self._generate_options({
+        options = self._generate_options(self.report, {
             'export_type': 'statistical_survey_and_vat_summary_statement',
             'emebi_flow': 'arrivals_and_dispatches',
         })

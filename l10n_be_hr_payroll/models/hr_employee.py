@@ -13,7 +13,7 @@ class HrEmployee(models.Model):
 
     niss = fields.Char(
         'NISS Number', compute="_compute_niss", store=True, readonly=False,
-        groups="hr.group_hr_user", tracking=True)
+        groups="hr.group_hr_user", tracking=True, index=True)
     spouse_fiscal_status = fields.Selection([
         ('without_income', 'Without Income'),
         ('high_income', 'With High income'),
@@ -58,7 +58,7 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
         string="Number of days to recover (N)", tracking=True, groups="hr_payroll.group_hr_payroll_user",
         help="Number of days on which you should recover the holiday pay.")
     l10n_be_holiday_pay_recovered_n = fields.Float(
-        string="Recovered Simple Holiday Pay (N)", tracking=True,
+        string="Recovered Simple Holiday Pay (N)",
         compute='_compute_l10n_be_holiday_pay_recovered', groups="hr_payroll.group_hr_payroll_user",
         help="Amount of the holiday pay paid by the previous employer already recovered.")
     double_pay_line_n_ids = fields.Many2many(
@@ -76,7 +76,7 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
         string="Number of days to recover (N-1)", tracking=True, groups="hr_payroll.group_hr_payroll_user",
         help="Number of days on which you should recover the holiday pay.")
     l10n_be_holiday_pay_recovered_n1 = fields.Float(
-        string="Recovered Simple Holiday Pay (N-1)", tracking=True,
+        string="Recovered Simple Holiday Pay (N-1)",
         compute='_compute_l10n_be_holiday_pay_recovered', groups="hr_payroll.group_hr_payroll_user",
         help="Amount of the holiday pay paid by the previous employer already recovered.")
     double_pay_line_n1_ids = fields.Many2many(
@@ -172,14 +172,15 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
             employee.l10n_be_holiday_pay_recovered_n1 = - sum(line_values['HolPayRecN1'][p.id]['total'] for p in employee_payslips)
 
     def _compute_spouse_fiscal_status_explanation(self):
+        no_income_threshold = self.env['hr.rule.parameter'].sudo()._get_parameter_from_code('spouse_no_income_threshold', raise_if_not_found=False) or 165
         low_income_threshold = self.env['hr.rule.parameter'].sudo()._get_parameter_from_code('spouse_low_income_threshold')
         other_income_threshold = self.env['hr.rule.parameter'].sudo()._get_parameter_from_code('spouse_other_income_threshold')
         for employee in self:
-            employee.spouse_fiscal_status_explanation = _("""- Without Income: The spouse of the income recipient has no professional income.\n
+            employee.spouse_fiscal_status_explanation = _("""- Without Income: The spouse of the income recipient has no professional income or below %(no_income_threshold)s€.\n
 - High income: The spouse of the recipient of the income has professional income, other than pensions, annuities or similar income, which exceeds %(low_income_threshold)s€ net per month.\n
 - Low Income: The spouse of the recipient of the income has professional income, other than pensions, annuities or similar income, which does not exceed %(low_income_threshold)s€ net per month.\n
 - Low Pensions: The spouse of the beneficiary of the income has professional income which consists exclusively of pensions, annuities or similar income and which does not exceed %(other_income_threshold)s€ net per month.\n
-- High Pensions: The spouse of the beneficiary of the income has professional income which consists exclusively of pensions, annuities or similar income and which exceeds %(other_income_threshold)s€ net per month.""", low_income_threshold=low_income_threshold, other_income_threshold=other_income_threshold)
+- High Pensions: The spouse of the beneficiary of the income has professional income which consists exclusively of pensions, annuities or similar income and which exceeds %(other_income_threshold)s€ net per month.""", no_income_threshold=no_income_threshold, low_income_threshold=low_income_threshold, other_income_threshold=other_income_threshold)
 
     @api.depends('identification_id')
     def _compute_niss(self):
@@ -244,22 +245,9 @@ Source: Opinion on the indexation of the amounts set in Article 1, paragraph 4, 
 
     @api.model
     def _get_invalid_niss_employee_ids(self):
-        # as we do not store if the niss is valid or not it's not possible to fetch all the employees directly
-        # use sql and manually filter the employees
-
-        # return nothing if user has no right to either employee or bank partner
-        if not self.browse().has_access('read') or not self.env.user.has_group('hr.group_hr_user'):
-            return []
-
-        self.env.cr.execute('''
-            SELECT emp.id,
-                   emp.niss
-              FROM hr_employee emp
-              JOIN hr_contract con
-              ON con.id = emp.contract_id
-              AND con.state in ('open', 'close')
-             WHERE emp.company_id IN %s
-               AND emp.employee_type IN ('employee', 'student')
-               AND emp.active=TRUE
-        ''', (tuple(c.id for c in self.env.companies if c.country_id.code == 'BE'),))
-        return [row['id'] for row in self.env.cr.dictfetchall() if not row['niss'] or not self._validate_niss(row['niss'])]
+        res = self.search_read([
+            ('company_id', 'in', self.env.companies.filtered(lambda c: c.country_id.code == 'BE').ids),
+            ('employee_type', 'in', ('employee', 'student')),
+            ('contract_ids.state', 'in', ('open', 'close'))
+        ], ['id', 'niss'])
+        return [row['id'] for row in res if not row['niss'] or not self._validate_niss(row['niss'])]

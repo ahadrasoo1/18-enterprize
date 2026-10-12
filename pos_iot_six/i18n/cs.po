@@ -1,23 +1,27 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* pos_iot_six
-# 
+# * pos_iot_six
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+#
+# "Marta (wacm)" <wacm@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:27+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Czech (https://app.transifex.com/odoo/teams/41243/cs/)\n"
+"POT-Creation-Date: 2025-12-29 18:48+0000\n"
+"PO-Revision-Date: 2026-02-27 05:18+0000\n"
+"Last-Translator: \"Marta (wacm)\" <wacm@odoo.com>\n"
+"Language-Team: Czech <https://translate.odoo.com/projects/odoo-18/"
+"pos_iot_six/cs/>\n"
+"Language: cs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: cs\n"
-"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
+"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : "
+"(n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
+"X-Generator: Weblate 5.14.3\n"
 
 #. module: pos_iot_six
 #: model_terms:ir.ui.view,arch_db:pos_iot_six.view_add_six_terminal
@@ -47,12 +51,18 @@ msgstr "Vytvořeno dne"
 #. module: pos_iot_six
 #: model:ir.model.fields,field_description:pos_iot_six.field_pos_iot_six_add_six_terminal__display_name
 msgid "Display Name"
-msgstr "Zobrazovací název"
+msgstr "Zobrazovaný název"
 
 #. module: pos_iot_six
-#. odoo-python
-#: code:addons/pos_iot_six/wizard/add_six_terminal.py:0
-msgid "Failed to save Six Terminal ID to IoT Box"
+#. odoo-javascript
+#: code:addons/pos_iot_six/static/src/js/payment_six.js:0
+msgid "Failed to get balance report from the terminal. Please retry."
+msgstr ""
+
+#. module: pos_iot_six
+#. odoo-javascript
+#: code:addons/pos_iot_six/static/src/js/six_terminal_id_field.xml:0
+msgid "Failed to save Terminal ID to IoT Box"
 msgstr ""
 
 #. module: pos_iot_six
@@ -82,9 +92,27 @@ msgid "Last Updated on"
 msgstr "Naposledy upraveno dne"
 
 #. module: pos_iot_six
+#. odoo-javascript
+#: code:addons/pos_iot_six/static/src/js/six_terminal_id_field.xml:0
+msgid "Must only contain digits"
+msgstr ""
+
+#. module: pos_iot_six
+#. odoo-javascript
+#: code:addons/pos_iot_six/static/src/js/payment_six.js:0
+msgid "No printer configured"
+msgstr ""
+
+#. module: pos_iot_six
 #: model:ir.model,name:pos_iot_six.model_pos_payment_method
 msgid "Point of Sale Payment Methods"
 msgstr "Platební metody prodejního místa"
+
+#. module: pos_iot_six
+#. odoo-javascript
+#: code:addons/pos_iot_six/static/src/js/six_terminal_id_field.xml:0
+msgid "Saved Terminal ID to IoT Box"
+msgstr ""
 
 #. module: pos_iot_six
 #: model_terms:ir.ui.view,arch_db:pos_iot_six.pos_payment_method_view_form_six_iot
@@ -98,15 +126,21 @@ msgid "Setup a Six Payment Terminal"
 msgstr ""
 
 #. module: pos_iot_six
+#. odoo-javascript
+#: code:addons/pos_iot_six/static/src/xml/balance_button.xml:0
+msgid "Six Terminal Balance"
+msgstr ""
+
+#. module: pos_iot_six
 #: model:ir.model.fields,field_description:pos_iot_six.field_iot_box__six_terminal_id
 #: model:ir.model.fields,field_description:pos_iot_six.field_pos_iot_six_add_six_terminal__six_terminal_id
 msgid "Six Terminal ID (TID)"
 msgstr ""
 
 #. module: pos_iot_six
-#. odoo-python
-#: code:addons/pos_iot_six/wizard/add_six_terminal.py:0
-msgid "Six Terminal ID must only contain digits."
+#. odoo-javascript
+#: code:addons/pos_iot_six/static/src/js/payment_six.js:0
+msgid "Six balance report error"
 msgstr ""
 
 #. module: pos_iot_six
@@ -129,7 +163,8 @@ msgid "The IoT Box that your Six terminal is connected to."
 msgstr ""
 
 #. module: pos_iot_six
-#. odoo-python
-#: code:addons/pos_iot_six/wizard/add_six_terminal.py:0
-msgid "Warning"
-msgstr "Varování"
+#. odoo-javascript
+#: code:addons/pos_iot_six/static/src/js/payment_six.js:0
+msgid ""
+"You must select a printer in your POS config to print Six balance report"
+msgstr ""

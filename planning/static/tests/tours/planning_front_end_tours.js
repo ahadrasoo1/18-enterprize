@@ -1,7 +1,6 @@
 import { registry } from "@web/core/registry";
 
 registry.category("web_tour.tours").add('planning_front_end_tour', {
-    test: true,
     steps: () => [{
         trigger: "button[title='Week view']",
         content: "The front end calendar should be rendered",
@@ -25,6 +24,7 @@ registry.category("web_tour.tours").add('planning_front_end_tour', {
         trigger: "form[id='modal_action_switch_shift'] button[type='submit']",
         content: "Click on the 'Ask to Switch' button in the popover",
         run: "click",
+        expectUnloadPage: true,
     }, {
         trigger: "div.o_planning_toast.bg-success",
         content: "A success planning toast notification should appear",
@@ -38,6 +38,7 @@ registry.category("web_tour.tours").add('planning_front_end_tour', {
         trigger: "div.o_planning_calendar_unwanted_shifts td[name='buttons'] div button[type='submit']",
         content: "Click on the 'Cancel Switch' button to cancel the switch shift request",
         run: "click",
+        expectUnloadPage: true,
     }, {
         trigger: "div.o_planning_calendar_open_shifts",
         content: "Since we have an open shift available, the open shifts section be rendered",
@@ -49,7 +50,6 @@ registry.category("web_tour.tours").add('planning_front_end_tour', {
 });
 
 registry.category("web_tour.tours").add('planning_front_end_allow_unassign_tour', {
-    test: true,
     steps: () => [{
         trigger: "td.fc-timegrid-col a[style='border-color: rgb(238, 75, 57); background-color: rgb(238, 75, 57);']",
         content: "Click on shift of the employee on the calendar",
@@ -58,6 +58,7 @@ registry.category("web_tour.tours").add('planning_front_end_allow_unassign_tour'
         trigger: "form[id='modal_action_dismiss_shift'] button[type='submit']",
         content: "Click on the 'I am Unavailable' button in the popover",
         run: "click",
+        expectUnloadPage: true,
     }, {
         trigger: "div.o_planning_toast.bg-success",
         content: "A success planning toast notification should appear",
@@ -68,7 +69,6 @@ registry.category("web_tour.tours").add('planning_front_end_allow_unassign_tour'
 });
 
 registry.category("web_tour.tours").add('planning_front_end_buttons_tour', {
-    test: true,
     steps: () => [{
         trigger: "div.o_planning_toast.bg-success",
         content: "A success planning toast notification should appear",

@@ -2,7 +2,7 @@ import { defineDocumentSpreadsheetModels } from "@documents_spreadsheet/../tests
 import { describe, expect, test } from "@odoo/hoot";
 import { stores } from "@odoo/o-spreadsheet";
 import { Partner } from "@spreadsheet/../tests/helpers/data";
-import { createSpreadsheetWithPivot } from "@spreadsheet/../tests/helpers/pivot";
+import { createSpreadsheetWithPivot } from "@documents_spreadsheet/../tests/helpers/pivot_helpers";
 import { makeStoreWithModel } from "@spreadsheet/../tests/helpers/stores";
 import { fields } from "@web/../tests/web_test_helpers";
 
@@ -25,8 +25,8 @@ test("deferred updates", async () => {
     expect(store.isDirty).toBe(false);
     store.update({ columns: [{ fieldName: "bar" }] });
     expect(store.isDirty).toBe(true);
-    expect(store.definition.columns[0].fieldName).toEqual("bar");
-    expect(store.definition.rows[0].fieldName).toEqual("foo");
+    expect(store.definition.columns[0].fieldName).toBe("bar");
+    expect(store.definition.rows[0].fieldName).toBe("foo");
     let definition = JSON.parse(JSON.stringify(model.getters.getPivotCoreDefinition(pivotId)));
     expect(definition.columns).toEqual([{ fieldName: "product_id" }], {
         message: "updates are defered",
@@ -73,7 +73,7 @@ test("remove row then add col", async () => {
     store.update({ columns: [{ fieldName: "bar" }] });
     expect(store.definition.rows).toEqual([]);
     expect(store.definition.columns.length).toBe(1);
-    expect(store.definition.columns[0].fieldName).toEqual("bar");
+    expect(store.definition.columns[0].fieldName).toBe("bar");
 });
 
 test("non-groupable fields are filtered", async () => {
@@ -278,6 +278,22 @@ test("non measure fields are filtered and sorted", async () => {
     expect(store.measureFields.length).toBe(5);
     const measures = ["__count", "dummy_float", "dummy_many2one", "dummy_monetary", "probability"];
     expect(store.measureFields.map((m) => m.name)).toEqual(measures);
+});
+
+test("update preserves sorting", async function () {
+    const { model, pivotId } = await createSpreadsheetWithPivot();
+    const { store } = makeStoreWithModel(model, PivotSidePanelStore, pivotId);
+    const sortedColumn = {
+        domain: [],
+        measure: "probability",
+        order: "asc",
+    };
+    store.update({ sortedColumn });
+    expect(model.getters.getPivotCoreDefinition(pivotId).sortedColumn).toEqual(sortedColumn);
+    store.update({
+        domain: [["foo", "=", 1]],
+    });
+    expect(model.getters.getPivotCoreDefinition(pivotId).sortedColumn).toEqual(sortedColumn);
 });
 
 test("Existing dimensions fields are filtered, but not measures", async () => {

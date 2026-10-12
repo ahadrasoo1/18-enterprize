@@ -50,8 +50,11 @@ export function useSpreadsheetThumbnail() {
     return () => {
         const dimensions = SPREADSHEET_DIMENSIONS;
         const canvas = document.querySelector(".o-grid canvas:not(.o-figure-canvas)");
+        if (!canvas) {
+            return undefined;
+        }
         const canvasResizer = document.createElement("canvas");
-        const size = 750;
+        const size = 500;
         canvasResizer.width = size;
         canvasResizer.height = size;
         const canvasCtx = canvasResizer.getContext("2d");
@@ -74,6 +77,10 @@ export function useSpreadsheetThumbnail() {
                 size
             );
         }
-        return canvasResizer.toDataURL().replace("data:image/png;base64,", "");
+        const type = "image/webp";
+        const quality = 0;
+        const dataUrl = canvasResizer.toDataURL(type, quality);
+        const regexp = new RegExp("^data:image/.*;base64,");
+        return dataUrl.replace(regexp, "");
     };
 }

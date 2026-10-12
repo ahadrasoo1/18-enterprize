@@ -1,36 +1,44 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* hr_payroll_account_iso20022
-# 
+# * hr_payroll_account_iso20022
+#
 # Translators:
-# Wil Odoo, 2024
-# Fernanda Alvarez, 2024
-# 
+# Fernanda Alvarez, 2025
+# Wil Odoo, 2025
+#
+# "Fernanda Alvarez (mfar)" <mfar@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:27+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Fernanda Alvarez, 2024\n"
-"Language-Team: Spanish (Latin America) (https://app.transifex.com/odoo/teams/41243/es_419/)\n"
+"POT-Creation-Date: 2025-12-29 18:47+0000\n"
+"PO-Revision-Date: 2026-01-17 09:06+0000\n"
+"Last-Translator: \"Fernanda Alvarez (mfar)\" <mfar@odoo.com>\n"
+"Language-Team: Spanish (Latin America) <https://translate.odoo.com/projects/"
+"odoo-18/hr_payroll_account_iso20022/es_419/>\n"
+"Language: es_419\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: es_419\n"
-"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=(n == 1) ? 0 : ((n != 0 && n % 1000000 == 0)"
+" ? 1 : 2);\n"
+"X-Generator: Weblate 5.14.3\n"
 
 #. module: hr_payroll_account_iso20022
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account_iso20022.view_employee_form
 msgid ""
 "<span class=\"d-flex gap-2 w-50\">\n"
-"                            <span invisible=\"is_trusted_bank_account\" class=\"text-muted\">Untrusted</span>\n"
-"                            <span invisible=\"not is_trusted_bank_account\" class=\"text-success\">Trusted</span>\n"
+"                            <span invisible=\"is_trusted_bank_account\" "
+"class=\"text-muted\">Untrusted</span>\n"
+"                            <span invisible=\"not is_trusted_bank_account\" "
+"class=\"text-success\">Trusted</span>\n"
 "                        </span>"
 msgstr ""
 "<span class=\"d-flex gap-2 w-50\">\n"
-"                            <span invisible=\"is_trusted_bank_account\" class=\"text-muted\">No fiable</span>\n"
-"                            <span invisible=\"not is_trusted_bank_account\" class=\"text-success\">Fiable</span>\n"
+"                            <span invisible=\"is_trusted_bank_account\" "
+"class=\"text-muted\">No fiable</span>\n"
+"                            <span invisible=\"not is_trusted_bank_account\" "
+"class=\"text-success\">Fiable</span>\n"
 "                        </span>"
 
 #. module: hr_payroll_account_iso20022
@@ -60,6 +68,11 @@ msgid "Employees With Invalid Bank Accounts"
 msgstr "Empleados con cuentas bancarias no válidas"
 
 #. module: hr_payroll_account_iso20022
+#: model:hr.payroll.dashboard.warning,name:hr_payroll_account_iso20022.hr_payroll_dashboard_warning_employee_no_country
+msgid "Employees Without Any Country"
+msgstr "Empleados sin país"
+
+#. module: hr_payroll_account_iso20022
 #: model:hr.payroll.dashboard.warning,name:hr_payroll_account_iso20022.hr_payroll_dashboard_warning_untrusted_bank_accounts
 msgid "Employees with untrusted Bank Account numbers"
 msgstr "Empleados con números de cuenta bancaria no confiables"
@@ -67,7 +80,7 @@ msgstr "Empleados con números de cuenta bancaria no confiables"
 #. module: hr_payroll_account_iso20022
 #: model:ir.model.fields,field_description:hr_payroll_account_iso20022.field_hr_payroll_payment_report_wizard__export_format
 msgid "Export Format"
-msgstr "Exportar formato"
+msgstr "Formato de exportación"
 
 #. module: hr_payroll_account_iso20022
 #: model:ir.model,name:hr_payroll_account_iso20022.model_hr_payroll_payment_report_wizard
@@ -109,13 +122,12 @@ msgid ""
 "emails are compromised. Once verified, you can activate the ability to send "
 "money."
 msgstr ""
-"Con frecuencia se reciben correos que contienen facturas falsas con números "
-"de cuenta fraudulentos, a esta práctica se le llama phishing. Es importante "
-"verificar los nuevos números de cuenta y la mejor manera de hacerlo es "
-"llamar al proveedor, lo cual es esencial porque si se encuentra en esta "
-"situación, quiere decir que el correo del proveedor está en peligro. Una vez"
-" que haya comprobado que la información es correcta, puede activar la "
-"función de enviar dinero."
+"Enviar facturas falsas con un número de cuenta fraudulento es una práctica "
+"común de phishing. Para protegerte, es importante que siempre verifiques los "
+"números de cuenta nuevos, de preferencia por teléfono con el proveedor, ya "
+"que el phishing suele ocurrir cuando sus correos están comprometidos. Una "
+"vez que hayas verificado que la información es correcta puedes activar la "
+"función para enviar dinero."
 
 #. module: hr_payroll_account_iso20022
 #. odoo-python
@@ -131,13 +143,20 @@ msgid "Some employees (%s) don't have a work contact."
 msgstr "Algunos empleados (%s) no tienen un contacto laboral."
 
 #. module: hr_payroll_account_iso20022
+#: model:ir.model.fields.selection,name:hr_payroll_account_iso20022.selection__hr_payroll_payment_report_wizard__export_format__iso20022_ch
+msgid "Swiss ISO20022"
+msgstr "ISO20022 suizo"
+
+#. module: hr_payroll_account_iso20022
 #. odoo-python
 #: code:addons/hr_payroll_account_iso20022/models/hr_employee.py:0
 msgid ""
-"The following employees have invalid bank accounts and could not be trusted:\n"
+"The following employees have invalid bank accounts and could not be "
+"trusted:\n"
 "%s"
 msgstr ""
-"Los siguientes empleados no tienen cuentas bancarias válidas y no se pueden realizar operaciones:\n"
+"Los siguientes empleados no tienen cuentas bancarias válidas y no se pueden "
+"realizar operaciones:\n"
 "%s"
 
 #. module: hr_payroll_account_iso20022

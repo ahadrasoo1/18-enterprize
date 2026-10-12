@@ -15,8 +15,8 @@
 
                 <table class="table table-sm table-striped" id="timesheet_table">
                     <t t-set="display_sol" t-value="False"/>
-                    <t t-foreach="timesheets" t-as="timesheet">
-                        <t t-if="timesheet.so_line != ticket.sale_line_id">
+                    <t t-foreach="timesheets" t-as="ts">
+                        <t t-if="ts.so_line != ticket.sale_line_id">
                             <t t-set="display_sol" t-value="True"/>
                         </t>
                     </t>
@@ -100,7 +100,7 @@
     </template>
     <template id="portal_helpdesk_ticket_inherit" inherit_id="helpdesk.portal_helpdesk_ticket">
         <xpath expr="//t[@t-foreach='grouped_tickets']/tbody/tr[hasclass('table-light')]" position="inside">
-            <t t-elif="groupby == 'sale_line_id'">
+            <t t-elif="groupby == 'sale_order_id'">
                 <th colspan="6">
                     <span t-if="tickets[0].sudo().sale_line_id" t-field="tickets[0].sudo().sale_line_id"/>
                     <span t-else="">Not Billed</span>
@@ -109,11 +109,14 @@
         </xpath>        
     </template>
     <template id="portal_my_timesheets_inherit" inherit_id="sale_timesheet.portal_my_timesheets_inherit">
-        <xpath expr="//th[contains(text(), 'Task')]" position="replace">
+        <xpath expr='//th[@t-if="not groupby == &apos;task_id&apos;"]' position="replace">
             <th t-if="groupby not in ['task_id', 'helpdesk_ticket_id']">Task/Ticket</th>
         </xpath>
         <xpath expr="//span[@t-field='timesheet.task_id']" position="after">
             <span t-if="timesheet.helpdesk_ticket_id" t-field="timesheet.helpdesk_ticket_id" t-att-title="timesheet.helpdesk_ticket_id.display_name"/>
+        </xpath>
+        <xpath expr="//tr/td[span[@t-field='timesheet.task_id']]" position="attributes">
+            <attribute name="t-if">groupby not in ['task_id', 'helpdesk_ticket_id']</attribute>
         </xpath>
         <xpath expr="//t[@t-foreach='grouped_timesheets']/tbody/tr[hasclass('table-light')]/th[hasclass('text-end')]" position="before">
             <t t-elif="groupby == 'helpdesk_ticket_id'">

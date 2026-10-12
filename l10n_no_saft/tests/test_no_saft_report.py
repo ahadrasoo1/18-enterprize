@@ -3,7 +3,7 @@
 from odoo.addons.account_reports.tests.common import TestAccountReportsCommon
 from odoo.tests.common import test_xsd
 from odoo.tests import tagged
-from odoo import fields
+from odoo import Command, fields
 
 from freezegun import freeze_time
 
@@ -79,6 +79,18 @@ class TestNoSaftReportCommon(TestAccountReportsCommon):
                     'tax_ids': [(6, 0, cls.company_data['default_tax_purchase'].ids)],
                 })],
             },
+            {
+                # this entry is added to ensure that the XML will have CreditAmount tag
+                # CreditAmount (or DebitAmount) is necessary for the SAF-T XML validator (even if the entry is empty)
+                'move_type': 'entry',
+                'date': '2019-11-30',
+                'partner_id': cls.partner_a.id,
+                'line_ids': [Command.create({
+                    'debit': 0.0,
+                    'credit': 0.0,
+                    'account_id': cls.company_data['default_account_revenue'].id,
+                })],
+            },
         ])
         cls.invoices.action_post()
 
@@ -95,7 +107,7 @@ class TestNoSaftReport(TestNoSaftReportCommon):
             self.get_xml_tree_from_string(f'''
                 <AuditFile xmlns="urn:StandardAuditFile-Taxation-Financial:NO">
                     <Header>
-                        <AuditFileVersion>1.10</AuditFileVersion>
+                        <AuditFileVersion>1.30</AuditFileVersion>
                         <AuditFileCountry>NO</AuditFileCountry>
                         <AuditFileDateCreated>2019-12-31</AuditFileDateCreated>
                         <SoftwareCompanyName>Odoo SA</SoftwareCompanyName>
@@ -129,7 +141,8 @@ class TestNoSaftReport(TestNoSaftReportCommon):
                             <Account>
                                 <AccountID>___ignore___</AccountID>
                                 <AccountDescription>Accounts receivable</AccountDescription>
-                                <StandardAccountID>1500</StandardAccountID>
+                                <GroupingCategory>RF-1167</GroupingCategory>
+                                <GroupingCode>1500</GroupingCode>
                                 <AccountType>GL</AccountType>
                                 <OpeningDebitBalance>0.00</OpeningDebitBalance>
                                 <ClosingDebitBalance>2500.00</ClosingDebitBalance>
@@ -137,15 +150,17 @@ class TestNoSaftReport(TestNoSaftReportCommon):
                             <Account>
                                 <AccountID>___ignore___</AccountID>
                                 <AccountDescription>Retained result</AccountDescription>
-                                <StandardAccountID>2099</StandardAccountID>
+                                <GroupingCategory>RF-1167</GroupingCategory>
+                                <GroupingCode>2099</GroupingCode>
                                 <AccountType>GL</AccountType>
                                 <OpeningDebitBalance>8000.00</OpeningDebitBalance>
-                                <ClosingDebitBalance>0.00</ClosingDebitBalance>
+                                <ClosingDebitBalance>8000.00</ClosingDebitBalance>
                             </Account>
                             <Account>
                                 <AccountID>___ignore___</AccountID>
                                 <AccountDescription>Trade creditors (copy)</AccountDescription>
-                                <StandardAccountID>2401</StandardAccountID>
+                                <GroupingCategory>RF-1167</GroupingCategory>
+                                <GroupingCode>2401</GroupingCode>
                                 <AccountType>GL</AccountType>
                                 <OpeningCreditBalance>10000.00</OpeningCreditBalance>
                                 <ClosingCreditBalance>10000.00</ClosingCreditBalance>
@@ -153,7 +168,8 @@ class TestNoSaftReport(TestNoSaftReportCommon):
                             <Account>
                                 <AccountID>___ignore___</AccountID>
                                 <AccountDescription>Output VAT, high rate</AccountDescription>
-                                <StandardAccountID>2700</StandardAccountID>
+                                <GroupingCategory>RF-1167</GroupingCategory>
+                                <GroupingCode>2700</GroupingCode>
                                 <AccountType>GL</AccountType>
                                 <OpeningDebitBalance>0.00</OpeningDebitBalance>
                                 <ClosingCreditBalance>500.00</ClosingCreditBalance>
@@ -161,7 +177,8 @@ class TestNoSaftReport(TestNoSaftReportCommon):
                             <Account>
                                 <AccountID>___ignore___</AccountID>
                                 <AccountDescription>Input VAT, high rate</AccountDescription>
-                                <StandardAccountID>2710</StandardAccountID>
+                                <GroupingCategory>RF-1167</GroupingCategory>
+                                <GroupingCode>2710</GroupingCode>
                                 <AccountType>GL</AccountType>
                                 <OpeningDebitBalance>2000.00</OpeningDebitBalance>
                                 <ClosingDebitBalance>2000.00</ClosingDebitBalance>
@@ -169,7 +186,8 @@ class TestNoSaftReport(TestNoSaftReportCommon):
                             <Account>
                                 <AccountID>___ignore___</AccountID>
                                 <AccountDescription>Sales revenue, merchandise, subject to VAT, high rate</AccountDescription>
-                                <StandardAccountID>3000</StandardAccountID>
+                                <GroupingCategory>RF-1167</GroupingCategory>
+                                <GroupingCode>3000</GroupingCode>
                                 <AccountType>GL</AccountType>
                                 <OpeningDebitBalance>0.00</OpeningDebitBalance>
                                 <ClosingCreditBalance>2000.00</ClosingCreditBalance>
@@ -191,8 +209,11 @@ class TestNoSaftReport(TestNoSaftReportCommon):
                                     <Telephone>+352 24 11 11 11</Telephone>
                                 </Contact>
                                 <CustomerID>___ignore___</CustomerID>
-                                <OpeningDebitBalance>0.00</OpeningDebitBalance>
-                                <ClosingDebitBalance>2500.00</ClosingDebitBalance>
+                                <BalanceAccount>
+                                    <AccountID>___ignore___</AccountID>
+                                    <OpeningDebitBalance>0.00</OpeningDebitBalance>
+                                    <ClosingDebitBalance>2500.00</ClosingDebitBalance>
+                                </BalanceAccount>
                             </Customer>
                         </Customers>
                         <TaxTable>
@@ -204,7 +225,7 @@ class TestNoSaftReport(TestNoSaftReportCommon):
                                     <Description>25%</Description>
                                     <TaxPercentage>25.0</TaxPercentage>
                                     <Country>NO</Country>
-                                    <StandardTaxCode>02</StandardTaxCode>
+                                    <StandardTaxCode>3</StandardTaxCode>
                                     <BaseRate>100</BaseRate>
                                 </TaxCodeDetails>
                             </TaxTableEntry>
@@ -230,7 +251,7 @@ class TestNoSaftReport(TestNoSaftReportCommon):
                         </Owners>
                     </MasterFiles>
                     <GeneralLedgerEntries>
-                        <NumberOfEntries>2</NumberOfEntries>
+                        <NumberOfEntries>3</NumberOfEntries>
                         <TotalDebit>10000.00</TotalDebit>
                         <TotalCredit>10000.00</TotalCredit>
                         <Journal>
@@ -262,9 +283,9 @@ class TestNoSaftReport(TestNoSaftReportCommon):
                                         <TaxCode>___ignore___</TaxCode>
                                         <TaxPercentage>25.0</TaxPercentage>
                                         <TaxBaseDescription>25%</TaxBaseDescription>
-                                        <TaxAmount>
+                                        <CreditTaxAmount>
                                             <Amount>1250.00</Amount>
-                                        </TaxAmount>
+                                        </CreditTaxAmount>
                                     </TaxInformation>
                                 </Line>
                                 <Line>
@@ -315,9 +336,9 @@ class TestNoSaftReport(TestNoSaftReportCommon):
                                         <TaxCode>___ignore___</TaxCode>
                                         <TaxPercentage>25.0</TaxPercentage>
                                         <TaxBaseDescription>25%</TaxBaseDescription>
-                                        <TaxAmount>
+                                        <DebitTaxAmount>
                                             <Amount>750.00</Amount>
-                                        </TaxAmount>
+                                        </DebitTaxAmount>
                                     </TaxInformation>
                                 </Line>
                                 <Line>
@@ -344,6 +365,33 @@ class TestNoSaftReport(TestNoSaftReportCommon):
                                 </Line>
                             </Transaction>
                         </Journal>
+                        <Journal>
+                            <JournalID>___ignore___</JournalID>
+                            <Description>Miscellaneous Operations</Description>
+                            <Type>general</Type>
+                            <Transaction>
+                                <TransactionID>___ignore___</TransactionID>
+                                <Period>11</Period>
+                                <PeriodYear>2019</PeriodYear>
+                                <TransactionDate>2019-11-30</TransactionDate>
+                                <TransactionType>entry</TransactionType>
+                                <Description>MISC/2019/11/0001</Description>
+                                <SystemEntryDate>___ignore___</SystemEntryDate>
+                                <GLPostingDate>2019-11-30</GLPostingDate>
+                                <CustomerID>___ignore___</CustomerID>
+                                <Line>
+                                    <RecordID>___ignore___</RecordID>
+                                    <AccountID>___ignore___</AccountID>
+                                    <ValueDate>2019-11-30</ValueDate>
+                                    <SourceDocumentID>___ignore___</SourceDocumentID>
+                                    <CustomerID>___ignore___</CustomerID>
+                                    <Description>MISC/2019/11/0001</Description>
+                                    <CreditAmount>
+                                        <Amount>0.00</Amount>
+                                    </CreditAmount>
+                                </Line>
+                            </Transaction>
+                        </Journal>
                     </GeneralLedgerEntries>
                 </AuditFile>
             '''),
@@ -352,7 +400,7 @@ class TestNoSaftReport(TestNoSaftReportCommon):
 
 @tagged('external_l10n', 'post_install', '-at_install', '-standard', 'external')
 class TestNoSaftReportXmlValidity(TestNoSaftReportCommon):
-    @test_xsd(url='https://raw.githubusercontent.com/Skatteetaten/saf-t/master/Norwegian_SAF-T_Financial_Schema_v_1.10.xsd')
+    @test_xsd(url='https://raw.githubusercontent.com/Skatteetaten/saf-t/master/SAF-T_Financial_1.3/Norwegian_SAF-T_Financial_Schema_v_1.30.xsd')
     def test_xml_validity(self):
         report = self.env.ref('account_reports.general_ledger_report')
         options = self._generate_options(report, fields.Date.from_string('2019-01-01'), fields.Date.from_string('2019-12-31'))

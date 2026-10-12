@@ -1,32 +1,34 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* currency_rate_live
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Daye Jeong, 2024
+# Sarah Park, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:26+0000\n"
+"POT-Creation-Date: 2026-02-27 18:47+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
+"Last-Translator: Sarah Park, 2025\n"
 "Language-Team: Korean (https://app.transifex.com/odoo/teams/41243/ko/)\n"
+"Language: ko\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: ko\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. module: currency_rate_live
 #: model_terms:ir.ui.view,arch_db:currency_rate_live.res_config_settings_view_form
 msgid ""
-"<i title=\"Update now\" role=\"img\" aria-label=\"Update now\" class=\"fa "
-"fa-fw fa-refresh\"/>"
+"<i title=\"Update now\" role=\"img\" aria-label=\"Update now\" class=\"fa fa-"
+"fw fa-refresh\"/>"
 msgstr ""
-"<i title=\"Update now\" role=\"img\" aria-label=\"Update now\" class=\"fa "
-"fa-fw fa-refresh\"/>"
+"<i title=\"Update now\" role=\"img\" aria-label=\"Update now\" class=\"fa fa-"
+"fw fa-refresh\"/>"
 
 #. module: currency_rate_live
 #: model:ir.model,name:currency_rate_live.model_res_company
@@ -114,7 +116,8 @@ msgstr "서비스 공급자"
 msgid ""
 "The selected exchange rate provider requires the GTQ and USD currencies to "
 "be active."
-msgstr "선택하신 환율 제공업체를 사용하려면 GTQ 및 USD 통화를 활성화헤야 합니다."
+msgstr ""
+"선택하신 환율 제공업체를 사용하려면 GTQ 및 USD 통화를 활성화헤야 합니다."
 
 #. module: currency_rate_live
 #. odoo-python
@@ -122,7 +125,9 @@ msgstr "선택하신 환율 제공업체를 사용하려면 GTQ 및 USD 통화�
 msgid ""
 "Unable to connect to the online exchange rate platform %s. The web service "
 "may be temporarily down. Please try again in a moment."
-msgstr "%s 온라인 환율 플랫폼에 연결할 수 없습니다. 웹 서비스가 일시적으로 중단될 수 있습니다. 잠시 후에 다시 시도해 주세요."
+msgstr ""
+"%s 온라인 환율 플랫폼에 연결할 수 없습니다. 웹 서비스가 일시적으로 중단될 수 "
+"있습니다. 잠시 후에 다시 시도해 주세요."
 
 #. module: currency_rate_live
 #: model:ir.model.fields.selection,name:currency_rate_live.selection__res_company__currency_interval_unit__weekly
@@ -135,7 +140,9 @@ msgstr "매주"
 msgid ""
 "Your main currency (%s) is not supported by this exchange rate provider. "
 "Please choose another one."
-msgstr "사용자의 기본 통화(%s)가 이 환율 공급자에서 지원되지 않습니다. 다른 것을 선택하세요."
+msgstr ""
+"사용자의 기본 통화(%s)가 이 환율 공급자에서 지원되지 않습니다. 다른 것을 선택"
+"하세요."
 
 #. module: currency_rate_live
 #: model:ir.model.fields.selection,name:currency_rate_live.selection__res_company__currency_provider__cbuae
@@ -170,6 +177,11 @@ msgstr "[CL] 칠레 중앙 은행: mindicador.cl 경유"
 #. module: currency_rate_live
 #: model:ir.model.fields.selection,name:currency_rate_live.selection__res_company__currency_provider__banrepco
 msgid "[CO] Bank of the Republic"
+msgstr "[CO] 공화국 은행"
+
+#. module: currency_rate_live
+#: model:ir.model.fields.selection,name:currency_rate_live.selection__res_company__currency_provider__cu
+msgid "[CU] Central Bank of Cuba"
 msgstr ""
 
 #. module: currency_rate_live
@@ -188,9 +200,19 @@ msgid "[GT] Bank of Guatemala"
 msgstr "[GT] 과테말라 은행"
 
 #. module: currency_rate_live
+#: model:ir.model.fields.selection,name:currency_rate_live.selection__res_company__currency_provider__mnb
+msgid "[HU] Magyar Nemzeti Bank"
+msgstr "[HU] Magyar Nemzeti Bank"
+
+#. module: currency_rate_live
 #: model:ir.model.fields.selection,name:currency_rate_live.selection__res_company__currency_provider__bi
 msgid "[ID] Bank Indonesia"
 msgstr "[ID] 인도네시아 은행"
+
+#. module: currency_rate_live
+#: model:ir.model.fields.selection,name:currency_rate_live.selection__res_company__currency_provider__boi
+msgid "[IT] Bank of Italy"
+msgstr "[IT] 이탈리아 은행"
 
 #. module: currency_rate_live
 #: model:ir.model.fields.selection,name:currency_rate_live.selection__res_company__currency_provider__banxico
@@ -223,9 +245,19 @@ msgid "[SE] Sveriges Riksbank"
 msgstr "[SE] 스웨덴 은행"
 
 #. module: currency_rate_live
+#: model:ir.model.fields.selection,name:currency_rate_live.selection__res_company__currency_provider__bsi
+msgid "[SI] Bank of Slovenia"
+msgstr "[SI] 슬로베니아 은행"
+
+#. module: currency_rate_live
+#: model:ir.model.fields.selection,name:currency_rate_live.selection__res_company__currency_provider__bot
+msgid "[TH] Bank of Thailand"
+msgstr "[TH] 태국 은행"
+
+#. module: currency_rate_live
 #: model:ir.model.fields.selection,name:currency_rate_live.selection__res_company__currency_provider__tcmb
-msgid "[TR] Central Bank of the Republic of Turkey"
-msgstr "[TR] 튀르키예 공화국 중앙 은행"
+msgid "[TR] Central Bank of the Republic of Türkiye"
+msgstr "[TR] 터키 공화국 중앙은행"
 
 #. module: currency_rate_live
 #: model:ir.model.fields.selection,name:currency_rate_live.selection__res_company__currency_provider__hmrc

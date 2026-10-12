@@ -118,7 +118,7 @@ class RentalSchedule(models.Model):
                         ON res.stock_lot_id=lot.id
                         OR pickedup.stock_lot_id=lot.id
                 UNION ALL
-                SELECT DISTINCT ON (sml.lot_id)
+                SELECT DISTINCT ON (sml)
                     sml.lot_id,
                     sl.name,
                     sol.id AS sol_id,

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import api, models
+from odoo import models
 
 
 class L10nInReportAccount(models.Model):
@@ -61,22 +61,24 @@ class L10nInReportAccount(models.Model):
             details_pos_lines = {}
             for pos_order_line in pos_order_lines:
                 move_id = pos_order_line.order_id.session_move_id.id
-                income_account = pos_order_line.product_id.with_company(pos_order_line.company_id)._get_product_accounts()["income"]
+                income_account = pos_order_line.product_id.with_company(pos_order_line.company_id)._get_product_accounts()["income"] or pos_order_line.order_id.config_id.journal_id.default_account_id
                 if pos_order_line.order_id.fiscal_position_id:
                     income_account = pos_order_line.order_id.fiscal_position_id.map_account(income_account)
                 details_pos_lines.setdefault(move_id, {})
                 if products.browse(pos_order_line.product_id.id).type == 'service':
                     uom_code = "NA"
+                    product_qty = 0
                 else:
                     uom_code = (
                         uoms.browse(pos_order_line.product_uom_id.id).l10n_in_code and
                         uoms.browse(pos_order_line.product_uom_id.id).l10n_in_code.split("-")[0] or "OTH"
                     )
+                    product_qty = pos_order_line.qty
                 details_pos_lines[move_id][pos_order_line.id] = {
                     "account_id": income_account.id,
                     "price_subtotal": pos_order_line.price_subtotal,
                     "tax_ids": pos_order_line.tax_ids_after_fiscal_position.flatten_taxes_hierarchy().ids,
-                    "qty": pos_order_line.qty,
+                    "qty": product_qty,
                     "product_hsn_code": self.env["account.edi.format"]._l10n_in_edi_extract_digits(pos_order_line.l10n_in_hsn_code),
                     "currency_rate": pos_order_line.order_id.currency_rate,
                     "product_uom_code": uom_code
@@ -87,15 +89,29 @@ class L10nInReportAccount(models.Model):
             return details_pos_line['account_id'] == account_move_line.account_id.id \
                 and ((account_move_line.credit > 0.00 and details_pos_line['price_subtotal'] > 0.00) \
                 or (account_move_line.debit > 0.00 and details_pos_line['price_subtotal'] < 0.00)) \
-                and details_pos_line['tax_ids'] == account_move_line.tax_ids.ids
+                and sorted(details_pos_line['tax_ids']) == sorted(account_move_line.tax_ids.ids)
 
         pos_journal_items = journal_items.filtered(lambda l: l.move_id.pos_session_ids and l.move_id.move_type == "entry")
-        ignore_reversal_pos_jounal_items = journal_items.filtered(lambda l: l.move_id.reversed_pos_order_id and l.move_id.move_type == "entry")
-        hsn_json = super()._get_gstr1_hsn_json(journal_items - pos_journal_items - ignore_reversal_pos_jounal_items, tax_details_by_move)
-        pos_orders = pos_journal_items.move_id.pos_session_ids.order_ids.filtered(lambda l: not l.is_invoiced)
+        hsn_json = super()._get_gstr1_hsn_json(journal_items - pos_journal_items, tax_details_by_move)
+        # Extract all POS orders related to the POS journal items
+        all_pos_orders = pos_journal_items.move_id.pos_session_ids.order_ids
+        # Split orders into invoiced and non-invoiced
+        non_invoiced_orders = all_pos_orders.filtered(lambda o: not o.is_invoiced)
+        invoiced_orders = all_pos_orders - non_invoiced_orders
+        # Include the original POS orders that got reversed after session close
+        reversal_data = self.env['account.move'].search_read(
+            domain=[('reversed_pos_order_id', 'in', invoiced_orders.ids)],
+            fields=['reversed_pos_order_id'],
+        )
+        reversed_order_ids = [rec['reversed_pos_order_id'][0] for rec in reversal_data]
+        reversed_orders = self.env['pos.order'].browse(reversed_order_ids)
+        pos_orders = non_invoiced_orders | reversed_orders
         pos_order_lines = self.env['pos.order.line'].browse(pos_orders.lines.ids)
         pos_order_lines.fetch(['product_id', 'product_uom_id'])
         details_pos_lines_by_move = _set_details_pos_lines(pos_order_lines)
+        hsn_new_schema_apply_date = self._get_hsn_new_schema_apply_date()
+        hsn_section = 'data' if self.start_date < hsn_new_schema_apply_date else 'hsn_b2c'
+        hsn_json.setdefault(hsn_section, {})
         for move_id in pos_journal_items.mapped("move_id"):
             tax_details = tax_details_by_move.get(move_id)
             details_pos_lines = details_pos_lines_by_move.get(move_id.id)
@@ -120,25 +136,26 @@ class L10nInReportAccount(models.Model):
                     product_uom_code = details_pos_line['product_uom_code']
                     product_hsn_code = details_pos_line['product_hsn_code']
                     group_key = "%s-%s-%s" % (tax_rate, product_hsn_code, product_uom_code)
-                    hsn_json.setdefault(group_key, {
+                    hsn_json[hsn_section].setdefault(group_key, {
                         "hsn_sc": product_hsn_code,
                         "uqc": product_uom_code,
                         "rt": tax_rate,
                         "qty": 0.00, "txval": 0.00, "iamt": 0.00, "samt": 0.00, "camt": 0.00, "csamt": 0.00})
-                    hsn_json[group_key]['qty'] += details_pos_line['qty']
+                    hsn_data = hsn_json[hsn_section][group_key]
+                    hsn_data['qty'] += details_pos_line['qty']
                     # check is last in loop
                     if index == len(pos_matched_lines):
-                        hsn_json[group_key]['txval'] += remaining_values['txval']
-                        hsn_json[group_key]['iamt'] += remaining_values['iamt']
-                        hsn_json[group_key]['samt'] += remaining_values['samt']
-                        hsn_json[group_key]['camt'] += remaining_values['camt']
-                        hsn_json[group_key]['csamt'] += remaining_values['csamt']
+                        hsn_data['txval'] += remaining_values['txval']
+                        hsn_data['iamt'] += remaining_values['iamt']
+                        hsn_data['samt'] += remaining_values['samt']
+                        hsn_data['camt'] += remaining_values['camt']
+                        hsn_data['csamt'] += remaining_values['csamt']
                     else:
-                        hsn_json[group_key]['txval'] += line_tax_details.get('base_amount', 0.00) * pos_ratio * -1
-                        hsn_json[group_key]['iamt'] += line_tax_details.get('igst', 0.00) * pos_ratio * -1
-                        hsn_json[group_key]['samt'] += line_tax_details.get('cgst', 0.00) * pos_ratio * -1
-                        hsn_json[group_key]['camt'] += line_tax_details.get('sgst', 0.00) * pos_ratio * -1
-                        hsn_json[group_key]['csamt'] += line_tax_details.get('cess', 0.00) * pos_ratio * -1
+                        hsn_data['txval'] += line_tax_details.get('base_amount', 0.00) * pos_ratio * -1
+                        hsn_data['iamt'] += line_tax_details.get('igst', 0.00) * pos_ratio * -1
+                        hsn_data['samt'] += line_tax_details.get('cgst', 0.00) * pos_ratio * -1
+                        hsn_data['camt'] += line_tax_details.get('sgst', 0.00) * pos_ratio * -1
+                        hsn_data['csamt'] += line_tax_details.get('cess', 0.00) * pos_ratio * -1
 
                         remaining_values['txval'] -= line_tax_details.get('base_amount', 0.00) * pos_ratio * -1
                         remaining_values['iamt'] -= line_tax_details.get('igst', 0.00) * pos_ratio * -1

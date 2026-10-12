@@ -26,8 +26,10 @@ class AccountFollowupReport(models.AbstractModel):
                 'report_template': self.env.ref('account_followup.action_report_followup').id,
                 'company_id': to_send_partner.company_id.id or self.env.company.id,
             })
+
+            # Allow snailmail_letter to generate the attachment using the followup_options
+            letter.with_context(followup_options=options)._snailmail_print()
             if self.env['snailmail.letter']._is_valid_address(letter):
-                letter._snailmail_print()
                 sent_at_least_once = True
         if not sent_at_least_once:
             raise UserError(_('You are trying to send a letter by post, but no follow-up contact has any address set'))

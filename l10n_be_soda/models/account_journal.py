@@ -58,7 +58,8 @@ class AccountJournal(models.Model):
         for attachment in attachments:
             parsed_attachment = etree.parse(io.BytesIO(attachment.raw))
             # The document VAT number must match the journal's company's VAT number
-            journal_company_vat = self.company_id.company_registry or self.company_id.vat and re.search(r'\d+', self.company_id.vat).group()
+            journal_company_vat = self.company_id.vat or self.company_id.company_registry
+            journal_company_vat = journal_company_vat and re.sub("[^0-9]", "", journal_company_vat)
             parsed_ent_num = parsed_attachment.find('.//EntNum')
             ent_num = parsed_ent_num.text and re.search(r'\d+', parsed_ent_num.text).group()
             if ent_num != journal_company_vat:
@@ -70,7 +71,7 @@ class AccountJournal(models.Model):
             # account.move.ref is SocialNumber+SequenceNumber+AccountPeriodYYYY/AccountPeriodmm : check that this move has not already been imported
             account_period = parsed_attachment.find('.//AccountPeriod').text
             ref = "%s-%s-%s/%s" % (parsed_attachment.find('.//Source').text, parsed_attachment.find('.//SeqNumber').text, account_period[:4], account_period[4:])
-            existing_move = self.env['account.move'].search([('ref', '=', ref)])
+            existing_move = self.env['account.move'].search([('ref', '=', ref), ('company_id', '=', self.company_id.id)])
             if existing_move:
                 if self._context.get('raise_no_imported_file', True):
                     raise UserError(

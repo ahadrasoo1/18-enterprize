@@ -2,6 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo.tests import Form
+from odoo import Command
 
 from .test_common import TestQualityMrpCommon
 
@@ -135,6 +136,54 @@ class TestQualityCheck(TestQualityMrpCommon):
         self.assertEqual(production_backorder.check_ids.point_id, quality_point_operation_type)
         self.assertEqual(production_backorder.check_ids.production_id, production_backorder)
 
+    def test_04_quality_check_on_quantity(self):
+        """ Test Quality Check creation of 'move_line' type.
+        Check that quality checks are created for the final product.
+        Check that quality checks are not created for the components.
+        """
+        self.env['product.product'].browse(self.product_id).tracking = 'serial'
+        quality_point_operation_type, _ = self.env['quality.point'].create([
+            {
+                'picking_type_ids': [Command.link(self.picking_type_id)],
+                'measure_on': 'move_line',
+                'test_type_id': self.env.ref('quality_control.test_type_passfail').id,
+            },
+            {
+                'picking_type_ids': [Command.link(self.picking_type_id)],
+                'measure_on': 'move_line',
+                'product_ids': [Command.link(self.bom.bom_line_ids[0].product_id.id)],
+                'test_type_id': self.env.ref('quality_control.test_type_passfail').id,
+            },
+        ])
+
+        production_form = Form(self.env['mrp.production'])
+        production_form.product_id = self.env['product.product'].browse(self.product_id)
+        production_form.product_qty = 5.0
+        production = production_form.save()
+        production.action_confirm()
+
+        self.assertEqual(len(production.check_ids), 1)
+        self.assertEqual(production.check_ids.point_id, quality_point_operation_type)
+        self.assertEqual(production.check_ids.production_id, production)
+        production.qty_producing = 1
+
+        # Do the quality checks and create backorder
+        action = production.check_quality()
+        quality_wizard = Form(self.env[(action.get('res_model'))].browse(action.get('res_id')).with_context(action['context']))
+        action = quality_wizard.save().do_fail()
+        production.action_generate_serial()
+        for move in production.move_raw_ids:
+            details_operation_form = Form(move, view=self.env.ref('stock.view_stock_move_operations'))
+            with details_operation_form.move_line_ids.edit(0) as ml:
+                ml.lot_id = self.lot_product_product_drawer_drawer_0 if ml.product_id == self.product_product_drawer_drawer else self.lot_product_product_drawer_case_0
+                ml.quantity = 1
+            details_operation_form.save()
+        production.move_raw_ids.picked = True
+        backorder_action = production.button_mark_done()
+        backorder_form = Form(self.env['mrp.production.backorder'].with_context(**backorder_action['context']))
+        backorder_form.save().action_close_mo()
+        self.assertEqual(production.state, 'done')
+
     def test_quality_check_serial_backorder(self):
         """Create a MO for a product tracked by serial number.
         Open the smp wizard, generate all but one serial numbers and create a back order.
@@ -242,3 +291,202 @@ class TestQualityCheck(TestQualityMrpCommon):
 
         # Now check that no new quality check are created.
         self.assertEqual(len(self.mrp_production_qc_test1.check_ids), 1)
+
+    def test_manufacture_picking_type_with_product_categ_in_qp(self):
+        """Create a quality point of type measure on'operation' with the manufacturing
+        picking type and product category set, and verify that the quality check
+        is correctly created.
+        """
+        qp = self.env['quality.point'].create({
+            'product_category_ids': [Command.link(self.bom.product_tmpl_id.categ_id.id)],
+            'picking_type_ids': [Command.link(self.picking_type_id)],
+            'measure_on': 'operation',
+            'test_type_id': self.env.ref('quality_control.test_type_passfail').id,
+        })
+        production = self.env['mrp.production'].create({
+            'product_id': self.product.id,
+            'product_qty': 20,
+            'move_raw_ids': [
+                Command.create({
+                    'product_id': self.product_3.id,
+                    'product_uom_qty': 10,
+                })
+            ],
+        })
+        production.action_confirm()
+        self.assertEqual(production.state, 'confirmed')
+        self.assertEqual(len(production.check_ids), 1)
+        self.assertEqual(production.check_ids.point_id, qp)
+        production.check_ids.do_pass()
+        self.assertEqual(production.check_ids.quality_state, 'pass')
+
+    def test_failing_sn_product(self):
+        """Test that a manufacturing order with a serial-numbered product
+        in multiple quantity can fail and be sent to the failure location.
+        """
+        self.product.tracking = 'serial'
+        self.product.bom_ids.bom_line_ids.product_id.tracking = 'none'
+        self.env['quality.point'].create({
+            'product_ids': [Command.link(self.product.id)],
+            'picking_type_ids': [Command.link(self.picking_type_id)],
+            'measure_on': 'move_line',
+            'test_type_id': self.env.ref('quality_control.test_type_passfail').id,
+            'failure_location_ids': [Command.link(self.failure_location.id)],
+        })
+        mo = self.env['mrp.production'].create({
+            'product_id': self.product.id,
+            'product_qty': 2.0,
+        })
+        mo.action_confirm()
+        mo.action_generate_serial()
+        self.assertEqual(len(mo.check_ids), 1)
+        action = mo.check_ids.action_open_quality_check_wizard()
+        wizard = self.env[action['res_model']].with_context(action['context']).create({})
+        action = wizard.do_fail()
+        wizard = self.env[action['res_model']].with_context(action['context']).browse(action['res_id'])
+        wizard.failure_location_id = self.failure_location.id
+        wizard.confirm_fail()
+        self.assertEqual(mo.check_ids.quality_state, 'fail')
+        mo.move_raw_ids.picked = True
+        # validate the MO and create a backorder
+        action = mo.button_mark_done()
+        backorder_form = Form(self.env[action['res_model']].with_context(**action['context']))
+        backorder = backorder_form.save().action_backorder()
+        self.assertEqual(mo.state, 'done')
+        # validate the backorder and pass the QC
+        backorder = mo.procurement_group_id.mrp_production_ids[1]
+        backorder.action_generate_serial()
+        self.assertEqual(len(backorder.check_ids), 1)
+        backorder.check_ids.do_pass()
+        self.assertEqual(backorder.check_ids.quality_state, 'pass')
+        backorder.move_raw_ids.picked = True
+        backorder.button_mark_done()
+        self.assertEqual(backorder.state, 'done')
+
+    def test_procure_method_with_mto_and_failure_location(self):
+        """Create a delivery picking with an MTO product and a quality point that has a failure location.
+        Ensure that the move is switched to 'make_to_stock' when the quality check fails,
+        as the destination location differs from the failure location.
+        """
+        # Set the product's routes to MTO and Manufacture.
+        mto_route = self.env.ref('stock.route_warehouse0_mto')
+        mto_route.active = True
+        manufacture_route = self.env['stock.route'].search([('name', '=', 'Manufacture')])
+        product = self.bom.product_tmpl_id.product_variant_ids[0]
+        product.route_ids = [Command.set([mto_route.id, manufacture_route.id])]
+        (product | self.bom.bom_line_ids.product_id).tracking = 'none'
+        # Create a quality point for the product with a failure location.
+        qcp = self.env['quality.point'].create({
+            'product_ids': [Command.link(product.id)],
+            'picking_type_ids': [Command.link(self.picking_type_id)],
+            'measure_on': 'move_line',
+            'test_type_id': self.env.ref('quality_control.test_type_passfail').id,
+            'failure_location_ids': [Command.link(self.failure_location.id)],
+        })
+        # Create a delivery picking with the MTO product.
+        stock_location = self.env.ref('stock.stock_location_stock')
+        customer_location = self.env.ref('stock.stock_location_customers')
+        picking_type_out = self.env.ref('stock.picking_type_out')
+        picking = self.env['stock.picking'].create({
+            'picking_type_id': picking_type_out.id,
+            'location_id': stock_location.id,
+            'location_dest_id': customer_location.id,
+            'move_ids': [Command.create({
+                'name': product.name,
+                'product_id': product.id,
+                'product_uom_qty': 10.0,
+                'product_uom': product.uom_id.id,
+                'location_id': stock_location.id,
+                'location_dest_id': customer_location.id,
+                'procure_method': 'make_to_order',
+            })],
+        })
+        picking.action_confirm()
+        # The move should be in 'waiting' state and have the procurement method set to 'make_to_order'
+        self.assertEqual(picking.move_ids.state, 'waiting')
+        self.assertEqual(picking.move_ids.procure_method, 'make_to_order')
+        # Search for the manufacturing order created from the picking
+        mo = self.env['mrp.production'].search([('product_id', '=', product.id)], limit=1)
+        self.assertTrue(mo, "No manufacturing order created for the MTO product.")
+        mo.qty_producing = 10
+        # Fail 10 units from the MO
+        action = mo.check_ids.action_open_quality_check_wizard()
+        wizard = self.env[action['res_model']].with_context(action['context']).create({
+            'qty_failed': 10,
+            'failure_location_id': qcp.failure_location_ids.id,
+        })
+        wizard.confirm_fail()
+        # validate the MO
+        mo.move_raw_ids.picked = True
+        mo.button_mark_done()
+        self.assertEqual(mo.state, 'done')
+        # Check that the move is switched to 'make_to_stock' and the picking state is 'confirmed'.
+        self.assertEqual(mo.finished_move_line_ids.location_dest_id.ids, qcp.failure_location_ids.ids)
+        self.assertEqual(picking.move_ids.procure_method, 'make_to_stock')
+        self.assertEqual(picking.state, 'confirmed')
+
+        # Test with partial fail
+        picking_2 = self.env['stock.picking'].create({
+            'picking_type_id': picking_type_out.id,
+            'location_id': stock_location.id,
+            'location_dest_id': customer_location.id,
+            'move_ids': [Command.create({
+                'name': 'Partial Fail Product',
+                'product_id': product.id,
+                'product_uom_qty': 10.0,
+                'product_uom': product.uom_id.id,
+                'location_id': stock_location.id,
+                'location_dest_id': customer_location.id,
+                'procure_method': 'make_to_order',
+            })],
+        })
+        picking_2.action_confirm()
+        # Search for the manufacturing order created from the picking
+        mo_2 = self.env['mrp.production'].search([('product_id', '=', product.id)], limit=1)
+        self.assertTrue(mo_2, "No manufacturing order created for the MTO product.")
+        mo_2.qty_producing = 10
+        # Fail only 5 units from the MO
+        action = mo_2.check_ids.action_open_quality_check_wizard()
+        wizard = self.env[action['res_model']].with_context(action['context']).create({
+            'qty_failed': 5,
+            'failure_location_id': qcp.failure_location_ids.id,
+        })
+        wizard.confirm_fail()
+        # validate the MO
+        mo_2.move_raw_ids.picked = True
+        mo_2.button_mark_done()
+        self.assertEqual(mo_2.state, 'done')
+        # Check that the move is not switched to 'make_to_stock'
+        self.assertEqual(mo_2.finished_move_line_ids.location_dest_id.ids, qcp.failure_location_ids.ids)
+        self.assertEqual(picking_2.move_ids.procure_method, 'make_to_order')
+
+    def test_merge_mo_unlinks_cancelled_mo_quality_checks(self):
+        """Test quality checks of the source MOs unlinks after a merge."""
+        quality_point = self.env['quality.point'].create({
+            'product_ids': [Command.link(self.product.id)],
+            'picking_type_ids': [Command.link(self.picking_type_id)],
+        })
+        productions = self.env['mrp.production'].create([{
+            'product_id': self.product.id,
+            'bom_id': self.bom.id,
+            'product_qty': 1,
+            'product_uom_id': self.product.uom_id.id,
+            'picking_type_id': self.picking_type_id,
+        }, {
+            'product_id': self.product.id,
+            'bom_id': self.bom.id,
+            'product_qty': 2,
+            'product_uom_id': self.product.uom_id.id,
+            'picking_type_id': self.picking_type_id,
+        }])
+        productions.action_confirm()
+        source_checks = productions.check_ids
+        self.assertEqual(len(source_checks), 2)
+
+        action = productions.action_merge()
+        merged_production = self.env['mrp.production'].browse(action['res_id'])
+
+        self.assertEqual(productions.mapped('state'), ['cancel', 'cancel'])
+        self.assertFalse(source_checks.exists())
+        self.assertEqual(merged_production.product_qty, 3)
+        self.assertEqual(merged_production.check_ids.point_id, quality_point)

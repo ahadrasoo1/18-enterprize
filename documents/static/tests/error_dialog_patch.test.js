@@ -1,6 +1,6 @@
 import { defineMailModels } from "@mail/../tests/mail_test_helpers";
 import { expect, test } from "@odoo/hoot";
-import { animationFrame } from "@odoo/hoot-mock";
+import { animationFrame, runAllTimers } from "@odoo/hoot-mock";
 import { EventBus } from "@odoo/owl";
 import {
     contains,
@@ -35,15 +35,18 @@ test("Shareable error dialog", async () => {
 
     mockService("file_upload", {
         bus: _bus,
-        upload: (route, files, params = {}) => {
+        upload: (route) => {
             if (route === "/documents/upload_traceback") {
                 _bus.trigger("FILE_UPLOAD_LOADED", {
-                    upload: { data: new FormData(), xhr: { status : 200, response: '["test url"]' } }
+                    upload: {
+                        data: new FormData(),
+                        xhr: { status: 200, response: '["test url"]' },
+                    },
                 });
                 expect.step("Upload traceback");
             }
         },
-    })
+    });
 
     const error = makeServerError({
         subType: "Odoo Client Error",
@@ -72,6 +75,84 @@ test("Shareable error dialog", async () => {
         "test url",
         "Success notification",
     ]);
+    expect(".modal-footer .o_field_CopyClipboardChar").toHaveCount(1);
+    expect(".modal-footer .o_field_CopyClipboardChar").toHaveText("test url");
+    await contains(".o_clipboard_button").click();
+    await animationFrame();
+    expect.verifySteps(["test url"]);
+});
+
+test("Multiple error dialogs", async () => {
+    expect.errors(3);
+    const _bus = new EventBus();
+    patchWithCleanup(browser.navigator.clipboard, {
+        async writeText(text) {
+            expect.step(text);
+        },
+    });
+
+    mockService("notification", {
+        add: (message, options) => {
+            expect(message).toBe("The document URL has been copied to your clipboard.");
+            expect(options).toEqual({ type: "success" });
+            expect.step("Success notification");
+        },
+    });
+
+    mockService("file_upload", {
+        bus: _bus,
+        upload: (route) => {
+            if (route === "/documents/upload_traceback") {
+                _bus.trigger("FILE_UPLOAD_LOADED", {
+                    upload: {
+                        data: new FormData(),
+                        xhr: { status: 200, response: '["test url"]' },
+                    },
+                });
+                expect.step("Upload traceback");
+            }
+        },
+    });
+
+    const error1 = makeServerError({
+        subType: "Odoo Client Error",
+        message: "Message 1",
+        errorName: "client error",
+    });
+    const error2 = makeServerError({
+        subType: "Odoo Client Error",
+        message: "Message 2",
+        errorName: "client error",
+    });
+    const error3 = makeServerError({
+        subType: "Odoo Client Error",
+        message: "Message 3",
+        errorName: "client error",
+    });
+
+    await mountWithCleanup(MainComponentsContainer);
+    onRpc("documents.document", "can_upload_traceback", () => {
+        expect.step("Check access rights");
+        return true;
+    });
+
+    Promise.reject(error1);
+    await runAllTimers();
+    await animationFrame();
+    expect.verifyErrors(["Message 1"]);
+    Promise.reject(error2);
+    await runAllTimers();
+    await animationFrame();
+    expect.verifyErrors(["Message 2"]);
+    Promise.reject(error3);
+    await runAllTimers();
+    await animationFrame();
+    expect.verifyErrors(["Message 3"]);
+    expect.verifySteps(["Check access rights", "Check access rights", "Check access rights"]);
+    await contains(".modal-footer button:contains(Share):eq(2)").click();
+    expect(".modal-footer button:contains(Share):eq(2)").not.toBeEnabled();
+    await animationFrame();
+    expect.verifySteps(["Upload traceback", "test url", "Success notification"]);
     expect(".modal-footer .o_field_CopyClipboardChar").toHaveCount(1);
     expect(".modal-footer .o_field_CopyClipboardChar").toHaveText("test url");
     await contains(".o_clipboard_button").click();

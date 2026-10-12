@@ -1,23 +1,26 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* delivery_bpost
-# 
+# * delivery_bpost
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+#
+# Weblate <noreply-mt-weblate@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Japanese (https://app.transifex.com/odoo/teams/41243/ja/)\n"
+"POT-Creation-Date: 2026-04-17 18:45+0000\n"
+"PO-Revision-Date: 2026-05-17 05:59+0000\n"
+"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-18/"
+"delivery_bpost/ja/>\n"
+"Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: ja\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 5.17\n"
 
 #. module: delivery_bpost
 #: model:ir.model.fields.selection,name:delivery_bpost.selection__delivery_carrier__bpost_label_stock_type__a4
@@ -127,6 +130,11 @@ msgid "Domestic"
 msgstr "国内"
 
 #. module: delivery_bpost
+#: model_terms:ir.ui.view,arch_db:delivery_bpost.bpost_shipping_request
+msgid "EUR"
+msgstr "EUR"
+
+#. module: delivery_bpost
 #: model:ir.model.fields.selection,name:delivery_bpost.selection__delivery_carrier__bpost_shipment_type__gift
 msgid "GIFT"
 msgstr "プレゼント"
@@ -187,6 +195,22 @@ msgstr "パスフレーズ"
 #: code:addons/delivery_bpost/models/bpost_request.py:0
 msgid "Please provide at least one item to ship."
 msgstr "船に少なくとも一つのアイテムを提供してください。"
+
+#. module: delivery_bpost
+#. odoo-python
+#: code:addons/delivery_bpost/models/bpost_request.py:0
+msgid ""
+"Product [%s] is missing a Country of Origin, which is required for "
+"international shipping."
+msgstr "プロダクト [%s] は原産国が未設定です。これは国際配送に必須の情報です。"
+
+#. module: delivery_bpost
+#. odoo-python
+#: code:addons/delivery_bpost/models/bpost_request.py:0
+msgid ""
+"Product [%s] is missing an HS Code, which is required for international "
+"shipping."
+msgstr "プロダクト [%s] には、国際配送に必要なHSコードが未設定です。"
 
 #. module: delivery_bpost
 #: model:ir.model.fields,field_description:delivery_bpost.field_delivery_carrier__delivery_type
@@ -252,7 +276,8 @@ msgstr "Bpost配送サービスが応答しません。後ほど再度お試し�
 #. odoo-python
 #: code:addons/delivery_bpost/models/bpost_request.py:0
 msgid ""
-"The address of your company/warehouse is incomplete or wrong (Missing field(s):  \n"
+"The address of your company/warehouse is incomplete or wrong (Missing "
+"field(s):  \n"
 " %s)"
 msgstr ""
 "会社/倉庫の住所が不完全か間違っています(不明なフィールド:\n"
@@ -270,7 +295,8 @@ msgstr "プロダクトが全てサービスであるため、推定送料を計
 #. odoo-python
 #: code:addons/delivery_bpost/models/bpost_request.py:0
 msgid ""
-"The estimated shipping price cannot be computed because the weight is missing for the following product(s): \n"
+"The estimated shipping price cannot be computed because the weight is "
+"missing for the following product(s): \n"
 " %s"
 msgstr ""
 "以下のプロダクトの重量がないため、見積送料を計算できません: \n"
@@ -368,7 +394,9 @@ msgstr "bpostデフォルト梱包タイプ"
 msgid ""
 "bpost Domestic is used only to ship inside Belgium. Please change the "
 "delivery method into bpost International."
-msgstr "bpost国内はベルギー国内への発送にのみ使用されます。配送方法をbpost 国際に変更して下さい。"
+msgstr ""
+"bpost国内はベルギー国内への発送にのみ使用されます。配送方法をbpost 国際に変更"
+"して下さい。"
 
 #. module: delivery_bpost
 #. odoo-python
@@ -376,7 +404,9 @@ msgstr "bpost国内はベルギー国内への発送にのみ使用されます�
 msgid ""
 "bpost International is used only to ship outside Belgium. Please change the "
 "delivery method into bpost Domestic."
-msgstr "bpost国際はベルギー国外への発送にのみ使用されます。配送方法をbpost 国内に変更して下さい。"
+msgstr ""
+"bpost国際はベルギー国外への発送にのみ使用されます。配送方法をbpost 国内に変更"
+"して下さい。"
 
 #. module: delivery_bpost
 #: model_terms:ir.ui.view,arch_db:delivery_bpost.res_config_settings_view_form_sale

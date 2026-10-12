@@ -152,9 +152,7 @@ options.registry.WebsiteFormEditor.include({
         if (value === "website_studio.form_more_model" && !previewMode) {
             const modelId = await this._selectModel();
             if (modelId) {
-                let shouldRerender = false;
                 if (!this.models.find((m) => m.id === modelId)) {
-                    shouldRerender = true;
                     const model = (
                         await this.orm.webRead("ir.model", [modelId], {
                             specification: IR_MODEL_SPEC,
@@ -171,11 +169,9 @@ options.registry.WebsiteFormEditor.include({
                     this._makeSelectAction();
                 }
                 const proms = [this._applyFormModel(modelId)];
-                if (shouldRerender) {
-                    // The synchronous part of this one should be triggered
-                    // after the synchronous part of applyFormModel
-                    proms.push(this._rerenderXML());
-                }
+                // The synchronous part of this one should be triggered
+                // after the synchronous part of applyFormModel
+                proms.push(this._rerenderXML());
                 return Promise.all(proms);
             }
             return;

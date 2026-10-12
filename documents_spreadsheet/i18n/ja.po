@@ -1,29 +1,39 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* documents_spreadsheet
-# 
+# * documents_spreadsheet
+#
 # Translators:
-# Wil Odoo, 2024
-# 
+# Wil Odoo, 2025
+# Junko Augias, 2025
+#
+# Weblate <noreply-mt-weblate@weblate.org>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-26 09:15+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Japanese (https://app.transifex.com/odoo/teams/41243/ja/)\n"
+"POT-Creation-Date: 2025-12-29 18:47+0000\n"
+"PO-Revision-Date: 2025-11-20 21:02+0000\n"
+"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-18/"
+"documents_spreadsheet/ja/>\n"
+"Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: ja\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 5.12.2\n"
 
 #. module: documents_spreadsheet
 #. odoo-python
 #: code:addons/documents_spreadsheet/wizard/save_spreadsheet_template.py:0
 msgid "\"%s\" saved as template"
 msgstr "\"%s\" 個がテンプレートとして保存されました"
+
+#. module: documents_spreadsheet
+#. odoo-python
+#: code:addons/documents_spreadsheet/models/documents_document.py:0
+msgid "%(folder)s is used by %(company)s"
+msgstr "%(folder)s は %(company)s に使用されています"
 
 #. module: documents_spreadsheet
 #. odoo-python
@@ -45,13 +55,27 @@ msgstr "このスプレッドシートとユーザーの組み合わせはすで
 #. module: documents_spreadsheet
 #: model:ir.model.constraint,message:documents_spreadsheet.constraint_documents_document_frozen_spreadsheet_access_via_link_access_internal
 msgid "A frozen spreadsheet can not be editable"
-msgstr ""
+msgstr "保護されたスプレッドシートは編集できません"
+
+#. module: documents_spreadsheet
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/demo/files/pipeline_dashboard.json:0
+msgid "Actuals vs Target"
+msgstr "実績 vs 目標"
+
+#. module: documents_spreadsheet
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/demo/files/pipeline_dashboard.json:0
+msgid "Actuals vs Target status"
+msgstr "実績 vs 目標ステータス"
 
 #. module: documents_spreadsheet
 #: model_terms:ir.ui.view,arch_db:documents_spreadsheet.save_spreadsheet_template_view_form
 msgid ""
 "Any user will be able to create a new spreadsheet based on this template."
-msgstr "すべてのユーザーは、このテンプレートに基づいて新しいスプレッドシートを作成できます。"
+msgstr ""
+"すべてのユーザーは、このテンプレートに基づいて新しいスプレッドシートを作成で"
+"きます。"
 
 #. module: documents_spreadsheet
 #: model_terms:ir.ui.view,arch_db:documents_spreadsheet.save_spreadsheet_template_view_form
@@ -76,7 +100,7 @@ msgstr "コンフィグ設定"
 #. module: documents_spreadsheet
 #: model_terms:ir.ui.view,arch_db:documents_spreadsheet.save_spreadsheet_template_view_form
 msgid "Confirm"
-msgstr "確認"
+msgstr "確定"
 
 #. module: documents_spreadsheet
 #: model:ir.actions.act_window,name:documents_spreadsheet.spreadsheet_contributor_action
@@ -132,6 +156,13 @@ msgid "Display Name"
 msgstr "表示名"
 
 #. module: documents_spreadsheet
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_document__display_thumbnail
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_save_spreadsheet_template__display_thumbnail
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__display_thumbnail
+msgid "Display Thumbnail"
+msgstr "サムネイルを表示"
+
+#. module: documents_spreadsheet
 #: model:ir.model,name:documents_spreadsheet.model_documents_document
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_cell_thread__document_id
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_contributor__document_id
@@ -141,13 +172,13 @@ msgstr "ドキュメント"
 #. module: documents_spreadsheet
 #: model:ir.model,name:documents_spreadsheet.model_documents_access
 msgid "Document / Partner"
-msgstr ""
+msgstr "ドキュメント / 仕入先"
 
 #. module: documents_spreadsheet
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_res_company__document_spreadsheet_folder_id
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_res_config_settings__document_spreadsheet_folder_id
 msgid "Document Spreadsheet Folder"
-msgstr ""
+msgstr "ドキュメントスプレッドシートフォルダ"
 
 #. module: documents_spreadsheet
 #: model_terms:ir.ui.view,arch_db:documents_spreadsheet.spreadsheet_template_view_tree
@@ -172,7 +203,14 @@ msgid ""
 "Excel files cannot be previewed or edited directly in Odoo. Opening your "
 "file with Odoo Spreadsheet will allow you to do so."
 msgstr ""
-"ExcelファイルはOdooで直接プレビューしたり編集したりすることはできません。Odoo スプレッドシートでファイルを開くと編集が可能になります。"
+"ExcelファイルはOdooで直接プレビューしたり編集したりすることはできません。"
+"Odoo スプレッドシートでファイルを開くと編集が可能になります。"
+
+#. module: documents_spreadsheet
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/demo/files/pipeline_dashboard.json:0
+msgid "Expected Revenue by Stage"
+msgstr "ステージ別の見込収益"
 
 #. module: documents_spreadsheet
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__file_name
@@ -184,35 +222,40 @@ msgstr "ファイル名"
 #: code:addons/documents_spreadsheet/static/src/bundle/actions/spreadsheet_freeze_and_share/spreadsheet_freeze_and_share.xml:0
 #: code:addons/documents_spreadsheet/static/src/documents_control_panel/documents_control_panel.xml:0
 msgid "Freeze and share"
-msgstr ""
+msgstr "保護して共有"
 
 #. module: documents_spreadsheet
 #: model:ir.model.fields.selection,name:documents_spreadsheet.selection__documents_document__handler__frozen_folder
 msgid "Frozen Folder"
-msgstr ""
+msgstr "保護されたフォルダ"
 
 #. module: documents_spreadsheet
 #: model:ir.model.fields.selection,name:documents_spreadsheet.selection__documents_document__handler__frozen_spreadsheet
 msgid "Frozen Spreadsheet"
-msgstr ""
+msgstr "保護されたスプレッドシート"
 
 #. module: documents_spreadsheet
 #. odoo-python
 #: code:addons/documents_spreadsheet/models/documents_access.py:0
 msgid "Frozen Spreadsheets can not be editable."
-msgstr ""
+msgstr "保護されたスプレッドシートは編集できません"
 
 #. module: documents_spreadsheet
 #. odoo-python
 #: code:addons/documents_spreadsheet/models/documents_document.py:0
 msgid "Frozen at %(date)s: %(name)s"
-msgstr ""
+msgstr "保護日付 %(date)s: %(name)s"
 
 #. module: documents_spreadsheet
 #. odoo-python
 #: code:addons/documents_spreadsheet/models/documents_document.py:0
 msgid "Frozen spreadsheets"
-msgstr ""
+msgstr "保護されたスプレッドシート"
+
+#. module: documents_spreadsheet
+#: model:ir.model,name:documents_spreadsheet.model_ir_http
+msgid "HTTP Routing"
+msgstr "HTTPルーティング"
 
 #. module: documents_spreadsheet
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_document__handler
@@ -225,6 +268,12 @@ msgstr "ハンドラ"
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__id
 msgid "ID"
 msgstr "ID"
+
+#. module: documents_spreadsheet
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/static/src/documents_control_panel/documents_control_panel.xml:0
+msgid "Insert in spreadsheet"
+msgstr "スプレッドシートに挿入"
 
 #. module: documents_spreadsheet
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_save_spreadsheet_template__write_uid
@@ -244,6 +293,12 @@ msgstr "最終更新日"
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_contributor__last_update_date
 msgid "Last update date"
 msgstr "最終更新日時"
+
+#. module: documents_spreadsheet
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/demo/files/pipeline_dashboard.json:0
+msgid "Lost Opportunities by Stage"
+msgstr "ステージごとの失注案件"
 
 #. module: documents_spreadsheet
 #: model_terms:ir.ui.view,arch_db:documents_spreadsheet.spreadsheet_template_view_tree
@@ -276,7 +331,13 @@ msgstr "ドキュメントで作成した新しいスプレッドシート"
 #. module: documents_spreadsheet
 #. odoo-javascript
 #. odoo-python
-#: code:addons/documents_spreadsheet/models/spreadsheet_template.py:0
+#: code:addons/documents_spreadsheet/models/documents_document.py:0
+#: code:addons/documents_spreadsheet/static/src/bundle/actions/spreadsheet_action.js:0
+msgid "New spreadsheet created in My Drive"
+msgstr "新しいスプレッドシートがマイドライブに作成されました"
+
+#. module: documents_spreadsheet
+#. odoo-javascript
 #: code:addons/documents_spreadsheet/static/src/bundle/actions/spreadsheet_template/spreadsheet_template_action.js:0
 msgid "New spreadsheet template created"
 msgstr "作成された新しいスプレッドシートのテンプレート"
@@ -286,6 +347,18 @@ msgstr "作成された新しいスプレッドシートのテンプレート"
 #: code:addons/documents_spreadsheet/static/src/documents_view/documents_spreadsheet_controller_mixin.js:0
 msgid "Open with Odoo Spreadsheet"
 msgstr "Odooスプレッドシートで開く"
+
+#. module: documents_spreadsheet
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/demo/files/pipeline_dashboard.json:0
+msgid "Opportunities by Stage"
+msgstr "ステージごとの案件"
+
+#. module: documents_spreadsheet
+#. odoo-python
+#: code:addons/documents_spreadsheet/models/documents_document.py:0
+msgid "Portal users cannot be the owner of a spreadsheet."
+msgstr "ポータルユーザーは、スプレッドシートの所有者になることはできません。"
 
 #. module: documents_spreadsheet
 #. odoo-javascript
@@ -308,7 +381,7 @@ msgstr "テンプレートとして保存"
 #. odoo-javascript
 #: code:addons/documents_spreadsheet/static/src/documents_control_panel/documents_control_panel.js:0
 msgid "Select one and only one spreadsheet"
-msgstr ""
+msgstr "1つのスプレッドシートのみを選択して下さい"
 
 #. module: documents_spreadsheet
 #. odoo-javascript
@@ -353,7 +426,7 @@ msgstr "スプレッドシートデータ"
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_save_spreadsheet_template__spreadsheet_file_name
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__spreadsheet_file_name
 msgid "Spreadsheet File Name"
-msgstr ""
+msgstr "スプレッドシートファイル名"
 
 #. module: documents_spreadsheet
 #: model_terms:ir.ui.view,arch_db:documents_spreadsheet.spreadsheet_document_view_kanban
@@ -408,7 +481,9 @@ msgstr "スプレッドシートファイル"
 msgid ""
 "Spreadsheet files cannot be handled from the Trash. Would you like to "
 "restore this document?"
-msgstr "スプレッドシートファイルはゴミ箱からは操作できません。このドキュメントを復元しますか？"
+msgstr ""
+"スプレッドシートファイルはゴミ箱からは操作できません。このドキュメントを復元"
+"しますか？"
 
 #. module: documents_spreadsheet
 #. odoo-python
@@ -423,6 +498,8 @@ msgstr "スプレッドシート"
 #: code:addons/documents_spreadsheet/models/documents_access.py:0
 msgid "Spreadsheets can not be shared in edit mode to non-internal users."
 msgstr ""
+"スプレッドシートは、社外のユーザに対して編集モードで共有することはできませ"
+"ん。"
 
 #. module: documents_spreadsheet
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_cell_thread__template_id
@@ -437,6 +514,26 @@ msgstr "テンプレート名"
 #. module: documents_spreadsheet
 #. odoo-python
 #: code:addons/documents_spreadsheet/models/documents_document.py:0
+msgid ""
+"The company for a folder cannot be changed if it is already used as the "
+"spreadsheet workspace for at least one other company: %s"
+msgstr ""
+"少なくとも1つの他の会社でスプレッドシートのワークスペースとしてすでに使用され"
+"ている場合、フォルダの会社を変更することはできません: %s"
+
+#. module: documents_spreadsheet
+#. odoo-python
+#: code:addons/documents_spreadsheet/models/res_company.py:0
+msgid ""
+"The company of %(folder)s should either be undefined or set to %(company)s. "
+"Otherwise, it is not possible to link the workspace to the company."
+msgstr ""
+"%(folder)s の会社は、未定義にするか、または%(company)s に設定する必要がありま"
+"す。そうでない場合、ワークスペースを会社にリンクすることができません。"
+
+#. module: documents_spreadsheet
+#. odoo-python
+#: code:addons/documents_spreadsheet/models/documents_document.py:0
 msgid "The file is not a xlsx file"
 msgstr "このファイルは xlsxファイルではありません。"
 
@@ -446,7 +543,7 @@ msgstr "このファイルは xlsxファイルではありません。"
 #: code:addons/documents_spreadsheet/static/src/documents_permission_panel/documents_member_invite.js:0
 #: code:addons/documents_spreadsheet/static/src/documents_permission_panel/documents_partner_access.js:0
 msgid "The frozen spreadsheets are readonly."
-msgstr ""
+msgstr "保護されたスプレッドシートは読取専用です。"
 
 #. module: documents_spreadsheet
 #. odoo-python
@@ -458,9 +555,11 @@ msgstr "アクセスしようとしているスプレッドシートは存在し
 #. odoo-javascript
 #: code:addons/documents_spreadsheet/static/src/documents_permission_panel/documents_access_settings.js:0
 msgid ""
-"The spreadsheets can not be shared in edit mode with a link, change Internal"
-" to give write access."
+"The spreadsheets can not be shared in edit mode with a link, change Internal "
+"to give write access."
 msgstr ""
+"スプレッドシートは、リンクでは編集モードで共有できません。変更するには、内部"
+"を変更して書込み権限を与えます。"
 
 #. module: documents_spreadsheet
 #. odoo-python
@@ -478,6 +577,8 @@ msgstr "xlsxファイルが大きすぎます。"
 #: model_terms:ir.ui.view,arch_db:documents_spreadsheet.documents_error_live_data
 msgid "This spreadsheet contains live data, only internal users can view it."
 msgstr ""
+"このスプレッドシートにはライブデータが含まれており、社内ユーザのみが閲覧でき"
+"ます。"
 
 #. module: documents_spreadsheet
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_document__thumbnail
@@ -490,6 +591,8 @@ msgstr "サムネイル"
 #: model:ir.model.constraint,message:documents_spreadsheet.constraint_documents_document_spreadsheet_access_via_link
 msgid "To share a spreadsheet in edit mode, add the user in the accesses"
 msgstr ""
+"編集モードのスプレッドシートを共有するには、アクセス権のあるユーザを追加しま"
+"す。"
 
 #. module: documents_spreadsheet
 #. odoo-javascript
@@ -524,24 +627,36 @@ msgstr "ワークスペース"
 #. module: documents_spreadsheet
 #. odoo-python
 #: code:addons/documents_spreadsheet/models/documents_document.py:0
+msgid "You are not allowed to freeze spreadsheets in Company"
+msgstr "会社でスプレッドシートをフリーズすることは許可されていません。"
+
+#. module: documents_spreadsheet
+#. odoo-python
+#: code:addons/documents_spreadsheet/models/documents_document.py:0
 msgid "You can not edit a frozen spreadsheet"
-msgstr ""
+msgstr "保護されたスプレッドシートは編集することはできません"
 
 #. module: documents_spreadsheet
 #. odoo-javascript
 #: code:addons/documents_spreadsheet/static/src/bundle/actions/spreadsheet_action.js:0
 msgid "You can not freeze a frozen spreadsheet"
-msgstr ""
+msgstr "保護されたスプレッドシートを保護することはできません"
 
 #. module: documents_spreadsheet
 #. odoo-javascript
 #: code:addons/documents_spreadsheet/static/src/documents_permission_panel/documents_member_invite.js:0
 #: code:addons/documents_spreadsheet/static/src/documents_permission_panel/documents_partner_access.js:0
 msgid "You can not share spreadsheet in edit mode to non-internal user."
-msgstr ""
+msgstr "編集モードのスプレッドシートは、社外ユーザと共有できません。"
 
 #. module: documents_spreadsheet
 #. odoo-python
 #: code:addons/documents_spreadsheet/models/documents_document.py:0
 msgid "You don't have access to this document"
 msgstr "このドキュメントにアクセスできません。"
+
+#. module: documents_spreadsheet
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/demo/files/pipeline_dashboard.json:0
+msgid "of target"
+msgstr "ターゲット"

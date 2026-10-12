@@ -571,6 +571,9 @@ class CAMT:
     _get_credit_debit_indicator = partial(_generic_get,
         xpath='ns:CdtDbtInd/text()')
 
+    _get_charges_credit_debit_indicator = partial(_generic_get,
+        xpath='ns:Chrgs/ns:Rcrd/ns:CdtDbtInd/text()')
+
     _get_transaction_date = partial(_generic_get,
         xpath=('ns:ValDt/ns:Dt/text()'
             '| ns:BookgDt/ns:Dt/text()'
@@ -634,21 +637,19 @@ class CAMT:
                     return float(value), currency_name
             return None, None
 
-        def get_rate(*entries, target_currency, amount_currency):
+        def get_rate(*entries, target_currency, source_currency=None):
             for entry in entries:
-                source_rate = get_value_and_currency_name(entry, CAMT._source_rate_getters, target_currency=target_currency)[0]
-                target_rate = get_value_and_currency_name(entry, CAMT._target_rate_getters, target_currency=target_currency)[0]
+                source_rate = get_value_and_currency_name(entry, CAMT._source_rate_getters)[0]
+                target_rate = get_value_and_currency_name(entry, CAMT._target_rate_getters)[0]
 
                 rate = source_rate or target_rate
-                # According to the camt.053 Swiss Payment Standards, the exchange rate should be divided by 100 if the
-                # currency is in YEN, SEK, DKK or NOK.
-                if amount_currency in ['SEK', 'DKK', 'YEN', 'NOK'] and target_currency == 'CHF':
-                    rate = rate and rate / 100
-                else:
-                    if not source_rate and target_rate:
-                        rate = 1 / rate
-
                 if rate:
+                    # According to the camt.053 Swiss Payment Standards, the exchange rate should be divided by 100 if the
+                    # currency is in YEN, SEK, DKK or NOK.
+                    if target_currency == 'CHF' and source_currency in ('SEK', 'DKK', 'YEN', 'NOK'):
+                        rate /= 100
+                    elif not source_rate:
+                        rate = 1 / rate
                     return rate
             return None
 
@@ -656,7 +657,8 @@ class CAMT:
             for entry in entries:
                 charges = get_value_and_currency_name(entry, CAMT._charges_getters, target_currency=target_currency)[0]
                 if charges:
-                    return charges
+                    sign = -1 if CAMT._get_charges_credit_debit_indicator(entry, namespaces=namespaces) == "DBIT" else 1
+                    return sign * charges
             return None
 
         entry_details = nodes[0]
@@ -678,7 +680,7 @@ class CAMT:
         if not journal_currency or amount_currency_name == journal_currency_name:
             rate = 1.0
         else:
-            rate = get_rate(entry_details, entry, target_currency=journal_currency_name, amount_currency=amount_currency_name)
+            rate = get_rate(entry_details, entry, target_currency=journal_currency_name, source_currency=amount_currency_name)
             entry_amount = entry_details_amount or entry_amount
             if entry_details_amount:
                 entry_amount_in_currency = entry_details_amount_in_currency
@@ -775,9 +777,9 @@ class CAMT:
         subfamily = node.xpath('ns:Domn/ns:Fmly/ns:SubFmlyCd/text()', namespaces=namespaces)
         if code:
             return {'transaction_type': "{code}: {family} ({subfamily})".format(
-                code=codes[code[0].upper()],
-                family=family and codes[family[0].upper()] or '',
-                subfamily=subfamily and codes[subfamily[0].upper()] or '',
+                code=codes.get(code[0].upper(), code[0]),
+                family=family and codes.get(family[0].upper(), family[0]) or '',
+                subfamily=subfamily and codes.get(subfamily[0].upper(), subfamily[0]) or '',
             )}
         return {}
 

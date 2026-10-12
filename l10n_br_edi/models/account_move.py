@@ -191,6 +191,18 @@ class AccountMove(models.Model):
         )
         return super().button_draft()
 
+    def button_cancel(self):
+        # EXTENDS 'account'
+        res = super().button_cancel()
+        self.l10n_br_last_edi_status = "cancelled"
+        return res
+
+    def _get_fields_to_detach(self):
+        # EXTENDS account
+        fields_list = super()._get_fields_to_detach()
+        fields_list.append('l10n_br_edi_xml_attachment_file')
+        return fields_list
+
     def button_request_correction(self):
         return {
             "name": _("Fiscal Document Correction"),
@@ -330,7 +342,7 @@ class AccountMove(models.Model):
                     invoice.l10n_br_last_edi_status = "pending" if invoice.l10n_br_is_service_transaction else "accepted"
                     invoice.l10n_br_access_key = response["key"]
 
-                    self.with_context(no_new_invoice=True).message_post(
+                    invoice.with_context(no_new_invoice=True).message_post(
                         body=_("E-invoice submitted successfully."),
                         attachment_ids=invoice._l10n_br_edi_attachments_from_response(response).ids,
                     )
@@ -387,11 +399,17 @@ class AccountMove(models.Model):
         return tax_calculation_response, tax_calculation_response.pop("header")
 
     def _l10n_br_edi_validate_partner(self, partner):
-        required_fields = ("street", "street2", "zip", "vat")
-        errors = []
-
         if not partner:
             return []
+
+        errors = []
+        requires_minimal_info = (
+            self.l10n_br_is_service_transaction and
+            partner.l10n_br_tax_regime == "individual" and
+            partner.l10n_br_activity_sector == "finalConsumer" and
+            partner.l10n_latam_identification_type_id == self.env.ref("l10n_br.cpf")
+        )
+        required_fields = ("zip",) if requires_minimal_info else ("street", "street2", "zip", "vat")
 
         for field in required_fields:
             if not partner[field]:
@@ -424,7 +442,19 @@ class AccountMove(models.Model):
         return payment_mode
 
     def _l10n_br_log_informative_taxes(self, payload):
-        informative_taxes = payload.get("summary", {}).get("taxImpactHighlights", {}).get("informative", [])
+        skip_icmsDeson = any(
+            td['taxImpact']['accounting'] == 'none' and td['taxType'] == 'icmsDeson'
+            for line in payload.get("lines", [])
+            for td in line.get("taxDetails", [])
+        )
+
+        informative_taxes = []
+        taxes_summary = payload.get("summary", {}).get("taxImpactHighlights", {})
+        for tax_type, taxes in taxes_summary.items():
+            if tax_type == 'informative':
+                informative_taxes += taxes
+            elif skip_icmsDeson:
+                informative_taxes += [tax for tax in taxes if tax['taxType'] == 'icmsDeson']
         # Informative taxes look like: [{"taxType": "aproxtribCity", "tax": 7.8, "subtotalTaxable": 200}, ...]
         # Transform to:
         # - taxType: aproxtribCity, tax: 7.8, subtotalTaxable: 200
@@ -620,9 +650,11 @@ class AccountMove(models.Model):
             return None, str(e)
 
     def _cron_l10n_br_get_invoice_statuses(self, batch_size=10):
-        pending_invoices = self.search([("l10n_br_last_edi_status", "=", "pending")], limit=batch_size)
+        pending_invoices = self.search([("l10n_br_last_edi_status", "=", "pending")], limit=batch_size + 1)
         for invoice in pending_invoices[:batch_size]:
             invoice.button_l10n_br_edi_get_service_invoice()
+            if self._can_commit():
+                self.env.cr.commit()
 
         if len(pending_invoices) > batch_size:
             self.env.ref("l10n_br_edi.ir_cron_l10n_br_edi_check_status")._trigger()

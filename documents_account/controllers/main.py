@@ -1,16 +1,19 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo.http import content_disposition, request, route
-from odoo.tools import str2bool
+from odoo.tools import replace_exceptions, str2bool
 from odoo.addons.documents.controllers.documents import ShareRoute
+from werkzeug.exceptions import BadRequest
 
 
 class AccountShareRoute(ShareRoute):
 
     @route()
-    def documents_content(self, access_token, download=False):
-        if str2bool(download):
-            return super().documents_content(access_token)
+    def documents_content(self, access_token, download=True):
+        with replace_exceptions(ValueError, by=BadRequest):
+            download = str2bool(download)
+        if download:
+            return super().documents_content(access_token, download)
 
         document = self._from_access_token(access_token, skip_log=True)
         is_public = request.env.user._is_public()
@@ -25,4 +28,4 @@ class AccountShareRoute(ShareRoute):
             ]
             return request.make_response(embedded_pdf, headers)
 
-        return super().documents_content(access_token)
+        return super().documents_content(access_token, download)

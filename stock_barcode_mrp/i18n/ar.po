@@ -1,24 +1,25 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* stock_barcode_mrp
-# 
+#
 # Translators:
-# Wil Odoo, 2024
-# Malaz Abuidris <msea@odoo.com>, 2024
-# 
+# Malaz Abuidris <msea@odoo.com>, 2025
+# Wil Odoo, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:28+0000\n"
+"POT-Creation-Date: 2025-12-29 18:49+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Malaz Abuidris <msea@odoo.com>, 2024\n"
+"Last-Translator: Wil Odoo, 2025\n"
 "Language-Team: Arabic (https://app.transifex.com/odoo/teams/41243/ar/)\n"
+"Language: ar\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: ar\n"
-"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
+"&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
 
 #. module: stock_barcode_mrp
 #: model_terms:ir.ui.view,arch_db:stock_barcode_mrp.res_config_settings_view_form
@@ -208,7 +209,7 @@ msgstr "إنتاج الكل "
 #. odoo-javascript
 #: code:addons/stock_barcode_mrp/static/src/components/header.xml:0
 msgid "Producing"
-msgstr ""
+msgstr "ينتج"
 
 #. module: stock_barcode_mrp
 #: model_terms:ir.ui.view,arch_db:stock_barcode_mrp.mrp_product_selector
@@ -250,9 +251,13 @@ msgstr "قم بمسح منتج لتصفية الطلبات. "
 
 #. module: stock_barcode_mrp
 #. odoo-javascript
-#: code:addons/stock_barcode_mrp/static/src/kanban/stock_barcode_kanban_renderer.xml:0
-msgid "Scan an"
-msgstr "مسح"
+#: code:addons/stock_barcode_mrp/static/src/kanban/stock_barcode_kanban_renderer.js:0
+msgid ""
+"Scan an %(bold_start)s order %(bold_end)s or a %(bold_start)s product %"
+"(bold_end)s to filter your records"
+msgstr ""
+"قم بمسح %(bold_start)sطلب%(bold_end)s أو %(bold_start)sمنتج%(bold_end)s "
+"لتصفية سجلاتك "
 
 #. module: stock_barcode_mrp
 #. odoo-javascript
@@ -329,11 +334,14 @@ msgstr "وحدة القياس"
 #. module: stock_barcode_mrp
 #: model:ir.model.fields,help:stock_barcode_mrp.field_stock_move_line__manual_consumption
 msgid ""
-"When activated, then the registration of consumption for that component is recorded manually exclusively.\n"
-"If not activated, and any of the components consumption is edited manually on the manufacturing order, Odoo assumes manual consumption also."
+"When activated, then the registration of consumption for that component is "
+"recorded manually exclusively.\n"
+"If not activated, and any of the components consumption is edited manually "
+"on the manufacturing order, Odoo assumes manual consumption also."
 msgstr ""
 "عندما تكون مفعلة، ثم يتم تسجيل استهلاك ذلك المكون يدوياً فقط. \n"
-"إذا لم تكن مفعلة، ويتم تحرير استهلاك المكونات يدوياً في أمر التصنيع، يفترض أودو الاستهلاك اليدوي أيضاً. "
+"إذا لم تكن مفعلة، ويتم تحرير استهلاك المكونات يدوياً في أمر التصنيع، يفترض "
+"أودو الاستهلاك اليدوي أيضاً. "
 
 #. module: stock_barcode_mrp
 #: model:ir.model,name:stock_barcode_mrp.model_mrp_production_backorder
@@ -343,29 +351,11 @@ msgstr "معالج للتعيين كمنتهي أو إنشاء طلب متأخر
 #. module: stock_barcode_mrp
 #. odoo-javascript
 #: code:addons/stock_barcode_mrp/static/src/models/barcode_mrp_model.js:0
+msgid "You are expected to scan one or more products."
+msgstr "من المتوقع أن تقوم بمسح منتج واحد أو أكثر."
+
+#. module: stock_barcode_mrp
+#. odoo-javascript
+#: code:addons/stock_barcode_mrp/static/src/models/barcode_mrp_model.js:0
 msgid "You can't add the final product of a MO as a byproduct."
 msgstr "لا يمكنك إضافة المنتج النهائي لأمر التصنيع كمنتج ثانوي. "
-
-#. module: stock_barcode_mrp
-#. odoo-javascript
-#: code:addons/stock_barcode_mrp/static/src/kanban/stock_barcode_kanban_renderer.xml:0
-msgid "or a"
-msgstr "أو "
-
-#. module: stock_barcode_mrp
-#. odoo-javascript
-#: code:addons/stock_barcode_mrp/static/src/kanban/stock_barcode_kanban_renderer.xml:0
-msgid "order"
-msgstr ""
-
-#. module: stock_barcode_mrp
-#. odoo-javascript
-#: code:addons/stock_barcode_mrp/static/src/kanban/stock_barcode_kanban_renderer.xml:0
-msgid "product"
-msgstr "المنتج"
-
-#. module: stock_barcode_mrp
-#. odoo-javascript
-#: code:addons/stock_barcode_mrp/static/src/kanban/stock_barcode_kanban_renderer.xml:0
-msgid "to filter your records"
-msgstr ""

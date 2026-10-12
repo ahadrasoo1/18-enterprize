@@ -197,7 +197,7 @@
                                                     <input type="hidden" name="max_capacity" t-att-value="max_capacity"/>
                                                     <label class="mb-2 o_editable" for="resourceCapacity">Number of people</label>
                                                     <select class="form-select cursor-pointer" name="resourceCapacity" id="resourceCapacity">
-                                                        <option value="1" t-att-selected="not asked_capacity and 'selected'" data-placeholder-option="True">-</option>
+                                                        <option value="0" t-att-selected="not asked_capacity and 'selected'" data-placeholder-option="True">-</option>
                                                         <option t-foreach="range(1, max_capacity + 1)" t-as="counter"
                                                             t-att-value="counter" t-att-selected="counter == asked_capacity and 'selected'">
                                                             <t t-out="counter"/>
@@ -230,6 +230,8 @@
                             <t t-set="isDate" t-value="True"/>
                             <t t-set="staff_user" t-value="user_selected"/>
                             <t t-set="resource" t-value="resource_selected"/>
+                            <t t-set="selectionPossible"
+                               t-value="appointment_type.assign_method != 'time_auto_assign' and len(users_possible or resources_possible) > 1"/>
                         </t>
                     </div>
                 </div>
@@ -255,6 +257,7 @@
             <i class="fa fa-3x fa-spin fa-spinner mx-auto text-o-color-2"/>
         </div>
         <div id="slots_availabilities" class="d-none">
+            <input type="hidden" name="max_resource_capacity" t-att-value="max_resource_capacity"/>
             <div id="calendar" t-attf-class="p-0 border rounded-3 overflow-hidden #{'d-none' if (month_first_available is False or not appointment_type.active) and capacity == 1 else ''}">
                 <t t-set="displayed_month_id" t-value="month_kept_from_update if month_kept_from_update is not False else month_first_available"/>
                 <div t-foreach="slots" t-as="month" t-attf-id="month-#{month['id']}" t-attf-class="o_appointment_month #{'d-none' if month['id'] != displayed_month_id else ''}">
@@ -359,7 +362,7 @@
     <template id="appointment_meeting_user" name="Meeting user">
         <t t-set="is_chosen_user_assign_method" t-value="appointment_type.assign_method != 'time_auto_assign'"/>
         <t t-set="based_on_users" t-value="appointment_type.schedule_based_on == 'users'"/>
-        <t t-if="(based_on_users and (len(users_possible) == 1 or is_chosen_user_assign_method or appointment_type.category not in ['punctual', 'recurring']) and (appointment_type.avatars_display == 'show' and isDate or isDetails)) or (not based_on_users and resource)">
+        <t t-if="isDetails or (isDate and not selectionPossible) or appointment_type.category not in ['punctual', 'recurring']">
             <div class="mt-3 pt-3 border-top">
                 <small class="text-uppercase text-muted">
                     <t t-if="staff_user">Operator</t>
@@ -369,7 +372,7 @@
                     class="o_appointment_user_short_card d-flex flex-column gap-1 mt-2"
                     itemscope="itemscope"
                     itemtype="http://schema.org/Employee">
-                    <div t-attf-class="d-flex #{'align-items-center' if appointment_type.avatars_display == 'show' else ''} py-1 px-0 bg-transparent border-0">
+                    <div t-attf-class="d-flex py-1 px-0 bg-transparent border-0">
                         <t t-if="staff_user">
                             <div t-if="appointment_type.avatars_display == 'show'" t-attf-style="background-image: url('/appointment/#{appointment_type.id}/avatar?user_id=#{staff_user.id}');"
                                 class="rounded-circle o_appointment_avatar_background o_appointment_user_avatar"/>
@@ -382,7 +385,7 @@
                         <t t-if="resource">
                             <div t-if="appointment_type.avatars_display == 'show'"
                                 t-attf-style="background-image: url('/appointment/#{appointment_type.id}/resource_avatar?resource_id=#{resource.id}');"
-                                class="rounded-circle o_appointment_avatar_background o_appointment_user_avatar"/>
+                                class="mt-1 flex-shrink-0 rounded-circle o_appointment_avatar_background o_appointment_user_avatar"/>
                             <i t-else="" class="fa fa-fw fa-cubes mt-1 text-muted"/>
                             <div class="ms-2">
                                 <strong class="mb-1" t-out="resource.name"/>

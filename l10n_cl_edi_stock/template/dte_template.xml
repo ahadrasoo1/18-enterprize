@@ -63,7 +63,7 @@
                 <IndExe t-if="line_amounts.get('total_amount', 0.0) == 0.0 and picking.l10n_cl_delivery_guide_reason == '1'" t-out="'4'"/>
                 <NmbItem t-out="format_length(line.product_id.name, 80)"/>
                 <DscItem t-out="format_length(line.product_id.name, 1000)"/>
-                <QtyItem t-out="float_repr(line.product_uom_qty, 6)"/>
+                <QtyItem t-out="float_repr(line.quantity, 6)"/>
                 <UnmdItem t-out="format_uom(line.product_uom)"/>
                 <PrcItem t-if="line_amounts.get('price_unit', False)" t-out="float_repr(line_amounts['price_unit'], 6)"/>
             <t t-if="line_amounts.get('discount', False)">
@@ -82,7 +82,7 @@
                 <NroLinRef t-out="'1'"/>
                 <TpoDocRef t-out="'801'"/>
                 <FolioRef t-out="picking.sale_id.client_order_ref"/>
-                <FchRef t-out="picking.sale_id.date_order.date()"/>
+                <FchRef t-if="not picking.l10n_latam_document_type_id._is_doc_type_voucher()" t-out="picking.sale_id.date_order.date()"/>
                 <RazonRef t-out="'Orden de compra Ref Cliente'"/>
             </Referencia>
         </t>

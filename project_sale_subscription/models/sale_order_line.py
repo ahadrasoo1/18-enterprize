@@ -5,6 +5,7 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
 from odoo import models
+from odoo.osv import expression
 
 
 class SaleOrderLine(models.Model):
@@ -17,12 +18,18 @@ class SaleOrderLine(models.Model):
 
     def _timesheet_service_generation(self):
         super(SaleOrderLine, self.filtered(
-            lambda sol: sol.order_id._can_generate_service() or not sol.recurring_invoice
+            lambda sol: sol._can_generate_service()
         ))._timesheet_service_generation()
 
+    def _can_generate_service(self):
+        return self.order_id._can_generate_service() or not self.recurring_invoice
+
     def _timesheet_create_task(self, project):
-        task = super()._timesheet_create_task(project)
         order = self.order_id
+        task = super()._timesheet_create_task(project)
+        # Recurrence cannot be configured for recurring products without a subscription plan.
+        if not order.plan_id and self.product_id.recurring_invoice:
+            return task
         # if the product is not recurrent or the project doesn't allow recurring tasks, we don't bother
         recurring_tasks_setting = self.env['res.config.settings'].default_get(['group_project_recurring_tasks']).get('group_project_recurring_tasks')
         if not self.product_id.recurring_invoice or not recurring_tasks_setting:
@@ -47,3 +54,9 @@ class SaleOrderLine(models.Model):
             'recurrence_id': recurrence.id,
         })
         return task
+
+    def _get_product_from_sol_name_domain(self, product_name):
+        return expression.AND([
+            super()._get_product_from_sol_name_domain(product_name),
+            [("recurring_invoice", "=", False)],
+        ])

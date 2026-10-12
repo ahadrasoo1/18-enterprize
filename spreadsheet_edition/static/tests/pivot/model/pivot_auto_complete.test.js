@@ -221,6 +221,21 @@ test("ODOO.VALUE group with a single date grouped by day", async function () {
     expect(composer.autocompleteProvider).toBe(undefined, { message: "autocomplete closed" });
 });
 
+test("PIVOT.VALUE group after a positional group", async function () {
+    const { model } = await createSpreadsheetWithPivot({
+        arch: /*xml*/ `
+            <pivot>
+                <field name="product_id" type="col"/>
+                <field name="date" type="row"/>
+                <field name="probability" type="measure"/>
+            </pivot>`,
+    });
+    const { store: composer } = makeStoreWithModel(model, CellComposerStore);
+    composer.startEdition('=PIVOT.VALUE(1,"probability", "#date:month", 1,');
+    const autoComplete = composer.autocompleteProvider;
+    expect(autoComplete.proposals.map((p) => p.text)).toEqual(['"product_id"', '"#product_id"']);
+});
+
 test("PIVOT.VALUE search field", async function () {
     const { model } = await createSpreadsheetWithPivot({
         arch: /*xml*/ `
@@ -366,19 +381,19 @@ test("PIVOT.VALUE autocomplete date field for group value", async function () {
     expect(autoComplete.proposals).toEqual([
         {
             description: "April 2016",
-            fuzzySearchKey: "04/2016April 2016",
+            fuzzySearchKey: '"04/2016"April 2016',
             htmlContent: [{ color: "#00a82d", value: '"04/2016"' }],
             text: '"04/2016"',
         },
         {
             description: "October 2016",
-            fuzzySearchKey: "10/2016October 2016",
+            fuzzySearchKey: '"10/2016"October 2016',
             htmlContent: [{ color: "#00a82d", value: '"10/2016"' }],
             text: '"10/2016"',
         },
         {
             description: "December 2016",
-            fuzzySearchKey: "12/2016December 2016",
+            fuzzySearchKey: '"12/2016"December 2016',
             htmlContent: [
                 {
                     color: "#00a82d",
@@ -407,19 +422,19 @@ test("PIVOT.VALUE autocomplete date field with no specified granularity for grou
     expect(autoComplete.proposals).toEqual([
         {
             description: "April 2016",
-            fuzzySearchKey: "04/2016April 2016",
+            fuzzySearchKey: '"04/2016"April 2016',
             htmlContent: [{ color: "#00a82d", value: '"04/2016"' }],
             text: '"04/2016"',
         },
         {
             description: "October 2016",
-            fuzzySearchKey: "10/2016October 2016",
+            fuzzySearchKey: '"10/2016"October 2016',
             htmlContent: [{ color: "#00a82d", value: '"10/2016"' }],
             text: '"10/2016"',
         },
         {
             description: "December 2016",
-            fuzzySearchKey: "12/2016December 2016",
+            fuzzySearchKey: '"12/2016"December 2016',
             htmlContent: [
                 {
                     color: "#00a82d",

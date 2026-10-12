@@ -5,6 +5,7 @@ import {
 import { browser } from "@web/core/browser/browser";
 import { patch } from "@web/core/utils/patch";
 import { IoTPrinter } from "@pos_iot/app/iot_printer";
+import { deduceUrl } from "@point_of_sale/utils";
 
 patch(hardwareProxyService, {
     dependencies: [...hardwareProxyService.dependencies, "orm"],
@@ -27,11 +28,15 @@ patch(HardwareProxy.prototype, {
      */
     pingBoxes() {
         this.setConnectionInfo({ status: "connecting" });
-        for (const { ip, ip_url } of this.iotBoxes) {
+        for (const { ip } of this.iotBoxes) {
             const timeoutController = new AbortController();
+            const url = deduceUrl(ip);
             setTimeout(() => timeoutController.abort(), 1000);
             browser
-                .fetch(`${ip_url}/hw_proxy/hello`, { signal: timeoutController.signal })
+                .fetch(`${url}/hw_proxy/hello`, {
+                    signal: timeoutController.signal,
+                    targetAddressSpace: odoo.use_lna ? "local" : undefined,
+                })
                 .catch(() => ({}))
                 .then((response) => this.setProxyConnectionStatus(ip, response.ok || false));
         }
@@ -59,7 +64,7 @@ patch(HardwareProxy.prototype, {
         }
     },
     /**
-     * Check the status of the devices every 5 seconds and update the status of
+     * Check the status of the devices every 60 seconds and update the status of
      * the drivers. This status is valid only if the IoT Box is connected.
      */
     async statusLoop() {
@@ -77,6 +82,18 @@ patch(HardwareProxy.prototype, {
             devices.map((device) => [device.type, { status: "connected" }])
         );
         this.setConnectionInfo({ drivers });
-        setTimeout(() => this.statusLoop(), 5000);
+        setTimeout(() => this.statusLoop(), 60000);
+    },
+    /**
+     * @override remove connection check as v19.1+ IoT Boxes can be reached by websocket:
+     * ping connection check doesn't make sense.
+     */
+    async openCashbox(action = false) {
+        if (this.pos.config.iface_cashdrawer && this.printer) {
+            this.printer.openCashbox();
+            if (action) {
+                this.pos.logEmployeeMessage(action, "CASH_DRAWER_ACTION");
+            }
+        }
     },
 });

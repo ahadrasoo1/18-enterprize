@@ -4,7 +4,7 @@
 import pytz
 
 from collections import defaultdict
-from datetime import datetime
+from datetime import datetime, date
 from dateutil.relativedelta import relativedelta
 from dateutil.rrule import rrule, DAILY
 
@@ -323,7 +323,11 @@ class HrContract(models.Model):
         # when based on a flat fee, is computed as 71.8% of the actual cost, capped at the
         # reimbursement for 7 km of train-based transportation (34.00 EUR)
         # Source: http://www.cnt-nar.be/CCT-COORD/cct-019-09.pdf (Art. 4)
-        return min(amount * 0.718, 34)
+        public_transport_max_amount = self.env['hr.rule.parameter'].sudo()._get_parameter_from_code(
+            'public_transport_max_amount', date=self.env.context.get('payslip_date') or date.today(), raise_if_not_found=False)
+        if not public_transport_max_amount:
+            public_transport_max_amount = 43
+        return min(amount * 0.718, public_transport_max_amount)
 
     @api.depends('km_home_work', 'transport_mode_private_car')
     def _compute_private_car_reimbursed_amount(self):
@@ -465,7 +469,7 @@ class HrContract(models.Model):
         date_from = datetime.combine(date_from, datetime.min.time())
         date_to = datetime.combine(date_to, datetime.max.time())
         work_data = defaultdict(lambda: list([0, 0]))  # [days, hours]
-        number_of_hours_full_day = self.resource_calendar_id._get_max_number_of_hours(date_from, date_to)
+        number_of_hours_full_day = self.resource_calendar_id._get_max_number_of_hours(date_from, date_to) if self.resource_calendar_id else 0
 
         # First, found work entry that didn't exceed interval.
         work_entries = self.env['hr.work.entry']._read_group(
@@ -484,11 +488,11 @@ class HrContract(models.Model):
                 else:
                     number_of_days = 1 # If not supposed to work in calendar attendances, then there
                                        # are not time offs
-                work_data[('full', work_entry_type_id)][0] += number_of_days
-                work_data[('full', work_entry_type_id)][1] += duration_sum
+                work_data['full', work_entry_type_id][0] += number_of_days
+                work_data['full', work_entry_type_id][1] += duration_sum
             else:
-                work_data[('half', work_entry_type_id)][0] += 1
-                work_data[('half', work_entry_type_id)][1] += duration_sum
+                work_data['half', work_entry_type_id][0] += 1
+                work_data['half', work_entry_type_id][1] += duration_sum
 
         # Second, find work entry that exceeds interval and compute right duration.
         work_entries = self.env['hr.work.entry'].search(self._get_work_hours_domain(date_from, date_to, domain=domain, inside=False))
@@ -504,13 +508,13 @@ class HrContract(models.Model):
                     date_start, date_stop, compute_leaves=False, calendar=calendar
                 )[employee.id]
                 if float_compare(contract_data.get('hours', 0), number_of_hours_full_day, 2) != -1:
-                    work_data[('full', work_entry.work_entry_type_id.id)][0] += 1
-                    work_data[('full', work_entry.work_entry_type_id.id)][1] += work_entry.duration
+                    work_data['full', work_entry.work_entry_type_id.id][0] += 1
+                    work_data['full', work_entry.work_entry_type_id.id][1] += work_entry.duration
                 else:
-                    work_data[('half', work_entry.work_entry_type_id.id)][1] += work_entry.duration
+                    work_data['half', work_entry.work_entry_type_id.id][1] += work_entry.duration
             else:
                 dt = date_stop - date_start
-                work_data[('half', work_entry.work_entry_type_id.id)] += dt.days * 24 + dt.seconds / 3600  # Number of hours
+                work_data['half', work_entry.work_entry_type_id.id][1] += dt.days * 24 + dt.seconds / 3600  # Number of hours
         return work_data
 
     # override to add work_entry_type from leave
@@ -519,8 +523,8 @@ class HrContract(models.Model):
         if not self._is_struct_from_country('BE'):
             return result
 
-        # The public holidays are paid only during the 14 first days of unemployment
         if result.code == "LEAVE500":
+            # The public holidays are paid only during the 14 first days of unemployment
             unemployed_less_than_14_days_before = self.env['hr.leave'].search([
                 ('employee_id', '=', self.employee_id.id),
                 ('date_to', '>=', leave.date_from + relativedelta(days=-14)),
@@ -537,34 +541,38 @@ class HrContract(models.Model):
                 if is_unemployed:
                     return unemployed_less_than_14_days_before[0].holiday_status_id.work_entry_type_id
 
-        # The public holidays are paid only during the period of 30 days following the start of the
-        # suspension of the employment contract due to illness or accident, work accident or
-        # occupational disease, pregnancy or childbirth leave, strike or lockout;
-        if result.code == "LEAVE500":
+            # The public holidays are paid only during the period of 30 days following the start of the
+            # suspension of the employment contract due to illness or accident, work accident or
+            # occupational disease, pregnancy or childbirth leave, strike or lockout;
             absent_less_than_X_days_before = self.env['hr.leave'].search([
                 ('employee_id', '=', self.employee_id.id),
                 ('date_to', '>=', leave.date_from + relativedelta(days=-30)),
                 ('date_from', '<=', leave.date_from),
-                ('holiday_status_id.work_entry_type_id.code', 'in', ['LEAVE210', 'LEAVE220', 'LEAVE230', 'LEAVE115', 'LEAVE281']),
+                ('holiday_status_id.work_entry_type_id.code', 'in', [
+                    'LEAVE210', 'LEAVE220', 'LEAVE230', 'LEAVE115', 'LEAVE281', 'LEAVE280', 'LEAVE110', 'LEAVE214'
+                ]),
                 ('state', '=', 'validate'),
             ], order="date_from asc")
             if absent_less_than_X_days_before:
+                unpaid_work_entry_type = absent_less_than_X_days_before[0].holiday_status_id.work_entry_type_id
+                if unpaid_work_entry_type.code == 'LEAVE110':
+                    unpaid_work_entry_type = self.env.ref('l10n_be_hr_payroll.work_entry_type_part_sick', False)
                 is_absent = True
                 # Special case for credit-times
                 # If time credit duration X is:
                 # X < 1 month -> Unpaid
                 # 1 <= X < 3 months -> Paid the first 14 days
                 # X >= 3 months -> Paid the first 30 days
-                # Alway unpaid for full time credit time
+                # Always unpaid for full time credit time
                 paid_duration = 30
                 if self.time_credit:
                     if not self.work_time_rate:
-                        return absent_less_than_X_days_before[0].holiday_status_id.work_entry_type_id
+                        return unpaid_work_entry_type
                     duration_start = self._get_occupation_dates()[0][1]
                     duration_stop = leave.date_from.date()
                     number_of_months = (duration_stop.year - duration_start.year) * 12 + (duration_stop.month - duration_start.month)
                     if number_of_months < 1:
-                        return absent_less_than_X_days_before[0].holiday_status_id.work_entry_type_id
+                        return unpaid_work_entry_type
                     if number_of_months < 3:
                         paid_duration = 14
                         absent_less_than_X_days_before = absent_less_than_X_days_before.filtered_domain([
@@ -574,7 +582,7 @@ class HrContract(models.Model):
                     if all(l.date_from > day or l.date_to < day for l in absent_less_than_X_days_before):
                         is_absent = False
                 if is_absent:
-                    return absent_less_than_X_days_before[0].holiday_status_id.work_entry_type_id
+                    return unpaid_work_entry_type
 
         # The salary is not guaranteed after 30 calendar days of sick leave (it means from the 31th
         # day of sick leave)

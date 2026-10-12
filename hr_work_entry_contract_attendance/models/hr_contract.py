@@ -5,6 +5,7 @@ from collections import defaultdict
 import pytz
 
 from pytz import timezone
+from datetime import timedelta
 
 from odoo import fields, models
 from odoo.addons.hr_work_entry_contract.models.hr_work_intervals import WorkIntervals
@@ -44,10 +45,15 @@ class HrContract(models.Model):
             tz = timezone(emp_cal.tz or resource.tz)    # refer to resource's tz if fully flexible resource (calendar is False)
             check_in_tz = attendance.check_in.astimezone(tz)
             check_out_tz = attendance.check_out.astimezone(tz)
-            lunch_intervals = attendance.employee_id._employee_attendance_intervals(check_in_tz, check_out_tz, lunch=True)
-            leaves = emp_cal._leave_intervals_batch(check_in_tz, check_out_tz, None)[False] if emp_cal else WorkIntervals([])
-            real_lunch_intervals = lunch_intervals - leaves
-            attendance_intervals = Intervals([(check_in_tz, check_out_tz, attendance)]) - real_lunch_intervals
+            if attendance.overtime_status == 'refused':
+                check_out_tz -= timedelta(hours=attendance.validated_overtime_hours)
+            if attendance.employee_id.resource_calendar_id and not attendance.employee_id.resource_calendar_id.flexible_hours:
+                lunch_intervals = attendance.employee_id._employee_attendance_intervals(check_in_tz, check_out_tz, lunch=True)
+                leaves = emp_cal._leave_intervals_batch(check_in_tz, check_out_tz, None)[False] if emp_cal else WorkIntervals([])
+                real_lunch_intervals = lunch_intervals - leaves
+                attendance_intervals = Intervals([(check_in_tz, check_out_tz, attendance)]) - real_lunch_intervals
+            else:
+                attendance_intervals = Intervals([(check_in_tz, check_out_tz, attendance)])
             for interval in attendance_intervals:
                 intervals[attendance.employee_id.resource_id.id].append((
                     max(start_dt, interval[0]),
@@ -75,6 +81,7 @@ class HrContract(models.Model):
             ('employee_id', 'in', calendar_based_contracts.employee_id.ids),
             ('check_in', '<=', end_dt),
             ('check_out', '>=', start_dt), #We ignore attendances without check_out date
+            ('overtime_status', '=', 'approved'),
         ])
 
         resource_ids = attendances.employee_id.resource_id.ids

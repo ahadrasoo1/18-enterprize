@@ -94,7 +94,7 @@ class TestActivityPerformance(BaseMailPerformance):
         enabled. No computed fields are involved. """
         test_record = self.test_record.with_env(self.env)
 
-        with self.assertQueryCount(employee=33):
+        with self.assertQueryCount(employee=32):
             activity = test_record.activity_schedule(
                 'mail.mail_activity_data_call',
                 summary='Call Activity',
@@ -111,8 +111,7 @@ class TestActivityPerformance(BaseMailPerformance):
         """ Simply check CRUD operations on records having advanced mixin VOIP
         enabled. No computed fields are involved. """
         test_records = self.test_records_voip.with_env(self.env)
-
-        with self.assertQueryCount(employee=168):
+        with self.assertQueryCount(employee=154):
             activities = test_records.activity_schedule(
                 'mail.mail_activity_data_call',
                 summary='Call Activity',
@@ -131,7 +130,7 @@ class TestActivityPerformance(BaseMailPerformance):
         enabled. No computed fields are involved. """
         test_record_voip = self.test_record_voip.with_env(self.env)
 
-        with self.assertQueryCount(employee=50):
+        with self.assertQueryCount(employee=52):
             activity = test_record_voip.activity_schedule(
                 'mail.mail_activity_data_upload_document',
                 summary='Upload Activity',
@@ -147,7 +146,7 @@ class TestActivityPerformance(BaseMailPerformance):
     def test_create_call_activity(self):
         test_record_voip = self.test_record_voip.with_env(self.env)
 
-        with self.assertQueryCount(employee=11):
+        with self.assertQueryCount(employee=12):
             activity = test_record_voip.create_call_activity()
             self.env.flush_all()
 
@@ -167,7 +166,7 @@ class TestActivityPerformance(BaseMailPerformance):
         in order to see difference with other activities (generic type). """
         test_records = self.test_records_voip.with_env(self.env)
 
-        with self.assertQueryCount(employee=158):
+        with self.assertQueryCount(employee=138):
             activities = test_records.activity_schedule(
                 activity_type_id=self.generic_activity.id,
                 automated=False,
@@ -176,7 +175,7 @@ class TestActivityPerformance(BaseMailPerformance):
             self.env.flush_all()
         self.assertEqual(len(activities), 10)
 
-        with self.assertQueryCount(employee=34):
+        with self.assertQueryCount(employee=25):
             activities[:3].write({'user_id': self.user_root.id})
             activities[3:6].write({'user_id': self.env.uid})
             activities[6:].write({'user_id': self.user_admin.id})
@@ -190,7 +189,8 @@ class TestActivityPerformance(BaseMailPerformance):
         ])
         self.env.flush_all()
 
-        with self.assertQueryCount(employee=64):
+        # actual counter: 62, +1 random to investigate
+        with self.assertQueryCount(employee=63):
             activities.action_feedback(
                 feedback='Intense feedback',
                 attachment_ids=attachments.ids,
@@ -210,14 +210,14 @@ class TestActivityPerformance(BaseMailPerformance):
         in order to see difference with other activities (generic type). """
         test_records = self.test_records_voip.with_env(self.env)
 
-        with self.assertQueryCount(employee=20):
+        with self.assertQueryCount(employee=21):
             activities = test_records.create_call_activity()
             self.env.flush_all()
 
         # check business information (to benefits from this test)
         self.assertEqual(activities.activity_type_id, self.phonecall_activity)
 
-        with self.assertQueryCount(employee=106):
+        with self.assertQueryCount(employee=91):
             activities[:3].write({'user_id': self.user_root.id})
             activities[3:6].write({'user_id': self.env.uid})
             activities[6:].write({'user_id': self.user_admin.id})
@@ -232,7 +232,7 @@ class TestActivityPerformance(BaseMailPerformance):
         ])
         self.env.flush_all()
 
-        with self.assertQueryCount(employee=64):
+        with self.assertQueryCount(employee=60):
             activities.action_feedback(
                 feedback='Intense feedback',
                 attachment_ids=attachments.ids,

@@ -1,23 +1,25 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* hr_payroll_account
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Malaz Abuidris <msea@odoo.com>, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:27+0000\n"
+"POT-Creation-Date: 2025-12-29 18:47+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
+"Last-Translator: Malaz Abuidris <msea@odoo.com>, 2025\n"
 "Language-Team: Arabic (https://app.transifex.com/odoo/teams/41243/ar/)\n"
+"Language: ar\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: ar\n"
-"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
+"&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_account_bank_statement_line__payslip_count
@@ -29,13 +31,19 @@ msgstr "عدد إيصالات الدفع "
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_payslip_run_view_form
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.hr_payslip_view_form
 msgid ""
-"<span class=\"o_stat_text\" invisible=\"move_state != 'draft'\">Journal Entry <br/>(Draft)</span>\n"
-"                        <span class=\"o_stat_text\" invisible=\"move_state != 'posted'\">Journal Entry <br/>(Posted)</span>\n"
-"                        <span class=\"o_stat_text\" invisible=\"move_state != 'cancel'\">Journal Entry <br/>(Canceled)</span>"
+"<span class=\"o_stat_text\" invisible=\"move_state != 'draft'\">Journal "
+"Entry <br/>(Draft)</span>\n"
+"                        <span class=\"o_stat_text\" invisible=\"move_state !"
+"= 'posted'\">Journal Entry <br/>(Posted)</span>\n"
+"                        <span class=\"o_stat_text\" invisible=\"move_state !"
+"= 'cancel'\">Journal Entry <br/>(Canceled)</span>"
 msgstr ""
-"<span class=\"o_stat_text\" invisible=\"move_state != 'draft'\">قيد اليومية <br/>(مسودة)</span>\n"
-"                        <span class=\"o_stat_text\" invisible=\"move_state != 'posted'\">قيد اليومية <br/>(تم ترحيله)</span>\n"
-"                        <span class=\"o_stat_text\" invisible=\"move_state != 'cancel'\">قيد اليومية <br/>(تم إلغاؤه)</span> "
+"<span class=\"o_stat_text\" invisible=\"move_state != 'draft'\">قيد اليومية "
+"<br/>(مسودة)</span>\n"
+"                        <span class=\"o_stat_text\" invisible=\"move_state !"
+"= 'posted'\">قيد اليومية <br/>(تم ترحيله)</span>\n"
+"                        <span class=\"o_stat_text\" invisible=\"move_state !"
+"= 'cancel'\">قيد اليومية <br/>(تم إلغاؤه)</span> "
 
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.view_move_form_inherit
@@ -173,15 +181,15 @@ msgid ""
 "into a single account move line. This will anonymize the accounting entries "
 "but also disable single payment generations."
 msgstr ""
-"قم بتمكين هذا الخيار لدمج كافة القيود المحاسبية لنفس الفترة في بند حركة حساب"
-" واحد. سيؤدي هذا إلى إخفاء هوية القيود المحاسبية ولكن أيضاً تعطيل إنشاء "
-"عمليات الدفع الفردية. "
+"قم بتمكين هذا الخيار لدمج كافة القيود المحاسبية لنفس الفترة في بند حركة حساب "
+"واحد. سيؤدي هذا إلى إخفاء هوية القيود المحاسبية ولكن أيضاً تعطيل إنشاء عمليات "
+"الدفع الفردية. "
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,help:hr_payroll_account.field_hr_salary_rule__split_move_lines
 msgid ""
-"Enable this option to split the accountig entries for this rule according to"
-" the payslip line name. It could be useful for deduction/reimbursement or "
+"Enable this option to split the accountig entries for this rule according to "
+"the payslip line name. It could be useful for deduction/reimbursement or "
 "salary attachments for instance."
 msgstr ""
 "قم بتفعيل هذا الخيار لتقسيم القيود المحاسبية لهذه القاعدة وفقاً لاسم بند "
@@ -203,7 +211,7 @@ msgstr "معالج تقرير دفع المرتبات للموارد البشر�
 #: model:ir.model.fields,field_description:hr_payroll_account.field_account_setup_bank_manual_config__has_alt_bank_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_res_partner_bank__has_alt_bank_account
 msgid "Has Alt Bank Account"
-msgstr ""
+msgstr "يحتوي على حساب بنكي بديل "
 
 #. module: hr_payroll_account
 #. odoo-python
@@ -248,7 +256,7 @@ msgstr "حركة"
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_payslip_run__move_state
 msgid "Move State"
-msgstr ""
+msgstr "حالة الحركة "
 
 #. module: hr_payroll_account
 #: model:ir.model.fields,field_description:hr_payroll_account.field_hr_salary_rule__not_computed_in_net
@@ -260,12 +268,6 @@ msgstr "لم يتم احتسابه في الصافي بشكل خاضع للمس�
 #: code:addons/hr_payroll_account/models/hr_payslip.py:0
 msgid "One of the contract for these payslips has no structure type."
 msgstr "لا يحتوي أحد عقود إيصالات الدفع هذه على نوع هيكل. "
-
-#. module: hr_payroll_account
-#. odoo-python
-#: code:addons/hr_payroll_account/models/hr_payslip.py:0
-msgid "One of the payroll structures has no account journal defined on it."
-msgstr "لا يحتوي أحد هياكل إيصالات الدفع على دفتر يومية للحساب معين فيه. "
 
 #. module: hr_payroll_account
 #: model:ir.model,name:hr_payroll_account.model_account_payment_register
@@ -384,9 +386,9 @@ msgstr "الحساب البنكي للموظف غير موثوق به "
 #. module: hr_payroll_account
 #: model:ir.model.fields,help:hr_payroll_account.field_hr_salary_rule__not_computed_in_net
 msgid ""
-"This field allows you to delete the value of this rule in the \"Net Salary\""
-" rule at the accounting level to explicitly display the value of this rule "
-"in the accounting. For example, if you want to display the value of your "
+"This field allows you to delete the value of this rule in the \"Net Salary\" "
+"rule at the accounting level to explicitly display the value of this rule in "
+"the accounting. For example, if you want to display the value of your "
 "representation fees, you can check this field."
 msgstr ""
 "يتيح لك هذا الحقل حذف قيمة هذه القاعدة في قاعدة \"صافي الراتب\" على المستوى "
@@ -396,7 +398,7 @@ msgstr ""
 #. module: hr_payroll_account
 #: model_terms:ir.ui.view,arch_db:hr_payroll_account.view_partner_bank_form_inherit_hr_payroll_account
 msgid "This will replace the employee existing bank account."
-msgstr ""
+msgstr "سيحل ذلك محل الحساب البنكي الحالي للموظف. "
 
 #. module: hr_payroll_account
 #. odoo-python
@@ -408,10 +410,19 @@ msgstr "يمكنك تسجيل الدفع لقيود اليومية المرحّ�
 #. odoo-python
 #: code:addons/hr_payroll_account/models/hr_payslip.py:0
 msgid "You can only register payments for unpaid documents."
-msgstr ""
+msgstr "يمكنك فقط تسجيل المدفوعات للمستندات غير المدفوعة. "
+
+#. module: hr_payroll_account
+#. odoo-python
+#: code:addons/hr_payroll_account/models/hr_payslip.py:0
+msgid "You can't create a journal entry for a paid payslip."
+msgstr "لا يمكنك إنشاء قيد دفتر يومية لإيصال دفع مدفوع. "
 
 #. module: hr_payroll_account
 #. odoo-python
 #: code:addons/hr_payroll_account/models/account_journal.py:0
 msgid "You cannot delete the journal linked to a Salary Structure"
 msgstr "لا يمكنك حذف دفتر اليومية المرتبط بهيكل راتب "
+
+#~ msgid "One of the payroll structures has no account journal defined on it."
+#~ msgstr "لا يحتوي أحد هياكل إيصالات الدفع على دفتر يومية للحساب معين فيه. "

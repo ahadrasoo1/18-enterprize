@@ -20,7 +20,6 @@ registry.category("web_tour.tours").add('rental_tour', {
     run: "click",
 },
 {
-    isActive: ["auto"],
     trigger: ".o_breadcrumb .active:contains(Products)",
 },
 {
@@ -73,9 +72,6 @@ registry.category("web_tour.tours").add('rental_tour', {
     run: "click",
 },
 {
-    trigger: ".o_field_widget[name='partner_id'] .o_external_button",
-},
-{
     trigger: "a:contains('Add a product')",
     content: _t("Click here to start filling the quotation."),
     tooltipPosition: 'bottom',
@@ -104,7 +100,6 @@ registry.category("web_tour.tours").add('rental_tour', {
     run: "click",
 },
 {
-    isActive: ["auto"],
     trigger: ".o_sale_order",
 },
 {
@@ -119,7 +114,6 @@ registry.category("web_tour.tours").add('rental_tour', {
     run: "click",
 },
 {
-    isActive: ["auto"],
     trigger: ".o_sale_order",
 },
 {

@@ -1,33 +1,33 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* quality_control
-# 
+# * quality_control
+#
 # Translators:
-# Wil Odoo, 2024
-# 
+# Raymond Yu <cl_yu@hotmail.com>, 2024
+# Chloe Wang, 2025
+# 何彬 <vnsoft.he@gmail.com>, 2025
+# Wil Odoo, 2025
+# Weblate <noreply-mt-weblate@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Chinese (China) (https://app.transifex.com/odoo/teams/41243/zh_CN/)\n"
+"POT-Creation-Date: 2026-04-10 18:47+0000\n"
+"PO-Revision-Date: 2026-01-10 09:31+0000\n"
+"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"Language-Team: Chinese (Simplified Han script) <https://translate.odoo.com/"
+"projects/odoo-18/quality_control/zh_Hans/>\n"
+"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: zh_CN\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 5.14.3\n"
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_point_view_form_inherit_quality_control
-msgid "% of Operations"
-msgstr "% 的操作"
-
-#. module: quality_control
-#: model_terms:ir.ui.view,arch_db:quality_control.quality_point_view_form_inherit_quality_control
-msgid "% of Transfers"
-msgstr "% 的调拨"
+msgid "% of the time"
+msgstr "占时间 %"
 
 #. module: quality_control
 #: model:ir.actions.report,print_report_name:quality_control.quality_check_report
@@ -41,18 +41,13 @@ msgid "15.3 cm"
 msgstr "15.3 厘米"
 
 #. module: quality_control
-#: model_terms:ir.ui.view,arch_db:quality_control.worksheet_page
-msgid "2023-08-15"
-msgstr "2023-08-15"
-
-#. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_alert_team_dashboard_view_kanban
 msgid ""
 "<i class=\"fa fa-envelope-o\" role=\"img\" aria-label=\"Domain alias\" "
 "title=\"Domain alias\"/>&amp;nbsp;"
 msgstr ""
-"<i class=\"fa fa-envelope-o\" role=\"img\" aria-label=\"域别名\" "
-"title=\"域别名\"/>&amp;nbsp;"
+"<i class=\"fa fa-envelope-o\" role=\"img\" aria-label=\"域别名\" title=\"域别"
+"名\"/>&amp;nbsp;"
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_point_view_form_inherit_quality_control
@@ -111,15 +106,6 @@ msgstr "<span class=\"o_stat_text\">质量检查</span>"
 #: model_terms:ir.ui.view,arch_db:quality_control.stock_picking_view_form_inherit_quality
 msgid "<span class=\"o_stat_text\">Quality Checks</span>"
 msgstr "<span class=\"o_stat_text\">质量检查</span>"
-
-#. module: quality_control
-#: model_terms:ir.ui.view,arch_db:quality_control.quality_point_view_form_inherit_quality_control
-msgid ""
-"<span invisible=\"measure_frequency_type in ('all', 'on_demand')\">Every "
-"</span>"
-msgstr ""
-"<span invisible=\"measure_frequency_type in ('all', "
-"'on_demand')\">每一个</span>"
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_point_view_form_inherit_quality_control
@@ -240,7 +226,7 @@ msgstr "允许的品质检查点"
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_point_view_search
 msgid "Archived"
-msgstr "已存档"
+msgstr "已归档"
 
 #. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_point__average
@@ -340,7 +326,7 @@ msgstr "每次控制"
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.view_quality_point_kanban
 msgid "Control per:"
-msgstr ""
+msgstr "每次控制："
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_check_wizard_form_failure
@@ -415,7 +401,8 @@ msgstr "所有库存作业的默认单位。"
 #: model_terms:ir.actions.act_window,help:quality_control.quality_check_action_team
 msgid ""
 "Define Quality Control Points in order to automatically generate\n"
-"              quality checks at the right logistic operation: transfers, manufacturing orders."
+"              quality checks at the right logistic operation: transfers, "
+"manufacturing orders."
 msgstr ""
 "定义质量控制点，以便自动生成\n"
 "              在正确的物流操作中产生质量检查：转移、制造订单。"
@@ -466,6 +453,12 @@ msgstr "丢弃"
 #: model:ir.model.fields,field_description:quality_control.field_quality_spreadsheet_template__display_name
 msgid "Display Name"
 msgstr "显示名称"
+
+#. module: quality_control
+#: model:ir.model.fields,field_description:quality_control.field_quality_check_spreadsheet__display_thumbnail
+#: model:ir.model.fields,field_description:quality_control.field_quality_spreadsheet_template__display_thumbnail
+msgid "Display Thumbnail"
+msgstr "显示缩略图"
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_spreadsheet_template_view_list
@@ -531,6 +524,11 @@ msgstr "频率单位值"
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_check_view_search
+msgid "Future Activities"
+msgstr "未来活动"
+
+#. module: quality_control
+#: model_terms:ir.ui.view,arch_db:quality_control.quality_check_view_search
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_point_view_search
 msgid "Group By"
 msgstr "分组方式"
@@ -554,14 +552,16 @@ msgstr "如果质量检查未通过，则会从该列表中为每个未通过的
 #. module: quality_control
 #: model:ir.model.fields,help:quality_control.field_quality_check_on_demand__lot_id
 msgid ""
-"If you want to specify a lot/serial number before the transfer validation,"
-"                                create a new lot here from this field with "
-"the same exact lot name of the move line you want to add a check for."
-"                                If you want to create a check for all move "
-"lines, leave this field empty."
+"If you want to specify a lot/serial number before the transfer "
+"validation,                                create a new lot here from this "
+"field with the same exact lot name of the move line you want to add a check "
+"for.                                If you want to create a check for all "
+"move lines, leave this field empty."
 msgstr ""
-"如果要在转账验证前指定批次/序列号，                                请在此字段中创建一个新批次，批次名称与要添加检查的移"
-" 动行完全相同。                              如果要为所有移动资料行创建检查，请将此字段留空。"
+"如果要在转账验证前指定批次/序列号，                                请在此字段"
+"中创建一个新批次，批次名称与要添加检查的移 动行完全相"
+"同。                              如果要为所有移动资料行创建检查，请将此字段"
+"留空。"
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_check_view_search
@@ -615,6 +615,11 @@ msgstr "最后更新人"
 #: model:ir.model.fields,field_description:quality_control.field_quality_spreadsheet_template__write_date
 msgid "Last Updated on"
 msgstr "上次更新日期"
+
+#. module: quality_control
+#: model_terms:ir.ui.view,arch_db:quality_control.quality_check_view_search
+msgid "Late Activities"
+msgstr "最近活动"
 
 #. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_check__lot_line_id
@@ -721,7 +726,7 @@ msgstr "新建"
 #. odoo-javascript
 #: code:addons/quality_control/static/src/spreadsheet_bundle/quality_spreadsheet_template_action/quality_spreadsheet_template_action.js:0
 msgid "New quality spreadsheet template created"
-msgstr ""
+msgstr "已创建新的质量电子表格模板"
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.view_quality_check_wizard
@@ -779,12 +784,12 @@ msgstr "基准单位"
 #. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_check_wizard__note
 msgid "Note"
-msgstr "注释"
+msgstr "备注"
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_check_view_form
 msgid "Notes"
-msgstr "凭单"
+msgstr "备注"
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_check_wizard_form_failure
@@ -806,7 +811,7 @@ msgstr "按需要"
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.view_quality_check_wizard
 msgid "Open spreadsheet"
-msgstr ""
+msgstr "打开电子表格"
 
 #. module: quality_control
 #: model:ir.model.fields.selection,name:quality_control.selection__quality_check__measure_on__operation
@@ -822,11 +827,13 @@ msgstr "作业"
 msgid ""
 "Operation = One quality check is requested at the operation level.\n"
 "                  Product = A quality check is requested per product.\n"
-"                 Quantity = A quality check is requested for each new product quantity registered, with partial quantity checks also possible."
+"                 Quantity = A quality check is requested for each new "
+"product quantity registered, with partial quantity checks also possible."
 msgstr ""
 "操作 = 在操作层面要求进行一次质量检查。\n"
 "                  产品 = 每个产品要求进行一次质量检查。\n"
-"                  数量 = 对每个新注册的产品数量要求进行质量检查，也可以进行部分数量检查。"
+"                  数量 = 对每个新注册的产品数量要求进行质量检查，也可以进行部"
+"分数量检查。"
 
 #. module: quality_control
 #. odoo-python
@@ -1136,7 +1143,7 @@ msgstr "质量点"
 #: model:ir.actions.act_window,name:quality_control.quality_spreadsheet_template_action_config
 #: model:ir.ui.menu,name:quality_control.menu_config_quality_spreadsheet_template
 msgid "Quality Spreadsheet Templates"
-msgstr ""
+msgstr "质量电子表格模板"
 
 #. module: quality_control
 #: model:ir.actions.act_window,name:quality_control.quality_tag_action
@@ -1160,22 +1167,22 @@ msgstr "质量团队根据需要他们的角色（团队）对不同的质量警
 #. module: quality_control
 #: model:ir.model,name:quality_control.model_report_quality_control_quality_worksheet_internal
 msgid "Quality Worksheet Internal Report"
-msgstr "质量工作表 内部报告"
+msgstr "质量工作表 内部报表"
 
 #. module: quality_control
 #: model:ir.model,name:quality_control.model_report_quality_control_quality_worksheet
 msgid "Quality Worksheet Report"
-msgstr "质量工作表报告"
+msgstr "质量工作表报表"
 
 #. module: quality_control
 #: model:ir.model,name:quality_control.model_quality_check_spreadsheet
 msgid "Quality check spreadsheet"
-msgstr ""
+msgstr "质量检查电子表格"
 
 #. module: quality_control
 #: model:ir.model,name:quality_control.model_quality_spreadsheet_template
 msgid "Quality check template spreadsheet"
-msgstr ""
+msgstr "质量检查模板电子表格"
 
 #. module: quality_control
 #: model_terms:ir.actions.act_window,help:quality_control.quality_point_action
@@ -1203,7 +1210,7 @@ msgstr "不合格数量"
 #. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_check__qty_passed
 msgid "Quantity Passed"
-msgstr ""
+msgstr "合格数量"
 
 #. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_check__qty_tested
@@ -1220,12 +1227,12 @@ msgstr "批量内测试的产品数量"
 #. module: quality_control
 #: model:ir.model.fields,help:quality_control.field_quality_check__qty_failed
 msgid "Quantity of product that failed the quality check"
-msgstr ""
+msgstr "产品质量检查不合格的数量"
 
 #. module: quality_control
 #: model:ir.model.fields,help:quality_control.field_quality_check__qty_passed
 msgid "Quantity of product that passed the quality check"
-msgstr ""
+msgstr "产品质量检查合格的数量"
 
 #. module: quality_control
 #: model:ir.model.fields,help:quality_control.field_quality_check__qty_to_test
@@ -1252,7 +1259,7 @@ msgstr "参考号"
 #. module: quality_control
 #: model:ir.ui.menu,name:quality_control.menu_quality_reporting
 msgid "Reporting"
-msgstr "报告"
+msgstr "报表"
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_point_view_search
@@ -1263,7 +1270,7 @@ msgstr "负责人"
 #. odoo-javascript
 #: code:addons/quality_control/static/src/spreadsheet_bundle/quality_check_spreadsheet_action/quality_check_spreadsheet_action.xml:0
 msgid "Save in"
-msgstr ""
+msgstr "保存在"
 
 #. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_check_on_demand__show_lot_number
@@ -1303,7 +1310,7 @@ msgstr "电子表格数据"
 #: model:ir.model.fields,field_description:quality_control.field_quality_check_spreadsheet__spreadsheet_file_name
 #: model:ir.model.fields,field_description:quality_control.field_quality_spreadsheet_template__spreadsheet_file_name
 msgid "Spreadsheet File Name"
-msgstr ""
+msgstr "电子表格文件名称"
 
 #. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_check_spreadsheet__spreadsheet_revision_ids
@@ -1320,7 +1327,7 @@ msgstr "电子表格快照"
 #. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_point__spreadsheet_template_id
 msgid "Spreadsheet Template"
-msgstr "电子表格模版"
+msgstr "电子表格模板"
 
 #. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_check_spreadsheet__spreadsheet_binary_data
@@ -1360,7 +1367,7 @@ msgstr "库存移动明细"
 #: model:ir.model.fields,field_description:quality_control.field_quality_point__spreadsheet_check_cell
 #: model:ir.model.fields,field_description:quality_control.field_quality_spreadsheet_template__check_cell
 msgid "Success cell"
-msgstr ""
+msgstr "成功储存格"
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_tag_view_search
@@ -1382,7 +1389,7 @@ msgstr "团队名称"
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.view_quality_point_kanban
 msgid "Team:"
-msgstr ""
+msgstr "团队："
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_alert_team_view_tree
@@ -1421,6 +1428,13 @@ msgid ""
 "several sheets, specify which one you want to use (e.g. Sheet2!C4). If not "
 "specified, the first sheet is selected by default."
 msgstr ""
+"如果成功单元格值为 TRUE，则检查成功。如果有多个工作表，请指定要使用哪一个（例"
+"如 Sheet2!C4）。如果未指定，则默认选择第一个工作表。"
+
+#. module: quality_control
+#: model:ir.model.fields,help:quality_control.field_quality_point__measure_frequency_value
+msgid "The probability of each quality check being generated"
+msgstr "生成每项质量检查的概率"
 
 #. module: quality_control
 #. odoo-python
@@ -1438,7 +1452,12 @@ msgstr "缩略图"
 #: model:ir.model.fields,field_description:quality_control.field_quality_alert__title
 #: model:ir.model.fields,field_description:quality_control.field_quality_check_wizard__title
 msgid "Title"
-msgstr "称谓"
+msgstr "标题"
+
+#. module: quality_control
+#: model_terms:ir.ui.view,arch_db:quality_control.quality_check_view_search
+msgid "Today Activities"
+msgstr "今日活动"
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_point_view_form_inherit_quality_control
@@ -1479,6 +1498,12 @@ msgid "Unit of Measure"
 msgstr "计量单位"
 
 #. module: quality_control
+#. odoo-python
+#: code:addons/quality_control/models/quality_spreadsheet_template.py:0
+msgid "Untitled spreadsheet"
+msgstr "未命名电子表格"
+
+#. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.view_quality_check_wizard
 msgid "Validate"
 msgstr "验证"
@@ -1517,12 +1542,12 @@ msgstr "按需选择质量检查点向导"
 #. module: quality_control
 #: model:ir.actions.report,name:quality_control.quality_check_report
 msgid "Worksheet Report - External (PDF)"
-msgstr "工作表报告 - 外部 (PDF)"
+msgstr "工作表报表 - 外部 (PDF)"
 
 #. module: quality_control
 #: model:ir.actions.report,name:quality_control.quality_check_report_internal
 msgid "Worksheet Report - Internal (PDF)"
-msgstr "工作表报告 - 内部 (PDF)"
+msgstr "工作表报表 - 内部 (PDF)"
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.view_quality_check_wizard
@@ -1541,11 +1566,11 @@ msgstr "您不能为草稿、已完成或已取消的转账创建质量检查。
 #. odoo-python
 #: code:addons/quality_control/models/quality.py:0
 msgid ""
-"You measured %(measure).2f %(unit)s and it should be between "
-"%(tolerance_min).2f and %(tolerance_max).2f %(unit)s."
+"You measured %(measure).2f %(unit)s and it should be between %"
+"(tolerance_min).2f and %(tolerance_max).2f %(unit)s."
 msgstr ""
-"您测量了 "
-"%(measure).2f%(unit)s，它应该介于%(tolerance_min).2f和%(tolerance_max).2f%(unit)s之间。"
+"您测量了 %(measure).2f%(unit)s，它应该介于%(tolerance_min).2f和%"
+"(tolerance_max).2f%(unit)s之间。"
 
 #. module: quality_control
 #. odoo-python
@@ -1573,3 +1598,6 @@ msgstr "例如：QA大师"
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_alert_team_view_form
 msgid "e.g. mycompany.com"
 msgstr "e.g. mycompany.com"
+
+#~ msgid "2023-08-15"
+#~ msgstr "2023-08-15"

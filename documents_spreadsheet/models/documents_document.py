@@ -5,14 +5,13 @@ import contextlib
 import io
 import json
 import zipfile
-import datetime
 
 from lxml import etree
 
 from odoo import _, Command, fields, models, api
 from odoo.exceptions import UserError, AccessError, ValidationError
 from odoo.osv import expression
-from odoo.tools import image_process, consteq
+from odoo.tools import format_list, image_process, consteq
 from odoo.tools.misc import DEFAULT_SERVER_DATE_FORMAT
 
 
@@ -79,22 +78,24 @@ class Document(models.Model):
         # (see @_check_spreadsheet_share)
         self.env['documents.document'].check_access('create')
         self.check_access('read')
-        self.folder_id.check_access('write')
+        if not self.env.su and self.folder_id and self.folder_id.user_permission != 'edit':
+            raise AccessError(_('You are not allowed to freeze spreadsheets in Company'))
 
-        folder = self.env['documents.document'].sudo().search([
+        folder_sudo = self.env['documents.document'].sudo().search([
             ('folder_id', '=', self.folder_id.id),
             ('type', '=', 'folder'),
             ('handler', '=', 'frozen_folder'),
         ], limit=1)
 
-        if not folder:
-            folder = self.env['documents.document'].create({
+        if not folder_sudo:
+            folder_sudo = self.env['documents.document'].sudo().create({
                 'name': _('Frozen spreadsheets'),
                 'type': 'folder',
                 'handler': 'frozen_folder',
                 'folder_id': self.folder_id.id,
                 'access_via_link': 'none',
-                'access_internal': 'view',
+                'access_internal': 'none',
+                'access_ids': False,
                 'owner_id': self.env.ref('base.user_root').id,
             })
 
@@ -107,7 +108,7 @@ class Document(models.Model):
             'access_internal': 'none' if self.access_internal == 'none' else 'view',
             'access_via_link': 'view',
             'spreadsheet_data': spreadsheet_data,
-            'folder_id': folder.id,
+            'folder_id': folder_sudo.id,
             'excel_export': base64.b64encode(self.env['spreadsheet.mixin']._zip_xslx_files(excel_files)),
             'handler': 'frozen_spreadsheet',
             'is_access_via_link_hidden': True,
@@ -116,6 +117,32 @@ class Document(models.Model):
                 'role': 'view' if access.role == 'edit' else access.role,
             }) for access in self.access_ids if access.role],
         })
+
+    def _get_access_update_domain(self):
+        """Allow to change the access of the frozen folders / spreadsheets only if we open their share panel."""
+        return expression.AND([
+            super()._get_access_update_domain(),
+            expression.OR([
+                [('id', 'in', self.ids)],
+                [('handler', 'not in', ('frozen_folder', 'frozen_spreadsheet'))],
+            ]),
+        ])
+
+    @api.constrains('company_id')
+    def _check_company_id(self):
+        domain = expression.OR([
+            [('document_spreadsheet_folder_id', '=', folder.id), ('id', '!=', folder.company_id.id)]
+            for folder in self
+            if folder.company_id and folder.type == 'folder'
+        ])
+        companies = self.env['res.company'].search(domain)
+        if companies:
+            errors = format_list(self.env, [
+                self.env._("%(folder)s is used by %(company)s", folder=comp.document_spreadsheet_folder_id.display_name, company=comp.display_name)
+                for comp in companies
+            ])
+            raise ValidationError(_("The company for a folder cannot be changed if it is already used as the "
+                                    "spreadsheet workspace for at least one other company: %s", errors))
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -144,13 +171,21 @@ class Document(models.Model):
             raise ValidationError(_("The spreadsheet you are trying to access does not exist."))
         data = super().join_spreadsheet_session(access_token)
         self._update_spreadsheet_contributors()
+        sudo_self = self.sudo()
         return {
             **data,
-            'handler': self.sudo().handler,
-            'access_url': self.sudo().access_url,
-            'is_favorited': self.sudo().is_favorited,
-            'folder_id': self.sudo().folder_id.id,
+            'handler': sudo_self.handler,
+            'access_url': sudo_self.access_url,
+            'is_favorited': sudo_self.is_favorited,
+            'folder_id': sudo_self.folder_id.id,
+            'copy_in_my_drive': self._cannot_create_sibling(),
         }
+
+    @api.constrains('owner_id')
+    def _check_owner_is_internal_user(self):
+        spreadsheet_docs = self.filtered(lambda rec: rec.handler in ("spreadsheet", "frozen_spreadsheet"))
+        if any(user.share for user in spreadsheet_docs.owner_id):
+            raise AccessError(_("Portal users cannot be the owner of a spreadsheet."))
 
     def _check_spreadsheet_share(self, operation, access_token):
         if not self.env.su and operation == 'write' and self.sudo().handler == 'frozen_spreadsheet':
@@ -174,6 +209,14 @@ class Document(models.Model):
         spreadsheet_docs.file_extension = False
         super(Document, self - spreadsheet_docs)._compute_file_extension()
 
+    @api.depends("attachment_id", "handler")
+    def _compute_spreadsheet_data(self):
+        for document in self.with_context(bin_size=False):
+            if document.handler in ("spreadsheet", "frozen_spreadsheet"):
+                document.spreadsheet_data = document.attachment_id.raw
+            else:
+                document.spreadsheet_data = False
+
     @api.depends("datas", "handler")
     def _compute_spreadsheet_binary_data(self):
         for document in self:
@@ -190,13 +233,15 @@ class Document(models.Model):
                     "mimetype": "application/o-spreadsheet"
                 })
 
-    @api.depends("thumbnail")
+    @api.depends_context('uid')
+    @api.depends("display_thumbnail")
     def _compute_spreadsheet_thumbnail_checksum(self):
         spreadsheets = self.filtered(lambda doc: doc.handler == "spreadsheet")
-        thumbnails = self.env["ir.attachment"].sudo().search([
-            ("res_model", "=", self._name),
-            ("res_field", "=", "thumbnail"),
-            ("res_id", "in", spreadsheets.ids),
+        thumbnails = self.env['ir.attachment'].sudo().search([
+            ('res_model', '=', self._name),
+            ('res_field', '=', 'display_thumbnail'),
+            ('res_id', 'in', spreadsheets.ids),
+            ('create_uid', '=', self.env.uid)
         ])
         thumbnails_by_documents = thumbnails.grouped("res_id")
         for document in self:
@@ -251,8 +296,6 @@ class Document(models.Model):
         return [
             {
                 'folder_id': default_folder.id,
-                'access_internal': 'none',
-                'access_via_link': 'none',
                 **vals,
             }
             if vals.get('handler') == 'spreadsheet' else vals
@@ -262,6 +305,10 @@ class Document(models.Model):
     def _update_spreadsheet_contributors(self):
         """Add the current user to the spreadsheet contributors.
         """
+        can_write = self.env['spreadsheet.contributor'].has_access('write')
+        can_create = self.env['spreadsheet.contributor'].has_access('create')
+        if not can_write or not can_create:
+            return
         for document in self:
             if document.handler == 'spreadsheet':
                 self.env['spreadsheet.contributor']._update(self.env.user, document)
@@ -313,7 +360,11 @@ class Document(models.Model):
             docs = docs[offset:offset + limit]
         else:
             docs = docs[offset:]
-        return docs.read(["display_name", "thumbnail"])
+        return docs.read(["display_name", "display_thumbnail"])
+
+    @api.model
+    def _get_shortcuts_copy_fields(self):
+        return super()._get_shortcuts_copy_fields() | {'handler'}
 
     def clone_xlsx_into_spreadsheet(self, archive_source=False):
         """Clone an XLSX document into a new document with its content unzipped, and return the new document id"""
@@ -321,7 +372,21 @@ class Document(models.Model):
 
         unzipped, attachments = self._unzip_xlsx()
 
+        def adjust_role(partner, role):
+            """Ensure non-internal users do not have 'edit' access."""
+            user_ids = partner.with_context(active_test=False).user_ids
+            return 'view' if not user_ids or all(user_ids.mapped("share")) else role
+
+        access_ids = [
+            Command.create({
+                'partner_id': acc.partner_id.id,
+                'role': adjust_role(acc.partner_id, acc.role)
+            })
+            for acc in self.access_ids.filtered("role")
+        ]
+
         doc = self.copy({
+            "access_ids": access_ids,
             "attachment_id": False,
             "handler": "spreadsheet",
             "mimetype": "application/o-spreadsheet",
@@ -343,13 +408,22 @@ class Document(models.Model):
         if is_multipage is not None:
             return is_multipage
 
-        if self.mimetype == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" and self.attachment_id.raw:
-            try:
-                spreadsheet_data = self._unzip_xlsx()[0]
-            except XSLXReadUserError:
-                # No need to raise for this, just return that we don't know
+        if self.mimetype in XLSX_MIME_TYPES and self.attachment_id.raw:
+            file = io.BytesIO(self.attachment_id.raw)
+            if not zipfile.is_zipfile(file):
                 return None
-            return self._is_xlsx_data_multipage(spreadsheet_data)
+            with zipfile.ZipFile(file) as archive:
+                if '[Content_Types].xml' not in archive.namelist():
+                    # the xlsx file is invalid
+                    return None
+                with archive.open("[Content_Types].xml") as myfile:
+                    content = myfile.read()
+                    tree = etree.fromstring(content)
+                    nodes = tree.xpath(
+                        "//ns:Override[@ContentType='application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml']",
+                        namespaces={"ns": "http://schemas.openxmlformats.org/package/2006/content-types"}
+                    )
+                    return len(nodes) > 1
 
         if self.handler in ("spreadsheet", "frozen_spreadsheet"):
             spreadsheet_data = json.loads(self.spreadsheet_data or '{}')
@@ -379,16 +453,16 @@ class Document(models.Model):
     def _unzip_xlsx(self):
         file = io.BytesIO(self.attachment_id.raw)
         if not zipfile.is_zipfile(file) or self.mimetype not in XLSX_MIME_TYPES:
-            raise XSLXReadUserError(_("The file is not a xlsx file"))
+            raise UserError(_("The file is not a xlsx file"))
 
         unzipped_size = 0
         with zipfile.ZipFile(file) as input_zip:
             if len(input_zip.infolist()) > 1000:
-                raise XSLXReadUserError(_("The xlsx file is too big"))
+                raise UserError(_("The xlsx file is too big"))
 
             if "[Content_Types].xml" not in input_zip.namelist() or \
                     not any(name.startswith("xl/") for name in input_zip.namelist()):
-                raise XSLXReadUserError(_("The xlsx file is corrupted"))
+                raise UserError(_("The xlsx file is corrupted"))
 
             unzipped = {}
             attachments = []
@@ -400,7 +474,7 @@ class Document(models.Model):
 
                 unzipped_size += info.file_size
                 if unzipped_size > 50 * 1000 * 1000:  # 50MB
-                    raise XSLXReadUserError(_("The xlsx file is too big"))
+                    raise UserError(_("The xlsx file is too big"))
 
                 if info.filename.endswith((".xml", ".xml.rels")):
                     unzipped[info.filename] = input_zip.read(info.filename).decode()
@@ -425,15 +499,7 @@ class Document(models.Model):
 
     @api.autovacuum
     def _gc_spreadsheet(self):
-        yesterday = datetime.datetime.utcnow() - datetime.timedelta(days=1)
-        domain = [
-            ('handler', 'in', ('spreadsheet', 'frozen_spreadsheet')),
-            ('create_date', '<', yesterday),
-            ('spreadsheet_revision_ids', '=', False),
-            ('spreadsheet_snapshot', '=', False),
-            ('previous_attachment_ids', '=', False)
-        ]
-        self.search(domain).action_archive()
+        """TODO: remove in master"""
 
     def action_open_spreadsheet(self):
         self.ensure_one()
@@ -447,14 +513,18 @@ class Document(models.Model):
 
     @api.model
     def get_spreadsheets(self, domain=(), offset=0, limit=None):
-        domain = expression.AND([domain, [("handler", "in", ("spreadsheet", "frozen_spreadsheet"))]])
+        domain = expression.AND([domain, [("handler", "=", "spreadsheet")]])
         return {
             "records": self._get_spreadsheets_to_display(domain, offset, limit),
             "total": self.search_count(domain),
         }
 
     def _creation_msg(self):
-        return _("New spreadsheet created in Documents")
+        return (
+            _("New spreadsheet created in My Drive")
+            if not self.folder_id and self.owner_id == self.env.user
+            else  _("New spreadsheet created in Documents")
+        )
 
     @api.model
     def _get_spreadsheet_selector(self):
@@ -482,16 +552,21 @@ class Document(models.Model):
         if snapshot.get("lists") or snapshot.get("pivots") or snapshot.get("chartOdooMenusReferences"):
             return True
 
+        for sheet in snapshot.get("sheets", []):
+            for figure in sheet.get("figures", []):
+                if figure.get("data", {}).get("type", "").startswith("odoo_"):
+                    return True
+
         revisions = self._build_spreadsheet_messages()
-        return any(  # modification not yet committed in snapshot
-            command.get("type")
-            in ("INSERT_ODOO_LIST", "ADD_PIVOT", "LINK_ODOO_MENU_TO_CHART")
+        return any(
+            command.get("type") in ("INSERT_ODOO_LIST", "ADD_PIVOT", "LINK_ODOO_MENU_TO_CHART")
+            or (
+                command.get("type") == "CREATE_CHART"
+                and command.get("definition", {}).get("type", "").startswith("odoo_")
+            )
             for revision in revisions
             for command in revision.get("commands", [])
         )
 
     def _get_writable_record_name_field(self):
         return 'name'
-
-class XSLXReadUserError(UserError):
-    pass

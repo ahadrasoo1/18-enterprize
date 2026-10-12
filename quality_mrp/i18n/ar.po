@@ -1,23 +1,24 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* quality_mrp
-# 
+#
 # Translators:
-# Wil Odoo, 2024
-# 
+# Wil Odoo, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
+"POT-Creation-Date: 2025-12-29 18:46+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
+"Last-Translator: Wil Odoo, 2025\n"
 "Language-Team: Arabic (https://app.transifex.com/odoo/teams/41243/ar/)\n"
+"Language: ar\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: ar\n"
-"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
+"&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
 
 #. module: quality_mrp
 #: model_terms:ir.ui.view,arch_db:quality_mrp.mrp_production_view_form_inherit_quality
@@ -53,6 +54,14 @@ msgstr "التنبيهات"
 #: model:ir.model.fields,field_description:quality_mrp.field_mrp_production__check_ids
 msgid "Checks"
 msgstr "الفحوصات "
+
+#. module: quality_mrp
+#. odoo-python
+#: code:addons/quality_mrp/models/quality.py:0
+msgid ""
+"It will not be possible to edit the failed quantity of a quantity type "
+"quality check on a manufacturing order"
+msgstr ""
 
 #. module: quality_mrp
 #: model:ir.model,name:quality_mrp.model_mrp_production
@@ -123,10 +132,13 @@ msgstr "حركة المخزون"
 #. module: quality_mrp
 #. odoo-python
 #: code:addons/quality_mrp/models/quality.py:0
-msgid ""
-"The Quantity quality check type is not possible with manufacturing operation"
-" types."
-msgstr "نوع فحص جودة الكمية غير ممكن مع أنواع عمليات التصنيع. "
+msgid "Warning"
+msgstr "تحذير"
+
+#. module: quality_mrp
+#: model:ir.model,name:quality_mrp.model_quality_check_wizard
+msgid "Wizard for Quality Check Pop Up"
+msgstr "معالج لنافذة فحص الجودة "
 
 #. module: quality_mrp
 #: model:ir.model,name:quality_mrp.model_quality_check_on_demand
@@ -147,8 +159,8 @@ msgstr ""
 #. odoo-python
 #: code:addons/quality_mrp/models/mrp_production.py:0
 msgid ""
-"You cannot perform a quality check if the quantity producing is zero. Please"
-" set the production quantity first."
+"You cannot perform a quality check if the quantity producing is zero. Please "
+"set the production quantity first."
 msgstr ""
 "لا يمكنك إجراء فحوصات جودة إذا كانت الكمية المنتَجة 0. يُرجى إعداد كمية "
 "الإنتاج أولاً. "

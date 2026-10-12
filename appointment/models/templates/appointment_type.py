@@ -126,6 +126,7 @@ class AppointmentType(models.Model):
                 for weekday in range(2, 7)
             ],
             'schedule_based_on': 'resources',
+            'staff_user_ids': [],
         }
 
     @api.model
@@ -147,4 +148,5 @@ class AppointmentType(models.Model):
             ],
             'resource_manage_capacity': False,
             'schedule_based_on': 'resources',
+            'staff_user_ids': [],
         }

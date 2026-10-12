@@ -87,17 +87,13 @@ class HRPayslip(models.Model):
         return [header, *rows]
 
     def action_payslip_payment_report(self, export_format='l10n_sa_wps'):
-        self.ensure_one()
-        return {
-            'type': 'ir.actions.act_window',
-            'res_model': 'hr.payroll.payment.report.wizard',
-            'view_mode': 'form',
-            'view_id': 'hr_payslip_payment_report_view_form',
-            'views': [(False, 'form')],
-            'target': 'new',
+        action = super().action_payslip_payment_report()
+        if self.company_id.country_code != 'SA':
+            return action
+        action.update({
             'context': {
-                'default_payslip_ids': self.ids,
-                'default_payslip_run_id': self.payslip_run_id.id,
+                **action['context'],
                 'default_export_format': export_format,
             },
-        }
+        })
+        return action

@@ -17,11 +17,11 @@ class DocumentsHrController(http.Controller):
         the HR companies folders.
         """
         employee = self._check_token(employee_id, token)
-        if not employee.user_partner_id:
+        if not employee.work_contact_id:
             raise Forbidden()
 
         documents = http.request.env["documents.document"].sudo().search([
-            ("partner_id", "=", employee.user_partner_id.id),
+            ("partner_id", "=", employee.work_contact_id.id),
             ("id", "child_of", employee.company_id.documents_hr_folder.id),
         ])
 
@@ -40,7 +40,7 @@ class DocumentsHrController(http.Controller):
         if (
             not document
             or not document.parent_path.startswith(employee.company_id.documents_hr_folder.parent_path)
-            or document.partner_id != employee.user_partner_id
+            or document.partner_id != employee.work_contact_id
         ):
             raise Forbidden()
 

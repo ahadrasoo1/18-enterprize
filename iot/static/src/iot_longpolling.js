@@ -1,7 +1,6 @@
 /** @odoo-module **/
 
 import { registry } from '@web/core/registry';
-import { ensureJQuery } from "@web/core/ensure_jquery";
 import { IoTConnectionErrorDialog } from './iot_connection_error_dialog';
 
 export class IoTLongpolling {
@@ -11,7 +10,6 @@ export class IoTLongpolling {
     }
     // setup to allow patching
     async setup({ dialog }) {
-        await ensureJQuery();
         // CONSTANTS
         this.POLL_TIMEOUT = 60000;
         this.POLL_ROUTE = '/hw_drivers/event';
@@ -28,6 +26,7 @@ export class IoTLongpolling {
         this._listeners = {};
         this._delayedStartPolling(this.RPC_DELAY);
         this.dialogService = dialog;
+        this.useLna = false;
     }
 
     //--------------------------------------------------------------------------
@@ -49,7 +48,7 @@ export class IoTLongpolling {
                 last_event: 0,
                 devices: {},
                 session_id: this._session_id,
-                rpc: false,
+                abortController: null,
             };
         }
         for (const device in devices) {
@@ -86,11 +85,9 @@ export class IoTLongpolling {
      * @param {Object} data contains the information needed to perform an action on this device_identifier
      */
     action(iot_ip, device_identifier, data) {
-        this.protocol = window.location.protocol;
-        var self = this;
         var data = {
             params: {
-                session_id: self._session_id,
+                session_id: this._session_id,
                 device_identifier: device_identifier,
                 data: JSON.stringify(data),
             }
@@ -98,12 +95,7 @@ export class IoTLongpolling {
         var options = {
             timeout: this.ACTION_TIMEOUT,
         };
-        var prom = new Promise(function (resolve, reject) {
-            self._rpcIoT(iot_ip, self.ACTION_ROUTE, data, options)
-                .then(resolve)
-                .fail(reject);
-        });
-        return prom;
+        return this._rpcIoT(iot_ip, this.ACTION_ROUTE, data, options);
     }
 
     /**
@@ -114,7 +106,7 @@ export class IoTLongpolling {
      */
     startPolling(iot_ip, fallback = false) {
         if (iot_ip) {
-            if (!this._listeners[iot_ip].rpc) {
+            if (!this._listeners[iot_ip].abortController) {
                 this._poll(iot_ip, fallback);
             }
         } else {
@@ -132,9 +124,9 @@ export class IoTLongpolling {
      * from listening on notifications on this channel.
      */
     stopPolling(iot_ip) {
-        if (this._listeners[iot_ip].rpc) {
-            this._listeners[iot_ip].rpc.abort();
-            this._listeners[iot_ip].rpc = false;
+        if (this._listeners[iot_ip].abortController) {
+            this._listeners[iot_ip].abortController.abort();
+            this._listeners[iot_ip].abortController = null;
         }
     }
 
@@ -161,6 +153,14 @@ export class IoTLongpolling {
         return s.join("");
     }
 
+    formatEndpoint(ip, route, forceHttp = false) {
+        const protocol = forceHttp ? "http:" : window.location.protocol;
+        const rawIp = forceHttp ? ip.replace(/^(\d+)-(\d+)-(\d+)-(\d+).*/, "$1.$2.$3.$4") : ip;
+        const url = new URL(`${protocol}//${rawIp}`);
+        url.pathname = route;
+        return url.toString();
+    }
+
     /**
      * Execute a RPC to the box
      * Used to do polling or an action
@@ -170,24 +170,29 @@ export class IoTLongpolling {
      * @param {Object} data information needed to perform an action or the listener for the polling
      * @param {Object} options.timeout
      */
-    _rpcIoT(iot_ip, route, data, options) {
-        this.protocol = window.location.protocol;
-        var port = this.protocol === 'http:' ? ':8069' : '';
-        var url = this.protocol + '//' + iot_ip + port;
-        var queryOptions = Object.assign({
-            url: url + route,
-            dataType: 'json',
-            contentType: "application/json;charset=utf-8",
-            data: JSON.stringify(data),
-            method: 'POST',
-        }, options);
-        var request = $.ajax(queryOptions);
-        if (this._listeners[iot_ip] && route === '/hw_drivers/event') {
-            this._listeners[iot_ip].rpc = request;
-            return this._listeners[iot_ip].rpc;
+    async _rpcIoT(iot_ip, route, data, options) {
+        const url = this.formatEndpoint(iot_ip, route, this.useLna);
+        const requestParams = {
+            method: "POST",
+            body: JSON.stringify(data),
+            headers: {
+                "Content-Type": "application/json;charset=utf-8",
+            },
+            targetAddressSpace: this.useLna ? "local" : undefined,
+        };
+        const abortController = new AbortController();
+        if (options.timeout) {
+            requestParams.signal = AbortSignal.any([AbortSignal.timeout(options.timeout), abortController.signal]);
         } else {
-            return request;
+            requestParams.signal = abortController.signal;
         }
+
+        if (this._listeners[iot_ip] && route === '/hw_drivers/event') {
+            this._listeners[iot_ip].abortController = abortController;
+        }
+
+        const response = await fetch(url, requestParams);
+        return await response.json();
     }
 
     /**
@@ -197,7 +202,6 @@ export class IoTLongpolling {
      * @param {Boolean} fallback if true, no `IoTConnectionErrorDialog` popup will be displayed on fail
      */
     _poll(iot_ip, fallback = false) {
-        var self = this;
         var listener = this._listeners[iot_ip];
         var data = {
             params: {
@@ -209,27 +213,30 @@ export class IoTLongpolling {
         };
 
         // The backend has a maximum cycle time of 50 seconds so give +10 seconds
-        this._rpcIoT(iot_ip, this.POLL_ROUTE, data, options)
-            .then(function (result) {
-                self._retries = 0;
-                self._listeners[iot_ip].rpc = false;
-                const remainingDevices = Object.keys(self._listeners[iot_ip].devices || {});
+        this._rpcIoT(iot_ip, this.POLL_ROUTE, data, options).then(
+            (result) => {
+                this._retries = 0;
+                this._listeners[iot_ip].abortController = null;
+                const remainingDevices = Object.keys(this._listeners[iot_ip].devices || {});
                 if (result.result) {
-                    if (self._session_id === result.result.session_id) {
-                        self._onSuccess(iot_ip, result.result);
+                    if (this._session_id === result.result.session_id) {
+                        this._onSuccess(iot_ip, result.result);
                     }
                 } else if (remainingDevices.length > 0) {
-                    self._poll(iot_ip);
+                    this._poll(iot_ip);
                 }
-            }).fail(function (jqXHR, textStatus) {
-                if (textStatus === 'error') {
-                    if (!fallback) {
-                        self._doWarnFail(iot_ip);
-                    }
-                } else {
-                    self._onError();
+            },
+            (e) => {
+                if (e.name === "AbortError") {
+                    return;
                 }
-            });
+                if (e.name === "TimeoutError") {
+                    this._onError();
+                } else if (!fallback) {
+                    this._doWarnFail(iot_ip);
+                }
+            }
+        );
     }
 
     _onSuccess(iot_ip, result) {
@@ -256,6 +263,15 @@ export class IoTLongpolling {
      */
     _doWarnFail(url) {
         this.dialogService.add(IoTConnectionErrorDialog, { href: url });
+    }
+
+    /**
+     * Enable/disable using Local Network Access.
+     * This forces HTTP on all IoT requests.
+     * @param {boolean} isLnaEnabled
+     */
+    setLna(isLnaEnabled) {
+        this.useLna = isLnaEnabled;
     }
 }
 

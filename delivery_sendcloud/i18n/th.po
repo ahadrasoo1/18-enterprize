@@ -1,22 +1,23 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* delivery_sendcloud
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Rasareeyar Lappiam, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
+"POT-Creation-Date: 2026-04-10 18:47+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
+"Last-Translator: Rasareeyar Lappiam, 2025\n"
 "Language-Team: Thai (https://app.transifex.com/odoo/teams/41243/th/)\n"
+"Language: th\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: th\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. module: delivery_sendcloud
@@ -24,9 +25,11 @@ msgstr ""
 #: code:addons/delivery_sendcloud/models/sendcloud_service.py:0
 msgid ""
 "\n"
-"Additionally, some individual product(s) are too heavy for the heaviest available shipping method.\n"
+"Additionally, some individual product(s) are too heavy for the heaviest "
+"available shipping method.\n"
 "                             \n"
-"Divide the quantity of the following product(s) across your packages if possible or choose another carrier:\n"
+"Divide the quantity of the following product(s) across your packages if "
+"possible or choose another carrier:\n"
 "\t%s"
 msgstr ""
 "\n"
@@ -40,10 +43,20 @@ msgstr ""
 #: code:addons/delivery_sendcloud/models/sendcloud_service.py:0
 msgid ""
 "\n"
-"Try to distribute your products across your packages so that they weigh less than %(max_weight)s %(unit)s or choose another carrier."
+"Try to distribute your products across your packages so that they weigh less "
+"than %(max_weight)s %(unit)s or choose another carrier."
 msgstr ""
 "\n"
-"พยายามกระจายผลิตภัณฑ์ของคุณทั่วทั้งพัสดุเพื่อให้มีน้ำหนักน้อยกว่า %(max_weight)s %(unit)s หรือเลือกผู้ให้บริการรายอื่น"
+"พยายามกระจายผลิตภัณฑ์ของคุณทั่วทั้งพัสดุเพื่อให้มีน้ำหนักน้อยกว่า %(max_weight)s %(unit)s "
+"หรือเลือกผู้ให้บริการรายอื่น"
+
+#. module: delivery_sendcloud
+#. odoo-python
+#: code:addons/delivery_sendcloud/models/sendcloud_service.py:0
+msgid ""
+" Please make sure there is an address with the same name under \"Address "
+"Name (optional)\" in your Sendcloud Address configuration."
+msgstr ""
 
 #. module: delivery_sendcloud
 #. odoo-python
@@ -63,8 +76,8 @@ msgid ""
 "<i class=\"fa fa-exclamation-triangle\"/> Do not forget to load your "
 "SendCloud shipping products for a valid configuration."
 msgstr ""
-"<i class=\"fa fa-exclamation-triangle\"/> อย่าลืมโหลดผลิตภัณฑ์จัดส่ง "
-"SendCloud ของคุณเพื่อการกำหนดค่าที่ถูกต้อง"
+"<i class=\"fa fa-exclamation-triangle\"/> อย่าลืมโหลดผลิตภัณฑ์จัดส่ง SendCloud "
+"ของคุณเพื่อการกำหนดค่าที่ถูกต้อง"
 
 #. module: delivery_sendcloud
 #: model_terms:ir.ui.view,arch_db:delivery_sendcloud.view_delivery_carrier_form
@@ -74,8 +87,8 @@ msgid ""
 "creation."
 msgstr ""
 "<i class=\"fa fa-exclamation-triangle\"/>ในสภาพแวดล้อมการทดสอบ "
-"เพื่อหลีกเลี่ยงการเรียกเก็บเงิน "
-"การจัดส่งของคุณจะ<b>ถูกยกเลิก</b>โดยอัตโนมัติหลังจากการสร้างฉลาก"
+"เพื่อหลีกเลี่ยงการเรียกเก็บเงิน การจัดส่งของคุณจะ<b>ถูกยกเลิก</"
+"b>โดยอัตโนมัติหลังจากการสร้างฉลาก"
 
 #. module: delivery_sendcloud
 #: model_terms:ir.ui.view,arch_db:delivery_sendcloud.view_delivery_carrier_form
@@ -93,8 +106,7 @@ msgid ""
 "enabled carriers in your Sendcloud account."
 msgstr ""
 "<i class=\"fa fa-info-circle\"/> "
-"สินค้าจัดส่งที่มีจำหน่ายขึ้นอยู่กับผู้ให้บริการที่เปิดใช้งานในบัญชี "
-"Sendcloud ของคุณ"
+"สินค้าจัดส่งที่มีจำหน่ายขึ้นอยู่กับผู้ให้บริการที่เปิดใช้งานในบัญชี Sendcloud ของคุณ"
 
 #. module: delivery_sendcloud
 #: model:ir.model.fields,field_description:delivery_sendcloud.field_sendcloud_shipping_wizard__sendcloud_products_code
@@ -192,10 +204,13 @@ msgstr "สินค้าจัดส่ง"
 #. module: delivery_sendcloud
 #: model:ir.model.fields,help:delivery_sendcloud.field_delivery_carrier__sendcloud_shipping_rules
 msgid ""
-"Depending your Sendcloud account type, through rules you can define the shipping method to use depending on different conditions like destination, weight, value, etc.\n"
+"Depending your Sendcloud account type, through rules you can define the "
+"shipping method to use depending on different conditions like destination, "
+"weight, value, etc.\n"
 "Rules can override shipping product selected in Odoo"
 msgstr ""
-"ขึ้นอยู่กับประเภทบัญชี Sendcloud ของคุณ คุณสามารถกำหนดวิธีจัดส่งที่จะใช้ตามเงื่อนไขที่แตกต่างกัน เช่น ปลายทาง น้ำหนัก มูลค่า ฯลฯ ผ่านกฎต่างๆ\n"
+"ขึ้นอยู่กับประเภทบัญชี Sendcloud ของคุณ คุณสามารถกำหนดวิธีจัดส่งที่จะใช้ตามเงื่อนไขที่แตกต่างกัน "
+"เช่น ปลายทาง น้ำหนัก มูลค่า ฯลฯ ผ่านกฎต่างๆ\n"
 "กฎสามารถแทนที่การจัดส่งผลิตภัณฑ์ที่เลือกใน Odoo ได้"
 
 #. module: delivery_sendcloud
@@ -208,8 +223,8 @@ msgstr "แสดงชื่อ"
 #. odoo-python
 #: code:addons/delivery_sendcloud/models/sendcloud_service.py:0
 msgid ""
-"Each address line can only contain a maximum of 75 characters. You can split"
-" the address into multiple lines to try to avoid this limitation."
+"Each address line can only contain a maximum of 75 characters. You can split "
+"the address into multiple lines to try to avoid this limitation."
 msgstr ""
 "แต่ละบรรทัดที่อยู่สามารถมีตัวอักษรได้สูงสุด 75 ตัวเท่านั้น "
 "คุณสามารถแบ่งที่อยู่ออกเป็นหลายบรรทัดเพื่อหลีกเลี่ยงข้อจำกัดนี้"
@@ -291,8 +306,7 @@ msgstr "โหลดผลิตภัณฑ์ของคุณ"
 #: code:addons/delivery_sendcloud/models/sendcloud_service.py:0
 msgid ""
 "Make sure country codes are set in partner country and warehouse country"
-msgstr ""
-"ตรวจสอบให้แน่ใจว่าได้ตั้งค่ารหัสประเทศในประเทศของพาร์ทเนอร์และประเทศของคลังสินค้า"
+msgstr "ตรวจสอบให้แน่ใจว่าได้ตั้งค่ารหัสประเทศในประเทศของพาร์ทเนอร์และประเทศของคลังสินค้า"
 
 #. module: delivery_sendcloud
 #. odoo-javascript
@@ -346,9 +360,7 @@ msgstr "ไม่มีการหยิบหรือสั่งซื้อ
 msgid ""
 "Note that a unit of the product '%s' is heavier than the maximum weight "
 "allowed by the shipping method."
-msgstr ""
-"โปรดทราบว่าหน่วยของผลิตภัณฑ์ '%s' "
-"นั้นหนักกว่าน้ำหนักสูงสุดที่วิธีจัดส่งกำหนด"
+msgstr "โปรดทราบว่าหน่วยของผลิตภัณฑ์ '%s' นั้นหนักกว่าน้ำหนักสูงสุดที่วิธีจัดส่งกำหนด"
 
 #. module: delivery_sendcloud
 #. odoo-python
@@ -382,9 +394,11 @@ msgstr "ฟังก์ชันอื่นๆ"
 #: code:addons/delivery_sendcloud/static/src/views/sendcloud_product_selection_widget.xml:0
 msgid ""
 "Please check SendCloud return product documentation before selecting return "
-"product. For some products, you can be charged for return labels printed but"
-" not used."
+"product. For some products, you can be charged for return labels printed but "
+"not used."
 msgstr ""
+"โปรดตรวจสอบเอกสารประกอบผลิตภัณฑ์ส่งคืนของ SendCloud ก่อนเลือกผลิตภัณฑ์ส่งคืน "
+"สำหรับผลิตภัณฑ์บางรายการ คุณอาจถูกเรียกเก็บเงินสำหรับฉลากส่งคืนที่ถูกพิมพ์แต่ไม่ได้ใช้งาน"
 
 #. module: delivery_sendcloud
 #: model:ir.model.fields,field_description:delivery_sendcloud.field_delivery_carrier__delivery_type
@@ -400,6 +414,11 @@ msgstr "การคืนสินค้า"
 #: model:ir.model.fields,field_description:delivery_sendcloud.field_sendcloud_shipping_wizard__return_products
 msgid "Return Products"
 msgstr "คืนสินค้า"
+
+#. module: delivery_sendcloud
+#: model:ir.model.fields,help:delivery_sendcloud.field_delivery_carrier__country_id
+msgid "Select the country to be used by this delivery method"
+msgstr "เลือกประเทศที่จะใช้ในการจัดส่งวิธีนี้"
 
 #. module: delivery_sendcloud
 #: model_terms:ir.ui.view,arch_db:delivery_sendcloud.view_delivery_carrier_form
@@ -480,9 +499,9 @@ msgstr "สินค้าจัดส่ง Sendcloud"
 #. module: delivery_sendcloud
 #. odoo-python
 #: code:addons/delivery_sendcloud/models/sendcloud_service.py:0
-msgid ""
-"Sendcloud is not responding. Check your credentials and/or retry later."
+msgid "Sendcloud is not responding. Check your credentials and/or retry later."
 msgstr ""
+"Sendcloud ไม่มีการตอบสนอง โปรดตรวจสอบข้อมูลประจำตัวของคุณและ/หรือลองใหม่อีกครั้งในภายหลัง"
 
 #. module: delivery_sendcloud
 #: model:ir.model.fields,field_description:delivery_sendcloud.field_delivery_carrier__country_id
@@ -531,8 +550,7 @@ msgstr ""
 msgid ""
 "Some packages in your transfer are too heavy for the heaviest available "
 "shipping method."
-msgstr ""
-"พัสดุบางชิ้นในการโอนเงินของคุณมีน้ำหนักมากเกินไปสำหรับวิธีจัดส่งที่หนักที่สุดที่มีอยู่"
+msgstr "พัสดุบางชิ้นในการโอนเงินของคุณมีน้ำหนักมากเกินไปสำหรับวิธีจัดส่งที่หนักที่สุดที่มีอยู่"
 
 #. module: delivery_sendcloud
 #. odoo-python
@@ -564,12 +582,16 @@ msgid ""
 "delivery partner via the delivery order and make sure the parent of the "
 "delivery partner is the partner you want to ship to."
 msgstr ""
+"ที่อยู่จัดส่งของลูกค้าถูกลบออกจากสถานที่รับสินค้าแล้ว ข้อมูลนี้จำเป็นสำหรับ Sendcloud "
+"โปรดไปที่บริษัทจัดส่งผ่านใบสั่งซื้อการจัดส่ง "
+"และตรวจสอบให้แน่ใจว่าบริษัทหลักของบริษัทจัดส่งคือบริษัทที่คุณต้องการจัดส่งให้"
 
 #. module: delivery_sendcloud
 #. odoo-python
 #: code:addons/delivery_sendcloud/models/sendcloud_service.py:0
 msgid ""
-"The estimated shipping price cannot be computed because the weight is missing for the following product(s): \n"
+"The estimated shipping price cannot be computed because the weight is "
+"missing for the following product(s): \n"
 " %s"
 msgstr ""
 "ไม่สามารถคำนวณราคาจัดส่งโดยประมาณได้เนื่องจากไม่มีน้ำหนักของสินค้าต่อไปนี้:\n"
@@ -587,8 +609,7 @@ msgstr "สินค้าจัดส่งที่กำหนดค่าไ
 msgid ""
 "The total weight of your transfer is too heavy for the heaviest available "
 "shipping method."
-msgstr ""
-"น้ำหนักรวมของการโอนเงินของคุณหนักเกินไปสำหรับวิธีจัดส่งที่หนักที่สุดที่มีอยู่"
+msgstr "น้ำหนักรวมของการโอนเงินของคุณหนักเกินไปสำหรับวิธีจัดส่งที่หนักที่สุดที่มีอยู่"
 
 #. module: delivery_sendcloud
 #. odoo-python
@@ -604,9 +625,8 @@ msgstr ""
 #. odoo-python
 #: code:addons/delivery_sendcloud/models/delivery_carrier.py:0
 msgid ""
-"There is no rate available for this order with the selected shipping "
-"product."
-msgstr ""
+"There is no rate available for this order with the selected shipping product."
+msgstr "ไม่มีอัตราค่าบริการสำหรับคำสั่งซื้อนี้กับผลิตภัณฑ์จัดส่งที่เลือก"
 
 #. module: delivery_sendcloud
 #. odoo-python
@@ -630,7 +650,8 @@ msgstr "ไม่มีวิธีจัดส่งสำหรับการ
 msgid ""
 "There's no method with matching weight range for packages :\n"
 "%s\n"
-"You can either choose another carrier, change your filters or redefine the content of your package(s)."
+"You can either choose another carrier, change your filters or redefine the "
+"content of your package(s)."
 msgstr ""
 "ไม่มีวิธีใดที่มีช่วงน้ำหนักที่ตรงกันสำหรับบรรจุภัณฑ์ :\n"
 "%s\n"
@@ -642,8 +663,7 @@ msgstr ""
 msgid ""
 "There's no shipping method matching all your selected filters for this "
 "picking/order."
-msgstr ""
-"ไม่มีวิธีจัดส่งที่ตรงกับตัวกรองที่คุณเลือกทั้งหมดสำหรับการเลือก/คำสั่งซื้อนี้"
+msgstr "ไม่มีวิธีจัดส่งที่ตรงกับตัวกรองที่คุณเลือกทั้งหมดสำหรับการเลือก/คำสั่งซื้อนี้"
 
 #. module: delivery_sendcloud
 #. odoo-python
@@ -693,8 +713,7 @@ msgstr "คุณต้องเพิ่มรหัสสาธารณะแ
 msgid ""
 "You must assign the required 'Shipping From' field in order to search for "
 "available products"
-msgstr ""
-"คุณต้องกำหนดฟิลด์ 'จากการจัดส่ง' ที่จำเป็นเพื่อค้นหาผลิตภัณฑ์ที่มีจำหน่าย"
+msgstr "คุณต้องกำหนดฟิลด์ 'จากการจัดส่ง' ที่จำเป็นเพื่อค้นหาผลิตภัณฑ์ที่มีจำหน่าย"
 
 #. module: delivery_sendcloud
 #. odoo-python
@@ -716,3 +735,9 @@ msgid ""
 msgstr ""
 "สร้างขึ้นใน Sendcloud <br/>\n"
 "            <b>หมายเลขติดตาม:</b>"
+
+#. module: delivery_sendcloud
+#. odoo-javascript
+#: code:addons/delivery_sendcloud/static/src/views/sendcloud_product_selection_widget.xml:0
+msgid "g"
+msgstr ""

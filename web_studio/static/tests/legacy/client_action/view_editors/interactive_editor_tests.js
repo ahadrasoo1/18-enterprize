@@ -227,6 +227,7 @@ QUnit.module("View Editors", () => {
                 type: "monetary",
                 store: true,
                 currency_field: "x_currency_id",
+                manual: true,
             };
 
             await createViewEditor({
@@ -252,12 +253,48 @@ QUnit.module("View Editors", () => {
                 },
             });
             await click(target.querySelector("th[data-name='monetary_field']"));
+            assert.containsOnce(target, ".o_web_studio_sidebar div[name='currency_field']");
+            assert.containsNone(
+                target,
+                ".o_web_studio_sidebar div[name='currency_field'] .o_select_menu_toggler_clear"
+            );
             await editAnySelect(
                 target,
                 ".o_web_studio_sidebar .o_web_studio_property_currency_field .o_select_menu",
                 "Currency2"
             );
             assert.verifySteps(["set_currency", "edit_view"]);
+        });
+
+        QUnit.test("field monetary not manual (base field) currency_field is readonly", async (assert) => {
+            const arch =
+                "<list><field name='display_name'/><field name='monetary_field'/><field name='x_currency_id'/></list>";
+            serverData.models.coucou.fields.x_currency_id = {
+                string: "Currency",
+                type: "many2one",
+                relation: "res.currency",
+                store: true,
+            };
+            serverData.models.coucou.fields.monetary_field = {
+                string: "Monetary",
+                type: "monetary",
+                store: true,
+                currency_field: "x_currency_id",
+                manual: false,
+            };
+            await createViewEditor({
+                serverData,
+                type: "list",
+                resModel: "coucou",
+                arch
+            });
+
+            await click(target.querySelector("th[data-name='monetary_field']"));
+            assert.containsOnce(target, ".o_web_studio_sidebar div[name='currency_field'] .o_select_menu_toggler:disabled");
+            assert.containsNone(
+                target,
+                ".o_web_studio_sidebar div[name='currency_field'] .o_select_menu_toggler_clear"
+            );
         });
 
         QUnit.test("add a related field", async function (assert) {
@@ -1134,6 +1171,62 @@ QUnit.module("View Editors", () => {
                 target.querySelector(".o_web_studio_view_renderer .o_view_controller"),
                 "o_kanban_view my_custom_class my_custom_class2"
             );
+        });
+
+        QUnit.test("edit selection values trims values", async (assert) => {
+            const arch = `<list><field name="display_name"/></list>`;
+            await createViewEditor({
+                type: "list",
+                serverData,
+                resModel: "coucou",
+                arch,
+                mockRPC: function (route, args) {
+                    if (route === "/web_studio/edit_view") {
+                        assert.step("edit view");
+                        assert.strictEqual(
+                            args.operations[0].node.field_description.selection,
+                            '[["with spaces","with spaces"]]'
+                        );
+                    }
+                },
+            });
+
+            await dragAndDrop(
+                target.querySelector(".o_web_studio_new_fields .o_web_studio_field_selection"),
+                target.querySelector(".o_web_studio_hook")
+            );
+
+            await editInput(
+                target.querySelector(
+                    ".modal .o_web_studio_selection_editor .o-web-studio-interactive-list-item-input"
+                ),
+                null,
+                "with spaces   "
+            );
+            await click(target.querySelector(".o-web-studio-interactive-list-edit-item"));
+            await click(target.querySelector(".modal .btn-primary"));
+            assert.verifySteps(["edit view"]);
+        });
+
+        QUnit.test("should not crash when adding a selection field with empty values", async (assert) => {
+            const arch = "<list><field name='display_name'/></list>";
+            await createViewEditor({
+                type: "list",
+                serverData,
+                resModel: "coucou",
+                arch,
+            });
+
+            await dragAndDrop(
+                target.querySelector(".o_web_studio_new_fields .o_web_studio_field_selection"),
+                target.querySelector(".o_web_studio_hook")
+            );
+            await nextTick();
+
+            let notCrashed = true;
+            window.onerror = () => (notCrashed = false);
+            await click(target.querySelector(".o-web-studio-interactive-list-edit-item"));
+            assert.ok(notCrashed);
         });
     });
 });

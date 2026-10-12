@@ -2,9 +2,12 @@
 
 import json
 import re
+from urllib.parse import quote
+from werkzeug.exceptions import BadRequest
 
-from odoo.http import request, route
+from odoo.http import request, route, STATIC_CACHE_LONG
 from odoo.addons.documents.controllers.documents import ShareRoute
+from odoo.tools import replace_exceptions
 
 # ends with .osheet.json or .osheet (6).json
 SPREADSHEET_RE = re.compile(r'\.osheet(\s?\(\d+\))?\.json$')
@@ -29,10 +32,11 @@ class SpreadsheetShareRoute(ShareRoute):
             {
                 "spreadsheet_name": document.name,
                 "share": document,
+                "is_frozen": document.handler == "frozen_spreadsheet",
                 "session_info": request.env["ir.http"].session_info(),
                 "props": {
-                    "dataUrl": f"/documents/spreadsheet/{document.access_token}",
-                    "downloadExcelUrl": f"/documents/content/{document.access_token}",
+                    "dataUrl": f"/documents/spreadsheet/{quote(document.access_token, safe='')}",
+                    "downloadExcelUrl": "",
                 },
             },
         )
@@ -69,3 +73,27 @@ class SpreadsheetShareRoute(ShareRoute):
             document_sudo.handler = 'spreadsheet'
             document_sudo._check_spreadsheet_data()
         return document_sudo
+
+    @route(['/documents/display_thumbnail/<access_token>',
+            '/documents/display_thumbnail/<access_token>/<int:width>x<int:height>'],
+            type='http', auth='public', readonly=True)
+    def documents_display_thumbnail(self, access_token, width='0', height='0', unique=''):
+        """Show the thumbnail of the document, or a placeholder.
+
+        :param access_token: the access token to the document record
+        :param width: resize the thumbnail to this maximum width
+        :param height: resize the thumbnail to this maximum height
+        :param unique: force storing the file in the browser cache, best
+            used with the checksum of the attachment
+        """
+        with replace_exceptions(ValueError, by=BadRequest):
+            width = int(width)
+            height = int(height)
+        send_file_kwargs = {}
+        if unique:
+            send_file_kwargs['immutable'] = True
+            send_file_kwargs['max_age'] = STATIC_CACHE_LONG
+        spreadsheet_sudo = self._from_access_token(access_token, skip_log=True)
+        return request.env['ir.binary']._get_image_stream_from(
+            spreadsheet_sudo, 'display_thumbnail', width=width, height=height
+        ).get_response(as_attachment=False, **send_file_kwargs)

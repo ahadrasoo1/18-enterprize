@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
-"PO-Revision-Date: 2024-09-25 09:25+0000\n"
+"POT-Creation-Date: 2026-06-12 17:46+0000\n"
+"PO-Revision-Date: 2026-06-12 17:46+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -54,16 +54,6 @@ msgid "01/01/2023 9:00 AM"
 msgstr ""
 
 #. module: planning
-#: model_terms:ir.actions.act_window,help:planning.planning_action_roles
-msgid "04:00"
-msgstr ""
-
-#. module: planning
-#: model_terms:ir.actions.act_window,help:planning.planning_action_roles
-msgid "08:00"
-msgstr ""
-
-#. module: planning
 #: model_terms:hr.job,job_details:planning.job_maintenance_technician
 #: model_terms:hr.job,job_details:planning.job_quality_control
 msgid "1 Onsite Interview"
@@ -73,36 +63,6 @@ msgstr ""
 #: model_terms:hr.job,job_details:planning.job_maintenance_technician
 #: model_terms:hr.job,job_details:planning.job_quality_control
 msgid "1 Phone Call"
-msgstr ""
-
-#. module: planning
-#: model_terms:ir.ui.view,arch_db:planning.resource_planning
-msgid "100"
-msgstr ""
-
-#. module: planning
-#: model_terms:ir.actions.act_window,help:planning.planning_action_roles
-msgid "12:00"
-msgstr ""
-
-#. module: planning
-#: model_terms:ir.actions.act_window,help:planning.planning_action_roles
-msgid "13"
-msgstr ""
-
-#. module: planning
-#: model_terms:ir.actions.act_window,help:planning.planning_action_roles
-msgid "14"
-msgstr ""
-
-#. module: planning
-#: model_terms:ir.actions.act_window,help:planning.planning_action_roles
-msgid "15"
-msgstr ""
-
-#. module: planning
-#: model_terms:ir.actions.act_window,help:planning.planning_action_roles
-msgid "16:00"
 msgstr ""
 
 #. module: planning
@@ -170,7 +130,7 @@ msgid ""
 "<div>\n"
 "                    <p t-if=\"ctx.get('old_assignee_name')\">Dear <t t-out=\"ctx['old_assignee_name']\">Anita Oliver</t>,</p>\n"
 "                    <p t-else=\"\">Hello,</p>\n"
-"                    <br>\n"
+"                    <br/>\n"
 "                    <p>\n"
 "                        The following shift that you requested to switch has been re-assigned\n"
 "                        <t t-if=\"ctx.get('new_assignee_name')\"> to <t t-out=\"ctx['new_assignee_name']\">Marc Demo</t></t>.\n"
@@ -207,7 +167,7 @@ msgid ""
 "                            <td style=\"padding: 5px;\" t-out=\"object.name or ''\">/</td>\n"
 "                        </tr>\n"
 "                    </table>\n"
-"                    <br>\n"
+"                    <br/>\n"
 "                </div>\n"
 "            "
 msgstr ""
@@ -215,29 +175,27 @@ msgstr ""
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.planning_shift_notification
 msgid ""
-"<i class=\"fa fa-check-circle text-success\"/>\n"
+"<i class=\"fa fa-check-circle\"/>\n"
 "                        You have successfully requested to switch your shift. You will be notified when another employee takes over your shift."
 msgstr ""
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.planning_shift_notification
 msgid ""
-"<i class=\"fa fa-check-circle text-success\"/> Request to switch shift "
-"cancelled successfully."
+"<i class=\"fa fa-check-circle\"/> Request to switch shift cancelled "
+"successfully."
+msgstr ""
+
+#. module: planning
+#: model_terms:ir.ui.view,arch_db:planning.planning_shift_notification
+msgid "<i class=\"fa fa-check-circle\"/> This shift is no longer assigned to you."
 msgstr ""
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.planning_shift_notification
 msgid ""
-"<i class=\"fa fa-check-circle text-success\"/> This shift is no longer "
-"assigned to you."
-msgstr ""
-
-#. module: planning
-#: model_terms:ir.ui.view,arch_db:planning.planning_shift_notification
-msgid ""
-"<i class=\"fa fa-check-circle text-success\"/> You were successfully "
-"assigned this open shift."
+"<i class=\"fa fa-check-circle\"/> You were successfully assigned this open "
+"shift."
 msgstr ""
 
 #. module: planning
@@ -255,15 +213,15 @@ msgstr ""
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.planning_shift_notification
 msgid ""
-"<i class=\"fa fa-exclamation-circle text-warning\"/> This shift is already "
-"assigned to another employee."
+"<i class=\"fa fa-exclamation-circle\"/> This shift is already assigned to "
+"another employee."
 msgstr ""
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.planning_shift_notification
 msgid ""
-"<i class=\"fa fa-exclamation-circle text-warning\"/> You can no longer "
-"unassign yourself from this shift."
+"<i class=\"fa fa-exclamation-circle\"/> You can no longer unassign yourself "
+"from this shift."
 msgstr ""
 
 #. module: planning
@@ -290,7 +248,7 @@ msgstr ""
 
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.planning_view_kanban
-msgid "<i class=\"me-1 mt-1 fa fa-clock-o\" role=\"img\" aria-label=\"Date\" title=\"Date\"/>"
+msgid "<i class=\"mt-1 fa fa-clock-o\" role=\"img\" aria-label=\"Date\" title=\"Date\"/>"
 msgstr ""
 
 #. module: planning
@@ -484,10 +442,10 @@ msgid ""
 "                        margin: 20px 15px 0px 15px;\n"
 "                    }\n"
 "                </style>\n"
-"                <div>\n"
+"                <body><div>\n"
 "                    <p t-if=\"ctx.get('employee_name')\">Dear <t t-out=\"ctx['employee_name']\">Anita Oliver</t>,</p>\n"
 "                    <p t-else=\"\">Hello,</p>\n"
-"                    <br>\n"
+"                    <br/>\n"
 "                    <p t-if=\"ctx.get('open_shift_available')\">We have a new shift opening:</p>\n"
 "                    <p t-else=\"\">You have been assigned the following shift:</p>\n"
 "                    <table style=\"margin-left: 30px;\">\n"
@@ -528,11 +486,11 @@ msgid ""
 "                        <a t-if=\"ctx.get('google_url')\" t-att-href=\"ctx['google_url']\" target=\"_blank\" class=\"planning_mail_template_button\">Add to Google Calendar</a>\n"
 "                        <a t-if=\"ctx.get('iCal_url')\" t-att-href=\"ctx['iCal_url']\" target=\"_blank\" class=\"planning_mail_template_button\">Add to iCal/Outlook</a>\n"
 "                    </div>\n"
-"                    <br>\n"
+"                    <br/>\n"
 "                    <p t-if=\"ctx.get('open_shift_available')\">If you are interested and available, please assign yourself this open shift.</p>\n"
 "                    <p t-else=\"\">In case the current shift doesn't suit you, we encourage you to reach out to your colleagues and request to switch shifts. They might be interested in exchanging shifts with you.</p>\n"
 "                </div>\n"
-"            "
+"            </body>"
 msgstr ""
 
 #. module: planning
@@ -549,10 +507,10 @@ msgid ""
 "                    text-align: center;\n"
 "                }\n"
 "                </style>\n"
-"                <div>\n"
+"                <body><div>\n"
 "                    <p t-if=\"ctx.get('employee')\">Dear <t t-out=\"ctx['employee'].name or ''\">Anita Oliver</t>,</p>\n"
 "                    <p t-else=\"\">Hello,</p>\n"
-"                    <br>\n"
+"                    <br/>\n"
 "                    <p t-if=\"ctx.get('start_datetime') and ctx.get('end_datetime')\">\n"
 "                        Your upcoming shifts from <t t-out=\"format_date(ctx['start_datetime'])\">05-05-2021</t>\n"
 "                        to <t t-out=\"format_date(ctx['end_datetime'])\">05-11-2021</t> have been published.\n"
@@ -565,7 +523,7 @@ msgid ""
 "                            <a t-att-href=\"ctx['planning_url_ics']\" target=\"_blank\" class=\"planning_mail_template_button\" style=\"color: #374151; background-color: #E7E9ED; border: solid #E7E9ED;\">Add to Calendar</a>\n"
 "                        </div>\n"
 "                    </div>\n"
-"                    <br>\n"
+"                    <br/>\n"
 "                    <p t-if=\"ctx.get('slot_unassigned') or (object.allow_self_unassign and object.self_unassign_days_before)\">\n"
 "                        <t t-if=\"ctx.get('slot_unassigned')\">\n"
 "                            We would also like to remind you that there are some open shifts available, and if you are interested and available, please assign yourself to those shifts.\n"
@@ -574,10 +532,10 @@ msgid ""
 "                            If you are unable to work a shift that has been assigned to you, please unassign yourself within <t t-out=\"object.self_unassign_days_before or ''\">5</t> day(s) before the start of the shift.\n"
 "                        </t>\n"
 "                    </p>\n"
-"                    <p t-if=\"ctx.get('message')\" t-out=\"ctx['message']\"></p>\n"
+"                    <p t-if=\"ctx.get('message')\" t-out=\"ctx['message']\"/>\n"
 "                    <p t-if=\"object.allow_self_unassign\">In case your current schedule doesn't suit you, we encourage you to reach out to your colleagues and request to switch shifts. They might be interested in exchanging shifts with you.</p>\n"
 "                </div>\n"
-"            "
+"            </body>"
 msgstr ""
 
 #. module: planning
@@ -714,6 +672,7 @@ msgstr ""
 #. module: planning
 #. odoo-javascript
 #: code:addons/planning/static/src/views/planning_form/planning_form_view.js:0
+#: code:addons/planning/static/src/views/planning_gantt/planning_gantt_renderer.js:0
 msgid "Are you sure you want to delete this shift?"
 msgstr ""
 
@@ -981,6 +940,7 @@ msgstr ""
 #. module: planning
 #. odoo-javascript
 #: code:addons/planning/static/src/views/planning_form/planning_form_view.js:0
+#: code:addons/planning/static/src/views/planning_gantt/planning_gantt_renderer.js:0
 #: model_terms:ir.ui.view,arch_db:planning.planning_role_view_kanban
 #: model_terms:ir.ui.view,arch_db:planning.planning_view_gantt
 #: model_terms:ir.ui.view,arch_db:planning.planning_view_kanban
@@ -1817,6 +1777,7 @@ msgstr ""
 
 #. module: planning
 #: model:ir.model.fields,field_description:planning.field_planning_slot__slot_properties
+#: model_terms:ir.ui.view,arch_db:planning.planning_view_search
 msgid "Properties"
 msgstr ""
 
@@ -2211,6 +2172,12 @@ msgstr ""
 
 #. module: planning
 #. odoo-python
+#: code:addons/planning/wizard/planning_send.py:0
+msgid "Shifts published — employees without a work email were skipped"
+msgstr ""
+
+#. module: planning
+#. odoo-python
 #: code:addons/planning/models/planning.py:0
 msgid "Shifts reset to draft"
 msgstr ""
@@ -2352,13 +2319,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/planning/models/planning_template.py:0
 msgid ""
-"The start hour cannot be before the end hour for a one-day shift template."
-msgstr ""
-
-#. module: planning
-#. odoo-python
-#: code:addons/planning/wizard/planning_send.py:0
-msgid "The work email is missing for the following employees:"
+"The start hour cannot be after the end hour for a one-day shift template."
 msgstr ""
 
 #. module: planning
@@ -2580,6 +2541,12 @@ msgstr ""
 #. module: planning
 #. odoo-python
 #: code:addons/planning/models/planning.py:0
+msgid "You cannot assign yourself to a shift in the past."
+msgstr ""
+
+#. module: planning
+#. odoo-python
+#: code:addons/planning/models/planning.py:0
 msgid "You cannot cancel a request to switch made by another user."
 msgstr ""
 
@@ -2599,6 +2566,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/planning/models/planning.py:0
 msgid "You cannot switch a shift that is in the past."
+msgstr ""
+
+#. module: planning
+#. odoo-python
+#: code:addons/planning/models/planning.py:0
+msgid "You cannot unassign yourself from a shift in the past."
 msgstr ""
 
 #. module: planning
@@ -2660,12 +2633,6 @@ msgstr ""
 #. module: planning
 #. odoo-javascript
 #: code:addons/planning/static/src/components/address_recurrency_confirmation_dialog/address_recurrency_confirmation_dialog.xml:0
-msgid "all"
-msgstr ""
-
-#. module: planning
-#. odoo-javascript
-#: code:addons/planning/static/src/components/address_recurrency_confirmation_dialog/address_recurrency_confirmation_dialog.xml:0
 msgid "all shifts"
 msgstr ""
 
@@ -2706,18 +2673,6 @@ msgstr ""
 #. module: planning
 #: model_terms:ir.ui.view,arch_db:planning.planning_view_gantt
 msgid "other shift(s) in conflict."
-msgstr ""
-
-#. module: planning
-#. odoo-javascript
-#: code:addons/planning/static/src/components/address_recurrency_confirmation_dialog/address_recurrency_confirmation_dialog.xml:0
-msgid "subsequent"
-msgstr ""
-
-#. module: planning
-#. odoo-javascript
-#: code:addons/planning/static/src/components/address_recurrency_confirmation_dialog/address_recurrency_confirmation_dialog.xml:0
-msgid "this"
 msgstr ""
 
 #. module: planning

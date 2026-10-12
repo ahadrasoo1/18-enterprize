@@ -5,7 +5,7 @@
 
 {
     'name': 'UK - Accounting Reports',
-    'version': '1.1',
+    'version': '1.2',
     'category': 'Accounting/Localizations/Reporting',
     'description': """
 Accounting reports for UK
@@ -29,7 +29,7 @@ MTD-VAT API to HMRC.
     ],
     'assets': {
         'web.assets_backend': [
-            "l10n_uk_reports/static/src/components/**/*",
+            "l10n_uk_reports/static/**/*",
             ],
     },
     'installable': True,

@@ -30,21 +30,11 @@
 
         <!-- internal -->
 
-        <record id="documents_data_design_brief_pdf_document" model="documents.document" forcecreate="0">
-            <field name="name">Interior Design Brief.pdf</field>
-            <field name="datas" type="base64" file="documents/demo/files/Interior_Design_Brief.pdf"/>
-            <field name="folder_id" ref="documents.document_internal_folder"/>
-            <field name="access_internal">view</field>
-            <field name="tag_ids" eval="[(6,0,[ref('documents.documents_tag_to_validate'),
-                                               ref('documents.documents_tag_project')])]"/>
-        </record>
-
         <record id="documents_data_multi_pdf_document" model="documents.document" forcecreate="0">
             <field name="name">Mails_inbox.pdf</field>
             <field name="datas" type="base64" file="documents/data/files/Mails_inbox.pdf"/>
             <field name="folder_id" ref="documents.document_internal_folder"/>
             <field name="access_internal">view</field>
-            <field name="tag_ids" eval="[(6,0,[ref('documents.documents_tag_inbox')])]"/>
         </record>
 
         <record id="documents_image_city_document" model="documents.document" forcecreate="0">
@@ -59,7 +49,6 @@
             <field name="datas" type="base64" file="documents/data/files/mail.png"/>
             <field name="folder_id" ref="documents.document_internal_folder"/>
             <field name="access_internal">view</field>
-            <field name="tag_ids" eval="[(6,0,[ref('documents.documents_tag_inbox')])]"/>
         </record>
         <!-- The thumbnail is added after -->
         <record id="documents_image_mail_document" model="documents.document" forcecreate="0">
@@ -72,6 +61,7 @@
             <field name="folder_id" ref="documents.document_internal_folder"/>
             <field name="access_internal">view</field>
         </record>
+
 
         <!-- finance -->
 
@@ -96,7 +86,6 @@
             <field name="datas" type="base64" file="documents/demo/files/invoice_openvalue.pdf"/>
             <field name="folder_id" ref="documents.document_finance_folder"/>
             <field name="access_internal">edit</field>
-            <field name="tag_ids" eval="[(6,0,[ref('documents.documents_tag_inbox')])]"/>
         </record>
 
         <record id="documents_data_comercial_tenancy_agreement" model="documents.document" forcecreate="0">
@@ -104,7 +93,6 @@
             <field name="datas" type="base64" file="documents/demo/files/Commercial-Tenancy-Agreement.pdf"/>
             <field name="folder_id" ref="documents.document_finance_folder"/>
             <field name="access_internal">edit</field>
-            <field name="tag_ids" eval="[(6,0,[ref('documents.documents_tag_inbox')])]"/>
         </record>
 
         <!-- marketing -->

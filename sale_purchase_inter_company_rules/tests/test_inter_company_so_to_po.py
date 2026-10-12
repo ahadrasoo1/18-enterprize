@@ -1,7 +1,8 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+from dateutil.relativedelta import relativedelta
 from .common import TestInterCompanyRulesCommonSOPO
-from odoo import Command
+from odoo import Command, fields
 from odoo.tests import Form, tagged
 
 
@@ -18,6 +19,7 @@ class TestInterCompanySaleToPurchase(TestInterCompanyRulesCommonSOPO):
             line.name = 'Service'
             line.product_id = self.product_consultant
             line.price_unit = 450.0
+            line.discount = 10.0
 
         return sale_order.save()
 
@@ -32,16 +34,18 @@ class TestInterCompanySaleToPurchase(TestInterCompanyRulesCommonSOPO):
 
         # I check that Quotation of purchase order and order line is same as sale order
         purchase_order = self.env['purchase.order'].search([('company_id', '=', partner.id)], limit=1)
+        fp = self.env['account.fiscal.position'].with_company(partner)._get_fiscal_position(company.partner_id)
 
         self.assertEqual(purchase_order.state, "draft", "Invoice should be in draft state.")
         self.assertEqual(purchase_order.partner_id, company.partner_id, "Vendor does not correspond to Company %s." % company.name)
         self.assertEqual(purchase_order.company_id, partner, "Company is not correspond to purchase order.")
-        self.assertEqual(purchase_order.amount_total, 517.5, "Total amount is incorrect.")
+        self.assertEqual(purchase_order.amount_total, 465.75, "Total amount is incorrect.")
         self.assertEqual(purchase_order.order_line[0].product_id, self.product_consultant, "Product in line is incorrect.")
         self.assertEqual(purchase_order.order_line[0].name, 'Service', "Product name is incorrect.")
         self.assertEqual(purchase_order.order_line[0].price_unit, 450, "Price unit is incorrect.")
         self.assertEqual(purchase_order.order_line[0].product_qty, 1, "Product qty is incorrect.")
-        self.assertEqual(purchase_order.order_line[0].price_subtotal, 450, "line total is incorrect.")
+        self.assertEqual(purchase_order.order_line[0].price_subtotal, 405, "line total is incorrect.")
+        self.assertEqual(purchase_order.fiscal_position_id, fp)
         return purchase_order
 
     def test_00_inter_company_sale_purchase(self):
@@ -174,6 +178,21 @@ class TestInterCompanySaleToPurchase(TestInterCompanyRulesCommonSOPO):
         purchase_order = self.env['purchase.order'].search([('partner_id', '=', self.company_b.partner_id.id)], limit=1)
         self.assertTrue(purchase_order)
         purchase_order.with_user(self.res_users_company_a).button_confirm()
+
+    def test_05_inter_company_delivery_date(self):
+        """ Ensures the SO's commitment date is properly reflected on the PO's expected arrival.
+        """
+        today = fields.Datetime.today()
+        self.company_b.update({
+            'intercompany_generate_purchase_orders': True,
+        })
+
+        sale_order = self._generate_draft_sale_order(self.company_a, self.company_b.partner_id, self.res_users_company_a)
+        sale_order.commitment_date = today + relativedelta(days=7)
+        sale_order.with_user(self.res_users_company_a).action_confirm()
+
+        purchase_order = self.env['purchase.order'].search([('company_id', '=', self.company_b.id)], limit=1)
+        self.assertEqual(purchase_order.date_planned, today + relativedelta(days=7))
 
     def test_sale_to_specific_partner(self):
         """

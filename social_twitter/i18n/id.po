@@ -1,23 +1,27 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* social_twitter
-# 
+# * social_twitter
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Abe Manyo, 2024
+#
+# Weblate <noreply-mt-weblate@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:28+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Indonesian (https://app.transifex.com/odoo/teams/41243/id/)\n"
+"POT-Creation-Date: 2026-04-10 18:52+0000\n"
+"PO-Revision-Date: 2026-04-11 18:34+0000\n"
+"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"Language-Team: Indonesian <https://translate.odoo.com/projects/odoo-18/"
+"social_twitter/id/>\n"
+"Language: id\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: id\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 5.16.2\n"
 
 #. module: social_twitter
 #. odoo-python
@@ -58,6 +62,11 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:social_twitter.social_stream_post_view_kanban
 msgid "<i class=\"fa fa-retweet me-1\" title=\"Repost a post\"/>"
 msgstr "<i class=\"fa fa-retweet me-1\" title=\"Repost postingan\"/>"
+
+#. module: social_twitter
+#: model_terms:ir.ui.view,arch_db:social_twitter.twitter_preview
+msgid "@x ·"
+msgstr ""
 
 #. module: social_twitter
 #. odoo-python
@@ -185,11 +194,11 @@ msgstr ""
 #. odoo-python
 #: code:addons/social_twitter/models/social_stream_post.py:0
 msgid ""
-"Failed to fetch the posts in the same thread: '%(text)s' using the account "
-"%(account)s."
+"Failed to fetch the posts in the same thread: '%(text)s' using the account %"
+"(account)s."
 msgstr ""
-"Gagal untuk mengambil post di thread yang sama: '%(text)s' menggunakan akun "
-"%(account)s."
+"Gagal untuk mengambil post di thread yang sama: '%(text)s' menggunakan akun %"
+"(account)s."
 
 #. module: social_twitter
 #. odoo-python
@@ -206,7 +215,7 @@ msgstr "Favorit untuk"
 #: model:ir.model.fields,field_description:social_twitter.field_social_post__has_twitter_account
 #: model:ir.model.fields,field_description:social_twitter.field_social_post_template__has_twitter_account
 msgid "Has X Account"
-msgstr ""
+msgstr "Memiliki Akun X"
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_twitter_account__id
@@ -284,7 +293,7 @@ msgstr "Silakan pilih akun X untuk tipe stream ini."
 #. odoo-python
 #: code:addons/social_twitter/models/social_post_template.py:0
 msgid "Please specify either an X Message or upload some X Images."
-msgstr ""
+msgstr "Silakan tulis Pesan X atau unggah Gambar X."
 
 #. module: social_twitter
 #. odoo-javascript
@@ -338,8 +347,7 @@ msgstr "Baca Lebih mengenai Akun X"
 #. odoo-python
 #: code:addons/social_twitter/models/social_stream_post.py:0
 msgid "Replies from posts older than 7 days must be accessed on Twitter.com"
-msgstr ""
-"Balasan dari post lebih tua dari 7 hari harus diakses pada Twitter.com"
+msgstr "Balasan dari post lebih tua dari 7 hari harus diakses pada Twitter.com"
 
 #. module: social_twitter
 #: model_terms:ir.ui.view,arch_db:social_twitter.social_stream_post_view_kanban
@@ -418,8 +426,8 @@ msgstr "Akun X Sosial"
 #. odoo-python
 #: code:addons/social_twitter/models/social_stream.py:0
 msgid ""
-"The keyword you've typed in does not look valid. Please try again with other"
-" words."
+"The keyword you've typed in does not look valid. Please try again with other "
+"words."
 msgstr ""
 "Kata kunci yang Anda ketik sepertinya tidak valid. Mohon coba lagi dengan "
 "kata-kata lain."
@@ -514,14 +522,20 @@ msgid ""
 "limit or API may have send improper response (error: %s)."
 msgstr ""
 "Kita tidak dapat menunggah gambar Anda, mungkin corrupted, mungkin melebihi "
-"batas ukuran atau API mungkin mengirimkan tanggapan yang tidak benar (error:"
-" %s)."
+"batas ukuran atau API mungkin mengirimkan tanggapan yang tidak benar (error: "
+"%s)."
 
 #. module: social_twitter
 #: model:ir.model.fields,help:social_twitter.field_social_post__twitter_image_ids
 #: model:ir.model.fields,help:social_twitter.field_social_post_template__twitter_image_ids
 msgid "Will attach images to your posts."
-msgstr ""
+msgstr "Akan melampirkan gambar ke post Anda."
+
+#. module: social_twitter
+#: model:ir.model.fields.selection,name:social_twitter.selection__social_media__media_type__twitter
+#: model:social.media,name:social_twitter.social_media_twitter
+msgid "X"
+msgstr "X"
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_stream_post__twitter_author_id
@@ -557,7 +571,7 @@ msgstr "ID X"
 #: model:ir.model.fields,field_description:social_twitter.field_social_post__twitter_image_ids
 #: model:ir.model.fields,field_description:social_twitter.field_social_post_template__twitter_image_ids
 msgid "X Images"
-msgstr ""
+msgstr "Gambar X"
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_stream_post__twitter_likes_count
@@ -568,7 +582,7 @@ msgstr "Likes X"
 #: model:ir.model.fields,field_description:social_twitter.field_social_post__twitter_message
 #: model:ir.model.fields,field_description:social_twitter.field_social_post_template__twitter_message
 msgid "X Message"
-msgstr ""
+msgstr "Pesan X"
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_account__twitter_oauth_token
@@ -683,10 +697,12 @@ msgstr ""
 #: code:addons/social_twitter/models/social_stream.py:0
 msgid ""
 "You cannot create a Stream from this X account.\n"
-"It may be because it's protected. To solve this, please make sure you follow it before trying again."
+"It may be because it's protected. To solve this, please make sure you follow "
+"it before trying again."
 msgstr ""
 "Anda tidak dapat Stream dari akun X ini.\n"
-"Ini bisa jadi karena akun ini dilindungi. Untuk menyelesaikan masalah ini, pastikan Anda mengikuti akun ini sebelum mencoba lagi."
+"Ini bisa jadi karena akun ini dilindungi. Untuk menyelesaikan masalah ini, "
+"pastikan Anda mengikuti akun ini sebelum mencoba lagi."
 
 #. module: social_twitter
 #. odoo-python
@@ -699,11 +715,9 @@ msgstr ""
 #. odoo-python
 #: code:addons/social_twitter/models/social_media.py:0
 msgid ""
-"You need to add the following callback URL to your X application settings: "
-"%s"
+"You need to add the following callback URL to your X application settings: %s"
 msgstr ""
-"Anda harus menambahkan callback URL berikut ke pengaturan aplikasi X Anda: "
-"%s"
+"Anda harus menambahkan callback URL berikut ke pengaturan aplikasi X Anda: %s"
 
 #. module: social_twitter
 #: model_terms:ir.ui.view,arch_db:social_twitter.social_stream_view_form

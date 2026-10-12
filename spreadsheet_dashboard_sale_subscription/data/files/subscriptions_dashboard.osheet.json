@@ -1,5 +1,5 @@
 {
-  "version": 21,
+  "version": 22,
   "sheets": [
     {
       "id": "sheet1",
@@ -714,32 +714,23 @@
         "F50": 1,
         "F63": 1,
         "F76": 1,
-        "A38": 2,
-        "A51": 2,
-        "A64": 2,
-        "A77": 2,
-        "C38": 2,
+        "A51:B51": 2,
+        "A64:B64": 2,
+        "A77:B77": 2,
+        "A38:C38": 2,
         "F38": 2,
-        "F51": 2,
-        "F64": 2,
-        "F77": 2,
+        "F51:G51": 2,
+        "F64:G64": 2,
+        "F77:G77": 2,
         "H38": 2,
-        "A39:A48": 3,
-        "A52:A61": 3,
-        "A65:A74": 3,
-        "A78:A87": 3,
-        "C39:D48": 3,
-        "C52:D61": 3,
-        "C65:D74": 3,
-        "C78:D87": 3,
-        "F39:F48": 3,
-        "F52:F61": 3,
-        "F65:F74": 3,
-        "F78:F87": 3,
-        "H39:I48": 3,
-        "H52:I61": 3,
-        "H65:I74": 3,
-        "H78:I87": 3,
+        "A39:D48": 3,
+        "A52:D61": 3,
+        "A65:D74": 3,
+        "A78:D87": 3,
+        "F39:I48": 3,
+        "F52:I61": 3,
+        "F65:I74": 3,
+        "F78:I87": 3,
         "D38": 4,
         "C51:D51": 4,
         "C64:D64": 4,
@@ -918,6 +909,7 @@
           "ranges": ["F39:F48"]
         }
       ],
+      "dataValidationRules": [],
       "figures": [
         {
           "id": "51823220-f22b-4359-8711-579a249c91bb",
@@ -937,9 +929,9 @@
             },
             "type": "scorecard",
             "background": "#FFF7ED",
-            "baseline": "Data!D3",
+            "baseline": "Data!D4",
             "baselineDescr": "ARR",
-            "keyValue": "Data!D2",
+            "keyValue": "Data!D3",
             "humanize": false
           }
         },
@@ -961,9 +953,9 @@
             },
             "type": "scorecard",
             "background": "#EFF6FF",
-            "baseline": "Data!B6",
+            "baseline": "Data!B7",
             "baselineDescr": "/sub.",
-            "keyValue": "Data!B5",
+            "keyValue": "Data!B6",
             "humanize": false
           }
         },
@@ -1199,7 +1191,7 @@
             "type": "scorecard",
             "background": "#EFF6FF",
             "baselineDescr": "Month(s)",
-            "keyValue": "Data!D10",
+            "keyValue": "Data!D11",
             "humanize": false
           }
         },
@@ -1222,7 +1214,7 @@
             "type": "scorecard",
             "background": "#EFF6FF",
             "baselineDescr": "",
-            "keyValue": "Data!D11",
+            "keyValue": "Data!D12",
             "humanize": false
           }
         },
@@ -1298,14 +1290,13 @@
       "areGridLinesVisible": true,
       "isVisible": true,
       "headerGroups": { "ROW": [], "COL": [] },
-      "dataValidationRules": [],
       "comments": {}
     },
     {
       "id": "eae01f9c-c461-4489-ade4-957ef2459d40",
       "name": "Data",
       "colNumber": 26,
-      "rowNumber": 103,
+      "rowNumber": 104,
       "rows": {},
       "cols": {
         "0": { "size": 215 },
@@ -1321,32 +1312,36 @@
           "content": "=PIVOT.HEADER(1,\"measure\",\"mrr_change_normalized\")"
         },
         "A3": {
+          "content": "=PIVOT.HEADER(2,\"measure\",\"recurring_monthly:sum\")"
+        },
+        "A4": {
           "content": "=PIVOT.HEADER(2,\"measure\",\"recurring_yearly\")"
         },
-        "A4": { "content": "=_t(\"New MRR\")" },
-        "A5": { "content": "=_t(\"Total Subscriptions\")" },
-        "A6": { "content": "=_t(\"Avg MRR / Subscriptions\")" },
-        "A7": { "content": "=_t(\"Churned\")" },
-        "A8": { "content": "=_t(\"Churned %\")" },
-        "A9": { "content": "=_t(\"Total churned\")" },
-        "A10": { "content": "=_t(\"Lifespan\")" },
-        "A11": { "content": "=_t(\"Lifetime Value\")" },
+        "A5": { "content": "=_t(\"New MRR\")" },
+        "A6": { "content": "=_t(\"Total Subscriptions\")" },
+        "A7": { "content": "=_t(\"Avg MRR / Subscriptions\")" },
+        "A8": { "content": "=_t(\"Churned\")" },
+        "A9": { "content": "=_t(\"Churned %\")" },
+        "A10": { "content": "=_t(\"Total churned\")" },
+        "A11": { "content": "=_t(\"Lifespan\")" },
+        "A12": { "content": "=_t(\"Lifetime Value\")" },
         "B1": { "content": "=_t(\"Current\")" },
         "B2": { "content": "=PIVOT.VALUE(1,\"mrr_change_normalized\")" },
-        "B3": { "content": "=PIVOT.VALUE(2,\"recurring_yearly\")" },
-        "B4": {
-          "content": "=IFERROR(PIVOT.VALUE(3,\"mrr_change_normalized\",\"event_type\",\"0_creation\",\"event_date:year\",2023))"
+        "B3": { "content": "=PIVOT.VALUE(2,\"recurring_monthly:sum\")" },
+        "B4": { "content": "=PIVOT.VALUE(2,\"recurring_yearly\")" },
+        "B5": {
+          "content": "=IFERROR(PIVOT.VALUE(3,\"mrr_change_normalized\",\"event_type\",\"0_creation\",\"event_date:year\",YEAR(NOW())))"
         },
-        "B5": { "content": "=PIVOT.VALUE(10,\"order_reference\")" },
-        "B6": { "content": "=IFERROR(B2/B5)" },
-        "B7": { "content": "=PIVOT.VALUE(11,\"order_reference\")" },
-        "B8": { "content": "=B7/(B5+B7)" },
-        "B9": { "content": "=PIVOT.VALUE(12,\"price_subtotal\")" },
-        "B10": { "content": "=1/B8" },
-        "B11": { "content": "=B6/B8" },
+        "B6": { "content": "=PIVOT.VALUE(10,\"order_reference\")" },
+        "B7": { "content": "=IFERROR(B3/B6)" },
+        "B8": { "content": "=PIVOT.VALUE(11,\"order_reference\")" },
+        "B9": { "content": "=B8/(B6+B8)" },
+        "B10": { "content": "=PIVOT.VALUE(12,\"price_subtotal\")" },
+        "B11": { "content": "=1/B9" },
+        "B12": { "content": "=B7/B9" },
         "C1": { "content": "=_t(\"Previous\")" },
-        "C4": {
-          "content": "=PIVOT.VALUE(3,\"mrr_change_normalized\",\"event_type\",\"0_creation\",\"event_date:year\",2022)"
+        "C5": {
+          "content": "=PIVOT.VALUE(3,\"mrr_change_normalized\",\"event_type\",\"0_creation\",\"event_date:year\",YEAR(NOW())-1)"
         },
         "D1": { "content": "=_t(\"Current\")" },
         "D2": { "content": "=IFERROR(FORMAT.LARGE.NUMBER(B2))" },
@@ -1356,22 +1351,23 @@
         "D6": { "content": "=IFERROR(FORMAT.LARGE.NUMBER(B6))" },
         "D7": { "content": "=IFERROR(FORMAT.LARGE.NUMBER(B7))" },
         "D8": { "content": "=IFERROR(FORMAT.LARGE.NUMBER(B8))" },
-        "D9": { "content": "=-IFERROR(FORMAT.LARGE.NUMBER(B9))" },
-        "D10": { "content": "=IFERROR(FORMAT.LARGE.NUMBER(B10))" },
-        "D11": { "content": "=FORMAT.LARGE.NUMBER(B11)" },
+        "D9": { "content": "=IFERROR(FORMAT.LARGE.NUMBER(B9))" },
+        "D10": { "content": "=-IFERROR(FORMAT.LARGE.NUMBER(B10))" },
+        "D11": { "content": "=IFERROR(FORMAT.LARGE.NUMBER(B11))" },
+        "D12": { "content": "=FORMAT.LARGE.NUMBER(B12)" },
         "E1": { "content": "=_t(\"Previous\")" },
-        "E4": { "content": "=IFERROR(FORMAT.LARGE.NUMBER(C4))" }
+        "E5": { "content": "=IFERROR(FORMAT.LARGE.NUMBER(C5))" }
       },
-      "styles": { "A1:E1": 5, "C4": 6, "D2:E11": 6 },
+      "styles": { "A1:E1": 5, "C5": 6, "D2": 6, "D4:D12": 6, "E2:E12": 6 },
       "formats": {},
       "borders": {},
       "conditionalFormats": [],
+      "dataValidationRules": [],
       "figures": [],
       "tables": [],
       "areGridLinesVisible": true,
       "isVisible": true,
       "headerGroups": { "ROW": [], "COL": [] },
-      "dataValidationRules": [],
       "comments": {}
     }
   ],
@@ -1428,7 +1424,7 @@
       "left": { "style": "thin", "color": "#FFFFFF" }
     }
   },
-  "revisionId": "START_REVISION",
+  "revisionId": "6a1fba62-7f5c-4a82-a13b-25a19fb93974",
   "uniqueFigureIds": true,
   "settings": {
     "locale": {
@@ -1532,15 +1528,16 @@
       ],
       "id": "2",
       "measures": [
-        { "id": "recurring_yearly", "fieldName": "recurring_yearly" }
+        { "id": "recurring_yearly", "fieldName": "recurring_yearly" },
+        {
+          "id": "recurring_monthly:sum",
+          "fieldName": "recurring_monthly",
+          "aggregator": "sum",
+          "isHidden": false
+        }
       ],
       "model": "sale.subscription.report",
       "name": "Subscription Analysis",
-      "sortedColumn": {
-        "groupId": [[], []],
-        "measure": "recurring_monthly",
-        "order": "desc"
-      },
       "formulaId": "2",
       "columns": [],
       "rows": []
@@ -2154,7 +2151,7 @@
         },
         "dbb716a1-5977-47ee-a53e-ca5716303433": {},
         "7d95fe28-fd13-4805-948c-95742e7d6733": {
-          "chain": "message_partner_ids",
+          "chain": "partner_id",
           "type": "many2many"
         },
         "b75963ca-ab5f-4da5-9c90-67526517e5e7": {
@@ -2162,7 +2159,7 @@
           "type": "many2one"
         },
         "4181e8e3-2e7e-42be-a88b-f24acb7d03e7": {
-          "chain": "activity_user_id",
+          "chain": "user_id",
           "type": "many2one"
         },
         "ec466626-f54a-4955-9611-eaa2719f1afb": {
@@ -2201,7 +2198,7 @@
         },
         "dbb716a1-5977-47ee-a53e-ca5716303433": {},
         "7d95fe28-fd13-4805-948c-95742e7d6733": {
-          "chain": "message_partner_ids",
+          "chain": "partner_id",
           "type": "many2many"
         },
         "b75963ca-ab5f-4da5-9c90-67526517e5e7": {
@@ -2209,7 +2206,7 @@
           "type": "many2one"
         },
         "4181e8e3-2e7e-42be-a88b-f24acb7d03e7": {
-          "chain": "activity_user_id",
+          "chain": "user_id",
           "type": "many2one"
         },
         "ec466626-f54a-4955-9611-eaa2719f1afb": {

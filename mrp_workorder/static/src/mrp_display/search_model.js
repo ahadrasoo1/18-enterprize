@@ -35,21 +35,7 @@ export class MrpDisplaySearchModel extends SearchModel {
                 },
             ],
         });
-        this.recordCache = { ids: [] };
         this.workorders = true;
-    }
-
-    removeRecordFromCache(id) {
-        this.recordCache.ids.splice(this.recordCache.ids.indexOf(id), 1);
-    }
-
-    invalidateRecordCache() {
-        this.recordCache.ids = [];
-    }
-
-    async _notify() {
-        this.invalidateRecordCache();
-        super._notify();
     }
 
     _getFacets() {
@@ -114,5 +100,21 @@ export class MrpDisplaySearchModel extends SearchModel {
             }
         }
         return super.deleteFavorite(favoriteId);
+    }
+
+    setWorkcenterFilter(workcenters) {
+        const filter = Object.values(this.searchItems).find(
+            (si) => si.name === "shop_floor_this_station"
+        );
+        if (!filter) {
+            return; // Avoid crashing when 'This Station' filter not installed.
+        }
+        filter.domain =
+            "['|', ['workorder_ids.workcenter_id.id', 'in', [" +
+            workcenters.map((wc) => wc.id).join(",") +
+            "]], ['workorder_ids', '=', False]]";
+        if (this.query.find((queryElem) => queryElem.searchItemId === filter.id)) {
+            this._notify();
+        }
     }
 }

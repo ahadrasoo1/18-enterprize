@@ -47,7 +47,6 @@
             </field>
             <field name="partner_id" position="attributes">
                 <attribute name="invisible">not allow_billable and not is_fsm</attribute>
-                <attribute name="required">is_fsm</attribute>
             </field>
             <xpath expr="//field[@name='child_ids']/list/field[@name='partner_id']" position="attributes">
                 <attribute name="column_invisible">not parent.allow_billable and not parent.is_fsm</attribute>

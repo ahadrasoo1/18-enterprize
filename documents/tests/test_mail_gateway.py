@@ -9,13 +9,14 @@ from odoo.addons.mail.tests.common import MailCommon
 from odoo.addons.test_mail.data.test_mail_data import MAIL_EML_ATTACHMENT, MAIL_NO_BODY
 from odoo.exceptions import AccessError, ValidationError
 from odoo.tests import new_test_user
+from odoo.tests.common import RecordCapturer
 from odoo.tools import mute_logger
 
 
 class TestMailGateway(MailCommon):
-    """Test document creation on incoming mail.
+    """Test document creation/update on incoming mail.
 
-    Especially that the partner_id is correctly set on the created document.
+    Mainly that the partner_id is correctly set on the created document.
     """
 
     @classmethod
@@ -29,12 +30,27 @@ class TestMailGateway(MailCommon):
             'alias_name': 'inbox-test',
         })
 
+        cls.folder_2 = cls.env['documents.document'].create({
+            'name': 'folder',
+            'type': 'folder',
+            'alias_tag_ids': False,
+            'alias_name': 'inbox-test-2',
+            'company_id': cls.company_2.id
+        })
+
         # edit the alias tags after the alias has been created
         cls.folder.alias_tag_ids = cls.tag.ids
 
         cls.email_with_no_partner = tools.email_normalize('non-existing@test.com')
         cls.pre_existing_partner = cls.env['res.partner'].find_or_create('existing@test.com')
         cls.email_filenames = ['attachment', 'original_msg.eml']
+        cls.document = cls.env['documents.document'].with_context(mail_create_nolog=True).create({
+            'access_internal': 'edit',
+            'datas': b"R0lGODdhAQABAIAAAP///////ywAAAAAAQABAAACAkQBADs=",
+            'name': 'file.gif',
+            'mimetype': 'image/gif',
+            'folder_id': cls.env['documents.document'].create({'name': 'folderA', 'type': 'folder'}).id,
+        })
 
         cls.other_tag = cls.env['documents.tag'].create({'name': 'new tag'})
         cls.non_existing_tag_id = cls.env['documents.document'].with_context(active_test=False).search([], order='id DESC', limit=1).id + 1
@@ -42,7 +58,7 @@ class TestMailGateway(MailCommon):
         cls.test_activity_type = cls.env['mail.activity.type'].create({'name': 'Test Activity Type'})
         cls.test_activity_type2 = cls.env['mail.activity.type'].create({'name': 'Test Activity Type2'})
 
-    def send_test_mail_with_attachment(self, email_from):
+    def send_test_mail_with_attachment(self, email_from, msg_id=None, references=None):
         with self.mock_mail_gateway():
             self.format_and_process(
                 MAIL_EML_ATTACHMENT,
@@ -50,6 +66,23 @@ class TestMailGateway(MailCommon):
                 f'inbox-test@{self.alias_domain}',
                 subject='Test document creation on incoming mail',
                 target_model='documents.document',
+                references=references or '<f3b9f8f8-28fa-2543-cab2-7aa68f679ebb@odoo.com>',
+                msg_id=msg_id or '<cb7eaf62-58dc-2017-148c-305d0c78892f@odoo.com>',
+            )
+        documents = self.env['documents.document'].search([('name', 'in', self.email_filenames)])
+        self.assertEqual(len(documents), len(self.email_filenames))
+        return documents
+
+    def send_test_mail_with_attachment_on_different_company(self, email_from, msg_id=None, references=None):
+        with self.mock_mail_gateway():
+            self.format_and_process(
+                MAIL_EML_ATTACHMENT,
+                email_from,
+                f'inbox-test-2@{self.alias_domain_c2_name}',
+                subject='Test document creation on incoming mail',
+                target_model='documents.document',
+                references=references or '<f3b9f8f8-28fa-2543-cab2-7aa68f679ebb@odoo.com>',
+                msg_id=msg_id or '<cb7eaf62-58dc-2017-148c-305d0c78892f@odoo.com>',
             )
         documents = self.env['documents.document'].search([('name', 'in', self.email_filenames)])
         self.assertEqual(len(documents), len(self.email_filenames))
@@ -66,6 +99,31 @@ class TestMailGateway(MailCommon):
                 'type': 'binary',
                 'alias_name': 'test',
             })
+
+    def test_reply_with_attachment(self):
+        """ Test reply with an attachment to a message posted on a document. """
+        message_ask_files = self.document.with_user(self.user_employee).message_post(
+            subject='Could you send the missing files ?', subtype_xmlid='mail.mt_comment')
+        with self.mock_mail_gateway(), RecordCapturer(self.env['documents.document'], []) as capture:
+            self.format_and_process(
+                MAIL_EML_ATTACHMENT,
+                'ihavethefiles@example.com',
+                'non-alias@test.com',
+                msg_id='<dc8eaf62-58dc-2017-148c-305d0c78892f@odoo.com>',
+                references=message_ask_files.message_id,
+                subject='Please find the files in attachment',
+                target_model='documents.document',
+            )
+
+        self.assertFalse(capture.records, "No new document has been created")
+        self.assertEqual(self.env['ir.attachment'].search_count(
+            [('res_id', '=', self.document.id), ('res_model', '=', self.document._name)]), 3)
+        doc_messages = self.env['mail.message'].search(
+            [('res_id', '=', self.document.id), ('model', '=', self.document._name)])
+        self.assertEqual(len(doc_messages), 2)
+        self.assertListEqual(
+            doc_messages.mapped('subject'),
+            ['Please find the files in attachment', 'Could you send the missing files ?'])
 
     @mute_logger('odoo.addons.mail.models.mail_thread')
     def test_set_contact_non_existing_partner(self):
@@ -88,7 +146,7 @@ class TestMailGateway(MailCommon):
         documents_count = self.env['documents.document'].with_context(active_test=False).search_count([])
 
         for document in self.send_test_mail_with_attachment(self.pre_existing_partner.email):
-            self.assertEqual(document.partner_id, self.pre_existing_partner)
+            self.assertFalse(document.partner_id)
             self.assertEqual(document.owner_id, self.folder.owner_id)
             self.assertEqual(document.attachment_id.res_model, 'documents.document')
             self.assertEqual(document.attachment_id.res_id, document.id)
@@ -194,7 +252,7 @@ class TestMailGateway(MailCommon):
         self.folder.alias_defaults = repr(defaults)
 
         for document in self.send_test_mail_with_attachment(self.pre_existing_partner.email):
-            self.assertEqual(document.partner_id, self.pre_existing_partner)
+            self.assertFalse(document.partner_id)
             self.assertEqual(document.attachment_id.res_model, 'documents.document')
             self.assertEqual(document.attachment_id.res_id, document.id)
             self.assertEqual(document.folder_id, self.folder)
@@ -256,3 +314,7 @@ class TestMailGateway(MailCommon):
 
         alias.alias_name = False
         Doc.with_user(user).create({'name': 'Test', 'alias_id': alias.id, 'type': 'folder'})
+
+    def test_send_attachment_email_multi_company(self):
+        for document in self.send_test_mail_with_attachment_on_different_company(self.pre_existing_partner.email):
+            self.assertIsNotNone(document)

@@ -36,6 +36,7 @@ import {
     diffColumn,
     getCellColor,
     getColorIndex,
+    getCellsOnRow,
     localEndOf,
     localStartOf,
     useGanttConnectorDraggable,
@@ -192,6 +193,7 @@ export class GanttRenderer extends Component {
         this.actionService = useService("action");
         this.dialogService = useService("dialog");
         this.notificationService = useService("notification");
+        this.orm = useService("orm");
 
         this.is24HourFormat = is24HourFormat();
 
@@ -296,7 +298,7 @@ export class GanttRenderer extends Component {
             hoveredCell: this.cellForDrag,
             elements: ".o_draggable",
             ignore: ".o_resize_handle,.o_connector_creator_bullet",
-            cells: ".o_gantt_cell",
+            cells: ".o_gantt_cell:not(.o_gantt_readonly)",
             // Style classes
             cellDragClassName: "o_gantt_cell o_drag_hover",
             ghostClassName: "o_dragged_pill_ghost",
@@ -312,9 +314,11 @@ export class GanttRenderer extends Component {
             onDragStart: ({ pill }) => {
                 this.popover.close();
                 this.setStickyPill(pill);
+                this.toggleRowsReadonly(false);
                 this.interaction.mode = "drag";
             },
             onDragEnd: () => {
+                this.toggleRowsReadonly(true);
                 this.setStickyPill();
                 this.interaction.mode = null;
             },
@@ -593,6 +597,7 @@ export class GanttRenderer extends Component {
             return groups[col];
         }
 
+        const lastCol = this.columnCount * this.model.metaData.scale.cellPart + 1;
         for (const pill of pills) {
             let addedInPreviousCol = false;
             let col;
@@ -605,7 +610,7 @@ export class GanttRenderer extends Component {
                 addedInPreviousCol = added;
             }
             // here col = this.getLastGridCol(pill)
-            if (addedInPreviousCol && col <= this.columnCount) {
+            if (addedInPreviousCol && col < lastCol) {
                 const group = getGroup(col);
                 group.break = true;
             }
@@ -921,8 +926,8 @@ export class GanttRenderer extends Component {
         this.rowHeaderWidth = this.hasRowHeaders
             ? Math.round((rowHeaderWidthPercentage * this.contentRefWidth) / 100)
             : 0;
-        const cellContainerWidth = this.contentRefWidth - this.rowHeaderWidth;
-        const columnWidth = Math.floor(cellContainerWidth / this.columnCount);
+        this.cellContainerWidth = this.contentRefWidth - this.rowHeaderWidth;
+        const columnWidth = Math.floor(this.cellContainerWidth / this.columnCount);
         const rectifiedColumnWidth = Math.max(columnWidth, minimalColumnWidth);
         this.cellPartWidth = Math.floor(rectifiedColumnWidth / cellPart);
         this.columnWidth = this.cellPartWidth * cellPart;
@@ -1148,7 +1153,7 @@ export class GanttRenderer extends Component {
         const diff = date.diff(globalStart);
         const totalDiff = globalStop.diff(globalStart);
         const factor = diff / totalDiff;
-        if (ifInBounds && (factor < 0 || 1 < factor)) {
+        if (ifInBounds && (factor < 0 || 1 <= factor)) {
             return false;
         }
         const rtlFactor = localization.direction === "rtl" ? -1 : 1;
@@ -1275,6 +1280,7 @@ export class GanttRenderer extends Component {
             o_gantt_group: row.isGroup,
             o_gantt_hoverable: this.isHoverable(row),
             o_group_open: !this.model.isClosed(row.id),
+            o_gantt_readonly: row.readonly,
         };
     }
 
@@ -1338,10 +1344,7 @@ export class GanttRenderer extends Component {
         const stopDate = record[dateStopField];
         const yearlessDateFormat = omit(DateTime.DATE_SHORT, "year");
 
-        const spanAccrossDays =
-            stopDate.startOf("day") > startDate.startOf("day") &&
-            startDate.endOf("day").diff(startDate, "hours").toObject().hours >= 3 &&
-            stopDate.diff(stopDate.startOf("day"), "hours").toObject().hours >= 3;
+        const spanAccrossDays = stopDate.startOf("day") > startDate.startOf("day");
         const spanAccrossWeeks = getStartOfLocalWeek(stopDate) > getStartOfLocalWeek(startDate);
         const spanAccrossMonths = stopDate.startOf("month") > startDate.startOf("month");
 
@@ -1406,6 +1409,13 @@ export class GanttRenderer extends Component {
         return style.join(";");
     }
 
+    /**
+     * @param {{ column?: [number, number], row?: [number, number] }} position
+     */
+    getGroupHeaderStyle(position) {
+        return this.getGridPosition(position) + `;max-width: ${this.cellContainerWidth}px`;
+    }
+
     setSomeGridStyleProperties() {
         const rowsTemplate = this.computeRowsTemplate();
         const colsTemplate = this.computeColsTemplate();
@@ -1443,12 +1453,18 @@ export class GanttRenderer extends Component {
             this.model.metaData;
 
         const startOutside = record[dateStartField] < globalStart;
-        const stopOutside = record[dateStopField] > globalStop;
+
+        let recordDateStopField = record[dateStopField];
+        if (this.model.dateStopFieldIsDate()) {
+            recordDateStopField = recordDateStopField.plus({ day: 1 });
+        }
+
+        const stopOutside = recordDateStopField > globalStop;
 
         /** @type {DateTime} */
         const pillStartDate = startOutside ? globalStart : record[dateStartField];
         /** @type {DateTime} */
-        const pillStopDate = stopOutside ? globalStop : record[dateStopField];
+        const pillStopDate = stopOutside ? globalStop : recordDateStopField;
 
         const disableStartResize = !canEdit || startOutside;
         const disableStopResize = !canEdit || stopOutside;
@@ -1679,6 +1695,7 @@ export class GanttRenderer extends Component {
             reload: () => this.model.fetchData(),
             buttons: [
                 {
+                    id: "open_view_edit_dialog",
                     text: canEdit ? _t("Edit") : _t("View"),
                     class: "btn btn-sm btn-primary",
                     // Sync with the mutex to wait for potential changes on the view
@@ -1922,6 +1939,10 @@ export class GanttRenderer extends Component {
             } else {
                 this.noDisplayedConnectors = true;
             }
+        }
+
+        if (this.containsReadonlyGroup()) {
+            this.setupInitialReadonly();
         }
 
         delete this.shouldComputeSomeWidths;
@@ -2174,8 +2195,24 @@ export class GanttRenderer extends Component {
 
         if (direction === "start") {
             params.start = dateAddFixedOffset(record[dateStartField], { [time]: cellTime * diff });
+            if (params.start > record[dateStopField]) {
+                return this.notificationService.add(
+                    _t("Starting date cannot be after the ending date"),
+                    {
+                        type: "warning",
+                    }
+                );
+            }
         } else {
             params.stop = dateAddFixedOffset(record[dateStopField], { [time]: cellTime * diff });
+            if (params.stop < record[dateStartField]) {
+                return this.notificationService.add(
+                    _t("Ending date cannot be before the starting date"),
+                    {
+                        type: "warning",
+                    }
+                );
+            }
         }
         const schedule = this.model.getSchedule(params);
 
@@ -2234,6 +2271,79 @@ export class GanttRenderer extends Component {
      */
     setStickyPill(pillEl) {
         this.stickyPillId = pillEl ? pillEl.dataset.pillId : null;
+    }
+
+    /**
+     * @returns {boolean}: whether one of the "groupedBy" fields of the model is readonly
+     */
+    containsReadonlyGroup() {
+        return this.model.metaData.groupedBy.some((groupedByField) => {
+            return this.model.metaData.fields[groupedByField].readonly;
+        });
+    }
+
+    /**
+     * For all rows to render, specify whether the row is grouped by a readonly
+     * field or is a child of a row grouped by a readonly field - by setting its'
+     * 'readonly' and 'readonlyChild' properties.
+     */
+    setupInitialReadonly() {
+        let foundReadonlyField = false;
+        const readonlyGroups = [];
+        const readonlyChildren = [];
+        for (const groupedByField of this.props.model.metaData.groupedBy) {
+            // Field itself is readonly
+            if (this.model.metaData.fields[groupedByField].readonly) {
+                foundReadonlyField = true;
+                readonlyGroups.push(groupedByField);
+            }
+            // There is a readonly parent group
+            else if (foundReadonlyField) {
+                readonlyChildren.push(groupedByField);
+            }
+        }
+
+        for (const row of this.rowsToRender) {
+            row.readonlyChild = readonlyChildren.includes(row.groupedByField);
+            row.readonly = readonlyGroups.includes(row.groupedByField) || row.readonlyChild;
+        }
+    }
+
+    /**
+     * @param {boolean} addReadonly: whether to add or remove the readonly class
+     */
+    toggleRowsReadonly(addReadonly) {
+        if (!this.stickyPillId || !this.containsReadonlyGroup()) {
+            return;
+        }
+        const startingRowId = this.pills[this.stickyPillId].rowId;
+        const rowIdx = this.rows.findIndex((r) => r.id === startingRowId);
+        this.toggleReadonly(this.rows[rowIdx], addReadonly);
+        // Also update rows that are part of the same "child group"
+        if (this.rows[rowIdx].readonlyChild) {
+            for (const row of this.rows.slice(0, rowIdx).reverse()) {
+                if (!row.readonlyChild) {
+                    break;
+                }
+                this.toggleReadonly(row, addReadonly);
+            }
+            for (const row of this.rows.slice(rowIdx + 1, this.rows.length)) {
+                if (!row.readonlyChild) {
+                    break;
+                }
+                this.toggleReadonly(row, addReadonly);
+            }
+        }
+    }
+
+    toggleReadonly(row, addReadonly) {
+        for (const cell of getCellsOnRow(this.gridRef.el, row.id)) {
+            if (addReadonly) {
+                cell.classList.add("o_gantt_readonly");
+            } else {
+                cell.classList.remove("o_gantt_readonly");
+            }
+        }
     }
 
     /**
@@ -2454,23 +2564,23 @@ export class GanttRenderer extends Component {
         this.model.removeDependency(masterId, slaveId);
     }
     rescheduleAccordingToDependencyCallback(result) {
-        if (result["type"] !== "warning" && "old_vals_per_pill_id" in result) {
+        const isWarning = result.type === "warning";
+        if (!isWarning && "old_vals_per_pill_id" in result) {
             this.model.toggleHighlightPlannedFilter(
                 Object.keys(result["old_vals_per_pill_id"]).map(Number)
             );
         }
         this.notificationFn?.();
+        const icon = isWarning ? "fa-warning" : "fa-check";
         this.notificationFn = this.notificationService.add(
             markup(
-                `<i class="fa btn-link fa-check"></i><span class="ms-1">${escape(
-                    result["message"]
-                )}</span>`
+                `<i class="fa ${icon}"></i><span class="ms-1">${escape(result["message"])}</span>`
             ),
             {
                 type: result["type"],
                 sticky: true,
                 buttons:
-                    result["type"] === "warning"
+                    isWarning || !result.old_vals_per_pill_id
                         ? []
                         : [
                               {

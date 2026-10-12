@@ -77,7 +77,15 @@
             <record id="ae_corporate_tax_report_line_taxable_amount" model="account.report.line">
                 <field name="name">Taxable Amount</field>
                 <field name="code">AE_CORP_TAXABLE</field>
-                <field name="aggregation_formula">AE_CORP_GRP.balance - AE_CORP_TAX_EX.balance - AE_CORP_MANUAL_DED.balance</field>
+                <field name="aggregation_formula" eval="False"/>
+                <field name="expression_ids">
+                    <record id="ae_corporate_tax_report_expression_taxable_amount" model="account.report.expression">
+                        <field name="label">balance</field>
+                        <field name="engine">aggregation</field>
+                        <field name="formula"> AE_CORP_GRP.balance - AE_CORP_TAX_EX.balance - AE_CORP_MANUAL_DED.balance </field>
+                        <field name="subformula">if_above(CUR(0))</field>
+                    </record>
+                </field>
                 <field name="children_ids">
                     <record id="ae_corporate_tax_report_line_disallowed_portion" model="account.report.line">
                         <field name="name">Disallowed Portion</field>
@@ -125,6 +133,7 @@
                         <field name="label">balance</field>
                         <field name="engine">aggregation</field>
                         <field name="formula">AE_CORP_TAXABLE.balance * (AE_CORP_TAX_PERC.balance / 100)</field>
+                        <field name="subformula">if_above(CUR(0))</field>
                     </record>
                 </field>
             </record>

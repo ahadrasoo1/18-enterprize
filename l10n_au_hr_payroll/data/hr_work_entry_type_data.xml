@@ -5,6 +5,9 @@
         <field name="l10n_au_is_ote" eval="True"/>
         <field name="l10n_au_work_stp_code">G</field>
     </record>
+    <record id="hr_work_entry.overtime_work_entry_type" model="hr.work.entry.type">
+        <field name="l10n_au_work_stp_code">T</field>
+    </record>
 
     <!-- Time Off Entries -->
     <!-- We need a unique work entry type for each time off -->
@@ -42,14 +45,17 @@
         <field name="name">Other Paid Leave</field>
         <field name="color">5</field>
         <field name="code">AU.O</field>
+        <field name="is_leave" eval="True"/>
         <field name="l10n_au_is_ote" eval="True"/>
         <field name="country_id" ref="base.au"/>
+        <field name="l10n_au_work_stp_code">O</field>
     </record>
 
     <record id="l10n_au_work_entry_type_parental" model="hr.work.entry.type">
         <field name="name">Paid Parental Leave</field>
         <field name="color">5</field>
         <field name="code">AU.P</field>
+        <field name="is_leave" eval="True"/>
         <field name="l10n_au_is_ote" eval="True"/>
         <field name="l10n_au_work_stp_code">P</field>
         <field name="country_id" ref="base.au"/>
@@ -68,6 +74,7 @@
         <field name="name">Ancillary and Defence Leave</field>
         <field name="color">5</field>
         <field name="code">AU.A</field>
+        <field name="is_leave" eval="True"/>
         <field name="l10n_au_is_ote" eval="True"/>
         <field name="l10n_au_work_stp_code">A</field>
         <field name="country_id" ref="base.au"/>
@@ -90,12 +97,14 @@
     </record>
 
     <!-- Overtime Entries -->
+    <!-- Remove the record in master, switch to hr_work_entry.overtime_work_entry_type -->
     <record id="l10n_au_work_entry_type_overtime_regular" model="hr.work.entry.type">
         <field name="name">Overtime: Regular</field>
         <field name="color">4</field>
         <field name="code">l10n_au_overtime_regular</field>
         <field name="l10n_au_work_stp_code">T</field>
         <field name="country_id" ref="base.au"/>
+        <field name="active" eval="False"/>
     </record>
 
     <record id="l10n_au_work_entry_type_overtime_saturday" model="hr.work.entry.type">

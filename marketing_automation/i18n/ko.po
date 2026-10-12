@@ -1,23 +1,29 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* marketing_automation
-# 
+# * marketing_automation
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Daye Jeong, 2024
+# Sarah Park, 2025
+#
+# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Kwanghee Park (kwpa)" <kwpa@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Korean (https://app.transifex.com/odoo/teams/41243/ko/)\n"
+"POT-Creation-Date: 2026-06-12 17:46+0000\n"
+"PO-Revision-Date: 2026-04-29 18:55+0000\n"
+"Last-Translator: \"Kwanghee Park (kwpa)\" <kwpa@odoo.com>\n"
+"Language-Team: Korean <https://translate.odoo.com/projects/odoo-18/"
+"marketing_automation/ko/>\n"
+"Language: ko\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: ko\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 5.17\n"
 
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_activity_summary_template
@@ -179,24 +185,34 @@ msgstr "<span class=\"o_form_label\">레코드</span>"
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_campaign_view_form
 msgid ""
-"<span role=\"img\" title=\"Graph\" aria-label=\"Graph\" class=\"o_ma_activity_tab active\" data-tab-type=\"graph\">\n"
-"                                                            <i class=\"fa fa-pie-chart\"/>\n"
+"<span role=\"img\" title=\"Graph\" aria-label=\"Graph\" "
+"class=\"o_ma_activity_tab active\" data-tab-type=\"graph\">\n"
+"                                                            <i class=\"fa fa-"
+"pie-chart\"/>\n"
 "                                                        </span>\n"
-"                                                        <span title=\"Filter\" role=\"img\" aria-label=\"Filter\" class=\"o_ma_activity_tab\" data-tab-type=\"filter\">\n"
-"                                                            <i class=\"fa fa-filter\"/>\n"
+"                                                        <span "
+"title=\"Filter\" role=\"img\" aria-label=\"Filter\" "
+"class=\"o_ma_activity_tab\" data-tab-type=\"filter\">\n"
+"                                                            <i class=\"fa fa-"
+"filter\"/>\n"
 "                                                        </span>"
 msgstr ""
-"<span role=\"img\" title=\"Graph\" aria-label=\"Graph\" class=\"o_ma_activity_tab active\" data-tab-type=\"graph\">\n"
-"                                                            <i class=\"fa fa-pie-chart\"/>\n"
+"<span role=\"img\" title=\"Graph\" aria-label=\"Graph\" "
+"class=\"o_ma_activity_tab active\" data-tab-type=\"graph\">\n"
+"                                                            <i class=\"fa fa-"
+"pie-chart\"/>\n"
 "                                                        </span>\n"
-"                                                        <span title=\"Filter\" role=\"img\" aria-label=\"Filter\" class=\"o_ma_activity_tab\" data-tab-type=\"filter\">\n"
-"                                                            <i class=\"fa fa-filter\"/>\n"
+"                                                        <span "
+"title=\"Filter\" role=\"img\" aria-label=\"Filter\" "
+"class=\"o_ma_activity_tab\" data-tab-type=\"filter\">\n"
+"                                                            <i class=\"fa fa-"
+"filter\"/>\n"
 "                                                        </span>"
 
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_campaign_view_kanban
 msgid "<span>Completed</span>"
-msgstr "<span>완료됨</span>"
+msgstr "<span>완료</span>"
 
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_campaign_view_kanban
@@ -206,7 +222,7 @@ msgstr "<span>진행중</span>"
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_campaign_view_kanban
 msgid "<span>Total</span>"
-msgstr "<span>전체 작업</span>"
+msgstr "<span>전체</span>"
 
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_activity_summary_template
@@ -287,7 +303,9 @@ msgstr "활동 유형"
 msgid ""
 "Activity will only be performed if record satisfies this domain, obtained "
 "from the combination of the activity filter and its inherited filter"
-msgstr "활동 필터와 상속된 필터의 조합에서 얻은 레코드가 이 도메인을 만족하는 경우에만 활동이 수행됩니다."
+msgstr ""
+"활동 필터와 상속된 필터의 조합에서 얻은 레코드가 이 도메인을 만족하는 경우에"
+"만 활동이 수행됩니다."
 
 #. module: marketing_automation
 #. odoo-python
@@ -355,6 +373,12 @@ msgid "Allows us to filter relevant Campaigns"
 msgstr "관련 캠페인에 필터를 할 수 있습니다."
 
 #. module: marketing_automation
+#. odoo-python
+#: code:addons/marketing_automation/wizard/marketing_campaign_test.py:0
+msgid "Another test has been launched for this participant"
+msgstr "대상자용으로 다른 테스트가 시작되었습니다."
+
+#. module: marketing_automation
 #: model:ir.model.fields,field_description:marketing_automation.field_marketing_activity__domain
 msgid "Applied Filter"
 msgstr "적용된 필터"
@@ -385,21 +409,23 @@ msgstr "자동 생성 캠페인"
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_campaign_view_form
 msgid ""
-"Be aware that participants that had no more activities could be reintroduced"
-" into the campaign and new traces could be created for them."
-msgstr "더 이상 활동이 없었던 참가자를 캠페인에 다시 도입할 수 있고 새로운 흔적을 만들 수 있습니다."
+"Be aware that participants that had no more activities could be reintroduced "
+"into the campaign and new traces could be created for them."
+msgstr ""
+"더 이상 활동이 없었던 참가자를 캠페인에 다시 도입할 수 있고 새로운 흔적을 만"
+"들 수 있습니다."
 
 #. module: marketing_automation
 #. odoo-python
 #: code:addons/marketing_automation/models/marketing_campaign.py:0
 msgid "Blacklist Bounces"
-msgstr "블랙리스트 반송"
+msgstr "수신 거부 반송"
 
 #. module: marketing_automation
 #. odoo-python
 #: code:addons/marketing_automation/models/marketing_campaign.py:0
 msgid "Blacklist record"
-msgstr "블랙리스트 기록"
+msgstr "수신 거부 기록"
 
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_campaign_view_form
@@ -473,8 +499,8 @@ msgid ""
 "amount of time after the scheduled date. (e.g. Time-limited offer, Upcoming "
 "event, …)"
 msgstr ""
-"예약된 날짜가 지난 후 특정 시간 이후에는 작업이 실행되지 않도록 하려면 이 항목을 선택하십시오. (예: 기간 제한 행사, 향후 이벤트 "
-"등)"
+"예약된 날짜가 지난 후 특정 시간 이후에는 작업이 실행되지 않도록 하려면 이 항"
+"목을 선택하십시오. (예: 기간 제한 행사, 향후 이벤트 등)"
 
 #. module: marketing_automation
 #: model:ir.model.fields,field_description:marketing_automation.field_marketing_activity__child_ids
@@ -612,8 +638,7 @@ msgstr "삭제"
 #. odoo-javascript
 #: code:addons/marketing_automation/static/src/js/marketing_automation_one2many.js:0
 msgid ""
-"Deleting this activity will delete ALL its children activities. Are you "
-"sure?"
+"Deleting this activity will delete ALL its children activities. Are you sure?"
 msgstr "이 활동을 삭제 시 하위 활동 전체가 삭제됩니다. 계속하시겠습니까?"
 
 #. module: marketing_automation
@@ -712,6 +737,12 @@ msgstr "오류가 발생했습니다! 활동의 재귀 계층 구조를 생성�
 #. module: marketing_automation
 #. odoo-python
 #: code:addons/marketing_automation/models/marketing_activity.py:0
+msgid "Error! You can't modify the hierarchy of an active Activity."
+msgstr ""
+
+#. module: marketing_automation
+#. odoo-python
+#: code:addons/marketing_automation/models/marketing_activity.py:0
 msgid "Exception in mass mailing: %s"
 msgstr "일괄 메일에 예외 발생 : %s"
 
@@ -754,6 +785,11 @@ msgstr "필터"
 
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_campaign_view_form
+msgid "Generate Participants"
+msgstr "참가자 생성"
+
+#. module: marketing_automation
+#: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_campaign_view_form
 msgid "Generate participants"
 msgstr "참가자 생성"
 
@@ -768,7 +804,8 @@ msgstr "10% 할인"
 msgid ""
 "Here you will be able to check the results of your mailings from all "
 "Marketing Automation Campaigns."
-msgstr "여기에서 마케팅 자동화 캠페인의 메일링 결과 전체를 확인하실 수 있습니다."
+msgstr ""
+"여기에서 마케팅 자동화 캠페인의 메일링 결과 전체를 확인하실 수 있습니다."
 
 #. module: marketing_automation
 #. odoo-python
@@ -861,19 +898,21 @@ msgstr "링크 통계"
 #. module: marketing_automation
 #: model:ir.ui.menu,name:marketing_automation.link_tracker_menu_reporting_marketing_automation
 msgid "Link Tracker"
-msgstr "링크 추적기"
+msgstr "UTM 빌더"
 
 #. module: marketing_automation
 #: model_terms:ir.actions.act_window,help:marketing_automation.link_tracker_action_marketing_campaign
 msgid ""
 "Link Trackers are created when mailings with links are sent to track how "
 "many clicks they get."
-msgstr "UTM 빌더는 클릭수를 추적하기 위하여 링크를 포함한 메일을 전송하시면 생성됩니다."
+msgstr ""
+"UTM 빌더는 클릭수를 추적하기 위하여 링크를 포함한 메일을 전송하시면 생성됩니"
+"다."
 
 #. module: marketing_automation
 #: model:ir.model.fields,field_description:marketing_automation.field_marketing_trace__links_click_datetime
 msgid "Links Click Datetime"
-msgstr ""
+msgstr "링크 클릭 날짜"
 
 #. module: marketing_automation
 #: model:ir.model.fields.selection,name:marketing_automation.selection__marketing_activity__trigger_category__email
@@ -954,6 +993,8 @@ msgid ""
 "Mailings %(mailing_names)s are used in marketing campaigns. You should take "
 "care of this before unlinking the mailings."
 msgstr ""
+"메일 %(mailing_names)s이(가) 마케팅 캠페인에 사용됩니다. 메일링 연결을 해제하"
+"기 전에 이 문제를 처리해야 합니다."
 
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_campaign_view_form
@@ -1041,7 +1082,9 @@ msgstr "마케팅 추적"
 msgid ""
 "Marketing campaigns use mass mailings with some specific behavior; this "
 "field is used to indicate its statistics may be suspicious."
-msgstr "마케팅 캠페인은 특별한 행동과 함께 일괄 메일을 사용합니다; 이 필드는 불확실한 통계를 가리킬 때 사용됩니다."
+msgstr ""
+"마케팅 캠페인은 특별한 행동과 함께 일괄 메일을 사용합니다; 이 필드는 불확실"
+"한 통계를 가리킬 때 사용됩니다."
 
 #. module: marketing_automation
 #: model:ir.model,name:marketing_automation.model_mailing_mailing
@@ -1192,6 +1235,14 @@ msgstr "소셜 게시물과의 상호 작용 (예: 공유, 댓글 등) 수"
 #: code:addons/marketing_automation/models/marketing_campaign.py:0
 msgid "Offer free catalog"
 msgstr "무료 상품안내서 제공"
+
+#. module: marketing_automation
+#. odoo-python
+#: code:addons/marketing_automation/models/mailing_mailing.py:0
+msgid ""
+"Oops! You can't retry sending emails from inside a Marketing Automation "
+"campaign."
+msgstr ""
 
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_campaign_view_form
@@ -1418,6 +1469,11 @@ msgstr "실행"
 
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_campaign_view_form
+msgid "Run Activities"
+msgstr "활동 실행"
+
+#. module: marketing_automation
+#: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_campaign_view_form
 msgid "Run the next scheduled activity for each participant of this campaign?"
 msgstr "해당 캠페인의 각 참가자를 위해 다음 예정 활동을 진행할까요?"
 
@@ -1428,7 +1484,7 @@ msgstr "해당 캠페인의 각 참가자를 위해 다음 예정 활동을 진�
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_participant_view_search
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_trace_view_search
 msgid "Running"
-msgstr "실행 중"
+msgstr "진행 중"
 
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_campaign_view_form
@@ -1536,9 +1592,11 @@ msgstr "소셜 미디어 게시물"
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_campaign_view_form
 msgid ""
-"Some participants are already running on this campaign. Click on 'Update' to"
-" apply the modifications you've just made."
-msgstr "일부 참여자는 이미 이 캠페인에 참여하고 있습니다. ‘업데이트’를 클릭하여 방금 작성한 수정사항을 승인하십시오."
+"Some participants are already running on this campaign. Click on 'Update' to "
+"apply the modifications you've just made."
+msgstr ""
+"일부 참여자는 이미 이 캠페인에 참여하고 있습니다. ‘업데이트’를 클릭하여 방금 "
+"작성한 수정사항을 승인하십시오."
 
 #. module: marketing_automation
 #: model:ir.model.fields,field_description:marketing_automation.field_marketing_activity__source_id
@@ -1614,7 +1672,8 @@ msgid ""
 "Switching Target Model invalidates the existing activities. Either update "
 "your activity actions to match the new Target Model or delete them."
 msgstr ""
-"대상 모델을 전환하면 기존 활동이 무효 처리됩니다. 새로운 대상 모델과 일치하도록 활동 작업을 업데이트하거나 삭제하시기 바랍니다."
+"대상 모델을 전환하면 기존 활동이 무효 처리됩니다. 새로운 대상 모델과 일치하도"
+"록 활동 작업을 업데이트하거나 삭제하시기 바랍니다."
 
 #. module: marketing_automation
 #: model:ir.model.fields,field_description:marketing_automation.field_marketing_campaign__require_sync
@@ -1625,7 +1684,7 @@ msgstr "참가자들의 동기화가 필요합니다"
 #. odoo-python
 #: code:addons/marketing_automation/models/marketing_campaign.py:0
 msgid "Tag Hot Contacts"
-msgstr "인기 연락처 태그"
+msgstr "핫 리드 태그"
 
 #. module: marketing_automation
 #: model:ir.model.fields,field_description:marketing_automation.field_marketing_campaign__tag_ids
@@ -1766,7 +1825,7 @@ msgstr "고유 필드"
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_campaign_view_form
 msgid "Update"
-msgstr "갱신"
+msgstr "업데이트"
 
 #. module: marketing_automation
 #: model:ir.model.fields,field_description:marketing_automation.field_marketing_campaign__use_leads
@@ -1784,7 +1843,8 @@ msgstr ""
 "모델의 필드에서 중복을 방지합니다.\n"
 "예시 \n"
 "                 ‘고객’모델의 경우, 만약 동일 이메일 주소가 있을 때\n"
-"                 중복작업을 진행하기 원하지 않는다면 여기 이메일 필드를 선택하시면 됩니다"
+"                 중복작업을 진행하기 원하지 않는다면 여기 이메일 필드를 선택"
+"하시면 됩니다"
 
 #. module: marketing_automation
 #: model:res.groups,name:marketing_automation.group_marketing_automation_user
@@ -1810,7 +1870,7 @@ msgstr "유효 기간 유형"
 #. odoo-python
 #: code:addons/marketing_automation/models/marketing_campaign.py:0
 msgid "Warning"
-msgstr "경고"
+msgstr "주의"
 
 #. module: marketing_automation
 #: model:ir.model.fields.selection,name:marketing_automation.selection__marketing_activity__interval_type__weeks
@@ -1822,7 +1882,7 @@ msgstr "주"
 #. odoo-python
 #: code:addons/marketing_automation/models/marketing_campaign.py:0
 msgid "Welcome Flow"
-msgstr "환영 진행"
+msgstr "웰컴 진행 순서"
 
 #. module: marketing_automation
 #. odoo-python
@@ -1850,30 +1910,37 @@ msgstr "업무 순서 시작"
 #. odoo-python
 #: code:addons/marketing_automation/models/marketing_activity.py:0
 msgid ""
-"You are trying to set the activity \"%(parent_activity)s\" as \"%(parent_type)s\" while its child \"%(activity)s\" has the trigger type \"%(trigger_type)s\"\n"
+"You are trying to set the activity \"%(parent_activity)s\" as \"%"
+"(parent_type)s\" while its child \"%(activity)s\" has the trigger type \"%"
+"(trigger_type)s\"\n"
 "Please modify one of those activities before saving."
 msgstr ""
-"\"%(parent_activity)s\" 작업을 \"%(parent_type)s\"으로 설정하려고 하나 하위 \"%(activity)s\"의 작동 유형이 \"%(trigger_type)s\"으로 되어있습니다.\n"
+"\"%(parent_activity)s\" 작업을 \"%(parent_type)s\"으로 설정하려고 하나 하위 "
+"\"%(activity)s\"의 작동 유형이 \"%(trigger_type)s\"으로 되어있습니다.\n"
 "저장하기 전 해당 작업 중 하나를 수정해 주세요."
 
 #. module: marketing_automation
 #. odoo-python
 #: code:addons/marketing_automation/models/utm_campaign.py:0
 msgid ""
-"You cannot delete these UTM Campaigns as they are linked to the following marketing campaigns in Marketing Automation:\n"
+"You cannot delete these UTM Campaigns as they are linked to the following "
+"marketing campaigns in Marketing Automation:\n"
 "%(campaign_names)s"
 msgstr ""
-"이 UTM 캠페인은 마케팅 자동화 항목에서 다음의 마케팅 캠페인에 연결되어 있으므로 삭제할 수 없습니다:\n"
+"이 UTM 캠페인은 마케팅 자동화 항목에서 다음의 마케팅 캠페인에 연결되어 있으므"
+"로 삭제할 수 없습니다:\n"
 "%(campaign_names)s"
 
 #. module: marketing_automation
 #. odoo-python
 #: code:addons/marketing_automation/models/utm_source.py:0
 msgid ""
-"You cannot delete these UTM Sources as they are linked to the following marketing activities in Marketing Automation:\n"
+"You cannot delete these UTM Sources as they are linked to the following "
+"marketing activities in Marketing Automation:\n"
 "%(activities_names)s"
 msgstr ""
-"이 UTM 소스는 마케팅 자동화 항목에서 다음의 마케팅 캠페인에 연결되어 있으므로 삭제할 수 없습니다:\n"
+"이 UTM 소스는 마케팅 자동화 항목에서 다음의 마케팅 캠페인에 연결되어 있으므"
+"로 삭제할 수 없습니다:\n"
 "%(activities_names)s"
 
 #. module: marketing_automation
@@ -1897,21 +1964,25 @@ msgstr "<strong>워크플로우 시작</strong> 후,<br/>"
 msgid ""
 "after the Participant <strong>clicked</strong>,<br/>on any link included in "
 "the <strong>Mailing</strong> sent by the Activity \""
-msgstr "참가자가 활동에서 보낸 <strong>메일링</strong>에 포함된 링크를 <strong>클릭</strong><br/>하면\""
+msgstr ""
+"참가자가 활동에서 보낸 <strong>메일링</strong>에 포함된 링크를 <strong>클릭</"
+"strong><br/>하면\""
 
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_activity_summary_template
 msgid ""
 "after the Participant <strong>opened</strong> the <strong>Mailing</strong> "
 "sent by the Activity \""
-msgstr "참가자가 활동에서 보낸 <strong>메일링</strong>을 <strong>열면</strong>\""
+msgstr ""
+"참가자가 활동에서 보낸 <strong>메일링</strong>을 <strong>열면</strong>\""
 
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_activity_summary_template
 msgid ""
-"after the Participant <strong>replied</strong> to the "
-"<strong>Mailing</strong> sent by the Activity \""
-msgstr "참가자가 활동에서 보낸 <strong>메일링</strong>에 <strong>회신</strong>하면 ”"
+"after the Participant <strong>replied</strong> to the <strong>Mailing</"
+"strong> sent by the Activity \""
+msgstr ""
+"참가자가 활동에서 보낸 <strong>메일링</strong>에 <strong>회신</strong>하면 ”"
 
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_activity_summary_template
@@ -1957,7 +2028,8 @@ msgstr "예정된 날짜가 경과했습니다."
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_activity_summary_template
 msgid ""
 "if no link included in the <strong>Mailing</strong> sent by the Activity \""
-msgstr "활동에서 보낸 <strong>메일링</strong>에 링크가 포함되어 있지 않은 경우 \""
+msgstr ""
+"활동에서 보낸 <strong>메일링</strong>에 링크가 포함되어 있지 않은 경우 \""
 
 #. module: marketing_automation
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_activity_summary_template
@@ -1988,9 +2060,3 @@ msgstr "테스트 참가자 생성"
 #: model_terms:ir.ui.view,arch_db:marketing_automation.marketing_activity_summary_template
 msgid "will be"
 msgstr "는"
-
-#. module: marketing_automation
-#. odoo-javascript
-#: code:addons/marketing_automation/static/src/components/campaign_template_picker_dialog/campaign_template_picker_dialog.xml:0
-msgid "{{template_value.title}}"
-msgstr "{{template_value.title}}"

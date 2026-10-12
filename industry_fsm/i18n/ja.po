@@ -1,24 +1,27 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* industry_fsm
-# 
+# * industry_fsm
+#
 # Translators:
-# Wil Odoo, 2024
-# Junko Augias, 2024
-# 
+# Ryoko Tsuda <ryoko@quartile.co>, 2024
+# Wil Odoo, 2025
+# Junko Augias, 2025
+# "Junko Augias (juau)" <juau@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Junko Augias, 2024\n"
-"Language-Team: Japanese (https://app.transifex.com/odoo/teams/41243/ja/)\n"
+"POT-Creation-Date: 2026-04-10 18:47+0000\n"
+"PO-Revision-Date: 2026-06-06 11:21+0000\n"
+"Last-Translator: \"Junko Augias (juau)\" <juau@odoo.com>\n"
+"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-18/"
+"industry_fsm/ja/>\n"
+"Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: ja\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 2026.6.1\n"
 
 #. module: industry_fsm
 #: model:ir.model.fields,field_description:industry_fsm.field_report_project_task_user_fsm__nbr
@@ -35,22 +38,14 @@ msgstr "%(partner)sには同じ時間に %(number)sタスクあります。"
 #: model:ir.actions.report,print_report_name:industry_fsm.task_custom_report
 msgid ""
 "'Field Service Report - %s - %s' % (object.name, object.partner_id.name)"
-msgstr "'フィールドサービスレポート - %s - %s' % (object.name, object.partner_id.name)"
+msgstr ""
+"'フィールドサービスレポート - %s - %s' % (object.name, "
+"object.partner_id.name)"
 
 #. module: industry_fsm
 #: model_terms:ir.ui.view,arch_db:industry_fsm.worksheet_custom_page
 msgid "10 days"
 msgstr "10日間"
-
-#. module: industry_fsm
-#: model_terms:ir.ui.view,arch_db:industry_fsm.worksheet_custom_page
-msgid "10:00"
-msgstr "10:00"
-
-#. module: industry_fsm
-#: model_terms:ir.ui.view,arch_db:industry_fsm.worksheet_custom_page
-msgid "2023-01-01"
-msgstr "2023-01-01"
 
 #. module: industry_fsm
 #: model_terms:ir.ui.view,arch_db:industry_fsm.worksheet_custom_page
@@ -61,43 +56,58 @@ msgstr "5日間"
 #: model:mail.template,body_html:industry_fsm.mail_template_data_intervention_details
 msgid ""
 "<div>\n"
-"    <t t-set=\"date_begin\" t-value=\"format_datetime(object.planned_date_begin, tz=object.partner_id.tz, lang_code=object.partner_id.lang)\"></t>\n"
+"    <t t-set=\"date_begin\" t-"
+"value=\"format_datetime(object.planned_date_begin, tz=object.partner_id.tz, "
+"lang_code=object.partner_id.lang)\"/>\n"
 "\n"
-"    <t t-set=\"date_end\" t-value=\"format_datetime(object.date_deadline, tz=object.partner_id.tz, lang_code=object.partner_id.lang)\"></t>\n"
+"    <t t-set=\"date_end\" t-value=\"format_datetime(object.date_deadline, "
+"tz=object.partner_id.tz, lang_code=object.partner_id.lang)\"/>\n"
 "\n"
-"    Dear <t t-out=\"object.partner_id.name or 'customer'\">customer</t>,<br><br>\n"
+"    Dear <t t-out=\"object.partner_id.name or 'customer'\">customer</t>,<br/"
+"><br/>\n"
 "    <t t-if=\"date_begin and date_end\">\n"
-"        Your <t t-out=\"object.name or ''\">Boiler maintenance</t> intervention is scheduled from the <t t-out=\"date_begin or ''\">05/31/2021 12:30:00</t> to the <t t-out=\"date_end or ''\">05/31/2021 14:30:00</t>.\n"
+"        Your <t t-out=\"object.name or ''\">Boiler maintenance</t> "
+"intervention is scheduled from the <t t-out=\"date_begin or ''\">05/31/2021 "
+"12:30:00</t> to the <t t-out=\"date_end or ''\">05/31/2021 14:30:00</t>.\n"
 "    </t>\n"
 "    <t t-else=\"\">\n"
-"        Your <t t-out=\"object.name or ''\">Boiler maintenance</t> intervention is scheduled.\n"
+"        Your <t t-out=\"object.name or ''\">Boiler maintenance</t> "
+"intervention is scheduled.\n"
 "    </t>\n"
-"    <br><br>\n"
+"    <br/><br/>\n"
 "    Best regards,\n"
-"    <t t-if=\"user.signature\">\n"
-"        <br>\n"
-"        <t t-out=\"user.signature or ''\">--<br>Mitchell Admin</t>\n"
+"    <t t-if=\"user.signature\" data-o-mail-quote-container=\"1\">\n"
+"        <br/>\n"
+"        <t t-out=\"user.signature or ''\" data-o-mail-quote=\"1\">--<br data-"
+"o-mail-quote=\"1\"/>Mitchell Admin</t>\n"
 "    </t>\n"
 "</div>\n"
 "        "
 msgstr ""
 "<div>\n"
-"    <t t-set=\"date_begin\" t-value=\"format_datetime(object.planned_date_begin, tz=object.partner_id.tz, lang_code=object.partner_id.lang)\"></t>\n"
+"    <t t-set=\"date_begin\" t-"
+"value=\"format_datetime(object.planned_date_begin, tz=object.partner_id.tz, "
+"lang_code=object.partner_id.lang)\"/>\n"
 "\n"
-"    <t t-set=\"date_end\" t-value=\"format_datetime(object.date_deadline, tz=object.partner_id.tz, lang_code=object.partner_id.lang)\"></t>\n"
+"    <t t-set=\"date_end\" t-value=\"format_datetime(object.date_deadline, "
+"tz=object.partner_id.tz, lang_code=object.partner_id.lang)\"/>\n"
 "\n"
-"     <t t-out=\"object.partner_id.name or 'customer'\">お客様</t>、<br><br>\n"
+"     <t t-out=\"object.partner_id.name or 'customer'\">お客様</t>、<br/><br/"
+">\n"
 "    <t t-if=\"date_begin and date_end\">\n"
-"        お客様の<t t-out=\"object.name or ''\">ボイラー整備</t>は <t t-out=\"date_begin or ''\">05/31/2021 12:30:00</t> から <t t-out=\"date_end or ''\">05/31/2021 14:30:00</t>の予定です。\n"
+"        <t t-out=\"object.name or ''\">ボイラー整備</t> は <t t-"
+"out=\"date_begin or ''\">05/31/2021 12:30:00</t> から <t t-out=\"date_end or "
+"''\">05/31/2021 14:30:00</t>の予定です。\n"
 "    </t>\n"
 "    <t t-else=\"\">\n"
-"        <t t-out=\"object.name or ''\">ボイラー整備</t>が予定されました。 \n"
+"        <t t-out=\"object.name or ''\">ボイラー整備</t> が予定されました。\n"
 "    </t>\n"
-"    <br><br>\n"
-"    宜しくお願いします。\n"
-"    <t t-if=\"user.signature\">\n"
-"        <br>\n"
-"        <t t-out=\"user.signature or ''\">--<br>Mitchell Admin</t>\n"
+"    <br/><br/>\n"
+"    宜しくお願い致します。\n"
+"    <t t-if=\"user.signature\" data-o-mail-quote-container=\"1\">\n"
+"        <br/>\n"
+"        <t t-out=\"user.signature or ''\" data-o-mail-quote=\"1\">--<br data-"
+"o-mail-quote=\"1\"/>Mitchell Admin</t>\n"
 "    </t>\n"
 "</div>\n"
 "        "
@@ -111,18 +121,22 @@ msgstr "<i class=\"fa fa-check me-1\"/>レポート署名"
 #: model:mail.template,body_html:industry_fsm.mail_template_data_task_report
 msgid ""
 "<p>\n"
-"                Dear <t t-out=\"object.partner_id.name or 'Customer'\">Customer</t>,<br><br>\n"
-"                Please find attached the field service report for our onsite operation. <br><br>\n"
-"                Feel free to contact us if you have any questions.<br><br>\n"
-"                Best regards,<br><br>\n"
+"                Dear <t t-out=\"object.partner_id.name or "
+"'Customer'\">Customer</t>,<br/><br/>\n"
+"                Please find attached the field service report for our onsite "
+"operation. <br/><br/>\n"
+"                Feel free to contact us if you have any questions.<br/><br/"
+">\n"
+"                Best regards,<br/><br/>\n"
 "            </p>\n"
 "        "
 msgstr ""
 "<p>\n"
-"                <t t-out=\"object.partner_id.name or 'Customer'\">お客様</t>、<br><br>\n"
-"                現場でのサービス報告書を添付致します。<br><br>\n"
-"                ご質問がございましたら、お気軽にお問合せ下さい。<br><br>\n"
-"                宜しくお願い致します。<br><br>\n"
+"                <t t-out=\"object.partner_id.name or 'Customer'\">お客様</"
+"t>、<br/><br/>\n"
+"                現場でのサービス報告書を添付致します。<br/><br/>\n"
+"                ご質問がございましたら、お気軽にお問合せ下さい。<br/><br/>\n"
+"                宜しくお願い致します。<br/><br/>\n"
 "            </p>\n"
 "        "
 
@@ -140,11 +154,29 @@ msgstr ""
 #. module: industry_fsm
 #: model_terms:ir.ui.view,arch_db:industry_fsm.worksheet_custom_page
 msgid ""
-"<span style=\"                             font-size: 10px;                             color: #fff;                             text-transform: uppercase;                             text-align: center;                             font-weight: bold; line-height: 20px;                             transform: rotate(45deg);                             width: 100px; height: auto; display: block;                             background: green;                             position: absolute;                             top: 19px; right: -21px; left: auto;                             padding: 0;\">\n"
+"<span style=\"                             font-size: "
+"10px;                             color: #fff;                             "
+"text-transform: uppercase;                             text-align: "
+"center;                             font-weight: bold; line-height: "
+"20px;                             transform: "
+"rotate(45deg);                             width: 100px; height: auto; "
+"display: block;                             background: "
+"green;                             position: "
+"absolute;                             top: 19px; right: -21px; left: "
+"auto;                             padding: 0;\">\n"
 "                            Signed\n"
 "                        </span>"
 msgstr ""
-"<span style=\"                             font-size: 10px;                             color: #fff;                             text-transform: uppercase;                             text-align: center;                             font-weight: bold; line-height: 20px;                             transform: rotate(45deg);                             width: 100px; height: auto; display: block;                             background: green;                             position: absolute;                             top: 19px; right: -21px; left: auto;                             padding: 0;\">\n"
+"<span style=\"                             font-size: "
+"10px;                             color: #fff;                             "
+"text-transform: uppercase;                             text-align: "
+"center;                             font-weight: bold; line-height: "
+"20px;                             transform: "
+"rotate(45deg);                             width: 100px; height: auto; "
+"display: block;                             background: "
+"green;                             position: "
+"absolute;                             top: 19px; right: -21px; left: "
+"auto;                             padding: 0;\">\n"
 "                            署名済\n"
 "                        </span>"
 
@@ -181,7 +213,7 @@ msgstr "FSMプロジェクトには会社の制約が必要です。"
 #. module: industry_fsm
 #: model:ir.model.fields,field_description:industry_fsm.field_report_project_task_user_fsm__active
 msgid "Active"
-msgstr "有効化"
+msgstr "有効"
 
 #. module: industry_fsm
 #: model:ir.ui.menu,name:industry_fsm.mail_activity_plan_menu_config_task
@@ -209,7 +241,7 @@ msgstr "全てのタスク"
 #. module: industry_fsm
 #: model:ir.actions.server,name:industry_fsm.project_task_all_fsm_server_action
 msgid "All Tasks Server Action"
-msgstr ""
+msgstr "全タスクサーバアクション"
 
 #. module: industry_fsm
 #: model:ir.model.fields,field_description:industry_fsm.field_report_project_task_user_fsm__allocated_hours
@@ -218,8 +250,7 @@ msgstr "割当時間"
 
 #. module: industry_fsm
 #: model_terms:ir.actions.act_window,help:industry_fsm.project_task_user_action_report_fsm
-msgid ""
-"Analyze the progress of your tasks and the performance of your workers."
+msgid "Analyze the progress of your tasks and the performance of your workers."
 msgstr "タスクの進捗状況や作業員のパフォーマンスを分析します。"
 
 #. module: industry_fsm
@@ -296,7 +327,7 @@ msgstr "設定"
 #. module: industry_fsm
 #: model_terms:ir.ui.view,arch_db:industry_fsm.view_task_stop_timer_wizard_form
 msgid "Confirm"
-msgstr "確認"
+msgstr "確定"
 
 #. module: industry_fsm
 #. odoo-javascript
@@ -304,7 +335,9 @@ msgstr "確認"
 msgid ""
 "Confirm the <b>time spent</b> on your task. <i>Tip: note that the duration "
 "has automatically been rounded to 15 minutes.</i>"
-msgstr "タスクで <b>消費</b>を確認します。 <i>ヒント: 所要時間は自動的に15分に丸められています。</i>"
+msgstr ""
+"タスクで <b>消費</b>を確認します。 <i>ヒント: 所要時間は自動的に15分に丸めら"
+"れています。</i>"
 
 #. module: industry_fsm
 #: model:ir.model,name:industry_fsm.model_res_partner
@@ -359,7 +392,9 @@ msgstr "タスクから直接新規見積書を作成"
 msgid ""
 "Create projects to organize your tasks and define a different workflow for "
 "each project."
-msgstr "プロジェクトを作成して、タスクを整理し、プロジェクトごとに異なるワークフローを定義します。"
+msgstr ""
+"プロジェクトを作成して、タスクを整理し、プロジェクトごとに異なるワークフロー"
+"を定義します。"
 
 #. module: industry_fsm
 #: model:ir.model.fields,field_description:industry_fsm.field_project_task_stop_timers_wizard__create_uid
@@ -423,6 +458,8 @@ msgid ""
 "Design tailored worksheet templates for various interventions, and analyze "
 "collected intervention data."
 msgstr ""
+"さまざまな介入に合わせたワークシートテンプレートを設計し、収集した介入データ"
+"を分析"
 
 #. module: industry_fsm
 #: model_terms:ir.ui.view,arch_db:industry_fsm.project_project_view_form_simplified_footer_fsm
@@ -444,7 +481,9 @@ msgstr "表示名"
 msgid ""
 "Display tasks in the Field Service module and allow planning with start/end "
 "dates."
-msgstr "フィールドサービスモジュールにタスクを表示し、開始日/終了日で計画を立てることができます。"
+msgstr ""
+"フィールドサービスモジュールにタスクを表示し、開始日/終了日で計画を立てること"
+"ができます。"
 
 #. module: industry_fsm
 #. odoo-python
@@ -538,7 +577,13 @@ msgstr "今後の活動"
 msgid ""
 "Give it a <b>title</b> <i>(e.g. Boiler maintenance, Air-conditioning "
 "installation, etc.).</i>"
-msgstr " <b>タイトル</b> <i>(例: ボイラー整備、エアコン設置など)</i>を付けて下さい。"
+msgstr ""
+"<b>件名</b> <i>(例: ボイラー整備、エアコン設置など)</i>を付けて下さい。"
+
+#. module: industry_fsm
+#: model:ir.model.fields,field_description:industry_fsm.field_report_project_task_user_fsm__total_hours_spent
+msgid "Hours By Task (Including Subtasks)"
+msgstr "タスクごとの時間 (サブタスク含む)"
 
 #. module: industry_fsm
 #: model:ir.model.fields,field_description:industry_fsm.field_project_task_stop_timers_wizard__id
@@ -611,7 +656,7 @@ msgstr "最終更新日"
 #. module: industry_fsm
 #: model_terms:ir.ui.view,arch_db:industry_fsm.project_task_view_search_fsm
 msgid "Late Activities"
-msgstr "遅れた活動"
+msgstr "期限超過の活動"
 
 #. module: industry_fsm
 #. odoo-javascript
@@ -625,7 +670,9 @@ msgstr "タイマーを開始して、タスクに<b>費やされた時間を追
 msgid ""
 "Let's <b>mark your task as done!</b> <i>Tip: when doing so, your stock will "
 "automatically be updated, and your task will be closed.</i>"
-msgstr " <b>タスクを完了とマーク</b>しましょう。 <i>ヒント: マークすると、在庫が自動的に更新され、タスクがクローズされます。</i>"
+msgstr ""
+" <b>タスクを完了とマーク</b>しましょう。 <i>ヒント: マークすると、在庫が自動"
+"的に更新され、タスクがクローズされます。</i>"
 
 #. module: industry_fsm
 #. odoo-javascript
@@ -636,7 +683,7 @@ msgstr "最初の<b>タスク</b>を作成しましょう。"
 #. module: industry_fsm
 #: model:ir.model.fields,field_description:industry_fsm.field_project_task_stop_timers_wizard__line_ids
 msgid "Line"
-msgstr "ライン"
+msgstr "明細行"
 
 #. module: industry_fsm
 #: model_terms:ir.ui.view,arch_db:industry_fsm.worksheet_custom_page
@@ -658,7 +705,7 @@ msgstr "マップ"
 #. module: industry_fsm
 #: model:ir.actions.server,name:industry_fsm.project_task_fsm_map_server_action
 msgid "Map Server Action"
-msgstr ""
+msgstr "サーバアクションをマップ"
 
 #. module: industry_fsm
 #: model_terms:ir.ui.view,arch_db:industry_fsm.worksheet_custom_page
@@ -689,7 +736,7 @@ msgstr "マイルストン"
 #. odoo-python
 #: code:addons/industry_fsm/controllers/webmanifest.py:0
 msgid "My Calendar"
-msgstr ""
+msgstr "自分のカレンダー"
 
 #. module: industry_fsm
 #. odoo-python
@@ -703,12 +750,12 @@ msgstr "自分のタスク"
 #. module: industry_fsm
 #: model:ir.actions.server,name:industry_fsm.project_task_fsm_server_action
 msgid "My Tasks Server Action"
-msgstr ""
+msgstr "自分のタスクサーバアクション"
 
 #. module: industry_fsm
 #: model:ir.actions.server,name:industry_fsm.project_task_fsm_mobile_server_action
 msgid "My Tasks in mobile Server Action"
-msgstr ""
+msgstr "自分のタスク モバイルサーバアクション内"
 
 #. module: industry_fsm
 #: model_terms:ir.ui.view,arch_db:industry_fsm.view_partner_address_form_industry_fsm
@@ -719,7 +766,7 @@ msgstr "ナビゲーション"
 #. odoo-python
 #: code:addons/industry_fsm/controllers/webmanifest.py:0
 msgid "New task"
-msgstr ""
+msgstr "新規タスク"
 
 #. module: industry_fsm
 #: model_terms:ir.actions.act_window,help:industry_fsm.project_task_user_action_report_fsm
@@ -756,6 +803,11 @@ msgid "No tasks found. Let's create one!"
 msgstr "タスクが見つかりません。新しいタスクを作成しましょう！"
 
 #. module: industry_fsm
+#: model:ir.model.fields,field_description:industry_fsm.field_report_project_task_user_fsm__overtime
+msgid "Overtime"
+msgstr "残業時間"
+
+#. module: industry_fsm
 #: model:ir.model.fields,field_description:industry_fsm.field_report_project_task_user_fsm__parent_id
 msgid "Parent Task"
 msgstr "親タスク"
@@ -789,7 +841,7 @@ msgstr "ロケーションごと計画"
 #. module: industry_fsm
 #: model:ir.actions.server,name:industry_fsm.project_task_fsm_planning_groupby_location_server_action
 msgid "Planning by Location Server Action"
-msgstr ""
+msgstr "ロケーションサーバアクションによる計画"
 
 #. module: industry_fsm
 #: model:ir.actions.act_window,name:industry_fsm.project_task_action_fsm_planning_groupby_project
@@ -800,7 +852,7 @@ msgstr "プロジェクト別の計画"
 #. module: industry_fsm
 #: model:ir.actions.server,name:industry_fsm.project_task_fsm_planning_groupby_project_server_action
 msgid "Planning by Project Server Action"
-msgstr ""
+msgstr "プロジェクトサーバアクションによる計画"
 
 #. module: industry_fsm
 #: model:ir.actions.act_window,name:industry_fsm.project_task_action_fsm_planning_groupby_user
@@ -811,7 +863,7 @@ msgstr "ユーザ別の計画"
 #. module: industry_fsm
 #: model:ir.actions.server,name:industry_fsm.project_task_fsm_planning_groupby_user_server_action
 msgid "Planning by User Action"
-msgstr ""
+msgstr "ユーザアクションによる計画"
 
 #. module: industry_fsm
 #: model:ir.model.fields,field_description:industry_fsm.field_report_project_task_user_fsm__priority
@@ -846,7 +898,9 @@ msgstr "属性"
 msgid ""
 "Ready to <b>manage your onsite interventions</b>? <i>Click Field Service to "
 "start.</i>"
-msgstr "<b>オンサイト介入の管理</b>をする準備ができましたか？ <i>フィールドサービスをクリックして始めましょう</i>"
+msgstr ""
+"<b>オンサイト対応の管理</b>をする準備ができましたか？ <i>フィールドサービスを"
+"クリックして始めましょう</i>"
 
 #. module: industry_fsm
 #: model:ir.model,name:industry_fsm.model_ir_actions_report
@@ -897,7 +951,9 @@ msgstr "レポートを送信"
 msgid ""
 "Set this template on a project's stage to automate email when tasks reach "
 "stages"
-msgstr "このテンプレートをプロジェクトのステージに設定すると、タスクがステージに到達したときにメールが自動送信されます。"
+msgstr ""
+"このテンプレートをプロジェクトのステージに設定すると、タスクがステージに到達"
+"したときにメールが自動送信されます。"
 
 #. module: industry_fsm
 #: model:ir.actions.act_window,name:industry_fsm.res_config_settings_action_fsm
@@ -947,8 +1003,8 @@ msgstr "スキル"
 #. module: industry_fsm
 #: model_terms:ir.ui.view,arch_db:industry_fsm.view_task_stop_timer_wizard_form
 msgid ""
-"Some employees are still running their timer for this task. Are you sure you"
-" want to continue?"
+"Some employees are still running their timer for this task. Are you sure you "
+"want to continue?"
 msgstr "このタスク用にタイマーが稼働している従業員がいます。本当に続けますか？"
 
 #. module: industry_fsm
@@ -975,7 +1031,7 @@ msgstr "開始日"
 #. module: industry_fsm
 #: model:ir.model.fields,field_description:industry_fsm.field_report_project_task_user_fsm__state
 msgid "State"
-msgstr "都道府県・州"
+msgstr "ステータス"
 
 #. module: industry_fsm
 #. odoo-javascript
@@ -1031,7 +1087,7 @@ msgstr "タスクの繰り返し"
 #. module: industry_fsm
 #: model:ir.model,name:industry_fsm.model_project_task_type
 msgid "Task Stage"
-msgstr "タスク工程"
+msgstr "タスクステージ"
 
 #. module: industry_fsm
 #: model:ir.model,name:industry_fsm.model_report_industry_fsm_worksheet_custom
@@ -1076,7 +1132,9 @@ msgstr "フィールドサービスレポートが顧客により署名されま
 msgid ""
 "The field service report is unavailable for the selected tasks as they do "
 "not contain any timesheets, products, or worksheets."
-msgstr "選択したタスクにはタイムシート、プロダクト、ワークシートが含まれていないため、フィールドサービスレポートは利用できません。"
+msgstr ""
+"選択したタスクにはタイムシート、プロダクト、ワークシートが含まれていないた"
+"め、フィールドサービスレポートは利用できません。"
 
 #. module: industry_fsm
 #. odoo-python
@@ -1165,7 +1223,7 @@ msgstr "スケジュール対象"
 #. module: industry_fsm
 #: model:ir.actions.server,name:industry_fsm.project_task_to_schedule_fsm_server_action
 msgid "To Schedule Server Action"
-msgstr ""
+msgstr "サーバアクションをスケジュールする"
 
 #. module: industry_fsm
 #: model_terms:ir.ui.view,arch_db:industry_fsm.project_task_view_search_fsm
@@ -1177,7 +1235,8 @@ msgstr "予定/割当対象"
 #: model_terms:ir.actions.act_window,help:industry_fsm.project_task_action_all_fsm2
 msgid ""
 "To get things done, plan activities and use the task status.<br>\n"
-"                Collaborate efficiently by chatting in real-time or via email."
+"                Collaborate efficiently by chatting in real-time or via "
+"email."
 msgstr ""
 "業務を完了させるために、活動を計画し、タスクステータスを使用します。<br>\n"
 "リアルタイムチャットやEメールを使って、効率的に協力しましょう。"
@@ -1199,12 +1258,7 @@ msgstr "今日"
 #. module: industry_fsm
 #: model_terms:ir.ui.view,arch_db:industry_fsm.project_task_view_search_fsm
 msgid "Today Activities"
-msgstr "本日の活動"
-
-#. module: industry_fsm
-#: model:ir.model.fields,field_description:industry_fsm.field_report_project_task_user_fsm__total_hours_spent
-msgid "Total Time Spent"
-msgstr "消費時間合計"
+msgstr "今日の活動"
 
 #. module: industry_fsm
 #: model_terms:ir.actions.act_window,help:industry_fsm.project_task_type_action_fsm
@@ -1224,7 +1278,7 @@ msgstr "ユーザ"
 #. module: industry_fsm
 #: model_terms:ir.ui.view,arch_db:industry_fsm.view_task_form2_inherit
 msgid "View Itinerary"
-msgstr "日程表を見る"
+msgstr "行程を表示"
 
 #. module: industry_fsm
 #: model:ir.model.fields,field_description:industry_fsm.field_project_task_stop_timers_wizard_line__wizard_id
@@ -1271,9 +1325,10 @@ msgid ""
 "format_datetime(object.date_deadline, tz=object.partner_id.tz, "
 "lang_code=object.partner_id.lang) or '' }}"
 msgstr ""
-"以下が予定されています: {{ object.planned_date_begin and object.date_deadline and 'from"
-" the ' + format_datetime(object.planned_date_begin, tz=object.partner_id.tz,"
-" lang_code=object.partner_id.lang) + ' to the ' + "
+"以下が予定されています: {{ object.planned_date_begin and "
+"object.date_deadline and 'from the ' + "
+"format_datetime(object.planned_date_begin, tz=object.partner_id.tz, "
+"lang_code=object.partner_id.lang) + ' to the ' + "
 "format_datetime(object.date_deadline, tz=object.partner_id.tz, "
 "lang_code=object.partner_id.lang) or '' }}"
 
@@ -1297,3 +1352,9 @@ msgstr "FSMか？"
 #: model:ir.actions.server,name:industry_fsm.fsm_customer_ratings_server_action
 msgid "project.project.fsm"
 msgstr "project.project.fsm"
+
+#~ msgid "10:00"
+#~ msgstr "10:00"
+
+#~ msgid "2023-01-01"
+#~ msgstr "2023-01-01"

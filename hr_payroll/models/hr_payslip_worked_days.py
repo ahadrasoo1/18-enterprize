@@ -44,7 +44,7 @@ class HrPayslipWorkedDays(models.Model):
             if worked_days.payslip_id.wage_type == "hourly":
                 worked_days.amount = worked_days.payslip_id.contract_id.hourly_wage * worked_days.number_of_hours if worked_days.is_paid else 0
             else:
-                worked_days.amount = worked_days.payslip_id.contract_id.contract_wage * worked_days.number_of_hours / (worked_days.payslip_id.sum_worked_hours or 1) if worked_days.is_paid else 0
+                worked_days.amount = worked_days.payslip_id.contract_id.contract_wage * worked_days.number_of_hours / (worked_days.payslip_id._get_regular_worked_hours() or 1) if worked_days.is_paid else 0
 
     def _is_half_day(self):
         self.ensure_one()
@@ -67,6 +67,16 @@ class HrPayslipWorkedDays(models.Model):
                 ['id:recordset']
             )
         }
+        work_entries = {
+            (employee, date.date()): we
+            for employee, date, we in self.env['hr.work.entry']._read_group(
+            domain=[
+                ('date_start', '<=', max(self.payslip_id.mapped('date_to'))),
+                ('date_stop', '>=', min(self.payslip_id.mapped('date_from'))),
+                ('employee_id', 'in', self.payslip_id.employee_id.ids)
+            ],
+            groupby=['employee_id', 'date_start:day'],
+            aggregates=['id:recordset'])}
         for worked_days in self:
             public_holidays = to_check_public_holiday.get(worked_days.work_entry_type_id, '')
             holidays = public_holidays and public_holidays.filtered(lambda p:
@@ -74,9 +84,18 @@ class HrPayslipWorkedDays(models.Model):
                 and p.date_from.date() <= worked_days.payslip_id.date_to
                 and p.date_to.date() >= worked_days.payslip_id.date_from
                 and p.company_id == worked_days.payslip_id.company_id)
-            half_day = worked_days._is_half_day()
+            actual_holidays = self.env['resource.calendar.leaves']
             if holidays:
-                name = (', '.join(holidays.mapped('name')))
+                for holiday in holidays:
+                    work_entry_list = work_entries.get(
+                        (worked_days.payslip_id.employee_id, holiday.date_from.date()),
+                        self.env['hr.work.entry']
+                    )
+                    if any(we.code == holiday.work_entry_type_id.code for we in work_entry_list):
+                        actual_holidays |= holiday
+            if actual_holidays:
+                name = (', '.join(actual_holidays.mapped('name')))
             else:
                 name = worked_days.work_entry_type_id.name
+            half_day = worked_days._is_half_day()
             worked_days.name = name + (_(' (Half-Day)') if half_day else '')

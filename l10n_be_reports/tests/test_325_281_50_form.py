@@ -72,7 +72,7 @@ class TestResPartner(AccountTestInvoicingCommon):
     @classmethod
     def create_and_post_bill(cls, partner_id, product_id, amount, date):
         invoice = cls.env['account.move'].create({
-            'move_type': 'in_invoice',
+            'move_type': 'in_invoice' if amount >= 0 else 'in_refund',
             'partner_id': partner_id.id,
             'invoice_payment_term_id': False,
             'invoice_date': fields.Date.from_string(date),
@@ -85,7 +85,7 @@ class TestResPartner(AccountTestInvoicingCommon):
                     'product_uom_id': product_id.uom_id.id,
                     'quantity': 1.0,
                     'discount': 0.0,
-                    'price_unit': amount,
+                    'price_unit': abs(amount),
                     'tax_ids': [],
                 }),
             ]
@@ -774,6 +774,21 @@ class TestResPartner(AccountTestInvoicingCommon):
         self.assertIn(form_3, self.partner_a.forms_281_50)
         self.assertNotIn(form_2, self.partner_a.forms_281_50)
 
+    def test_281_50_partner_with_invalid_company(self):
+        """Ensure that you can not create a form with a partner wich belong in an other company"""
+        # set partner_a to belong to an other company
+        self.partner_a.company_id = self.company_data_2['company']
+        with self.assertRaisesRegex(UserError, "There are some inconsistencies in the partner-company association. The following partners should be accessible by their paired company: partner_a: company_1_data"):
+            self.create_form28150(ref_year=2020)
+            self.partner_a.company_id = self.company_data_2['company']
+        # set partner_a to belong to a child company
+        branch = self.env['res.company'].create({
+            'name': "Branch A",
+            'parent_id': self.company_data['company'].id,
+        })
+        self.partner_a.company_id = branch
+        self.create_form28150(ref_year=2020)
+
     def test_325_and_281_50_should_raise_error_when_unlink_and_state_is_generated(self):
         form = self.create_form28150(ref_year=2020)
         with self.assertRaises(UserError):
@@ -984,28 +999,43 @@ class TestResPartner(AccountTestInvoicingCommon):
             'form_281_50_ids': form_281_50_from_form_325_ids.ids,
         }])
 
+    def test_281_50_form_for_amount_below_250_shouldnt_be_created(self):
+        self.create_and_post_bill(partner_id=self.partner_b, product_id=self.product_b, amount=200.0, date='2000-05-12')
+        form_325 = self.create_325_form(ref_year=2000)
+        self.assertFalse(form_325.form_281_50_ids.filtered(lambda f: f.partner_id.id == self.partner_b.id))
+
     def test_281_50_vendor_bill_and_credit_note_without_payment(self):
         """ Ensure form 281.50 handles correctly credit note in its computation """
+        self.create_and_post_bill(partner_id=self.partner_b, product_id=self.product_b, amount=1000.0, date='2000-05-12')
         bill = self.create_and_post_bill(partner_id=self.partner_b, product_id=self.product_b, amount=1000.0, date='2000-05-12')
 
         credit_note = bill._reverse_moves([{'invoice_date': '2000-05-12'}])
         credit_note.action_post()
 
         form_325 = self.create_325_form(ref_year=2000)
+        # The credit note should have reduce the amount of commission
         self.assertRecordValues(form_325.form_281_50_ids.filtered(lambda x: x.partner_id.id == self.partner_b.id), [
             {
                 'partner_id': self.partner_b.id,
                 'commissions': 0.0,
                 'atn': 0.0,
-                'fees': 0.0,
+                'fees': 1000.0,
                 'exposed_expenses': 0.0,
-                'total_remuneration': 0.0,
+                'total_remuneration': 1000.0,
                 'paid_amount': 0.0,
             }
         ])
 
-    def test_281_50_vendor_bill_and_credit_note_with_payment(self):
-        """ Ensure form 281.50 handles correctly credit note and their payments in its computation """
+    def test_281_50_form_for_amount_without_payment_resulting_in_0_due_to_credit_note_shouldnt_be_created(self):
+        bill = self.create_and_post_bill(partner_id=self.partner_b, product_id=self.product_b, amount=1000.0, date='2000-05-12')
+
+        credit_note = bill._reverse_moves([{'invoice_date': '2000-05-12'}])
+        credit_note.action_post()
+
+        form_325 = self.create_325_form(ref_year=2000)
+        self.assertFalse(form_325.form_281_50_ids.filtered(lambda f: f.partner_id.id == self.partner_b.id))
+
+    def test_281_50_form_for_amount_with_payment_resulting_in_0_due_to_credit_note_shouldnt_be_created(self):
         bill = self.create_and_post_bill(partner_id=self.partner_b, product_id=self.product_b, amount=1000.0, date='2000-05-12')
         self.pay_bill(bill=bill, amount=1000.0, date='2000-05-12')
 
@@ -1014,17 +1044,13 @@ class TestResPartner(AccountTestInvoicingCommon):
         self.pay_bill(bill=credit_note, amount=-1000.0, date='2000-05-12')
 
         form_325 = self.create_325_form(ref_year=2000)
-        self.assertRecordValues(form_325.form_281_50_ids.filtered(lambda x: x.partner_id.id == self.partner_b.id), [
-            {
-                'partner_id': self.partner_b.id,
-                'commissions': 0.0,
-                'atn': 0.0,
-                'fees': 0.0,
-                'exposed_expenses': 0.0,
-                'total_remuneration': 0.0,
-                'paid_amount': 0.0,
-            }
-        ])
+        self.assertFalse(form_325.form_281_50_ids.filtered(lambda x: x.partner_id.id == self.partner_b.id))
+
+    def test_281_50_form_shouldnt_be_created_if_no_amount_to_report(self):
+        """ Ensure partner having only amls with 0 as balance don't get reported """
+        self.create_and_post_bill(partner_id=self.partner_b, product_id=self.product_b, amount=0, date='2000-05-12')
+        form_325 = self.create_325_form(ref_year=2000)
+        self.assertFalse(form_325.form_281_50_ids.filtered(lambda x: x.partner_id.id == self.partner_b.id))
 
     def test_281_50_positive_and_negative_line_should_compensate(self):
         """Ensure form 281.50 handles negative lines put on the same account"""
@@ -1074,3 +1100,63 @@ class TestResPartner(AccountTestInvoicingCommon):
                 'paid_amount': 900.0,
             }
         ])
+
+    def test_281_50_negative_amount_shouldnt_be_reported(self):
+        credit_note = self.create_and_post_bill(self.partner_b, self.product_b, -1000.0, '2000-05-12')
+        self.pay_bill(bill=credit_note, amount=-1000.0, date='2000-05-12')
+
+        form_325 = self.create_325_form(ref_year=2000)
+        self.assertFalse(form_325.form_281_50_ids.filtered(lambda x: x.partner_id.id == self.partner_b.id))
+
+    def test_281_50_write_off_and_exchange_difference_prevent_zero_division_error(self):
+        partner_id = self.partner_b
+        product_id = self.product_b
+        foreign_currency = self.other_currency
+        payable_account = partner_id.commercial_partner_id.property_account_payable_id
+        # simulate 0ed writeoff and 0ed exchange difference
+        zeroed_entry = self.env['account.move'].create({
+            'move_type': 'entry',
+            'partner_id': partner_id.id,
+            'date': fields.Date.from_string('2000-05-12'),
+            'line_ids': [
+                Command.create({
+                    'account_id': product_id.property_account_expense_id.id,
+                    'partner_id': partner_id.id,
+                    'currency_id': foreign_currency.id,
+                    'balance': 0,
+                    'amount_currency': 1000.0,
+                }),
+                Command.create({
+                    'account_id': payable_account.id,
+                    'partner_id': partner_id.id,
+                    'currency_id': foreign_currency.id,
+                    'balance': 0,
+                    'amount_currency': -1000.0,
+                }),
+            ]
+        })
+        zeroed_entry.action_post()
+        bank_move = self.env['account.move'].create({
+            'move_type': 'entry',
+            'partner_id': partner_id.id,
+            'date': fields.Date.from_string('2000-05-12'),
+            'journal_id': self.company_data['default_journal_bank'].id,
+            'line_ids': [
+                Command.create({
+                    'account_id': payable_account.id,
+                    'currency_id': foreign_currency.id,
+                    'balance': 0,
+                    'amount_currency': 1000.0,
+                }),
+                Command.create({
+                    'account_id': self.company_data['default_journal_bank'].default_account_id.id,
+                    'currency_id': foreign_currency.id,
+                    'balance': 0,
+                    'amount_currency': -1000.0,
+                }),
+            ],
+        })
+        bank_move.action_post()
+        moves = bank_move + zeroed_entry
+        moves.line_ids.filtered(lambda l: l.account_id == payable_account).reconcile()
+        form_325 = self.create_325_form(ref_year=2000)

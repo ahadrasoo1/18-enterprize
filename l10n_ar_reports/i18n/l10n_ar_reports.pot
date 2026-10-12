@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 17.0+e\n"
+"Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-20 10:49+0000\n"
-"PO-Revision-Date: 2023-11-20 10:49+0000\n"
+"POT-Creation-Date: 2025-12-29 19:01+0000\n"
+"PO-Revision-Date: 2025-12-29 19:01+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -16,17 +16,9 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: l10n_ar_reports
-#: model_terms:ir.ui.view,arch_db:l10n_ar_reports.search_template_ar_vat_book
-msgid ""
-"<span class=\"fa fa-filter\"/>\n"
-"                    Tax Type:"
-msgstr ""
-
-#. module: l10n_ar_reports
-#: model_terms:ir.ui.view,arch_db:l10n_ar_reports.res_config_settings_view_form
-msgid ""
-"<span class=\"fa fa-lg fa-building-o\" title=\"Values set here are company-"
-"specific.\" groups=\"base.group_multi_company\"/>"
+#. odoo-python
+#: code:addons/l10n_ar_reports/models/l10n_ar_vat_book.py:0
+msgid "+%s non-previewed lines"
 msgstr ""
 
 #. module: l10n_ar_reports
@@ -45,8 +37,8 @@ msgid "Afip Responsibility Type Name"
 msgstr ""
 
 #. module: l10n_ar_reports
-#. odoo-python
-#: code:addons/l10n_ar_reports/models/l10n_ar_vat_book.py:0
+#. odoo-javascript
+#: code:addons/l10n_ar_reports/static/src/components/argentinian_report/filters.js:0
 msgid "All"
 msgstr ""
 
@@ -95,7 +87,6 @@ msgstr ""
 #. module: l10n_ar_reports
 #: model:ir.model.fields,field_description:l10n_ar_reports.field_res_company__l10n_ar_computable_tax_credit
 #: model:ir.model.fields,field_description:l10n_ar_reports.field_res_config_settings__l10n_ar_computable_tax_credit
-#: model:ir.model.fields,field_description:l10n_ar_reports.field_res_config_test__l10n_ar_computable_tax_credit
 msgid "Computable Tax Credit: Prorate Options"
 msgstr ""
 
@@ -379,13 +370,21 @@ msgstr ""
 #. module: l10n_ar_reports
 #. odoo-python
 #: code:addons/l10n_ar_reports/models/l10n_ar_vat_book.py:0
-msgid "The country '%s' does not have a '%s' configured."
+msgid "The country '%(country)s' does not have a '%(vat_type)s' configured."
 msgstr ""
 
 #. module: l10n_ar_reports
 #. odoo-python
 #: code:addons/l10n_ar_reports/models/l10n_ar_vat_book.py:0
 msgid "The partner '%s' does not have a country configured."
+msgstr ""
+
+#. module: l10n_ar_reports
+#. odoo-javascript
+#: code:addons/l10n_ar_reports/static/src/components/argentinian_report/warnings.xml:0
+msgid ""
+"This report contains more lines than the limit set on it.\n"
+"        To save performance, the exceeding lines are hidden from this preview, but they will be appear in exported files as usual."
 msgstr ""
 
 #. module: l10n_ar_reports

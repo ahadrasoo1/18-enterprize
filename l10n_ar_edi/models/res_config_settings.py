@@ -1,8 +1,7 @@
-# Part of Odoo. See LICENSE file for full copyright and licensing details.
-from odoo import models, fields, api, _
-from odoo.exceptions import UserError
 import re
 
+from odoo import _, fields, models
+from odoo.exceptions import UserError
 
 class ResConfigSettings(models.TransientModel):
 
@@ -15,6 +14,10 @@ class ResConfigSettings(models.TransientModel):
     l10n_ar_afip_ws_crt_id = fields.Many2one(related='company_id.l10n_ar_afip_ws_crt_id', readonly=False)
 
     l10n_ar_fce_transmission_type = fields.Selection(related="company_id.l10n_ar_fce_transmission_type", readonly=False)
+    l10n_ar_payment_foreign_currency = fields.Selection(
+        related="company_id.l10n_ar_payment_foreign_currency",
+        readonly=False,
+        inverse="_inverse_l10n_ar_payment_foreign_currency")
 
     def l10n_ar_action_create_certificate_request(self):
         self.ensure_one()
@@ -24,6 +27,11 @@ class ResConfigSettings(models.TransientModel):
             raise UserError(_('The company country must be defined before this action'))
         if not self.company_id.partner_id.l10n_ar_vat:
             raise UserError(_('The company CUIT must be defined before this action'))
+
+        if not self.l10n_ar_afip_ws_key_id:
+            private_key_sudo = self.env['certificate.key'].sudo()._generate_rsa_private_key(self.company_id, name='afip_id_rsa_%s' % fields.Datetime.now().strftime("%Y%m%d_%H%M%S"))
+            self.l10n_ar_afip_ws_key_id = private_key_sudo
+
         return {'type': 'ir.actions.act_url', 'url': '/l10n_ar_edi/download_csr/' + str(self.company_id.id), 'target': 'new'}
 
     def l10n_ar_connection_test(self):
@@ -64,3 +72,8 @@ class ResConfigSettings(models.TransientModel):
 
     def random_demo_cert(self):
         self.company_id.set_demo_random_cert()
+
+    def _inverse_l10n_ar_payment_foreign_currency(self):
+        for record in self:
+            self.env['ir.config_parameter'].sudo().set_param(
+                f"l10n_ar_edi.{record.company_id.id}_foreign_currency_payment", record.l10n_ar_payment_foreign_currency)

@@ -3,24 +3,26 @@
 # 	* sale_renting_sign
 #
 # Translators:
-# Bole <bole@dajmi5.com>, 2022
-# Martin Trigaux, 2022
-# Davor Bojkić <davor.bojkic@storm.hr>, 2022
-# Karolina Tonković <karolina.tonkovic@storm.hr>, 2022
+# Karolina Tonković <karolina.tonkovic@storm.hr>, 2024
+# Davor Bojkić <davor.bojkic@storm.hr>, 2024
+# Matija Gudlin, 2024
+# Bole <bole@dajmi5.com>, 2024
+# Luka Carević <luka@uvid.hr>, 2025
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 16.0beta+e\n"
+"Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-16 16:03+0000\n"
-"PO-Revision-Date: 2022-09-22 05:48+0000\n"
-"Last-Translator: Karolina Tonković <karolina.tonkovic@storm.hr>, 2022\n"
+"POT-Creation-Date: 2025-12-29 18:49+0000\n"
+"PO-Revision-Date: 2024-09-25 09:44+0000\n"
+"Last-Translator: Luka Carević <luka@uvid.hr>, 2025\n"
 "Language-Team: Croatian (https://app.transifex.com/odoo/teams/41243/hr/)\n"
 "Language: hr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 
 #. module: sale_renting_sign
 #: model:ir.model.fields,field_description:sale_renting_sign.field_sale_order__sign_request_count
@@ -28,14 +30,14 @@ msgid "# of Signature Requests"
 msgstr ""
 
 #. module: sale_renting_sign
-#: model_terms:ir.ui.view,arch_db:sale_renting_sign.message_signature_link
-msgid "A document has been signed and a copy attached to this order:"
-msgstr ""
-
-#. module: sale_renting_sign
 #: model_terms:ir.ui.view,arch_db:sale_renting_sign.rental_sign_wizard_view_form
 msgid "Cancel"
-msgstr "Odustani"
+msgstr "Otkaži"
+
+#. module: sale_renting_sign
+#: model:sign.template,redirect_url_text:sale_renting_sign.template_rental_sign
+msgid "Close"
+msgstr "Zatvori"
 
 #. module: sale_renting_sign
 #: model:ir.model,name:sale_renting_sign.model_res_company
@@ -45,7 +47,7 @@ msgstr "Tvrtke"
 #. module: sale_renting_sign
 #: model:ir.model,name:sale_renting_sign.model_res_config_settings
 msgid "Config Settings"
-msgstr "Postavke"
+msgstr "Konfiguracijske postavke"
 
 #. module: sale_renting_sign
 #: model:ir.model.fields,field_description:sale_renting_sign.field_rental_sign_wizard__create_uid
@@ -70,7 +72,7 @@ msgstr ""
 #. module: sale_renting_sign
 #: model:ir.model.fields,field_description:sale_renting_sign.field_rental_sign_wizard__display_name
 msgid "Display Name"
-msgstr "Naziv"
+msgstr "Naziv za prikaz"
 
 #. module: sale_renting_sign
 #: model:ir.model.fields,field_description:sale_renting_sign.field_rental_sign_wizard__template_id
@@ -95,17 +97,11 @@ msgstr "Promijenio"
 #. module: sale_renting_sign
 #: model:ir.model.fields,field_description:sale_renting_sign.field_rental_sign_wizard__write_date
 msgid "Last Updated on"
-msgstr "Vrijeme promjene"
-
-#. module: sale_renting_sign
-#: model:sign.template,redirect_url_text:sale_renting_sign.template_rental_sign
-msgid "Open Link"
-msgstr ""
+msgstr "Promijenjeno"
 
 #. module: sale_renting_sign
 #: model:ir.model,name:sale_renting_sign.model_sale_order
 #: model:ir.model.fields,field_description:sale_renting_sign.field_rental_sign_wizard__order_id
-#: model:ir.model.fields,field_description:sale_renting_sign.field_sign_request__sale_order_id
 #: model:ir.model.fields,field_description:sale_renting_sign.field_sign_send_request__sale_order_id
 msgid "Sales Order"
 msgstr "Prodajni nalog"
@@ -125,12 +121,12 @@ msgstr "Potpiši dokument"
 #: model_terms:ir.ui.view,arch_db:sale_renting_sign.rental_order_inherit_rental_sign
 #: model_terms:ir.ui.view,arch_db:sale_renting_sign.rental_sign_wizard_view_form
 msgid "Sign Documents"
-msgstr ""
+msgstr "Potpiši dokumente"
 
 #. module: sale_renting_sign
 #: model:ir.model,name:sale_renting_sign.model_rental_sign_wizard
 msgid "Sign Documents from a SO"
-msgstr ""
+msgstr "Potpiši dokumente iz ponude"
 
 #. module: sale_renting_sign
 #: model:ir.model,name:sale_renting_sign.model_sign_send_request
@@ -149,7 +145,10 @@ msgstr "Zahtjevi za potpis"
 
 #. module: sale_renting_sign
 #: model:ir.model.fields,help:sale_renting_sign.field_res_company__rental_sign_tmpl_id
-msgid "This document template will be selected by default when signing documents from a rental order. You should select a template accessible to all Sign users."
+msgid ""
+"This document template will be selected by default when signing documents "
+"from a rental order. You should select a template accessible to all Sign "
+"users."
 msgstr ""
 
 #. module: sale_renting_sign

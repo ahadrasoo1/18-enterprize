@@ -119,7 +119,7 @@ class MulticurrencyRevaluationWizard(models.TransientModel):
         report = self.env.ref('account_reports.multicurrency_revaluation_report')
         included_line_id = report.line_ids.filtered(lambda l: l.code == 'multicurrency_included').id
         generic_included_line_id = report._get_generic_line_id('account.report.line', included_line_id)
-        options = {**self._context['multicurrency_revaluation_report_options'], 'unfold_all': False}
+        options = {**self._context['multicurrency_revaluation_report_options'], 'unfold_all': True}
         report_lines = report._get_lines(options)
         move_lines = []
 
@@ -170,7 +170,7 @@ class MulticurrencyRevaluationWizard(models.TransientModel):
         self.ensure_one()
         move_vals = self._get_move_vals()
         if move_vals['line_ids']:
-            move = self.env['account.move'].create(move_vals)
+            move = self.env['account.move'].with_context(skip_invoice_sync=True).create(move_vals)
             move.action_post()
             reverse_move = move._reverse_moves(default_values_list=[{
                 'ref': _("Reversal of: %s", move.ref),

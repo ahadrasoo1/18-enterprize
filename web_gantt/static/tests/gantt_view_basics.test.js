@@ -10,7 +10,7 @@ import {
     onRpc,
     patchWithCleanup,
 } from "@web/../tests/web_test_helpers";
-import { Tasks, defineGanttModels } from "./gantt_mock_models";
+import { Tasks, Project, defineGanttModels } from "./gantt_mock_models";
 import {
     SELECTORS,
     focusToday,
@@ -47,7 +47,7 @@ test("empty ungrouped gantt rendering", async () => {
     });
     const { viewTitle, range, columnHeaders, rows } = getGridContent();
     expect(viewTitle).toBe(null);
-    expect(range).toBe("From: 12/01/2018 to: 02/28/2019");
+    expect(range).toBe("12/01/2018 -> 02/28/2019");
     expect(columnHeaders).toHaveLength(34);
     expect(rows).toEqual([{}]);
     expect(SELECTORS.noContentHelper).toHaveCount(0);
@@ -58,7 +58,6 @@ test("ungrouped gantt rendering", async () => {
     const startDateLocalString = deserializeDateTime(task2.start).toFormat("f");
     const stopDateLocalString = deserializeDateTime(task2.stop).toFormat("f");
     Tasks._views.gantt = `<gantt date_start="start" date_stop="stop"/>`;
-    Tasks._views.search = `<search/>`;
 
     onRpc("get_gantt_data", ({ model }) => expect.step(model));
     await mountWithCleanup(WebClient);
@@ -72,7 +71,7 @@ test("ungrouped gantt rendering", async () => {
 
     const { viewTitle, range, columnHeaders, rows } = getGridContent();
     expect(viewTitle).toBe(null);
-    expect(range).toBe("From: 12/01/2018 to: 02/28/2019");
+    expect(range).toBe("12/01/2018 -> 02/28/2019");
     expect(columnHeaders).toHaveLength(34);
     expect(getActiveScale()).toBe(2);
     expect(SELECTORS.expandCollapseButtons).not.toBeVisible();
@@ -130,7 +129,7 @@ test("ordered gantt view", async () => {
     });
     const { viewTitle, range, columnHeaders, rows } = getGridContent();
     expect(viewTitle).toBe("Gantt View");
-    expect(range).toBe("From: 12/01/2018 to: 02/28/2019");
+    expect(range).toBe("12/01/2018 -> 02/28/2019");
     expect(columnHeaders).toHaveLength(34);
     expect(SELECTORS.noContentHelper).toHaveCount(0);
     expect(rows).toEqual([
@@ -181,7 +180,7 @@ test("empty single-level grouped gantt rendering", async () => {
     });
     const { viewTitle, range, columnHeaders, rows } = getGridContent();
     expect(viewTitle).toBe("Gantt View");
-    expect(range).toBe("From: 12/01/2018 to: 02/28/2019");
+    expect(range).toBe("12/01/2018 -> 02/28/2019");
     expect(columnHeaders).toHaveLength(34);
     expect(rows).toEqual([{ title: "" }]);
     expect(SELECTORS.noContentHelper).toHaveCount(0);
@@ -197,7 +196,7 @@ test("single-level grouped gantt rendering", async () => {
     expect(SELECTORS.expandCollapseButtons).not.toBeVisible();
 
     const { range, viewTitle, columnHeaders, rows } = getGridContent();
-    expect(range).toBe("From: 12/01/2018 to: 02/28/2019");
+    expect(range).toBe("12/01/2018 -> 02/28/2019");
     expect(viewTitle).toBe("Tasks");
     expect(columnHeaders).toHaveLength(34);
     expect(rows).toEqual([
@@ -260,7 +259,7 @@ test("single-level grouped gantt rendering with group_expand", async () => {
     expect(SELECTORS.expandCollapseButtons).not.toBeVisible();
 
     const { range, viewTitle, columnHeaders, rows } = getGridContent();
-    expect(range).toBe("From: 12/01/2018 to: 02/28/2019");
+    expect(range).toBe("12/01/2018 -> 02/28/2019");
     expect(viewTitle).toBe("Tasks");
     expect(columnHeaders).toHaveLength(34);
     expect(rows).toEqual([
@@ -315,7 +314,7 @@ test("multi-level grouped gantt rendering", async () => {
     expect(SELECTORS.expandCollapseButtons).toHaveCount(2);
 
     const { range, viewTitle, columnHeaders, rows } = getGridContent();
-    expect(range).toBe("From: 12/01/2018 to: 02/28/2019");
+    expect(range).toBe("12/01/2018 -> 02/28/2019");
     expect(viewTitle).toBe("Tasks");
     expect(columnHeaders).toHaveLength(34);
     expect(rows).toEqual([
@@ -428,7 +427,7 @@ test("many2many grouped gantt rendering", async () => {
     expect(SELECTORS.expandCollapseButtons).not.toBeVisible();
 
     const { range, viewTitle, columnHeaders, rows } = getGridContent();
-    expect(range).toBe("From: 12/01/2018 to: 02/28/2019");
+    expect(range).toBe("12/01/2018 -> 02/28/2019");
     expect(viewTitle).toBe("Tasks");
     expect(columnHeaders).toHaveLength(34);
     expect(rows).toEqual([
@@ -481,7 +480,7 @@ test("multi-level grouped with many2many field in gantt view", async () => {
     expect(SELECTORS.expandCollapseButtons).toHaveCount(2);
 
     const { range, viewTitle, columnHeaders, rows } = getGridContent();
-    expect(range).toBe("From: 12/01/2018 to: 02/28/2019");
+    expect(range).toBe("12/01/2018 -> 02/28/2019");
     expect(viewTitle).toBe("Tasks");
     expect(columnHeaders).toHaveLength(34);
     expect(rows).toEqual([
@@ -557,7 +556,7 @@ test("full precision gantt rendering", async () => {
     expect(SELECTORS.expandCollapseButtons).toHaveCount(2);
 
     const { range, viewTitle, columnHeaders, rows } = getGridContent();
-    expect(range).toBe("From: 12/16/2018 to: 01/05/2019");
+    expect(range).toBe("12/16/2018 -> 01/05/2019");
     expect(viewTitle).toBe("Gantt View");
     expect(columnHeaders).toHaveLength(9);
     expect(rows).toEqual([
@@ -690,7 +689,7 @@ test("scale switching", async () => {
     expect(getActiveScale()).toBe(2);
     expect(SELECTORS.expandCollapseButtons).not.toBeVisible();
     let gridContent = getGridContent();
-    expect(gridContent.range).toBe("From: 12/01/2018 to: 02/28/2019");
+    expect(gridContent.range).toBe("12/01/2018 -> 02/28/2019");
     expect(gridContent.columnHeaders).toHaveLength(34);
     expect(gridContent.rows).toEqual([
         {
@@ -728,7 +727,7 @@ test("scale switching", async () => {
     expect(getActiveScale()).toBe(5);
     expect(SELECTORS.expandCollapseButtons).not.toBeVisible();
     gridContent = getGridContent();
-    expect(gridContent.range).toBe("From: 12/01/2018 to: 02/28/2019");
+    expect(gridContent.range).toBe("12/01/2018 -> 02/28/2019");
     expect(gridContent.columnHeaders).toHaveLength(42);
     expect(gridContent.rows).toEqual([
         {
@@ -765,7 +764,7 @@ test("scale switching", async () => {
     expect(getActiveScale()).toBe(4);
     expect(SELECTORS.expandCollapseButtons).not.toBeVisible();
     gridContent = getGridContent();
-    expect(gridContent.range).toBe("From: 12/01/2018 to: 02/28/2019");
+    expect(gridContent.range).toBe("12/01/2018 -> 02/28/2019");
     expect(gridContent.columnHeaders).toHaveLength(10);
     expect(gridContent.rows).toEqual([
         {
@@ -790,7 +789,7 @@ test("scale switching", async () => {
     expect(getActiveScale()).toBe(2);
     expect(SELECTORS.expandCollapseButtons).not.toBeVisible();
     gridContent = getGridContent();
-    expect(gridContent.range).toBe("From: 12/01/2018 to: 02/28/2019");
+    expect(gridContent.range).toBe("12/01/2018 -> 02/28/2019");
     expect(gridContent.columnHeaders).toHaveLength(34);
     expect(gridContent.rows).toEqual([
         {
@@ -829,7 +828,7 @@ test("scale switching", async () => {
     expect(getActiveScale()).toBe(0);
     expect(SELECTORS.expandCollapseButtons).not.toBeVisible();
     gridContent = getGridContent();
-    expect(gridContent.range).toBe("From: 12/01/2018 to: 02/28/2019");
+    expect(gridContent.range).toBe("12/01/2018 -> 02/28/2019");
     expect(gridContent.columnHeaders).toHaveLength(3);
     expect(gridContent.rows).toEqual([
         {
@@ -911,8 +910,14 @@ test("Day scale with 24-hours format", async () => {
 });
 
 test("group tasks by task_properties", async () => {
+    Project._fields.properties_definitions = fields.PropertiesDefinition();
+    Project._records[0].properties_definitions = [
+        {
+            name: "bd6404492c244cff",
+            type: "char",
+        },
+    ];
     Tasks._fields.task_properties = fields.Properties({
-        string: "Task properties",
         definition_record: "project_id",
         definition_record_field: "properties_definitions",
     });
@@ -924,13 +929,9 @@ test("group tasks by task_properties", async () => {
             stop: "2018-12-24 08:00:00",
             user_id: 1,
             project_id: 1,
-            task_properties: [
-                {
-                    name: "bd6404492c244cff",
-                    type: "char",
-                    value: "test value 1",
-                },
-            ],
+            task_properties: {
+                bd6404492c244cff: "test value 1",
+            },
         },
         {
             id: 2,
@@ -939,13 +940,9 @@ test("group tasks by task_properties", async () => {
             stop: "2018-12-12 08:00:00",
             user_id: 2,
             project_id: 1,
-            task_properties: [
-                {
-                    name: "bd6404492c244cff",
-                    type: "char",
-                    value: "test value 1",
-                },
-            ],
+            task_properties: {
+                bd6404492c244cff: "test value 1",
+            },
         },
     ];
     await mountGanttView({
@@ -1051,7 +1048,7 @@ test("initialization with default_start_date only", async (assert) => {
         context: { default_start_date: "2028-04-25" },
     });
     const { range, columnHeaders, groupHeaders } = getGridContent();
-    expect(range).toBe("From: 04/25/2028 to: 06/30/2028");
+    expect(range).toBe("04/25/2028 -> 06/30/2028");
     expect(columnHeaders.slice(0, 7).map((h) => h.title)).toEqual([
         "25",
         "26",
@@ -1072,7 +1069,7 @@ test("initialization with default_stop_date only", async (assert) => {
         context: { default_stop_date: "2028-04-25" },
     });
     const { range, columnHeaders, groupHeaders } = getGridContent();
-    expect(range).toBe("From: 02/01/2028 to: 04/25/2028");
+    expect(range).toBe("02/01/2028 -> 04/25/2028");
     expect(
         columnHeaders.slice(columnHeaders.length - 7, columnHeaders.length).map((h) => h.title)
     ).toEqual(["19", "20", "21", "22", "23", "24", "25"]);
@@ -1090,7 +1087,7 @@ test("initialization with default_start_date and default_stop_date", async (asse
         },
     });
     const { range, groupHeaders } = getGridContent();
-    expect(range).toBe("From: 01/29/2017 to: 05/26/2019");
+    expect(range).toBe("01/29/2017 -> 05/26/2019");
     expect(groupHeaders.map((h) => h.title)).toEqual(["December 2018", "January 2019"]);
     expect(`${SELECTORS.columnHeader}.o_gantt_today`).toHaveCount(1);
 });
@@ -1124,11 +1121,11 @@ test("switch startDate and stopDate if not in <= relation", async () => {
         resModel: "tasks",
         arch: `<gantt date_start="start" date_stop="stop"/>`,
     });
-    expect(getGridContent().range).toBe("From: 12/01/2018 to: 02/28/2019");
+    expect(getGridContent().range).toBe("12/01/2018 -> 02/28/2019");
     await selectGanttRange({ startDate: "2019-03-01" });
-    expect(getGridContent().range).toBe("From: 03/01/2019 to: 03/01/2019");
+    expect(getGridContent().range).toBe("03/01/2019 -> 03/01/2019");
     await selectGanttRange({ stopDate: "2019-02-28" });
-    expect(getGridContent().range).toBe("From: 02/28/2019 to: 02/28/2019");
+    expect(getGridContent().range).toBe("02/28/2019 -> 02/28/2019");
 });
 
 test("range will not exceed 10 years", async () => {
@@ -1138,11 +1135,11 @@ test("range will not exceed 10 years", async () => {
             <gantt date_start="start" date_stop="stop"/>
         `,
     });
-    expect(getGridContent().range).toBe("From: 12/01/2018 to: 02/28/2019");
+    expect(getGridContent().range).toBe("12/01/2018 -> 02/28/2019");
     await selectGanttRange({ startDate: "2006-02-28" });
-    expect(getGridContent().range).toBe("From: 02/28/2006 to: 02/27/2016");
+    expect(getGridContent().range).toBe("02/28/2006 -> 02/27/2016");
     await selectGanttRange({ stopDate: "2020-02-28" });
-    expect(getGridContent().range).toBe("From: 03/01/2010 to: 02/28/2020");
+    expect(getGridContent().range).toBe("03/01/2010 -> 02/28/2020");
 });
 
 test("popover-template with an added footer", async () => {
@@ -1253,4 +1250,72 @@ test("popover-template with a button in the body", async () => {
     await click(".o_popover .popover-body button");
     await animationFrame();
     expect(SELECTORS.pill).toHaveCount(0);
+});
+
+test("aggregation with half precision", async () => {
+    Tasks._records = Tasks._records.slice(0, 2);
+    Tasks._records[0].start = "2018-12-31 07:00:00";
+    Tasks._records[0].stop = "2018-12-31 11:00:00";
+    Tasks._records[1].start = "2018-12-31 07:00:00";
+    Tasks._records[1].stop = "2018-12-31 16:00:00";
+    await mountGanttView({
+        resModel: "tasks",
+        arch: `
+            <gantt date_start="start" date_stop="stop" total_row="1" default_range="month" precision="{'month':'day:half'}" />
+        `,
+    });
+    expect(getGridContent().rows).toEqual([
+        {
+            pills: [
+                {
+                    title: "Task 1",
+                    colSpan: "31 December 2018 -> 31 (1/2) December 2018",
+                    level: 0,
+                },
+                {
+                    title: "Task 2",
+                    colSpan: "31 December 2018 -> 31 December 2018",
+                    level: 1,
+                },
+            ],
+        },
+        {
+            isTotalRow: true,
+            pills: [
+                {
+                    title: "2",
+                    colSpan: "31 December 2018 -> 31 (1/2) December 2018",
+                    level: 0,
+                },
+                {
+                    title: "1",
+                    colSpan: "31 (1/2) December 2018 -> 31 December 2018",
+                    level: 0,
+                },
+            ],
+        },
+    ]);
+});
+
+test("today button always navigates to today, even when on yesterday", async () => {
+    await mountGanttView({
+        resModel: "tasks",
+        arch: `<gantt default_scale="day" date_start="start" date_stop="stop"/>`,
+    });
+
+    // Navigate to yesterday
+    await click(SELECTORS.previousButton);
+    await ganttControlsChanges();
+    let { range } = getGridContent();
+    expect(range).toBe("12/17/2018 -> 12/19/2018", {
+        message: "today (2018-12-20) is not part of the current range",
+    });
+
+    await focusToday();
+    await ganttControlsChanges();
+
+    ({ range } = getGridContent());
+    expect(range).toBe("12/19/2018 -> 12/20/2018", {
+        message: "today (2018-12-20) is included in the current range",
+    });
 });

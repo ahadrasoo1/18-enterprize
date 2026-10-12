@@ -32,9 +32,6 @@ export class AccountMoveLineListController extends ListController {
         useChildSubEnv({
             setPopout: this.setPopout.bind(this),
         });
-
-        // We need to override the openRecord from ListController since it does things we do not want like opening the default form view
-        this.openRecord = () => {}
     }
 
     get previewEnabled() {

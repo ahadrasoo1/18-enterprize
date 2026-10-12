@@ -108,9 +108,13 @@ class TestScheduleRelativePayslip(TransactionCase):
             self.billy_contract.write({
                 'schedule_pay': 'quarterly',
             })
-            payslip = self.env['hr.payslip'].new({
+            payslip = self.env['hr.payslip'].create({
                 'name': 'Black Spot February',
                 'employee_id': self.billy_emp.id,
+                'struct_id': self.structure.id,
+                'contract_id': self.billy_contract.id,
+                'date_from': Date.to_date('2024-01-01'),
+                'date_to': Date.to_date('2024-01-31'),
             })
             self.assertTrue(
                 payslip.warning_message and "Work entries may not be generated" in payslip.warning_message,
@@ -118,13 +122,89 @@ class TestScheduleRelativePayslip(TransactionCase):
 
             payslip.date_from = Date.to_date('2022-01-31')
             self.assertTrue(
-                payslip.warning_message and "The period selected does not match the contract validity period." in payslip.warning_message,
-                "A warning should be set on potentially missing work entries.")
+                payslip.warning_message and "No running contract over payslip period" in payslip.warning_message,
+                "An error should be set on contract validity.")
 
             payslip.date_to = Date.to_date('2022-05-14')
             self.assertTrue(
-                payslip.warning_message and "The period selected does not match the contract validity period." in payslip.warning_message,
-                "A warning should be set on potentially missing work entries.")
+                payslip.warning_message and "No running contract over payslip period" in payslip.warning_message,
+                "An error should be set on contract validity.")
             self.assertTrue(
                 payslip.warning_message and "The duration of the payslip is not accurate according to the structure type." in payslip.warning_message,
                 "A warning should be set on potentially missing work entries.")
+
+            self.billy_contract.write({
+                'schedule_pay': 'monthly',
+            })
+
+            payslip.date_from = Date.to_date('2022-12-02')
+            payslip.date_to = Date.to_date('2023-01-01')
+
+            # There is contract over the payslip period (since contract is from 2023-01-01 -> 2023-12-31), no warning for it
+            self.assertFalse(payslip.warning_message and "No running contract over payslip period" in payslip.warning_message,
+                "An error should be set on contract validity.")
+
+            payslip.date_from = Date.to_date('2024-01-01')
+            payslip.date_to = Date.to_date('2024-01-31')
+
+            # There is not contract over the payslip period, warning is required
+            self.assertTrue(payslip.warning_message and "No running contract over payslip period" in payslip.warning_message,
+                "An error should be set on contract validity.")
+
+            payslip.date_from = Date.to_date('2023-12-01')
+
+            # There is contract over the payslip period, no warning for it
+            self.assertFalse(payslip.warning_message and "No running contract over payslip period" in payslip.warning_message,
+                "An error should be set on contract validity.")
+
+            payslip.date_from = Date.to_date('2023-12-31')
+
+            # There is contract over the payslip period, no warning for it
+            self.assertFalse(payslip.warning_message and "No running contract over payslip period" in payslip.warning_message,
+                "An error should be set on contract validity.")
+
+            payslip.contract_id.write({
+                'date_start': '2026-01-01',
+                'date_end': '2026-12-31',
+            })
+
+            # There is no contract over the payslip period, warning is required (payslip dates (31/12/2023->30/01/2024))
+            self.assertTrue(payslip.warning_message and "No running contract over payslip period" in payslip.warning_message,
+                "An error should be set on contract validity.")
+
+            payslip.contract_id.write({
+                'date_start': '2023-12-30',
+                'date_end': '2024-03-31',
+            })
+
+            # There is contract over the payslip period, no warning for it (payslip dates (31/12/2023->30/01/2024))
+            self.assertFalse(payslip.warning_message and "No running contract over payslip period" in payslip.warning_message,
+                "An error should be set on contract validity.")
+
+            payslip.contract_id.write({
+                'date_start': '2022-01-01',
+                'date_end': '2024-01-10',
+            })
+
+            # There is contract over the payslip period, no warning for it (payslip dates (31/12/2023->30/01/2024))
+            self.assertFalse(payslip.warning_message and "No running contract over payslip period" in payslip.warning_message,
+                "An error should be set on contract validity.")
+
+            payslip.contract_id.write({
+                'date_start': '2022-01-01',
+                'date_end': '2023-12-30',
+            })
+
+            # There is no contract over the payslip period, warning is required (payslip dates (31/12/2023->30/01/2024))
+            self.assertTrue(payslip.warning_message and "No running contract over payslip period" in payslip.warning_message,
+                "An error should be set on contract validity.")
+
+            payslip.contract_id.write({
+                'date_start': '2024-01-05',
+                'date_end': '2024-01-05',
+            })
+
+            # There is contract over the payslip period, no warning for it (payslip dates (31/12/2023->30/01/2024))
+            # Since at least 1 day from contract covers the 1 day of payslip, there should not be warning
+            self.assertFalse(payslip.warning_message and "No running contract over payslip period" in payslip.warning_message,
+                "An error should be set on contract validity.")

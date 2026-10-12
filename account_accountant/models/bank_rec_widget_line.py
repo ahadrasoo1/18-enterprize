@@ -156,6 +156,7 @@ class BankRecWidgetLine(models.Model):
         currency_field='company_currency_id',
         compute='_compute_from_source_balance',
     )
+    source_rate = fields.Float()
 
     display_stroked_amount_currency = fields.Boolean(compute='_compute_display_stroked_amount_currency')
     display_stroked_balance = fields.Boolean(compute='_compute_display_stroked_balance')
@@ -350,7 +351,7 @@ class BankRecWidgetLine(models.Model):
     def _compute_display_stroked_balance(self):
         for line in self:
             line.display_stroked_balance = \
-                line.flag == 'new_aml' \
+                line.flag in ('new_aml', 'exchange_diff') \
                 and line.currency_id.compare_amounts(line.balance, line.source_balance) != 0
 
     @api.depends('flag')

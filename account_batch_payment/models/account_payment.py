@@ -7,8 +7,7 @@ from odoo import models, fields, api, _
 class AccountPayment(models.Model):
     _inherit = "account.payment"
 
-    batch_payment_id = fields.Many2one('account.batch.payment', ondelete='set null', copy=False,
-        check_company=True)
+    batch_payment_id = fields.Many2one('account.batch.payment', ondelete='set null', copy=False)
     amount_signed = fields.Monetary(
         currency_field='currency_id', compute='_compute_amount_signed',
         help='Negative value of amount field if payment_type is outbound')
@@ -54,3 +53,23 @@ class AccountPayment(models.Model):
             'view_mode': 'form',
             'res_id': self.batch_payment_id.id,
         }
+
+    def write(self, vals):
+        old_batch_payments = {payment: payment.batch_payment_id for payment in self}
+        result = super().write(vals)
+        if 'batch_payment_id' not in vals:
+            return result
+        batch_payment_id = vals.get('batch_payment_id')
+        batch_payment = self.env['account.batch.payment'].browse(batch_payment_id) if batch_payment_id else None
+        for payment in self:
+            if batch_payment:
+                payment.message_post(
+                    body=_('Payment added in batch %s', batch_payment._get_html_link(title=batch_payment.name)),
+                    message_type='comment',
+                )
+            elif old_batch_payments.get(payment):
+                payment.message_post(
+                    body=_('Payment removed from batch %s', old_batch_payments[payment]._get_html_link(title=old_batch_payments[payment].name)),
+                    message_type='comment',
+                )
+        return result

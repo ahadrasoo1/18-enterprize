@@ -1,15 +1,18 @@
 from freezegun import freeze_time
 
 import random
+import requests
 from base64 import b64encode
 from contextlib import contextmanager
 from datetime import datetime, date
-from unittest.mock import patch
+from os.path import join as opj
+from unittest.mock import Mock, patch
 import uuid
 
 from odoo import Command
 from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 from odoo.tools import file_open
+from odoo.addons.l10n_co_dian.models.res_partner import ResPartner
 from odoo.addons.l10n_co_edi.models.res_partner import FINAL_CONSUMER_VAT
 
 
@@ -45,6 +48,7 @@ class TestCoDianCommon(AccountTestInvoicingCommon):
             'street': "CL 12A",
             'city': city_bogota.name,
             'state_id': city_bogota.state_id.id,
+            'country_id': cls.env.ref('base.co').id,
             'l10n_co_edi_header_actividad_economica': '0114',
             'l10n_co_dian_operation_mode_ids': [
                 Command.create({
@@ -132,10 +136,31 @@ class TestCoDianCommon(AccountTestInvoicingCommon):
         cls.tax_ret_ica_0414 = cls.env["account.chart.template"].ref('l10n_co_tax_57')
         cls.tax_ret_iva_2_85 = cls.env["account.chart.template"].ref('l10n_co_tax_12')
 
-        # Other
+        # Sugar Taxes (need to fill 'l10n_co_edi_ref_nominal_tax' on the product !)
+        cls.sugar_tax_1 = cls.env['account.tax'].create({
+            'name': "IBUA >10gr 3500ml",
+            'amount_type': 'fixed',
+            'amount': 35 * 35,  # rate of the tax = 35 (for a product with >10gr of sugar per 100ml)
+            'l10n_co_edi_type': cls.env.ref('l10n_co_edi.tax_type_20').id,  # IBUA
+        })
+        cls.sugar_tax_2 = cls.sugar_tax_1.copy({
+            'name': "IBUA >6gr & <10gr 100ml",
+            'amount': 36,  # rate of the tax = 36 (for a product with >10gr of sugar per 100ml)
+        })
+
+        # Products
         cls.product_a.barcode = "562438192"
         cls.product_b.default_code = "prod_b"
-        cls.env.ref('uom.product_uom_dozen').l10n_co_edi_ubl = "DPC"
+        cls.product_sugar_1 = cls._create_product(
+            name="Coca cola 3.5L",
+            l10n_co_edi_ref_nominal_tax=3500,
+            default_code='P1111',
+        )
+        cls.product_sugar_2 = cls._create_product(
+            name="Sprite 100mL",
+            l10n_co_edi_ref_nominal_tax=100,
+            default_code='P2222',
+        )
 
     @classmethod
     def _create_move(cls, **kwargs):
@@ -162,6 +187,15 @@ class TestCoDianCommon(AccountTestInvoicingCommon):
             **kwargs,
         })
 
+    def _generate_xml(self, invoice, with_error=False):
+        with self._disable_get_acquirer_call():
+            result = self.env['account.edi.xml.ubl_dian']._export_invoice(invoice)
+
+        if with_error:
+            return result
+        else:
+            return result[0]
+
     def _assert_document_dian(self, xml, file):
         expected_dian = self._read_file(file, 'rb')
         self.assertXmlTreeEqual(
@@ -175,11 +209,55 @@ class TestCoDianCommon(AccountTestInvoicingCommon):
             content = f.read()
         return content
 
+    def _update_invoice_from_file(self, module_name, subfolder, filename, invoice):
+        """ Create an attachment from a file and post it on the invoice
+        """
+        file_path = opj(module_name, subfolder, filename)
+        file = self._read_file(file_path, 'rb')
+        attachment = self.env['ir.attachment'].create({
+            'name': filename,
+            'datas': b64encode(file),
+            'res_id': invoice.id,
+            'res_model': 'account.move',
+        })
+        invoice.message_post(attachment_ids=[attachment.id])
+
+    def _assert_imported_invoice_from_file(self, subfolder, filename, invoice_vals):
+        """ Create an empty account.move, update the xml file, and then check the invoice values. """
+        journal = self.company_data['default_journal_purchase']
+        invoice = self.env['account.move'].create({'move_type': 'in_invoice', 'journal_id': journal.id})
+        self._update_invoice_from_file(
+            module_name='l10n_co_dian',
+            subfolder=subfolder,
+            filename=filename,
+            invoice=invoice,
+        )
+        invoice_vals = invoice_vals.copy()
+        invoice_lines = invoice_vals.pop('invoice_lines', False)
+        self.assertRecordValues(invoice, [invoice_vals])
+        if invoice_lines:
+            self.assertRecordValues(invoice.invoice_line_ids, invoice_lines)
+
     @contextmanager
     def _mock_uuid_generation(self):
         rnd = random.Random(42)
         with patch(f'{self.utils_path}._uuid1', lambda: uuid.UUID(int=rnd.getrandbits(128))):
             yield
+
+    @contextmanager
+    def patched_document(self, method_name, return_value):
+        with patch.object(
+            self.registry['l10n_co_dian.document'],
+            method_name,
+            return_value=return_value,
+        ):
+            yield
+
+    def _mocked_request(self, response_file, status_code):
+        mock_response = Mock(spec=requests.Response)
+        mock_response.status_code = status_code
+        mock_response.text = self._read_file(f'l10n_co_dian/tests/responses/{response_file}')
+        return mock_response
 
     def _mocked_response(self, response_file, status_code):
         return {
@@ -188,12 +266,16 @@ class TestCoDianCommon(AccountTestInvoicingCommon):
         }
 
     def _mock_get_status(self):
-        return patch(f'{self.document_path}._get_status', return_value=self._mocked_response('GetStatus_invoice.xml', 200))
+        return self.patched_document('_get_status', self._mocked_response('GetStatus_invoice.xml', 200))
+
+    def _disable_get_acquirer_call(self):
+        return patch.object(ResPartner, attribute='_l10n_co_dian_call_get_acquirer', return_value=dict())
 
     def _mock_send_and_print(self, move, response_file, response_code=200):
         with (
             self._mock_get_status(),
             patch(f'{self.utils_path}._build_and_send_request', return_value=self._mocked_response(response_file, response_code)),
+            self._disable_get_acquirer_call(),
         ):
             self.env['account.move.send.wizard'] \
                 .with_context(active_model=move._name, active_ids=move.ids) \
@@ -201,5 +283,9 @@ class TestCoDianCommon(AccountTestInvoicingCommon):
                 .action_send_and_print()
 
     def _mock_get_status_zip(self, move, response_file, response_code=200):
-        with patch(f'{self.utils_path}._build_and_send_request', return_value=self._mocked_response(response_file, response_code)):
+        with patch.object(requests, 'post', return_value=self._mocked_request(response_file, response_code)):
             move.l10n_co_dian_document_ids._get_status_zip()
+
+    def _mock_button_l10n_co_dian_fetch_numbering_range(self, journal, response_file, response_code=200):
+        with patch.object(requests, 'post', return_value=self._mocked_request(response_file, response_code)):
+            return journal.button_l10n_co_dian_fetch_numbering_range()

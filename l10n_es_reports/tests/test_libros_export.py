@@ -1,6 +1,6 @@
 from odoo import Command, fields
 from odoo.addons.account_reports.tests.common import TestAccountReportsCommon
-from odoo.exceptions import UserError
+from odoo.exceptions import RedirectWarning, UserError
 from odoo.tests import tagged
 
 
@@ -56,12 +56,14 @@ class TestLibrosExport(TestAccountReportsCommon):
 
     def test_libros_export_line_vals(self):
         self.init_invoice('out_invoice', amounts=[1000], invoice_date=fields.Date.from_string('2019-10-12'), taxes=self.tax_21, post=True)
-        self.init_invoice('in_invoice', amounts=[1000], invoice_date=fields.Date.from_string('2019-06-15'), taxes=self.tax_21, post=True)
+        bill = self.init_invoice('in_invoice', amounts=[1000], invoice_date=fields.Date.from_string('2019-06-15'), taxes=self.tax_21)
+        bill.write({'ref': 'test ref'})
+        bill.action_post()
         inc_line_vals, exp_line_vals = self.get_libros_sheet_line_vals()
         line_vals = [inc_line_vals[m][t] for m in inc_line_vals for t in inc_line_vals[m]][0]
         self.assertDictEqual(line_vals, {
             'activity_code': 'A', 'activity_group': '6533', 'activity_type': '03', 'base_amount': 1000.0,
-            'billing_agreement': '', 'date_expedition': '10/12/2019', 'date_transaction': '', 'external_reference': '',
+            'billing_agreement': '', 'date_expedition': '12/10/2019', 'date_transaction': '', 'external_reference': '',
             'income_computable': 1000.0, 'income_concept': 'I01', 'invoice_final_number': '',
             'invoice_number': 'INV/2019/00001', 'invoice_series': '', 'invoice_type': 'F1', 'operation_code': '01',
             'operation_exempt': '', 'operation_qualification': 'S1', 'partner_name': 'Esperado Espagnole',
@@ -74,14 +76,14 @@ class TestLibrosExport(TestAccountReportsCommon):
         line_vals = [exp_line_vals[m][t] for m in exp_line_vals for t in exp_line_vals[m]][0]
         self.assertDictEqual(line_vals, {
             'activity_code': 'A', 'activity_group': '6533', 'activity_type': '03', 'base_amount': 1000.0,
-            'billing_agreement': '', 'date_expedition': '06/15/2019', 'date_reception': '06/15/2019',
+            'billing_agreement': '', 'date_expedition': '15/06/2019', 'date_reception': '15/06/2019',
             'date_transaction': '', 'deductible_later': '', 'deduction_period': '', 'deduction_year': '',
             'expense_concept': 'G01', 'expense_deductible': 1000.0, 'expense_final_number': '',
-            'expense_series_number': 'BILL/2019/06/0001', 'external_reference': '', 'investment_good': 'N',
+            'expense_series_number': 'test ref', 'external_reference': '', 'investment_good': 'N',
             'invoice_type': 'F1', 'isp_taxable': 'N', 'operation_code': '01', 'partner_name': 'Esperado Espagnole',
             'partner_nif_code': '', 'partner_nif_id': '59962470K', 'partner_nif_type': '', 'payment_amount': '',
             'payment_date': '', 'payment_medium': '', 'payment_medium_id': '', 'period': '2T', 'property_reference': '',
-            'property_situation': '', 'reception_number': '', 'reception_number_final': '', 'surcharge_fee': 0.0,
+            'property_situation': '', 'reception_number': 'BILL/2019/06/0001', 'reception_number_final': '', 'surcharge_fee': 0.0,
             'surcharge_type': 0.0, 'tax_deductible': 210.0, 'tax_rate': 21.0, 'taxed_amount': 210.0,
             'total_amount': 1210.0, 'withholding_amount': 0.0, 'withholding_type': 0.0, 'year': 2019,
         })
@@ -152,7 +154,9 @@ class TestLibrosExport(TestAccountReportsCommon):
         })
 
     def test_libros_export_with_dua_group(self):
-        self.init_invoice('in_invoice', amounts=[500], post=True, taxes=[self.tax_dua_group])
+        bill = self.init_invoice('in_invoice', amounts=[500], taxes=[self.tax_dua_group])
+        bill.write({'ref': 'test ref'})
+        bill.action_post()
         exp_line_vals = self.get_libros_sheet_line_vals()[1]
         line_vals_list = [exp_line_vals[m][t] for m in exp_line_vals for t in exp_line_vals[m]]
         self.assertEqual(len(line_vals_list), 1)
@@ -162,11 +166,11 @@ class TestLibrosExport(TestAccountReportsCommon):
             'billing_agreement': '', 'date_expedition': '01/01/2019', 'date_reception': '01/01/2019',
             'date_transaction': '', 'deductible_later': '', 'deduction_period': '', 'deduction_year': '',
             'expense_concept': 'G01', 'expense_deductible': 500.0, 'expense_final_number': '',
-            'expense_series_number': 'BILL/2019/01/0001', 'external_reference': '', 'investment_good': 'N',
+            'expense_series_number': 'test ref', 'external_reference': '', 'investment_good': 'N',
             'invoice_type': 'F5', 'isp_taxable': 'N', 'operation_code': '01', 'partner_name': 'Esperado Espagnole',
             'partner_nif_code': '', 'partner_nif_id': '59962470K', 'partner_nif_type': '', 'payment_amount': '',
             'payment_date': '', 'payment_medium': '', 'payment_medium_id': '', 'period': '1T', 'property_reference': '',
-            'property_situation': '', 'reception_number': '', 'reception_number_final': '', 'surcharge_fee': 0.0,
+            'property_situation': '', 'reception_number': 'BILL/2019/01/0001', 'reception_number_final': '', 'surcharge_fee': 0.0,
             'surcharge_type': 0.0, 'tax_deductible': 50.0, 'tax_rate': 10.0, 'taxed_amount': 50.0,
             'total_amount': 550.0, 'withholding_amount': 0.0, 'withholding_type': 0.0, 'year': 2019,
         })
@@ -217,8 +221,8 @@ class TestLibrosExport(TestAccountReportsCommon):
         self.assertEqual(len(line_vals_list), 1)
         amount_vals = self.get_amount_vals(line_vals_list[0])
         self.assertDictEqual(amount_vals, {
-            'expense_deductible': 1000.0, 'total_amount': 1000.0, 'base_amount': 1000.0, 'tax_rate': 21.0,
-            'taxed_amount': 0.0, 'tax_deductible': 0.0, 'surcharge_type': 0.0, 'surcharge_fee': 0.0,
+            'expense_deductible': 1000.0, 'total_amount': 1210.0, 'base_amount': 1000.0, 'tax_rate': 21.0,
+            'taxed_amount': 210.0, 'tax_deductible': 210.0, 'surcharge_type': 0.0, 'surcharge_fee': 0.0,
             'withholding_type': 0.0, 'withholding_amount': 0.0,
         })
 
@@ -346,3 +350,91 @@ class TestLibrosExport(TestAccountReportsCommon):
         self.assertEqual(line_vals['partner_nif_code'], 'US')
         self.assertEqual(line_vals['partner_nif_id'], 'US66655598K')
         self.assertEqual(line_vals['partner_nif_type'], '06')
+
+    def test_libros_export_multi_tax_lines(self):
+        """ Checks the total computed for both withholding and surcharge taxe in case there is more than one tax line for each tax
+        (which can happen for example with analytic accounting; if not all base lines share the same analytic distribution).
+        """
+        analytic_plan = self.env['account.analytic.plan'].create({'name': "Analytic Plan"})
+        analytic_account = self.env['account.analytic.account'].create({'name': "Analytic Account", 'plan_id': analytic_plan.id})
+
+        company_id = self.company_data['company'].id
+        vat_tax = self.env.ref(f'account.{company_id}_account_tax_template_p_iva21_ic_bc')
+        withholding_tax = self.env.ref(f'account.{company_id}_account_tax_template_p_irpf15')
+        surcharge_tax = self.env.ref(f'account.{company_id}_account_tax_template_p_req52')
+        (vat_tax + withholding_tax + surcharge_tax).analytic = True
+
+        # Withholding taxes
+        invoice_withholding = self.init_invoice('in_invoice', partner=self.partner_a, amounts=[100, 100], post=False, taxes=vat_tax + withholding_tax)
+        invoice_withholding.invoice_line_ids[0].analytic_distribution = {analytic_account.id: 100}
+        invoice_withholding.action_post()
+
+        # Surcharge taxes
+        invoice_surcharge = self.init_invoice('in_invoice', partner=self.partner_a, amounts=[100, 100], post=False, taxes=vat_tax + surcharge_tax)
+        invoice_surcharge.invoice_line_ids[0].analytic_distribution = {analytic_account.id: 100}
+        invoice_surcharge.action_post()
+
+        exp_line_vals = self.get_libros_sheet_line_vals()[1]
+        line_vals_list = [exp_line_vals[m][t] for m in exp_line_vals for t in exp_line_vals[m]]
+        self.assertEqual(len(line_vals_list), 2)
+        self.assertEqual(line_vals_list[0]['surcharge_type'], 5.2)
+        self.assertEqual(line_vals_list[0]['surcharge_fee'], 10.4)
+        self.assertEqual(line_vals_list[1]['withholding_type'], 15.0)
+        self.assertEqual(line_vals_list[1]['withholding_amount'], 30.0)
+
+    def test_libros_operation_code_17_oss_sale(self):
+        """Customer invoice with an OSS (no_sujeto_loc) tax should produce operation_code '17'."""
+        oss_tag = self.env.ref('l10n_eu_oss.tag_oss', raise_if_not_found=False)
+        if not oss_tag:
+            oss_tag = self.env['account.account.tag'].create({'name': 'OSS', 'applicability': 'taxes'})
+            self.env['ir.model.data'].create({
+                'module': 'l10n_eu_oss',
+                'name': 'tag_oss',
+                'model': 'account.account.tag',
+                'res_id': oss_tag.id,
+            })
+        pt_partner = self.env['res.partner'].create({'name': 'PT Customer', 'country_id': self.env.ref('base.pt').id})
+        oss_tax = self.env['account.tax'].create({
+            'name': '23% PT VAT OSS',
+            'amount': 23.0,
+            'l10n_es_type': 'no_sujeto_loc',
+            'invoice_repartition_line_ids': [
+                Command.create({'repartition_type': 'base', 'tag_ids': oss_tag.ids}),
+                Command.create({'repartition_type': 'tax'}),
+            ],
+            'refund_repartition_line_ids': [
+                Command.create({'repartition_type': 'base'}),
+                Command.create({'repartition_type': 'tax'}),
+            ],
+        })
+        self._create_invoice_one_line(move_type='out_invoice', partner_id=pt_partner, price_unit=1000, tax_ids=oss_tax, post=True, invoice_date=fields.Date.from_string('2019-01-01'))
+        inc_line_vals = self.get_libros_sheet_line_vals()[0]
+        line_vals_list = [inc_line_vals[m][t] for m in inc_line_vals for t in inc_line_vals[m]]
+        self.assertEqual(len(line_vals_list), 1)
+        self.assertEqual(line_vals_list[0]['operation_code'], '17')
+
+    def test_libros_operation_code_09_intracomm_bill(self):
+        """Vendor bill with an intra-community tax (mod_303 casilla 10) should produce operation_code '09'."""
+        company_id = self.company_data['company'].id
+        tax_ic_21 = self.env.ref(f'account.{company_id}_account_tax_template_p_iva21_ic_bc')
+        be_partner = self.env['res.partner'].create({
+            'country_id': self.env.ref('base.be').id,
+            'name': 'Belgian Partner',
+            'vat': 'BE0477472701',
+        })
+        self._create_invoice_one_line(move_type='in_invoice', partner_id=be_partner, price_unit=1000, tax_ids=tax_ic_21, post=True, invoice_date=fields.Date.from_string('2019-01-01'))
+        exp_line_vals = self.get_libros_sheet_line_vals()[1]
+        line_vals_list = [exp_line_vals[m][t] for m in exp_line_vals for t in exp_line_vals[m]]
+        self.assertEqual(len(line_vals_list), 1)
+        self.assertEqual(line_vals_list[0]['operation_code'], '09')
+
+    def test_export_libros_de_iva_missing_iae_group(self):
+        """Test that RedirectWarning is raised when IAE Group is not configured."""
+        # Remove IAE group from company
+        self.company_data['company'].l10n_es_reports_iae_group = False
+
+        report = self.env.ref('account.generic_tax_report')
+        options = self._generate_options(report, fields.Date.from_string('2019-01-01'), fields.Date.from_string('2019-12-31'))
+
+        with self.assertRaisesRegex(RedirectWarning, "Please configure the \"IAE Group or Heading\" of your company."):
+            self.env['account.generic.tax.report.handler'].export_libros_de_iva(options)

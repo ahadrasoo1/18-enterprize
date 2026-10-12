@@ -77,7 +77,7 @@ class BankRecWidget(models.Model):
         for wizard in self:
             new_batches = self.line_ids.filtered(lambda x: x.flag == 'new_batch')
             for batch in new_batches.source_batch_payment_id:
-                wizard.selected_aml_ids += self._get_amls_from_batch_payments(batch)
+                wizard.selected_aml_ids += self._get_amls_from_batch_payments(batch, include_invoice_only=True)
 
     # -------------------------------------------------------------------------
     # HELPERS RPC
@@ -103,6 +103,7 @@ class BankRecWidget(models.Model):
             'domain': [('journal_id', '=', journal.id)],
         })
         context['search_default_same_journal'] = True
+        context['search_default_unreconciled'] = True
 
         # == Dynamic Currency filter ==
         if self.transaction_currency_id != self.company_currency_id:
@@ -127,17 +128,20 @@ class BankRecWidget(models.Model):
         # EXTENDS account_accountant
         return super()._lines_prepare_new_aml_line(
             aml,
-            source_batch_payment_id=aml.payment_id.batch_payment_id.id,
+            source_batch_payment_id=aml.payment_id.batch_payment_id.id or aml.move_id.matched_payment_ids.batch_payment_id[:1].id,
             **kwargs,
         )
 
-    def _get_amls_from_batch_payments(self, batch_payments):
+    def _get_amls_from_batch_payments(self, batch_payments, include_invoice_only=False):
         amls_domain = self.st_line_id._get_default_amls_matching_domain()
         amls = self.env['account.move.line']
         for batch in batch_payments:
             for payment in batch.payment_ids:
-                liquidity_lines, _counterpart_lines, _writeoff_lines = payment._seek_for_lines()
-                amls |= liquidity_lines.filtered_domain(amls_domain)
+                if payment.move_id:
+                    liquidity_lines, _counterpart_lines, _writeoff_lines = payment._seek_for_lines()
+                    amls |= liquidity_lines.filtered_domain(amls_domain)
+                elif payment.invoice_ids and include_invoice_only:
+                    amls |= payment.invoice_ids.line_ids.filtered(lambda line: line.account_id.account_type in payment._get_valid_payment_account_types())
         return amls
 
     def _lines_prepare_new_batch_line(self, batch_payment, **kwargs):
@@ -156,13 +160,53 @@ class BankRecWidget(models.Model):
             **kwargs,
         }
 
+    def _get_amls_vals_from_payment(self, payment):
+        amls_line_vals = []
+        amls_domain = self.st_line_id._get_default_amls_matching_domain()
+        if payment.move_id:
+            liquidity_lines, _counterpart_lines, _writeoff_lines = payment._seek_for_lines()
+            return [Command.create(self._lines_prepare_new_aml_line(aml)) for aml in liquidity_lines.filtered_domain(amls_domain)]
+        elif payment.invoice_ids:
+            invoices_amls = payment.invoice_ids.line_ids.filtered(lambda line: line.account_id.account_type in payment._get_valid_payment_account_types())
+            payment_residual = payment.amount
+            comp_curr = self.company_id.currency_id
+            for aml in invoices_amls.sorted(lambda aml: aml.date_maturity):
+                if payment.currency_id.compare_amounts(payment_residual, 0) <= 0:
+                    break
+                if aml.company_currency_id.is_zero(aml.amount_residual):
+                    continue
+
+                amls_line_vals.append(Command.create(self._lines_prepare_new_aml_line(aml)))
+                if payment.currency_id == aml.currency_id:
+                    payment_residual -= aml.amount_residual
+                elif payment.currency_id == comp_curr:
+                    # Foreign currency on aml but the company currency one on the payment.
+                    payment_residual -= aml.currency_id._convert(aml.amount_residual_currency, payment.currency_id, self.company_id, self.st_line_id.date)
+                else:
+                    # Company currency on aml but a foreign currency one on the payment.
+                    # OR
+                    # Foreign currency on payment different than the one set on the aml.
+                    payment_residual -= comp_curr._convert(aml.amount_residual, payment.currency_id, self.company_id, self.st_line_id.date)
+        return amls_line_vals
+
+    def _get_amls_vals_from_batch(self, batch_payment):
+        amls_line_vals = []
+        for payment in batch_payment.payment_ids:
+            amls_line_vals += self._get_amls_vals_from_payment(payment)
+        return amls_line_vals
+
     def _lines_load_new_batch_payments(self, batch_payments, reco_model=None):
         """ Create counterpart lines for the batch payments passed as parameter."""
         line_ids_commands = []
         kwargs = {'reconcile_model_id': reco_model.id} if reco_model else {}
         for batch in batch_payments:
-            aml_line_vals = self._lines_prepare_new_batch_line(batch, **kwargs)
-            line_ids_commands.append(Command.create(aml_line_vals))
+            if self._check_for_epd(batch):
+                # When loading a batch that contains payments with no move but an invoice eligible for early payment discounts,
+                # we load the corresponding amls instead of the batch, as it would get quite complicated to recompute the whole process on every action.
+                line_ids_commands += self._get_amls_vals_from_batch(batch)
+            else:
+                aml_line_vals = self._lines_prepare_new_batch_line(batch, **kwargs)
+                line_ids_commands.append(Command.create(aml_line_vals))
 
         if not line_ids_commands:
             return
@@ -185,7 +229,7 @@ class BankRecWidget(models.Model):
             (aml.currency_id, -aml.amount_residual, -aml.amount_residual_currency)
             for aml in self._get_amls_from_batch_payments(line.source_batch_payment_id)
         ] + [
-            (payment.currency_id, -payment.amount_company_currency_signed, -payment.amount)
+            (payment.currency_id, -payment.amount_company_currency_signed, -payment.amount_signed)
             for payment in line.source_batch_payment_id.payment_ids.filtered(lambda p: not p.move_id)
         ]:
             account, exchange_diff_balance = self._lines_get_account_balance_exchange_diff(
@@ -216,28 +260,74 @@ class BankRecWidget(models.Model):
         return exchange_diff_values
 
     def _validation_lines_vals(self, line_ids_create_command_list, aml_to_exchange_diff_vals, to_reconcile):
+        source2exchange = self.line_ids.filtered(lambda l: l.flag == 'exchange_diff').grouped('source_batch_payment_id')
+
         batch_lines = self.line_ids.filtered(lambda x: x.flag == 'new_batch')
+        valid_payment_states = batch_lines.source_batch_payment_id._valid_payment_states()
         for line in batch_lines:
-            for (currency, partner), payments in line.source_batch_payment_id.payment_ids.grouped(lambda p: (p.currency_id, p.partner_id)).items():
-                account2amount = defaultdict(float)
-                term_lines = payments.invoice_ids.line_ids.filtered(lambda l: l.display_type == 'payment_term')
-                for account, lines in term_lines.grouped('account_id').items():
-                    account2amount[account] += -sum(lines.mapped('amount_currency'))
-                    to_reconcile.append((len(line_ids_create_command_list) + 1, lines))
-                for payment in payments.filtered(lambda p: not p.invoice_ids):
-                    account2amount[partner.property_account_receivable_id] -= payment.amount
-                for account, amount in account2amount.items():
+            for payment in line.source_batch_payment_id.payment_ids.filtered(lambda p: p.state in valid_payment_states):
+                account2amount = defaultdict(lambda: {'balance': 0, 'amount_currency': 0})
+                account2lines = defaultdict(list)
+                term_lines = iter(payment.invoice_ids.line_ids.filtered(lambda l: l.display_type == 'payment_term' and not l.reconciled).sorted('date'))
+                remaining = {
+                    'amount_currency': payment.amount_signed,
+                    'balance': payment.amount_company_currency_signed,
+                }
+                select_amount_func = min if payment.payment_type == 'inbound' else max
+                while remaining['amount_currency'] and (term_line := next(term_lines, None)):
+                    current = {}
+                    for field in ('balance', 'amount_currency'):
+                        current[field] = select_amount_func(remaining[field], term_line[field])
+                        remaining[field] -= current[field]
+                        account2amount[term_line.account_id][field] -= current[field]
+                    account2lines[term_line.account_id].append(term_line.id)
+                if remaining['amount_currency'] or remaining['balance']:
+                    partner_account = (
+                        payment.partner_id.property_account_payable_id
+                        if payment.payment_type == "outbound"
+                        else payment.partner_id.property_account_receivable_id
+                    )
+                    account2amount[partner_account]['amount_currency'] -= remaining['amount_currency']
+                    account2amount[partner_account]['balance'] -= remaining['balance']
+
+                for account, amounts in account2amount.items():
+                    balance = amounts['balance']
+                    amount_currency = amounts['amount_currency']
                     line_ids_create_command_list.append(Command.create(line._get_aml_values(
                         sequence=len(line_ids_create_command_list) + 1,
-                        partner_id=partner.id,
+                        partner_id=payment.partner_id.id,
                         account_id=account.id,
-                        currency_id=currency.id,
-                        amount_currency=amount,
-                        balance=currency._convert(from_amount=amount, to_currency=self.env.company.currency_id),
+                        currency_id=payment.currency_id.id,
+                        amount_currency=amount_currency,
+                        balance=balance,
                     )))
-        batch_lines.source_batch_payment_id.payment_ids.filtered(lambda p: not p.move_id).action_validate()
+                    if lines := self.env['account.move.line'].browse(account2lines[account]):
+                        to_reconcile.append((len(line_ids_create_command_list), lines))
+            exchange_diff_vals = source2exchange.get(line.source_batch_payment_id, [])
+            for exchange_diff in exchange_diff_vals:
+                line_ids_create_command_list.append(Command.create(exchange_diff._get_aml_values(
+                    sequence=len(line_ids_create_command_list) + 1,
+                )))
+
+        batch_lines.source_batch_payment_id.payment_ids.filtered(lambda p: not p.move_id and p.state in valid_payment_states).action_validate()
         self.line_ids -= batch_lines
         super()._validation_lines_vals(line_ids_create_command_list, aml_to_exchange_diff_vals, to_reconcile)
+
+    def _check_for_epd(self, batch_payment):
+        """ Checks the batch payment for any payment for which the invoice is eligible
+            for an early payment discount that can be applied in the widget.
+        """
+        valid_payment_states = batch_payment._valid_payment_states()
+        no_move_payments = batch_payment.payment_ids.filtered(lambda payment: not payment.move_id)
+        if no_move_payments.invoice_ids.currency_id == self.transaction_currency_id:
+            for payment in no_move_payments:
+                if (
+                    len(payment.invoice_ids) == 1
+                    and payment.state in valid_payment_states
+                    and payment.invoice_ids._is_eligible_for_early_payment_discount(self.transaction_currency_id, self.st_line_id.date)
+                ):
+                    return True
+        return False
 
     # -------------------------------------------------------------------------
     # ACTIONS
@@ -272,9 +362,10 @@ class BankRecWidget(models.Model):
         existing_batch_new_amls = self.line_ids.filtered(lambda x: x.flag == 'new_aml' and x.source_batch_payment_id in batch_payments)
         self._action_remove_lines(existing_batch_new_amls)
         self._lines_load_new_batch_payments(batch_payments, reco_model=reco_model)
-        added_lines = self.line_ids.filtered(lambda x: x.flag == 'new_batch' and x.source_batch_payment_id in batch_payments)
+        added_lines = self.line_ids.filtered(lambda x: x.flag in ('new_batch', 'new_aml') and x.source_batch_payment_id in batch_payments)
         self._lines_recompute_exchange_diff(added_lines)
-        self._lines_check_apply_partial_matching()
+        if not self._lines_check_apply_early_payment_discount():
+            self._lines_check_apply_partial_matching()
         self._lines_add_auto_balance_line()
         self._action_clear_manual_operations_form()
 

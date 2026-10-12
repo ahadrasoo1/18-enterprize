@@ -23,14 +23,14 @@ class Partner extends models.Model {
         { id: 2, name: "Second record" },
     ];
     _views = {
-        "form,false": `
+        form: `
             <form>
                 <group>
                     <field name="name"/>
                 </group>
             </form>
         `,
-        "kanban,false": `
+        kanban: `
             <kanban>
                 <templates>
                     <t t-name="card">
@@ -39,8 +39,7 @@ class Partner extends models.Model {
                 </templates>
             </kanban>
         `,
-        "list,false": `<list><field name="name"/></list>`,
-        "search,false": `<search/>`,
+        list: `<list><field name="name"/></list>`,
     };
 }
 
@@ -51,8 +50,6 @@ defineActions([
         id: 1,
         name: "Partners Action 1",
         res_model: "partner",
-        type: "ir.actions.act_window",
-        mobile_view_mode: "kanban",
         views: [
             [false, "list"],
             [false, "kanban"],
@@ -63,7 +60,6 @@ defineActions([
         id: 2,
         name: "Partners Action 2",
         res_model: "partner",
-        type: "ir.actions.act_window",
         views: [
             [false, "list"],
             [false, "form"],

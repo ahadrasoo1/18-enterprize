@@ -1,15 +1,7 @@
-import { makeKwArgs } from "@web/../tests/web_test_helpers";
+import { onRpc } from "@web/../tests/web_test_helpers";
 import { parseDate } from "@web/core/l10n/dates";
-import { registry } from "@web/core/registry";
 
-/**
- * @private
- * @param {string} model
- * @param {Object} kwargs
- * @returns {Promise}
- */
-function _mockGetCohortData({ args, kwargs, model }) {
-    kwargs = makeKwArgs(kwargs);
+onRpc("get_cohort_data", function getCohortData({ kwargs, model }) {
     const displayFormats = {
         day: "dd MM yyyy",
         week: "WW kkkk",
@@ -87,14 +79,13 @@ function _mockGetCohortData({ args, kwargs, model }) {
             }
 
             const compareDate = colStartDate.toFormat(displayFormats[kwargs.interval]);
-            let colRecords = records.filter((record) => {
-                return (
+            let colRecords = records.filter(
+                (record) =>
                     record[kwargs.date_stop] &&
                     parseDate(record[kwargs.date_stop], { format: "yyyy-MM-dd" }).toFormat(
                         displayFormats[kwargs.interval]
                     ) == compareDate
-                );
-            });
+            );
             let colValue = 0;
             if (kwargs.measure === "__count") {
                 colValue = colRecords.length;
@@ -109,22 +100,19 @@ function _mockGetCohortData({ args, kwargs, model }) {
             }
 
             if (kwargs.timeline === "backward" && column === 0) {
-                colRecords = records.filter((record) => {
-                    return (
+                colRecords = records.filter(
+                    (record) =>
                         record[kwargs.date_stop] &&
                         parseDate(record[kwargs.date_stop], { format: "yyyy-MM-dd" }) >=
                             colStartDate
-                    );
-                });
+                );
                 if (kwargs.measure === "__count") {
                     initialValue = colRecords.length;
                 } else {
                     if (colRecords.length) {
                         initialValue = colRecords
                             .map((x) => x[kwargs.measure])
-                            .reduce((a, b) => {
-                                return a + b;
-                            });
+                            .reduce((a, b) => a + b);
                     }
                 }
                 initialChurnValue = value - initialValue;
@@ -144,26 +132,24 @@ function _mockGetCohortData({ args, kwargs, model }) {
             columns.push({
                 value: remainingValue,
                 churn_value: churnValue,
-                percentage: percentage,
+                percentage,
                 domain: [],
                 period: compareDate,
             });
         }
         rows.push({
             date: cohortStartDate.toFormat(displayFormats[kwargs.interval]),
-            value: value,
+            value,
             domain: group.__domain,
             columns: columns,
         });
     }
 
-    return Promise.resolve({
-        rows: rows,
+    return {
+        rows,
         avg: {
             avg_value: totalCount ? totalValue / totalCount : 0,
             columns_avg: columnsAvg,
         },
-    });
-}
-
-registry.category("mock_rpc").add("get_cohort_data", _mockGetCohortData);
+    };
+});

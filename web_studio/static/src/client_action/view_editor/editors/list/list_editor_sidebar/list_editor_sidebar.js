@@ -89,10 +89,17 @@ export class ListEditorSidebar extends Component {
     }
 
     get sortChoices() {
+        // only have stored fields that are present in arch
+        const storeFieldsInArch = Object.fromEntries(
+            Object.values(this.archInfo.fieldNodes).map((field) => [
+                field.name,
+                this.viewEditorModel.fields[field.name],
+            ])
+        );
         return fieldsToChoices(
-            this.archInfo.fieldNodes,
+            storeFieldsInArch,
             null,
-            (field) => !["one2many", "many2many", "binary"].includes(field.type)
+            (field) => !["one2many", "many2many", "binary"].includes(field.type) && field.store
         );
     }
 
@@ -107,7 +114,7 @@ export class ListEditorSidebar extends Component {
         return fieldsToChoices(
             this.viewEditorModel.fields,
             this.viewEditorModel.GROUPABLE_TYPES,
-            (field) => field.store
+            (field) => field.groupable
         );
     }
 

@@ -1,35 +1,42 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* mrp_workorder
-# 
+# * mrp_workorder
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Aleš Fiala <f.ales1@seznam.cz>, 2024
+# Marta Wacławek, 2025
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
+# "Marta (wacm)" <wacm@odoo.com>, 2026.
+# Tomáš Píšek <Tomas.Pisek@seznam.cz>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Czech (https://app.transifex.com/odoo/teams/41243/cs/)\n"
+"POT-Creation-Date: 2026-04-10 18:48+0000\n"
+"PO-Revision-Date: 2026-06-06 09:46+0000\n"
+"Last-Translator: Tomáš Píšek <Tomas.Pisek@seznam.cz>\n"
+"Language-Team: Czech <https://translate.odoo.com/projects/odoo-18/"
+"mrp_workorder/cs/>\n"
+"Language: cs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: cs\n"
-"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
+"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n "
+"<= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
+"X-Generator: Weblate 2026.6.1\n"
 
 #. module: mrp_workorder
 #. odoo-python
 #: code:addons/mrp_workorder/wizard/propose_change.py:0
 msgid "%(user_name)s suggests to delete this instruction"
-msgstr ""
+msgstr "%(user_name)s souhlasí se smazáním této instrukce"
 
 #. module: mrp_workorder
 #. odoo-python
 #: code:addons/mrp_workorder/wizard/propose_change.py:0
 msgid "%(user_name)s suggests to use this document as instruction"
-msgstr ""
+msgstr "%(user_name)s souhlasí s použitím tohoto dokumentu jako instrukce"
 
 #. module: mrp_workorder
 #. odoo-javascript
@@ -51,7 +58,7 @@ msgstr "<i class=\"fa fa-print\"/> Tisk příkazů čárových kódů"
 #. module: mrp_workorder
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_operation_form_view
 msgid "<span class=\"o_stat_text\">Instructions</span>"
-msgstr ""
+msgstr "<span class=\"o_stat_text\">Instrukce</span>"
 
 #. module: mrp_workorder
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_form_tablet
@@ -129,7 +136,7 @@ msgstr ""
 #: code:addons/mrp_workorder/models/mrp_workorder.py:0
 #: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_menu_dialog.xml:0
 msgid "Add a Step"
-msgstr ""
+msgstr "Přidat krok"
 
 #. module: mrp_workorder
 #. odoo-python
@@ -156,7 +163,7 @@ msgstr ""
 
 #. module: mrp_workorder
 #. odoo-javascript
-#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_workcenter_dialog.js:0
+#: code:addons/mrp_workorder/static/src/mrp_display/mrp_display.js:0
 msgid "All MO"
 msgstr "Výrobní příkazy"
 
@@ -185,6 +192,11 @@ msgstr "Archivováno"
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_workorder__employee_assigned_ids
 msgid "Assigned"
 msgstr "Přiřazeno"
+
+#. module: mrp_workorder
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.view_employee_form_account
+msgid "Attendance/Point of Sale/Manufacturing"
+msgstr ""
 
 #. module: mrp_workorder
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_production_tree_view_planning
@@ -223,7 +235,7 @@ msgstr "Binární soubor"
 #. odoo-javascript
 #: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_menu_dialog.xml:0
 msgid "Block"
-msgstr "Blok"
+msgstr "Zablokovat výrobu"
 
 #. module: mrp_workorder
 #. odoo-python
@@ -240,12 +252,18 @@ msgstr ""
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_point__bom_product_ids
 msgid "Bom Product"
-msgstr ""
+msgstr "Produkt kusovníku"
+
+#. module: mrp_workorder
+#. odoo-javascript
+#: code:addons/mrp_workorder/static/src/components/pin_popup.xml:0
+msgid "C"
+msgstr "C"
 
 #. module: mrp_workorder
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_form_tablet
 msgid "CONTINUE"
-msgstr ""
+msgstr "POKRAČOVAT"
 
 #. module: mrp_workorder
 #. odoo-javascript
@@ -310,7 +328,7 @@ msgstr "Komponent"
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_check__component_qty_to_do
 msgid "Component Qty To Do"
-msgstr ""
+msgstr "Komponenta Množství Úkol"
 
 #. module: mrp_workorder
 #: model:ir.model,name:mrp_workorder.model_res_config_settings
@@ -434,7 +452,7 @@ msgstr ""
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_check__is_deleted
 msgid "Deleted in production"
-msgstr ""
+msgstr "Smazáno v produkci"
 
 #. module: mrp_workorder
 #. odoo-javascript
@@ -455,7 +473,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_production_additional_workorder__display_name
 #: model:ir.model.fields,field_description:mrp_workorder.field_propose_change__display_name
 msgid "Display Name"
-msgstr "Zobrazovací název"
+msgstr "Zobrazovaný název"
 
 #. module: mrp_workorder
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.add_quality_check_from_tablet
@@ -543,7 +561,7 @@ msgstr "Dokončeno"
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_check__finished_lot_id
 msgid "Finished Lot/Serial"
-msgstr ""
+msgstr "Dokončené výrobní / sériové číslo"
 
 #. module: mrp_workorder
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_form_inherit_workorder
@@ -553,12 +571,12 @@ msgstr "Dokončené výrobní číslo / seriálové číslo"
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_workorder__finished_product_check_ids
 msgid "Finished Product Check"
-msgstr ""
+msgstr "Kontrola dokončeného výrobku"
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_check__finished_product_sequence
 msgid "Finished Product Sequence Number"
-msgstr ""
+msgstr "Pořadové číslo hotového výrobku"
 
 #. module: mrp_workorder
 #: model:ir.model.fields,help:mrp_workorder.field_mrp_bom__activity_type_icon
@@ -580,7 +598,7 @@ msgstr "Odkaz Google Slidu"
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_check__worksheet_url
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_point__worksheet_url
 msgid "Google doc URL"
-msgstr ""
+msgstr "URL Google docu"
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_workorder__has_operation_note
@@ -607,7 +625,7 @@ msgstr "Ikona, která označuje výjimečnou aktivitu."
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_check__worksheet_document
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_point__worksheet_document
 msgid "Image/PDF"
-msgstr ""
+msgstr "Obrázek/PDF"
 
 #. module: mrp_workorder
 #. odoo-javascript
@@ -628,6 +646,8 @@ msgid ""
 "In case of Quality Check by Quantity, Move Line on which the Quality Check "
 "applies"
 msgstr ""
+"V případě kontroly kvality podle množství přesuňte řádek, na který se "
+"kontrola kvality vztahuje"
 
 #. module: mrp_workorder
 #. odoo-javascript
@@ -649,14 +669,14 @@ msgstr "Instalovat aplikaci"
 #. module: mrp_workorder
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.add_quality_check_from_tablet
 msgid "Instruction"
-msgstr ""
+msgstr "Instrukce"
 
 #. module: mrp_workorder
 #. odoo-python
 #: code:addons/mrp_workorder/models/quality.py:0
 #: code:addons/mrp_workorder/wizard/propose_change.py:0
 msgid "Instruction:"
-msgstr ""
+msgstr "Instrukce:"
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_routing_workcenter__quality_point_count
@@ -672,35 +692,33 @@ msgstr ""
 
 #. module: mrp_workorder
 #: model:ir.model.fields,help:mrp_workorder.field_mrp_workorder__move_line_ids
-msgid ""
-"Inventory moves for which you must scan a lot number at this work order"
-msgstr ""
-"Pohyby inventáře, pro které musíte v této zakázce naskenovat číslo šarže"
+msgid "Inventory moves for which you must scan a lot number at this work order"
+msgstr "Pohyby zásob, pro které musíte v této zakázce naskenovat číslo šarže"
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_check__component_tracking
 msgid "Is Component Tracked"
-msgstr ""
+msgstr "Je komponenta sledována"
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_workorder__is_last_unfinished_wo
 msgid "Is Last Work Order To Process"
-msgstr ""
+msgstr "Je poslední výrobní příkaz ke zpracování"
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_workorder__is_last_lot
 msgid "Is Last lot"
-msgstr ""
+msgstr "Je poslední výrobní"
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_workorder__is_first_started_wo
 msgid "Is The first Work Order"
-msgstr ""
+msgstr "Je první výrobní příkaz"
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_point__is_workorder_step
 msgid "Is Workorder Step"
-msgstr ""
+msgstr "Je krok výrobního příkazu"
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_check__is_user_working
@@ -731,7 +749,7 @@ msgstr ""
 #: code:addons/mrp_workorder/static/src/mrp_display/mrp_display_record.js:0
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_production_view_form_log_note
 msgid "Log Note"
-msgstr ""
+msgstr "Zapsat poznámku"
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_production__log_note
@@ -802,7 +820,7 @@ msgstr "Označit jako hotovo"
 #. module: mrp_workorder
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_form_tablet
 msgid "Mark as Done and Close MO"
-msgstr ""
+msgstr "Označit jako dokončený a zavřít MO"
 
 #. module: mrp_workorder
 #. odoo-javascript
@@ -850,7 +868,7 @@ msgstr "Můj tým"
 
 #. module: mrp_workorder
 #. odoo-javascript
-#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_workcenter_dialog.js:0
+#: code:addons/mrp_workorder/static/src/mrp_display/mrp_display.js:0
 msgid "My WO"
 msgstr "Mé pracovní příkazy"
 
@@ -863,25 +881,25 @@ msgstr ""
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_propose_change__note
 msgid "New Instruction"
-msgstr ""
+msgstr "Nová instrukce"
 
 #. module: mrp_workorder
 #. odoo-python
 #: code:addons/mrp_workorder/wizard/propose_change.py:0
 msgid "New Instruction suggested by %(user_name)s"
-msgstr ""
+msgstr "Nová instrukce navržená uživatelem %(user_name)s"
 
 #. module: mrp_workorder
 #. odoo-python
 #: code:addons/mrp_workorder/models/quality.py:0
 msgid "New Step suggested by %(user_name)s"
-msgstr ""
+msgstr "Nový krok navržený uživatelem %(user_name)s"
 
 #. module: mrp_workorder
 #. odoo-python
 #: code:addons/mrp_workorder/wizard/propose_change.py:0
 msgid "New Title suggested:"
-msgstr ""
+msgstr "Navrhovaný nový název:"
 
 #. module: mrp_workorder
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_view_employee_filter
@@ -918,7 +936,7 @@ msgstr "Typ další aktivity"
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_check__next_check_id
 msgid "Next Check"
-msgstr ""
+msgstr "Další kontrola"
 
 #. module: mrp_workorder
 #. odoo-javascript
@@ -929,7 +947,7 @@ msgstr ""
 #. module: mrp_workorder
 #: model_terms:ir.actions.act_window,help:mrp_workorder.action_mrp_workorder_show_steps
 msgid "No manufacturing steps defined yet!"
-msgstr ""
+msgstr "Zatím nejsou definovány žádné výrobní kroky!"
 
 #. module: mrp_workorder
 #: model_terms:ir.actions.act_window,help:mrp_workorder.mrp_workorder_action_tablet
@@ -938,7 +956,7 @@ msgstr "Žádné pracovní příkazy!"
 
 #. module: mrp_workorder
 #. odoo-javascript
-#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_workcenter_dialog.js:0
+#: code:addons/mrp_workorder/static/src/mrp_display/mrp_display.js:0
 msgid ""
 "No workcenters are available, please create one first to add it to the shop "
 "floor view"
@@ -995,7 +1013,7 @@ msgstr "Přehled"
 #. module: mrp_workorder
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_form_tablet
 msgid "PAUSE"
-msgstr ""
+msgstr "PAUZA"
 
 #. module: mrp_workorder
 #: model:ir.model.fields.selection,name:mrp_workorder.selection__quality_point__test_report_type__pdf
@@ -1018,7 +1036,7 @@ msgstr "Prošlo"
 #. odoo-javascript
 #: code:addons/mrp_workorder/static/src/components/pin_popup.xml:0
 msgid "Password?"
-msgstr ""
+msgstr "Heslo?"
 
 #. module: mrp_workorder
 #. odoo-javascript
@@ -1028,6 +1046,7 @@ msgstr "Pozastavit"
 
 #. module: mrp_workorder
 #. odoo-javascript
+#: code:addons/mrp_workorder/static/src/mrp_display/mrp_display_record.xml:0
 #: code:addons/mrp_workorder/static/src/mrp_display/search_model.js:0
 msgid "Pending"
 msgstr "Čeká"
@@ -1057,7 +1076,7 @@ msgstr "Plánování dle výrobního střediska"
 #. odoo-python
 #: code:addons/mrp_workorder/models/quality.py:0
 msgid "Please enter a Lot/SN."
-msgstr ""
+msgstr "Zadejte prosím výrobní/sériové číslo."
 
 #. module: mrp_workorder
 #. odoo-python
@@ -1084,12 +1103,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/mrp_workorder/models/quality.py:0
 msgid "Please upload a picture."
-msgstr ""
+msgstr "Nahrajte prosím obrázek."
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_check__previous_check_id
 msgid "Previous Check"
-msgstr ""
+msgstr "Předchozí kontrola"
 
 #. module: mrp_workorder
 #. odoo-javascript
@@ -1138,7 +1157,7 @@ msgstr "Produkty"
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.add_quality_check_from_tablet
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.view_propose_change_wizard
 msgid "Propose Change"
-msgstr ""
+msgstr "Navrhněte změnu"
 
 #. module: mrp_workorder
 #: model:ir.model,name:mrp_workorder.model_propose_change
@@ -1154,7 +1173,7 @@ msgstr "Upozornění na kvalitu"
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_workorder__quality_alert_count
 msgid "Quality Alert Count"
-msgstr ""
+msgstr "Počet upozornění na kvalitu"
 
 #. module: mrp_workorder
 #: model:ir.model,name:mrp_workorder.model_quality_check
@@ -1190,7 +1209,7 @@ msgstr "Quality Point"
 #. module: mrp_workorder
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.view_routing_steps_search
 msgid "Quality Point Steps"
-msgstr ""
+msgstr "Kroky bodů kvality"
 
 #. module: mrp_workorder
 #: model:ir.model.fields,help:mrp_workorder.field_quality_point__product_ids
@@ -1200,7 +1219,7 @@ msgstr "Bod kvality se vztahuje na každý vybraný produkt."
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_workorder__quality_state
 msgid "Quality State"
-msgstr ""
+msgstr "Stav kvality"
 
 #. module: mrp_workorder
 #. odoo-javascript
@@ -1231,13 +1250,13 @@ msgstr "Důvod:"
 #. module: mrp_workorder
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_form_tablet
 msgid "Record production"
-msgstr ""
+msgstr "Záznam výroby"
 
 #. module: mrp_workorder
 #. odoo-javascript
 #: code:addons/mrp_workorder/static/src/mrp_display/mrp_display_record.js:0
 msgid "Register %s"
-msgstr ""
+msgstr "Zaregistrovat %s"
 
 #. module: mrp_workorder
 #: model:quality.point.test_type,name:mrp_workorder.test_type_register_byproducts
@@ -1266,22 +1285,22 @@ msgstr ""
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_workorder__additional
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_check__additional
 msgid "Register additional product"
-msgstr ""
+msgstr "Zaregistrovat další produkt"
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_point__bom_active
 msgid "Related Bill of Material Active"
-msgstr ""
+msgstr "Související kusovník aktivní"
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_check__component_remaining_qty
 msgid "Remaining Quantity for Component"
-msgstr ""
+msgstr "Zbývající množství pro komponent"
 
 #. module: mrp_workorder
 #: model:ir.model.fields.selection,name:mrp_workorder.selection__propose_change__change_type__remove_step
 msgid "Remove Current Step"
-msgstr ""
+msgstr "Odebrat aktuální krok"
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_point__test_report_type
@@ -1305,21 +1324,9 @@ msgstr "Výsledek"
 
 #. module: mrp_workorder
 #. odoo-javascript
-#: code:addons/mrp_workorder/static/src/mrp_display/mrp_display.js:0
-msgid "STARTED work on workorder %s"
-msgstr ""
-
-#. module: mrp_workorder
-#. odoo-javascript
-#: code:addons/mrp_workorder/static/src/mrp_display/mrp_display.js:0
-msgid "STOPPED work on workorder %s"
-msgstr ""
-
-#. module: mrp_workorder
-#. odoo-javascript
 #: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_menu_dialog.xml:0
 msgid "Scrap"
-msgstr "Vyřazení zásob"
+msgstr "Vyřazení materiálu"
 
 #. module: mrp_workorder
 #: model:ir.actions.act_window,name:mrp_workorder.action_open_employee_list
@@ -1353,15 +1360,17 @@ msgstr "Seriový"
 #. module: mrp_workorder
 #: model:ir.model.fields.selection,name:mrp_workorder.selection__propose_change__change_type__set_picture
 msgid "Set Picture"
-msgstr ""
+msgstr "Nastavit obrázek"
 
 #. module: mrp_workorder
 #. odoo-javascript
 #: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_menu_dialog.xml:0
 msgid "Set a New picture"
-msgstr ""
+msgstr "Nastavit nový obrázek"
 
 #. module: mrp_workorder
+#. odoo-javascript
+#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_workcenter_dialog.js:0
 #: model:ir.actions.client,name:mrp_workorder.action_mrp_display
 #: model:ir.model.fields,field_description:mrp_workorder.field_res_config_settings__group_mrp_wo_shop_floor
 #: model:ir.ui.menu,name:mrp_workorder.menu_mrp_workorder_root
@@ -1379,12 +1388,12 @@ msgstr ""
 #. module: mrp_workorder
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_routing_workcenter_tree_view_inherited
 msgid "Show Instructions"
-msgstr ""
+msgstr "Zobrazit instrukce"
 
 #. module: mrp_workorder
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.res_config_settings_view_form
 msgid "Show the timer on the work order screen"
-msgstr ""
+msgstr "Zobrazit časovač na obrazovce pracovního příkazu"
 
 #. module: mrp_workorder
 #. odoo-javascript
@@ -1401,12 +1410,12 @@ msgstr ""
 #. module: mrp_workorder
 #: model:product.template,description_sale:mrp_workorder.product_template_stool
 msgid "Small wooden stool"
-msgstr ""
+msgstr "Dřevěné stoličky"
 
 #. module: mrp_workorder
 #: model:ir.model.fields.selection,name:mrp_workorder.selection__quality_point__source_document__operation
 msgid "Specific Page of Operation Worksheet"
-msgstr ""
+msgstr "Konkrétní stránka pracovního listu operace"
 
 #. module: mrp_workorder
 #: model:ir.model.fields,help:mrp_workorder.field_mrp_bom__activity_state
@@ -1430,12 +1439,12 @@ msgstr "Krok"
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_check__source_document
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_point__source_document
 msgid "Step Document"
-msgstr ""
+msgstr "Krok dokumentu"
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_propose_change__step_id
 msgid "Step to change"
-msgstr ""
+msgstr "Krok ke změně"
 
 #. module: mrp_workorder
 #: model:ir.actions.act_window,name:mrp_workorder.action_mrp_workorder_show_steps
@@ -1457,24 +1466,29 @@ msgid "Stock Move Line"
 msgstr "Položka pohybu zásob"
 
 #. module: mrp_workorder
+#: model:ir.model,name:mrp_workorder.model_stock_rule
+msgid "Stock Rule"
+msgstr "Zásobovací pravidlo"
+
+#. module: mrp_workorder
 #: model:product.template,name:mrp_workorder.product_template_stool
 msgid "Stool"
-msgstr ""
+msgstr "Stolice"
 
 #. module: mrp_workorder
 #: model:product.template,name:mrp_workorder.product_template_stool_foot
 msgid "Stool Foot"
-msgstr ""
+msgstr "Noha stolice"
 
 #. module: mrp_workorder
 #: model:product.template,name:mrp_workorder.product_template_stool_top
 msgid "Stool Top"
-msgstr ""
+msgstr "Vrchol stolice"
 
 #. module: mrp_workorder
 #: model:ir.actions.client,name:mrp_workorder.tablet_client_action
 msgid "Tablet Client Action"
-msgstr ""
+msgstr "Akce klienta tabletu"
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_workorder__test_type
@@ -1491,13 +1505,16 @@ msgstr "Typ testu"
 #: model_terms:ir.actions.act_window,help:mrp_workorder.mrp_stock_picking_type_action
 msgid ""
 "The operation type system allows you to assign each stock\n"
-"            operation a specific type which will alter its views accordingly.\n"
-"            On the operation type you could e.g. specify if packing is needed by default,\n"
+"            operation a specific type which will alter its views "
+"accordingly.\n"
+"            On the operation type you could e.g. specify if packing is "
+"needed by default,\n"
 "            if it should show the customer."
 msgstr ""
 "Operace typu Systém vám umožňuje přidělit každé skladové\n"
 "            operaci specifický typ, který adekvátně upraví její zobrazení.\n"
-"            Na typu výběru můžete např. specifikovat, které balení je potřeba standardně,\n"
+"            Na typu výběru můžete např. specifikovat, které balení je "
+"potřeba standardně,\n"
 "            nebo zda by mělo být ukázané zákazníkovi."
 
 #. module: mrp_workorder
@@ -1518,6 +1535,8 @@ msgid ""
 "This workcenter isn't expected to have open workorders during this period. "
 "Work hours :"
 msgstr ""
+"Neočekává se, že toto pracovní centrum bude mít během tohoto období otevřené "
+"pracovní objednávky. pracovní doba:"
 
 #. module: mrp_workorder
 #. odoo-python
@@ -1558,8 +1577,10 @@ msgstr "Celkem množ."
 #. odoo-javascript
 #: code:addons/mrp_workorder/static/src/mrp_display/mrp_display.xml:0
 msgid ""
-"Track work orders, show instructions and record manufacturing operations from here:\n"
-"                                    quality control, consumed quantities, lot/serial numbers, etc."
+"Track work orders, show instructions and record manufacturing operations "
+"from here:\n"
+"                                    quality control, consumed quantities, "
+"lot/serial numbers, etc."
 msgstr ""
 
 #. module: mrp_workorder
@@ -1575,7 +1596,7 @@ msgstr "Typ"
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_propose_change__change_type
 msgid "Type of Change"
-msgstr ""
+msgstr "Typ změny"
 
 #. module: mrp_workorder
 #: model:ir.model.fields,help:mrp_workorder.field_mrp_bom__activity_exception_decoration
@@ -1627,7 +1648,7 @@ msgstr "Jednotky"
 #. module: mrp_workorder
 #: model:ir.actions.server,name:mrp_workorder.production_order_unplan_server_action
 msgid "Unplan orders"
-msgstr ""
+msgstr "Neplánovat objednávky"
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_check__component_uom_id
@@ -1637,13 +1658,13 @@ msgstr "MJ"
 #. module: mrp_workorder
 #: model:ir.model.fields.selection,name:mrp_workorder.selection__propose_change__change_type__update_step
 msgid "Update Current Step"
-msgstr ""
+msgstr "Aktualizovat aktuální krok"
 
 #. module: mrp_workorder
 #. odoo-javascript
 #: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_menu_dialog.xml:0
 msgid "Update Instructions"
-msgstr ""
+msgstr "Aktualizovat instrukce"
 
 #. module: mrp_workorder
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.quality_point_view_form_inherit_mrp
@@ -1656,17 +1677,21 @@ msgid ""
 "Use steps to show instructions on a worksheet to operators, or trigger "
 "quality checks at specific steps of the work order."
 msgstr ""
+"Použijte kroky k zobrazení pokynů na listu operátorům nebo spusťte kontroly "
+"kvality v konkrétních krocích pracovního příkazu."
 
 #. module: mrp_workorder
 #: model_terms:ir.actions.act_window,help:mrp_workorder.mrp_workorder_action_tablet
 msgid ""
-"Use the table work center control panel to register operations in the shop floor directly.\n"
-"            The tablet provides worksheets for your workers and allow them to scrap products, track time,\n"
+"Use the table work center control panel to register operations in the shop "
+"floor directly.\n"
+"            The tablet provides worksheets for your workers and allow them "
+"to scrap products, track time,\n"
 "            launch a maintenance request, perform quality tests, etc."
 msgstr ""
 "Pomocí ovládacího panelu tabulky pracovního centra můžete přímo v dílně "
-"zaznamenávat operace. Tablet poskytuje pracovníkům pracovní listy a umožňuje"
-" jim vyřazovat vadné výrobky, sledovat čas, spouštět požadavky na údržbu, "
+"zaznamenávat operace. Tablet poskytuje pracovníkům pracovní listy a umožňuje "
+"jim vyřazovat vadné výrobky, sledovat čas, spouštět požadavky na údržbu, "
 "provádět testy kvality atd."
 
 #. module: mrp_workorder
@@ -1701,6 +1726,12 @@ msgid "Waiting"
 msgstr "Čekající"
 
 #. module: mrp_workorder
+#. odoo-javascript
+#: code:addons/mrp_workorder/static/src/mrp_display/mrp_display_record.js:0
+msgid "What do you want to do?"
+msgstr "Co chcete udělat?"
+
+#. module: mrp_workorder
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.view_mrp_production_additional_workorder_wizard
 msgid "Will be placed at the beginning if emtpy"
 msgstr ""
@@ -1728,7 +1759,7 @@ msgstr "Pracovní příkaz"
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.quality_point_view_form_inherit_mrp
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.quality_point_view_tree
 msgid "Work Order Operation"
-msgstr ""
+msgstr "Operace pracovního příkazu"
 
 #. module: mrp_workorder
 #: model:ir.actions.act_window,name:mrp_workorder.mrp_workorder_action_tablet
@@ -1745,19 +1776,24 @@ msgstr "Plánování pracovních příkazů"
 #. module: mrp_workorder
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workcenter_view_kanban_inherit_workorder
 msgid "Work orders"
-msgstr ""
+msgstr "Pracovní příkazy"
 
 #. module: mrp_workorder
 #: model_terms:ir.actions.act_window,help:mrp_workorder.mrp_workorder_action_tablet
 msgid ""
 "Work orders are operations to do as part of a manufacturing order.\n"
-"            Operations are defined in the bill of materials or added in the manufacturing order directly."
+"            Operations are defined in the bill of materials or added in the "
+"manufacturing order directly."
 msgstr ""
+"Pracovní příkazy jsou operace, které je třeba provést v rámci výrobní "
+"zakázky.\n"
+"            Operace se definují v kusovníku nebo se přidávají přímo do "
+"výrobního příkazu."
 
 #. module: mrp_workorder
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.stock_picking_type_view_kanban
 msgid "Workcenter Control Panel"
-msgstr ""
+msgstr "Kontrolní panel výrobních center"
 
 #. module: mrp_workorder
 #: model:ir.model,name:mrp_workorder.model_mrp_workcenter_productivity
@@ -1777,7 +1813,7 @@ msgstr ""
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_propose_change__workorder_id
 msgid "Workorder"
-msgstr ""
+msgstr "Pracovní příkaz"
 
 #. module: mrp_workorder
 #. odoo-javascript
@@ -1790,7 +1826,7 @@ msgstr "Pracovní list"
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_check__worksheet_page
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_point__worksheet_page
 msgid "Worksheet Page"
-msgstr ""
+msgstr "Stránka pracovního listu"
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_workorder__worksheet_page
@@ -1822,6 +1858,8 @@ msgid ""
 "You cannot update the quantity to do of an ongoing manufacturing order for "
 "which quality checks have been performed."
 msgstr ""
+"U probíhající výrobní zakázky, u které byly provedeny kontroly kvality, "
+"nemůžete aktualizovat množství, které je třeba provést."
 
 #. module: mrp_workorder
 #. odoo-python
@@ -1839,8 +1877,8 @@ msgstr ""
 #. odoo-python
 #: code:addons/mrp_workorder/models/mrp_workorder.py:0
 msgid ""
-"You need to complete Quality Checks using the Shop Floor before marking Work"
-" Order as Done."
+"You need to complete Quality Checks using the Shop Floor before marking Work "
+"Order as Done."
 msgstr ""
 
 #. module: mrp_workorder
@@ -1921,14 +1959,20 @@ msgid "per employee"
 msgstr ""
 
 #. module: mrp_workorder
+#. odoo-javascript
+#: code:addons/mrp_workorder/static/src/mrp_display/mrp_display_record.xml:0
+msgid "s"
+msgstr ""
+
+#. module: mrp_workorder
 #: model:product.template,description_sale:mrp_workorder.product_template_stool_foot
 msgid "wooden stool foot"
-msgstr ""
+msgstr "dřevěná noha stolice"
 
 #. module: mrp_workorder
 #: model:product.template,description_sale:mrp_workorder.product_template_stool_top
 msgid "wooden stool top"
-msgstr ""
+msgstr "dřevěný vrchol stolice"
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_production__employee_ids

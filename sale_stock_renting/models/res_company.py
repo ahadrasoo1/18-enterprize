@@ -10,7 +10,7 @@ class ResCompany(models.Model):
     # Rental Inventory
 
     rental_loc_id = fields.Many2one(
-        "stock.location", string="In rent",
+        "stock.location", string="Rental Location",
         domain=[('usage', '=', 'internal')],
         help="This technical location serves as stock for products currently in rental"
         "This location is internal because products in rental"
@@ -36,7 +36,7 @@ class ResCompany(models.Model):
         for company in self.sudo():
             if not company.rental_loc_id:
                 rental_loc_values.append({
-                    "name": "Rental",
+                    "name": self.env._("Rental"),
                     "usage": "internal",
                     "company_id": company.id,
                     "location_id": self.env.ref('stock.stock_location_customers').id,

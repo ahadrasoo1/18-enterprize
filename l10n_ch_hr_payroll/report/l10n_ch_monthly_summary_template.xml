@@ -44,7 +44,7 @@
                                         Monthly Wage Type Summary.
                                     </div>
                                 </div>
-                                <table class="o_ignore_layout_styling table table-sm">
+                                <table class="table table-sm">
                                     <thead class="o_black_border">
                                         <tr>
                                             <th>Code</th>
@@ -53,15 +53,15 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <span t-foreach="line_values[aggreg_record]" t-as="rule">
+                                        <t t-foreach="line_values[aggreg_record]" t-as="line">
                                             <tr>
-                                                <td><span t-esc="rule.l10n_ch_code"/></td>
-                                                <td><span t-esc="rule.name"/></td>
+                                                <td><span t-esc="line['code']"/></td>
+                                                <td><span t-esc="line['name']"/></td>
                                                 <td class="text-end">
-                                                    <span t-esc="line_values[aggreg_record][rule]" t-options='{"widget": "monetary", "display_currency": company.currency_id}'/>
+                                                    <span t-esc="line['total']" t-options='{"widget": "monetary", "display_currency": company.currency_id}'/>
                                                 </td>
                                             </tr>
-                                        </span>
+                                        </t>
                                     </tbody>
                                 </table>
                             </div>

@@ -3,12 +3,17 @@
 import contextlib
 import json
 import jwt
+import logging
 from datetime import datetime, date
 from markupsafe import Markup
 
 from odoo import api, Command, fields, models, tools, _
 from odoo.tools import split_every
+from odoo.exceptions import RedirectWarning, UserError
 from .irn_exception import IrnException
+
+_logger = logging.getLogger(__name__)
+
 
 UOM_REF_MAP = {
     "CMS": "uom.product_uom_cm",
@@ -31,8 +36,8 @@ UOM_REF_MAP = {
 class AccountMove(models.Model):
     _inherit = 'account.move'
 
-    l10n_in_exception = fields.Html("Exception")
-    l10n_in_gst_return_period_id = fields.Many2one("l10n_in.gst.return.period", "GST Return Period")
+    l10n_in_exception = fields.Html("Exception", copy=False)
+    l10n_in_gst_return_period_id = fields.Many2one("l10n_in.gst.return.period", "GST Return Period", copy=False)
     l10n_in_gstr2b_reconciliation_status = fields.Selection(selection=[
         ("pending", "Pending"),
         ("matched", "Fully Matched"),
@@ -42,32 +47,49 @@ class AccountMove(models.Model):
         ("gstr2_bills_not_in_odoo", "GSTR-2 Bills not in Odoo")],
         string="GSTR-2B Reconciliation",
         readonly=True,
-        default="pending"
+        default="pending",
+        copy=False
     )
     l10n_in_reversed_entry_warning = fields.Boolean('Display reversed entry warning', compute="_compute_l10n_in_reversed_entry_warning")
-    l10n_in_irn_number = fields.Char('IRN Number', readonly=True)
+    l10n_in_irn_number = fields.Char('IRN Number', readonly=True, copy=False)
     l10n_in_gstr_activate_einvoice_fetch = fields.Selection(related="company_id.l10n_in_gstr_activate_einvoice_fetch")
 
-    @api.depends('move_type', 'reversed_entry_id', 'state', 'invoice_date', 'invoice_line_ids.tax_ids')
+    @api.depends('move_type', 'reversed_entry_id', 'state', 'invoice_date', 'invoice_line_ids.tax_ids', 'checked')
     def _compute_l10n_in_reversed_entry_warning(self):
         for move in self:
-            if move.country_code == 'IN' and move.move_type == 'out_refund' and move.state == 'draft' and move.invoice_date and move.reversed_entry_id and move.invoice_line_ids.tax_ids:
+            if (move.country_code == 'IN'
+                and move.move_type == 'out_refund'
+                and move.invoice_date
+                and move.reversed_entry_id
+                and move.invoice_line_ids.tax_ids
+                and (move.state == 'draft' or (move.state == 'posted' and not move.checked))
+            ):
                 move.l10n_in_reversed_entry_warning = move.reversed_entry_id.invoice_date < move.get_fiscal_year_start_date(move.company_id, move.invoice_date)
             else:
                 move.l10n_in_reversed_entry_warning = False
 
-    def get_fiscal_year_start_date(self, company, invoice_date):
-        fiscal_year_start_month = (int(company.fiscalyear_last_month) % 12) + 1
-        fiscal_year_start_date = date(invoice_date.year, fiscal_year_start_month, 1)
-        if invoice_date.month <= 11:
-            fiscal_year_start_date = fiscal_year_start_date.replace(year=invoice_date.year - 1)
-        return fiscal_year_start_date
-
     def _post(self, soft=True):
+        """
+        The parent `_post` method sets the `checked` flag based on the journal
+        configuration. After posting, we explicitly reset `checked` to False
+        for invoices that have a credit note (reversed entry) warning.
+        """
+        warning_invoices = self.filtered(lambda i: i.l10n_in_reversed_entry_warning)
+        to_post = super()._post(soft=soft)
         for invoice in self:
             if invoice.l10n_in_gstr2b_reconciliation_status == "gstr2_bills_not_in_odoo":
                 invoice.l10n_in_gstr2b_reconciliation_status = "pending"
-        return super(AccountMove, self)._post(soft=soft)
+        warning_invoices.checked = False
+        return to_post
+
+    def button_draft(self):
+        res = super().button_draft()
+        self.write({
+            "l10n_in_exception": False,
+            "l10n_in_gstr2b_reconciliation_status": "pending",
+            "l10n_in_gst_return_period_id": False,
+        })
+        return res
 
     def l10n_in_update_move_using_irn(self):
         """ Fetch the attachment from IRN and use it to update the invoice.
@@ -78,7 +100,8 @@ class AccountMove(models.Model):
         :returns: action to refresh the form view.
         """
         context = {'active_id': self.ids, 'active_model': 'account.move'}
-        self.env['l10n_in.gst.return.period'].with_context(context)._check_config(next_gst_action='fetch_irn_from_account_move', company=self.env.company)
+        for company in self.company_id:
+            self.env['l10n_in.gst.return.period'].with_context(context)._check_config(next_gst_action='fetch_irn_from_account_move', company=company)
 
         JSON_MIMETYPE = 'application/json'
         STATUS_CANCELLED = 'CNL'
@@ -94,10 +117,18 @@ class AccountMove(models.Model):
                 # Retrieve IRN details if no valid attachment is found
                 gov_json_data = self._l10n_in_retrieve_details_from_irn(move.l10n_in_irn_number, move.company_id)
             except IrnException as e:
-                move.message_post(body=Markup("Fetching IRN details failed with error(s):<br/> %s") % str(e))
+                if str(e) == 'no-credit':
+                    message = self.env["account.edi.format"]._l10n_in_edi_get_iap_buy_credits_message(self.company_id)
+                else:
+                    message = str(e)
+                move.message_post(
+                    author_id=self.env.ref('base.partner_root').id,
+                    body=Markup("Fetching IRN details failed with error(s):<br/> %s") % message
+                )
                 continue
             attachment = self.env['ir.attachment'].create({
-                'name': f'{move.l10n_in_irn_number}.json',
+                # Limit the name to 45 characters to avoid exceeding the limit on e-invoice portal
+                'name': f'{move.l10n_in_irn_number[:45]}.json',
                 'mimetype': JSON_MIMETYPE,
                 'raw': json.dumps(gov_json_data),
                 'res_model': 'account.move',
@@ -131,8 +162,10 @@ class AccountMove(models.Model):
                 ]
                 moves = self.env['account.move'].search(domain)
                 for move_batch in split_every(job_count, moves):
-                    for move in move_batch:
-                        move.l10n_in_update_move_using_irn()
+                    try:
+                        move_batch.l10n_in_update_move_using_irn()
+                    except (RedirectWarning, UserError):
+                        _logger.exception('Error when update Bill with IRN')
                     if not (tools.config['test_enable'] or tools.config['test_file']):
                         self._cr.commit()
 
@@ -205,6 +238,7 @@ class AccountMove(models.Model):
         seller_details = content['SellerDtls']
         item_list = content['ItemList']
         value_details = content['ValDtls']
+        trans_details = content['TranDtls']
 
         self.l10n_in_irn_number = content.get('Irn', False)
         self.move_type = {
@@ -231,7 +265,11 @@ class AccountMove(models.Model):
         igst_tag_id = self.env.ref('l10n_in.tax_tag_igst')
         cgst_tag_id = self.env.ref('l10n_in.tax_tag_cgst')
         sgst_tag_id = self.env.ref('l10n_in.tax_tag_sgst')
+        sgst_rc_tag_id = self.env.ref('l10n_in.tax_tag_sgst_rc')
+        cgst_rc_tag_id = self.env.ref('l10n_in.tax_tag_cgst_rc')
+        igst_rc_tag_id = self.env.ref('l10n_in.tax_tag_igst_rc')
         gst_tag_ids = cgst_tag_id + sgst_tag_id
+        gst_rc_tag_ids = sgst_rc_tag_id + cgst_rc_tag_id
 
         uom_map = {
             irn_uom: self.env['ir.model.data']._xmlid_to_res_id(xmlid)
@@ -241,24 +279,49 @@ class AccountMove(models.Model):
         invoice_lines = []
         other_charges = value_details.get('OthChrg', 0)
         cess_charges = 0
+        not_mapped_tax_values = {}
+        is_rcm_invoice = 1 if trans_details.get('RegRev') == "Y" else 0
         for item in item_list:
             line_dict = {}
-            if 'GstRt' in item:
-                tag_id = igst_tag_id.ids if item.get('IgstAmt') else gst_tag_ids.ids
-                taxes = _get_tax(item['GstRt'], tag_id)
-                if taxes:
-                    line_dict['tax_ids'] = [Command.link(taxes.id)]
+            gst_rate = item.get('GstRt')
 
-            line_dict['discount'] = (item.get('Discount', 0.0) / item.get('TotAmt', 1.0)) * 100.0 if item.get('TotAmt') else 0.0
+            if gst_rate:
+                is_igst = bool(item.get('IgstAmt'))
+                if is_rcm_invoice:
+                    tax_tag_ids = igst_rc_tag_id.ids if is_igst else gst_rc_tag_ids.ids
+                else:
+                    tax_tag_ids = igst_tag_id.ids if is_igst else gst_tag_ids.ids
+
+                applicable_tax = _get_tax(gst_rate, tax_tag_ids)
+                if applicable_tax:
+                    line_dict['tax_ids'] = [Command.link(applicable_tax.id)]
+                else:
+                    tax_key_base = (gst_rate, "IGST" if is_igst else "GST")
+                    tax_amount = item.get('IgstAmt', 0) if is_igst else item.get('CgstAmt', 0) + item.get('SgstAmt', 0)
+                    not_mapped_tax_values.setdefault(tax_key_base, 0)
+                    not_mapped_tax_values[tax_key_base] += tax_amount
+                    if is_rcm_invoice:
+                        tax_key_rcm = tax_key_base + ("RC",)
+                        not_mapped_tax_values.setdefault(tax_key_rcm, 0)
+                        not_mapped_tax_values[tax_key_rcm] -= tax_amount
+
             line_dict['product_uom_id'] = uom_map.get(item.get('Unit'))
+            # For service-type products where the quantity might be 0, therefore, replace 0 with 1 to ensure proper handling.
+            quantity = item.get('Qty') or 1
+            price_unit = item.get('UnitPrice')
+            if price_unit:
+                line_dict['discount'] = (item.get('Discount', 0.0) / item.get('TotAmt', 1.0)) * 100.0 if item.get('TotAmt') else 0.0
+            else:
+                # For service-type products where UnitPrice might be 0,
+                # calculate and replace it with AssAmt divided by quantity to ensure accurate unit pricing and proper handling.
+                price_unit = item.get('AssAmt', 0) / quantity
             invoice_lines.append(
                 Command.create({
                     **line_dict,
                     'name': item.get('PrdDesc'),
                     'l10n_in_hsn_code': item.get('HsnCd'),
-                    # For service-type products where the quantity might be 0, therefore, replace 0 with 1 to ensure proper handling.
-                    'quantity': item.get('Qty') or 1,
-                    'price_unit': item.get('UnitPrice'),
+                    'quantity': quantity,
+                    'price_unit': price_unit,
                 })
             )
             other_charges += item.get('OthChrg', 0)
@@ -275,6 +338,13 @@ class AccountMove(models.Model):
             invoice_lines.append(Command.create({
                 'name': "CESS Charges",
                 'price_unit': cess_charges,
+            }))
+        # Create invoice lines for the grouped tax values
+        for tax_group, tax_amount in not_mapped_tax_values.items():
+            line_name = f"{tax_group[0]}% ({tax_group[1]}){' - Reverse Charge' if is_rcm_invoice else ''}"
+            invoice_lines.append(Command.create({
+                'name': line_name,
+                'price_unit': tax_amount,
             }))
         # Create rounding value line
         if (rounding_amount := value_details.get('RndOffAmt')):

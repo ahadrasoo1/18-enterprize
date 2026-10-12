@@ -180,7 +180,9 @@ class PlanningSlot(models.Model):
 
         slots_to_unlink = PlanningShift
         for slot in self:
-            if not slot.exists() or slot.sale_line_id and not slot.start_datetime \
+            if not slot.exists():
+                self -= slot
+            elif slot.sale_line_id and not slot.start_datetime \
                 and float_utils.float_compare(slot.allocated_hours, 0.0, precision_digits=2) < 1:
                 slots_to_unlink |= slot
         if (self - slots_to_unlink).sale_line_id:

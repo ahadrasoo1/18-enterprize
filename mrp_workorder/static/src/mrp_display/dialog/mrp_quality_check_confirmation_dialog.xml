@@ -9,7 +9,9 @@
             </t>
             <div class="o_quality_check_body d-flex w-100">
                 <div class="o_instruction w-75">
-                    <div t-out="props.body"/>
+                    <div class="o_field_widget o_field_html">
+                        <HtmlField t-props="htmlInfo"/>
+                    </div>
                 </div>
                 <div t-if="recordData.additional_note" t-out="recordData.additional_note"/>
             </div>
@@ -45,7 +47,7 @@
                 <span name="measure" class="o_field_widget text-end pe-2">
                     <FloatField t-props="measureInfo"/>
                 </span>
-                <span t-esc="recordData.norm_unit" class="text-lowercase"/>
+                <span t-esc="recordData.norm_unit"/>
             </div>
             <div t-elif="recordData.test_type === 'picture'" class="workorder_picture">
                 <TabletImageField t-props="picInfo"/>

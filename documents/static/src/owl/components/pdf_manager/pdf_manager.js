@@ -116,7 +116,7 @@ export class PdfManager extends Component {
                 }
                 for (const pdf_document of this.props.documents) {
                     this._addFile(pdf_document.name, {
-                        url: `/documents/content/${pdf_document.access_token}`,
+                        url: `/documents/content/${encodeURIComponent(pdf_document.access_token)}`,
                         documentId: pdf_document.id,
                     });
                 }
@@ -555,7 +555,7 @@ export class PdfManager extends Component {
         }
         try {
             const documentIds = await this._sendChanges();
-            this.props.onProcessDocuments({ documentIds, actionId, exit });
+            await this.props.onProcessDocuments({ documentIds, actionId, exit });
             this._displayNumberCreatedDocuments(documentIds.length);
             if (!exit) {
                 this._embeddedActionApplied = true;
@@ -743,7 +743,7 @@ export class PdfManager extends Component {
             : Math.min(canvas.width / viewPort.width, canvas.height / viewPort.height);
         await page.render({
             canvasContext: canvas.getContext("2d"),
-            viewport: page.getViewport({ scale, rotation: isLandscape ? 270 : 0 }),
+            viewport: page.getViewport({ scale, rotation: isLandscape ? 270 : viewPort.rotation }),
         }).promise;
         return canvas;
     }
@@ -1260,7 +1260,7 @@ export class PdfManager extends Component {
     /**
      * @public
      */
-    onArchive() {
+    async onArchive() {
         let pagesToDelete = this.selectedPageIds;
         if (pagesToDelete.length === 0 && !this.state.focusedPage && !this.state.viewedPage) {
             this._displayErrorNotification(_t("No document has been selected"));
@@ -1297,13 +1297,13 @@ export class PdfManager extends Component {
                     this._removePage(pageId, { fromFile: true });
                 }
                 if (this.state.numberOfPages === 0) {
-                    this.props.onProcessDocuments({ isForcingDelete: true });
+                    await this.props.onProcessDocuments({ isForcingDelete: true });
                     await this.props.close();
                 }
                 this._displayNumberDeletedPages(pagesToDelete.length);
                 this.state.focusedPage = nextFocusedPageId;
                 if (this.state.viewedPage && nextFocusedPageId) {
-                    this.onClickPage(nextFocusedPageId);
+                    await this.onClickPage(nextFocusedPageId);
                 } else {
                     this.state.viewedPage = undefined;
                 }

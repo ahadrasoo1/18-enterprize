@@ -2,10 +2,11 @@
 
 from odoo.addons.l10n_mx_edi_extended.tests.common import TestMxExtendedEdiCommon
 from odoo.addons.stock_account.tests.test_anglo_saxon_valuation_reconciliation_common import ValuationReconciliationTestCommon
-from odoo import fields
+from odoo import Command, fields
 from odoo.tests import tagged
 
 from freezegun import freeze_time
+from lxml import etree
 
 
 @tagged('post_install_l10n', 'post_install', '-at_install')
@@ -111,3 +112,24 @@ class TestEdiResults(TestMxExtendedEdiCommon, ValuationReconciliationTestCommon)
             self.assertRecordValues(invoice.invoice_line_ids, [{
                 'l10n_mx_edi_customs_number': landing_cost.l10n_mx_edi_customs_number,
             }])
+
+    def test_set_customs_number(self):
+        """
+        Test that custom number is put on CFDI
+        """
+        numero_pedimento = '15  48  3009  1234567'
+        invoice = self._create_invoice(
+            l10n_mx_edi_external_trade_type='03',
+            invoice_line_ids=[Command.create({'product_id': self.product.id, 'l10n_mx_edi_customs_number': numero_pedimento})]
+        )
+
+        with freeze_time('2017-01-07'), self.with_mocked_pac_sign_success():
+            invoice._l10n_mx_edi_cfdi_invoice_try_send()
+
+        cfdi_node = etree.fromstring(invoice.l10n_mx_edi_invoice_document_ids
+            .filtered(lambda x: x.state == 'invoice_sent')
+            .attachment_id.raw)
+        self.assertEqual(
+            cfdi_node.xpath("//*[name()='cfdi:InformacionAduanera']")[0].get('NumeroPedimento'),
+            numero_pedimento
+        )

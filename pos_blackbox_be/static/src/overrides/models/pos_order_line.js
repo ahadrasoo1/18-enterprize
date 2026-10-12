@@ -179,4 +179,10 @@ patch(PosOrderline.prototype, {
     getLineTaxLabels() {
         return this.product_id.taxes_id?.map((tax) => tax.tax_group_id.pos_receipt_label).join(" ");
     },
+    setOptions(options) {
+        super.setOptions(...arguments);
+        if (options.qty_sign) {
+            this.set_quantity(this.get_quantity() * options.qty_sign);
+        }
+    },
 });

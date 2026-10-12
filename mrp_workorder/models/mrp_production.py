@@ -69,10 +69,12 @@ class MrpProduction(models.Model):
         }
 
     def action_open_shop_floor(self):
+        """ Opens shop floor on Overview workcenter with a filter for current MO """
         self.ensure_one()
         action = self.env['ir.actions.actions']._for_xml_id('mrp_workorder.action_mrp_display')
         action['context'] = {
             'show_all_workorders': True,
+            'workcenter_id': 0,  # Sets active WC to Overview'
             'search_default_name': self.name,
             'shouldHideNewWorkcenterButton': True,
         }
@@ -95,7 +97,8 @@ class MrpProduction(models.Model):
 
     def pre_button_mark_done(self):
         res = super().pre_button_mark_done()
-        self.workorder_ids.verify_quality_checks()
+        if res is True:
+            self.workorder_ids.verify_quality_checks()
         return res
 
     def _update_catalog_line_quantity(self, line, quantity, **kwargs):
@@ -108,7 +111,7 @@ class MrpProduction(models.Model):
         values = super()._get_new_catalog_line_values(product_id, quantity)
         if kwargs.get('from_shop_floor'):
             values.update({
-                'quantity': quantity,
+                'additional': True,
                 'manual_consumption': True,
             })
         return values

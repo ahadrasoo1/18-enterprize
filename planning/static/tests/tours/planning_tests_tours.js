@@ -2,10 +2,10 @@
 
 import { markup } from "@odoo/owl";
 import { registry } from "@web/core/registry";
+const today = luxon.DateTime.now();
 
 registry.category("web_tour.tours").add('planning_test_tour', {
     url: '/odoo',
-    test: true,
     steps: () => [{
     trigger: '.o_app[data-menu-xmlid="planning.planning_menu_root"]',
     content: "Let's start managing your employees' schedule!",
@@ -35,25 +35,11 @@ registry.category("web_tour.tours").add('planning_test_tour', {
 }, {
     trigger: ".o_field_widget[name='start_datetime'] input",
     content: "Set start datetime",
-    run: function (actions) {
-        const input = this.anchor;
-        input.value = input.value.replace(/(\d{2}:){2}\d{2}/g, '08:00:00');
-        input.dispatchEvent(new InputEvent('input', {
-            bubbles: true,
-        }));
-        input.dispatchEvent(new Event("change", { bubbles: true, cancelable: false }));
-    }
+    run: `edit ${today.toFormat("MM/dd/yyyy")} 09:00`,
 }, {
     trigger: "input[data-field=end_datetime]",
     content: "Set end datetime",
-    run: function (actions) {
-        const input = this.anchor;
-        input.value = input.value.replace(/(\d{2}:){2}\d{2}/g, '11:59:59');
-        input.dispatchEvent(new InputEvent('input', {
-            bubbles: true,
-        }));
-        input.dispatchEvent(new Event("change", { bubbles: true, cancelable: false }));
-    }
+    run: `edit ${today.toFormat("MM/dd/yyyy")} 11:59`,
 }, {
     trigger: "button[name='action_save_template']",
     content: "Save this shift as a template",
@@ -67,7 +53,7 @@ registry.category("web_tour.tours").add('planning_test_tour', {
     trigger: ".o_gantt_pill :contains('11:59')",
     content: markup("<b>Drag & drop</b> your shift to reschedule it. <i>Tip: hit CTRL (or Cmd) to duplicate it instead.</i> <b>Adjust the size</b> of the shift to modify its period."),
     run: function () {
-        const expected = "8:00 AM - 11:59 AM";
+        const expected = "9:00 AM - 11:59 AM";
         // Without the replace below, this step could break since luxon
         // (via Intl) uses sometimes U+202f instead of a simple space.
         // Note: U+202f is a narrow non-break space.
@@ -113,7 +99,6 @@ registry.category("web_tour.tours").add('planning_test_tour', {
     tooltipPosition: "right",
     run: 'click',
 }, {
-    isActive: ["auto"],
     id: "planning_check_format_step",
     trigger: ".o_gantt_pill span:contains(Developer)",
     content: "Check naming format of resource and role when grouped",
@@ -128,7 +113,6 @@ registry.category("web_tour.tours").add('planning_test_tour', {
     tooltipPosition: "right",
     run: 'click',
 }, {
-    isActive: ["auto"],
     id: "planning_check_format_step",
     trigger: ".o_gantt_pill.opacity-25",
     content: "Check that the filter is applied",
@@ -136,7 +120,6 @@ registry.category("web_tour.tours").add('planning_test_tour', {
 
 registry.category("web_tour.tours").add('planning_test_tour_no_email', {
     url: '/odoo',
-    test: true,
     steps: () => [{
     trigger: '.o_app[data-menu-xmlid="planning.planning_menu_root"]',
     content: "Open the planning app, should land in the gantt view",
@@ -174,7 +157,6 @@ registry.category("web_tour.tours").add('planning_test_tour_no_email', {
 
 registry.category("web_tour.tours").add('planning_shift_switching_backend', {
     url: '/odoo',
-    test: true,
     steps: () => [{
     trigger: '.o_app[data-menu-xmlid="planning.planning_menu_root"]',
     content: "Get in the planning app",
@@ -217,7 +199,6 @@ registry.category("web_tour.tours").add('planning_shift_switching_backend', {
 
 registry.category("web_tour.tours").add('planning_assigning_unwanted_shift_backend', {
     url: '/odoo',
-    test: true,
     steps: () => [{
     trigger: '.o_app[data-menu-xmlid="planning.planning_menu_root"]',
     content: "Get in the planning app",

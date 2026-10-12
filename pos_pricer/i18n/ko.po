@@ -1,23 +1,27 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* pos_pricer
-# 
+# * pos_pricer
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Daye Jeong, 2024
+#
+# "Kwanghee Park (kwpa)" <kwpa@odoo.com>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Korean (https://app.transifex.com/odoo/teams/41243/ko/)\n"
+"POT-Creation-Date: 2025-12-29 18:45+0000\n"
+"PO-Revision-Date: 2025-09-04 22:31+0000\n"
+"Last-Translator: \"Kwanghee Park (kwpa)\" <kwpa@odoo.com>\n"
+"Language-Team: Korean <https://translate.odoo.com/projects/odoo-18/"
+"pos_pricer/ko/>\n"
+"Language: ko\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: ko\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 5.12.2\n"
 
 #. module: pos_pricer
 #: model:ir.model.constraint,message:pos_pricer.constraint_pricer_tag_name_unique
@@ -43,6 +47,11 @@ msgstr "인증 URL"
 #: model:product.pricelist,name:pos_pricer.pricer_demo_pricelist
 msgid "Christmas"
 msgstr "크리스마스"
+
+#. module: pos_pricer
+#: model:ir.model,name:pos_pricer.model_res_partner
+msgid "Contact"
+msgstr "연락처"
 
 #. module: pos_pricer
 #: model:ir.model.fields,field_description:pos_pricer.field_pricer_store__create_or_update_products_url
@@ -107,7 +116,9 @@ msgstr "Pricer 시스템 내 매장 인증"
 msgid ""
 "Invalid tag name. Should be 1 letter followed by 16 digits. Example: "
 "'N4081315789813275'"
-msgstr "태그 이름이 잘못되었습니다. 문자 한 글자와 16자리로 구성되어야 합니다. 예: 'N4081315789813275'."
+msgstr ""
+"태그 이름이 잘못되었습니다. 문자 한 글자와 16자리로 구성되어야 합니다. 예: "
+"'N4081315789813275'."
 
 #. module: pos_pricer
 #: model:ir.model.fields,help:pos_pricer.field_pricer_tag__name
@@ -155,7 +166,7 @@ msgstr "바코드 '%s'에 대한 제품을 찾을 수 없습니다."
 #. module: pos_pricer
 #: model:ir.model.fields,field_description:pos_pricer.field_product_product__on_sale_price
 msgid "On Sale Price"
-msgstr ""
+msgstr "판매 가격"
 
 #. module: pos_pricer
 #: model:ir.actions.server,name:pos_pricer.pricer_sync_cron_ir_actions_server
@@ -175,7 +186,7 @@ msgstr "POS 환경 설정"
 #. module: pos_pricer
 #: model:ir.model.fields,help:pos_pricer.field_product_product__on_sale_price
 msgid "Price after setting a Pricer Sales Pricelist"
-msgstr ""
+msgstr "가격 책정 판매 가격 목록 설정 후 가격"
 
 #. module: pos_pricer
 #: model:ir.ui.menu,name:pos_pricer.pos_menu_pricer_configuration
@@ -211,7 +222,7 @@ msgstr "링크되지 않은 Pricer 제품"
 #. module: pos_pricer
 #: model:ir.model.fields,field_description:pos_pricer.field_product_product__pricer_sale_pricelist_id
 msgid "Pricer Sales Pricelist"
-msgstr ""
+msgstr "가격 판매 가격표"
 
 #. module: pos_pricer
 #: model:ir.model.fields,field_description:pos_pricer.field_product_product__pricer_store_id
@@ -231,7 +242,9 @@ msgstr "Pricer 스토어 ID"
 msgid ""
 "Pricer Store ID must only contain lowercase a-z, 0-9 or '-' and not start "
 "with '-'"
-msgstr "가격 책정자 스토어 ID는 소문자 a-z, 숫자 0-9 또는 '-'로만 구성되어야 하며 '-'로 시작할 수 없습니다."
+msgstr ""
+"가격 책정자 스토어 ID는 소문자 a-z, 숫자 0-9 또는 '-'로만 구성되어야 하며 "
+"'-'로 시작할 수 없습니다."
 
 #. module: pos_pricer
 #: model:ir.model.fields,help:pos_pricer.field_pricer_store__name
@@ -343,6 +356,11 @@ msgid "Store Name"
 msgstr "매장명"
 
 #. module: pos_pricer
+#: model:ir.model,name:pos_pricer.model_product_supplierinfo
+msgid "Supplier Pricelist"
+msgstr "공급업체 가격표"
+
+#. module: pos_pricer
 #. odoo-javascript
 #: code:addons/pos_pricer/static/src/views/pricer_quick_pairing_form_view.js:0
 msgid "Tag '%s' found"
@@ -369,25 +387,33 @@ msgid ""
 msgstr "태그 ID는 문자와 16자리 숫자로 구성된 17자 문자열이어야 합니다."
 
 #. module: pos_pricer
+#: model:ir.model,name:pos_pricer.model_account_tax
+msgid "Tax"
+msgstr "세금"
+
+#. module: pos_pricer
 #: model:ir.model.fields,help:pos_pricer.field_product_product__pricer_sale_pricelist_id
 msgid ""
 "This pricelist will be used to set sales on Pricer tags for this product"
-msgstr ""
+msgstr "이 가격표는 이 제품의 가격표 태그에 판매를 설정하는 데 적용됩니다."
 
 #. module: pos_pricer
 #: model:ir.model.fields,help:pos_pricer.field_pricer_tag__pricer_store_id
 #: model:ir.model.fields,help:pos_pricer.field_product_product__pricer_store_id
 msgid ""
-"This product will be linked to and displayed on the Pricer tags of the store"
-" selected here"
-msgstr "이 품목은 여기에서 선택한 스토어의 가격 책정 태그에 연결되고 표시됩니다."
+"This product will be linked to and displayed on the Pricer tags of the store "
+"selected here"
+msgstr ""
+"이 품목은 여기에서 선택한 스토어의 가격 책정 태그에 연결되고 표시됩니다."
 
 #. module: pos_pricer
 #: model:ir.model.fields,help:pos_pricer.field_product_product__pricer_tag_ids
 msgid ""
 "This product will be linked to and displayed on the Pricer tags with ids "
 "listed here. It is recommended to use a barcode scanner"
-msgstr "이 제품은 나열된 ID로 가격표 태그에 연결되고 표시됩니다. 바코드 스캐너를 사용하는 것이 좋습니다."
+msgstr ""
+"이 제품은 나열된 ID로 가격표 태그에 연결되고 표시됩니다. 바코드 스캐너를 사용"
+"하는 것이 좋습니다."
 
 #. module: pos_pricer
 #: model_terms:ir.ui.view,arch_db:pos_pricer.pricer_pricer_store_view_list

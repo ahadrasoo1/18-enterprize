@@ -2,7 +2,6 @@
 
 from odoo import models, api
 from itertools import groupby
-from operator import itemgetter
 
 
 class PosOrder(models.Model):
@@ -22,27 +21,31 @@ class PosOrder(models.Model):
             config = self.browse(order_id).config_id
         return bool(config and config.company_id.l10n_de_is_germany_and_fiskaly() and config.floor_ids)
 
-    @api.model
-    def sync_from_ui(self, orders):
-        if len(orders) > 0 and self._check_config_germany_floor(session_id=orders[0]['session_id']):
-            order_differences = {}
-            for ui_order in orders:
-                if ui_order['state'] == 'draft':
-                    existing_order = None
-                    if ui_order.get('id'):
-                        existing_order = self.env['pos.order'].browse(ui_order['id']).exists()
-                    if not existing_order or existing_order.state == 'draft':
-                        differences = self._line_differences(existing_order, ui_order)
-                        if differences:
-                            order_differences[ui_order['name']] = differences
+    def read_pos_data(self, data, config_id):
+        result = super().read_pos_data(data, config_id)
+        if not len(self):
+            return result
 
-            res = super().sync_from_ui(orders)
-            for json_record in res['pos.order']:
-                if json_record['pos_reference'] in order_differences:
-                    json_record['differences'] = order_differences[json_record['pos_reference']]
-            return res
-        else:
-            return super().sync_from_ui(orders)
+        session_id = self[0].session_id.id
+        if not self._check_config_germany_floor(session_id=session_id):
+            return result
+
+        order_differences = {}
+        for ui_order in data:
+            if ui_order['state'] == 'draft':
+                existing_order = None
+                if ui_order.get('id'):
+                    existing_order = self.env['pos.order'].browse(ui_order['id']).exists()
+                if not existing_order or existing_order.state == 'draft':
+                    differences = self._line_differences(existing_order, ui_order)
+                    if differences:
+                        order_differences[ui_order['name']] = differences
+
+        for json_record in result['pos.order']:
+            if json_record['pos_reference'] in order_differences:
+                json_record['differences'] = order_differences[json_record['pos_reference']]
+
+        return result
 
     @api.model
     def _line_differences(self, existing_order, ui_order=None):
@@ -52,7 +55,7 @@ class PosOrder(models.Model):
         :return: a list of lines difference
         """
         new_line_dict = {} if not ui_order else self._merge_order_lines(
-            [line[2] for line in ui_order['lines'] if line[2]['qty'] != 0]
+            [line[2] for line in ui_order['lines'] if line[0] in [0, 1] and line[2]['qty'] != 0]
         )
         old_lines = []
         if existing_order:
@@ -89,8 +92,10 @@ class PosOrder(models.Model):
         :param order_lines: The list of lines in a dictionary format
         :return: {(id[int], price[int], discount[int]): {'qty': float, 'text': string, 'price_per_unit': float} }
         """
+        def keys(line):
+            return (line['product_id'], line['price_unit'], line.get('discount', 0))
+
         line_dict = {}
-        keys = itemgetter('product_id', 'price_unit', 'discount')
         for k, g in groupby(sorted(order_lines, key=keys), key=keys):
             group = list(g)
             unit_price = group[0]['price_subtotal_incl']/group[0]['qty']
@@ -104,6 +109,7 @@ class PosOrder(models.Model):
 
     @api.model
     def retrieve_line_difference(self, ui_orders):
+        """This method is deprecated and will be removed in master (saas-19.1)."""
         res = {}
         for order in ui_orders:
             existing_order = None if not order.get('access_token') else self.search([('access_token', '=', order.get('access_token'))])

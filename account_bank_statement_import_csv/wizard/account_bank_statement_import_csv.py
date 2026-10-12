@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
+import contextlib
 
 import psycopg2
 
 from odoo import _, api, fields, models, Command
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 from odoo.addons.base_import.models.base_import import FIELDS_RECURSION_LIMIT
 
 
@@ -55,6 +56,11 @@ class AccountBankStmtImportCSV(models.TransientModel):
         if not journal_id or not bank_stmt_import:
             return data
 
+        has_amount = 'amount' in import_fields
+        has_credit = 'credit' in import_fields
+        has_debit = 'debit' in import_fields
+        if (has_debit ^ has_credit) or not (has_amount ^ has_debit):
+            raise ValidationError(_("Make sure that an Amount or Debit and Credit is in the file."))
         statement_vals = options['statement_vals'] = {}
         ret_data = []
 
@@ -112,7 +118,7 @@ class AccountBankStmtImportCSV(models.TransientModel):
                 remove_index.append(index_balance)
             # Remove added field debit/credit/balance
             for index in sorted(remove_index, reverse=True):
-                line.remove(line[index])
+                del line[index]
             if line[import_fields.index('amount')]:
                 ret_data.append(line)
 
@@ -125,25 +131,19 @@ class AccountBankStmtImportCSV(models.TransientModel):
 
     def execute_import(self, fields, columns, options, dryrun=False):
         if options.get('bank_stmt_import'):
-            self._cr.execute('SAVEPOINT import_bank_stmt')
-            res = super().execute_import(fields, columns, options, dryrun=dryrun)
-            statement = self.env['account.bank.statement'].create({
-                'reference': self.file_name,
-                'line_ids': [Command.set(res.get('ids', []))],
-                **options.get('statement_vals', {}),
-            })
+            with self.env.cr.savepoint(flush=False) as sp:
+                res = super().execute_import(fields, columns, options, dryrun=dryrun)
 
-            try:
-                if dryrun:
-                    self._cr.execute('ROLLBACK TO SAVEPOINT import_bank_stmt')
-                else:
-                    self._cr.execute('RELEASE SAVEPOINT import_bank_stmt')
-                    res['messages'].append({
-                        'statement_id': statement.id,
-                        'type': 'bank_statement'
-                        })
-            except psycopg2.InternalError:
-                pass
-            return res
+                if not 'statement_id' in fields:
+                    statement = self.env['account.bank.statement'].create({
+                        'reference': self.file_name,
+                        'line_ids': [Command.set(res.get('ids', []))],
+                        **options.get('statement_vals', {}),
+                    })
+
+                with contextlib.suppress(psycopg2.InternalError):
+                    sp.close(rollback=dryrun)
+
+                return res
         else:
             return super(AccountBankStmtImportCSV, self).execute_import(fields, columns, options, dryrun=dryrun)

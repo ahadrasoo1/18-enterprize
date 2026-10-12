@@ -11,16 +11,6 @@ from odoo.tests.common import TransactionCase, tagged
 
 # ---------------------------------- HELPERS ----------------------------------
 XMLPARSER = ET.XMLParser(remove_blank_text=True, strip_cdata=False, resolve_entities=False)
-IR_MODEL_INFO_FIELD = """<field name="info"><![CDATA[ Main super-class for regular database-persisted Odoo models.
-
-    Odoo models are created by inheriting from this class::
-
-        class user(Model):
-            ...
-
-    The system will later instantiate the class once per database (on
-    which the class' module is installed).
-    ]]></field>"""
 
 
 def nodes_equal(n1, n2):
@@ -116,7 +106,12 @@ class StudioExportAssertor:
         self.content_iter = iter(content)
 
     def get_exported(self, name=None):
-        """If name not found (or None) will iterate on all generated files"""
+        """If name not found (or None) will iterate on all generated files
+
+        Returns:
+            If name is provided, returns the exported file content associated with that name.
+            If name is not provided or not found, returns a dictionary of all exported files.
+        """
         with MockRequest(self.export_case.env):
             while name not in self.exported_cache:
                 try:
@@ -144,15 +139,15 @@ class StudioExportAssertor:
 
     def assertManifest(self, **expected):
         exported = self.get_exported("__manifest__.py")
-        for key in expected:
+        for key, value in expected.items():
             if key == "depends":
                 with MockRequest(self.export_case.env):
                     self.export_case.assertEqual(
-                        _clean_dependencies(set(exported["depends"] + expected["depends"])),
+                        _clean_dependencies(set(exported["depends"] + value)),
                         exported["depends"],
                     )
             else:
-                self.export_case.assertEqual(exported[key], expected[key])
+                self.export_case.assertEqual(exported[key], value)
 
     def assertXML(self, path, expected):
         root = self.get_exported(path)
@@ -243,7 +238,7 @@ class TestStudioExports(StudioExportCase):
             "data/ir_model.xml",
             f"""<odoo>
             <record id="{self.get_xmlid(custom_model)}" model="ir.model" context="{{'studio': True}}">
-                {IR_MODEL_INFO_FIELD}
+                <field name="info"><![CDATA[{custom_model.info}]]></field>
                 <field name="model">x_furnace_types</field>
                 <field name="name">Furnace Types</field>
             </record>
@@ -463,6 +458,37 @@ class TestStudioExports(StudioExportCase):
             </odoo>""",
         )
 
+    def test_export_model_non_attachment_binary_field(self):
+        self.create_customization(
+            "ir.model.fields",
+            name="x_test_binary",
+            ttype="binary",
+            model_id=self.env["ir.model"]._get("res.partner").id,
+            state="manual",
+            depends="name",
+            compute="for partner in self: partner['x_test_binary'] = [{'key': 'value'}]",
+            field_description="Test Binary Field",
+            store=False,
+        )
+        partner = self.env["res.partner"].create({
+            "name": "Test Partner Binary Field",
+        })
+        self.assertEqual(partner.x_test_binary, [{'key': 'value'}])
+        wizard_data = self.env["studio.export.wizard.data"].create(
+            [{"model": partner._name, "res_id": partner.id}]
+        )
+        studio_module = self.env["ir.module.module"].get_studio_module()
+        self._current_wizard = self.env["studio.export.wizard"].create({
+            "default_export_data": [Command.set(wizard_data.ids)],
+        })
+        export_info = self._current_wizard._get_export_info()
+        content = generate_module(studio_module, export_info)
+        export = StudioExportAssertor(export_case=self, content=content)
+        export.assertFileContains(
+            f"static/src/binary/res_partner/{partner.id}-x_test_binary",
+            "[{'key': 'value'}]"
+        )
+
     def test_export_model_with_many2one_attachment(self):
         some_record = self.TestModel.create({"name": "Some record"})
         attachment = self.env["ir.attachment"].create(
@@ -661,6 +687,11 @@ class TestStudioExports(StudioExportCase):
             "model2_id": model2_record.id,
             "model3_id": model3_record.id
         })
+        model2c_record = self.TestModel2.create({"name": "Yet another record"})
+        model2_record.write({
+            "res_model": self.TestModel2._name,
+            "res_id": model2c_record.id,
+        })
 
         self.create_export_model(self.TestModel2._name)
         self.create_export_model(self.TestModel3._name)
@@ -687,9 +718,14 @@ class TestStudioExports(StudioExportCase):
         export.assertXML(
             "data/test_studio_export_model2.xml",
             f"""<odoo>
+            <record id="{self.get_xmlid(model2c_record)}" model="test.studio_export.model2">
+                <field name="name">Yet another record</field>
+            </record>
             <record id="{self.get_xmlid(model2_record)}" model="test.studio_export.model2">
                 <field name="name">Some other record</field>
                 <field name="model3_id" ref="{self.get_xmlid(model3_record)}"/>
+                <field name="res_model">test.studio_export.model2</field>
+                <field name="res_id" ref="{self.get_xmlid(model2c_record)}"/>
             </record>
             <record id="{self.get_xmlid(model2b_record)}" model="test.studio_export.model2">
                 <field name="name">Some other record</field>
@@ -760,4 +796,52 @@ class TestStudioExports(StudioExportCase):
             f"""Found 1 circular dependencies (you may have to change data loading order to avoid issues when importing):
 (data) {self.TestModel._name} -> {self.TestModel2._name} -> {self.TestModel3._name} -> {self.TestModel._name}
 """,
+        )
+
+    def test_export_abstract_actions_with_proper_types(self):
+        WindowActions = self.env["ir.actions.act_window"].with_user(2)
+        window_action = WindowActions.create({
+            "name": "Test action",
+            "type": "ir.actions.act_window",
+            "res_model": self.TestModel._name,
+            "view_mode": "form",
+            "target": "new",
+        })
+
+        URLActions = self.env["ir.actions.act_url"].with_user(2)
+        url_action = URLActions.create({
+            "name": "Test action",
+            "type": "ir.actions.act_url",
+            "url": "http://odoo.com",
+        })
+
+        self.create_export_model("ir.actions.actions", domain=[("id", "in", [window_action.id, url_action.id])])
+        export = self.studio_export()
+
+        export.assertFileList(
+            "data/ir_actions_act_window.xml",
+            "data/ir_actions_act_url.xml",
+        )
+
+        export.assertXML(
+            "data/ir_actions_act_window.xml",
+            f"""<odoo>
+            <record id="{self.get_xmlid(window_action)}" model="ir.actions.act_window">
+                <field name="name">Test action</field>
+                <field name="res_model">{self.TestModel._name}</field>
+                <field name="view_mode">form</field>
+                <field name="target">new</field>
+            </record>
+            </odoo>""",
+        )
+
+        export.assertXML(
+            "data/ir_actions_act_url.xml",
+            f"""<odoo>
+            <record id="{self.get_xmlid(url_action)}" model="ir.actions.act_url">
+                <field name="name">Test action</field>
+                <field name="display_name">Test action</field>
+                <field name="url"><![CDATA[http://odoo.com]]></field>
+            </record>
+            </odoo>""",
         )

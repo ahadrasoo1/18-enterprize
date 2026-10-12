@@ -1,23 +1,26 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* helpdesk_sale_timesheet
-# 
+#
 # Translators:
 # Stevin Lilla, 2024
 # Siim Raasuke, 2024
-# 
+# Leaanika Randmets, 2024
+# Martin Trigaux, 2024
+# Anna, 2024
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:27+0000\n"
+"POT-Creation-Date: 2025-12-29 18:47+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Siim Raasuke, 2024\n"
+"Last-Translator: Anna, 2024\n"
 "Language-Team: Estonian (https://app.transifex.com/odoo/teams/41243/et/)\n"
+"Language: et\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: et\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #. module: helpdesk_sale_timesheet
@@ -105,7 +108,7 @@ msgstr "Mittearveldatav"
 #. module: helpdesk_sale_timesheet
 #: model_terms:ir.ui.view,arch_db:helpdesk_sale_timesheet.portal_helpdesk_ticket_inherit
 msgid "Not Billed"
-msgstr ""
+msgstr "Arveldamata"
 
 #. module: helpdesk_sale_timesheet
 #: model_terms:ir.ui.view,arch_db:helpdesk_sale_timesheet.helpdesk_sla_view_form_inherit_sale_timesheet
@@ -138,7 +141,7 @@ msgstr "Ajaarvestuse arveldamine on meeskonnas aktiveeritud."
 #: model:ir.model.fields,field_description:helpdesk_sale_timesheet.field_helpdesk_sla_report_analysis__remaining_hours_so
 #: model:ir.model.fields,field_description:helpdesk_sale_timesheet.field_helpdesk_ticket_report_analysis__remaining_hours_so
 msgid "Remaining Hours on SO"
-msgstr ""
+msgstr "Alles jäänud tunde müügitellimusel"
 
 #. module: helpdesk_sale_timesheet
 #: model:ir.model,name:helpdesk_sale_timesheet.model_helpdesk_sla_report_analysis
@@ -155,6 +158,8 @@ msgid "Sales Order"
 msgstr "Müügitellimus"
 
 #. module: helpdesk_sale_timesheet
+#. odoo-python
+#: code:addons/helpdesk_sale_timesheet/controllers/portal.py:0
 #: model:ir.model.fields,field_description:helpdesk_sale_timesheet.field_helpdesk_sla_report_analysis__sale_line_id
 #: model:ir.model.fields,field_description:helpdesk_sale_timesheet.field_helpdesk_ticket__sale_line_id
 #: model:ir.model.fields,field_description:helpdesk_sale_timesheet.field_helpdesk_ticket_report_analysis__sale_line_id
@@ -165,11 +170,21 @@ msgstr "Müügiartikkel"
 #. module: helpdesk_sale_timesheet
 #: model:ir.model.fields,help:helpdesk_sale_timesheet.field_helpdesk_ticket__sale_line_id
 msgid ""
-"Sales Order Item to which the time spent on this ticket will be added in order to be invoiced to your customer.\n"
-"By default the last prepaid sales order item that has time remaining will be selected.\n"
+"Sales Order Item to which the time spent on this ticket will be added in "
+"order to be invoiced to your customer.\n"
+"By default the last prepaid sales order item that has time remaining will be "
+"selected.\n"
 "Remove the sales order item in order to make this ticket non-billable.\n"
-"You can also change or remove the sales order item of each timesheet entry individually."
+"You can also change or remove the sales order item of each timesheet entry "
+"individually."
 msgstr ""
+"Müügitellimuse artikkel, millele lisatakse sellele piletile kulunud aeg, et "
+"kliendile arveldada.\n"
+"Vaikimisi valitakse viimane ettemakstud müügitellimuse artikkel, millel on "
+"aega järele jäänud.\n"
+"Selle pileti mittearveldamiseks eemaldage müügitellimuse artikkel.\n"
+"Samuti saate muuta või eemaldada iga tööajaarvestuse kirje müügitellimuse "
+"artiklit eraldi."
 
 #. module: helpdesk_sale_timesheet
 #: model:ir.model,name:helpdesk_sale_timesheet.model_sale_order_line
@@ -180,13 +195,13 @@ msgstr "Müügitellimuse rida"
 #. odoo-python
 #: code:addons/helpdesk_sale_timesheet/controllers/portal.py:0
 msgid "Search in Sales Order"
-msgstr ""
+msgstr "Otsi müügitellimusest"
 
 #. module: helpdesk_sale_timesheet
 #. odoo-python
 #: code:addons/helpdesk_sale_timesheet/controllers/portal.py:0
 msgid "Search in Ticket"
-msgstr ""
+msgstr "Otsi piletist"
 
 #. module: helpdesk_sale_timesheet
 #: model:ir.model.fields,field_description:helpdesk_sale_timesheet.field_helpdesk_sla__product_ids
@@ -228,7 +243,7 @@ msgstr "Aja arveldamine"
 #. module: helpdesk_sale_timesheet
 #: model:ir.model.fields,field_description:helpdesk_sale_timesheet.field_helpdesk_ticket__remaining_hours_so
 msgid "Time Remaining on SO"
-msgstr ""
+msgstr "Järelejäänud aeg müügitellimusel"
 
 #. module: helpdesk_sale_timesheet
 #: model_terms:ir.ui.view,arch_db:helpdesk_sale_timesheet.tickets_followup_timesheet
@@ -239,7 +254,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:helpdesk_sale_timesheet.portal_helpdesk_ticket_timesheet
 #: model_terms:ir.ui.view,arch_db:helpdesk_sale_timesheet.tickets_followup_timesheet
 msgid "Time Spent"
-msgstr ""
+msgstr "Kulutatud aeg"
 
 #. module: helpdesk_sale_timesheet
 #: model_terms:ir.ui.view,arch_db:helpdesk_sale_timesheet.tickets_followup_timesheet

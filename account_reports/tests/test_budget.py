@@ -489,3 +489,286 @@ class TestBudgetReport(TestAccountReportsCommon):
             expected_lines,
             options,
         )
+
+    def test_financial_budget_with_analytic_groupby(self):
+        """ Ensure that when budgets and analytics groupby filters are both active, then their headers are
+        displayed on the same level, and values in the report are properly computed"""
+
+        budget_a = self.env['account.report.budget'].create([{'name': "Budget A"}])
+        budget_b = self.env['account.report.budget'].create([{'name': "Budget B"}])
+
+        budget_a._create_or_update_budget_items(
+            value_to_set=2400,  # 100 each month
+            account_id=self.account_1.id,
+            rounding=self.env.company.currency_id.decimal_places,
+            date_from='2024-01-01',
+            date_to='2025-12-31',
+        )
+        budget_b._create_or_update_budget_items(
+            value_to_set=3000,  # 125 each month
+            account_id=self.account_1.id,
+            rounding=self.env.company.currency_id.decimal_places,
+            date_from='2024-01-01',
+            date_to='2025-12-31',
+        )
+
+        self.env.user.groups_id += self.env.ref('analytic.group_analytic_accounting')
+        self.report.write({'filter_analytic_groupby': True})
+
+        analytic_plan_a = self.env['account.analytic.plan'].create([{
+            'name': 'Plan A',
+        }])
+        analytic_account_1 = self.env['account.analytic.account'].create([{
+            'name': 'Account A1',
+            'plan_id': analytic_plan_a.id
+        }])
+        analytic_account_2 = self.env['account.analytic.account'].create([{
+            'name': 'Account A2',
+            'plan_id': analytic_plan_a.id
+        }])
+
+        moves_2024 = self._create_moves({self.account_1.id: 100}, '2024-01-01', '2024-12-31', to_post=False)
+        moves_2025 = self._create_moves({self.account_1.id: 150}, '2025-01-01', '2025-12-31', to_post=False)
+
+        for move_line in (moves_2024 + moves_2025).line_ids:
+            move_line.analytic_distribution = {str(analytic_account_1.id): 75.0, str(analytic_account_2.id): 25.0}
+
+        (moves_2024 + moves_2025).action_post()
+
+        options = self._generate_options(
+            self.report,
+            '2025-01-01',
+            '2025-12-31',
+            default_options={
+                'comparison': {'filter': 'previous_period', 'number_period': 1},
+                'analytic_accounts_groupby': [analytic_account_1.id, analytic_account_2.id],
+                'budgets': [{'id': budget_a.id, 'selected': True}, {'id': budget_b.id, 'selected': True}],
+            }
+        )
+
+        self.assertEqual(
+            [header['name'] for header in options['column_headers'][1]],
+            ['Account A1', 'Account A2', '', 'Budget A', '%', 'Budget B', '%']
+        )
+
+        self.assertLinesValues(
+            self.report._get_lines(options),
+            #                                   [                             2025                          ]    [                          2024                             ]
+            #                                   [ A1 ] [ A2 ] [ Total ] [ Budget A ] [ % ] [ Budget B ] [ % ]    [ A1 ] [ A2 ] [ Total ] [ Budget A ] [ % ] [ Budget B ] [ % ]
+            [0,                                   1,     2,      3,          4,        5,        6,       7,       8,     9,      10,         11,      12,      13,        14],
+            [
+                ('line_domain',                 1350,   450,    1800,      1200,  '150.0%',  1500,   '120.0%',   900,   300,     1200,      1200,  '100.0%',   1500,   '80.0%'),
+                (self.account_1.display_name,   1350,   450,    1800,      1200,  '150.0%',  1500,   '120.0%',   900,   300,     1200,      1200,  '100.0%',   1500,   '80.0%'),
+                ('line_account_codes',          1350,   450,    1800,      1200,  '150.0%',  1500,   '120.0%',   900,   300,     1200,      1200,  '100.0%',   1500,   '80.0%'),
+                (self.account_1.display_name,   1350,   450,    1800,      1200,  '150.0%',  1500,   '120.0%',   900,   300,     1200,      1200,  '100.0%',   1500,   '80.0%'),
+            ],
+            options,
+        )
+
+    def test_financial_budget_with_several_columns(self):
+        """ Ensure that financial budget feature works properly on reports with several columns,
+        and that percentage column of budget is hidden is the case where multiple monetary columns exist """
+        self.report.write({
+            'column_ids': [
+                Command.create({
+                    'name': "Column test",
+                    'expression_label': 'column_test',
+                }),
+            ],
+        })
+
+        self._create_moves(
+            {
+                self.account_1.id: 100,
+                self.account_2.id: 200,
+                self.account_3.id: 300,
+            },
+            '2020-01-01',
+            '2020-01-01',
+        )
+
+        options = self._generate_options(
+            self.report,
+            '2020-01-01',
+            '2020-12-31',
+            default_options={
+                'comparison': {'filter': 'previous_period', 'number_period': 1},
+                'budgets': [{'id': self.budget_1.id, 'selected': True}],
+            }
+        )
+
+        # Ensure level header colspan is 3 for top header, 2 for the columns + 1 selected budget
+        self.assertEqual(
+            self.report._get_column_headers_render_data(options),
+            {'level_colspan': [3, 2], 'level_repetitions': [1, 2], 'custom_subheaders': []}
+        )
+
+        self.assertLinesValues(
+            self.report._get_lines(options),
+            #                                   [          2020                ]  [            2019              ]
+            #                                   [ col 1 ] [ col 2 ] [ budget 1 ]  [ col 1 ] [ col 2 ] [ budget 1 ]
+            [0,                                     1,        2,         3,          4,        5,         6],
+            [
+                ('line_domain',                   600,        '',      1110,          0,       '',         0),
+                (self.account_1.display_name,     100,        '',      1000,          0,       '',         0),
+                (self.account_2.display_name,     200,        '',         0,          0,       '',         0),
+                (self.account_3.display_name,     300,        '',       100,          0,       '',         0),
+                (self.account_4.display_name,       0,        '',        10,          0,       '',         0),
+                ('line_account_codes',            600,        '',      1110,          0,       '',         0),
+                (self.account_1.display_name,     100,        '',      1000,          0,       '',         0),
+                (self.account_2.display_name,     200,        '',         0,          0,       '',         0),
+                (self.account_3.display_name,     300,        '',       100,          0,       '',         0),
+                (self.account_4.display_name,       0,        '',        10,          0,       '',         0),
+            ],
+            options,
+        )
+
+    def test_hierarchy_with_budget(self):
+        """ Check that the report lines are correct with a budget and the option "Hierarchy and subtotals" is ticked"""
+        self.env['account.group'].create({
+            'name': 'Sales',
+            'code_prefix_start': '1',
+            'code_prefix_end': '9',
+        })
+
+        move = self.env['account.move'].create({
+            'date': '2020-02-02',
+            'line_ids': [
+                Command.create({
+                    'account_id': self.company_data['default_account_revenue'].id,
+                    'name': 'name',
+                })
+            ],
+        })
+        move.action_post()
+        move.line_ids.flush_recordset()
+        profit_and_loss_report = self.env.ref('account_reports.profit_and_loss')
+        line_id = self._get_basic_line_dict_id_from_report_line_ref('account_reports.account_financial_report_revenue0')
+        options = self._generate_options(profit_and_loss_report, '2020-02-01', '2024-12-28', default_options={'budgets': [{'id': self.budget_1.id, 'selected': True}]})
+        options['unfolded_lines'] = [line_id]
+        options['hierarchy'] = True
+        options['unfold_all'] = True
+
+        lines = profit_and_loss_report._get_lines(options)
+        unfolded_lines = profit_and_loss_report._get_unfolded_lines(lines, line_id)
+        unfolded_lines = [{'name': line['name'], 'level': line['level']} for line in unfolded_lines]
+
+        self.assertEqual(
+            unfolded_lines,
+            [
+                {'level': 1, 'name': 'Revenue'},
+                {'level': 2, 'name': '1-9 Sales'},
+                {'level': 3, 'name': '400000 Product Sales'},
+            ]
+        )
+
+    def test_budget_report_edit_items_with_date(self):
+        """
+        Ensure budget items are created or updated correctly
+        when editing across varying date ranges
+        """
+        def set_budget_item(value, account_id, date_from, date_to):
+            budget._create_or_update_budget_items(
+                value_to_set=value,
+                account_id=account_id,
+                rounding=self.env.company.currency_id.decimal_places,
+                date_from=date_from,
+                date_to=date_to,
+            )
+
+        budget = self.env['account.report.budget'].create({'name': "Budget"})
+        set_budget_item(1200, self.account_1.id, '2025-01-01', '2025-12-01')
+        expected_items = [
+            {'amount': 100.0, 'date': fields.Date.to_date('2025-01-01')},
+            {'amount': 100.0, 'date': fields.Date.to_date('2025-02-01')},
+            {'amount': 100.0, 'date': fields.Date.to_date('2025-03-01')},
+            {'amount': 100.0, 'date': fields.Date.to_date('2025-04-01')},
+            {'amount': 100.0, 'date': fields.Date.to_date('2025-05-01')},
+            {'amount': 100.0, 'date': fields.Date.to_date('2025-06-01')},
+            {'amount': 100.0, 'date': fields.Date.to_date('2025-07-01')},
+            {'amount': 100.0, 'date': fields.Date.to_date('2025-08-01')},
+            {'amount': 100.0, 'date': fields.Date.to_date('2025-09-01')},
+            {'amount': 100.0, 'date': fields.Date.to_date('2025-10-01')},
+            {'amount': 100.0, 'date': fields.Date.to_date('2025-11-01')},
+            {'amount': 100.0, 'date': fields.Date.to_date('2025-12-01')},
+        ]
+        self.assertRecordValues(budget.item_ids, expected_items)
+
+        # Update the second and third months to total of 900 (450 per month)
+        set_budget_item(900, self.account_1.id, '2025-01-10', '2025-3-10')
+        # Now the second and third months each have an amount of 450
+
+        set_budget_item(1000, self.account_1.id, '2025-01-01', '2025-12-01')
+        expected_items = [
+            {'amount': 100.0 - 75.00, 'date': fields.Date.to_date('2025-01-01')},
+            {'amount': 450.0 - 75.00, 'date': fields.Date.to_date('2025-02-01')},
+            {'amount': 450.0 - 75.00, 'date': fields.Date.to_date('2025-03-01')},
+            {'amount': 100.0 - 75.00, 'date': fields.Date.to_date('2025-04-01')},
+            {'amount': 100.0 - 75.00, 'date': fields.Date.to_date('2025-05-01')},
+            {'amount': 100.0 - 75.00, 'date': fields.Date.to_date('2025-06-01')},
+            {'amount': 100.0 - 75.00, 'date': fields.Date.to_date('2025-07-01')},
+            {'amount': 100.0 - 75.00, 'date': fields.Date.to_date('2025-08-01')},
+            {'amount': 100.0 - 75.00, 'date': fields.Date.to_date('2025-09-01')},
+            {'amount': 100.0 - 75.00, 'date': fields.Date.to_date('2025-10-01')},
+            {'amount': 100.0 - 75.00, 'date': fields.Date.to_date('2025-11-01')},
+            {'amount': 100.0 - 75.00, 'date': fields.Date.to_date('2025-12-01')},
+        ]
+        self.assertRecordValues(budget.item_ids, expected_items)
+
+    def test_budget_filter_with_percentage_figure_type(self):
+        """
+        Test that budget filters don't crash when a report has lines with percentage
+        figure type that cannot be matched for budget comparison.
+        """
+        report_with_percentage = self.env['account.report'].create({
+            'name': "Report with Percentage Line",
+            'filter_date_range': True,
+            'filter_budgets': True,
+            'root_report_id': self.env.ref('account_reports.profit_and_loss').id,
+            'column_ids': [
+                Command.create({
+                    'name': "Balance",
+                    'expression_label': 'balance',
+                }),
+            ],
+            'line_ids': [
+                Command.create({
+                    'name': 'percentage_line',
+                    'expression_ids': [
+                        Command.create({
+                            'label': 'balance',
+                            'formula': '100',
+                            'engine': 'external',
+                            'figure_type': 'percentage',
+                        }),
+                    ],
+                }),
+                Command.create({
+                    'name': 'monetary_line',
+                    'groupby': 'account_id',
+                    'foldable': False,
+                    'expression_ids': [
+                        Command.create({
+                            'label': 'balance',
+                            'formula': "[('account_id.account_type', '=', 'income')]",
+                            'subformula': 'sum',
+                            'engine': 'domain',
+                        }),
+                    ],
+                }),
+            ],
+        })
+
+        self._create_moves(
+            {self.account_1.id: 100},
+            '2020-01-01',
+            '2020-01-01',
+        )
+        options = self._generate_options(
+            report_with_percentage,
+            '2020-01-01',
+            '2020-12-31',
+            default_options={'budgets': [{'id': self.budget_1.id, 'selected': True}]},
+        )
+        lines = report_with_percentage._get_lines(options)
+        self.assertTrue(lines)

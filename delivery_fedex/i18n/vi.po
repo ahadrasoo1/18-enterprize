@@ -1,22 +1,23 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* delivery_fedex
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Thi Huong Nguyen, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
+"POT-Creation-Date: 2025-12-29 18:50+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
+"Last-Translator: Thi Huong Nguyen, 2025\n"
 "Language-Team: Vietnamese (https://app.transifex.com/odoo/teams/41243/vi/)\n"
+"Language: vi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: vi\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. module: delivery_fedex
@@ -40,10 +41,12 @@ msgstr "<span class=\"o_form_label\">Đơn vị chiều dài kiện hàng</span>
 #: model_terms:ir.ui.view,arch_db:delivery_fedex.view_delivery_carrier_form_with_provider_fedex
 msgid ""
 "<span invisible=\"fedex_weight_unit != 'KG'\">CM</span>\n"
-"                                <span invisible=\"fedex_weight_unit != 'LB'\">IN</span>"
+"                                <span invisible=\"fedex_weight_unit != "
+"'LB'\">IN</span>"
 msgstr ""
 "<span invisible=\"fedex_weight_unit != 'KG'\">CM</span>\n"
-"                                <span invisible=\"fedex_weight_unit != 'LB'\">IN</span>"
+"                                <span invisible=\"fedex_weight_unit != "
+"'LB'\">IN</span>"
 
 #. module: delivery_fedex
 #: model_terms:ir.ui.view,arch_db:delivery_fedex.view_delivery_carrier_form_with_provider_fedex
@@ -117,18 +120,18 @@ msgstr "Dữ liệu bổ sung"
 
 #. module: delivery_fedex
 #: model:ir.model.fields,field_description:delivery_fedex.field_delivery_carrier__fedex_extra_data_rate_request
-msgid "Extra data for rate"
-msgstr "Dữ liệu bổ sung về cước phí"
+msgid "Extra data for rate (legacy)"
+msgstr "Dữ liệu bổ sung về cước phí (cũ)"
 
 #. module: delivery_fedex
 #: model:ir.model.fields,field_description:delivery_fedex.field_delivery_carrier__fedex_extra_data_return_request
-msgid "Extra data for return"
-msgstr "Dữ liệu bổ sung về trả hàng"
+msgid "Extra data for return (legacy)"
+msgstr "Dữ liệu bổ sung về trả hàng (cũ)"
 
 #. module: delivery_fedex
 #: model:ir.model.fields,field_description:delivery_fedex.field_delivery_carrier__fedex_extra_data_ship_request
-msgid "Extra data for ship"
-msgstr "Dữ liệu bổ sung về vận chuyển"
+msgid "Extra data for ship (legacy)"
+msgstr "Dữ liệu bổ sung về vận chuyển (cũ)"
 
 #. module: delivery_fedex
 #: model:ir.model.fields,field_description:delivery_fedex.field_delivery_carrier__fedex_label_file_type
@@ -173,7 +176,7 @@ msgstr "FEDEX_GROUND"
 #. module: delivery_fedex
 #: model:ir.model.fields.selection,name:delivery_fedex.selection__delivery_carrier__fedex_service_type__fedex_international_connect_plus
 msgid "FEDEX_INTERNATIONAL_CONNECT_PLUS"
-msgstr ""
+msgstr "FEDEX_INTERNATIONAL_CONNECT_PLUS"
 
 #. module: delivery_fedex
 #: model:ir.model.fields.selection,name:delivery_fedex.selection__delivery_carrier__fedex_service_type__fedex_international_priority
@@ -238,24 +241,18 @@ msgstr "FIRST_OVERNIGHT"
 #. module: delivery_fedex
 #: model:ir.model.fields.selection,name:delivery_fedex.selection__delivery_carrier__delivery_type__fedex
 #: model:ir.model.fields.selection,name:delivery_fedex.selection__stock_package_type__package_carrier_type__fedex
-msgid "FedEx"
-msgstr "FedEx"
+msgid "FedEx (Legacy)"
+msgstr "FedEx (Cũ)"
 
 #. module: delivery_fedex
 #: model:ir.model.fields,field_description:delivery_fedex.field_delivery_carrier__fedex_account_number
-msgid "FedEx Account Number"
-msgstr "Số tài khoản FedEx"
+msgid "FedEx Legacy Account Number"
+msgstr "Số tài khoản FedEx cũ"
 
 #. module: delivery_fedex
 #: model:ir.model.fields,field_description:delivery_fedex.field_delivery_carrier__fedex_saturday_delivery
 msgid "FedEx Saturday Delivery"
 msgstr "FedEx giao hàng thứ 7"
-
-#. module: delivery_fedex
-#: model_terms:ir.ui.view,arch_db:delivery_fedex.res_config_settings_view_form_sale
-#: model_terms:ir.ui.view,arch_db:delivery_fedex.res_config_settings_view_form_stock
-msgid "FedEx Shipping Methods"
-msgstr "Phương thức vận chuyển FedEx"
 
 #. module: delivery_fedex
 #: model_terms:ir.ui.view,arch_db:delivery_fedex.view_delivery_carrier_form_with_provider_fedex
@@ -292,7 +289,7 @@ msgstr "Fedex Quốc tế"
 #. module: delivery_fedex
 #: model:ir.model.fields,field_description:delivery_fedex.field_delivery_carrier__fedex_default_package_type_id
 msgid "Fedex Package Type"
-msgstr "Kiểu đóng gói Fedex"
+msgstr "Loại kiện hàng Fedex"
 
 #. module: delivery_fedex
 #: model:ir.model.fields,field_description:delivery_fedex.field_delivery_carrier__fedex_service_type
@@ -558,11 +555,11 @@ msgstr "Lô hàng #%s đã bị hủy"
 #. odoo-python
 #: code:addons/delivery_fedex/models/delivery_fedex.py:0
 msgid ""
-"Shipment created into Fedex<br/><b>Tracking Numbers:</b> "
-"%(tracking_numbers)s<br/><b>Packages:</b> %(packages)s"
+"Shipment created into Fedex<br/><b>Tracking Numbers:</b> %"
+"(tracking_numbers)s<br/><b>Packages:</b> %(packages)s"
 msgstr ""
-"Lô hàng đã được tạo trong Fedex<br/><b>Số theo dõi:</b> "
-"%(tracking_numbers)s<br/><b>Kiện hàng:</b> %(packages)s"
+"Lô hàng đã được tạo trong Fedex<br/><b>Số theo dõi:</b> %"
+"(tracking_numbers)s<br/><b>Kiện hàng:</b> %(packages)s"
 
 #. module: delivery_fedex
 #: model:ir.model,name:delivery_fedex.model_delivery_carrier
@@ -582,7 +579,8 @@ msgid ""
 "(To Select Countries)"
 msgstr ""
 "Dịch vụ đặc biệt:Giao hàng thứ 7, có thể yêu cầu vào các ngày sau.\n"
-"                                                                                 Thứ 5:\n"
+"                                                                                 Thứ "
+"5:\n"
 "1.FEDEX_2_DAY.\n"
 "Thứ 6:\n"
 "1.PRIORITY_OVERNIGHT.\n"
@@ -598,7 +596,7 @@ msgstr "Dịch vụ tiêu chuẩn"
 #. module: delivery_fedex
 #: model:ir.model,name:delivery_fedex.model_stock_package_type
 msgid "Stock package type"
-msgstr "Kiểu đóng gói tồn kho"
+msgstr "Loại kiện hàng tồn kho"
 
 #. module: delivery_fedex
 #: model:ir.model.fields,help:delivery_fedex.field_delivery_carrier__fedex_extra_data_rate_request
@@ -606,24 +604,31 @@ msgstr "Kiểu đóng gói tồn kho"
 #: model:ir.model.fields,help:delivery_fedex.field_delivery_carrier__fedex_extra_data_ship_request
 msgid ""
 "The extra data in FedEx is organized like the inside of a json file.\n"
-"This functionality is advanced/technical and should only be used if you know what you are doing.\n"
+"This functionality is advanced/technical and should only be used if you know "
+"what you are doing.\n"
 "\n"
 "Example of valid value: ```\n"
-"\"ShipmentDetails\": {\"Pieces\": {\"Piece\": {\"AdditionalInformation\": \"extra info\"}}}\n"
+"\"ShipmentDetails\": {\"Pieces\": {\"Piece\": {\"AdditionalInformation\": "
+"\"extra info\"}}}\n"
 "```\n"
 "\n"
-"With the above example, the AdditionalInformation of each piece will be updated.\n"
-"More info on https://www.fedex.com/en-us/developer/web-services/process.html#documentation"
+"With the above example, the AdditionalInformation of each piece will be "
+"updated.\n"
+"More info on https://www.fedex.com/en-us/developer/web-services/"
+"process.html#documentation"
 msgstr ""
 "Dữ liệu bổ sung trong FedEx được tổ chức giống như bên trong một tệp json.\n"
-"Đây là một chức năng nâng cao/mang tính kỹ thuật và chỉ nên được sử dụng nếu bạn nhận thức được mình đang làm gì.\n"
+"Đây là một chức năng nâng cao/mang tính kỹ thuật và chỉ nên được sử dụng nếu "
+"bạn nhận thức được mình đang làm gì.\n"
 "\n"
 "Ví dụ về giá trị hợp lệ: ```\n"
-"\"ShipmentDetails\": {\"Pieces\": {\"Piece\": {\"AdditionalInformation\": \"thông tin bổ sung\"}}}\n"
+"\"ShipmentDetails\": {\"Pieces\": {\"Piece\": {\"AdditionalInformation\": "
+"\"thông tin bổ sung\"}}}\n"
 "```\n"
 "\n"
 "Với ví dụ trên, AdditionalInformation của mỗi mảnh sẽ được cập nhật.\n"
-"Xem thêm thông tin tại https://www.fedex.com/en-us/developer/web-services/process.html#documentation"
+"Xem thêm thông tin tại https://www.fedex.com/en-us/developer/web-services/"
+"process.html#documentation"
 
 #. module: delivery_fedex
 #: model_terms:ir.ui.view,arch_db:delivery_fedex.view_delivery_carrier_form_with_provider_fedex
@@ -633,8 +638,8 @@ msgstr "Bước cuối cùng là"
 #. module: delivery_fedex
 #: model_terms:ir.ui.view,arch_db:delivery_fedex.view_delivery_carrier_form_with_provider_fedex
 msgid ""
-"These certifications usually require that you contact the FedEx support team"
-" by email."
+"These certifications usually require that you contact the FedEx support team "
+"by email."
 msgstr ""
 "Những chứng nhận này thường yêu cầu bạn liên hệ đội ngũ hỗ trợ FedEx qua "
 "email."

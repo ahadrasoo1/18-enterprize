@@ -29,7 +29,7 @@
                     <Acteco t-out="activity.code"/>
                 </t>
                     <Sucursal t-if="move.journal_id.l10n_cl_point_of_sale_name and not move.l10n_latam_document_type_id._is_doc_type_voucher()" t-out="format_length(move.journal_id.l10n_cl_point_of_sale_name, 9)"/>
-                    <DirOrigen t-out="format_length('%s %s' % (move.company_id.partner_id.street, (move.company_id.partner_id.street2 or '')), 70)"/>
+                    <DirOrigen t-out="format_length(('%s %s' % (move.company_id.partner_id.street, move.company_id.partner_id.street2 or '')).strip(), 70)"/>
                     <CmnaOrigen t-out="move.company_id.partner_id.city or ''"/>
                     <CdgVendedor t-if="not move.l10n_latam_document_type_id._is_doc_type_voucher() and move.user_id" t-out="format_length(move.user_id.name, 60)"/>
                 </Emisor>
@@ -43,7 +43,7 @@
                     </Extranjero>
                     <GiroRecep t-if="not move.partner_id._l10n_cl_is_foreign() and not move.l10n_latam_document_type_id._is_doc_type_export() and not move.l10n_latam_document_type_id._is_doc_type_voucher()" t-out="format_length(move.partner_id.l10n_cl_activity_description or move.commercial_partner_id.l10n_cl_activity_description, 40)"/>
                     <Contacto t-out="format_length(move.partner_id.phone or move.commercial_partner_id.phone or move.partner_id.email or '', 80)"/>
-                    <CorreoRecep t-if="(move.partner_id.email or move.commercial_partner_id.email or move.partner_id.l10n_cl_dte_email or move.commercial_partner_id.l10n_cl_dte_email) and not move.l10n_latam_document_type_id._is_doc_type_voucher()" t-out="move.partner_id.email or move.commercial_partner_id.email or move.partner_id.l10n_cl_dte_email or move.commercial_partner_id.l10n_cl_dte_email"/>
+                    <CorreoRecep t-if="(move.partner_id.email or move.commercial_partner_id.email or move.partner_id.l10n_cl_dte_email or move.commercial_partner_id.l10n_cl_dte_email) and not move.l10n_latam_document_type_id._is_doc_type_voucher()" t-out="move.partner_id.l10n_cl_dte_email or move.commercial_partner_id.l10n_cl_dte_email or move.partner_id.email or move.commercial_partner_id.email"/>
                     <DirRecep t-if="not move.l10n_latam_document_type_id._is_doc_type_voucher()" t-out="format_length(move.partner_id.street or move.commercial_partner_id.street or '' + ' ' + move.partner_id.street2 or move.commercial_partner_id.street2 or '', 70)"/>
                     <CmnaRecep t-out="move._l10n_cl_get_comuna_recep()"/>
                 </Receptor>
@@ -56,7 +56,7 @@
                 </t>
                     <Aduana>
                         <CodModVenta>01</CodModVenta>
-                        <TotClauVenta t-out="float_repr(amounts['total_amount'], amounts['main_currency_round'])"/>
+                        <TotClauVenta t-out="float_repr(amounts['total_amount'], 2)"/>
                     </Aduana>
                 </Transporte>
             </t>
@@ -83,11 +83,11 @@
                     <MntExeOtrMnda t-if="amounts['second_currency']['subtotal_amount_exempt']" t-out="float_rr(amounts['second_currency']['subtotal_amount_exempt'], round_currency)"/>
                     <IVAOtrMnda t-if="amounts['second_currency']['vat_amount']" t-out="float_repr(amounts['second_currency']['vat_amount'], round_currency)"/>
                 <t t-foreach="withholdings" t-as="tax">
-                    <ImptRetOtrMnda>
+                    <ImpRetOtrMnda>
                         <TipoImpOtrMnda t-out="tax['tax_code']"/>
                         <TasaImpOtrMnda t-out="tax['tax_percent']"/>
-                        <ValorImpOtrMnda t-out="move.currency_id._convert(tax['tax_amount'], move.currency_id, move.company_id, move.date)"/>
-                    </ImptRetOtrMnda>
+                        <VlrImpOtrMnda t-out="move.currency_id._convert(tax['tax_amount'], move.currency_id, move.company_id, move.date)"/>
+                    </ImpRetOtrMnda>
                 </t>
                     <MntTotOtrMnda t-out="float_repr(amounts['second_currency']['total_amount'], round_currency)"/>
                 </OtraMoneda>
@@ -121,7 +121,7 @@
                 <DescuentoPct t-out="float_repr(line.discount, 2)"/>
                 <DescuentoMonto t-out="float_repr(line_amounts['total_discount'], 0)"/>
             </t>
-            <t t-foreach="line.tax_ids.filtered(lambda x: x.tax_group_id in [env.ref('account.{cid}_tax_group_retenciones'.format(cid=line.company_id.id)), env.ref('account.{cid}_tax_group_ila'.format(cid=line.company_id.id))])" t-as="tax">
+            <t t-foreach="line.tax_ids.filtered(lambda x: x.tax_group_id in [env['account.chart.template'].with_company(line.company_id).ref('tax_group_retenciones'), env['account.chart.template'].with_company(line.company_id).ref('tax_group_ila')])" t-as="tax">
                 <CodImpAdic t-out="tax.l10n_cl_sii_code"/>
             </t>
                 <MontoItem t-out="float_rr(line_amounts['price_subtotal'], line_amounts['decimal_places'])"/>
@@ -149,7 +149,7 @@
                 <NroLinRef t-out="reference_number"/>
                 <TpoDocRef t-out="reference_id.l10n_cl_reference_doc_type_id.code"/>
                 <FolioRef t-out="reference_id.origin_doc_number[:18]"/>
-                <FchRef t-out="reference_id.date"/>
+                <FchRef t-if="not move.l10n_latam_document_type_id._is_doc_type_voucher()" t-out="reference_id.date"/>
                 <CodRef t-out="reference_id.reference_doc_code"/>
                 <RazonRef t-if="reference_id.reason" t-out="reference_id.reason[:90]"/>
             </Referencia>

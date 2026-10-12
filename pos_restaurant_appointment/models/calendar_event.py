@@ -9,6 +9,12 @@ class CalendarEvent(models.Model):
     _name = 'calendar.event'
     _inherit = ["calendar.event", "pos.load.mixin"]
 
+    answers = fields.Char('Q&A answers', compute='_get_answers')
+
+    def _get_answers(self):
+        for record in self:
+            record.answers = (', ').join([answer.value_text_box or answer.value_answer_id.name for answer in record.appointment_answer_input_ids.sorted('id')])
+
     @api.model
     def _load_pos_data_domain(self, data):
         now = fields.Datetime.now()
@@ -32,33 +38,31 @@ class CalendarEvent(models.Model):
     def _send_table_notifications(self, events, command):
         today = fields.Date.today()
         fields_to_read = self._fields_for_restaurant_table()
-        event_list = []
 
         for event in events:
+            # Don't include the event if it's not for today
+            if event.start.date() != today:
+                continue
+
             event_dict = event.read(fields_to_read, load=False)[0]
+            event_appointment_type_id = event_dict.get('appointment_type_id')
             # tables that are booked for this event
             event_table_ids = event.booking_line_ids.appointment_resource_id.sudo().pos_table_ids
             for table in event_table_ids:
                 for config in table.floor_id.pos_config_ids:
                     session = config.current_session_id
 
-                    # Don't include the event if it's not for today
-                    if not session or event.start.date() != today:
-                        continue
-
-                    event_list.append({
-                        'session': session,
-                        'event': event_dict,
-                    })
-
-        for item in event_list:
-            session.config_id._notify(("TABLE_BOOKING", {
-                "command": command,
-                "event": item['event'],
-            }))
+                    if (
+                        session
+                        and config.appointment_type_id
+                        and config.appointment_type_id.id == event_appointment_type_id
+                    ):
+                        config._notify(("TABLE_BOOKING", {
+                            "command": command,
+                            "event": event_dict,
+                        }))
 
     def action_open_booking_gantt_view(self):
-        appointment_type_id = self.appointment_resource_ids[0].appointment_type_ids[0].id if self.appointment_resource_ids else self.id
         return {
             'name': 'Manage Bookings',
             'type': 'ir.actions.act_window',
@@ -68,7 +72,8 @@ class CalendarEvent(models.Model):
             'context': {
                 'appointment_booking_gantt_show_all_resources': True,
                 'active_model': 'appointment.type',
-                "search_default_appointment_type_id": appointment_type_id,
+                'default_partner_ids': [],
+                "search_default_appointment_type_id": self._context.get("appointment_type_id"),
             }
         }
 

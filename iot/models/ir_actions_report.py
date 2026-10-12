@@ -5,6 +5,7 @@ import base64
 
 from odoo import fields, models, _
 from odoo.exceptions import UserError
+from lxml.etree import ParserError
 
 
 class IrActionReport(models.Model):
@@ -17,10 +18,12 @@ class IrActionReport(models.Model):
         """
             Send the dictionary in message to the iot_box via websocket, or return the data to be sent by longpolling.
         """
-        datas = self._render(self.report_name, res_ids, data=data)
-        data_bytes = datas[0]
-        data_base64 = base64.b64encode(data_bytes)
-        iot_identifiers = {device["iotIdentifier"] for device in devices}
+        data_base64 = self.env.context.get('data_base64', False)
+        if not data_base64:
+            datas = self._render(self.report_name, res_ids, data=data)
+            data_bytes = datas[0]
+            data_base64 = base64.b64encode(data_bytes)
+
         if not websocket:
             return [
                 [
@@ -28,21 +31,27 @@ class IrActionReport(models.Model):
                     device["identifier"],
                     device['name'],
                     data_base64,
+                    f"{print_id}_{device['id']}",  # idempotent id
                 ]
                 for device in devices
             ]
 
-        self._send_websocket({
-            "iotDevice": {
-                "iotIdentifiers": list(iot_identifiers),
-                "identifiers": [{
-                    "identifier": device["identifier"],
-                    "id": device["id"]
-                } for device in devices],
-            },
-            "print_id": print_id,
-            "document": data_base64
-        })
+        for device in devices:
+            self._send_websocket({
+                "iotDevice": {
+                    "iotIdentifiers": [device["iotIdentifier"]],
+                    "identifiers": [{
+                        "identifier": device["identifier"],
+                        "id": device["id"]
+                    }],
+                },
+                "iot_identifier": device["iotIdentifier"],  # compatibility w/ newer IoT boxes
+                "device_identifier": device["identifier"],  # compatibility w/ newer IoT boxes
+                "iot_idempotent_id": f"{print_id}_{device['id']}",
+                "print_id": print_id,
+                "session_id": print_id,  # compatibility w/ newer IoT boxes
+                "document": data_base64
+            })
         return print_id
 
     def _send_websocket(self, message):
@@ -69,24 +78,21 @@ class IrActionReport(models.Model):
             "device_ids",
         }
 
-    def get_action_wizard(self, res_ids, data=None, print_id=0):
+    def get_action_wizard(self):
+        self.ensure_one()
         wizard = self.env['select.printers.wizard'].create({
             'display_device_ids' : self.device_ids,
         })
         return {
-                'name': "Select printers",
-                'res_id': wizard.id,
-                'type': 'ir.actions.act_window',
-                'res_model': 'select.printers.wizard',
-                'target': 'new',
-                'views': [[False, 'form']],
-                'context': {
-                    'res_ids': res_ids,
-                    'data': data,
-                    'report_id': self._ids[0],
-                    'print_id': print_id,
-                    'default_report_id': self._ids[0]
-                },
+            'name': _("Select Printers for %s", self.name),
+            'res_id': wizard.id,
+            'type': 'ir.actions.act_window',
+            'res_model': 'select.printers.wizard',
+            'target': 'new',
+            'views': [[False, 'form']],
+            'context': {
+                'report_id': self.id,
+            },
         }
 
     def get_devices_from_ids(self, id_list):
@@ -103,3 +109,19 @@ class IrActionReport(models.Model):
                 "display_name": device_id.display_name
             })
         return device_list
+
+    def _render_qweb_pdf(self, report_ref, *args, **kwargs):
+        """Override to ensure the user is informed when trying to print an empty report
+        without an IoT printer.
+
+        This can happen when trying to print delivery labels, that have empty reports used for assigning
+        IoT printers.
+        """
+        try:
+            return super()._render_qweb_pdf(report_ref, *args, **kwargs)
+        except ParserError:
+            raise UserError(_(
+                "The report you are trying to print requires an IoT Box to be printed.\n"
+                "Make sure you linked the report '%s' to the corresponding IoT printer device.",
+                report_ref
+            ))

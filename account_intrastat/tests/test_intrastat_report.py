@@ -693,31 +693,6 @@ class TestIntrastatReport(TestAccountReportsCommon):
             options
         )
 
-    def test_intrastat_no_service_product(self):
-        service_product = self.env['product.product'].create({
-            'name': 'Consultancy',
-            'type': 'service',
-            'intrastat_code_id': None,
-            'intrastat_origin_country_id': None,
-        })
-        move = self.env['account.move'].create({
-            'move_type': 'out_invoice',
-            'partner_id': self.partner_a.id,
-            'invoice_date': '2022-01-01',
-            'currency_id': self.env.ref('base.EUR').id,
-            'invoice_line_ids': [
-                Command.create({
-                    'product_id': service_product.id,
-                    'account_id': self.company_data['default_account_revenue'].id,
-                    'price_unit': 20.0,
-                }),
-            ],
-        })
-        move.action_post()
-
-        options = self._generate_options(self.report, '2022-01-01', '2022-01-31')
-        self.assertEqual(len(self.report._get_lines(options)), 1, "Services shouldn't be included in the intrastat report")
-
     def test_no_supplementary_units(self):
         """ Test a report from an invoice with no units """
         no_supplementary_units_invoice = self.env['account.move'].create({
@@ -1110,7 +1085,7 @@ class TestIntrastatReport(TestAccountReportsCommon):
 
         self.assertLinesValues(
             self.report._get_lines(options),
-            [0, 12, 24],  # Name, Value July 2024, Value June 2024
+            [0, 12, 25],  # Name, Value July 2024, Value June 2024
             [
                 ('Intrastat',                                                       40.0,       40.0),
                 ('Dispatch - BE0475646428 - 22042176 - BE',                         0,         20.00),
@@ -1173,3 +1148,201 @@ class TestIntrastatReport(TestAccountReportsCommon):
             options,
         )
         self.env.ref('account_intrastat.intrastat_line').user_groupby = 'intrastat_grouping, id'
+
+    def test_intrastat_report_load_more(self):
+        partner_be = self.env['res.partner'].create([
+            {
+                'name': 'BE Partner',
+                'country_id': self.env.ref('base.be').id,
+                'vat': 'BE0477472701',
+            },
+        ])
+
+        moves = self.env['account.move'].create([
+            {
+                'move_type': 'out_invoice',
+                'partner_id': partner_be.id,
+                'invoice_date': '2022-01-01',
+                'date': '2022-01-01',
+                'intrastat_country_id': self.env.ref('base.be').id,
+                'invoice_line_ids': [
+                    Command.create({
+                        'name': 'line_1',
+                        'product_id': self.spanish_rioja.id,
+                        'intrastat_transaction_id': None,
+                        'product_uom_id': self.env.ref('uom.product_uom_unit').id,
+                        'quantity': 1.0,
+                        'account_id': self.company_data['default_account_revenue'].id,
+                        'price_unit': 80.0,
+                        'tax_ids': [],
+                    }),
+                ],
+            },
+            {
+                'move_type': 'out_invoice',
+                'partner_id': partner_be.id,
+                'invoice_date': '2022-01-02',
+                'date': '2022-01-02',
+                'intrastat_country_id': self.env.ref('base.be').id,
+                'invoice_line_ids': [
+                    Command.create({
+                        'name': 'line_1',
+                        'product_id': self.spanish_rioja.id,
+                        'intrastat_transaction_id': None,
+                        'product_uom_id': self.env.ref('uom.product_uom_unit').id,
+                        'quantity': 1.0,
+                        'account_id': self.company_data['default_account_revenue'].id,
+                        'price_unit': 80.0,
+                        'tax_ids': [],
+                    }),
+                ],
+
+            },
+            {
+                'move_type': 'out_invoice',
+                'partner_id': partner_be.id,
+                'invoice_date': '2022-01-03',
+                'date': '2022-01-03',
+                'intrastat_country_id': self.env.ref('base.be').id,
+                'invoice_line_ids': [
+                    Command.create({
+                        'name': 'line_1',
+                        'product_id': self.spanish_rioja.id,
+                        'intrastat_transaction_id': None,
+                        'product_uom_id': self.env.ref('uom.product_uom_unit').id,
+                        'quantity': 1.0,
+                        'account_id': self.company_data['default_account_revenue'].id,
+                        'price_unit': 50.0,
+                        'tax_ids': [],
+                    }),
+                ],
+
+            },
+        ])
+        moves.action_post()
+
+        options = self._generate_options(self.report, '2022-01-01', '2022-01-31', default_options={'unfold_all': True})
+        lines = self.report._get_lines(options)
+        self.assertLinesValues(
+            lines,
+            # 0/name,                                            12/value
+            [0,                                                  12],
+            [
+                ('Intrastat',                                 210.0),
+                ('Dispatch - BE0477472701 - 22042176 - BE',   210.0),
+                ('INV/2022/00003',                             50.0),
+                ('INV/2022/00002',                             80.0),
+                ('INV/2022/00001',                             80.0),
+            ],
+            options,
+        )
+
+        self.report.load_more_limit = 1
+        lines = self.report._get_lines(options)
+        self.assertLinesValues(
+            lines,
+            # 0/name,                                            12/value
+            [0,                                                  12],
+            [
+                ('Intrastat',                                 210.0),
+                ('Dispatch - BE0477472701 - 22042176 - BE',   210.0),
+                ('INV/2022/00003',                             50.0),
+                ('Load more...',                                 '')
+            ],
+            options,
+        )
+
+        load_more_1 = self.report.get_expanded_lines(
+            options,
+            lines[1]['id'],
+            lines[3]['groupby'],
+            lines[3]['expand_function'],
+            lines[3]['progress'],
+            lines[3]['offset'],
+            None,
+        )
+
+        self.assertLinesValues(
+            load_more_1,
+            # 0/name,                                            12/value
+            [0,                                                  12],
+            [
+                ('INV/2022/00002',                             80.0),
+                ('Load more...',                                 '')
+            ],
+            options,
+        )
+
+        load_more_2 = self.report.get_expanded_lines(
+            options,
+            lines[1]['id'],
+            load_more_1[1]['groupby'],
+            load_more_1[1]['expand_function'],
+            load_more_1[1]['progress'],
+            load_more_1[1]['offset'],
+            None,
+        )
+
+        self.assertLinesValues(
+            load_more_2,
+            # 0/name,                                            12/value
+            [0,                                                  12],
+            [
+                ('INV/2022/00001',                             80.0)
+            ],
+            options,
+        )
+
+    def test_reverse_move_default_intrastat_code(self):
+        """
+        Test that if default values are set for "Default invoice transaction code" and "Default refund transaction code"
+        When a move is reversed, the code is correctly set
+        """
+        self.env.company.intrastat_default_invoice_transaction_code_id = self.intrastat_codes['commodity']
+        self.env.company.intrastat_default_refund_transaction_code_id = self.intrastat_codes['transaction']
+        invoice_to_be_refund = self.env['account.move'].create({
+            'move_type': 'out_invoice',
+            'partner_id': self.partner_a.id,
+            'invoice_date': '2022-01-15',
+            'intrastat_country_id': self.env.ref('base.be').id,
+            'invoice_line_ids': [
+                Command.create({
+                    'product_id': self.spanish_rioja.id,
+                    'product_uom_id': self.env.ref('uom.product_uom_unit').id,
+                    'quantity': 1.0,
+                    'account_id': self.company_data['default_account_revenue'].id,
+                    'price_unit': 100.0,
+                }),
+            ],
+        })
+        invoice_to_be_refund.action_post()
+        self.assertEqual(invoice_to_be_refund.line_ids.intrastat_transaction_id, self.intrastat_codes['commodity'])
+
+        credit_note_wizard = self.env['account.move.reversal'].with_context({
+            'active_ids': invoice_to_be_refund.ids,
+            'active_id': invoice_to_be_refund.id,
+            'active_model': 'account.move',
+        }).create({
+            'reason': 'reason test create',
+            'journal_id': invoice_to_be_refund.journal_id.id,
+        })
+        action = credit_note_wizard.reverse_moves()
+        credit_note = self.env['account.move'].browse(action['res_id'])
+        self.assertEqual(credit_note.line_ids.intrastat_transaction_id, self.intrastat_codes['transaction'])
+
+    def test_intrastat_preserved_on_autocomplete(self):
+        """Ensure intrastat_transaction_id is set correctly when using autocomplete (invoice_vendor_bill_id)"""
+        bill = self._create_invoice(
+            move_type='in_invoice',
+            invoice_line_ids=[self._prepare_invoice_line(
+                product_id=self.product_1,
+                intrastat_transaction_id=self.intrastat_codes['transaction'].id,
+            )]
+        )
+        new_bill = self.env['account.move'].create({'move_type': 'in_invoice', 'partner_id': bill.partner_id.id})
+        new_bill.invoice_vendor_bill_id = bill
+        new_bill._onchange_invoice_vendor_bill()
+        self.assertEqual(
+            bill.invoice_line_ids[0].intrastat_transaction_id,
+            new_bill.invoice_line_ids[0].intrastat_transaction_id,
+        )

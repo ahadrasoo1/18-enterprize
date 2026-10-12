@@ -1,5 +1,7 @@
 /** @odoo-module **/
 
+import { _t } from "@web/core/l10n/translation";
+import { user } from "@web/core/user";
 import { KanbanRecord } from "@web/views/kanban/kanban_record";
 import { DocumentsKanbanCompiler } from "./documents_kanban_compiler";
 import { FileUploadProgressBar } from "@web/core/file_upload/file_upload_progress_bar";
@@ -7,6 +9,7 @@ import { useBus, useService } from "@web/core/utils/hooks";
 import { useState, xml } from "@odoo/owl";
 
 const CANCEL_GLOBAL_CLICK = ["a", ".dropdown", ".oe_kanban_action"].join(",");
+const COMPANY_ROOT_OWNER_ID = 1;
 
 export class DocumentsKanbanRecord extends KanbanRecord {
     static components = {
@@ -24,9 +27,8 @@ export class DocumentsKanbanRecord extends KanbanRecord {
             t-att-data-id="props.canResequence and props.record.id"
             t-att-tabindex="props.record.model.useSampleModel ? -1 : 0"
             t-on-click.synthetic="onGlobalClick"
-            t-on-dblclick="onDoubleClick"
             t-on-dragenter.stop.prevent="onDragEnter"
-            t-on-dragover.stop.prevent="onDragOver"
+            t-on-dragover.prevent="onDragOver"
             t-on-dragleave.stop.prevent="onDragLeave"
             t-on-drop.stop.prevent="onDrop"
             t-on-keydown.synthetic="onKeydown"
@@ -48,6 +50,14 @@ export class DocumentsKanbanRecord extends KanbanRecord {
         // Pdf Thumbnail
         this.pdfService = useService("documents_pdf_thumbnail");
         this.pdfService.enqueueRecords([this.props.record]);
+
+        // Activity updates from Chatter
+        this.documentService = useService("document.document");
+        useBus(this.documentService.bus, "DOCUMENT_CHATTER_ACTIVITY_CHANGED", ({ detail }) => {
+            if (this.props.record.data.id == detail.recordId) {
+                this.props.record.load();
+            }
+        });
     }
 
     /**
@@ -69,9 +79,32 @@ export class DocumentsKanbanRecord extends KanbanRecord {
         } else if (this.drag.state === "invalid") {
             result += " o_drag_invalid";
         }
+        if (
+            this.env.isSmall &&
+            this.props.list.groupByField?.name == "last_access_date_group"
+        ) {
+            result += " flex-grow-1";
+        }
         return result;
     }
 
+    get renderingContext() {
+        const context = super.renderingContext;
+        context.encodeURIComponent = encodeURIComponent;
+
+        if ([false, "TRASH", "RECENT"].includes(this.env.searchModel.getSelectedFolderId())) {
+            context.inFolder = this.props.record.data.folder_id?.[1] ||
+                (
+                    this.props.record.data?.owner_id[0] === user.userId
+                    ? _t("My Drive")
+                    : this.props.record.data?.owner_id[0] === COMPANY_ROOT_OWNER_ID
+                        ? _t("Company")
+                        : _t("Shared with me")
+                );
+        }
+        context.mimetype = this.props.record.shortcutTarget.data.mimetype;
+        return context;
+    }
     /**
      * Get the current file upload for this record if there is any
      */
@@ -95,21 +128,7 @@ export class DocumentsKanbanRecord extends KanbanRecord {
                 return;
             }
         }
-        const options = {};
-        if (ev.target.classList.contains("o_record_selector")) {
-            options.isKeepSelection = true;
-        }
-        this.props.record.onRecordClick(ev, options);
-    }
-
-    onDoubleClick() {
-        if (
-            this.props.record.data.type !== "folder" &&
-            !this.props.record.data.shortcut_document_id
-        ) {
-            return;
-        }
-        this.props.record.onRecordDoubleClick();
+        this.props.record.onRecordClick(ev);
     }
 
     onKeydown(ev) {
@@ -118,12 +137,8 @@ export class DocumentsKanbanRecord extends KanbanRecord {
         }
         ev.preventDefault();
         const options = {};
-        if (ev.key === "Enter") {
-            if (this.props.record.data.type === "folder") {
-                this.props.record.onRecordDoubleClick();
-            } else {
-                this.props.record.onClickPreview(ev);
-            }
+        if (ev.key === "Enter" && this.props.record.data.type !== "folder") {
+            this.props.record.onClickPreview(ev);
         } else if (ev.key === " ") {
             options.isKeepSelection = true;
         }
@@ -132,6 +147,9 @@ export class DocumentsKanbanRecord extends KanbanRecord {
 
     onDragEnter(ev) {
         if (this.props.record.data.type !== "folder") {
+            return;
+        }
+        if (!ev.dataTransfer.types.includes("o_documents_data")) {
             return;
         }
         const isInvalidFolder = this.props.list.selection

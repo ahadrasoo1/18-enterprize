@@ -9,6 +9,17 @@ from odoo.tools.misc import format_amount
 @tagged('post_install', '-at_install')
 class AccountJournalDashboard3WayWatchTest(TestAccountJournalDashboardCommon):
 
+    @classmethod
+    def init_invoice(cls, move_type, partner=None, invoice_date=None, post=False, products=None, amounts=None, taxes=None, company=False, currency=None, journal=None, invoice_date_due=None, release_to_pay=None):
+        move = super().init_invoice(move_type, partner, invoice_date, False, products, amounts, taxes, company, currency, journal)
+        if invoice_date_due:
+            move.invoice_date_due = invoice_date_due
+        if release_to_pay:
+            move.release_to_pay = release_to_pay
+        if post:
+            move.action_post()
+        return move
+
     def test_sale_purchase_journal_for_purchase(self):
         """
         Test different purchase journal setups with or without multicurrency:
@@ -31,11 +42,11 @@ class AccountJournalDashboard3WayWatchTest(TestAccountJournalDashboardCommon):
 
         expected_vals_list = [
             # number_draft, sum_draft, number_waiting, sum_waiting, number_late, sum_late, currency
-            [            1,       100,              1,         100,           1,      100, company_currency],
-            [            1,       200,              1,         100,           1,      100, foreign_currency],
-            [            1,       400,              1,         400,           1,      400, foreign_currency],
-            [            1,       200,              1,         200,           1,      200, company_currency],
-            [            1,       100,              1,         100,           1,      100, company_currency],
+            [            1,       100,              1,          55,           1,       55, company_currency],
+            [            1,       200,              1,         110,           1,      110, foreign_currency],
+            [            1,       400,              1,         220,           1,      220, foreign_currency],
+            [            1,       200,              1,         110,           1,      110, company_currency],
+            [            1,       100,              1,          55,           1,       55, company_currency],
         ]
 
         for (purchase_journal, bill_currency), expected_vals in zip(setup_values, expected_vals_list):
@@ -58,12 +69,12 @@ class AccountJournalDashboard3WayWatchTest(TestAccountJournalDashboardCommon):
         self._create_test_vendor_bills(journal)
 
         dashboard_data = journal._get_journal_dashboard_data_batched()[journal.id]
-        # Expected behavior is to have six amls waiting for payment for a total amount of 4440$
-        # three of which would be late for a total amount of 140$
-        self.assertEqual(6, dashboard_data['number_waiting'])
-        self.assertEqual(format_amount(self.env, 8880, company_currency), dashboard_data['sum_waiting'])
-        self.assertEqual(3, dashboard_data['number_late'])
-        self.assertEqual(format_amount(self.env, 480, company_currency), dashboard_data['sum_late'])
+        # Expected behavior is to have three moves waiting for payment for a total amount of 4440$ one of which would be late
+        # for a total amount of 40$ (second move has one of three lines late but that's not enough to make the move late)
+        self.assertEqual(3, dashboard_data['number_waiting'])
+        self.assertEqual(format_amount(self.env, 4440, company_currency), dashboard_data['sum_waiting'])
+        self.assertEqual(1, dashboard_data['number_late'])
+        self.assertEqual(format_amount(self.env, 40, company_currency), dashboard_data['sum_late'])
 
     @freeze_time("2019-01-22")
     def test_customer_invoice_dashboard(self):
@@ -134,7 +145,7 @@ class AccountJournalDashboard3WayWatchTest(TestAccountJournalDashboardCommon):
         self.assertIn('13.3', dashboard_data['sum_draft'])
 
         self.assertEqual(dashboard_data['number_waiting'], 1)
-        self.assertIn('81.72', dashboard_data['sum_waiting'])
+        self.assertIn('68.42', dashboard_data['sum_waiting'])
 
         # Check waiting payment
         refund.action_post()
@@ -143,8 +154,8 @@ class AccountJournalDashboard3WayWatchTest(TestAccountJournalDashboardCommon):
         self.assertEqual(dashboard_data['number_draft'], 0)
         self.assertIn('0.00', dashboard_data['sum_draft'])
 
-        self.assertEqual(dashboard_data['number_waiting'], 1)
-        self.assertIn('81.72', dashboard_data['sum_waiting'])
+        self.assertEqual(dashboard_data['number_waiting'], 2)
+        self.assertIn('55.12', dashboard_data['sum_waiting'])
 
         # Check partial on refund
         payment = self.env['account.payment'].create({
@@ -163,12 +174,12 @@ class AccountJournalDashboard3WayWatchTest(TestAccountJournalDashboardCommon):
         self.assertEqual(dashboard_data['number_draft'], 0)
         self.assertIn('0.00', dashboard_data['sum_draft'])
 
-        self.assertEqual(dashboard_data['number_waiting'], 1)
-        self.assertIn('81.72', dashboard_data['sum_waiting'])
+        self.assertEqual(dashboard_data['number_waiting'], 2)
+        self.assertIn('65.12', dashboard_data['sum_waiting'])
 
         dashboard_data = journal._get_journal_dashboard_data_batched()[journal.id]
-        self.assertEqual(dashboard_data['number_late'], 1)
-        self.assertIn('81.72', dashboard_data['sum_late'])
+        self.assertEqual(dashboard_data['number_late'], 2)
+        self.assertIn('65.12', dashboard_data['sum_late'])
 
     def test_sale_purchase_journal_for_multi_currency_sale(self):
         currency = self.other_currency
@@ -202,5 +213,28 @@ class AccountJournalDashboard3WayWatchTest(TestAccountJournalDashboardCommon):
 
         default_journal_sale = self.company_data['default_journal_sale']
         dashboard_data = default_journal_sale._get_journal_dashboard_data_batched()[default_journal_sale.id]
-        self.assertEqual(format_amount(self.env, 100, company_currency), dashboard_data['sum_waiting'])
-        self.assertEqual(format_amount(self.env, 100, company_currency), dashboard_data['sum_late'])
+        self.assertEqual(format_amount(self.env, 55, company_currency), dashboard_data['sum_waiting'])
+        self.assertEqual(format_amount(self.env, 55, company_currency), dashboard_data['sum_late'])
+
+    @freeze_time("2023-03-15")
+    def test_purchase_journal_numbers_and_sums_to_validate(self):
+        company_currency = self.company_data['currency']
+        journal = self.company_data['default_journal_purchase']
+
+        datas = [
+            {'invoice_date_due': '2023-04-30'},
+            {'invoice_date_due': '2023-04-30', 'release_to_pay': 'yes'},
+            {'invoice_date_due': '2023-04-30', 'release_to_pay': 'no'},
+            {'invoice_date_due': '2023-03-01'},
+            {'invoice_date_due': '2023-03-01', 'release_to_pay': 'yes'},
+            {'invoice_date_due': '2023-03-01', 'release_to_pay': 'no'},
+        ]
+
+        for data in datas:
+            self.init_invoice('in_invoice', invoice_date='2023-03-01', post=False, amounts=[4000], journal=journal, invoice_date_due=data['invoice_date_due'], release_to_pay=data.get('release_to_pay'))
+
+        dashboard_data = journal._get_journal_dashboard_data_batched()[journal.id]
+        # Expected behavior is to have six amls waiting for payment for a total amount of 4440$
+        # three of which would be late for a total amount of 140$
+        self.assertEqual(4, dashboard_data['number_draft'])
+        self.assertEqual(format_amount(self.env, 16000, company_currency), dashboard_data['sum_draft'])

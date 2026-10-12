@@ -224,11 +224,11 @@ class TestReportEngines(TestAccountReportsCommon):
         # Create the report.
         test_line_1 = self._prepare_test_report_line(
             self._prepare_test_expression_tax_tags('11'),
-            groupby='account_id',
+            groupby='account_id,move_type',
         )
         test_line_2 = self._prepare_test_report_line(
             self._prepare_test_expression_tax_tags('222T'),
-            groupby='account_id',
+            groupby='parent_state,account_id',
         )
         test_line_3 = self._prepare_test_report_line(
             self._prepare_test_expression_tax_tags('3333'),
@@ -258,8 +258,11 @@ class TestReportEngines(TestAccountReportsCommon):
             [
                 ('test_line_1',        5400.0),
                 ('101001 101001',      3000.0),
+                ('Journal Entry',      3000.0),
                 ('101002 101002',      2400.0),
+                ('Journal Entry',      2400.0),
                 ('test_line_2',           0.0),
+                ('Posted',                0.0),
                 ('101001 101001',         0.0),
                 ('test_line_3',         600.0),
                 ('101001 101001',       600.0),
@@ -285,11 +288,11 @@ class TestReportEngines(TestAccountReportsCommon):
         # Create the report.
         test_line_1 = self._prepare_test_report_line(
             self._prepare_test_expression_domain(domain, 'sum'),
-            groupby='account_id',
+            groupby='account_id,move_type',
         )
         test_line_2 = self._prepare_test_report_line(
             self._prepare_test_expression_domain(domain, '-sum'),
-            groupby='account_id',
+            groupby='parent_state,account_id',
         )
         test_line_3 = self._prepare_test_report_line(
             self._prepare_test_expression_domain(domain, 'sum_if_neg'),
@@ -331,9 +334,13 @@ class TestReportEngines(TestAccountReportsCommon):
             [
                 ('test_line_1',       -1800.0),
                 ('101002 101002',      -300.0),
+                ('Journal Entry',      -300.0),
                 ('101003 101003',      -600.0),
+                ('Journal Entry',      -600.0),
                 ('101004 101004',      -900.0),
+                ('Journal Entry',      -900.0),
                 ('test_line_2',        1800.0),
+                ('Posted',             1800.0),
                 ('101002 101002',       300.0),
                 ('101003 101003',       600.0),
                 ('101004 101004',       900.0),
@@ -392,7 +399,7 @@ class TestReportEngines(TestAccountReportsCommon):
         )
         test_line_2 = self._prepare_test_report_line(
             self._prepare_test_expression_account_codes('1C'),
-            groupby='account_id',
+            groupby='parent_state,account_id',
         )
         test_line_3 = self._prepare_test_report_line(
             self._prepare_test_expression_account_codes('1D'),
@@ -408,7 +415,7 @@ class TestReportEngines(TestAccountReportsCommon):
         )
         test_line_6 = self._prepare_test_report_line(
             self._prepare_test_expression_account_codes(r'-101\(101002,101003)'),
-            groupby='account_id',
+            groupby='account_id,move_type',
         )
         test_line_7 = self._prepare_test_report_line(
             self._prepare_test_expression_account_codes('10.'),
@@ -486,6 +493,7 @@ class TestReportEngines(TestAccountReportsCommon):
                 ('101002 101002',      -300.0),
                 ('101003 101003',      -600.0),
                 ('test_line_2',        -900.0),
+                ('Posted',             -900.0),
                 ('101002 101002',      -300.0),
                 ('101003 101003',      -600.0),
                 ('test_line_3',       13000.0),
@@ -499,6 +507,7 @@ class TestReportEngines(TestAccountReportsCommon):
                 ('101002 101002',       300.0),
                 ('test_line_6',       -2000.0),
                 ('101001 101001',     -2000.0),
+                ('Journal Entry',     -2000.0),
                 ('test_line_7',       10000.0),
                 ('10.20.0 10.20.0',   10000.0),
                 ('test_line_8',       10000.0),
@@ -506,7 +515,7 @@ class TestReportEngines(TestAccountReportsCommon):
                 ('test_line_9',        8600.0),
                 ('10.20.0 10.20.0',   10000.0),
                 ('101001 101001',     -2000.0),
-                ('101002 101002',      -300.0),
+                ('101002 101002',         0.0),
                 ('101003 101003',       600.0),
                 ('test_line_10',       8600.0),
                 ('10.20.0 10.20.0',   10000.0),
@@ -1783,3 +1792,296 @@ class TestReportEngines(TestAccountReportsCommon):
             expected_amls = move.line_ids.filtered(lambda x: x.partner_id == expected_partner)
             audit_result_amls = move.line_ids.filtered_domain(action_dict['domain'])
             self.assertEqual(audit_result_amls, expected_amls, f"Wrong audit result for partner {expected_partner.name}: {audit_result_amls}")
+
+    def test_account_codes_load_more_limit_groupby(self):
+        """ The account_codes engine performs an additional groupby in its SQL query. This tests makes sure this does not break the behavior
+        of the load_more_limit when grouping.
+        """
+        partner_a, partner_b, partner_c = self.env['res.partner'].create([
+            {'name': 'Partner A'},
+            {'name': 'Partner B'},
+            {'name': 'Partner C'},
+        ])
+
+        report = self._create_report(
+            [
+                self._prepare_test_report_line(
+                    self._prepare_test_expression_account_codes('1'),
+                    groupby='partner_id',
+                ),
+            ],
+            load_more_limit=2,
+        )
+
+        move = self._create_test_account_moves([
+            self._prepare_test_account_move_line(10, account_code='11', partner_id=partner_a.id),
+            self._prepare_test_account_move_line(20, account_code='11', partner_id=partner_a.id),
+            self._prepare_test_account_move_line(25, account_code='12', partner_id=partner_a.id),
+            self._prepare_test_account_move_line(30, account_code='11'),
+            self._prepare_test_account_move_line(40, account_code='11'),
+            self._prepare_test_account_move_line(50, account_code='12', partner_id=partner_b.id),
+            self._prepare_test_account_move_line(60, account_code='13', partner_id=partner_c.id),
+            self._prepare_test_account_move_line(-210, account_code='2'),
+        ])
+
+        options = self._generate_options(report, '2020-01-01', '2020-01-01', default_options={'unfold_all': True})
+
+        self.assertLinesValues(
+            # pylint: disable=bad-whitespace
+            report._get_lines(options),
+            [   0,                               1],
+            [
+                ('test_line_1',              235.0),
+                ('Partner A',                 55.0),
+                ('Partner B',                 50.0),
+                ('Load more...',                ''),
+            ],
+            options,
+        )
+
+    def test_account_name_added_in_account_code_grouping(self):
+        company_a = self.env['res.company'].sudo().create({
+            'name': "Company A",
+        })
+        company_b = self.env['res.company'].sudo().create({
+            'name': "Company B",
+        })
+        context = {
+            **self.env.context,
+            'allowed_company_ids': [company_a.id, company_b.id],
+        }
+        journal_vals = {
+            'name': "Misc",
+            'type': 'general',
+            'code': "MSC",
+        }
+        AccountJournal = self.env['account.journal'].with_context(context)
+        AccountJournal.create(journal_vals | {'company_id': company_a.id})
+        AccountJournal.with_company(company_b).create(journal_vals | {'company_id': company_b.id})
+
+        AccountAccount = self.env['account.account'].with_context(context)
+        account_a = AccountAccount.create({
+            'name': "Account A",
+            'code': "100000",
+            'company_ids': company_a.ids,
+        })
+        counterpart_account_a = AccountAccount.create({
+            'name': "Some account",
+            'code': "200000",
+            'company_ids': company_a.ids,
+        })
+        account_b1 = AccountAccount.create({
+            'name': "Mapping to Account A code",
+            'code': "300000",
+            'company_ids': company_b.ids,
+        })
+        account_b2 = AccountAccount.create({
+            'name': "Mapping to a code that doesn't exist in company A",
+            'code': "400000",
+            'company_ids': company_b.ids,
+        })
+        account_b3 = AccountAccount.create({
+            'name': "No mapping in company A",
+            'code': "500000",
+            'company_ids': company_b.ids,
+        })
+
+        account_b1.code = account_a.code
+        account_b2.code = "600000"
+
+        date = '2025-01-01'
+
+        AccountMove = self.env['account.move'].with_context(context)
+        AccountMove.create({
+            'move_type': 'entry',
+            'date': date,
+            'line_ids': [
+                Command.create({
+                    'account_id': account_a.id,
+                    'balance': 20,
+                }),
+                Command.create({
+                    'account_id': counterpart_account_a.id,
+                    'balance': -20,
+                }),
+            ],
+            'company_id': company_a.id,
+        }).action_post()
+        AccountMove.create({
+            'move_type': 'entry',
+            'date': date,
+            'line_ids': [
+                Command.create({
+                    'account_id': account_b1.id,
+                    'balance': 30,
+                }),
+                Command.create({
+                    'account_id': account_b2.id,
+                    'balance': 70,
+                }),
+                Command.create({
+                    'account_id': account_b3.id,
+                    'balance': -100,
+                }),
+            ],
+            'company_id': company_b.id,
+        }).action_post()
+
+        report = self.env['account.report'].with_context(context).create({
+            'name': "Simple Report",
+            'filter_multi_company': 'selector',
+            'column_ids': [Command.create({
+                'name': "Balance",
+                'expression_label': 'balance',
+            })],
+            'line_ids': [Command.create({
+                'name': "The line",
+                'groupby': 'account_code',
+                'expression_ids': [Command.create({
+                    'label': 'balance',
+                    'engine': 'domain',
+                    'formula': [],
+                    'subformula': 'sum',
+                })],
+            })],
+        })
+        options = self._generate_options(report, date, date)
+        lines = report._get_lines(options)
+
+        self.assertLinesValues(
+            # pylint: disable=bad-whitespace
+            lines,
+            [   0,                                                                       1],
+            [
+                (report.line_ids.name,                                                   0),
+                (f'{account_a.code} {account_a.name}',                                  50),
+                (f'{counterpart_account_a.code} {counterpart_account_a.name}',         -20),
+                (account_b2.code,                                                       70),
+                ('Undefined',                                                         -100),
+            ],
+            options,
+        )
+
+    def test_consolidated_report_includes_unmapped_accounts_from_other_companies(self):
+        company_a = self.env['res.company'].sudo().create({
+            'name': "Company A",
+        })
+        company_b = self.env['res.company'].sudo().create({
+            'name': "Company B",
+        })
+
+        context = {
+            **self.env.context,
+            'allowed_company_ids': [company_a.id, company_b.id],
+        }
+        journal_vals = {
+            'name': "Misc",
+            'type': 'general',
+            'code': "MSC",
+        }
+        AccountJournal = self.env['account.journal'].with_context(context)
+        AccountJournal.create(journal_vals | {'company_id': company_a.id})
+        AccountJournal.with_company(company_b).create(journal_vals | {'company_id': company_b.id})
+
+        AccountAccount = self.env['account.account'].with_context(context)
+        account_tag = self.env['account.account.tag']._load_records([
+            {
+                'xml_id': 'account_reports.account_codes_engine_test_tag1',
+                'noupdate': True,
+                'values': {
+                    'name': "account_codes test tag 1",
+                    'applicability': 'accounts',
+                },
+            }
+        ])
+        account_a = AccountAccount.create({
+            'name': "Account A",
+            'code': "100000",
+            'company_ids': company_a.ids,
+            'tag_ids': [(4, account_tag.id)],
+        })
+        counterpart_account_a = AccountAccount.create({
+            'name': "Counterpart A",
+            'code': "200000",
+            'company_ids': company_a.ids,
+            'tag_ids': [(4, account_tag.id)],
+        })
+        account_b = AccountAccount.create({
+            'name': "Account B",
+            'code': "500000",
+            'company_ids': company_b.ids,
+            'tag_ids': [(4, account_tag.id)],
+        })
+        counterpart_account_b = AccountAccount.create({
+            'name': "Counterpart B",
+            'code': "600000",
+            'company_ids': company_b.ids,
+            'tag_ids': [(4, account_tag.id)],
+        })
+
+        date = '2026-01-01'
+
+        AccountMove = self.env['account.move'].with_context(context)
+        AccountMove.create({
+            'move_type': 'entry',
+            'date': date,
+            'line_ids': [
+                Command.create({
+                    'account_id': account_a.id,
+                    'balance': 100,
+                }),
+                Command.create({
+                    'account_id': counterpart_account_a.id,
+                    'balance': -100,
+                }),
+            ],
+            'company_id': company_a.id,
+        }).action_post()
+        AccountMove.create({
+            'move_type': 'entry',
+            'date': date,
+            'line_ids': [
+                Command.create({
+                    'account_id': account_b.id,
+                    'balance': 1000,
+                }),
+                Command.create({
+                    'account_id': counterpart_account_b.id,
+                    'balance': -1000,
+                }),
+            ],
+            'company_id': company_b.id,
+        }).action_post()
+
+        report = self.env['account.report'].with_context(context).create({
+            'name': "Simple Report",
+            'filter_multi_company': 'selector',
+            'column_ids': [Command.create({
+                'name': "Balance",
+                'expression_label': 'balance',
+            })],
+            'line_ids': [Command.create({
+                'name': "The line",
+                'groupby': 'account_id',
+                'expression_ids': [Command.create({
+                    'label': 'balance',
+                    'engine': 'account_codes',
+                    'formula': "tag(account_reports.account_codes_engine_test_tag1)",
+                })],
+            })],
+        })
+        options = self._generate_options(report, date, date)
+        lines = report._get_lines(options)
+        self.assertLinesValues(
+            # pylint: disable=bad-whitespace
+            lines,
+            [   0,                                                                       1],
+            [
+                (report.line_ids.name,                                                   0),
+                (f'{account_a.code} {account_a.name}',                                  100),
+                (f'{counterpart_account_a.code} {counterpart_account_a.name}',         -100),
+                (f'{account_b.name}',                                                  1000),
+                (f'{counterpart_account_b.name}',                                     -1000),
+            ],
+            options,
+        )

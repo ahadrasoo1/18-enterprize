@@ -1,30 +1,28 @@
 import {
+    DocumentsDocument,
     defineDocumentSpreadsheetModels,
     defineDocumentSpreadsheetTestAction,
-    DocumentsDocument,
+    getBasicData,
+    getBasicServerData,
+    getDocumentBasicData,
 } from "@documents_spreadsheet/../tests/helpers/data";
+import { makeDocumentsSpreadsheetMockEnv } from "@documents_spreadsheet/../tests/helpers/model";
 import {
     createSpreadsheetFromPivotView,
     spawnPivotViewForSpreadsheet,
 } from "@documents_spreadsheet/../tests/helpers/pivot_helpers";
 import { SpreadsheetAction } from "@documents_spreadsheet/bundle/actions/spreadsheet_action";
-import { expect, getFixture, test } from "@odoo/hoot";
+import { beforeEach, expect, getFixture, test } from "@odoo/hoot";
 import { pointerDown } from "@odoo/hoot-dom";
 import { animationFrame } from "@odoo/hoot-mock";
-import { Model, constants } from "@odoo/o-spreadsheet";
+import { Model, constants, helpers } from "@odoo/o-spreadsheet";
 import { selectCell, setCellContent } from "@spreadsheet/../tests/helpers/commands";
-import {
-    Partner,
-    Product,
-    getBasicData,
-    getBasicServerData,
-} from "@spreadsheet/../tests/helpers/data";
+import { Partner, Product, ResUsers } from "@spreadsheet/../tests/helpers/data";
 import {
     getCellContent,
     getCellValue,
     getEvaluatedCell,
 } from "@spreadsheet/../tests/helpers/getters";
-import { makeDocumentsSpreadsheetMockEnv } from "@documents_spreadsheet/../tests/helpers/model";
 import { getZoneOfInsertedDataSource } from "@spreadsheet/../tests/helpers/pivot";
 import { waitForDataLoaded } from "@spreadsheet/helpers/model";
 import {
@@ -46,10 +44,16 @@ import { user } from "@web/core/user";
 import { session } from "@web/session";
 import { WebClient } from "@web/webclient/webclient";
 
+const { sanitizeSheetName } = helpers;
+
 defineDocumentSpreadsheetModels();
 defineDocumentSpreadsheetTestAction();
 
 const { PIVOT_TABLE_CONFIG } = constants;
+
+beforeEach(() => {
+    ResUsers._records = getDocumentBasicData().models["res.users"].records;
+});
 
 test("simple pivot export", async () => {
     const { model } = await createSpreadsheetFromPivotView({
@@ -60,7 +64,6 @@ test("simple pivot export", async () => {
                         <pivot>
                             <field name="foo" type="measure"/>
                         </pivot>`,
-                "partner,false,search": /* xml */ `<search/>`,
             },
         },
     });
@@ -83,7 +86,6 @@ test("simple pivot export with two measures", async () => {
                             <field name="foo" type="measure"/>
                             <field name="probability" type="measure"/>
                         </pivot>`,
-                "partner,false,search": /* xml */ `<search/>`,
             },
         },
     });
@@ -203,7 +205,6 @@ test("groupby date field without interval defaults to month", async () => {
                             <field name="date" type="row"/>
                             <field name="probability" type="measure"/>
                         </pivot>`,
-                "partner,false,search": /* xml */ `<search/>`,
             },
         },
     });
@@ -239,7 +240,7 @@ test("groupby date field without interval defaults to month", async () => {
     expect(getEvaluatedCell(model, "B5").formattedValue).toBe("");
 
     setCellContent(model, "B4", '=PIVOT.VALUE(1,"probability:avg","date","10/2016","foo",1)');
-    expect(getEvaluatedCell(model, "B4").formattedValue).toEqual("11.00");
+    expect(getEvaluatedCell(model, "B4").formattedValue).toBe("11.00");
 });
 
 test("pivot with one level of group bys", async () => {
@@ -266,7 +267,6 @@ test("groupby date field on row gives correct name", async () => {
                             <field name="date" type="row"/>
                             <field name="probability" type="measure"/>
                         </pivot>`,
-                "partner,false,search": /* xml */ `<search/>`,
             },
         },
     });
@@ -295,7 +295,6 @@ test("pivot with two levels of group bys in rows", async () => {
                             <field name="product_id" type="row"/>
                             <field name="probability" type="measure"/>
                         </pivot>`,
-                "partner,false,search": /* xml */ `<search/>`,
             },
         },
     });
@@ -330,7 +329,6 @@ test("verify that there is a record for an undefined many2one header", async () 
                             <field name="product_id" type="row"/>
                             <field name="probability" type="measure"/>
                         </pivot>`,
-                "partner,false,search": /* xml */ `<search/>`,
             },
         },
     });
@@ -359,7 +357,6 @@ test("undefined date is inserted in pivot", async () => {
                             <field name="date" interval="day" type="row"/>
                             <field name="probability" type="measure"/>
                         </pivot>`,
-                "partner,false,search": /* xml */ `<search/>`,
             },
         },
     });
@@ -377,7 +374,6 @@ test("pivot with two levels of group bys in cols", async () => {
                             <field name="product_id" type="col"/>
                             <field name="probability" type="measure"/>
                         </pivot>`,
-                "partner,false,search": /* xml */ `<search/>`,
             },
         },
     });
@@ -407,7 +403,6 @@ test("pivot with count as measure", async () => {
                         <pivot>
                             <field name="probability" type="measure"/>
                         </pivot>`,
-                "partner,false,search": /* xml */ `<search/>`,
             },
         },
         actions: async (target) => {
@@ -445,7 +440,6 @@ test("pivot with two levels of group bys in cols with not enough cols", async ()
                                 <field name="foo" type="row"/>
                                 <field name="probability" type="measure"/>
                             </pivot>`,
-                "partner,false,search": /* xml */ `<search/>`,
             },
         },
     });
@@ -464,7 +458,6 @@ test("groupby week is sorted", async () => {
                             <field name="date" interval="week" type="row"/>
                             <field name="probability" type="measure"/>
                         </pivot>`,
-                "partner,false,search": /* xml */ `<search/>`,
             },
         },
     });
@@ -482,7 +475,6 @@ test("Can save a pivot in a new spreadsheet", async () => {
                  <pivot string="Partners">
                      <field name="probability" type="measure"/>
                  </pivot>`,
-            "partner,false,search": /* xml */ `<search/>`,
         },
     };
     await prepareWebClientForSpreadsheet();
@@ -520,7 +512,6 @@ test("Can save a pivot in existing spreadsheet", async () => {
                     <pivot>
                         <field name="probability" type="measure"/>
                     </pivot>`,
-            "partner,false,search": /* xml */ `<search/>`,
         },
     };
     await prepareWebClientForSpreadsheet();
@@ -552,6 +543,7 @@ test("Can save a pivot in existing spreadsheet", async () => {
     await contains(".o_pivot_add_spreadsheet").click();
     await contains(".o-spreadsheet-grid div[data-id='2']").click();
     await contains(".modal-content > .modal-footer > .btn-primary").click();
+    await animationFrame(); // Wait for the mounted to be executed
     expect(".o_spreadsheet_pivot_side_panel").toHaveCount(1);
     await getService("action").doAction(1); // leave the spreadsheet action
     expect.verifySteps(["join_spreadsheet_session", "write"]);
@@ -588,6 +580,7 @@ test("Add pivot sheet at the end of existing sheets", async () => {
     await contains(".o_pivot_add_spreadsheet").click();
     await contains(".o-spreadsheet-grid div[data-id='456']").click();
     await contains(".modal-content > .modal-footer > .btn-primary").click();
+    await animationFrame(); // Wait for the mounted to be executed
     expect(".o-sheet").toHaveCount(3, { message: "it should have a third sheet" });
     const sheets = fixture.querySelectorAll(".o-sheet");
     const activeSheet = fixture.querySelector(".o-sheet.active");
@@ -685,10 +678,10 @@ test("pivot with a contextual domain", async () => {
         },
     });
     const domain = model.getters.getPivotCoreDefinition(pivotId).domain;
-    expect(domain).toEqual('[("foo", "=", uid)]', {
+    expect(domain).toBe('[("foo", "=", uid)]', {
         message: "It should have the raw domain string",
     });
-    expect(model.exportData().pivots[pivotId].domain).toEqual('[("foo", "=", uid)]', {
+    expect(model.exportData().pivots[pivotId].domain).toBe('[("foo", "=", uid)]', {
         message: "domain is exported with the dynamic value",
     });
     expect.verifySteps(["read_group", "read_group"]);
@@ -710,7 +703,6 @@ test("pivot with a quote in name", async function () {
                             <field name="display_name" type="col"/>
                             <field name="id" type="row"/>
                         </pivot>`,
-                "product,false,search": `<search/>`,
             },
         },
     });
@@ -729,7 +721,6 @@ test("group by related field with archived record", async function () {
                             <field name="name" type="row"/>
                             <field name="probability" type="measure"/>
                         </pivot>`,
-                "partner,false,search": /* xml */ `<search/>`,
             },
         },
     });
@@ -749,7 +740,6 @@ test("group by regular field with archived record", async function () {
                             <field name="foo" type="row"/>
                             <field name="probability" type="measure"/>
                         </pivot>`,
-                "partner,false,search": /* xml */ `<search/>`,
             },
         },
     });
@@ -963,7 +953,6 @@ test("sort second pivot measure (ascending)", async () => {
                             <field name="probability" type="measure"/>
                             <field name="foo" type="measure"/>
                         </pivot>`,
-                "partner,false,search": /* xml */ `<search/>`,
             },
         },
         actions: async (target) => {
@@ -995,7 +984,6 @@ test("sort second pivot measure (descending)", async () => {
                             <field name="probability" type="measure"/>
                             <field name="foo" type="measure"/>
                         </pivot>`,
-                "partner,false,search": /* xml */ `<search/>`,
             },
         },
         actions: async (target) => {
@@ -1015,6 +1003,27 @@ test("sort second pivot measure (descending)", async () => {
         order: "desc",
         originIndexes: [0],
     });
+});
+
+test("remove sorting if measure is removed", async () => {
+    const { model, pivotId } = await createSpreadsheetFromPivotView({
+        serverData: {
+            models: getBasicData(),
+            views: {
+                "partner,false,pivot": /* xml */ `
+                    <pivot default_order="probability desc">
+                        <field name="product_id" type="row"/>
+                        <field name="probability" type="measure"/>
+                        <field name="foo" type="measure"/>
+                    </pivot>`,
+            },
+        },
+        actions: async (target) => {
+            await toggleMenu("Measures");
+            await toggleMenuItem("Probability"); // remove probability measure
+        },
+    });
+    expect(model.getters.getPivotCoreDefinition(pivotId).sortedColumn).toBe(null);
 });
 
 test("search view with group by and additional row group", async () => {
@@ -1092,6 +1101,31 @@ test("Pivot name is not changed if the name is empty", async () => {
     expect(model.getters.getPivotName(pivotId)).toBe("Partners by Foo");
 });
 
+test("Sheet is created when pivot name contains invalid characters", async () => {
+    await spawnPivotViewForSpreadsheet();
+
+    let spreadsheetAction;
+    patchWithCleanup(SpreadsheetAction.prototype, {
+        setup() {
+            super.setup();
+            spreadsheetAction = this;
+        },
+    });
+    await contains(document.body.querySelector(".o_pivot_add_spreadsheet")).click();
+    const pivotName = "Do not keep Unsupported characters: '-:-*-?-\\-[-]-/";
+    await contains(".o_sp_name").edit(pivotName);
+    await contains(".modal-content > .modal-footer > .btn-primary").click();
+    const model = getSpreadsheetActionModel(spreadsheetAction);
+    await waitForDataLoaded(model);
+    const pivotId = model.getters.getPivotIds()[0];
+    expect(model.getters.getPivotName(pivotId)).toBe(pivotName);
+    expect(model.getters.getPivotDisplayName(pivotId)).toBe(`(#1) ${pivotName}`);
+    const sanitizedSheetName = sanitizeSheetName(pivotName);
+    expect(model.getters.getSheetName(model.getters.getActiveSheetId())).toBe(
+        `${sanitizedSheetName} (Pivot #1)`
+    );
+});
+
 test("Check pivot measures with m2o field", async function () {
     const data = getBasicData();
     Partner._records.push(
@@ -1110,7 +1144,6 @@ test("Check pivot measures with m2o field", async function () {
                                 <field name="bar" type="row"/>
                                 <field name="product_id" type="measure"/>
                             </pivot>`,
-                "partner,false,search": `<search/>`,
             },
         },
     });
@@ -1134,7 +1167,6 @@ test("Pivot export from an action with an xml ID", async function () {
 });
 
 test("Test Autofill component", async function () {
-    const fixture = getFixture();
     const { model } = await createSpreadsheetFromPivotView();
     selectCell(model, "A3");
     setCellContent(model, "B3", "");
@@ -1144,7 +1176,7 @@ test("Test Autofill component", async function () {
     // does not react well to the events
     model.dispatch("AUTOFILL_SELECT", { col: 1, row: 2 });
     await animationFrame();
-    expect(fixture.querySelector(".o-autofill-nextvalue")).toHaveText("1");
+    expect(".o-autofill-nextvalue:first").toHaveText("1");
     expect(getCellContent(model, "B2")).toBe(
         `=PIVOT.HEADER(1,"foo",1,"measure","probability:avg")`
     );
@@ -1159,7 +1191,7 @@ test("Inserted pivot is inserted with a table", async function () {
 
     expect(tables.length).toBe(1);
     expect(tables[0].range.zone).toEqual(pivotZone);
-    expect(tables[0].type).toEqual("static");
+    expect(tables[0].type).toBe("static");
     expect(tables[0].config).toEqual({ ...PIVOT_TABLE_CONFIG, numberOfHeaders: 1 });
 });
 
@@ -1176,7 +1208,6 @@ test("The table has the correct number of headers when inserting a pivot", async
                                 <field name="probability" type="row"/>
                                 <field name="foo" type="measure"/>
                             </pivot>`,
-                "partner,false,search": /* xml */ `<search/>`,
             },
         },
     });
@@ -1186,6 +1217,6 @@ test("The table has the correct number of headers when inserting a pivot", async
     const pivotZone = getZoneOfInsertedDataSource(model, "pivot", pivotId);
 
     expect(tables[0].range.zone).toEqual(pivotZone);
-    expect(tables[0].type).toEqual("static");
+    expect(tables[0].type).toBe("static");
     expect(tables[0].config.numberOfHeaders).toBe(3);
 });

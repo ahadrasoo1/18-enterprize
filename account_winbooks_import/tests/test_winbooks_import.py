@@ -5,7 +5,7 @@ from odoo.tests import common, tagged
 import base64
 import requests
 
-TESTURL = 'https://s3.amazonaws.com/winbooks-public/softwares/winbooks-classic-and-virtual-invoice/Tools/PARFILUX_2013.04.08.zip'
+TESTURL = 'https://files.exact.com/static/downloads/winbooks/PARFILUX_2013.04.08.zip'
 FILENAME = 'PARFILUX_2013.04.08.zip'
 
 
@@ -29,7 +29,7 @@ class TestWinbooksImport(common.TransactionCase):
         # self.env.cr.commit(); return  # uncomment to avoid fetching multiple times locally
         test_company = self.env['res.company'].create({
             'name': 'My Winbooks Company',
-            'currency_id': self.env['res.currency'].search([('name', '=', 'EUR')]).id,
+            'currency_id': self.env['res.currency'].with_context(active_test=False).search([('name', '=', 'EUR')]).id,
             'country_id': self.env.ref('base.be').id,
         })
         self.env['account.chart.template'].try_loading('be_comp', test_company)
@@ -37,7 +37,7 @@ class TestWinbooksImport(common.TransactionCase):
             'zip_file': attachment.datas,
         })
         last = self.env['account.move'].search([('company_id', '=', test_company.id)], order='id desc', limit=1)
-        wizard.with_company(test_company).with_context(winbooks_import_hard_fail=False).import_winbooks_file()
+        wizard.with_company(test_company).import_winbooks_file()
         new_moves = self.env['account.move'].search([
             ('company_id', '=', test_company.id),
             ('id', '>', last.id),
@@ -45,4 +45,3 @@ class TestWinbooksImport(common.TransactionCase):
         self.assertTrue(new_moves)
         new_moves.action_post()
         self.assertTrue(new_moves.line_ids.full_reconcile_id, "There should be at least one full reconciliation after the import")
-        self.env.flush_all()  # be sure to trigger SQL constraints

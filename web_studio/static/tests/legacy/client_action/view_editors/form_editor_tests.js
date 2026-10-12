@@ -515,8 +515,8 @@ QUnit.module("View Editors", (hooks) => {
 
         const sheetHooksValues = [
             {
-                xpath: "/form[1]/sheet[1]",
-                position: "inside",
+                xpath: "/form[1]/sheet[1]/*[1]",
+                position: "before",
                 type: "insideSheet",
             },
             {
@@ -583,6 +583,30 @@ QUnit.module("View Editors", (hooks) => {
             target.querySelector(".o_web_studio_form_view_editor .o_form_sheet > div:nth-child(5)"),
             "o_web_studio_hook",
             "last div should be a hook"
+        );
+    });
+
+    QUnit.test("correctly display hook in form with empty sheet", async function (assert) {
+        await createViewEditor({
+            serverData,
+            type: "form",
+            resModel: "coucou",
+            arch: `
+                <form>
+                    <field name="name" invisible="1"/>
+                    <sheet/>
+                </form>`,
+        });
+
+        const hooks = target.querySelectorAll(".o_form_sheet > div.o_web_studio_hook");
+        assert.strictEqual(hooks.length, 1);
+        assert.deepEqual(
+            { ...hooks[0].dataset },
+            {
+                xpath: "/form[1]/sheet[1]",
+                position: "inside",
+                type: "insideSheet",
+            }
         );
     });
 
@@ -1382,7 +1406,7 @@ QUnit.module("View Editors", (hooks) => {
         assert.containsN(
             target,
             ".o_web_studio_property",
-            11,
+            10,
             "the sidebar should now display the field properties"
         );
 
@@ -2608,6 +2632,71 @@ QUnit.module("View Editors", (hooks) => {
         );
     });
 
+    QUnit.test("correctly serialize booleans in approval domain", async function (assert) {
+        assert.expect(1);
+        registry
+            .category("services")
+            .add(getApprovalSpecBatchedService.name, getApprovalSpecBatchedService);
+
+        await createViewEditor({
+            serverData,
+            type: "form",
+            resModel: "coucou",
+            arch: `<form>
+                <header>
+                    <button name="0" string="Test" type="action" class="o_test_action_button" studio_approval="True"/>
+                </header>
+                <sheet>
+                    <field name="m2o"/>
+                </sheet>
+            </form>`,
+            resId: 1,
+            mockRPC: async function (route, args, performRPC) {
+                if (route === "/web/domain/validate") {
+                    return true;
+                } else if (route === "/web/dataset/call_kw/studio.approval.rule/create_rule") {
+                    return {};
+                } else if (route === "/web/dataset/call_kw/studio.approval.rule/write") {
+                    assert.strictEqual(args.args[1].domain, '[("id", "=", False)]');
+                    return {};
+                } else if (
+                    route === "/web/dataset/call_kw/studio.approval.rule/get_approval_spec"
+                ) {
+                    const rules = {
+                        1: {
+                            action_id: "0",
+                            approval_group_id: [1, "User types / Internal User"],
+                            approver_ids: [],
+                            can_validate: true,
+                            domain: [["id", "=", false]],
+                            exclusive_user: false,
+                            id: 1,
+                            message: false,
+                            method: false,
+                            name: false,
+                            notification_order: "1",
+                            users_to_notify: [],
+                        },
+                    };
+                    return {
+                        all_rules: rules,
+                        coucou: [[[false, false, "0"], { rules: [1], entries: [] }]],
+                    };
+                } else if (args.method === "get_views") {
+                    const result = await performRPC(route, args);
+                    for (const modelInfo of Object.values(result.models)) {
+                        modelInfo.has_approval_rules = true;
+                    }
+                    return result;
+                }
+            },
+        });
+
+        await click(target, ".o_form_statusbar button[name='0']");
+        await click(target, ".o_approval_domain");
+        await click(target, ".modal-footer .btn-primary");
+    });
+
     QUnit.test("button rainbowman Truish value in sidebar", async function (assert) {
         const fakeHTTPService = {
             start() {
@@ -3024,7 +3113,8 @@ QUnit.module("View Editors", (hooks) => {
         await click(target, ".o_web_studio_editX2Many[data-type='form']");
         await nextTick();
         assert.containsOnce(target, ".o-form-buttonbox");
-        assert.containsOnce(target, ".o-form-buttonbox button[name='some_action']");
+        assert.containsNone(target, ".o-form-buttonbox .o_web_studio_button_hook");
+        assert.containsNone(target, ".o-form-buttonbox button[name='some_action']");
     });
 
     QUnit.test("cannot add a related properties field", async (assert) => {
@@ -3134,6 +3224,220 @@ QUnit.module("View Editors", (hooks) => {
         await click(target, ".o_web_studio_sidebar .o_web_studio_remove");
         await click(target, ".o_dialog .btn-primary");
         assert.verifySteps(["edit_view"]);
+    });
+
+    QUnit.test("don't show span, fields in button box", async function (assert) {
+        await createViewEditor({
+            serverData,
+            type: "form",
+            resModel: "coucou",
+            resId: 1,
+            arch: `<form><sheet><div class="oe_button_box" name="button_box">
+                <span id="button_worksheet" invisible="1"/>
+                <field name="char_field" invisible="1"/>
+                <button name="action_visible" type="object" invisible="id != 1" class="oe_stat_button" icon="fa-star">
+                    <field name="id" widget="statinfo"/>
+                </button>
+                <button name="action_invisible" type="object" invisible="id == 1" class="oe_stat_button" icon="fa-gear">
+                    <field name="id" widget="statinfo"/>
+                </button>
+            </div></sheet></form>`,
+        });
+        assert.containsOnce(target, ".o-form-buttonbox button[name=action_visible]");
+        assert.containsNone(target, ".o-form-buttonbox button[name=action_invisible]");
+        await click(selectorContains(target, ".o_web_studio_sidebar .nav-link", "View"));
+        await click(target.querySelector(".o_web_studio_sidebar input#show_invisible"));
+        assert.containsOnce(target, ".o-form-buttonbox button[name=action_visible]");
+        assert.containsOnce(target, ".o-form-buttonbox button[name=action_invisible]");
+        assert.containsNone(target, ".o-form-buttonbox span#button_worksheet");
+        assert.containsNone(target, ".o-form-buttonbox .o_field_widget[name=char_field]");
+    });
+
+    QUnit.module("Form > ButtonBox", () => {
+        function buttons(parent) {
+            return Array.from(parent.querySelectorAll(":scope > .o-form-buttonbox button")).map(
+                (e) => {
+                    return e.classList.contains("o_web_studio_add_element")
+                        ? "add_element"
+                        : e.getAttribute("name") || "o_button_more";
+                }
+            );
+        }
+
+        function checkMainButtons(expected, message) {
+            QUnit.assert.deepEqual(
+                buttons(target.querySelector(".o_form_sheet_bg > div")),
+                expected,
+                message
+            );
+        }
+
+        function checkExtraButtons(expected, message) {
+            QUnit.assert.deepEqual(
+                buttons(target.querySelector(".o_form_sheet_bg")),
+                expected,
+                message
+            );
+        }
+
+        QUnit.test(
+            "button_box: few visible buttons and no invisible buttons",
+            async function (assert) {
+                const editor = await createViewEditor({
+                    type: "form",
+                    resModel: "coucou",
+                    resId: 1,
+                    serverData,
+                    arch: `<form>
+                        <sheet>
+                            <div class="oe_button_box" name="button_box">
+                                <button name="one" type="object" className="oe_stat_button" icon="fa-star">
+                                    <field name="id" widget="statinfo"/>
+                                </button>
+                                <button name="two" type="object" className="oe_stat_button" icon="fa-star">
+                                    <field name="id" widget="statinfo"/>
+                                </button>
+                            </div>
+                            <group><group><field name="id"/></group></group>
+                        </sheet>
+                    </form>`,
+                });
+                assert.equal(
+                    editor.env.services.ui.size,
+                    5,
+                    "This test should be run using a resolution of 1366x768, aka the HttpCase browser_size"
+                );
+                checkMainButtons(["add_element", "one", "two"]);
+                checkExtraButtons([]);
+                await click(selectorContains(target, ".o_web_studio_sidebar .nav-link", "View"));
+                await click(target.querySelector(".o_web_studio_sidebar input#show_invisible"));
+                await nextTick();
+                checkMainButtons(["add_element", "one", "two"]);
+                checkExtraButtons([]);
+            }
+        );
+
+        QUnit.test("button_box: few mixed buttons", async function (assert) {
+            const editor = await createViewEditor({
+                type: "form",
+                resModel: "coucou",
+                resId: 1,
+                serverData,
+                arch: `<form>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="one" type="object" className="oe_stat_button" icon="fa-star">
+                                <field name="id" widget="statinfo"/>
+                            </button>
+                            <button name="two" type="object" className="oe_stat_button" icon="fa-star" invisible="id != 5">
+                                <field name="id" widget="statinfo"/>
+                            </button>
+                        </div>
+                        <group><group><field name="id"/></group></group>
+                    </sheet>
+                </form>`,
+            });
+            assert.equal(
+                editor.env.services.ui.size,
+                5,
+                "This test should be run using a resolution of 1366x768, aka the HttpCase browser_size"
+            );
+            checkMainButtons(["add_element", "one"]);
+            checkExtraButtons([]);
+            await click(selectorContains(target, ".o_web_studio_sidebar .nav-link", "View"));
+            await click(target.querySelector(".o_web_studio_sidebar input#show_invisible"));
+            await nextTick();
+            checkMainButtons(["add_element", "one", "two"]);
+            checkExtraButtons([]);
+        });
+
+        QUnit.test("button_box: many visible buttons", async function (assert) {
+            const editor = await createViewEditor({
+                type: "form",
+                resModel: "coucou",
+                resId: 1,
+                serverData,
+                arch: `<form>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="one" type="object" className="oe_stat_button" icon="fa-star">
+                                <field name="id" widget="statinfo"/>
+                            </button>
+                            <button name="two" type="object" className="oe_stat_button" icon="fa-star">
+                                <field name="id" widget="statinfo"/>
+                            </button>
+                            <button name="three" type="object" className="oe_stat_button" icon="fa-star">
+                                <field name="id" widget="statinfo"/>
+                            </button>
+                            <button name="four" type="object" className="oe_stat_button" icon="fa-star">
+                                <field name="id" widget="statinfo"/>
+                            </button>
+                            <button name="five" type="object" className="oe_stat_button" icon="fa-star">
+                                <field name="id" widget="statinfo"/>
+                            </button>
+                        </div>
+                        <group><group><field name="id"/></group></group>
+                    </sheet>
+                </form>`,
+            });
+            assert.equal(
+                editor.env.services.ui.size,
+                5,
+                "This test should be run using a resolution of 1366x768, aka the HttpCase browser_size"
+            );
+            checkMainButtons(["add_element", "one", "two", "three", "o_button_more"]);
+            checkExtraButtons([]);
+            await click(target, ".o-form-buttonbox .o_button_more");
+            checkMainButtons(["add_element", "one", "two", "three", "o_button_more"]);
+            checkExtraButtons(["four", "five"]);
+        });
+
+        QUnit.test("button_box: many mixed buttons", async function (assert) {
+            const editor = await createViewEditor({
+                type: "form",
+                resModel: "coucou",
+                resId: 1,
+                serverData,
+                arch: `<form>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="one" type="object" className="oe_stat_button" icon="fa-star">
+                                <field name="id" widget="statinfo"/>
+                            </button>
+                            <button name="two" type="object" className="oe_stat_button" icon="fa-star">
+                                <field name="id" widget="statinfo"/>
+                            </button>
+                            <button name="three" type="object" className="oe_stat_button" icon="fa-star" invisible="id != 5">
+                                <field name="id" widget="statinfo"/>
+                            </button>
+                            <button name="four" type="object" className="oe_stat_button" icon="fa-star">
+                                <field name="id" widget="statinfo"/>
+                            </button>
+                            <button name="five" type="object" className="oe_stat_button" icon="fa-star">
+                                <field name="id" widget="statinfo"/>
+                            </button>
+                        </div>
+                        <group><group><field name="id"/></group></group>
+                    </sheet>
+                </form>`,
+            });
+
+            assert.equal(
+                editor.env.services.ui.size,
+                5,
+                "This test should be run using a resolution of 1366x768, aka the HttpCase browser_size"
+            );
+            checkMainButtons(["add_element", "one", "two", "four", "five"]);
+            checkExtraButtons([]);
+            await click(selectorContains(target, ".o_web_studio_sidebar .nav-link", "View"));
+            await click(target.querySelector(".o_web_studio_sidebar input#show_invisible"));
+            await nextTick();
+            checkMainButtons(["add_element", "one", "two", "three", "o_button_more"]);
+            checkExtraButtons([]);
+            await click(target, ".o-form-buttonbox .o_button_more");
+            checkMainButtons(["add_element", "one", "two", "three", "o_button_more"]);
+            checkExtraButtons(["four", "five"]);
+        });
     });
 });
 
@@ -3435,7 +3739,6 @@ QUnit.module("View Editors", (hooks) => {
             ".o_web_studio_view_renderer .o_field_one2many .o-web-studio-edit-x2manys-buttons"
         ).style["z-index"];
         assert.strictEqual(blockOverlayZindex, "1000", "z-index of blockOverlay should be 1000");
-        assert.verifySteps(["/web_studio/get_default_value", "get_default_value: coucou"]);
 
         await click(
             target.querySelector(
@@ -3713,7 +4016,7 @@ QUnit.module("View Editors", (hooks) => {
             serverData.views["coucou,false,search"] = `<search></search>`;
 
             const mockRPC = (route, args) => {
-                if (!["/hr_attendance/attendance_user_data", "/mail/action"].includes(route)) {
+                if (!["/hr_attendance/attendance_user_data", "/mail/data"].includes(route)) {
                     assert.step(route);
                 }
                 if (route === "/web_studio/chatter_allowed") {
@@ -3761,7 +4064,6 @@ QUnit.module("View Editors", (hooks) => {
             );
 
             await click(target.querySelector(".o_web_studio_view_renderer .o_field_one2many"));
-            assert.verifySteps(["/web_studio/get_default_value"]);
 
             await click(
                 target.querySelector(
@@ -3780,7 +4082,6 @@ QUnit.module("View Editors", (hooks) => {
             ]);
 
             await click(target.querySelector(".o_web_studio_view_renderer .o_field_one2many"));
-            assert.verifySteps(["/web_studio/get_default_value"]);
             await click(
                 target.querySelector(
                     '.o_web_studio_view_renderer .o_field_one2many .o_web_studio_editX2Many[data-type="form"]'
@@ -3803,27 +4104,6 @@ QUnit.module("View Editors", (hooks) => {
                 target.querySelector(".o_inner_group .o_web_studio_hook")
             );
             assert.verifySteps(["/web_studio/edit_view", "/web/dataset/call_kw/partner/web_read"]);
-
-            // add a new button
-            await click(
-                target.querySelector(".o_web_studio_form_view_editor .o_web_studio_button_hook")
-            );
-            assert.verifySteps([]);
-
-            assert.containsOnce(target, ".modal .o_web_studio_new_button_dialog");
-            await click(
-                target.querySelector(
-                    ".modal .o_web_studio_new_button_dialog .o_input_dropdown input"
-                )
-            );
-            assert.verifySteps(["/web/dataset/call_kw/ir.model.fields/name_search"]);
-            await click(target.querySelector(".modal .o_web_studio_new_button_dialog li a"));
-            assert.strictEqual(
-                target.querySelector(
-                    ".modal .o_web_studio_new_button_dialog .o-autocomplete--input"
-                ).value,
-                "Partner"
-            );
         }
     );
 
@@ -4397,4 +4677,55 @@ QUnit.module("View Editors", (hooks) => {
             );
         }
     );
+
+    QUnit.test("x2many list with virtual record", async function (assert) {
+        const action = serverData.actions["studio.coucou_action"];
+
+        action.views = [[1, "form"]];
+        action.res_model = "coucou";
+        serverData.views["coucou,1,form"] = /*xml */ `
+           <form>
+                <field name='product_ids'>
+                    <list>
+                        <field name="display_name" />
+                    </list>
+               </field>
+           </form>`;
+
+        const mockRPC = (route, args) => {
+            if (args.method === "onchange") {
+                return {
+                    value: {
+                        product_ids: [
+                            [
+                                0,
+                                0,
+                                {
+                                    display_name: "virtual",
+                                },
+                            ],
+                        ],
+                    },
+                };
+            }
+        };
+
+        const webClient = await createEnterpriseWebClient({ serverData, mockRPC });
+        await doAction(webClient, "studio.coucou_action");
+        assert.strictEqual(
+            target.querySelector(".o_form_view .o_field_one2many .o_data_row").textContent,
+            "virtual"
+        );
+        await openStudio(target);
+
+        await click(target.querySelector(".o_web_studio_form_view_editor .o_field_one2many"));
+        await click(
+            target.querySelector(
+                '.o_web_studio_form_view_editor .o_field_one2many .o_web_studio_editX2Many[data-type="list"]'
+            )
+        );
+
+        assert.containsOnce(target, ".o_view_controller.o_list_view");
+        assert.containsNone(target, ".o_data_row");
+    });
 });

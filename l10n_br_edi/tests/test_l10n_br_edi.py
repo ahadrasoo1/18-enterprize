@@ -13,7 +13,7 @@ from odoo.addons.l10n_br_edi.tests.data_invoice_1 import (
     invoice_1_submit_fail_response,
     invoice_1_cancel_success_response,
     invoice_1_correct_success_response,
-    invoice_1_correct_fail_response,
+    invoice_1_correct_fail_response, invoice_1_cancel_fail_response,
 )
 from .mocked_successful_status_response import RESPONSE as SUCCESSFUL_STATUS_RESPONSE
 from odoo.exceptions import UserError, ValidationError, AccessError
@@ -124,7 +124,7 @@ class TestL10nBREDI(TestL10nBREDICommon):
 
     def test_l10n_br_edi_generate_and_send_single_wizard(self):
         single_wizard = self.env['account.move.send.wizard'].create({'move_id': self.invoice.id})
-        self.assertTrue('manual' in single_wizard.sending_methods)
+        self.assertEqual(single_wizard.sending_methods, ['email'])
         self.assertEqual(single_wizard.invoice_edi_format, False)
         self.assertTrue('br_edi' in single_wizard.extra_edis)
         with self.with_patched_account_move("_l10n_br_iap_request", invoice_1_submit_success_response):
@@ -218,7 +218,7 @@ class TestL10nBREDI(TestL10nBREDICommon):
     def test_update_cancel(self):
         self.invoice.button_draft()  # FIXME this test only works with a draft invoice, is it intended ?
         wizard = self.env["l10n_br_edi.invoice.update"].create(
-            {"move_id": self.invoice.id, "mode": "cancel", "reason": "test reason"}
+            {"move_id": self.invoice.id, "mode": "cancel", "reason": "test reason with at least 15 characters"}
         )
 
         with self.with_patched_account_move("_l10n_br_iap_cancel_invoice_goods", invoice_1_cancel_success_response):
@@ -226,6 +226,15 @@ class TestL10nBREDI(TestL10nBREDICommon):
 
         self.assertEqual(self.invoice.state, "cancel", "Invoice should be cancelled.")
         self.assertEqual(self.invoice.l10n_br_last_edi_status, "cancelled", "Invoice should be EDI cancelled.")
+
+    def test_update_cancel_error(self):
+        wizard = self.env["l10n_br_edi.invoice.update"].create(
+            {"move_id": self.invoice.id, "mode": "cancel", "reason": "test reason with at least 15 characters"}
+        )
+
+        with self.with_patched_account_move("_l10n_br_iap_cancel_invoice_goods", invoice_1_cancel_fail_response), \
+             self.assertRaisesRegex(UserError, "Rejei\u00e7\u00e3o: Evento n\u00e3o atende o Schema XML espec\u00edfico"):
+            wizard.action_submit()
 
     def test_update_correction(self):
         wizard = self.env["l10n_br_edi.invoice.update"].create(
@@ -297,6 +306,7 @@ class TestL10nBREDIServices(TestL10nBREDICommon):
             single_wizard.action_send_and_print()
 
         informative_taxes = """Informative taxes:.*\
+subtotalTaxable: 446.11, tax: 11.11, taxType: icmsDeson.*\
 subtotalTaxable: 435, tax: 58.51, taxType: aproxtribFed.*\
 subtotalTaxable: 435, tax: 82.65, taxType: aproxtribState.*\
 subtotalTaxable: 435, tax: 0, taxType: ipi"""
@@ -311,3 +321,26 @@ subtotalTaxable: 435, tax: 0, taxType: ipi"""
         self.assertEqual(self.invoice.l10n_br_last_edi_status, "accepted", "Invoice should be accepted.")
         self.assertTrue(self.invoice.invoice_pdf_report_id, "PDF should have been saved.")
         self.assertTrue(self.invoice.l10n_br_edi_xml_attachment_id, "XML should have been saved.")
+
+    def test_update_cancel_accepted_invoice(self):
+        """
+        Test that cancelling an accepted posted invoice correctly sets EDI status to 'cancelled'.
+        """
+        # Simulate the real-world flow: invoice is posted and accepted
+        self.invoice.l10n_br_last_edi_status = "accepted"
+        self.invoice.l10n_br_access_key = "12345678901234567890123456789012345678901234"
+        self.assertEqual(self.invoice.state, "posted", "Invoice should be posted.")
+        self.assertEqual(self.invoice.l10n_br_last_edi_status, "accepted", "Invoice should be accepted.")
+
+        # Create cancellation wizard
+        wizard = self.env["l10n_br_edi.invoice.update"].create(
+            {"move_id": self.invoice.id, "mode": "cancel", "reason": "test reason with at least 15 characters"}
+        )
+
+        # Submit cancellation
+        with self.with_patched_account_move("_l10n_br_iap_cancel_invoice_goods", invoice_1_cancel_success_response):
+            wizard.action_submit()
+
+        # Verify the invoice is cancelled and EDI status is correctly set
+        self.assertEqual(self.invoice.state, "cancel", "Invoice should be cancelled.")
+        self.assertEqual(self.invoice.l10n_br_last_edi_status, "cancelled", "Invoice EDI status should be 'cancelled'")

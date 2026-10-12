@@ -1,22 +1,23 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* account_avatax
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Junko Augias, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:26+0000\n"
+"POT-Creation-Date: 2025-12-29 18:46+0000\n"
 "PO-Revision-Date: 2024-09-25 09:43+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
+"Last-Translator: Junko Augias, 2025\n"
 "Language-Team: Japanese (https://app.transifex.com/odoo/teams/41243/ja/)\n"
+"Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: ja\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. module: account_avatax
@@ -37,46 +38,56 @@ msgstr ""
 #. module: account_avatax
 #: model_terms:ir.ui.view,arch_db:account_avatax.res_config_settings_view_form
 msgid ""
-"<i title=\"Go to Avatax portal\" role=\"img\" aria-label=\"Go to Avatax portal\" class=\"fa fa-external-link-square fa-fw\"/>\n"
+"<i title=\"Go to Avatax portal\" role=\"img\" aria-label=\"Go to Avatax "
+"portal\" class=\"fa fa-external-link-square fa-fw\"/>\n"
 "                                Avatax portal"
 msgstr ""
-"<i title=\"Go to Avatax portal\" role=\"img\" aria-label=\"Go to Avatax portal\" class=\"fa fa-external-link-square fa-fw\"/>\n"
+"<i title=\"Go to Avatax portal\" role=\"img\" aria-label=\"Go to Avatax "
+"portal\" class=\"fa fa-external-link-square fa-fw\"/>\n"
 "                                Avataxポータル"
 
 #. module: account_avatax
 #: model_terms:ir.ui.view,arch_db:account_avatax.res_config_settings_view_form
 msgid ""
-"<i title=\"Show logs\" role=\"img\" aria-label=\"Show logs\" class=\"fa fa-file-text-o\"/>\n"
+"<i title=\"Show logs\" role=\"img\" aria-label=\"Show logs\" class=\"fa fa-"
+"file-text-o\"/>\n"
 "                                Show logs"
 msgstr ""
-"<i title=\"Show logs\" role=\"img\" aria-label=\"Show logs\" class=\"fa fa-file-text-o\"/>\n"
+"<i title=\"Show logs\" role=\"img\" aria-label=\"Show logs\" class=\"fa fa-"
+"file-text-o\"/>\n"
 "                                ログを表示"
 
 #. module: account_avatax
 #: model_terms:ir.ui.view,arch_db:account_avatax.res_config_settings_view_form
 msgid ""
-"<i title=\"Start logging for 30 minutes\" role=\"img\" aria-label=\"Start logging for 30 minutes\" class=\"fa fa-file-text-o\"/>\n"
+"<i title=\"Start logging for 30 minutes\" role=\"img\" aria-label=\"Start "
+"logging for 30 minutes\" class=\"fa fa-file-text-o\"/>\n"
 "                                Start logging for 30 minutes"
 msgstr ""
-"<i title=\"Start logging for 30 minutes\" role=\"img\" aria-label=\"Start logging for 30 minutes\" class=\"fa fa-file-text-o\"/>\n"
+"<i title=\"Start logging for 30 minutes\" role=\"img\" aria-label=\"Start "
+"logging for 30 minutes\" class=\"fa fa-file-text-o\"/>\n"
 "                                30分のロギングを始める"
 
 #. module: account_avatax
 #: model_terms:ir.ui.view,arch_db:account_avatax.res_config_settings_view_form
 msgid ""
-"<i title=\"Sync Parameters\" role=\"img\" aria-label=\"Sync Parameters\" class=\"fa fa-refresh\"/>\n"
+"<i title=\"Sync Parameters\" role=\"img\" aria-label=\"Sync Parameters\" "
+"class=\"fa fa-refresh\"/>\n"
 "                                Sync Parameters"
 msgstr ""
-"<i title=\"Sync Parameters\" role=\"img\" aria-label=\"Sync Parameters\" class=\"fa fa-refresh\"/>\n"
+"<i title=\"Sync Parameters\" role=\"img\" aria-label=\"Sync Parameters\" "
+"class=\"fa fa-refresh\"/>\n"
 "                               パラメーターの同期"
 
 #. module: account_avatax
 #: model_terms:ir.ui.view,arch_db:account_avatax.res_config_settings_view_form
 msgid ""
-"<i title=\"Test connection\" role=\"img\" aria-label=\"Test connection\" class=\"fa fa-plug fa-fw\"/>\n"
+"<i title=\"Test connection\" role=\"img\" aria-label=\"Test connection\" "
+"class=\"fa fa-plug fa-fw\"/>\n"
 "                                Test connection"
 msgstr ""
-"<i title=\"Test connection\" role=\"img\" aria-label=\"Test connection\" class=\"fa fa-plug fa-fw\"/>\n"
+"<i title=\"Test connection\" role=\"img\" aria-label=\"Test connection\" "
+"class=\"fa fa-plug fa-fw\"/>\n"
 "                                接続テスト"
 
 #. module: account_avatax
@@ -189,7 +200,7 @@ msgstr "Avalara免責"
 #. module: account_avatax
 #: model:ir.actions.act_window,name:account_avatax.ir_logging_avalara_action
 msgid "Avalara Logging"
-msgstr "Avalaraロギング"
+msgstr "Avalara ログ情報"
 
 #. module: account_avatax
 #: model:ir.model.fields,field_description:account_avatax.field_res_partner__avalara_partner_code
@@ -247,7 +258,9 @@ msgstr "Avatax還付口座"
 msgid ""
 "Avatax will use this date to calculate the tax on this invoice. If not "
 "specified it will use the Invoice Date."
-msgstr "Avataxはこの日付を使用して請求書の税額を計算します。指定がない場合は、請求日が使用されます。"
+msgstr ""
+"Avataxはこの日付を使用して請求書の税額を計算します。指定がない場合は、請求日"
+"が使用されます。"
 
 #. module: account_avatax
 #: model_terms:ir.ui.view,arch_db:account_avatax.avatax_validate_address_view_form
@@ -445,10 +458,12 @@ msgstr "名称"
 #. odoo-python
 #: code:addons/account_avatax/models/account_external_tax_mixin.py:0
 msgid ""
-"Odoo could not change the state of the transaction related to %(document)s in AvaTax\n"
+"Odoo could not change the state of the transaction related to %(document)s "
+"in AvaTax\n"
 "Please check the status of `%(technical)s` in the AvaTax portal."
 msgstr ""
-"OdooがAvaTaxで%(document)sに関連する取引のステータスを変更できませんでした。\n"
+"OdooがAvaTaxで%(document)sに関連する取引のステータスを変更できませんでし"
+"た。\n"
 "AvaTaxポータルで`%(technical)s`の状態を確認して下さい。"
 
 #. module: account_avatax
@@ -581,9 +596,11 @@ msgstr "avataxとの接続テスト"
 #. module: account_avatax
 #: model:ir.model.fields,help:account_avatax.field_res_config_settings__avalara_partner_code
 msgid ""
-"The Avalara Company Code for this company. Avalara will interpret as DEFAULT"
-" if it is not set."
-msgstr "この会社のAvalara会社コード。設定されていない場合、Avalara は DEFAULT と解釈します。"
+"The Avalara Company Code for this company. Avalara will interpret as DEFAULT "
+"if it is not set."
+msgstr ""
+"この会社のAvalara会社コード。設定されていない場合、Avalara は DEFAULT と解釈"
+"します。"
 
 #. module: account_avatax
 #. odoo-python
@@ -634,7 +651,9 @@ msgstr "UPCを使用する"
 #. module: account_avatax
 #: model:ir.model.fields,help:account_avatax.field_res_config_settings__avalara_use_upc
 msgid "Use Universal Product Code instead of custom defined codes in Avalara."
-msgstr "Avalaraでは、カスタム定義コードの代わりにユニバーサルプロダクトコードを使用します。"
+msgstr ""
+"Avalaraでは、カスタム定義コードの代わりにユニバーサルプロダクトコードを使用し"
+"ます。"
 
 #. module: account_avatax
 #: model:ir.model.fields,help:account_avatax.field_account_avatax_unique_code__avatax_unique_code
@@ -664,8 +683,7 @@ msgstr "%sのアドレスを検証する"
 #. module: account_avatax
 #: model:ir.model.fields,help:account_avatax.field_res_config_settings__avalara_address_validation
 msgid ""
-"Validate and correct the addresses of partners in North America with "
-"Avalara."
+"Validate and correct the addresses of partners in North America with Avalara."
 msgstr "Avalaraで北アメリカのパートナーのアドレスを検証・訂正する。"
 
 #. module: account_avatax

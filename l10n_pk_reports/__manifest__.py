@@ -6,7 +6,7 @@
     'name': 'Pakistan - Accounting Reports',
     'version': '1.0',
     'description': """
-Accounting reports for Pakistan
+Accounting Reports for Pakistan (Profit and Loss report and Balance Sheet)
     """,
     'category': 'Accounting/Localizations/Reporting',
     'depends': ['l10n_pk', 'account_reports'],

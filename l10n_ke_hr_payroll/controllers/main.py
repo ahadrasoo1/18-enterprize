@@ -129,7 +129,7 @@ class L10nKeHrPayrollNssfReportController(http.Controller):
         )
         return response
 
-    @http.route(['/export/nhif/<int:wizard_id>'], type='http', auth='user')
+    @http.route(['/export/old_nhif/<int:wizard_id>'], type='http', auth='user')
     def export_nhif_report(self, wizard_id):
         wizard = request.env['l10n.ke.hr.payroll.nhif.report.wizard'].browse(wizard_id)
         if not wizard.exists() or not request.env.user.has_group('hr_payroll.group_hr_payroll_user'):

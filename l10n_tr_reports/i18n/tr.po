@@ -1,24 +1,28 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* l10n_tr
+# * l10n_tr_reports
 #
+# "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 17.3alpha1+e\n"
+"Project-Id-Version: Odoo Server 17.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-04 14:38+0000\n"
-"PO-Revision-Date: 2024-04-04 14:38+0000\n"
-"Last-Translator: \n"
-"Language-Team: \n"
+"POT-Creation-Date: 2026-02-20 19:04+0000\n"
+"PO-Revision-Date: 2025-11-08 12:43+0000\n"
+"Last-Translator: \"Dylan Kiss (dyki)\" <dyki@odoo.com>\n"
+"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-18-l10n/"
+"l10n_tr_reports/tr/>\n"
+"Language: tr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: \n"
-"Plural-Forms: \n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.12.2\n"
 
 #. module: l10n_tr_reports
 #: model:account.report.line,name:l10n_tr_reports.account_report_line_trbs_58
 msgid "Accumulated Deficit (-)"
-msgstr ""
+msgstr "Geçmiş Yıl Zararları (-)"
 
 #. module: l10n_tr_reports
 #: model:account.report.line,name:l10n_tr_reports.account_report_line_trbs_278
@@ -205,7 +209,7 @@ msgid "Deductible Vat"
 msgstr "İNDIRILECEK KDV"
 
 #. module: l10n_tr_reports
-#: model:ir.model.fields,field_description:l10n_tr_reports.field_account_journal__default_sales_return_account_id
+#: model_terms:ir.ui.view,arch_db:l10n_tr_reports.view_account_journal_form
 msgid "Default Return from Sales Account"
 msgstr "Satış Hesabından Temerrüt Getirisi"
 
@@ -323,6 +327,12 @@ msgid "General Reserves"
 msgstr "OLAĞANÜSTÜ YEDEKLER"
 
 #. module: l10n_tr_reports
+#. odoo-python
+#: code:addons/l10n_tr_reports/models/account_general_ledger.py:0
+msgid "Generate e-Ledger"
+msgstr "e-Defter Oluştur"
+
+#. module: l10n_tr_reports
 #: model:account.report.line,name:l10n_tr_reports.account_report_line_trbs_261
 msgid "Goodwill"
 msgstr "ŞEREFIYE"
@@ -367,6 +377,12 @@ msgstr "MADDI OLMAYAN DURAN VARLIKLAR"
 #: model:account.report.line,name:l10n_tr_reports.account_report_line_trbs_15
 msgid "Inventories"
 msgstr "STOKLAR"
+
+#. module: l10n_tr_reports
+#. odoo-javascript
+#: code:addons/l10n_tr_reports/static/src/components/general_ledger/warnings.xml:0
+msgid "Invoice(s)"
+msgstr "Fatura(lar)"
 
 #. module: l10n_tr_reports
 #: model:account.report.line,name:l10n_tr_reports.account_report_line_trbs_250
@@ -661,7 +677,8 @@ msgstr "DIĞER KDV"
 #. module: l10n_tr_reports
 #: model:account.report.line,name:l10n_tr_reports.account_report_line_trbs_368
 msgid "Overdue, Deferred Payables Or Payables on Instalments to The State"
-msgstr "VADESİ GEÇMİŞ ERTELENMİŞ VEYA TAKSİTLENDİRİLMİŞ VERGİ VE DİĞER YÜKÜMLÜLÜKLER"
+msgstr ""
+"VADESİ GEÇMİŞ ERTELENMİŞ VEYA TAKSİTLENDİRİLMİŞ VERGİ VE DİĞER YÜKÜMLÜLÜKLER"
 
 #. module: l10n_tr_reports
 #: model:account.report.line,name:l10n_tr_reports.account_report_line_trbs_50
@@ -699,6 +716,11 @@ msgstr "İŞTİRAKLERE BORÇLAR"
 #: model:account.report.line,name:l10n_tr_reports.account_report_line_trbs_332
 msgid "Payables to Subsidiaries"
 msgstr "İŞTİRAKLERE BORÇLAR"
+
+#. module: l10n_tr_reports
+#: model:ir.model,name:l10n_tr_reports.model_account_general_ledger_report_handler
+msgid "Polish JPK KR PD Custom Handler"
+msgstr ""
 
 #. module: l10n_tr_reports
 #: model:account.report.line,name:l10n_tr_reports.account_report_line_trbs_262
@@ -780,11 +802,6 @@ msgstr "TAHVİL ANAPARA BORÇ, TAKSİT VE FAİZLERİ"
 #: model:account.report.line,name:l10n_tr_reports.account_report_line_trbs_111
 msgid "Private Sector Bonds, Shares and Notes"
 msgstr "ÖZEL KESİM TAHVİL, SENET VE BONOLARI"
-
-#. module: l10n_tr_reports
-#: model:ir.model,name:l10n_tr_reports.model_product_template
-msgid "Product"
-msgstr "Ürün"
 
 #. module: l10n_tr_reports
 #: model:account.report.line,name:l10n_tr_reports.account_report_line_trbs_54
@@ -896,7 +913,8 @@ msgstr "KIDEM TAZMİNATI KARŞILIĞI"
 
 #. module: l10n_tr_reports
 #: model:account.report.line,name:l10n_tr_reports.account_report_line_trbs_370
-msgid "Provisions for Tax and Other Liabilities Relating to The Profit of The Period"
+msgid ""
+"Provisions for Tax and Other Liabilities Relating to The Profit of The Period"
 msgstr "DÖNEM KÂRI VERGİ VE DİĞER YASAL YÜKÜMLÜLÜK KARŞILIKLARI"
 
 #. module: l10n_tr_reports
@@ -963,8 +981,7 @@ msgid "Retained Earnings"
 msgstr "GEÇMIŞ YILLAR KARLARI"
 
 #. module: l10n_tr_reports
-#: model:ir.model.fields,field_description:l10n_tr_reports.field_product_product__return_account_id
-#: model:ir.model.fields,field_description:l10n_tr_reports.field_product_template__return_account_id
+#: model_terms:ir.ui.view,arch_db:l10n_tr_reports.product_template_form_view
 msgid "Return Account"
 msgstr "Hesabı İade Et"
 
@@ -1055,6 +1072,12 @@ msgid "Taxes and Funds Payable"
 msgstr "ÖDENECEK VERGI VE FONLAR"
 
 #. module: l10n_tr_reports
+#. odoo-javascript
+#: code:addons/l10n_tr_reports/static/src/components/general_ledger/warnings.xml:0
+msgid "There are"
+msgstr "Mevcut"
+
+#. module: l10n_tr_reports
 #: model:account.report.line,name:l10n_tr_reports.account_report_line_trbs_32
 #: model:account.report.line,name:l10n_tr_reports.account_report_line_trbs_42
 msgid "Trade Payables"
@@ -1100,3 +1123,22 @@ msgstr "İŞ AVANSLAR"
 #: model:account.report.line,name:l10n_tr_reports.account_report_line_trbs_151
 msgid "Work-in-Process – Production"
 msgstr "YARI MAMULLER - ÜRETİM"
+
+#. module: l10n_tr_reports
+#. odoo-python
+#: code:addons/l10n_tr_reports/models/account_general_ledger.py:0
+msgid "ZIP"
+msgstr "ZIP"
+
+#. module: l10n_tr_reports
+#. odoo-python
+#: code:addons/l10n_tr_reports/models/account_general_ledger.py:0
+msgid "e-ledger_%(from_date)s-%(to_date)s"
+msgstr "e-defter_%(from_date)s-%(to_date)s"
+
+#. module: l10n_tr_reports
+#. odoo-javascript
+#: code:addons/l10n_tr_reports/static/src/components/general_ledger/warnings.xml:0
+msgid ""
+"that have not been sent or waiting for approval from Nilvera in this period."
+msgstr "bu dönemde gönderilmemiş olan veya Nilvera’dan onay bekleyenler."

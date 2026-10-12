@@ -60,8 +60,8 @@ class WhatsAppTemplate(models.Model):
     active = fields.Boolean(default=True)
 
     wa_account_id = fields.Many2one(
-        comodel_name='whatsapp.account', string="Account", default=_get_default_wa_account_id,
-        ondelete="cascade")
+        comodel_name='whatsapp.account', string="Account", compute="_compute_wa_account_id",
+        ondelete="cascade", precompute=True, readonly=False, store=True)
     wa_template_uid = fields.Char(string="WhatsApp Template ID", copy=False)
     error_msg = fields.Char(string="Error Message")
 
@@ -159,9 +159,7 @@ class WhatsAppTemplate(models.Model):
                     raise AccessError(
                         _("You can not select field of %(model)s.", model=model_description)
                     )
-                safe_fields = set(COMMON_WHATSAPP_PHONE_SAFE_FIELDS)
-                if hasattr(model, '_wa_get_safe_phone_fields'):
-                    safe_fields |= set(model._wa_get_safe_phone_fields())
+                safe_fields = set(model._wa_get_safe_phone_fields())
                 if tmpl.phone_field not in safe_fields:
                     raise AccessError(
                         _("You are not allowed to use %(field)s in phone field, contact your administrator to configure it.",
@@ -329,6 +327,18 @@ class WhatsAppTemplate(models.Model):
         for template in self:
             template.has_invalid_button_number = any(template.button_ids.mapped('has_invalid_number'))
 
+    def _compute_wa_account_id(self):
+        """Set default account unless the template name is already used."""
+        default_account_id = self._get_default_wa_account_id()
+        account_less_templates = self.filtered(lambda template: not template.wa_account_id)
+        existing_template_names = set(self.env['whatsapp.template'].search([
+            ('template_name', 'in', account_less_templates.mapped('template_name')),
+            ('wa_account_id', '=', default_account_id),
+        ]).mapped('template_name'))
+        for template in account_less_templates:
+            if template.template_name not in existing_template_names:
+                template.wa_account_id = default_account_id
+
     @api.depends('model_id')
     def _compute_has_action(self):
         for tmpl in self:
@@ -460,7 +470,7 @@ class WhatsAppTemplate(models.Model):
         if not self.body:
             return None
         body_component = {'type': 'BODY', 'text': self.body}
-        body_params = self.variable_ids.filtered(lambda line: line.line_type == 'body')
+        body_params = self.variable_ids.filtered(lambda line: line.line_type == 'body').sorted(key=lambda var: var._extract_variable_index())
         if body_params:
             body_component['example'] = {'body_text': [body_params.mapped('demo_value')]}
         return body_component
@@ -819,7 +829,7 @@ class WhatsAppTemplate(models.Model):
         self.ensure_one()
         return {
             'name': _("Message Statistics Of %(template_name)s", template_name=self.name),
-            'view_mode': 'list,form',
+            'view_mode': 'list,form,graph',
             'res_model': 'whatsapp.message',
             'domain': [('wa_template_id', '=', self.id)],
             'type': 'ir.actions.act_window',
@@ -885,7 +895,7 @@ class WhatsAppTemplate(models.Model):
         """
         formatted_body = str(plaintext2html(body_html))  # stringify for regex
         formatted_body = re.sub(r'\*(.*?)\*', r'<b>\1</b>', formatted_body)
-        formatted_body = re.sub(r'_(.*?)_', r'<i>\1</i>', formatted_body)
+        formatted_body = re.sub(r'\b_([^_\s][^_]*?[^_\s])_\b', r'<i>\1</i>', formatted_body)  # apply italic when whitespace surrounded for not breaking urls
         formatted_body = re.sub(r'~(.*?)~', r'<s>\1</s>', formatted_body)
         formatted_body = re.sub(r'```(.*?)```', r'<code>\1</code>', formatted_body)
         return Markup(formatted_body)

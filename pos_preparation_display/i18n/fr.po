@@ -1,24 +1,28 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* pos_preparation_display
-# 
+# * pos_preparation_display
+#
 # Translators:
 # Wil Odoo, 2024
-# Manon Rondou, 2024
-# 
+# Manon Rondou, 2025
+#
+# "Manon Rondou (ronm)" <ronm@odoo.com>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Manon Rondou, 2024\n"
-"Language-Team: French (https://app.transifex.com/odoo/teams/41243/fr/)\n"
+"POT-Creation-Date: 2025-12-29 18:45+0000\n"
+"PO-Revision-Date: 2025-12-02 17:05+0000\n"
+"Last-Translator: \"Manon Rondou (ronm)\" <ronm@odoo.com>\n"
+"Language-Team: French <https://translate.odoo.com/projects/odoo-18/"
+"pos_preparation_display/fr/>\n"
+"Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: fr\n"
-"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : ((n != 0 && n % "
+"1000000 == 0) ? 1 : 2);\n"
+"X-Generator: Weblate 5.14.3\n"
 
 #. module: pos_preparation_display
 #: model_terms:ir.ui.view,arch_db:pos_preparation_display.preparation_display_view_kanban
@@ -73,8 +77,8 @@ msgid ""
 "Archive all preparation display's orders for a fresh start. This will not "
 "affect the PoS order history."
 msgstr ""
-"Archiver toutes les commandes de l'écran de préparation pour repartir du bon"
-" pied. Cette opération n'affecte pas l'historique des commandes du PdV."
+"Archiver toutes les commandes de l'écran de préparation pour repartir du bon "
+"pied. Cette opération n'affecte pas l'historique des commandes du PdV."
 
 #. module: pos_preparation_display
 #: model:ir.model.fields,help:pos_preparation_display.field_pos_preparation_display_display__average_time
@@ -174,7 +178,7 @@ msgstr "Nom d'affichage"
 #: code:addons/pos_preparation_display/static/src/app/components/order/order.xml:0
 #: code:addons/pos_preparation_display/static/src/app/components/preparation_display/preparation_display.xml:0
 msgid "Done"
-msgstr "Fait"
+msgstr "Terminé"
 
 #. module: pos_preparation_display
 #. odoo-javascript
@@ -186,7 +190,7 @@ msgstr "Explorer les données de démonstration"
 #. odoo-javascript
 #: code:addons/pos_preparation_display/static/src/override/point_of_sale/pos_store.js:0
 msgid "Failed in sending the changes to preparation display"
-msgstr "Échec de l'envoi des changements à l'écran de préparation"
+msgstr "Échec de l'envoi des changements vers l'écran de préparation"
 
 #. module: pos_preparation_display
 #. odoo-javascript
@@ -235,13 +239,13 @@ msgstr "Est un bar/restaurant"
 #. module: pos_preparation_display
 #: model:ir.model.fields,field_description:pos_preparation_display.field_pos_preparation_display_order_stage__done
 msgid "Is the order done"
-msgstr "La commande est faite ?"
+msgstr "La commande est terminée ?"
 
 #. module: pos_preparation_display
 #: model:ir.actions.server,name:pos_preparation_display.action_pos_preparation_display_kitchen_display
 #: model:ir.ui.menu,name:pos_preparation_display.menu_point_kitchen_display_root
 msgid "Kitchen Display"
-msgstr "Affichage cuisine"
+msgstr "Écran de cuisine"
 
 #. module: pos_preparation_display
 #: model:ir.model.fields,field_description:pos_preparation_display.field_pos_preparation_display_display__write_uid
@@ -294,7 +298,7 @@ msgstr "Offre"
 #. module: pos_preparation_display
 #: model:ir.model.fields,field_description:pos_preparation_display.field_pos_preparation_display_order_stage__order_id
 msgid "Order"
-msgstr "Ordre"
+msgstr "Commande"
 
 #. module: pos_preparation_display
 #: model:ir.model.fields,field_description:pos_preparation_display.field_pos_preparation_display_order__preparation_display_order_line_ids
@@ -495,6 +499,16 @@ msgstr "Le statut d'une ligne de commande, à faire ou non"
 #: model:ir.model.fields,help:pos_preparation_display.field_pos_preparation_display_stage__alert_timer
 msgid "Timer after which the order will be highlighted"
 msgstr "Délai après lequel la commande sera mise en évidence"
+
+#. module: pos_preparation_display
+#. odoo-python
+#: code:addons/pos_preparation_display/models/preparation_display.py:0
+msgid ""
+"You cannot modify the stages of a preparation display that has an active "
+"sessions."
+msgstr ""
+"Vous ne pouvez pas modifier les étapes d'un écran de préparation qui a des "
+"sessions actives."
 
 #. module: pos_preparation_display
 #: model:ir.actions.server,name:pos_preparation_display.preparation_display_delete_cron_ir_actions_server

@@ -1,48 +1,82 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* documents_hr
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Maitê Dietze, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-26 09:15+0000\n"
+"POT-Creation-Date: 2026-02-27 18:47+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Portuguese (Brazil) (https://app.transifex.com/odoo/teams/41243/pt_BR/)\n"
+"Last-Translator: Maitê Dietze, 2025\n"
+"Language-Team: Portuguese (Brazil) (https://app.transifex.com/odoo/teams/"
+"41243/pt_BR/)\n"
+"Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: pt_BR\n"
-"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % "
+"1000000 == 0 ? 1 : 2;\n"
 
 #. module: documents_hr
 #: model_terms:ir.ui.view,arch_db:documents_hr.documents_hr_portal_view
 msgid "<i class=\"fa fa-download fa-fw\"/> Download file"
-msgstr ""
+msgstr "<i class=\"fa fa-download fa-fw\"/> Baixar arquivo"
 
 #. module: documents_hr
 #: model:mail.template,body_html:documents_hr.mail_template_document_folder_link
 msgid ""
-"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"width:100%; margin:0px auto;\"><tbody>\n"
-"        <tr><td valign=\"top\" style=\"text-align: left; font-size: 14px;\">\n"
-"            Dear <t t-esc=\"object.name\"></t>, your personal documents access link is available for you.<br><br>\n"
-"            You'll find all your personal HR documents in this folder.<br><br>\n"
-"            Please keep this link secure.<br><br>\n"
-"            <div style=\"text-align: center; padding: 16px 0px 16px 0px; font-size: 14px;\">\n"
-"                <a t-attf-href=\"{{ object.sudo().documents_link_url }}\" target=\"_blank\" style=\"background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;\">\n"
+"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"width:100%; "
+"margin:0px auto;\"><tbody>\n"
+"        <tr><td valign=\"top\" style=\"text-align: left; font-size: 14px;"
+"\">\n"
+"            Dear <t t-esc=\"object.name\"/>, your personal documents access "
+"link is available for you.<br/><br/>\n"
+"            You'll find all your personal HR documents in this folder.<br/"
+"><br/>\n"
+"            Please keep this link secure.<br/><br/>\n"
+"            <div style=\"text-align: center; padding: 16px 0px 16px 0px; "
+"font-size: 14px;\">\n"
+"                <a t-attf-href=\"{{ object._get_documents_link_url() }}\" "
+"target=\"_blank\" style=\"background-color: #875A7B; padding: 8px 16px 8px "
+"16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;"
+"\">\n"
 "                    Your Documents\n"
 "                </a>\n"
 "            </div>\n"
-"            Have a nice day,<br>\n"
+"            Have a nice day,<br/>\n"
 "            The HR Team\n"
 "        </td></tr>\n"
 "    </tbody></table>\n"
 "                "
 msgstr ""
+"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"width:100%; "
+"margin:0px auto;\"><tbody>\n"
+"        <tr><td valign=\"top\" style=\"text-align: left; font-size: 14px;"
+"\">\n"
+"            Prezado(a) <t t-esc=\"object.name\"/>, seu link de acesso a "
+"documentos pessoais está disponível para você.<br/><br/>\n"
+"            ocê encontrará todos os seus documentos pessoais de RH nessa "
+"pasta.<br/><br/>\n"
+"            Mantenha esse link seguro.<br/><br/>\n"
+"            <div style=\"text-align: center; padding: 16px 0px 16px 0px; "
+"font-size: 14px;\">\n"
+"                <a t-attf-href=\"{{ object._get_documents_link_url() }}\" "
+"target=\"_blank\" style=\"background-color: #875A7B; padding: 8px 16px 8px "
+"16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;"
+"\">\n"
+"                    Seus documentos\n"
+"                </a>\n"
+"            </div>\n"
+"            Tenha um ótimo dia,<br/>\n"
+"            Equipe de RH\n"
+"        </td></tr>\n"
+"    </tbody></table>\n"
+"                "
 
 #. module: documents_hr
 #: model:documents.tag,name:documents_hr.documents_tag_absences
@@ -88,11 +122,9 @@ msgstr "Total de documentos"
 #. module: documents_hr
 #: model:ir.model,name:documents_hr.model_documents_redirect
 msgid "Document Redirect"
-msgstr ""
+msgstr "Redirecionamento de documentos"
 
 #. module: documents_hr
-#. odoo-python
-#: code:addons/documents_hr/models/res_users.py:0
 #: model:ir.model.fields,field_description:documents_hr.field_res_users__document_count
 #: model_terms:ir.ui.view,arch_db:documents_hr.hr_employee_view_form
 #: model_terms:ir.ui.view,arch_db:documents_hr.res_users_view_form
@@ -119,11 +151,9 @@ msgstr "Funcionário"
 #. odoo-python
 #: code:addons/documents_hr/models/hr_employee.py:0
 msgid ""
-"Employee's related user and private email must be set to use \"Send Access Link\" function:\n"
+"Employee's private email must be set to use \"Send Access Link\" function:\n"
 "%s"
 msgstr ""
-"O usuário relacionado e o e-mail pessoal do funcionário devem ser definidos para usar a função \"Enviar link de acesso\":\n"
-"%s"
 
 #. module: documents_hr
 #: model:documents.tag,name:documents_hr.documents_tag_employees
@@ -143,7 +173,7 @@ msgstr "Recursos Humanos"
 #. module: documents_hr
 #: model_terms:ir.ui.view,arch_db:documents_hr.documents_hr_portal_view
 msgid "My documents"
-msgstr ""
+msgstr "Meus documentos"
 
 #. module: documents_hr
 #: model:ir.model.fields,field_description:documents_hr.field_hr_departure_wizard__private_email
@@ -163,8 +193,8 @@ msgstr "Enviar link de acesso a documentos de RH"
 #. module: documents_hr
 #: model:ir.model.fields,help:documents_hr.field_hr_departure_wizard__send_hr_documents_access_link
 msgid ""
-"Send a share link to the private email of the employee with all the HR files"
-" he owns in Documents app"
+"Send a share link to the private email of the employee with all the HR files "
+"he owns in Documents app"
 msgstr ""
 "Envie um link de compartilhamento para o e-mail pessoal do funcionário com "
 "todos os arquivos de RH que ele possui no aplicativo Documentos"
@@ -199,7 +229,7 @@ msgstr "Espaço de trabalho"
 #. odoo-python
 #: code:addons/documents_hr/models/hr_employee.py:0
 msgid "You can not send the documents link to the employee."
-msgstr ""
+msgstr "Você não pode enviar o link dos documentos para o funcionário."
 
 #. module: documents_hr
 #. odoo-python
@@ -226,3 +256,12 @@ msgstr "Espaço de trabalho padrão de RH"
 msgid "{{ object.name }}, your personal documents access link is available"
 msgstr ""
 "{{ object.name }}, seu link de acesso a documentos pessoais está disponível"
+
+#~ msgid ""
+#~ "Employee's related user and private email must be set to use \"Send "
+#~ "Access Link\" function:\n"
+#~ "%s"
+#~ msgstr ""
+#~ "O usuário relacionado e o e-mail pessoal do funcionário devem ser "
+#~ "definidos para usar a função \"Enviar link de acesso\":\n"
+#~ "%s"

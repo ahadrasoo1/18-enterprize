@@ -1,33 +1,34 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* quality_control
-# 
+# * quality_control
+#
 # Translators:
-# Wil Odoo, 2024
-# 
+# Larissa Manderfeld, 2025
+# Wil Odoo, 2025
+#
+# "Larissa Manderfeld (lman)" <lman@odoo.com>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Spanish (https://app.transifex.com/odoo/teams/41243/es/)\n"
+"POT-Creation-Date: 2026-04-10 18:47+0000\n"
+"PO-Revision-Date: 2026-01-10 09:30+0000\n"
+"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"Language-Team: Spanish <https://translate.odoo.com/projects/odoo-18/"
+"quality_control/es/>\n"
+"Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: es\n"
-"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=(n == 1) ? 0 : ((n != 0 && n % 1000000 == "
+"0) ? 1 : 2);\n"
+"X-Generator: Weblate 5.14.3\n"
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_point_view_form_inherit_quality_control
-msgid "% of Operations"
-msgstr "% de operaciones"
-
-#. module: quality_control
-#: model_terms:ir.ui.view,arch_db:quality_control.quality_point_view_form_inherit_quality_control
-msgid "% of Transfers"
-msgstr "% de traslados"
+msgid "% of the time"
+msgstr "% del tiempo"
 
 #. module: quality_control
 #: model:ir.actions.report,print_report_name:quality_control.quality_check_report
@@ -39,11 +40,6 @@ msgstr "'Worksheet_%s' % object.name"
 #: model_terms:ir.ui.view,arch_db:quality_control.worksheet_page
 msgid "15.3 cm"
 msgstr "15,3 cm"
-
-#. module: quality_control
-#: model_terms:ir.ui.view,arch_db:quality_control.worksheet_page
-msgid "2023-08-15"
-msgstr "15-08-2023"
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_alert_team_dashboard_view_kanban
@@ -111,15 +107,6 @@ msgstr "<span class=\"o_stat_text\">Control de calidad</span>"
 #: model_terms:ir.ui.view,arch_db:quality_control.stock_picking_view_form_inherit_quality
 msgid "<span class=\"o_stat_text\">Quality Checks</span>"
 msgstr "<span class=\"o_stat_text\">Controles de calidad</span>"
-
-#. module: quality_control
-#: model_terms:ir.ui.view,arch_db:quality_control.quality_point_view_form_inherit_quality_control
-msgid ""
-"<span invisible=\"measure_frequency_type in ('all', 'on_demand')\">Every "
-"</span>"
-msgstr ""
-"<span invisible=\"measure_frequency_type in ('all', 'on_demand')\">Cada "
-"</span>"
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_point_view_form_inherit_quality_control
@@ -194,7 +181,7 @@ msgstr "Aceptar correos electrónicos de"
 #. module: quality_control
 #: model_terms:ir.actions.act_window,help:quality_control.quality_tag_action
 msgid "Add a new tag"
-msgstr "Agregar una nueva etiqueta"
+msgstr "Añadir una nueva etiqueta"
 
 #. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_check_wizard__additional_note
@@ -340,7 +327,7 @@ msgstr "Control por"
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.view_quality_point_kanban
 msgid "Control per:"
-msgstr ""
+msgstr "Control por:"
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_check_wizard_form_failure
@@ -416,10 +403,12 @@ msgstr ""
 #: model_terms:ir.actions.act_window,help:quality_control.quality_check_action_team
 msgid ""
 "Define Quality Control Points in order to automatically generate\n"
-"              quality checks at the right logistic operation: transfers, manufacturing orders."
+"              quality checks at the right logistic operation: transfers, "
+"manufacturing orders."
 msgstr ""
 "Defina puntos de control de calidad para que automáticamente se generen\n"
-"              controles de calidad con la operación de logística correcta: traslados y órdenes de fabricación."
+"              controles de calidad con la operación de logística correcta: "
+"traslados y órdenes de fabricación."
 
 #. module: quality_control
 #: model:ir.model.fields,help:quality_control.field_quality_check__testing_percentage_within_lot
@@ -466,7 +455,13 @@ msgstr "Descartar"
 #: model:ir.model.fields,field_description:quality_control.field_quality_check_wizard__display_name
 #: model:ir.model.fields,field_description:quality_control.field_quality_spreadsheet_template__display_name
 msgid "Display Name"
-msgstr "Nombre mostrado"
+msgstr "Nombre para mostrar"
+
+#. module: quality_control
+#: model:ir.model.fields,field_description:quality_control.field_quality_check_spreadsheet__display_thumbnail
+#: model:ir.model.fields,field_description:quality_control.field_quality_spreadsheet_template__display_thumbnail
+msgid "Display Thumbnail"
+msgstr "Mostrar miniatura"
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_spreadsheet_template_view_list
@@ -532,6 +527,11 @@ msgstr "Valor de la unidad de frecuencia"
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_check_view_search
+msgid "Future Activities"
+msgstr "Actividades futuras"
+
+#. module: quality_control
+#: model_terms:ir.ui.view,arch_db:quality_control.quality_check_view_search
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_point_view_search
 msgid "Group By"
 msgstr "Agrupar por"
@@ -557,17 +557,17 @@ msgstr ""
 #. module: quality_control
 #: model:ir.model.fields,help:quality_control.field_quality_check_on_demand__lot_id
 msgid ""
-"If you want to specify a lot/serial number before the transfer validation,"
-"                                create a new lot here from this field with "
-"the same exact lot name of the move line you want to add a check for."
-"                                If you want to create a check for all move "
-"lines, leave this field empty."
+"If you want to specify a lot/serial number before the transfer "
+"validation,                                create a new lot here from this "
+"field with the same exact lot name of the move line you want to add a check "
+"for.                                If you want to create a check for all "
+"move lines, leave this field empty."
 msgstr ""
-"Si desea especificar un número de serie o lote antes de validar el traslado,"
-"                                cree un nuevo lote aquí desde este campo con"
-" el mismo nombre exacto del lote de la línea de movimiento para la que desea"
-" agregar un control. Deje este campo vacío si desea crear un control para "
-"todas las líneas de movimiento."
+"Si desea especificar un número de serie o lote antes de validar el "
+"traslado,                                cree un nuevo lote aquí desde este "
+"campo con el mismo nombre exacto del lote de la línea de movimiento para la "
+"que desea añadir un control. Deje este campo vacío si desea crear un control "
+"para todas las líneas de movimiento."
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_check_view_search
@@ -623,6 +623,11 @@ msgstr "Última actualización por"
 #: model:ir.model.fields,field_description:quality_control.field_quality_spreadsheet_template__write_date
 msgid "Last Updated on"
 msgstr "Última actualización el"
+
+#. module: quality_control
+#: model_terms:ir.ui.view,arch_db:quality_control.quality_check_view_search
+msgid "Late Activities"
+msgstr "Actividades retrasadas"
 
 #. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_check__lot_line_id
@@ -729,7 +734,7 @@ msgstr "Nuevo"
 #. odoo-javascript
 #: code:addons/quality_control/static/src/spreadsheet_bundle/quality_spreadsheet_template_action/quality_spreadsheet_template_action.js:0
 msgid "New quality spreadsheet template created"
-msgstr ""
+msgstr "Nueva plantilla de hoja de cálculo de calidad creada"
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.view_quality_check_wizard
@@ -814,7 +819,7 @@ msgstr "Bajo pedido"
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.view_quality_check_wizard
 msgid "Open spreadsheet"
-msgstr ""
+msgstr "Abrir la hoja de cálculo"
 
 #. module: quality_control
 #: model:ir.model.fields.selection,name:quality_control.selection__quality_check__measure_on__operation
@@ -830,11 +835,15 @@ msgstr "Operación"
 msgid ""
 "Operation = One quality check is requested at the operation level.\n"
 "                  Product = A quality check is requested per product.\n"
-"                 Quantity = A quality check is requested for each new product quantity registered, with partial quantity checks also possible."
+"                 Quantity = A quality check is requested for each new "
+"product quantity registered, with partial quantity checks also possible."
 msgstr ""
 "Operación = Se solicita un control de calidad a nivel de operación.\n"
-"                  Producto = Se solicita un control de calidad por producto..\n"
-"                 Cantidad = Se solicita un control de calidad para cada nueva cantidad de producto registrada, con controles de cantidad parciales también posibles."
+"                  Producto = Se solicita un control de calidad por "
+"producto..\n"
+"                 Cantidad = Se solicita un control de calidad para cada "
+"nueva cantidad de producto registrada, con controles de cantidad parciales "
+"también posibles."
 
 #. module: quality_control
 #. odoo-python
@@ -1012,8 +1021,8 @@ msgid ""
 "Quality Alert stages define the different steps a quality alert should go "
 "through."
 msgstr ""
-"Las etapas de alerta de calidad definen los pasos que debe seguir una alerta"
-" de calidad."
+"Las etapas de alerta de calidad definen los pasos que debe seguir una alerta "
+"de calidad."
 
 #. module: quality_control
 #: model:ir.actions.act_window,name:quality_control.quality_alert_action_check
@@ -1146,7 +1155,7 @@ msgstr "Puntos de calidad"
 #: model:ir.actions.act_window,name:quality_control.quality_spreadsheet_template_action_config
 #: model:ir.ui.menu,name:quality_control.menu_config_quality_spreadsheet_template
 msgid "Quality Spreadsheet Templates"
-msgstr ""
+msgstr "Plantillas de hoja de cálculo de calidad"
 
 #. module: quality_control
 #: model:ir.actions.act_window,name:quality_control.quality_tag_action
@@ -1167,7 +1176,8 @@ msgid ""
 "              according to the roles (teams) that need them."
 msgstr ""
 "Los equipos de control de calidad agrupan las alertas o controles\n"
-"             de calidad de acuerdo con los diferentes (equipos) que lo necesitan."
+"             de calidad de acuerdo con los diferentes (equipos) que lo "
+"necesitan."
 
 #. module: quality_control
 #: model:ir.model,name:quality_control.model_report_quality_control_quality_worksheet_internal
@@ -1182,12 +1192,12 @@ msgstr "Informe de la hoja de trabajo de calidad"
 #. module: quality_control
 #: model:ir.model,name:quality_control.model_quality_check_spreadsheet
 msgid "Quality check spreadsheet"
-msgstr ""
+msgstr "Hoja de cálculo de control de calidad"
 
 #. module: quality_control
 #: model:ir.model,name:quality_control.model_quality_spreadsheet_template
 msgid "Quality check template spreadsheet"
-msgstr ""
+msgstr "Plantilla de hoja de cálculo para control de calidad"
 
 #. module: quality_control
 #: model_terms:ir.actions.act_window,help:quality_control.quality_point_action
@@ -1196,7 +1206,8 @@ msgid ""
 "              performed at each operation, for your different products."
 msgstr ""
 "Los puntos de control de calidad definen qué tipo de controles de calidad\n"
-"              deberían de llevarse acabo en cada operación para los diferentes productos."
+"              deberían de llevarse acabo en cada operación para los "
+"diferentes productos."
 
 #. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_check__qty_line
@@ -1215,7 +1226,7 @@ msgstr "Cantidad fallida"
 #. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_check__qty_passed
 msgid "Quantity Passed"
-msgstr ""
+msgstr "Cantidad aprobada"
 
 #. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_check__qty_tested
@@ -1232,12 +1243,12 @@ msgstr "Cantidad probada del producto dentro del lote"
 #. module: quality_control
 #: model:ir.model.fields,help:quality_control.field_quality_check__qty_failed
 msgid "Quantity of product that failed the quality check"
-msgstr ""
+msgstr "Cantidad de producto que no ha aprobado el control de calidad"
 
 #. module: quality_control
 #: model:ir.model.fields,help:quality_control.field_quality_check__qty_passed
 msgid "Quantity of product that passed the quality check"
-msgstr ""
+msgstr "Cantidad de producto que ha aprobado el control de calidad"
 
 #. module: quality_control
 #: model:ir.model.fields,help:quality_control.field_quality_check__qty_to_test
@@ -1275,7 +1286,7 @@ msgstr "Responsable"
 #. odoo-javascript
 #: code:addons/quality_control/static/src/spreadsheet_bundle/quality_check_spreadsheet_action/quality_check_spreadsheet_action.xml:0
 msgid "Save in"
-msgstr ""
+msgstr "Guardar en"
 
 #. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_check_on_demand__show_lot_number
@@ -1315,7 +1326,7 @@ msgstr "Datos de la hoja de cálculo"
 #: model:ir.model.fields,field_description:quality_control.field_quality_check_spreadsheet__spreadsheet_file_name
 #: model:ir.model.fields,field_description:quality_control.field_quality_spreadsheet_template__spreadsheet_file_name
 msgid "Spreadsheet File Name"
-msgstr ""
+msgstr "Nombre del archivo de la hoja de cálculo"
 
 #. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_check_spreadsheet__spreadsheet_revision_ids
@@ -1372,7 +1383,7 @@ msgstr "Línea de movimiento de stock"
 #: model:ir.model.fields,field_description:quality_control.field_quality_point__spreadsheet_check_cell
 #: model:ir.model.fields,field_description:quality_control.field_quality_spreadsheet_template__check_cell
 msgid "Success cell"
-msgstr ""
+msgstr "Celda de éxito"
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_tag_view_search
@@ -1394,7 +1405,7 @@ msgstr "Nombre del equipo"
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.view_quality_point_kanban
 msgid "Team:"
-msgstr ""
+msgstr "Equipo:"
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_alert_team_view_tree
@@ -1433,6 +1444,15 @@ msgid ""
 "several sheets, specify which one you want to use (e.g. Sheet2!C4). If not "
 "specified, the first sheet is selected by default."
 msgstr ""
+"Si el valor de la celda de éxito es TRUE quiere decir que el control fue "
+"exitoso. Si hay varias hojas, debe especificar cuál quiere usar (por "
+"ejemplo, Hoja2!C4). Si no se especifica, la primera hoja se selecciona por "
+"defecto."
+
+#. module: quality_control
+#: model:ir.model.fields,help:quality_control.field_quality_point__measure_frequency_value
+msgid "The probability of each quality check being generated"
+msgstr "La probabilidad de que se genere cada control de calidad"
 
 #. module: quality_control
 #. odoo-python
@@ -1451,6 +1471,11 @@ msgstr "Miniatura"
 #: model:ir.model.fields,field_description:quality_control.field_quality_check_wizard__title
 msgid "Title"
 msgstr "Título"
+
+#. module: quality_control
+#: model_terms:ir.ui.view,arch_db:quality_control.quality_check_view_search
+msgid "Today Activities"
+msgstr "Actividades de hoy"
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_point_view_form_inherit_quality_control
@@ -1489,6 +1514,12 @@ msgstr "Tipo:"
 #: model_terms:ir.ui.view,arch_db:quality_control.view_quality_check_wizard
 msgid "Unit of Measure"
 msgstr "Unidad de medida"
+
+#. module: quality_control
+#. odoo-python
+#: code:addons/quality_control/models/quality_spreadsheet_template.py:0
+msgid "Untitled spreadsheet"
+msgstr "Hoja de cálculo sin título"
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.view_quality_check_wizard
@@ -1555,11 +1586,11 @@ msgstr ""
 #. odoo-python
 #: code:addons/quality_control/models/quality.py:0
 msgid ""
-"You measured %(measure).2f %(unit)s and it should be between "
-"%(tolerance_min).2f and %(tolerance_max).2f %(unit)s."
+"You measured %(measure).2f %(unit)s and it should be between %"
+"(tolerance_min).2f and %(tolerance_max).2f %(unit)s."
 msgstr ""
-"Midió %(measure).2f %(unit)s y debería estar entre %(tolerance_min).2f y "
-"%(tolerance_max).2f %(unit)s."
+"Midió %(measure).2f %(unit)s y debería estar entre %(tolerance_min).2f y %"
+"(tolerance_max).2f %(unit)s."
 
 #. module: quality_control
 #. odoo-python
@@ -1587,3 +1618,6 @@ msgstr "p. ej. Los maestros de QA"
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_alert_team_view_form
 msgid "e.g. mycompany.com"
 msgstr "p. ej. micompañía.com"
+
+#~ msgid "2023-08-15"
+#~ msgstr "15-08-2023"

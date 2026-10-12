@@ -19,16 +19,31 @@ class AccountTaxReportHandler(models.AbstractModel):
     # With this, custom tax reports don't need to inherit from the generic tax report
 
     def _custom_options_initializer(self, report, options, previous_options):
-        options['buttons'].append({'name': _('Closing Entry'), 'action': 'action_periodic_vat_entries', 'sequence': 110, 'always_show': True})
-        self._enable_export_buttons_for_common_vat_groups_in_branches(options)
+        optional_periods = {
+            'monthly': 'month',
+            'trimester': 'quarter',
+            'year': 'year',
+        }
+
+        if self.env.user.has_group("account.group_account_user"):
+            options['buttons'].append({'name': _('Closing Entry'), 'action': 'action_periodic_vat_entries', 'sequence': 110, 'always_show': True})
+
+        options['enable_export_buttons_for_common_vat_in_branches'] = True
 
         day, month = self.env.company._get_tax_closing_start_date_attributes(report)
+        periodicity = self.env.company._get_tax_periodicity(report)
         options['tax_periodicity'] = {
-            'periodicity': self.env.company._get_tax_periodicity(report),
+            'periodicity': periodicity,
             'months_per_period': self.env.company._get_tax_periodicity_months_delay(report),
             'start_day': day,
             'start_month': month,
         }
+
+        options['show_tax_period_filter'] = periodicity not in optional_periods or day != 1 or month != 1
+        if not options['show_tax_period_filter'] and 'custom' not in options['date']['filter']:
+            period_type = optional_periods[periodicity]
+            options['date']['filter'] = options['date']['filter'].replace('tax_period', period_type)
+            options['date']['period_type'] = options['date']['period_type'].replace('tax_period', period_type)
 
     def _get_custom_display_config(self):
         display_config = defaultdict(dict)
@@ -74,11 +89,12 @@ class AccountTaxReportHandler(models.AbstractModel):
 
     def action_periodic_vat_entries(self, options, from_post=False):
         report = self.env['account.report'].browse(options['report_id'])
-        if (options['date']['period_type'] != 'tax_period' and not self._is_period_equal_to_options(report,
-                                                                                                    options)) and not self.env.context.get(
-                'override_tax_closing_warning'):
-            if len(options['companies']) > 1 and (report.filter_multi_company != 'tax_units' or not (
-                    report.country_id and options['available_tax_units'])):
+        if (
+            options['date']['period_type'] != 'tax_period'
+            and not self._is_period_equal_to_options(report, options)
+            and not self.env.context.get('override_tax_closing_warning')
+        ):
+            if len(options['companies']) > 1 and (report.filter_multi_company != 'tax_units' or not (report.country_id and options['available_tax_units'])):
                 message = _(
                     "You're about the generate the closing entries of multiple companies at once. Each of them will be created in accordance with its company tax periodicity.")
             else:
@@ -228,13 +244,14 @@ class AccountTaxReportHandler(models.AbstractModel):
             include_domestic, fiscal_positions = self._get_fpos_info_for_tax_closing(company, report, options)
             fiscal_position_ids = fiscal_positions.ids + ([False] if include_domestic else [])
             state_domain = ('state', '=', 'posted') if posted_only else ('state', '!=', 'cancel')
+            closing_report = company._get_closing_report_for_tax_closing_move(report, False)
             closing_moves += self.env['account.move'].search([
                 ('company_id', '=', company.id),
                 ('fiscal_position_id', 'in', fiscal_position_ids),
                 ('date', '=', period_end),
-                ('tax_closing_report_id', '=', options['report_id']),
+                ('tax_closing_report_id', '=', closing_report.id),
                 state_domain,
-            ], limit=1)
+            ])
 
         return closing_moves
 
@@ -577,6 +594,14 @@ class GenericTaxReportCustomHandler(models.AbstractModel):
 
         return parent_config
 
+    def _custom_options_initializer(self, report, options, previous_options=None):
+        super()._custom_options_initializer(report, options, previous_options=previous_options)
+
+        # We are on the generic tax report (no country) and the user can not change the fiscal position so we show them all.
+        if not report.country_id and len(options['available_vat_fiscal_positions']) <= (0 if options['allow_domestic'] else 1) and len(options['companies']) <= 1:
+            options['allow_domestic'] = False
+            options['fiscal_position'] = 'all'
+
     def _dynamic_lines_generator(self, report, options, all_column_groups_expression_totals, warnings=None):
         return self._get_dynamic_lines(report, options, 'default', warnings)
 
@@ -635,7 +660,7 @@ class GenericTaxReportCustomHandler(models.AbstractModel):
                 sorting_map_list.append(sorting_map)
             else:
                 # src_tax_type_tax_use.
-                selection = self.env['account.tax']._fields['type_tax_use'].selection
+                selection = self.env['account.tax']._fields['type_tax_use']._description_selection(self.env)
                 sorting_map_list.append({v[0]: (v, j) for j, v in enumerate(selection) if v[0] in record_ids_gb[i]})
 
         # Compute report lines.
@@ -703,6 +728,9 @@ class GenericTaxReportCustomHandler(models.AbstractModel):
 
         for column_group_key, options in options_by_column_group.items():
             query = report._get_report_query(options, 'strict_range')
+            # make sure account_move is always joined
+            if 'account_move_line__move_id' not in query._joins:
+                query.join('account_move_line', 'move_id', 'account_move', 'id', 'move_id')
 
             # Fetch the base amounts.
             self._cr.execute(SQL(
@@ -907,7 +935,7 @@ class GenericTaxReportCustomHandler(models.AbstractModel):
                 SELECT
                     %(select_clause)s,
                     trl.document_type = 'refund' AS is_refund,
-                    SUM(tdr.base_amount) AS base_amount,
+                    SUM(CASE WHEN tdr.display_type = 'rounding' THEN 0 ELSE tdr.base_amount END) AS base_amount,
                     SUM(tdr.tax_amount) AS tax_amount
                 FROM (%(tax_details_query)s) AS tdr
                 JOIN account_tax_repartition_line trl ON trl.id = tdr.tax_repartition_line_id
@@ -917,7 +945,7 @@ class GenericTaxReportCustomHandler(models.AbstractModel):
                     AND src_tax.type_tax_use IN ('sale', 'purchase')
                 JOIN account_account account ON account.id = tdr.base_account_id
                 WHERE tdr.tax_exigible
-                GROUP BY tdr.tax_repartition_line_id, trl.document_type, tdr.display_type, %(groupby_query)s
+                GROUP BY tdr.tax_repartition_line_id, trl.document_type, %(groupby_query)s
                 ORDER BY src_tax.sequence, src_tax.id, tax.sequence, tax.id
                 ''',
                 select_clause=SQL(',').join(select_clause_list),
@@ -1009,9 +1037,10 @@ class GenericTaxReportCustomHandler(models.AbstractModel):
                 tax_amount = tax_amounts[column['column_group_key']]
 
                 expr_label = column.get('expression_label')
+                col_value = ''
 
-                if expr_label == 'net':
-                    col_value = sign * tax_base_amount if index == len(groupby_fields) - 1 else ''
+                if expr_label == 'net' and index == len(groupby_fields) - 1:
+                    col_value = sign * tax_base_amount
 
                 if expr_label == 'tax':
                     col_value = sign * tax_amount
@@ -1112,12 +1141,15 @@ class GenericTaxReportCustomHandler(models.AbstractModel):
             net_value = next((col['no_format'] for col in report_line['columns'] if col['column_group_key'] == column_group_key and col['expression_label'] == 'net'), 0)
             tax_value = next((col['no_format'] for col in report_line['columns'] if col['column_group_key'] == column_group_key and col['expression_label'] == 'tax'), 0)
 
+            if net_value == '':  # noqa: PLC1901
+                continue
+
             currency = self.env.company.currency_id
             computed_tax_amount = float(net_value or 0) * tax_applied
             is_inconsistent = currency.compare_amounts(computed_tax_amount, tax_value)
 
             if is_inconsistent:
-                error = abs(abs(tax_value) - abs(computed_tax_amount)) / float(net_value or 1)
+                error = abs((abs(tax_value) - abs(computed_tax_amount)) / float(net_value or 1))
 
                 # Error is bigger than 0.1%. We can not ignore it.
                 if error > 0.001:

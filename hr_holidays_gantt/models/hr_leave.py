@@ -147,7 +147,7 @@ class HrLeave(models.Model):
                 is_validated = False
             else:
                 dt_delta = (leave.date_to - leave.date_from)
-                if leave.holiday_id and not (leave.holiday_id.request_unit_half or leave.holiday_id.request_unit_hours):
+                if leave.holiday_id and not (leave.holiday_id.sudo().request_unit_half or leave.holiday_id.sudo().request_unit_hours):
                     number_of_days = dt_delta.days + 1
                 else:
                     number_of_days = dt_delta.days + ((dt_delta.seconds / 3600) / 24)
@@ -178,7 +178,7 @@ class HrLeave(models.Model):
             # remove intervals smaller than a cell, as they will cause half a cell to turn grey
             # ie: when looking at a week, a employee start everyday at 8, so there is a unavailability
             # like: 2019-05-22 20:00 -> 2019-05-23 08:00 which will make the first half of the 23's cell grey
-            notable_intervals = filter(lambda interval: interval[1] - interval[0] >= cell_dt, leaves_mapping[employee.resource_id.id])
+            notable_intervals = filter(lambda interval: interval[1] - interval[0] >= cell_dt, leaves_mapping.get(employee.resource_id.id, []))
             result[employee.id] = [{'start': interval[0], 'stop': interval[1]} for interval in notable_intervals]
         return result
 

@@ -1,8 +1,9 @@
 from lxml import etree
 from odoo import Command
+from odoo.tests import tagged
 from odoo.tests.common import BaseCase, HttpCase
 from odoo.addons.web_studio.controllers import export
-from odoo.addons.web_studio.wizard.studio_export_wizard import _find_circular_dependencies
+from odoo.addons.web_studio.wizard.studio_export_wizard import _find_circular_dependencies, FIELDS_TO_EXPORT
 from odoo.addons.website.tools import MockRequest
 
 
@@ -118,6 +119,38 @@ class TestExport(HttpCase):
             "trg_date_range_type",
             "trigger"
         })
+
+    def test_fields_to_export_are_not_excluded(self):
+        for model, fields_to_export in FIELDS_TO_EXPORT.items():
+            export_model = self.env["studio.export.model"].create({
+                "model_id": self.env["ir.model"]._get(model).id,
+            })
+            excluded_fields = export_model.excluded_fields.mapped("name")
+            self.assertEqual(set(fields_to_export), set(fields_to_export) - set(excluded_fields))
+
+
+@tagged("post_install", "-at_install")
+class TestExportTours(HttpCase):
+    def test_can_export_new_module(self):
+        self.start_tour("/odoo?debug=tests", 'can_export_new_module', login="admin")
+        # check the export result made by the tour
+        wizard = self.env['studio.export.wizard'].search([], limit=1, order='id desc')
+        data, files, circular_dependencies = wizard._get_export_info()
+        self.assertEqual(circular_dependencies, [])
+        self.assertEqual(data, wizard.default_export_data)
+        self.assertEqual(len(wizard.additional_export_data), 0)
+        exported_models = {f[0] for f in files}
+        self.assertEqual(exported_models, {
+            'ir.actions.act_window', 'ir.default',
+            'ir.model', 'ir.model.fields', 'ir.model.access',
+            'ir.ui.view', 'ir.ui.menu',
+        })
+        self.assertEqual(len(data.filtered(lambda r: r.model == 'ir.model')), 1)
+        self.assertEqual(self.env['ir.model'].browse(data.filtered(lambda r: r.model == 'ir.model').res_id).name, 'My App Records')
+        created_menus = self.env['ir.ui.menu'].browse(data.filtered(lambda r: r.model == 'ir.ui.menu').mapped("res_id")).mapped("name")
+        self.assertEqual(len(created_menus), 2)
+        self.assertTrue('My New App' in created_menus)
+        self.assertTrue('My App Records' in created_menus)
 
 
 class TestCircularDependencies(BaseCase):

@@ -9,12 +9,12 @@ from odoo.addons.test_l10n_be_hr_payroll_account.tests.test_payslip import TestP
 
 @tagged('thirteen_month')
 class Test13thMonth(TestPayslipBase):
-
-    def setUp(self):
-        super(Test13thMonth, self).setUp()
-        self.structure = self.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_thirteen_month')
-        contract = self.employee.contract_id
-        self.payslip = self.create_payslip(contract, self.structure, datetime(2019, 12, 1), datetime(2019, 12, 31))
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.structure = cls.env.ref('l10n_be_hr_payroll.hr_payroll_structure_cp200_thirteen_month')
+        contract = cls.employee.contract_id
+        cls.payslip = cls.create_payslip(contract, cls.structure, datetime(2019, 12, 1), datetime(2019, 12, 31))
 
     def _adjust_payslip(self, contract):
         self.payslip.contract_id = contract
@@ -58,7 +58,7 @@ class Test13thMonth(TestPayslipBase):
         work_entries = self.employee.contract_ids.generate_work_entries(date(2018, 12, 31), date(2019, 12, 31))
         work_entries.action_validate()
         self._adjust_payslip(contract)
-        self.assertEqual(self.payslip._get_paid_amount(), 1250, 'It should be count 6 months')
+        self.assertEqual(self.payslip._get_paid_amount(), 0, '13th month only for people who started before 01/07')
 
     def test_13th_month_paid_amount_month_start(self):
         contract = self.create_contract(date(2019, 6, 3))  # 3rd June 2019 is a Monday => June should count

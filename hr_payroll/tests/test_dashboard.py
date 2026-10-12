@@ -33,7 +33,7 @@ class TestDashboardUi(HttpCase):
             'company_id': company.id,
         })
         # this will make one of the action box non empty
-        self.env['hr.employee'].create({
+        employee = self.env['hr.employee'].create({
             'user_id': user.id,
             'company_id': company.id,
             'department_id': department.id,
@@ -54,7 +54,41 @@ class TestDashboardUi(HttpCase):
                 'attachment_id': attachment.id,
                 'sign_item_ids': [(6, 0, [])],
             })
-        self.start_tour("/", "payroll_dashboard_ui_tour", login='dashboarder', timeout=300)
+
+        warnings = self.env['hr.payslip'].get_dashboard_warnings()
+        emp_wo_contract_warn = {}
+        for warning in warnings:
+            if warning['string'] == "Employees Without Running Contracts":
+                emp_wo_contract_warn = warning
+                break
+        self.assertTrue(emp_wo_contract_warn, "There should be a warning for employees without contracts")
+        emp_wo_contract = self.env['hr.employee'].search(emp_wo_contract_warn['action']['domain'])
+        self.assertTrue(
+            employee in emp_wo_contract,
+            "Laurie Poiret should appear in the list of employees without contract")
+
+        self.env['hr.contract'].create([{
+            'name': "Laurie's contract",
+            'employee_id': employee.id,
+            'state': 'open',
+            'hr_responsible_id': self.env.user.id,
+            'wage': 2000,
+        }])
+
+        warnings = self.env['hr.payslip'].get_dashboard_warnings()
+        emp_wo_contract_warn = {}
+        for warning in warnings:
+            if warning['string'] == "Employees Without Running Contracts":
+                emp_wo_contract_warn = warning
+                break
+        # Conditional checking as the warning might not be there depending on how other data are handled
+        if warning:
+            emp_wo_contract = self.env['hr.employee'].search(emp_wo_contract_warn['action']['domain'])
+            self.assertFalse(
+                employee in emp_wo_contract,
+                "Laurie Poiret should not appear in the list of employees without contract")
+
+        self.start_tour("/web", "payroll_dashboard_ui_tour", login='dashboarder', timeout=300)
 
 @tagged('-at_install', 'post_install', 'payroll_dashboard')
 class TestDashboard(TransactionCase):

@@ -1,4 +1,5 @@
 from . import test_account_fiscal_year
+from . import test_account_payment
 from . import test_bank_rec_widget
 from . import test_bank_rec_widget_tour
 from . import test_prediction

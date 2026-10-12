@@ -1,29 +1,29 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* sign
-# 
+# * sign
+#
 # Translators:
-# Wil Odoo, 2024
-# 
+# Wil Odoo, 2025
+# Stanislav Kurinec, 2025
+# Vojtěch Olšan, 2025
+# Marta Wacławek, 2025
+#
+# "Marta (wacm)" <wacm@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-26 09:13+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Czech (https://app.transifex.com/odoo/teams/41243/cs/)\n"
+"POT-Creation-Date: 2026-04-10 18:47+0000\n"
+"PO-Revision-Date: 2026-02-27 05:19+0000\n"
+"Last-Translator: \"Marta (wacm)\" <wacm@odoo.com>\n"
+"Language-Team: Czech <https://translate.odoo.com/projects/odoo-18/sign/cs/>\n"
+"Language: cs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: cs\n"
-"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
-
-#. module: sign
-#. odoo-javascript
-#: code:addons/sign/static/src/dialogs/thank_you_dialog.js:0
-msgid " You can safely close this window."
-msgstr " Toto okno můžete bez obav zavřít."
+"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n "
+"<= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
+"X-Generator: Weblate 5.14.3\n"
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_res_partner__signature_count
@@ -32,17 +32,13 @@ msgid "# Signatures"
 msgstr "# Podpisů"
 
 #. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid "#7898678"
-msgstr "#7898678"
-
-#. module: sign
 #. odoo-python
 #: code:addons/sign/controllers/main.py:0
 msgid ""
-"%(partner)s validated the signature by SMS with the phone number "
-"%(phone_number)s."
+"%(partner)s validated the signature by SMS with the phone number %"
+"(phone_number)s."
 msgstr ""
+"%(partner)s ověřen podpis pomocí SMS s telefonním číslem %(phone_number)s."
 
 #. module: sign
 #. odoo-python
@@ -60,7 +56,7 @@ msgstr "%s byl upraven a podepsán"
 #. odoo-python
 #: code:addons/sign/wizard/sign_send_request.py:0
 msgid "%s has been linked to this sign request."
-msgstr ""
+msgstr "%s byl propojen s požadavkem na podpis."
 
 #. module: sign
 #. odoo-python
@@ -98,52 +94,25 @@ msgstr ""
 "        požádal o váš podpis na dokumentu"
 
 #. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid "******1234"
-msgstr ""
-
-#. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_portal_my_request
 msgid ""
 "- <em>\n"
 "                                            Waiting Signature\n"
 "                                        </em>"
 msgstr ""
+"- <em>\n"
+"                                            Čekající podpis\n"
+"                                        </em>"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_portal_my_request
 msgid "- <em>Cancelled</em>"
-msgstr ""
+msgstr "- <em>Zrušeno</em>"
 
 #. module: sign
 #: model_terms:ir.actions.act_window,help:sign.sign_template_action
 msgid "- or -"
 msgstr "- nebo -"
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid "1001"
-msgstr ""
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid "192.168.1.1"
-msgstr ""
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid "20-03-2000"
-msgstr ""
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid "2023-08-18"
-msgstr ""
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid "2023-08-18 - 12:30:45"
-msgstr ""
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
@@ -168,8 +137,8 @@ msgstr "<b>Document ID:</b>"
 #. module: sign
 #. odoo-javascript
 #: code:addons/sign/static/src/js/tours/sign.js:0
-msgid "<b>Drag & drop “Signature”</b> into the bottom of the document."
-msgstr "<b>Přetáhnout & pustit “Podpis”</b> na konec dokumentu."
+msgid "<b>Drag & drop \"Signature\"</b> into the bottom of the document."
+msgstr ""
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.green_savings_report
@@ -214,10 +183,11 @@ msgstr "<br/>(přístup k e-mailu nebyl odeslán)"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_expired
-msgid "<i class=\"fa fa-check\"/> A fresh link has just been sent to your inbox!"
+msgid ""
+"<i class=\"fa fa-check\"/> A fresh link has just been sent to your inbox!"
 msgstr ""
-"<i class=\"fa fa-check\"/> Do vaší e-mailové schránky byl právě odeslán nový"
-" odkaz!"
+"<i class=\"fa fa-check\"/> Do vaší e-mailové schránky byl právě odeslán nový "
+"odkaz!"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
@@ -229,7 +199,8 @@ msgstr "<i class=\"fa fa-check\"/> Integrita dokumentu je platná."
 msgid ""
 "<i class=\"fa fa-exclamation-circle\"/> The document's integrity could not "
 "be verified."
-msgstr "<i class=\"fa fa-exclamation-circle\"/> Integritu dokumentu nelze ověřit."
+msgstr ""
+"<i class=\"fa fa-exclamation-circle\"/> Integritu dokumentu nelze ověřit."
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
@@ -242,8 +213,8 @@ msgid ""
 "<i class=\"fa fa-info-circle\"/> Links sent via email expire after a set "
 "delay to increase security."
 msgstr ""
-"<i class=\"fa fa-info-circle\"/> Odkazy zaslané e-mailem vyprší po nastavené"
-" prodlevě, aby se zvýšila bezpečnost."
+"<i class=\"fa fa-info-circle\"/> Odkazy zaslané e-mailem vyprší po nastavené "
+"prodlevě, aby se zvýšila bezpečnost."
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_terms_conditions_setting_banner
@@ -262,7 +233,7 @@ msgstr ""
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.signer_status_wrapper
 msgid "<small><i> Cancelled </i></small>"
-msgstr ""
+msgstr "<small><i> Zrušeno </i></small>"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.signer_status_wrapper
@@ -302,10 +273,15 @@ msgstr "<span class=\"o_stat_text\">Podepsaný dokument</span>"
 msgid ""
 "<span class=\"text-muted\" invisible=\"not share_link\">Sharing will create "
 "a copy of the file to sign. That file can be reached by the link below. "
-"Every public user using the link will generate a document when the Signature"
-" is complete. The link is private, only those that receive the link will be "
+"Every public user using the link will generate a document when the Signature "
+"is complete. The link is private, only those that receive the link will be "
 "able to sign it.</span>"
 msgstr ""
+"<span class=\"text-muted\" invisible=\"not share_link\">Sdílení vytvoří "
+"kopii souboru k podpisu. Soubor je dostupný pomocí odkazu níže. Kterýkoliv "
+"uživatel použitím odkazu vygeneruje dokument při dokončení podepisování. "
+"Odkaz je soukromý, pouze ti co odkaz obdrží, budou moci dokument podepsat.</"
+"span>"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
@@ -323,6 +299,14 @@ msgid "<span>This is a preview of your Terms &amp; Conditions.</span>"
 msgstr "<span>Toto je náhled vašich všeobecných obchodních podmínek.</span>"
 
 #. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.cancel_sign_request_item_with_confirmation
+msgid ""
+"<span>You won't receive any notification for this signature request anymore."
+"</span>"
+msgstr ""
+"<span>O této žádosti o podpis již nebudete dostávat žádné oznámení.</span>"
+
+#. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_portal_my_request
 msgid "<strong>Creation Date:</strong>"
 msgstr "<strong>Datum vzniku:</strong>"
@@ -338,12 +322,15 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_request
 msgid ""
 "<strong>Warning</strong> do not forward this email to other people!<br/>\n"
-"            They will be able to access this document and sign it as yourself.<br/>\n"
-"            <span>Your IP address and localization are associated to your signature to ensure traceability.</span>"
+"            They will be able to access this document and sign it as "
+"yourself.<br/>\n"
+"            <span>Your IP address and localization are associated to your "
+"signature to ensure traceability.</span>"
 msgstr ""
 "<strong>Varování</strong> neposílejte tento e-mail dalším osobám!<br/>\n"
 "            Budou moci měnit a podepsat tento dokument vaším jménem. <br/>\n"
-"            <span> Pro zajištění dohledatelnosti, bude k Vašemu podpisu přiřazena Vaše IP adresa a lokalizace.</span>"
+"            <span> Pro zajištění dohledatelnosti, bude k Vašemu podpisu "
+"přiřazena Vaše IP adresa a lokalizace.</span>"
 
 #. module: sign
 #. odoo-javascript
@@ -358,7 +345,7 @@ msgstr ""
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.message_signature_link
 msgid "A document has been signed and a copy attached to"
-msgstr ""
+msgstr "Dokument byl podepsán a jeho kopie byla připojena"
 
 #. module: sign
 #. odoo-python
@@ -372,8 +359,7 @@ msgstr ""
 #. module: sign
 #. odoo-python
 #: code:addons/sign/models/sign_request.py:0
-msgid ""
-"A shared sign request should only have one signer with an empty partner"
+msgid "A shared sign request should only have one signer with an empty partner"
 msgstr ""
 "Sdílená žádost k podpisu by měla mít pouze jednoho podepisujícího bez "
 "vyplněného partnera"
@@ -387,19 +373,18 @@ msgstr "Při sprchování se spotřebuje přibližně 65 l vody"
 #. odoo-python
 #: code:addons/sign/wizard/sign_send_request.py:0
 msgid "A signature request has been linked to this document: %s"
-msgstr ""
+msgstr "Žádost o podpis byla připojena k tomuto dokumentu: %s"
 
 #. module: sign
 #. odoo-python
 #: code:addons/sign/models/sign_request.py:0
 msgid "A valid sign request needs at least one sign request item"
-msgstr ""
-"Korektní požadavek k podpisu vyžaduje alespoň jednu podpisovou položku"
+msgstr "Korektní požadavek k podpisu vyžaduje alespoň jednu podpisovou položku"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
 msgid "ABCD1234"
-msgstr ""
+msgstr "ABCD1234"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
@@ -414,7 +399,7 @@ msgstr "Varování přístupových práv"
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.portal_my_home_sign
 msgid "Access your signed documents"
-msgstr ""
+msgstr "Přístup k vašim podepsaným dokumentům"
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request_item__access_via_link
@@ -501,12 +486,12 @@ msgstr "Přidat iniciály"
 #. odoo-javascript
 #: code:addons/sign/static/src/dialogs/initial_all_pages_dialog.xml:0
 msgid "Add Once"
-msgstr ""
+msgstr "Přidat jednou"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_form
 msgid "Add document tags here"
-msgstr ""
+msgstr "Zde přidejte štítky dokumentu"
 
 #. module: sign
 #. odoo-javascript
@@ -550,12 +535,6 @@ msgid "All Documents"
 msgstr "Všechny dokumenty"
 
 #. module: sign
-#. odoo-javascript
-#: code:addons/sign/static/src/dialogs/thank_you_dialog.xml:0
-msgid "All done!"
-msgstr "Vše hotovo!"
-
-#. module: sign
 #. odoo-python
 #: code:addons/sign/models/sign_request.py:0
 msgid "All signers must have valid email addresses"
@@ -584,7 +563,7 @@ msgstr "Průměrný počítač spotřebovává 750 Wh"
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
 msgid "Antwrep"
-msgstr ""
+msgstr "Antverp"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_kanban
@@ -598,6 +577,11 @@ msgstr "Archivovat"
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_view_form
 msgid "Archived"
 msgstr "Archivováno"
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.cancel_sign_request_item_with_confirmation
+msgid "Are you sure you want to cancel the sign request?"
+msgstr "Opravdu chcete zrušit žádost o podpis?"
 
 #. module: sign
 #: model:ir.model.fields,help:sign.field_sign_request__start_sign
@@ -660,13 +644,13 @@ msgstr "Pole pro automatické doplnění partnera"
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_item_option__available
 msgid "Available in new templates"
-msgstr ""
+msgstr "K dispozici v nových šablonách"
 
 #. module: sign
 #. odoo-python
 #: code:addons/sign/models/sign_request.py:0
 msgid "Back to %s"
-msgstr ""
+msgstr "Zpět na %s"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.green_savings_report
@@ -692,9 +676,9 @@ msgstr "Od"
 #. odoo-javascript
 #: code:addons/sign/static/src/dialogs/sign_name_and_signature_dialog.xml:0
 msgid ""
-"By clicking Adopt & Sign, I agree that the chosen signature/initials will be"
-" a valid electronic representation of my hand-written signature/initials for"
-" all purposes when it is used on documents, including legally binding "
+"By clicking Adopt & Sign, I agree that the chosen signature/initials will be "
+"a valid electronic representation of my hand-written signature/initials for "
+"all purposes when it is used on documents, including legally binding "
 "contracts."
 msgstr ""
 "Stiknutím Přijmout & Podepsat, souhlasím s tím že vybraný podpis/iniciály "
@@ -712,7 +696,6 @@ msgstr "Kopie zprávy"
 #: code:addons/sign/static/src/dialogs/public_signer_dialog.xml:0
 #: code:addons/sign/static/src/dialogs/sign_name_and_signature_dialog.xml:0
 #: code:addons/sign/static/src/dialogs/sign_refusal_dialog.xml:0
-#: code:addons/sign/static/src/dialogs/thank_you_dialog.xml:0
 #: model:ir.model.fields.selection,name:sign.selection__sign_log__action__cancel
 #: model_terms:ir.ui.view,arch_db:sign.sign_duplicate_template_with_pdf_view_form
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_form
@@ -720,6 +703,11 @@ msgstr "Kopie zprávy"
 #: model_terms:ir.ui.view,arch_db:sign.sign_send_request_view_form
 msgid "Cancel"
 msgstr "Zrušit"
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.cancel_sign_request_item_with_confirmation
+msgid "Cancel Sign Request"
+msgstr ""
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_kanban
@@ -787,6 +775,12 @@ msgstr "Klepnutím spustit"
 #: code:addons/sign/static/src/backend_components/sign_template/sign_item_custom_popover.xml:0
 #: code:addons/sign/static/src/dialogs/thank_you_dialog.js:0
 #: code:addons/sign/static/src/js/tours/sign.js:0
+#: model:sign.template,redirect_url_text:sign.template_sign_1
+#: model:sign.template,redirect_url_text:sign.template_sign_2
+#: model:sign.template,redirect_url_text:sign.template_sign_3
+#: model:sign.template,redirect_url_text:sign.template_sign_4
+#: model:sign.template,redirect_url_text:sign.template_sign_5
+#: model:sign.template,redirect_url_text:sign.template_sign_tour
 #: model_terms:ir.ui.view,arch_db:sign.green_savings_report
 #: model_terms:ir.ui.view,arch_db:sign.sign_terms_conditions_setting_banner
 msgid "Close"
@@ -911,8 +905,8 @@ msgstr "Kontakty v kopii"
 #. module: sign
 #: model:ir.model.fields,help:sign.field_sign_send_request__cc_partner_ids
 msgid ""
-"Contacts in copy will be notified by email once the document is either fully"
-" signed or refused."
+"Contacts in copy will be notified by email once the document is either fully "
+"signed or refused."
 msgstr ""
 "Kontakty v kopii budou upozorněny e-mailem, jakmile je dokument plně "
 "podepsán nebo zamítnut."
@@ -926,7 +920,7 @@ msgstr "Kopírovat do"
 #. module: sign
 #: model_terms:ir.actions.act_window,help:sign.sign_template_tag_action
 msgid "Create Sign Tags"
-msgstr ""
+msgstr "Vytvoření štítků podpisu"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_tree
@@ -1015,7 +1009,7 @@ msgstr "Výchozí výška"
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_mail_activity_type__default_sign_template_id
 msgid "Default Signature Template"
-msgstr ""
+msgstr "Výchozí podpisová šablona"
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_item_type__default_width
@@ -1025,7 +1019,7 @@ msgstr "Výchozí šířka"
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_item_role__sequence
 msgid "Default order"
-msgstr ""
+msgstr "Výchozí pořadí"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_view_kanban
@@ -1045,6 +1039,12 @@ msgid "Delete sign item"
 msgstr "Vymazat položku podpisu"
 
 #. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/dialogs/thank_you_dialog.js:0
+msgid "Deleted User"
+msgstr ""
+
+#. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.res_config_settings_view_form
 msgid ""
 "Deliver one-time codes by SMS to identify signatories when signing a "
@@ -1056,27 +1056,27 @@ msgstr ""
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
 msgid "Demo Action"
-msgstr ""
+msgstr "Demo akce"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
 msgid "Demo IP"
-msgstr ""
+msgstr "Demo IP"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
 msgid "Demo Latitude"
-msgstr ""
+msgstr "Demo šířka"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
 msgid "Demo Longitude"
-msgstr ""
+msgstr "Demo zeměpisná délka"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
 msgid "Demo Partner"
-msgstr ""
+msgstr "Demo Partner"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.doc_sign
@@ -1087,12 +1087,12 @@ msgstr "Podrobnosti"
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_res_users__sign_initials
 msgid "Digital Initials"
-msgstr ""
+msgstr "Digital Iniciály"
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_res_users__sign_initials_frame
 msgid "Digital Initials Frame"
-msgstr ""
+msgstr "Rámeček digitálních iniciál"
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_res_users__sign_signature
@@ -1131,7 +1131,7 @@ msgstr "Zobrazit"
 #: model:ir.model.fields,field_description:sign.field_sign_template__display_name
 #: model:ir.model.fields,field_description:sign.field_sign_template_tag__display_name
 msgid "Display Name"
-msgstr "Zobrazovací název"
+msgstr "Zobrazovaný název"
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_res_config_settings__sign_preview_ready
@@ -1176,12 +1176,19 @@ msgstr "Šablona dokumentu"
 #. odoo-javascript
 #: code:addons/sign/static/src/backend_components/sign_template/sign_template_top_bar.js:0
 msgid "Document saved as Template."
+msgstr "Dokument uložen jako šablona."
+
+#. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/views/helper/sign_action_helper.xml:0
+msgid "Document to send for signature or to sign yourself."
 msgstr ""
+"Dokument určený k podpisu – ať už vlastnímu, nebo k odeslání jiné osobě."
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.portal_my_home_sign
 msgid "Document(s) to sign"
-msgstr ""
+msgstr "Dokument(y) k podpisu"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_search
@@ -1195,6 +1202,9 @@ msgid "Documents"
 msgstr "Dokumenty"
 
 #. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/dialogs/thank_you_dialog.xml:0
+#: model_terms:ir.ui.view,arch_db:sign.sign_portal_my_request
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_tree
 msgid "Download"
 msgstr "Stáhnout"
@@ -1208,7 +1218,6 @@ msgstr "Stáhnout certifikát"
 #. module: sign
 #. odoo-javascript
 #: code:addons/sign/static/src/backend_components/sign_request/sign_request_control_panel.xml:0
-#: code:addons/sign/static/src/dialogs/thank_you_dialog.js:0
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_form
 msgid "Download Document"
 msgstr "Stáhnout dokument"
@@ -1223,14 +1232,14 @@ msgstr "Pole pro přetáhnutí v PDF"
 #. odoo-javascript
 #: code:addons/sign/static/src/views/helper/sign_action_helper.xml:0
 msgid "Drag and drop"
-msgstr ""
+msgstr "Přetáhněte"
 
 #. module: sign
 #. odoo-javascript
 #: code:addons/sign/static/src/js/tours/sign.js:0
 msgid ""
-"Draw your most beautiful signature!<br>You can also create one automatically"
-" or load a signature from your computer."
+"Draw your most beautiful signature!<br>You can also create one automatically "
+"or load a signature from your computer."
 msgstr ""
 "Nakreslete svůj nejkrásnější podpis!<br>Můžete také jeden vytvořit "
 "automaticky nebo načíst podpis z počítače."
@@ -1249,7 +1258,7 @@ msgstr "CHYBA: Neplatný soubor PDF!"
 #. module: sign
 #: model:ir.actions.report,name:sign.sign_report_green_savings_action
 msgid "Ecological Savings by using Electronic Signatures"
-msgstr ""
+msgstr "Ochrana životního prostředí použitím elektronických podpisů"
 
 #. module: sign
 #. odoo-javascript
@@ -1262,7 +1271,7 @@ msgstr "Upravit"
 #. odoo-javascript
 #: code:addons/sign/static/src/backend_components/sign_template/sign_template_top_bar.js:0
 msgid "Edit Template"
-msgstr ""
+msgstr "Upravit šablonu"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.res_config_settings_view_form
@@ -1441,8 +1450,8 @@ msgstr "Ikona v rámci awesome font, např. fa-tasks"
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.green_savings_report
 msgid ""
-"For 1000kg of paper usage, with 10% of recycled paper, environmental savings"
-" are based on"
+"For 1000kg of paper usage, with 10% of recycled paper, environmental savings "
+"are based on"
 msgstr ""
 "Za 1000kg použitého papíru, při 10% podílu recyklovaného papíru, jsou "
 "ekologické dopady založeny na"
@@ -1648,8 +1657,8 @@ msgstr "Pokud zaškrtnuto, nové zprávy vyžadují vaši pozornost."
 #: model:ir.model.fields,help:sign.field_sign_request_item__change_authorized
 msgid ""
 "If checked, recipient of a document with this role can be changed after "
-"having sent the request. Useful to replace a signatory who is out of office,"
-" etc."
+"having sent the request. Useful to replace a signatory who is out of office, "
+"etc."
 msgstr ""
 "Pokud je zatrženo, pak lze změnit příjemce dokumentu s touto rolí, i po "
 "odeslání požadavku k podpisu. To je užitečné, pokud je podepisující osoba "
@@ -1664,17 +1673,24 @@ msgstr "Pokud zaškrtnuto, některé zprávy mají chybu při doručení."
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_not_enough_credits
 msgid ""
-"If you do not want to receive these notifications anymore, you can disable the extra-authentication step in the\n"
+"If you do not want to receive these notifications anymore, you can disable "
+"the extra-authentication step in the\n"
 "                        <code>\n"
 "                            Sign &gt; Configuration &gt; Roles\n"
 "                        </code>\n"
 "                        menu."
 msgstr ""
+"Pokud již nechcete dostávat tyto upozornění, můžete zakázat dodatečný "
+"autentikační krok v \n"
+"                        <code>\n"
+"                            ePodpis &gt; Nastavení &gt; Role\n"
+"                        </code> \n"
+"                        menu."
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_request
 msgid "If you do not wish to receive future reminders about this document,"
-msgstr ""
+msgstr "Pokud si nepřejete v budoucnu dostávat upozornění o tomto dokumentu,"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_not_enough_credits
@@ -1705,7 +1721,7 @@ msgstr "Hash nezaměnitelnosti"
 #. odoo-javascript
 #: code:addons/sign/static/src/dialogs/sign_name_and_signature_dialog.xml:0
 msgid "Include a visual security frame around your signature"
-msgstr ""
+msgstr "Přidejte vizuální bezpečnostní rámeček kolem svého podpisu "
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_item_view_form
@@ -1751,7 +1767,7 @@ msgstr "Je sdíleno"
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.signer_status_wrapper
 msgid "Is Signing"
-msgstr ""
+msgstr "Podepisuje"
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_send_request__is_user_signer
@@ -1759,9 +1775,15 @@ msgid "Is User Signer"
 msgstr "Je podepisovatel uživatele"
 
 #. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/dialogs/thank_you_dialog.xml:0
+msgid "It's signed!"
+msgstr "Je podepsáno!"
+
+#. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
 msgid "John Doe"
-msgstr ""
+msgstr "Jan Testovací"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
@@ -1818,7 +1840,7 @@ msgstr "Naposledy upraveno dne"
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request__last_reminder
 msgid "Last reminder"
-msgstr ""
+msgstr "Poslední upomínka"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_search
@@ -1834,7 +1856,7 @@ msgstr "Zeměpisná šířka"
 #. module: sign
 #: model:ir.model.fields,help:sign.field_sign_send_request__validity
 msgid "Leave empty for requests without expiration."
-msgstr ""
+msgstr "Nechte prázdné pro žádosti bez vypršení platnosti"
 
 #. module: sign
 #. odoo-javascript
@@ -1867,12 +1889,12 @@ msgstr "Připojená aktivita"
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request__reference_doc
 msgid "Linked To"
-msgstr ""
+msgstr "Propojeno s"
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_send_request__reference_doc
 msgid "Linked to"
-msgstr ""
+msgstr "Propojeno s"
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_log__log_date
@@ -1883,13 +1905,13 @@ msgstr "Přihlaste se"
 #. odoo-python
 #: code:addons/sign/models/sign_log.py:0
 msgid "Log history of sign requests cannot be deleted!"
-msgstr ""
+msgstr "Protokol historie požadavků na podpis nelze smazat!"
 
 #. module: sign
 #. odoo-python
 #: code:addons/sign/models/sign_log.py:0
 msgid "Log history of sign requests cannot be modified!"
-msgstr ""
+msgstr "Protokol historie požadavků na podpis nelze upravit!"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.doc_sign
@@ -1954,8 +1976,7 @@ msgstr "Chyba při doručování zprávy"
 #. module: sign
 #: model:ir.model.fields,help:sign.field_sign_send_request__message_cc
 msgid "Message to be sent to contacts in copy of the signed document"
-msgstr ""
-"Zpráva, která má být odeslána kontaktům v kopii po podepsání dokumentu"
+msgstr "Zpráva, která má být odeslána kontaktům v kopii po podepsání dokumentu"
 
 #. module: sign
 #: model:ir.model.fields,help:sign.field_sign_send_request__message
@@ -2068,6 +2089,12 @@ msgid "Need a valid PDF to add signature fields!"
 msgstr "Potřebujete platné PDF pro přidání podpisových polí!"
 
 #. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/dialogs/thank_you_dialog.xml:0
+msgid "Need to sign documents?"
+msgstr "Potřebujete podepsat dokumenty?"
+
+#. module: sign
 #: model:ir.actions.act_window,name:sign.action_sign_send_request
 msgid "New Signature Request"
 msgstr "Žádost o nový podpis"
@@ -2165,7 +2192,7 @@ msgstr "Počet akcí"
 #: model:ir.model.fields,field_description:sign.field_sign_item__num_options
 #: model:ir.model.fields,field_description:sign.field_sign_item_radio_set__num_options
 msgid "Number of Radio Button options"
-msgstr ""
+msgstr "Počet možnosti přepínacích tlačítek"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_view_kanban
@@ -2198,6 +2225,12 @@ msgid "Number of pages"
 msgstr "Počet stránek"
 
 #. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/dialogs/thank_you_dialog.xml:0
+msgid "Odoo Sign"
+msgstr "Odoo Podpisy"
+
+#. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.green_savings_report
 msgid "One can weighs 15 g"
 msgstr "Jedna plechovka váží 15 g"
@@ -2225,16 +2258,6 @@ msgstr "Nahraný soubor nelze načíst. Je to korektní PDF?"
 #: code:addons/sign/controllers/terms.py:0
 msgid "Oops"
 msgstr "Jejda"
-
-#. module: sign
-#: model:sign.template,redirect_url_text:sign.template_sign_1
-#: model:sign.template,redirect_url_text:sign.template_sign_2
-#: model:sign.template,redirect_url_text:sign.template_sign_3
-#: model:sign.template,redirect_url_text:sign.template_sign_4
-#: model:sign.template,redirect_url_text:sign.template_sign_5
-#: model:sign.template,redirect_url_text:sign.template_sign_tour
-msgid "Open Link"
-msgstr "Otevřít odkaz"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.canceled_sign_request_item
@@ -2384,17 +2407,18 @@ msgstr "Přepínací tlačítka"
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_item_radio_set__radio_items
 msgid "Radio Items"
-msgstr ""
+msgstr "Elementy přepínače"
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_item__radio_set_id
 msgid "Radio button options"
-msgstr ""
+msgstr "Možnosti přepínacích tlačítek"
 
 #. module: sign
 #: model:ir.model,name:sign.model_sign_item_radio_set
 msgid "Radio button set for keeping radio button items together"
 msgstr ""
+"Sada přepínacích tlačítek, pro udržování přepínacích tlačítek dohromady"
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request__rating_ids
@@ -2415,6 +2439,7 @@ msgstr "Přesměrování"
 #. module: sign
 #. odoo-javascript
 #: code:addons/sign/static/src/dialogs/sign_refusal_dialog.xml:0
+#: code:addons/sign/static/src/dialogs/thank_you_dialog.xml:0
 #: model:ir.model.fields.selection,name:sign.selection__sign_log__action__refuse
 msgid "Refuse"
 msgstr "Odmítnout"
@@ -2430,7 +2455,7 @@ msgstr "Odmítnout dokument"
 #. odoo-javascript
 #: code:addons/sign/static/src/dialogs/sign_refusal_dialog.js:0
 msgid "Refuse to sign"
-msgstr ""
+msgstr "Odmítnout podepsání"
 
 #. module: sign
 #: model:ir.model.fields.selection,name:sign.selection__sign_log__request_state__refused
@@ -2449,7 +2474,7 @@ msgstr "Připomínka"
 #: model:ir.model.fields,field_description:sign.field_sign_request__reminder_enabled
 #: model:ir.model.fields,field_description:sign.field_sign_send_request__reminder_enabled
 msgid "Reminder Enabled"
-msgstr ""
+msgstr "Povoleno připomenutí"
 
 #. module: sign
 #: model:ir.ui.menu,name:sign.sign_reports
@@ -2504,7 +2529,7 @@ msgstr "Znovu odeslat pozvánku"
 #. odoo-javascript
 #: code:addons/sign/static/src/backend_components/sign_request/sign_request_control_panel.js:0
 msgid "Resent!"
-msgstr ""
+msgstr "Znovu odesláno!"
 
 #. module: sign
 #. odoo-javascript
@@ -2595,7 +2620,6 @@ msgstr "Uložit jako šablonu"
 #. module: sign
 #. odoo-javascript
 #: code:addons/sign/static/src/backend_components/sign_template/sign_template_body.js:0
-#: code:addons/sign/static/src/backend_components/sign_template/sign_template_top_bar.js:0
 msgid "Saved"
 msgstr "Uloženo"
 
@@ -2624,8 +2648,7 @@ msgid ""
 "example, select your own contact to sign the document yourself."
 msgstr ""
 "Vyberte kontakt, který má dokument podepsat, podle jeho role. <br>V tomto "
-"příkladu, vyberte svůj vlastní kontakt, abyste sami podepsali tento "
-"dokument."
+"příkladu, vyberte svůj vlastní kontakt, abyste sami podepsali tento dokument."
 
 #. module: sign
 #: model:ir.model.fields.selection,name:sign.selection__sign_item_type__item_type__selection
@@ -2648,7 +2671,7 @@ msgstr "Možnosti výběru"
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_view_kanban
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_view_tree
 msgid "Send"
-msgstr "Odchozí"
+msgstr "Odeslat"
 
 #. module: sign
 #. odoo-javascript
@@ -2754,7 +2777,6 @@ msgstr ""
 #: code:addons/sign/static/src/backend_components/sign_request/sign_request_control_panel.js:0
 #: code:addons/sign/static/src/dialogs/next_direct_sign_dialog.js:0
 #: code:addons/sign/static/src/dialogs/sign_name_and_signature_dialog.xml:0
-#: code:addons/sign/static/src/dialogs/thank_you_dialog.xml:0
 #: model:ir.ui.menu,name:sign.menu_document
 #: model_terms:ir.ui.view,arch_db:sign.res_config_settings_view_form
 #: model_terms:ir.ui.view,arch_db:sign.sign_portal_my_request
@@ -2846,12 +2868,6 @@ msgstr "Formát Podmínek podepisování"
 
 #. module: sign
 #. odoo-javascript
-#: code:addons/sign/static/src/dialogs/thank_you_dialog.js:0
-msgid "Sign Up for free"
-msgstr "Přihlaste se zdarma"
-
-#. module: sign
-#. odoo-javascript
 #: code:addons/sign/static/src/dialogs/sign_name_and_signature_dialog.xml:0
 msgid "Sign all"
 msgstr "Podepsat vše"
@@ -2860,6 +2876,12 @@ msgstr "Podepsat vše"
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_request
 msgid "Sign document"
 msgstr "Podepsat dokument"
+
+#. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/dialogs/thank_you_dialog.xml:0
+msgid "Sign now"
+msgstr "Podepsat teď"
 
 #. module: sign
 #. odoo-python
@@ -2888,17 +2910,8 @@ msgstr "Poslátní žádosti o podpis podepisovateli"
 msgid ""
 "Sign up for Odoo Sign to manage your own documents and signature requests!"
 msgstr ""
-"Abyste mohli spravovat vlastní dokumenty a požadavky k podpisu, přihlašte se"
-" do ePodpis Odoo!"
-
-#. module: sign
-#. odoo-javascript
-#: code:addons/sign/static/src/dialogs/thank_you_dialog.xml:0
-msgid ""
-"Sign up for Odoo Sign to manage your own documents and signature requests."
-msgstr ""
-"Zaregistrujte se do aplikace Odoo Podpis a spravujte vlastní dokumenty a "
-"žádosti o podpis."
+"Abyste mohli spravovat vlastní dokumenty a požadavky k podpisu, přihlašte se "
+"do ePodpis Odoo!"
 
 #. module: sign
 #: model:ir.actions.server,name:sign.sign_reminder_cron_ir_actions_server
@@ -2913,7 +2926,7 @@ msgstr "Podepisující"
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
 msgid "Signatory's hash:"
-msgstr ""
+msgstr "Digitální otisk podepisujícího:"
 
 #. module: sign
 #. odoo-javascript
@@ -2944,7 +2957,7 @@ msgstr "Podpisová položka"
 #. module: sign
 #: model:ir.actions.act_window,name:sign.sign_item_option_action
 msgid "Signature Item Options"
-msgstr ""
+msgstr "Možnosti položek podpisu"
 
 #. module: sign
 #: model:ir.model,name:sign.model_sign_item_role
@@ -3038,6 +3051,8 @@ msgid ""
 "Signature requested for template: %(template)s\n"
 "Signatories: %(signatories)s"
 msgstr ""
+"Požadavek podpisu k šabloně: %(template)s\n"
+"Podepisující: %(signatories)s"
 
 #. module: sign
 #. odoo-python
@@ -3083,6 +3098,14 @@ msgid "Signed document"
 msgstr "Podepsaný dokument"
 
 #. module: sign
+#. odoo-python
+#: code:addons/sign/models/sign_request.py:0
+msgid ""
+"Signed documents cannot be deleted for legal reasons. Please archive them "
+"instead."
+msgstr ""
+
+#. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request_item__signing_date
 #: model_terms:ir.ui.view,arch_db:sign.sign_portal_my_request
 #: model_terms:ir.ui.view,arch_db:sign.signer_status_wrapper
@@ -3126,7 +3149,7 @@ msgstr "Podepisování událostí"
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_send_request__set_sign_order
 msgid "Signing Order"
-msgstr ""
+msgstr "Pořadí podepisování"
 
 #. module: sign
 #. odoo-javascript
@@ -3142,7 +3165,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/sign/static/src/components/sign_request/signable_PDF_iframe.js:0
 msgid "Some fields have still to be completed"
-msgstr ""
+msgstr "Některá pole ještě musí být dokončena"
 
 #. module: sign
 #. odoo-python
@@ -3179,9 +3202,17 @@ msgstr "Omlouváme se, ale tento dokument nemůžete odmítnou."
 #. module: sign
 #: model:ir.model.fields,help:sign.field_sign_send_request__set_sign_order
 msgid ""
-"Specify the order for each signer. The signature request only gets sent to                                     the next signers in the sequence when all signers from the previous level have                                     signed the document.\n"
+"Specify the order for each signer. The signature request only gets sent "
+"to                                     the next signers in the sequence when "
+"all signers from the previous level have                                     "
+"signed the document.\n"
 "                                    "
 msgstr ""
+"Stanovte pořadí jednotlivých podepisujících. Žádost o podpis bude "
+"odeslána                                až tehdy, když dokument podepsali "
+"všichni, kdo jsou v                                                    "
+"pořadí před ním.\n"
+"                                 "
 
 #. module: sign
 #: model:sign.item.role,name:sign.sign_item_role_default
@@ -3194,7 +3225,7 @@ msgstr "Standardní"
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_search
 msgid "State"
-msgstr "Stát"
+msgstr "Stav"
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_log__request_state
@@ -3334,14 +3365,18 @@ msgstr "Podmínky v e-mailu"
 #: model:ir.model.fields,help:sign.field_res_company__sign_terms_type
 #: model:ir.model.fields,help:sign.field_res_config_settings__sign_terms_type
 msgid ""
-"Terms in Email - The text will be displayed at the bottom of every signature request email.\n"
+"Terms in Email - The text will be displayed at the bottom of every signature "
+"request email.\n"
 "\n"
-"        Terms as Web Page - A link will be pasted at the bottom of every signature request email, leading to your content.\n"
+"        Terms as Web Page - A link will be pasted at the bottom of every "
+"signature request email, leading to your content.\n"
 "        "
 msgstr ""
-"Podmínky v e-mailu  - Na konci e-mailu s požadavkem podpisu bude zobrazen text Podmínek. \n"
+"Podmínky v e-mailu  - Na konci e-mailu s požadavkem podpisu bude zobrazen "
+"text Podmínek. \n"
 "\n"
-"        Podmínky jako web stránka - Na konci e-mailu s požadavkem podpisu bude zobrazen odkaz, vedoucí na váš obsah.\n"
+"        Podmínky jako web stránka - Na konci e-mailu s požadavkem podpisu "
+"bude zobrazen odkaz, vedoucí na váš obsah.\n"
 "        "
 
 #. module: sign
@@ -3370,8 +3405,8 @@ msgstr ""
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.deleted_sign_request
 msgid ""
-"The Odoo Sign document you are trying to reach does not exist. The signature"
-" request might have been deleted or modified."
+"The Odoo Sign document you are trying to reach does not exist. The signature "
+"request might have been deleted or modified."
 msgstr ""
 "Odoo ePodpis dokument, který se snažíte zobrazit, neexistuje. Požadavek k "
 "podpisu mohl být smazán nebo změněn."
@@ -3400,8 +3435,8 @@ msgstr "Výpočet je založen na webstránce"
 #. odoo-python
 #: code:addons/sign/models/sign_request.py:0
 msgid ""
-"The contact of %(role)s has been changed from %(old_partner)s to "
-"%(new_partner)s."
+"The contact of %(role)s has been changed from %(old_partner)s to %"
+"(new_partner)s."
 msgstr ""
 "Kontakt pro roli %(role)s byl změně z %(old_partner)s na %(new_partner)s."
 
@@ -3415,7 +3450,7 @@ msgstr "Dokument"
 #. odoo-python
 #: code:addons/sign/models/sign_request.py:0
 msgid "The document %s has been fully signed."
-msgstr ""
+msgstr "Dokument %s byl plně podepsán."
 
 #. module: sign
 #. odoo-python
@@ -3468,7 +3503,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/sign/models/sign_request.py:0
 msgid "The mail has been sent to contacts in copy: %(contacts)s"
-msgstr ""
+msgstr "E-mail byl odeslán kontaktům v kopii: %(contacts)s"
 
 #. module: sign
 #. odoo-python
@@ -3490,9 +3525,15 @@ msgstr "Požadavek k podpisu nebyl kompletně podepsán"
 
 #. module: sign
 #. odoo-python
+#: code:addons/sign/controllers/main.py:0
+msgid "The signature has been canceled by %(partner)s(%(role)s)"
+msgstr "Podpis byl odmítnut %(partner)s(%(role)s)"
+
+#. module: sign
+#. odoo-python
 #: code:addons/sign/models/sign_request.py:0
 msgid "The signature has been refused by %(partner)s(%(role)s)"
-msgstr ""
+msgstr "Podpis byl odmítnut: %(partner)s(%(role)s)"
 
 #. module: sign
 #. odoo-python
@@ -3508,7 +3549,7 @@ msgstr "E-mail k podpisu byl odelán"
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.canceled_sign_request_item
 msgid "The signature request has been cancelled"
-msgstr ""
+msgstr "Požadavek na podpis byl zrušen"
 
 #. module: sign
 #. odoo-python
@@ -3525,8 +3566,7 @@ msgstr "Šablona již neexistuje."
 #. module: sign
 #. odoo-python
 #: code:addons/sign/wizard/sign_duplicate_template_with_pdf.py:0
-msgid ""
-"The template has more pages than the current file, it can't be applied."
+msgid "The template has more pages than the current file, it can't be applied."
 msgstr "Šablona má více stran než aktuální soubor, šablonu nelze aplikovat."
 
 #. module: sign
@@ -3559,7 +3599,7 @@ msgstr "Neexistují žádné žádosti o podpisy."
 #. odoo-javascript
 #: code:addons/sign/static/src/dialogs/thank_you_dialog.xml:0
 msgid "There are other documents waiting for your signature:"
-msgstr ""
+msgstr "Na váš podpis čekají další dokumenty:"
 
 #. module: sign
 #. odoo-python
@@ -3576,6 +3616,8 @@ msgid ""
 "There's no reason to panic, <br/>\n"
 "                        you can still sign your document in a few clicks!"
 msgstr ""
+"Není důvod k panice, <br/>\n"
+"                        stále můžete podepsat své dokumenty za pár kliků!"
 
 #. module: sign
 #. odoo-javascript
@@ -3604,7 +3646,7 @@ msgstr "Takto bude dokument pojmenován v poště"
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_expired
 msgid "This link has expired."
-msgstr ""
+msgstr "Platnost odkazu vypršela."
 
 #. module: sign
 #. odoo-python
@@ -3622,7 +3664,7 @@ msgstr "Tento podpisový požadavek nemůže být podepsán"
 #. odoo-python
 #: code:addons/sign/models/sign_request.py:0
 msgid "This sign request is not valid anymore"
-msgstr ""
+msgstr "Tato žádost o podpis už vypršela"
 
 #. module: sign
 #. odoo-python
@@ -3690,6 +3732,14 @@ msgid "Try Odoo Sign"
 msgstr "Vyzkoušejte Odoo ePodpis"
 
 #. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/views/helper/sign_action_helper.xml:0
+msgid "Try a sample contract"
+msgstr "Vyzkoušejte ukázkovou smlouvu"
+
+#. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/views/helper/sign_action_helper.xml:0
 #: model_terms:ir.actions.act_window,help:sign.sign_template_action
 msgid "Try our sample document"
 msgstr "Vyzkoušejte naši vzorovou šablonu"
@@ -3763,7 +3813,7 @@ msgstr "Nahrát"
 #. odoo-javascript
 #: code:addons/sign/static/src/views/common.xml:0
 msgid "Upload PDF"
-msgstr ""
+msgstr "Nahrát PDF"
 
 #. module: sign
 #. odoo-python
@@ -3782,6 +3832,12 @@ msgstr "Nahrát PDF a podepsat"
 #: model_terms:ir.actions.act_window,help:sign.sign_request_action
 msgid "Upload a PDF file or use an existing template to begin."
 msgstr "Abyste začali, nahrajte PDF soubor nebo použijte existující šablonu."
+
+#. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/views/helper/sign_action_helper.xml:0
+msgid "Upload a PDF file to create a reusable template."
+msgstr "Nahrajte PDF soubor pro vytvoření šablony, kterou můžete znovu použít"
 
 #. module: sign
 #: model_terms:ir.actions.act_window,help:sign.sign_template_action
@@ -3930,9 +3986,14 @@ msgstr "Voda"
 #. odoo-python
 #: code:addons/sign/models/sign_request.py:0
 msgid ""
-"We can only send reminders in the future - as soon as we find a way to send reminders in the past we'll notify you.\n"
-"In the mean time, please make sure to input a positive number of days for the reminder interval."
+"We can only send reminders in the future - as soon as we find a way to send "
+"reminders in the past we'll notify you.\n"
+"In the mean time, please make sure to input a positive number of days for "
+"the reminder interval."
 msgstr ""
+"Připomínky můžeme zasílat pouze v budoucnu - jakmile najdeme způsob, jak "
+"zasílat připomínky v minulosti, budeme vás informovat.\n"
+"Do té doby prosím nezapomeňte zadat kladný počet dní pro interval upomínek."
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.deleted_sign_request
@@ -3958,8 +4019,8 @@ msgstr "Jakmile se všichni podepíší, zašleme vám tento dokument e-mailem."
 #. odoo-javascript
 #: code:addons/sign/static/src/dialogs/sign_refusal_dialog.js:0
 msgid ""
-"We'll send an email to warn other contacts in copy & signers with the reason"
-" you provided."
+"We'll send an email to warn other contacts in copy & signers with the reason "
+"you provided."
 msgstr ""
 "Pošleme e-mail abysme seznámili další kontakty v kopii a podepisující s "
 "důvodem, který jste uvedl(a)."
@@ -3981,8 +4042,8 @@ msgid ""
 "Well done, your document is ready!<br>Let's send it to get our first "
 "signature."
 msgstr ""
-"Dobrá práce, váš dokument je připraven!<br>Pojďme ho odeslat, abysme získali"
-" náš první podpis."
+"Dobrá práce, váš dokument je připraven!<br>Pojďme ho odeslat, abysme získali "
+"náš první podpis."
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.green_savings_report
@@ -4020,13 +4081,13 @@ msgstr "Chybné heslo"
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
 msgid "XYZ123456"
-msgstr ""
+msgstr "XYZ123456"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.deleted_sign_request
 msgid ""
-"You can contact the person who invited you to sign the document by email for"
-" help."
+"You can contact the person who invited you to sign the document by email for "
+"help."
 msgstr ""
 "Můžete kontaktovat osobu, která vám odeslala tento dokument k podpisu, aby "
 "vám pomohla."
@@ -4043,6 +4104,8 @@ msgid ""
 "You can request a new link to access your document and sign it, it will  be "
 "delivered in your inbox right away."
 msgstr ""
+"Můžete požádat o nový odkaz pro přístup k vašemu dokumentu a podepsat jej; "
+"bude okamžitě doručen do vaší schránky."
 
 #. module: sign
 #. odoo-python
@@ -4051,8 +4114,8 @@ msgid ""
 "You can't delete a template for which signature requests exist but you can "
 "archive it instead."
 msgstr ""
-"Nelze odstranit šablonu, pro kterou existují požadavky na podpis, ale můžete"
-" ji místo toho archivovat."
+"Nelze odstranit šablonu, pro kterou existují požadavky na podpis, ale můžete "
+"ji místo toho archivovat."
 
 #. module: sign
 #. odoo-python
@@ -4077,6 +4140,7 @@ msgid ""
 "You do not have access to these documents, please contact a Sign "
 "Administrator."
 msgstr ""
+"Nemáte přístup k těmto dokumentům. Obraťte se prosím na správce Podpisů."
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_refused
@@ -4104,18 +4168,26 @@ msgstr "Je třeba definovat podepisující osobu"
 #. odoo-python
 #: code:addons/sign/models/sign_request.py:0
 msgid "You should select at least one document to download."
-msgstr ""
+msgstr "Měli byste vybrat alespoň jeden dokument ke stažení."
 
 #. module: sign
 #. odoo-javascript
 #: code:addons/sign/static/src/dialogs/thank_you_dialog.js:0
-msgid "You will receive the final signed document by email."
+msgid "You will get the signed document by email."
+msgstr "Podepsaný dokument obdržíte e-mailem."
+
+#. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/dialogs/thank_you_dialog.js:0
+msgid ""
+"You will get the signed document by email. You may also request a paper copy "
+"from the sender."
 msgstr ""
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.canceled_sign_request_item
 msgid "You won't receive any notification for this signature request anymore."
-msgstr ""
+msgstr "O této žádosti na podpis již nebudete dostávat žádné oznámení."
 
 #. module: sign
 #: model_terms:ir.actions.act_window,help:sign.sign_all_request_action
@@ -4161,7 +4233,7 @@ msgstr "Vaše jméno"
 #. odoo-javascript
 #: code:addons/sign/static/src/dialogs/next_direct_sign_dialog.xml:0
 msgid "Your signature has been saved. Next signatory is"
-msgstr ""
+msgstr "Váš podpis byl uložen. Dalším podepisujícím je"
 
 #. module: sign
 #. odoo-javascript
@@ -4174,7 +4246,7 @@ msgstr ""
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_completed
 msgid "and"
-msgstr "and"
+msgstr "a"
 
 #. module: sign
 #. odoo-javascript
@@ -4191,8 +4263,12 @@ msgstr "a:"
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_not_enough_credits
 msgid ""
 "because you don't have enough credits for this operation.\n"
-"                    The signatory was able to finish signing, but was not asked to authenticate fully."
+"                    The signatory was able to finish signing, but was not "
+"asked to authenticate fully."
 msgstr ""
+"protože nemáte dostatek kreditů pro tuto operaci,\n"
+"                    Podepisující byli schopni přidat své podpisy, ale nebyli "
+"požádáni o plnou autentifikaci."
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.green_report_container
@@ -4209,18 +4285,18 @@ msgstr "plechovky"
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_request
 msgid "click here to cancel it."
-msgstr ""
+msgstr "klikněte zde pro jeho zrušení."
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_form
 #: model_terms:ir.ui.view,arch_db:sign.sign_send_request_view_form
 msgid "days."
-msgstr ""
+msgstr "dní."
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
 msgid "demo@email.com"
-msgstr ""
+msgstr "demo@email.com"
 
 #. module: sign
 #. odoo-javascript
@@ -4248,7 +4324,7 @@ msgstr "např. smlouva o mlčenlivosti"
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_form
 #: model_terms:ir.ui.view,arch_db:sign.sign_send_request_view_form
 msgid "every"
-msgstr ""
+msgstr "každé"
 
 #. module: sign
 #: model:sign.item.type,tip:sign.sign_item_type_checkbox
@@ -4301,9 +4377,17 @@ msgid "ip"
 msgstr "ip"
 
 #. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/dialogs/thank_you_dialog.xml:0
+msgid "is free, forever, with unlimited users - and it's fun to use!"
+msgstr ""
+"je zdarma, navždy, s nelimitovaným počtem uživatelů - a jeho používání je "
+"hračka!"
+
+#. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
 msgid "john@example.com"
-msgstr ""
+msgstr "john@example.com"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.green_report_container
@@ -4416,7 +4500,7 @@ msgstr "to je"
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_request
 msgid "to sign the document."
-msgstr ""
+msgstr "k podepsání dokumentu."
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
@@ -4461,3 +4545,27 @@ msgstr "{{green_report_el_title}}"
 #: model_terms:ir.ui.view,arch_db:sign.green_report_el_pdf
 msgid "{{green_report_el_title}} Summary"
 msgstr "{{green_report_el_title}} Souhrn"
+
+#~ msgid "#7898678"
+#~ msgstr "#7898678"
+
+#~ msgid "******1234"
+#~ msgstr "******1234"
+
+#~ msgid "1001"
+#~ msgstr "1001"
+
+#~ msgid "192.168.1.1"
+#~ msgstr "192.168.1.1"
+
+#~ msgid "20-03-2000"
+#~ msgstr "20-03-2000"
+
+#~ msgid "2023-08-18"
+#~ msgstr "2023-08-18"
+
+#~ msgid "2023-08-18 - 12:30:45"
+#~ msgstr "2023-08-18 - 12:30:45"
+
+#~ msgid "<b>Drag & drop “Signature”</b> into the bottom of the document."
+#~ msgstr "<b>Přetáhnout & pustit “Podpis”</b> na konec dokumentu."

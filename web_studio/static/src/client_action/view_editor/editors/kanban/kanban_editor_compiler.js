@@ -7,7 +7,7 @@ const interestingSelector = [
     "div",
     "aside",
     "footer",
-    "field",
+    "field:not([data-used-by])",
     "main",
     "kanban",
     "widget",
@@ -142,6 +142,8 @@ export class KanbanEditorCompiler extends KanbanCompiler {
             const fieldNameExpr = `__comp__.props.record.fields["${fieldName}"].string`;
             const originalTOut = compiled.getAttribute("t-out");
             compiled.setAttribute("t-out", `${isEmptyExpr} ? ${fieldNameExpr} : ${originalTOut}`);
+        } else {
+            compiled.setAttribute("hasEmptyPlaceholder", true);
         }
         return compiled;
     }
@@ -190,6 +192,9 @@ export class KanbanEditorCompiler extends KanbanCompiler {
     }
 
     compileNode(node, params) {
+        if (node.tagName === "field" && node.hasAttribute("data-used-by")) {
+            return;
+        }
         let compiled;
         if (node.getAttribute?.("t-name") === "card") {
             compiled = this.compileCard(node);

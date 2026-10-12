@@ -1,35 +1,35 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* hr_expense_extract
-# 
+# * hr_expense_extract
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Junko Augias, 2025
+#
+# "Junko Augias (juau)" <juau@odoo.com>, 2025, 2026.
+# Weblate <noreply-mt-weblate@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:27+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Japanese (https://app.transifex.com/odoo/teams/41243/ja/)\n"
+"POT-Creation-Date: 2026-02-20 18:51+0000\n"
+"PO-Revision-Date: 2026-04-17 09:57+0000\n"
+"Last-Translator: \"Junko Augias (juau)\" <juau@odoo.com>\n"
+"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-18/"
+"hr_expense_extract/ja/>\n"
+"Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: ja\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-
-#. module: hr_expense_extract
-#. odoo-javascript
-#: code:addons/hr_expense_extract/static/src/js/tours/expense_tour.js:0
-msgid "<b>Congratulations</b>, you are now an expert of Expenses."
-msgstr "<b>おめでとうございます</b>これであなたは経費の達人です。"
+"X-Generator: Weblate 5.16.2\n"
 
 #. module: hr_expense_extract
 #. odoo-javascript
 #: code:addons/hr_expense_extract/static/src/js/tours/expense_tour.js:0
 msgid "<b>Wasting time recording your receipts?</b> Let’s try a better way."
 msgstr ""
+"<b>領収書の記録に時間を消耗していますか?</b> もっと良い方法があります。"
 
 #. module: hr_expense_extract
 #: model_terms:web_tour.tour,rainbow_man_message:hr_expense_extract.hr_expense_extract_tour
@@ -37,6 +37,8 @@ msgid ""
 "<span><b>Congratulations</b>, you are now an expert of Expenses.\n"
 "        </span>"
 msgstr ""
+"<span><b>おめでとうございます</b>。あなたは経費を使いこなせるエキスパートで"
+"す。        </span>"
 
 #. module: hr_expense_extract
 #: model:ir.model.fields,field_description:hr_expense_extract.field_hr_expense__message_needaction
@@ -165,6 +167,11 @@ msgid "Expense Report"
 msgstr "経費報告"
 
 #. module: hr_expense_extract
+#: model:ir.model,name:hr_expense_extract.model_hr_expense_split
+msgid "Expense Split"
+msgstr "経費分割"
+
+#. module: hr_expense_extract
 #: model:ir.model.fields,field_description:hr_expense_extract.field_res_config_settings__expense_extract_show_ocr_option_selection
 msgid "Expense processing option"
 msgstr "経費処理オプション"
@@ -177,7 +184,7 @@ msgstr "サンプル領収書から作成した経費"
 #. module: hr_expense_extract
 #: model:ir.model.fields,field_description:hr_expense_extract.field_hr_expense__extract_state_processed
 msgid "Extract State Processed"
-msgstr "処理済状態を抽出"
+msgstr "抽出処理済み"
 
 #. module: hr_expense_extract
 #: model:ir.model.fields,field_description:hr_expense_extract.field_hr_expense__extract_state
@@ -254,7 +261,7 @@ msgstr "仕訳帳"
 #. module: hr_expense_extract
 #: model:ir.model.fields.selection,name:hr_expense_extract.selection__expense_sample_register__partial_mode__open
 msgid "Keep open"
-msgstr "オープンのまま残す"
+msgstr "開いたままにする"
 
 #. module: hr_expense_extract
 #: model:ir.model.fields,field_description:hr_expense_extract.field_expense_sample_receipt__write_uid
@@ -277,17 +284,34 @@ msgstr "主要添付"
 #: model:ir.model.fields,help:hr_expense_extract.field_expense_sample_register__payment_method_line_id
 msgid ""
 "Manual: Pay or Get paid by any method outside of Odoo.\n"
-"Payment Providers: Each payment provider has its own Payment Method. Request a transaction on/to a card thanks to a payment token saved by the partner when buying or subscribing online.\n"
+"Payment Providers: Each payment provider has its own Payment Method. Request "
+"a transaction on/to a card thanks to a payment token saved by the partner "
+"when buying or subscribing online.\n"
 "Check: Pay bills by check and print it from Odoo.\n"
-"Batch Deposit: Collect several customer checks at once generating and submitting a batch deposit to your bank. Module account_batch_payment is necessary.\n"
-"SEPA Credit Transfer: Pay in the SEPA zone by submitting a SEPA Credit Transfer file to your bank. Module account_iso20022 is necessary.\n"
-"SEPA Direct Debit: Get paid in the SEPA zone thanks to a mandate your partner will have granted to you. Module account_iso20022 is necessary.\n"
+"Batch Deposit: Collect several customer checks at once generating and "
+"submitting a batch deposit to your bank. Module account_batch_payment is "
+"necessary.\n"
+"SEPA Credit Transfer: Pay in the SEPA zone by submitting a SEPA Credit "
+"Transfer file to your bank. Module account_iso20022 is necessary.\n"
+"SEPA Direct Debit: Get paid in the SEPA zone thanks to a mandate your "
+"partner will have granted to you. Module account_iso20022 is necessary.\n"
 msgstr ""
+"手動： Odoo以外の方法で支払を受けます。\n"
+"決済プロバイダ： 各決済プロバイダにはそれぞれ独自の決済方法があります。オンラ"
+"インで購入またはサブスクリプション利用する際にパートナーによって保存された決"
+"済トークンによって、カード上またはカード宛に取引を要求することができます。\n"
+"小切手：小切手で請求書を支払い、Odooから印刷することができます。\n"
+"バッチ入金： 複数の顧客の小切手を一度に収集し、銀行へのバッチ入金を生成して送"
+"信します。会計_バッチ_決済（account_batch_payment）モジュールが必要です。\n"
+"SEPAクレジット振替：SEPAクレジット振替ファイルを銀行に提出することでSEPAゾー"
+"ンで支払うことができます。account_iso20022 モジュールが必要です。\n"
+"SEPA Direct Debit： パートナーから付与された権限により、SEPAゾーンで支払いを"
+"受けることができます。account_iso20022 モジュールが必要です。\n"
 
 #. module: hr_expense_extract
 #: model:ir.model.fields.selection,name:hr_expense_extract.selection__expense_sample_register__partial_mode__paid
 msgid "Mark as fully paid"
-msgstr "完全に支払われたとしてマーク"
+msgstr "全額支払済とする"
 
 #. module: hr_expense_extract
 #: model:ir.model.fields,field_description:hr_expense_extract.field_expense_sample_register__memo

@@ -60,6 +60,8 @@ class SaleOrder(models.Model):
         self.ensure_one()
         if not self.has_rented_products:
             return True
+        if not (self.rental_start_date and self.rental_return_date):
+            return False
         days_forbidden = self.company_id._get_renting_forbidden_days()
         converted_rental_start_date = self.convert_to_website_tz(self.rental_start_date)
         converted_rental_return_date = self.convert_to_website_tz(self.rental_return_date)
@@ -101,6 +103,8 @@ class SaleOrder(models.Model):
         :param ProductProduct product: The product concerned by the warning
         """
         self.ensure_one()
+        if not (self.rental_start_date and self.rental_return_date):
+            return _("No dates were specified on your rental order.")
         company = self.company_id
         days_forbidden = company._get_renting_forbidden_days()
         pickup_forbidden = self.rental_start_date.isoweekday() in days_forbidden
@@ -168,7 +172,11 @@ class SaleOrder(models.Model):
                 'rental_return_date': current_end_date,
             })
         else:
+            rental_lines = self.order_line.filtered('is_rental')
+            self.env.add_to_compute(rental_lines._fields['name'], rental_lines)
             self._recompute_rental_prices()
+            rental_lines = self.order_line.filtered('is_rental')
+            rental_lines._compute_name()
 
     def _available_dates_for_renting(self):
         """Hook to override with the stock availability"""

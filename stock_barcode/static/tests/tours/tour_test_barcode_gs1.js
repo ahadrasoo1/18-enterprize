@@ -5,7 +5,7 @@ import { registry } from "@web/core/registry";
 import { stepUtils } from "./tour_step_utils";
 
 // Inventory Tests.
-registry.category("web_tour.tours").add('test_gs1_inventory_gtin_8', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_gs1_inventory_gtin_8', { steps: () => [
     {
         trigger: '.o_button_inventory',
         run: "click",
@@ -39,7 +39,7 @@ registry.category("web_tour.tours").add('test_gs1_inventory_gtin_8', {test: true
     ...stepUtils.validateBarcodeOperation('.o_barcode_line .qty-done:contains("78")'),
 ]});
 
-registry.category("web_tour.tours").add('test_gs1_inventory_product_units', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_gs1_inventory_product_units', { steps: () => [
     {
         trigger: '.o_button_inventory',
         run: "click",
@@ -67,7 +67,7 @@ registry.category("web_tour.tours").add('test_gs1_inventory_product_units', {tes
     ...stepUtils.validateBarcodeOperation(),
 ]});
 
-registry.category("web_tour.tours").add('test_gs1_inventory_lot_serial', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_gs1_inventory_lot_serial', { steps: () => [
     {
         trigger: '.o_button_inventory',
         run: "click",
@@ -297,7 +297,7 @@ registry.category("web_tour.tours").add('test_gs1_inventory_lot_serial', {test: 
     },
 ]});
 
-registry.category("web_tour.tours").add('test_gs1_inventory_package', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_gs1_inventory_package', { steps: () => [
     {
         trigger: '.o_button_inventory',
         run: "click",
@@ -400,7 +400,7 @@ registry.category("web_tour.tours").add('test_gs1_inventory_package', {test: tru
 
 // Picking Tests.
 
-registry.category("web_tour.tours").add('test_gs1_package_receipt', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_gs1_package_receipt', { steps: () => [
     { trigger: '.o_stock_barcode_main_menu', run: 'scan WHIN' },
     // Scans PRO_GTIN_8 x4
     { trigger: '.o_barcode_client_action', run: 'scan 0100000082655853300004' },
@@ -543,7 +543,7 @@ registry.category("web_tour.tours").add('test_gs1_package_receipt', {test: true,
     ...stepUtils.validateBarcodeOperation(),
 ]});
 
-registry.category("web_tour.tours").add('test_gs1_package_delivery', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_gs1_package_delivery', { steps: () => [
     {
         trigger: '.o_stock_barcode_main_menu',
         run: 'scan WHOUT',
@@ -572,7 +572,7 @@ registry.category("web_tour.tours").add('test_gs1_package_delivery', {test: true
     ...stepUtils.validateBarcodeOperation(),
 ]});
 
-registry.category("web_tour.tours").add('test_gs1_reserved_delivery', {test:true, steps: () => [
+registry.category("web_tour.tours").add('test_gs1_reserved_delivery', { steps: () => [
     {
         trigger: '.o_barcode_client_action',
         run: function () {
@@ -619,7 +619,7 @@ registry.category("web_tour.tours").add('test_gs1_reserved_delivery', {test:true
     ...stepUtils.validateBarcodeOperation(".o_validate_page.btn-primary"),
 ]});
 
-registry.category("web_tour.tours").add('test_gs1_receipt_conflicting_barcodes_1', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_gs1_receipt_conflicting_barcodes_1', { steps: () => [
     {
         trigger: '.o_barcode_client_action',
         run: function () {
@@ -647,7 +647,7 @@ registry.category("web_tour.tours").add('test_gs1_receipt_conflicting_barcodes_1
     ...stepUtils.validateBarcodeOperation(".o_validate_page.btn-primary"),
 ]});
 
-registry.category("web_tour.tours").add('test_gs1_delivery_ambiguous_lot_number', {test:true, steps: () => [
+registry.category("web_tour.tours").add('test_gs1_delivery_ambiguous_lot_number', { steps: () => [
     // Create a delivery.
     { trigger: '.o_stock_barcode_main_menu', run: 'scan WHOUT' },
     // Scan the GS1 barcode (contains product + lot)
@@ -687,7 +687,7 @@ registry.category("web_tour.tours").add('test_gs1_delivery_ambiguous_lot_number'
     ...stepUtils.validateBarcodeOperation(".o_validate_page.btn-primary"),
 ]});
 
-registry.category("web_tour.tours").add('test_gs1_delivery_ambiguous_serial_number', {test:true, steps: () => [
+registry.category("web_tour.tours").add('test_gs1_delivery_ambiguous_serial_number', { steps: () => [
     {
         trigger: '.o_barcode_client_action',
         run: 'scan LOC-01-00-00',
@@ -709,7 +709,7 @@ registry.category("web_tour.tours").add('test_gs1_delivery_ambiguous_serial_numb
     ...stepUtils.validateBarcodeOperation(".o_validate_page.btn-primary"),
 ]});
 
-registry.category("web_tour.tours").add('test_gs1_receipt_conflicting_barcodes_2', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_gs1_receipt_conflicting_barcodes_2', { steps: () => [
     {
         trigger: '.o_barcode_client_action',
         run: function () {
@@ -737,7 +737,7 @@ registry.category("web_tour.tours").add('test_gs1_receipt_conflicting_barcodes_2
     ...stepUtils.validateBarcodeOperation(".o_validate_page.btn-primary"),
 ]});
 
-registry.category("web_tour.tours").add('test_gs1_receipt_conflicting_barcodes_3', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_gs1_receipt_conflicting_barcodes_3', { steps: () => [
     {
         trigger: '.o_barcode_client_action',
         run: function () {
@@ -821,7 +821,7 @@ registry.category("web_tour.tours").add('test_gs1_receipt_conflicting_barcodes_3
     ...stepUtils.validateBarcodeOperation(".o_validate_page.btn-primary"),
 ]});
 
-registry.category("web_tour.tours").add("test_gs1_receipt_conflicting_barcodes_mistaken_as_gs1", {test: true, steps: () => [
+registry.category("web_tour.tours").add("test_gs1_receipt_conflicting_barcodes_mistaken_as_gs1", { steps: () => [
     // Creates a new receipt.
     { trigger: ".o_stock_barcode_main_menu", run: "scan WHIN" },
     // Scans 3000000015 -> Will be parsed as 15 units by the GS1 nomenclature
@@ -846,9 +846,27 @@ registry.category("web_tour.tours").add("test_gs1_receipt_conflicting_barcodes_m
             helper.assertLineQty(line, "1");
         },
     },
-    // Scans again 3000000015 but since it could genuinely be a quantity, we have no way to find if
-    // it's really a GS1 or something else and use it as it was parsed.
+    // Scans again 3000000015, now it could genuinely be interpreted as 15 units but we have no way
+    // to know what's the best use. Since we've a product using this barcode, we privilege exactness
     { trigger: ".o_barcode_client_action", run: "scan 3000000015" },
+    {
+        trigger: ".o_barcode_line[data-barcode='3000000015'].o_selected .qty-done:contains(2)",
+        run: function() {
+            const line = helper.getLine({ barcode: "3000000015" });
+            helper.assertLineQty(line, "2");
+        },
+    },
+    { trigger: ".o_barcode_client_action", run: "scan 21000000000003" },
+    {
+        trigger: ".o_barcode_line[data-barcode='21000000000003'] .qty-done:contains(2)",
+        run: function() {
+            const line = helper.getLine({ barcode: "21000000000003" });
+            helper.assertLineQty(line, "2");
+        },
+    },
+    // Scan 3000000014 which corresponds to a GS1 nomenclature and check it is applied
+    // as it does not correspond to an exact match
+    { trigger: ".o_barcode_client_action", run: "scan 3000000014" },
     {
         trigger: ".o_barcode_line.o_selected .qty-done:contains('16')",
         run: function() {
@@ -868,29 +886,26 @@ registry.category("web_tour.tours").add("test_gs1_receipt_conflicting_barcodes_m
             helper.assert(line.querySelector(".result-package").innerText, "21-Chouette-MegaPack");
         },
     },
-    // Now, scans a product tracked by SN and ensures the barcode starting by 21 are indeed
-    // interpreted as serial number once a tracked product's waiting a SN.
+    // Scans again 21-Chouette-MegaPack, now that we have a selected line for a tracked product it could genuinely be
+    // interpreted as a lot name "-Chouette-MegaPack" but since we have an exact match on the pack we privilege exactness
     { trigger: ".o_barcode_client_action", run: "scan productserial1" },
-    { trigger: ".o_barcode_line[data-barcode='productserial1']", run: "scan 21-Chouette-MegaPack" },
-    { trigger: ".o_barcode_line.o_selected .o_line_lot_name:contains('-Chouette-MegaPack')" },
-    { trigger: ".o_barcode_client_action", run: "scan 21000000000003" },
+    { trigger: ".o_barcode_client_action", run: "scan 21000000000004" },
     {
-        trigger: ".o_barcode_line.o_selected .o_line_button.o_toggle_sublines",
-        run: "click",
+        trigger: ".o_barcode_line[data-barcode='productserial1'] .o_line_lot_name:contains(000000000004)",
+        run: "scan 21-Chouette-MegaPack"
     },
     {
-        trigger: ".o_sublines .o_barcode_line.o_selected",
+        trigger: ".o_barcode_line[data-barcode='productserial1'].o_selected div[name=package]",
         run: function() {
-            helper.assert(document.querySelector(".o_barcode_line_summary .qty-done").innerText, "2");
-            helper.assert(
-                document.querySelector(".o_sublines .o_selected .o_line_lot_name").innerText,
-                "000000000003"
-            );
+            const line = helper.getLine({ barcode: "productserial1" });
+            helper.assertLineQty(line, "1");
+            helper.assertLineTrackingNumber(line, "000000000004");
+            helper.assert(line.querySelector(".result-package").innerText, "21-Chouette-MegaPack");
         },
     },
 ]});
 
-registry.category("web_tour.tours").add('test_gs1_receipt_lot_serial', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_gs1_receipt_lot_serial', { steps: () => [
     {
         trigger: '.o_barcode_client_action',
         run: function () {
@@ -947,7 +962,7 @@ registry.category("web_tour.tours").add('test_gs1_receipt_lot_serial', {test: tr
             const [line1, line2] = helper.getSublines();
             helper.assertLinesTrackingNumbers([line1, line2], ["b1-b001", "b1-b002"]);
             helper.assertLineQty(parentLine, "12/40");
-            helper.assertLineQty(line1, "8/40");
+            helper.assertLineQty(line1, "8");
             helper.assertLineQty(line2, "4");
             helper.assertLineIsHighlighted(line1, false);
             helper.assertLineIsHighlighted(line2, true);
@@ -963,7 +978,7 @@ registry.category("web_tour.tours").add('test_gs1_receipt_lot_serial', {test: tr
             helper.assertSublinesCount(2);
             const [line1, line2] = helper.getSublines();
             helper.assertLinesTrackingNumbers([line1, line2], ["b1-b001", "b1-b002"]);
-            helper.assertLineQty(line1, "8/40");
+            helper.assertLineQty(line1, "8");
             helper.assertLineQty(line2, "8");
             helper.assertLineIsHighlighted(line1, false);
             helper.assertLineIsHighlighted(line2, true);
@@ -980,7 +995,7 @@ registry.category("web_tour.tours").add('test_gs1_receipt_lot_serial', {test: tr
             helper.assertSublinesCount(3);
             const sublines = helper.getSublines();
             helper.assertLinesTrackingNumbers(sublines, ["b1-b001", "b1-b002", "b1-b003"]);
-            helper.assertLineQty(sublines[0], "8/40");
+            helper.assertLineQty(sublines[0], "8");
             helper.assertLineQty(sublines[1], "8");
             helper.assertLineQty(sublines[2], "1");
             helper.assertLineIsHighlighted(sublines[0], false);
@@ -1004,7 +1019,7 @@ registry.category("web_tour.tours").add('test_gs1_receipt_lot_serial', {test: tr
             helper.assertSublinesCount(3);
             const sublines = helper.getSublines();
             helper.assertLinesTrackingNumbers(sublines, ["b1-b001", "b1-b002", "b1-b003"]);
-            helper.assertLineQty(sublines[0], "8/40");
+            helper.assertLineQty(sublines[0], "8");
             helper.assertLineQty(sublines[1], "8");
             helper.assertLineQty(sublines[2], "3");
             helper.assertLineIsHighlighted(sublines[0], false);
@@ -1024,7 +1039,7 @@ registry.category("web_tour.tours").add('test_gs1_receipt_lot_serial', {test: tr
             helper.assertSublinesCount(3);
             const sublines = helper.getSublines();
             helper.assertLinesTrackingNumbers(sublines, ["b1-b001", "b1-b002", "b1-b003"]);
-            helper.assertLineQty(sublines[0], "8/40");
+            helper.assertLineQty(sublines[0], "8");
             helper.assertLineQty(sublines[1], "8");
             helper.assertLineQty(sublines[2], "8");
             helper.assertLineIsHighlighted(sublines[0], false);
@@ -1061,7 +1076,7 @@ registry.category("web_tour.tours").add('test_gs1_receipt_lot_serial', {test: tr
             const sublines = helper.getSublines({ selected: false });
             helper.assertLinesTrackingNumbers(sublines, ["b1-b001", "b1-b002", "b1-b003"]);
             const line4 = helper.getSubline({ selected: true });
-            helper.assertLineQty(sublines[0], "8/40");
+            helper.assertLineQty(sublines[0], "8");
             helper.assertLineQty(sublines[1], "8");
             helper.assertLineQty(sublines[2], "8");
             helper.assertLineQty(line4, "0");
@@ -1085,7 +1100,7 @@ registry.category("web_tour.tours").add('test_gs1_receipt_lot_serial', {test: tr
             helper.assertSublinesCount(4);
             const sublines = helper.getSublines();
             helper.assertLinesTrackingNumbers(sublines, ["b1-b001", "b1-b002", "b1-b003", "b1-b004"]);
-            helper.assertLineQty(sublines[0], "8/40");
+            helper.assertLineQty(sublines[0], "8");
             helper.assertLineQty(sublines[1], "8");
             helper.assertLineQty(sublines[2], "8");
             helper.assertLineQty(sublines[3], "4");
@@ -1107,7 +1122,7 @@ registry.category("web_tour.tours").add('test_gs1_receipt_lot_serial', {test: tr
             helper.assertSublinesCount(5);
             const sublines = helper.getSublines();
             helper.assertLinesTrackingNumbers(sublines, ["b1-b001", "b1-b002", "b1-b003", "b1-b004", "b1-b005"]);
-            helper.assertLineQty(sublines[0], "8/40");
+            helper.assertLineQty(sublines[0], "8");
             helper.assertLineQty(sublines[1], "8");
             helper.assertLineQty(sublines[2], "8");
             helper.assertLineQty(sublines[3], "4");
@@ -1130,7 +1145,7 @@ registry.category("web_tour.tours").add('test_gs1_receipt_lot_serial', {test: tr
             helper.assertSublinesCount(5);
             const sublines = helper.getSublines();
             helper.assertLinesTrackingNumbers(sublines, ["b1-b001", "b1-b002", "b1-b003", "b1-b004", "b1-b005"]);
-            helper.assertLineQty(sublines[0], "8/40");
+            helper.assertLineQty(sublines[0], "8");
             helper.assertLineQty(sublines[1], "8");
             helper.assertLineQty(sublines[2], "8");
             helper.assertLineQty(sublines[3], "4");
@@ -1154,7 +1169,7 @@ registry.category("web_tour.tours").add('test_gs1_receipt_lot_serial', {test: tr
             helper.assertSublinesCount(5);
             const sublines = helper.getSublines();
             helper.assertLinesTrackingNumbers(sublines, ["b1-b001", "b1-b002", "b1-b003", "b1-b004", "b1-b005"]);
-            helper.assertLineQty(sublines[0], "8/40");
+            helper.assertLineQty(sublines[0], "8");
             helper.assertLineQty(sublines[1], "8");
             helper.assertLineQty(sublines[2], "8");
             helper.assertLineQty(sublines[3], "8");
@@ -1169,7 +1184,7 @@ registry.category("web_tour.tours").add('test_gs1_receipt_lot_serial', {test: tr
     ...stepUtils.validateBarcodeOperation(".o_validate_page"),
 ]});
 
-registry.category("web_tour.tours").add('test_gs1_receipt_quantity_with_uom', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_gs1_receipt_quantity_with_uom', { steps: () => [
     {
         trigger: '.o_barcode_client_action',
         run: function () {
@@ -1291,7 +1306,7 @@ registry.category("web_tour.tours").add('test_gs1_receipt_quantity_with_uom', {t
     ...stepUtils.discardBarcodeForm(),
 ]});
 
-registry.category("web_tour.tours").add("test_gs1_receipt_scan_not_gs1_multi_barcode", {test: true, steps: () => [
+registry.category("web_tour.tours").add("test_gs1_receipt_scan_not_gs1_multi_barcode", { steps: () => [
     { trigger: ".o_stock_barcode_main_menu", run: "scan WHIN" },
     // Scan a barcode containing 1 product tracked by SN followed by 8 serial numbers.
     { trigger: ".o_barcode_client_action", run: "scan productserial1,sn1,sn2,sn3,sn4,sn5,sn6,sn7,sn8" },
@@ -1301,7 +1316,7 @@ registry.category("web_tour.tours").add("test_gs1_receipt_scan_not_gs1_multi_bar
     ...stepUtils.validateBarcodeOperation(),
 ]});
 
-registry.category("web_tour.tours").add('test_gs1_receipt_packaging', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_gs1_receipt_packaging', { steps: () => [
     {
         trigger: '.o_barcode_client_action',
         run: function () {
@@ -1349,7 +1364,7 @@ registry.category("web_tour.tours").add('test_gs1_receipt_packaging', {test: tru
     ...stepUtils.discardBarcodeForm(),
 ]});
 
-registry.category("web_tour.tours").add('test_gs1_receipt_packaging_with_uom', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_gs1_receipt_packaging_with_uom', { steps: () => [
     { trigger: ".o_stock_barcode_main_menu", run: "scan WHIN"},
     /* Scan (01)10347543011337(3103)000900(17)240701(10)100005
         - (01) 10347543011337: packaging barcode (6 units);
@@ -1412,7 +1427,7 @@ registry.category("web_tour.tours").add('test_gs1_receipt_packaging_with_uom', {
     },
 ]});
 
-registry.category("web_tour.tours").add('test_gs1_tracked_packaging', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_gs1_tracked_packaging', { steps: () => [
     // Create a receipt and check non-existing lot is correctly scanned alongside the packaging.
     { trigger: '.o_stock_barcode_main_menu', run: "scan WHIN" },
     { trigger: '.o_barcode_client_action', run: "scan 020000001265325610lot-001" },
@@ -1441,4 +1456,45 @@ registry.category("web_tour.tours").add('test_gs1_tracked_packaging', {test: tru
     },
     { trigger: '.o_validate_page', run: "click" },
     { trigger: '.o_notification_bar.bg-success' },
+]});
+
+registry.category("web_tour.tours").add("test_gs1_multi_company_setup", { steps: () => [
+    {
+        trigger: ".o_switch_company_menu > button",
+        run: "click",
+    },
+    {
+        trigger: ".o-dropdown--menu .company_label:contains('Lovely Company')",
+        run: "click",
+    },
+    {
+        trigger: ".o_switch_company_menu .oe_topbar_name:contains('Lovely Company')",
+    },
+    {
+        trigger: "[data-menu-xmlid='stock_barcode.stock_barcode_menu'] > .o_app_icon",
+        run: "click",
+    },
+    {
+        trigger: ".o_stock_barcode_main_menu",
+        run: "scan 0136939282410106"
+    },
+    {
+        content: "Check that the existing quant was found",
+        trigger: ".o_list_view .o_data_row:contains('Lovel/Stock')",
+    },
+    {
+        trigger: ".o_back_button",
+        run: "click",
+    },
+    {
+        trigger: ".o_stock_barcode_main_menu",
+        run: "scan 4133033710074365",
+    },
+    {
+        trigger: ".o_barcode_client_action",
+        run: "scan 0136939282410106",
+    },
+    {
+        trigger: ".o_barcode_line:contains(product1)",
+    },
 ]});

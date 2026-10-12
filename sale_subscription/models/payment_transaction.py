@@ -1,6 +1,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from datetime import datetime, time
+from datetime import datetime, time, timedelta
 
 from odoo import api, fields, models
 
@@ -48,8 +48,14 @@ class PaymentTransaction(models.Model):
             return mandate_values
 
         # Convert start and end dates into datetime by setting the time to midnight.
-        start_datetime = self.sale_order_ids.start_date \
-            and datetime.combine(self.sale_order_ids.start_date, time())
+        # Payment providers require the start_datetime of the mandate to not be lesser than yesterday
+        # e.g., stripe: https://docs.stripe.com/api/payment_intents/create#create_payment_intent-payment_method_options-card-mandate_options-start_date
+        current_time = fields.Datetime.now()
+        start_date = self.sale_order_ids.start_date or current_time
+        start_datetime = max(
+            datetime.combine(start_date, time()),
+            current_time - timedelta(days=1)
+        )
         end_datetime = self.sale_order_ids.end_date \
             and datetime.combine(self.sale_order_ids.end_date, time())
         mandate_values.update({
@@ -76,8 +82,9 @@ class PaymentTransaction(models.Model):
             tx._cancel_draft_invoices()
 
         tx_to_invoice._invoice_sale_orders()
-        tx_to_invoice.invoice_ids._post()
-        tx_to_invoice.filtered(lambda t: not t.subscription_action).invoice_ids.transaction_ids._send_invoice()
+        tx_to_invoice.invoice_ids.with_company(self.company_id)._post()
+        if not self.env.context.get('skip_sale_auto_invoice_send'):
+            tx_to_invoice.filtered(lambda t: not t.subscription_action).invoice_ids.transaction_ids._send_invoice()
 
     def _get_invoiced_subscription_transaction(self):
         # create the invoices for the transactions that are not yet linked to invoice
@@ -134,9 +141,12 @@ class PaymentTransaction(models.Model):
 
         :return: None
         """
-        super()._post_process()
+        # Avoid post processing tx whose SO is still being processed by the invoice cron
+        process_tx = self.filtered(lambda tx: not any(tx.sale_order_ids.mapped('is_invoice_cron')))
+        res = super(PaymentTransaction, process_tx)._post_process()
         any_paid_subscription = False
-        for tx in self:
+        close_reasons_ids = self.env['sale.order.close.reason']._get_reason_to_reopen()
+        for tx in process_tx:
             orders = tx.sale_order_ids or tx.invoice_ids.line_ids.subscription_id
             subscriptions = orders.filtered(lambda order: order.is_subscription)
             if tx.state == 'done' and len(subscriptions) > 0:
@@ -147,12 +157,15 @@ class PaymentTransaction(models.Model):
                 subscriptions.filtered(
                     lambda sub:
                         sub.subscription_state == '6_churn' and
-                        tx.last_state_change.date() <= sub.next_invoice_date
+                        sub.close_reason_id.id in close_reasons_ids and
+                        (tx.last_state_change.date() - timedelta(days=sub.plan_id.auto_close_limit)) <= sub.next_invoice_date
                 ).set_open()
             elif tx.state in ('error', 'cancel'):
                 tx._handle_unsuccessful_transaction()
         if any_paid_subscription:
             self._post_subscription_action()
+        return res
+
 
     def _post_subscription_action(self):
         """
@@ -160,6 +173,7 @@ class PaymentTransaction(models.Model):
         This will also reopen the order and remove the payment pending state.
         Partial payment should not have a subscription_action defined and therefore should not reopen the order.
         """
+        reopen_reasons_ids = self.env['sale.order.close.reason']._get_reason_to_reopen()
         for tx in self:
             orders = tx.sale_order_ids
             # quotation subscription paid on portal have pending transactions
@@ -173,8 +187,12 @@ class PaymentTransaction(models.Model):
                 # validation transaction have the `assign_token` `subscription_action`
                 # Once the token is assigned, we are done because we don't send emails in that case.
                 continue
-            orders.set_open()
-            if tx.subscription_action in ['manual_send_mail', 'automatic_send_mail']:
+            reopen_ids = []
+            for order in orders:
+                if order.subscription_state != '6_churn' or (not order.close_reason_id or order.close_reason_id.id in reopen_reasons_ids):
+                    reopen_ids.append(order.id)
+            self.env['sale.order'].browse(reopen_ids).set_open()
+            if tx.subscription_action:
                 automatic = tx.subscription_action == 'automatic_send_mail'
                 for order in orders:
                     order._subscription_post_success_payment(tx, tx.invoice_ids, automatic=automatic)
@@ -223,4 +241,21 @@ class PaymentTransaction(models.Model):
         subscriptions = self.sale_order_ids.filtered('is_subscription')
         draft_invoices = subscriptions.order_line.invoice_lines.move_id.filtered(lambda am: am.state == 'draft')
         if draft_invoices:
-            draft_invoices.state = 'cancel'
+            draft_invoices.button_cancel()
+
+    def _get_invoices_to_notify(self):
+        """ Override `payment` to filter out invoices whose logging is already handled by the cron.
+
+        This prevents deadlocks from happening in the case where:
+        1. the cron creates invoices linked to the transaction;
+        2. initiate the payment;
+        3. commits the cursor;
+        4. deletes the linked invoices because the payment didn't go through;
+        5. the payment webhook tries to log the payment failure on the committed-but-now-deleted
+           invoices.
+        """
+        return self.invoice_ids.filtered(
+            lambda invoice: not any(
+                o.is_invoice_cron for o in invoice.invoice_line_ids.sale_line_ids.order_id
+            )
+        )

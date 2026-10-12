@@ -1,9 +1,9 @@
 import { registry } from "@web/core/registry";
 import * as Chrome from "@point_of_sale/../tests/tours/utils/chrome_util";
 import * as Dialog from "@point_of_sale/../tests/tours/utils/dialog_util";
+import * as PaymentScreen from "@point_of_sale/../tests/tours/utils/payment_screen_util";
 
 registry.category("web_tour.tours").add("l10n_mx_edi_pos.tour_invoice_previous_order", {
-    test: true,
     steps: () =>
         [
             {
@@ -15,8 +15,13 @@ registry.category("web_tour.tours").add("l10n_mx_edi_pos.tour_invoice_previous_o
                 content: "Open POS session from backend",
                 trigger: "button[name='open_ui']",
                 run: "click",
+                expectUnloadPage: true,
             },
-            Dialog.confirm("Open Register"),
+            {
+                content: "Open Register",
+                trigger: ".modal .modal-footer .btn-primary:contains(open register)",
+                run: "click",
+            },
             {
                 content: "Select a product",
                 trigger: "div.product-content:contains('product_mx')",
@@ -32,11 +37,7 @@ registry.category("web_tour.tours").add("l10n_mx_edi_pos.tour_invoice_previous_o
                 trigger: "div.button.paymentmethod",
                 run: "click",
             },
-            {
-                content: "Validate",
-                trigger: "button.button.next.validation",
-                run: "click",
-            },
+            ...PaymentScreen.clickValidate(),
             {
                 content: "click on New Order",
                 trigger: "div button:contains('New Order')",
@@ -79,7 +80,10 @@ registry.category("web_tour.tours").add("l10n_mx_edi_pos.tour_invoice_previous_o
                 trigger: "select[name='l10n_mx_edi_cfdi_to_public']",
                 run: "select 0",
             },
-            Dialog.confirm(),
+            {
+                trigger: ".modal button:contains(ok)",
+                run: "click",
+            },
             {
                 content: "The 'Invoice' button should have now turned to 'Reprint Invoice'",
                 trigger: "span:contains('Reprint Invoice')",
@@ -90,7 +94,6 @@ registry.category("web_tour.tours").add("l10n_mx_edi_pos.tour_invoice_previous_o
 registry
     .category("web_tour.tours")
     .add("l10n_mx_edi_pos.tour_invoice_previous_order_default_usage", {
-        test: true,
         steps: () =>
             [
                 {
@@ -102,8 +105,13 @@ registry
                     content: "Open POS session from backend",
                     trigger: "button[name='open_ui']",
                     run: "click",
+                    expectUnloadPage: true,
                 },
-                Dialog.confirm("Open Register"),
+                {
+                    content: "Open Register",
+                    trigger: ".modal .modal-footer .btn-primary:contains(open register)",
+                    run: "click",
+                },
                 {
                     content: "Select a product",
                     trigger: "div.product-content:contains('product_mx')",
@@ -119,11 +127,7 @@ registry
                     trigger: "div.button.paymentmethod",
                     run: "click",
                 },
-                {
-                    content: "Validate",
-                    trigger: "button.button.next.validation",
-                    run: "click",
-                },
+                ...PaymentScreen.clickValidate(),
                 {
                     content: "click on New Order",
                     trigger: "div button:contains('New Order')",
@@ -161,7 +165,10 @@ registry
                     trigger: "select[name='l10n_mx_edi_cfdi_to_public']",
                     run: "select 1",
                 },
-                Dialog.confirm(),
+                {
+                    trigger: ".modal .modal-footer .btn-primary",
+                    run: "click",
+                },
                 {
                     content: "The 'Invoice' button should have now turned to 'Reprint Invoice'",
                     trigger: "span:contains('Reprint Invoice')",

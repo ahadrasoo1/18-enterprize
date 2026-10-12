@@ -51,6 +51,7 @@ export class GridCell {
      */
     get context() {
         return {
+            ...(this.model.searchParams.context || {}),
             ...this.row.section?.context,
             ...this.row.context,
             ...this.column.context,
@@ -128,7 +129,8 @@ export class GridRow {
         const labelArray = [];
         for (const rowField of this._dataPoint.rowFields) {
             let title = this.valuePerFieldName[rowField.name];
-            if (this.model.fieldsInfo[rowField.name].type === "many2one") {
+            const fieldInfo = this.model.fieldsInfo[rowField.name];
+            if (fieldInfo.type === "many2one") {
                 if (title) {
                     title = title[1];
                 } else if (labelArray.length) {
@@ -136,6 +138,8 @@ export class GridRow {
                 } else {
                     title = "None";
                 }
+            } else if (fieldInfo.type === "selection") {
+                title = fieldInfo.selection.find(([key]) => key === title)?.[1];
             }
             if (title) {
                 labelArray.push(title);
@@ -436,9 +440,11 @@ export class GridDataPoint {
     }
 
     get columnGroupByFieldName() {
-        return this.columnFieldIsDate
-            ? this.navigationInfo.range.name === 'year' ? `${this.columnFieldName}:month` : `${this.columnFieldName}:day`
-            : this.columnFieldName;
+        let columnGroupByFieldName = this.columnFieldName;
+        if (this.columnFieldIsDate) {
+            columnGroupByFieldName += `:${this.navigationInfo.range.step}`;
+        }
+        return columnGroupByFieldName;
     }
 
     get readonlyField() {

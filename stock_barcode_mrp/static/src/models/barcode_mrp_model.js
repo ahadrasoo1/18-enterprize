@@ -106,7 +106,7 @@ export default class BarcodeMRPModel extends BarcodePickingModel {
     }
 
     get showReservedSns() {
-        return true;
+        return this.record.picking_type_id.show_reserved_sns;
     }
 
     get isComplete() {
@@ -136,7 +136,21 @@ export default class BarcodeMRPModel extends BarcodePickingModel {
     }
 
     get canCreateNewLot() {
-        return true;
+        const currentLine =
+            this.selectedLine && this.selectedLine.product_id.tracking !== "none"
+                ? this.selectedLine
+                : this.lastScannedLine && this.lastScannedLine.product_id.tracking !== "none"
+                ? this.lastScannedLine
+                : this.selectedLine || this.lastScannedLine;
+        if (
+            currentLine &&
+            currentLine.product_id != this.record.product_id &&
+            !currentLine.byProduct
+        ) {
+            return this.record.use_create_components_lots;
+        } else {
+            return true;
+        }
     }
 
     get scrapContext() {
@@ -148,7 +162,9 @@ export default class BarcodeMRPModel extends BarcodePickingModel {
         if (this.record.state !== "done") {
             context.product_ids = this.pageLines.map(line => line.product_id.id);
         } else {
-            context.product_ids = this.byProductLines.map(line => line.product_id.id);
+            context.product_ids = this.byProductLines
+                ? this.byProductLines.map(line => line.product_id.id)
+                : [];
             context.product_ids.push(this.record.product_id.id);
         }
         return context;
@@ -170,10 +186,25 @@ export default class BarcodeMRPModel extends BarcodePickingModel {
     }
 
     get validateButtonLabel() {
-        if (this.record.qty_producing < this.record.product_qty){
+        if (this.record.qty_producing < this.record.product_qty) {
             return _t("Produce");
         }
         return _t("Produce All");
+    }
+
+    getLineLocation(line) {
+        return this.displayByProduct ? line.location_dest_id : super.getLineLocation(...arguments);
+    }
+
+    get displayDestinationLocation() {
+        return (
+            (this.groups.group_stock_multi_locations && this.displayByProduct) ||
+            super.displayDestinationLocation
+        );
+    }
+
+    lineCanBeSelected(line) {
+        return this.displayByProduct || super.lineCanBeSelected(line);
     }
 
     /** Fetch data and set state */
@@ -237,6 +268,10 @@ export default class BarcodeMRPModel extends BarcodePickingModel {
         const smlData = super._getMoveLineData(id);
         smlData.move_id = smlData.move_id && this.cache.getRecord('stock.move', smlData.move_id);
         return smlData;
+    }
+
+    _getLineMoveId(line) {
+        return line.move_id.id;
     }
 
     _createLinesState() {
@@ -351,7 +386,7 @@ export default class BarcodeMRPModel extends BarcodePickingModel {
             if (args.lot_id) {
                 this.record.lot_producing_id = args.lot_id;
             }
-            this.produceQty();
+            this.produceQty(args.qty_done);
             return;
         }
         let move = args.move_id;
@@ -408,7 +443,6 @@ export default class BarcodeMRPModel extends BarcodePickingModel {
             default_company_id: this.record.company_id,
             default_location_id: this._defaultLocation().id,
             default_location_dest_id: this._defaultDestLocation().id,
-            default_product_uom_id: this.record.product_uom_id.id,
             default_production_id: this.resId,
             default_qty_done: 0,
             final_product_id: this.record.product_id.id,
@@ -461,6 +495,7 @@ export default class BarcodeMRPModel extends BarcodePickingModel {
                     product_id: this.cache.getRecord('product.product', move.product_id),
                     location_id: move.location_id,
                     qty_done: qtyRemaining,
+                    reserved_uom_qty: qtyRemaining,
                     move_id: moveId,
                 }
                 if (this.groups.group_uom) {
@@ -492,6 +527,13 @@ export default class BarcodeMRPModel extends BarcodePickingModel {
 
     askBeforeNewLinesCreation(product) {
         return false;
+    }
+
+    displayLineQtyDemand(line) {
+        if (!this.pageLines.includes(line)) {
+            return true;
+        }
+        return super.displayLineQtyDemand(line);
     }
 
     /** Save commands */
@@ -566,9 +608,12 @@ export default class BarcodeMRPModel extends BarcodePickingModel {
         }
 
         if (!this.record.company_id) {
-            res['company_id'] = this._getCompanyId();
+            res.company_id = this._getCompanyId();
         }
-        return res
+        if (!this.record.picking_type_id) {
+            res.picking_type_id = this.picking_type_id;
+        }
+        return res;
     }
 
     _createCommandVals(line) {
@@ -592,6 +637,11 @@ export default class BarcodeMRPModel extends BarcodePickingModel {
         const defaultCompanyId = this.action.currentController.action.context['default_company_id'];
         const userCompanyId = session.user_companies.current_company;
         return defaultCompanyId || userCompanyId;
+    }
+
+    async _putInPack(additionalContext = {}) {
+        const message = _t("You are expected to scan one or more products.");
+        this.notification(message, { type: "danger" });
     }
 
 }

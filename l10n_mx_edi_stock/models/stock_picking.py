@@ -156,9 +156,12 @@ class Picking(models.Model):
     def _l10n_mx_edi_get_cartaporte_pdf_values(self):
         self.ensure_one()
 
+        existing_cfdi_values = self.env['l10n_mx_edi.document']._decode_cfdi_attachment(self.l10n_mx_edi_cfdi_attachment_id.raw)
         cfdi_values = self.env['l10n_mx_edi.document']._get_company_cfdi_values(self.company_id)
         self.env['l10n_mx_edi.document']._add_certificate_cfdi_values(cfdi_values)
         self._l10n_mx_edi_add_picking_cfdi_values(cfdi_values)
+        if existing_cfdi_values.get('carta_porte_idccp'):
+            cfdi_values['idccp'] = existing_cfdi_values['carta_porte_idccp']
 
         warehouse_partner = self.picking_type_id.warehouse_id.partner_id
 
@@ -216,6 +219,13 @@ class Picking(models.Model):
                 'transp_internac': "No",
             }
 
+        # Generate QR code of the URL to access the service regarding the current guide document (legal requirement)
+        barcode_value = url_quote_plus(f"https://verificacfdi.facturaelectronica.sat.gob.mx/verificaccp/default.aspx?"
+                                       f"IdCCP={cfdi_values['idccp']}&"
+                                       f"FechaOrig={cfdi_values['cfdi_date']}&"
+                                       f"FechaTimb={cfdi_values['scheduled_date']}")
+        barcode_src = f'/report/barcode/?barcode_type=QR&value={barcode_value}&width=180&height=180'
+
         return {
             **external_trade_vals,
             'idccp': cfdi_values['idccp'] or "-",
@@ -254,6 +264,7 @@ class Picking(models.Model):
                 }
                 for figure in self.l10n_mx_edi_vehicle_id.figure_ids.sorted('type')
             ],
+            'barcode_src': barcode_src,
         }
 
     def _l10n_mx_edi_get_extra_picking_report_values(self):
@@ -469,7 +480,7 @@ class Picking(models.Model):
             else:
                 cfdi_values['origen']['rfc_remitente_destinatario'] = emisor['rfc']
             self._l10n_mx_edi_add_domicilio_cfdi_values(cfdi_values['origen'], warehouse_partner)
-            self._l10n_mx_edi_add_domicilio_cfdi_values(cfdi_values['destino'], receptor['customer'])
+            self._l10n_mx_edi_add_domicilio_cfdi_values(cfdi_values['destino'], self.partner_id)
         else:
             cfdi_values['origen']['rfc_remitente_destinatario'] = receptor['rfc']
             if warehouse_partner.country_id.l10n_mx_edi_code != 'MEX':
@@ -478,7 +489,7 @@ class Picking(models.Model):
                 cfdi_values['destino']['residencia_fiscal'] = warehouse_partner.country_id.l10n_mx_edi_code
             else:
                 cfdi_values['destino']['rfc_remitente_destinatario'] = emisor['rfc']
-            self._l10n_mx_edi_add_domicilio_cfdi_values(cfdi_values['origen'], receptor['customer'])
+            self._l10n_mx_edi_add_domicilio_cfdi_values(cfdi_values['origen'], self.partner_id)
             self._l10n_mx_edi_add_domicilio_cfdi_values(cfdi_values['destino'], warehouse_partner)
 
         if self.l10n_mx_edi_external_trade:

@@ -82,7 +82,7 @@ class TestPayrollAccountCommon(odoo.tests.HttpCase):
                 'height': 0.015,
             }, {
                 'type_id': cls.env.ref('sign.sign_item_type_text').id,
-                'name': 'employee_id.private_street2',
+                'name': 'employee_id.private_street',
                 'required': True,
                 'responsible_id': cls.env.ref('sign.sign_item_role_employee').id,
                 'page': 1,
@@ -138,9 +138,16 @@ class TestPayrollAccountCommon(odoo.tests.HttpCase):
             }
         ])
 
+        cls.extra_days_time_off_type = cls.env['hr.leave.type'].create({
+            'name': 'Extra Time Off',
+            'requires_allocation': 'yes',
+        })
+
         cls.company_id = cls.env['res.company'].create({
             'name': 'My Belgian Company - TEST',
             'country_id': cls.env.ref('base.be').id,
+            'hr_contract_timeoff_auto_allocation': True,
+            'hr_contract_timeoff_auto_allocation_type_id': cls.extra_days_time_off_type.id,
         })
         partner_id = cls.env['res.partner'].create({
             'name': 'Laurie Poiret',
@@ -293,6 +300,7 @@ class TestPayrollAccountCommon(odoo.tests.HttpCase):
             'internet': 38,
             'mobile': 30,
             'eco_checks': 250,
+            'has_laptop': True,
             'car_id': False
         })
 

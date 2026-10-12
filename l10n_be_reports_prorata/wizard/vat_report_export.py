@@ -35,7 +35,7 @@ class AccountFinancialReportXMLReportExport(models.TransientModel):
         )
         if date_to and (
             date_to.month in (1, 2, 3)  # Only appears for first Quarter
-            or (date_to.year == 2024 and date_to.month in (4, 5, 6))  # Exception for year of law's implementation
+            or (date_to.year in (2024, 2025) and date_to.month in (4, 5, 6))  # Exception for year of law's implementation
         ):
             self.show_prorata = True
         else:
@@ -62,7 +62,7 @@ class AccountFinancialReportXMLReportExport(models.TransientModel):
             if self.prorata <= 0 or self.prorata > 100:
                 raise UserError(_("Definitive prorata must be an integer between 1 and 100"))
             sum_proratas_usage = self.prorata_at_100 + self.prorata_at_0 + self.special_prorata_deduction
-            if float_compare(sum_proratas_usage, 100, 0) != 0 and not float_is_zero(sum_proratas_usage, 0):
+            if float_compare(sum_proratas_usage, 100, 2) != 0 and not float_is_zero(sum_proratas_usage, 0):
                 raise UserError(_("The sum of the prorata uses must be 100%"))
             for field_name in ['prorata_at_100', 'prorata_at_0', 'special_prorata_deduction', 'special_prorata_1',
                                'special_prorata_2', 'special_prorata_3', 'special_prorata_4', 'special_prorata_5']:
@@ -72,16 +72,16 @@ class AccountFinancialReportXMLReportExport(models.TransientModel):
 
             options.update({
                 'prorata_deduction': {
-                    'prorata': self.prorata,
+                    'prorata': float_repr(self.prorata, 2),
                     'prorata_year': self.prorata_year,
-                    'prorata_at_100': float_repr(self.prorata_at_100, 0),
-                    'prorata_at_0': float_repr(self.prorata_at_0, 0),
-                    'special_prorata_deduction': float_repr(self.special_prorata_deduction, 0),
-                    'special_prorata_1': self.special_prorata_1 and float_repr(self.special_prorata_1, 0) or False,
-                    'special_prorata_2': self.special_prorata_2 and float_repr(self.special_prorata_2, 0) or False,
-                    'special_prorata_3': self.special_prorata_3 and float_repr(self.special_prorata_3, 0) or False,
-                    'special_prorata_4': self.special_prorata_4 and float_repr(self.special_prorata_4, 0) or False,
-                    'special_prorata_5': self.special_prorata_5 and float_repr(self.special_prorata_5, 0) or False,
+                    'prorata_at_100': float_repr(self.prorata_at_100, 2),
+                    'prorata_at_0': float_repr(self.prorata_at_0, 2),
+                    'special_prorata_deduction': float_repr(self.special_prorata_deduction, 2),
+                    'special_prorata_1': self.special_prorata_1 and float_repr(self.special_prorata_1, 2) or False,
+                    'special_prorata_2': self.special_prorata_2 and float_repr(self.special_prorata_2, 2) or False,
+                    'special_prorata_3': self.special_prorata_3 and float_repr(self.special_prorata_3, 2) or False,
+                    'special_prorata_4': self.special_prorata_4 and float_repr(self.special_prorata_4, 2) or False,
+                    'special_prorata_5': self.special_prorata_5 and float_repr(self.special_prorata_5, 2) or False,
                     'submit_more': self.submit_more,
                 }
             })

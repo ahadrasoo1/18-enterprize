@@ -67,7 +67,8 @@ class AppraisalAskFeedback(models.TransientModel):
     def _compute_deadline(self):
         date_in_month = fields.Date.today() + relativedelta(months=1)
         for wizard in self:
-            wizard.deadline = min(date_in_month, wizard.appraisal_id.date_close + relativedelta(days=-1))
+            # allow "last day" feedback fill by adding 1 day
+            wizard.deadline = min(date_in_month, wizard.appraisal_id.date_close + relativedelta(days=1))
 
     @api.onchange('employee_ids')
     def _onchange_employee_ids(self):
@@ -151,6 +152,7 @@ class AppraisalAskFeedback(models.TransientModel):
             'message': self.env['mail.message'].sudo().new(dict(body=mail_values['body_html'], record_name=self.survey_template_id.title)),
             'model_description': self.env['ir.model']._get('appraisal.ask.feedback').display_name,
             'company': self.env.company,
+            'record': self,
         }
         body = self.env['ir.qweb']._render('mail.mail_notification_light', template_ctx, minimal_qcontext=True, raise_if_not_found=False)
         if body:

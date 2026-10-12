@@ -108,7 +108,9 @@ class UPSRequest:
             return img_decoded
 
     def _check_required_value(self, order=False, picking=False, is_return=False):
+        is_express_checkout_partial_delivery_address = False
         if order:
+            is_express_checkout_partial_delivery_address = order._context.get('express_checkout_partial_delivery_address')
             shipper = order.company_id.partner_id
             ship_from = order.warehouse_id.partner_id
             ship_to = order.partner_shipping_id
@@ -148,7 +150,7 @@ class UPSRequest:
         res = [required_field[field] for field in required_field if field != 'phone' and not ship_to[field]]
         if ship_to.country_id.code in ('US', 'CA', 'IE') and not ship_to.state_id.code:
             res.append('State')
-        if not ship_to.street and not ship_to.street2:
+        if not ship_to.street and not ship_to.street2 and not is_express_checkout_partial_delivery_address:
             res.append('Street')
         if ship_to.country_id.code != 'HK' and not ship_to.zip:
             res.append('ZIP code')
@@ -162,19 +164,22 @@ class UPSRequest:
         if order:
             if not order.order_line:
                 return _("Please provide at least one item to ship.")
-            for line in order.order_line.filtered(lambda line: not line.product_id.weight and not line.is_delivery and line.product_id.type not in ['service', 'digital', False]):
-                return _('The estimated price cannot be computed because the weight of your product %s is missing.', line.product_id.display_name)
+            if error_lines := order.order_line._get_invalid_delivery_weight_lines():
+                return _(
+                    "The estimated shipping price cannot be computed because the weight is missing for the following product(s): \n %s",
+                    ", ".join(error_lines.product_id.mapped('name')),
+                )
         if picking:
             for ml in picking.move_line_ids.filtered(lambda ml: not ml.result_package_id and not ml.product_id.weight):
                 return _("The delivery cannot be done because the weight of your product %s is missing.", ml.product_id.display_name)
             packages_without_weight = picking.move_line_ids.mapped('result_package_id').filtered(lambda p: not p.shipping_weight)
             if packages_without_weight:
                 return _('Packages %s do not have a positive shipping weight.', ', '.join(packages_without_weight.mapped('display_name')))
-        if not phone:
+        if not phone and not is_express_checkout_partial_delivery_address:
             res.append('Phone')
         if res:
             return _("The recipient address is missing or wrong.\n(Missing field(s) : %s)", ",".join(res))
-        if len(self._clean_phone_number(phone)) < 10:
+        if phone and len(self._clean_phone_number(phone)) < 10:
             return _("Recipient Phone must be at least 10 alphanumeric characters."),
         return False
 
@@ -183,11 +188,18 @@ class UPSRequest:
         package_type_key = 'Packaging' if ship else 'PackagingType'
         res_packages = []
         for p in packages:
+            # merchandise description: product names (len: [1-35]), strip non-alphanumeric chars
+            desc = ','.join(['%s' % re.sub(r'[\W_]+', ' ', c.product_id.name) for c in p.commodities])
+            if is_return:
+                desc = 'return ' + desc
+            if len(desc) > 35:
+                desc = desc[:32] + '...'
+
             package = {
                 package_type_key: {
                     'Code': p.packaging_type or '00',
                 },
-                'Description': 'Return of package' if is_return else None,
+                'Description': desc or 'UPS shipment',
                 'PackageWeight': {
                     'UnitOfMeasurement': {
                         'Code': carrier.ups_package_weight_unit,
@@ -297,6 +309,7 @@ class UPSRequest:
             'alert_message': self._process_alerts(res['RateResponse']['Response']),
         }
 
+    # NOTE: `ship_to` should actually be the invoicing partner_id and not the delivery partner_id
     def _set_invoice(self, shipment_info, commodities, ship_to, is_return):
         invoice_products = []
         for commodity in commodities:
@@ -365,10 +378,24 @@ class UPSRequest:
             })
         shipment_service_options = {}
         if shipment_info.get('require_invoice'):
+            picking = packages[0].picking_id
+            if picking.sale_id:
+                sold_to = picking.sale_id.partner_invoice_id
+            else:
+                sold_to = ship_to.commercial_partner_id
+            if sold_to.country_id != ship_to.country_id:
+                msg = _('Detected a problem when validating delivery %(delivery_name)s. Invoicing address of the commercial invoice has been defaulted to %(ship_to_partner)s instead of %(sold_to_partner)s to avoid the following error from UPS: "The Sold To party\'s country code must be the same as the Ship To party\'s country code with the exception of Canada and satellite countries."', delivery_name=picking._get_html_link(), ship_to_partner=ship_to._get_html_link(), sold_to_partner=sold_to._get_html_link())
+                record_to_notify = picking.sale_id or picking
+                record_to_notify.message_post(
+                    body=msg,
+                    message_type='notification',
+                )
+                sold_to = ship_to
             shipment_service_options['InternationalForms'] = self._set_invoice(shipment_info, [c for pkg in packages for c in pkg.commodities],
-                                                                               ship_to, is_return)
+                                                                               sold_to, is_return)
             shipment_service_options['InternationalForms']['PurchaseOrderNumber'] = shipment_info.get('purchase_order_number')
             shipment_service_options['InternationalForms']['TermsOfShipment'] = shipment_info.get('terms_of_shipment')
+            shipment_service_options['InternationalForms']['FreightCharges'] = {'MonetaryValue': float_repr(shipment_info.get('freight_charge', 0.0), 2)}
         if saturday_delivery:
             shipment_service_options['SaturdayDeliveryIndicator'] = saturday_delivery
 
@@ -400,10 +427,20 @@ class UPSRequest:
                     },
                     'PaymentInformation': {
                         'ShipmentCharge': payment_info,
-                    }
+                    },
                 },
             },
         }
+
+        # Include ReferenceNumber only if the shipment is not US/US or PR/PR
+        if not (
+            (ship_from.country_id.code == 'US' and ship_to.country_id.code == 'US') or
+            (ship_from.country_id.code == 'PR' and ship_to.country_id.code == 'PR')
+        ):
+            request['ShipmentRequest']['Shipment']['ReferenceNumber'] = {
+                'Value': shipment_info.get('reference_number')
+            }
+
         # Shipments from US to CA or PR require extra info
         if ship_from.country_id.code == 'US' and ship_to.country_id.code in ['CA', 'PR']:
             request['ShipmentRequest']['Shipment']['InvoiceLineTotal'] = {

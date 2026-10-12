@@ -1,8 +1,10 @@
 /** @odoo-module */
 
+import { _t } from "@web/core/l10n/translation";
 import { deserializeDate } from "@web/core/l10n/dates";
+import { escape } from "@web/core/utils/strings";
 import { GridRenderer } from "@web_grid/views/grid_renderer";
-import { onWillStart } from "@odoo/owl";
+import { onWillStart, markup } from "@odoo/owl";
 
 export class TimesheetGridRenderer extends GridRenderer {
     static components = {
@@ -134,6 +136,23 @@ export class TimesheetGridRenderer extends GridRenderer {
         if (workingHours == null) {
             return null;
         }
+        if (workingHours.full_time_required_hours) {
+            let isToday = false;
+            let hoursWorked = 0;
+            const isTodayColumn = this.props.columns.some((column) => column.isToday);
+            for (const cell of Object.values(section.cells)) {
+                if (isTodayColumn) {
+                    if (isToday && !cell.column.isToday) {
+                        // we don't count after today
+                        break;
+                    } else if (!isToday && cell.column.isToday) {
+                        isToday = true;
+                    }
+                }
+                hoursWorked += cell.value;
+            }
+            return hoursWorked - workingHours.full_time_required_hours;
+        }
 
         return Object.values(section.cells).reduce((overtime, cell) => overtime + this.getSectionDailyOvertime(cell, workingHours), 0);
     }
@@ -143,12 +162,21 @@ export class TimesheetGridRenderer extends GridRenderer {
         const res = super._getSectionTotalCellBgColor(section);
         if (weeklyOvertime == null) {
             return res;
-        } else if (weeklyOvertime < 0) {
+        } else if (weeklyOvertime < -0.00001) {
             return 'text-bg-danger';
-        } else if (weeklyOvertime === 0) {
+        } else if (weeklyOvertime > -0.00001 && weeklyOvertime < 0.00001) {
             return 'text-bg-success';
         } else {
             return 'text-bg-warning';
         }
+    }
+
+    /** Return grid cell action helper when no records are found */
+    _getNoContentHelper() {
+        const noActivitiesFound = _t("No timesheets found. Let's create one!");
+        const noContentTimesheetHelper = _t("Keep track of your working hours by project every day and bill your customers for that time.");
+        return markup(
+            `<p class='o_view_nocontent_smiling_face'>${escape(noActivitiesFound)}</p><p>${escape(noContentTimesheetHelper)}</p>`
+        );
     }
 }

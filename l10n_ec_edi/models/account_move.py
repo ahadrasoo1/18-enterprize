@@ -250,16 +250,22 @@ class AccountMove(models.Model):
         invoices_not_ec = (self - invoices_ec)
         invoices_not_ec.l10n_ec_withhold_ids = False
         invoices_not_ec.l10n_ec_withhold_count = False
+
+        withhold_invoice_line_data = dict(self.env['account.move.line']._read_group(
+            [('l10n_ec_withhold_invoice_id', 'in', invoices_ec.ids)],
+            groupby = ['l10n_ec_withhold_invoice_id'],
+            aggregates = ['move_id:recordset']
+        ))
         for invoice in invoices_ec:
             withhold_ids = False
             withhold_count = False
-            if invoice.is_invoice():
-                withhold_ids = self.env['account.move.line'].search([('l10n_ec_withhold_invoice_id', '=', invoice.id)]).mapped('move_id')
+            if invoice.is_invoice() and withhold_invoice_line_data.get(invoice):
+                withhold_ids = withhold_invoice_line_data.get(invoice)
                 withhold_count = len(withhold_ids)
             invoice.l10n_ec_withhold_ids = withhold_ids
             invoice.l10n_ec_withhold_count = withhold_count
 
-    @api.onchange('l10n_latam_document_type_id', 'l10n_latam_document_number')
+    @api.onchange('l10n_latam_document_type_id', 'l10n_latam_document_number', 'partner_id')
     def _inverse_l10n_latam_document_number(self):
         super()._inverse_l10n_latam_document_number()
         self._l10n_ec_check_number_prefix()
@@ -285,6 +291,7 @@ class AccountMove(models.Model):
             if move.country_code == 'EC':
                 base_lines = [line._prepare_base_line_for_taxes_computation() for line in move.l10n_ec_reimbursement_ids]
                 AccountTax._add_tax_details_in_base_lines(base_lines, move.company_id)
+                AccountTax._round_base_lines_tax_details(base_lines, move.company_id)
                 move.reimbursement_totals = AccountTax._get_tax_totals_summary(
                     base_lines=base_lines,
                     currency=move.currency_id,
@@ -503,7 +510,7 @@ class AccountMove(models.Model):
                 'payment_total': abs(line.balance),
             }
             payment_vals.update({
-                'payment_term': max(((line.date_maturity or self.invoice_date) - self.invoice_date).days, 0),
+                'payment_term': max(((line.date_maturity or self.invoice_date) - self.invoice_date).days, 0) if self.invoice_date else 0,
                 'time_unit': "dias",
             })
             payment_data.append(payment_vals)
@@ -757,7 +764,7 @@ class AccountMove(models.Model):
             return False  # widget gives errors if no tax groups
 
         wth_subtotals = {
-            'formatted_amount_total': formatLang(self.env, vat_amount + pro_amount, currency_obj=currency_id),
+            'total_amount_currency': vat_amount + pro_amount,
             'allow_tax_edition': False,
             'groups_by_subtotal': {},
             'subtotals_order': [],
@@ -765,21 +772,25 @@ class AccountMove(models.Model):
             'display_tax_base': False,
         }
 
-        def add_subtotal(amount, base, currency, key):
+        def add_subtotal(amount, base, currency, key, tax_group):
             # Add a subtotal to the widget
             # We need to add a group_by_subtotal, subtotals and subtotals_order otherwise the widget will crash
-            formatted_base = formatLang(self.env, base, currency_obj=currency)
             wth_subtotals['groups_by_subtotal'][key] = []
             wth_subtotals['subtotals_order'].append(key)
             wth_subtotals['subtotals'].append({
                 'name': key,
-                'formatted_amount': _('(base: %(base)s) %(amount)s', base=formatted_base, amount=formatLang(self.env, amount, currency_obj=currency))
+                'base_amount_currency': amount,
+                'tax_groups': [{
+                    'display_base_amount_currency': True,
+                    'group_name': tax_group.name,
+                    'tax_amount_currency': amount,
+                }],
             })
 
         if vat_tax_group:
-            add_subtotal(vat_amount, vat_base, currency_id, _("VAT Withhold"))
+            add_subtotal(vat_amount, vat_base, currency_id, _("VAT Withhold"), vat_tax_group)
         if pro_tax_group:
-            add_subtotal(pro_amount, pro_base, currency_id, _("Profit Withhold"))
+            add_subtotal(pro_amount, pro_base, currency_id, _("Profit Withhold"), pro_tax_group)
 
         return wth_subtotals
 
@@ -988,16 +999,22 @@ class AccountMoveLine(models.Model):
         results = super()._prepare_edi_vals_to_export()
         currency_rate = self.balance / self.amount_currency if self.amount_currency != 0 else 1
 
-        sign = -1 if self.move_id.is_inbound() else 1
-        price_subtotal = self.balance * sign
-        if self.quantity and self.discount != 100.0:
-            price_unit = price_subtotal / ((1 - (self.discount or 0.0) / 100.0) * abs(self.quantity))
+        included_taxes = self.tax_ids.filtered(lambda t: t.price_include)
+        if self.quantity and self.discount != 100.0 and included_taxes:
+            base_line = self.move_id._prepare_product_base_line_for_taxes_computation(self)
+            # We need price unit before discount
+            base_line.update({
+                'quantity': 1,
+                'discount': 0,
+            })
+            self.env['account.tax']._add_tax_details_in_base_line(base_line, self.company_id, rounding_method='round_globally')
+            price_unit = base_line['tax_details']['raw_total_excluded_currency']
         else:
             price_unit = self.price_unit
 
         return {
             'price_discount': float_round(results['price_discount'] * currency_rate, precision_digits=6),
-            'price_unit': float_round(price_unit, precision_digits=6),  # balance is already in company currency
+            'price_unit': float_round(price_unit * currency_rate, precision_digits=6),
         }
 
     # ============================================

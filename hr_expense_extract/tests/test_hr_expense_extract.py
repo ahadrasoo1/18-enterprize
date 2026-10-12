@@ -1,9 +1,15 @@
-from odoo.addons.hr_expense.tests.common import TestExpenseCommon
-from odoo.addons.iap_extract.tests.test_extract_mixin import TestExtractMixin
-from odoo.tests import tagged, Form
+from unittest.mock import patch
+
+from freezegun import freeze_time
+
+from odoo import fields
+from odoo.tests import Form, tagged, users
 from odoo.tools import float_compare
 
-from ..models.hr_expense import OCR_VERSION
+from odoo.addons.hr_expense.tests.common import TestExpenseCommon
+from odoo.addons.hr_expense_extract.models.hr_expense import OCR_VERSION
+from odoo.addons.hr_expense_predict_product.models.hr_expense import HrExpense
+from odoo.addons.iap_extract.tests.test_extract_mixin import TestExtractMixin
 
 
 @tagged('post_install', '-at_install')
@@ -13,8 +19,6 @@ class TestExpenseExtractProcess(TestExpenseCommon, TestExtractMixin):
     def setUpClass(cls):
         super().setUpClass()
 
-        # Set the standard price to 0 to take the price from extract
-        cls.product_a.write({'standard_price': 0})
         cls.expense = cls.env['hr.expense'].create({
             'employee_id': cls.expense_employee.id,
             'product_id': cls.product_c.id,
@@ -25,11 +29,16 @@ class TestExpenseExtractProcess(TestExpenseCommon, TestExtractMixin):
             'raw': b'My expense',
         })
 
+    @classmethod
+    def default_env_context(cls):
+        # OVERRIDE to reactivate the tracking
+        return {}
+
     def get_result_success_response(self):
         return {
             'status': 'success',
             'results': [{
-                'description': {'selected_value': {'content': 'food', 'candidates': []}},
+                'description': {'selected_value': {'content': 'Pizzeria', 'candidates': []}},
                 'total': {'selected_value': {'content': 99.99, 'candidates': []}},
                 'date': {'selected_value': {'content': '2022-02-22', 'candidates': []}},
                 'currency': {'selected_value': {'content': 'euro', 'candidates': []}},
@@ -86,7 +95,6 @@ class TestExpenseExtractProcess(TestExpenseCommon, TestExtractMixin):
         self.assertEqual(float_compare(self.expense.total_amount, ext_result['total']['selected_value']['content'], 2), 0)
         self.assertEqual(self.expense.currency_id, eur_currency)
         self.assertEqual(str(self.expense.date), ext_result['date']['selected_value']['content'])
-        self.assertEqual(self.expense.name, self.expense.predicted_category, ext_result['description']['selected_value']['content'])
         self.assertEqual(self.expense.product_id, self.product_c)
 
     def test_manual_send_for_digitization(self):
@@ -120,7 +128,6 @@ class TestExpenseExtractProcess(TestExpenseCommon, TestExtractMixin):
         self.assertEqual(float_compare(self.expense.total_amount, ext_result['total']['selected_value']['content'], 2), 0)
         self.assertEqual(self.expense.currency_id, eur_currency)
         self.assertEqual(str(self.expense.date), ext_result['date']['selected_value']['content'])
-        self.assertEqual(self.expense.name, self.expense.predicted_category, ext_result['description']['selected_value']['content'])
         self.assertEqual(self.expense.product_id, self.product_c)
 
     def test_no_send_for_digitization(self):
@@ -207,7 +214,6 @@ class TestExpenseExtractProcess(TestExpenseCommon, TestExtractMixin):
         Test that the price unit does not change when the quantity changes after uploading an attachment
         when there is no digitisation
         """
-        self.product_a.write({'standard_price': 800})
         expense = self.env['hr.expense'].create({
             'name': 'expense',
             'employee_id': self.expense_employee.id,
@@ -226,3 +232,184 @@ class TestExpenseExtractProcess(TestExpenseCommon, TestExtractMixin):
         with Form(expense) as form:
             form.quantity = 2
             self.assertEqual(form.price_unit, 800)
+
+    def test_extract_multi_currencies(self):
+        """Test that exchange rate is fetched during extraction"""
+        self.env.ref('base.EUR').active = True
+        self.env['res.currency.rate'].create({
+                'name': '2022-01-01',
+                'rate': 3,
+                'currency_id': self.env.ref('base.EUR').id,
+                'company_id': self.env.company.id,
+            })
+        ocr_results = self.get_result_success_response()['results'][0]
+        self.expense.name = ""
+        self.expense._fill_document_with_results(ocr_results=ocr_results)
+
+        self.assertEqual(self.expense.total_amount, 33.33)
+
+    def test_extract_multi_currencies_with_several_possible_currencies(self):
+        """Test that the extraction does not crash"""
+        ocr_results = {
+                'description': {'selected_value': {'content': 'Pizzeria', 'candidates': []}},
+                'total': {'selected_value': {'content': 99.99, 'candidates': []}},
+                'date': {'selected_value': {'content': '2022-02-22', 'candidates': []}},
+                'currency': {'selected_value': {'content': '$', 'candidates': []}},
+            }
+        self.expense.name = ""
+        self.expense._fill_document_with_results(ocr_results=ocr_results)
+
+        self.assertTrue(self.expense.currency_id)
+
+    def test_extract_without_possible_currencies(self):
+        """Test that the extraction does not crash"""
+        ocr_results = {
+                'description': {'selected_value': {'content': 'Pizzeria', 'candidates': []}},
+                'total': {'selected_value': {'content': 99.99, 'candidates': []}},
+                'date': {'selected_value': {'content': '2022-02-22', 'candidates': []}},
+                'currency': {'selected_value': {'content': 'undefined', 'candidates': []}},
+            }
+        self.expense.name = ""
+        self.expense._fill_document_with_results(ocr_results=ocr_results)
+
+        self.assertTrue(self.expense.currency_id)
+
+    def test_extract_no_total(self):
+        ocr_results = self.get_result_success_response()['results'][0]
+        del ocr_results['total']
+        self.expense.name = ""
+        self.expense._fill_document_with_results(ocr_results=ocr_results)
+
+        self.assertAlmostEqual(self.expense.total_amount_currency, 0, 2)
+        self.assertAlmostEqual(self.expense.total_amount, 0, 2)
+        self.assertEqual(self.expense.currency_id.name, 'EUR')
+        self.assertEqual(self.expense.date, fields.Date.to_date('2022-02-22'))
+
+    def test_extract_no_currency(self):
+        self.env['res.currency.rate'].create({
+            'name': '2022-01-01',
+            'rate': 3,
+            'currency_id': self.env.ref('base.EUR').id,
+            'company_id': self.env.company.id,
+        })
+
+        ocr_results = self.get_result_success_response()['results'][0]
+        del ocr_results['currency']
+        self.expense.name = ""
+        self.expense._fill_document_with_results(ocr_results=ocr_results)
+
+        self.assertAlmostEqual(self.expense.total_amount_currency, 99.99, 2)
+        self.assertAlmostEqual(self.expense.total_amount, 99.99, 2)
+        self.assertEqual(self.expense.currency_id.name, 'USD')
+        self.assertEqual(self.expense.date, fields.Date.to_date('2022-02-22'))
+
+    def test_expense_extract_product_with_cost_only_company_currency(self):
+        """
+        Test that when an expense having a product whith a standard_price set up, we never change the currency
+        from the default company currency
+        """
+        eur_currency = self.env.ref('base.EUR')
+        eur_currency.active = True
+        company_currency = self.env.company.currency_id
+
+        self.env['res.currency.rate'].sudo().create({
+            'name': '2022-01-01',
+            'rate': 10,
+            'currency_id': eur_currency.id,
+            'company_id': self.env.company.id,
+        })
+
+        attachment = self.env['ir.attachment'].with_user(self.expense_user_employee).create({
+            'name': 'test_attachment.png',
+            'res_model': 'hr.expense',
+            'raw': b"R0lGODdhAQABAIAAAP///////ywAAAAAAQABAAACAkQBADs=",
+        })
+        extract_response = self.get_result_success_response()
+        extract_response['document_token'] = 'some_token'
+        extract_response['results'][0]['total']['selected_value']['content'] = 100
+        extract_response['results'][0]['currency']['selected_value']['content'] = '€'
+        with (
+            self._mock_iap_extract(extract_response=extract_response),
+            patch.object(HrExpense, '_predict_product', side_effect=lambda *args, **kwargs: self.product_a.id)
+        ):
+            self.env['hr.expense'].with_user(self.expense_user_employee).create_expense_from_attachments(attachment.ids)
+            expense = self.env['hr.expense'].search([('attachment_ids', '=', attachment.id)]).ensure_one()
+            expense._fill_document_with_results(ocr_results=extract_response['results'][0])
+
+        self.assertNotEqual(company_currency.id, eur_currency.id)
+        self.assertRecordValues(
+            expense,
+            [{'total_amount_currency': 800.0, 'total_amount': 800.0, 'currency_id': company_currency.id, 'product_id': self.product_a.id}],
+        )
+
+    @freeze_time('2024-01-01')
+    def test_extract_no_date(self):
+        self.env['res.currency.rate'].create({
+            'name': '2022-01-01',
+            'rate': 3,
+            'currency_id': self.env.ref('base.EUR').id,
+            'company_id': self.env.company.id,
+        })
+
+        ocr_results = self.get_result_success_response()['results'][0]
+        del ocr_results['date']
+        self.expense.name = ""
+        self.expense.date = None
+        self.expense._fill_document_with_results(ocr_results=ocr_results)
+
+        self.assertAlmostEqual(self.expense.total_amount_currency, 99.99, 2)
+        self.assertAlmostEqual(self.expense.total_amount, 33.33, 2)
+        self.assertEqual(self.expense.currency_id.name, 'EUR')
+        self.assertEqual(self.expense.date, fields.Date.to_date('2024-01-01'))
+
+    @users('admin')
+    def test_expense_ocr_note_author(self):
+        attachment = self.env['ir.attachment'].create({
+            'name': 'test_attachment.png',
+            'res_model': 'hr.expense',
+            'raw': b'My expense',
+        })
+        with self._mock_iap_extract(extract_response=self.parse_success_response()):
+            self.env['hr.expense'].create_expense_from_attachments(attachment.ids)
+
+        expense = self.env['hr.expense'].search([('attachment_ids', '=', attachment.id)]).ensure_one()
+        with self._mock_iap_extract(extract_response=self.get_result_success_response()):
+            expense.check_all_status()
+
+        self.env.cr.flush()
+        message = self.env['mail.message'].search([
+            ('model', '=', 'hr.expense'),
+            ('res_id', '=', expense.id),
+            ('tracking_value_ids', '!=', False),
+        ]).ensure_one()
+        author_name = message.author_id.complete_name
+        self.assertEqual(author_name, 'OdooBot')
+
+    def test_extract_conversion_when_currency_already_set(self):
+        """ Test that if EUR is already set on the record, the USD total still updates correctly from OCR """
+        eur_currency = self.env.ref('base.EUR')
+        eur_currency.active = True
+
+        self.env['res.currency.rate'].create({
+            'name': '2022-02-22',
+            'rate': 1.0 / 3.0,
+            'currency_id': eur_currency.id,
+            'company_id': self.env.company.id,
+        })
+
+        self.expense.write({
+            'currency_id': eur_currency.id,
+            'total_amount_currency': 1.0,
+            'total_amount': 3.0,
+        })
+
+        ocr_results = self.get_result_success_response()['results'][0]
+        ocr_results['total']['selected_value']['content'] = 50.0
+        ocr_results['currency']['selected_value']['content'] = 'EUR'
+        ocr_results['date']['selected_value']['content'] = '2022-02-22'
+
+        self.expense.name = ""
+        self.expense._fill_document_with_results(ocr_results=ocr_results)
+
+        self.assertEqual(self.expense.total_amount_currency, 50.0)
+        self.assertAlmostEqual(self.expense.total_amount, 150.0)

@@ -19,7 +19,18 @@ class CashFlowReportCustomHandler(models.AbstractModel):
 
             if layout_line_id in report_data and 'aml_groupby_account' in report_data[layout_line_id]:
                 aml_data_values = report_data[layout_line_id]['aml_groupby_account'].values()
-                for aml_data in sorted(aml_data_values, key=lambda x: x['account_code']):
+
+                aml_data_values_with_account_code = []
+                aml_data_values_without_account_code = []
+
+                for aml_data in aml_data_values:
+                    if aml_data['account_code'] is not None:
+                        aml_data_values_with_account_code.append(aml_data)
+                    else:
+                        aml_data_values_without_account_code.append(aml_data)
+
+                for aml_data in (sorted(aml_data_values_with_account_code, key=lambda x: x['account_code'])
+                                 + aml_data_values_without_account_code):
                     lines.append((0, self._get_aml_line(report, options, aml_data)))
 
         unexplained_difference_line = self._get_unexplained_difference_line(report, options, report_data)
@@ -238,7 +249,7 @@ class CashFlowReportCustomHandler(models.AbstractModel):
                 FROM %(table_references)s
                 %(currency_table_join)s
                 WHERE %(search_condition)s
-                GROUP BY account_move_line.account_id, account_code, account_name
+                GROUP BY account_move_line.account_id, %(account_code)s, %(account_name)s
                 ''',
                 column_group_key=column_group_key,
                 account_code=account_code,
@@ -296,7 +307,7 @@ class CashFlowReportCustomHandler(models.AbstractModel):
                 WHERE account_move_line.move_id IN (SELECT unnest(payment_move_ids.move_id) FROM payment_move_ids)
                     AND account_move_line.account_id NOT IN %(payment_account_ids)s
                     AND account_partial_reconcile.max_date BETWEEN %(date_from)s AND %(date_to)s
-                GROUP BY account_move_line.company_id, account_move_line.account_id, account_code, account_name, account_account_type, account_account_account_tag.account_account_tag_id
+                GROUP BY account_move_line.company_id, account_move_line.account_id, %(account_code)s, %(account_name)s, account_account_type, account_account_account_tag.account_account_tag_id
 
                 UNION ALL
 
@@ -319,7 +330,7 @@ class CashFlowReportCustomHandler(models.AbstractModel):
                 WHERE account_move_line.move_id IN (SELECT unnest(payment_move_ids.move_id) FROM payment_move_ids)
                     AND account_move_line.account_id NOT IN %(payment_account_ids)s
                     AND account_partial_reconcile.max_date BETWEEN %(date_from)s AND %(date_to)s
-                GROUP BY account_move_line.company_id, account_move_line.account_id, account_code, account_name, account_account_type, account_account_account_tag.account_account_tag_id
+                GROUP BY account_move_line.company_id, account_move_line.account_id, %(account_code)s, %(account_name)s, account_account_type, account_account_account_tag.account_account_tag_id
 
                 UNION ALL
 
@@ -339,7 +350,7 @@ class CashFlowReportCustomHandler(models.AbstractModel):
                     AND account_account_account_tag.account_account_tag_id IN %(cash_flow_tag_ids)s
                 WHERE account_move_line.move_id IN (SELECT unnest(payment_move_ids.move_id) FROM payment_move_ids)
                     AND account_move_line.account_id NOT IN %(payment_account_ids)s
-                GROUP BY account_move_line.account_id, account_code, account_name, account_account_type, account_account_account_tag.account_account_tag_id)
+                GROUP BY account_move_line.account_id, %(account_code)s, %(account_name)s, account_account_type, account_account_account_tag.account_account_tag_id)
                 ''',
                 column_group_key=column_group_key,
                 move_ids_query=move_ids_query,
@@ -518,7 +529,7 @@ class CashFlowReportCustomHandler(models.AbstractModel):
                     ON account_account_account_tag.account_account_id = account_move_line.account_id
                     AND account_account_account_tag.account_account_tag_id IN %(cash_flow_tag_ids)s
                 WHERE account_move_line.move_id IN %(move_ids)s
-                GROUP BY account_move_line.move_id, account_move_line.account_id, account_code, account_name, account_account_type, account_account_account_tag.account_account_tag_id
+                GROUP BY account_move_line.move_id, account_move_line.account_id, %(account_code)s, %(account_name)s, account_account_type, account_account_account_tag.account_account_tag_id
                 ''',
                 column_group_key=column['column_group_key'],
                 account_code=account_code,

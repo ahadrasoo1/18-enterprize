@@ -2,6 +2,8 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import fields, models
+from odoo.osv import expression
+import ast
 
 
 class ProductionLot(models.Model):
@@ -12,10 +14,18 @@ class ProductionLot(models.Model):
 
     def _compute_quality_check_qty(self):
         for prod_lot in self:
-            prod_lot.quality_check_qty = self.env['quality.check'].search_count([
-                ('lot_id', '=', prod_lot.id),
-                ('company_id', '=', self.env.company.id)
-            ])
+            domain = expression.AND([self._get_quality_check_domain(prod_lot), [('company_id', '=', self.env.company.id)]])
+            prod_lot.quality_check_qty = self.env['quality.check'].search_count(domain)
+
+    def _get_quality_check_domain(self, prod_lot):
+        return [('lot_id', '=', prod_lot.id)]
+
+    def action_open_quality_checks(self):
+        self.ensure_one()
+        action_values = self.env['ir.actions.act_window']._for_xml_id('quality_control.quality_check_action_production_lot')
+        domain = ast.literal_eval(action_values.get('domain')) if action_values.get('domain') else []
+        action_values["domain"] = expression.AND([domain, self._get_quality_check_domain(self)])
+        return action_values
 
     def _compute_quality_alert_qty(self):
         for prod_lot in self:

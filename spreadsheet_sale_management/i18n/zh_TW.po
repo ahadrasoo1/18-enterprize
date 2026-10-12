@@ -1,24 +1,32 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* spreadsheet_sale_management
-# 
+# * spreadsheet_sale_management
+#
 # Translators:
-# Wil Odoo, 2024
-# Tony Ng, 2024
-# 
+# Wil Odoo, 2025
+# Tony Ng, 2025
+#
+# Weblate <noreply-mt-weblate@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:28+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Tony Ng, 2024\n"
-"Language-Team: Chinese (Taiwan) (https://app.transifex.com/odoo/teams/41243/zh_TW/)\n"
+"POT-Creation-Date: 2026-06-19 17:50+0000\n"
+"PO-Revision-Date: 2026-06-20 18:30+0000\n"
+"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"Language-Team: Chinese (Traditional Han script) <https://translate.odoo.com/"
+"projects/odoo-18/spreadsheet_sale_management/zh_Hant/>\n"
+"Language: zh_TW\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: zh_TW\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 2026.6.1\n"
+
+#. module: spreadsheet_sale_management
+#: model_terms:ir.ui.view,arch_db:spreadsheet_sale_management.sale_order_spreadsheet_view_search
+msgid "Calculator Templates"
+msgstr "計算機範本"
 
 #. module: spreadsheet_sale_management
 #. odoo-javascript
@@ -58,6 +66,11 @@ msgid "Display Name"
 msgstr "顯示名稱"
 
 #. module: spreadsheet_sale_management
+#: model:ir.model.fields,field_description:spreadsheet_sale_management.field_sale_order_spreadsheet__display_thumbnail
+msgid "Display Thumbnail"
+msgstr "顯示縮圖"
+
+#. module: spreadsheet_sale_management
 #. odoo-javascript
 #: code:addons/spreadsheet_sale_management/static/src/bundle/field_sync/field_sync_extension_hook.js:0
 msgid "Edit sync"
@@ -79,6 +92,11 @@ msgstr "要同步的欄位"
 #: model:sale.order.template.line,name:spreadsheet_sale_management.sale_order_template_line_assembly
 msgid "Furniture Assembly"
 msgstr "傢俬組裝"
+
+#. module: spreadsheet_sale_management
+#: model:ir.model,name:spreadsheet_sale_management.model_ir_http
+msgid "HTTP Routing"
+msgstr "HTTP 路由"
 
 #. module: spreadsheet_sale_management
 #: model:ir.model.fields,field_description:spreadsheet_sale_management.field_sale_order_spreadsheet__id
@@ -130,7 +148,7 @@ msgstr "本地送貨"
 msgid ""
 "Multiple cells are updating the same field of the same record! Unable to "
 "determine which one to choose: %s"
-msgstr ""
+msgstr "多個儲存格正嘗試更新同一記錄的相同欄位！系統無法確定選用哪一個：%s"
 
 #. module: spreadsheet_sale_management
 #: model:ir.model.fields,field_description:spreadsheet_sale_management.field_sale_order_spreadsheet__name
@@ -157,7 +175,7 @@ msgstr "記錄在清單中的位置"
 #. module: spreadsheet_sale_management
 #: model:ir.model,name:spreadsheet_sale_management.model_sale_order_spreadsheet
 msgid "Quotation Spreadsheet"
-msgstr ""
+msgstr "報價單試算表"
 
 #. module: spreadsheet_sale_management
 #: model:ir.model,name:spreadsheet_sale_management.model_sale_order_template
@@ -175,6 +193,11 @@ msgstr "報價單範本"
 #: code:addons/spreadsheet_sale_management/models/sale_order_spreadsheet.py:0
 msgid "Quote"
 msgstr "引用"
+
+#. module: spreadsheet_sale_management
+#: model_terms:ir.ui.view,arch_db:spreadsheet_sale_management.sale_order_spreadsheet_view_search
+msgid "Quote Sheets"
+msgstr "報價表"
 
 #. module: spreadsheet_sale_management
 #: model:ir.model.fields,field_description:spreadsheet_sale_management.field_sale_order__spreadsheet_template_id
@@ -195,10 +218,16 @@ msgid "Sale Order Spreadsheet"
 msgstr "銷售訂單試算表"
 
 #. module: spreadsheet_sale_management
+#: model:ir.actions.act_window,name:spreadsheet_sale_management.sale_order_spreadsheet_action
+#: model:ir.ui.menu,name:spreadsheet_sale_management.menu_technical_spreadsheet_sale_order_template
+msgid "Sale Order Spreadsheets"
+msgstr "銷售訂單試算表"
+
+#. module: spreadsheet_sale_management
 #. odoo-python
 #: code:addons/spreadsheet_sale_management/models/sale_order_spreadsheet.py:0
 msgid "Sale order lines"
-msgstr ""
+msgstr "銷售單資料行"
 
 #. module: spreadsheet_sale_management
 #: model:ir.model,name:spreadsheet_sale_management.model_sale_order
@@ -257,9 +286,10 @@ msgstr "與此欄位同步"
 #. odoo-javascript
 #: code:addons/spreadsheet_sale_management/static/src/bundle/field_sync/model/field_sync_ui_plugin.js:0
 msgid ""
-"The value of %(cell_reference)s (%(cell_value)s) can't be used for field "
-"\"%(field_name)s\"."
-msgstr "%(cell_reference)s 的值（%(cell_value)s）不可用於欄位「%(field_name)s」。"
+"The value of %(cell_reference)s (%(cell_value)s) can't be used for field \"%"
+"(field_name)s\"."
+msgstr ""
+"%(cell_reference)s 的值（%(cell_value)s）不可用於欄位「%(field_name)s」。"
 
 #. module: spreadsheet_sale_management
 #: model:ir.model.fields,field_description:spreadsheet_sale_management.field_sale_order_spreadsheet__thumbnail
@@ -271,3 +301,9 @@ msgstr "縮圖"
 #: code:addons/spreadsheet_sale_management/static/src/bundle/field_sync/action/field_sync_action.js:0
 msgid "Unable to save"
 msgstr "未能儲存"
+
+#. module: spreadsheet_sale_management
+#. odoo-python
+#: code:addons/spreadsheet_sale_management/models/sale_order_spreadsheet.py:0
+msgid "Untitled spreadsheet"
+msgstr "未命名試算表"

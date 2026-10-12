@@ -1,23 +1,27 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* hr_appraisal_survey
-# 
+# * hr_appraisal_survey
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Manon Rondou, 2025
+# Erwin van der Ploeg <erwin@odooexperts.nl>, 2025
+# Bren Driesen <brdri@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Dutch (https://app.transifex.com/odoo/teams/41243/nl/)\n"
+"POT-Creation-Date: 2025-12-29 18:45+0000\n"
+"PO-Revision-Date: 2026-05-27 15:24+0000\n"
+"Last-Translator: Bren Driesen <brdri@odoo.com>\n"
+"Language-Team: Dutch <https://translate.odoo.com/projects/odoo-18/"
+"hr_appraisal_survey/nl/>\n"
+"Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: nl\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.17\n"
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_survey_page_statistics_header
@@ -51,47 +55,63 @@ msgstr "<span> / </span>"
 #. module: hr_appraisal_survey
 #: model:mail.template,body_html:hr_appraisal_survey.mail_template_appraisal_ask_feedback
 msgid ""
-"<t t-set=\"logged_user\" t-value=\"ctx.get('logged_user')\"></t>\n"
-"                <t t-set=\"employee\" t-value=\"ctx.get('employee')\"></t>\n"
-"                <t t-set=\"deadline\" t-value=\"ctx.get('deadline')\"></t>\n"
+"<t t-set=\"logged_user\" t-value=\"ctx.get('logged_user')\"/>\n"
+"                <t t-set=\"employee\" t-value=\"ctx.get('employee')\"/>\n"
+"                <t t-set=\"deadline\" t-value=\"ctx.get('deadline')\"/>\n"
 "                <div style=\"margin: 0px; padding: 0px;\">\n"
-"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
-"                        <p style=\"margin-left:5px\">Dear <t t-out=\"object.partner_id.name or 'participant'\">[participant]</t></p>\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
+"\">\n"
+"                        </p><p style=\"margin-left:5px\">Dear <t t-"
+"out=\"object.partner_id.name or 'participant'\">[participant]</t></p>\n"
 "                        <span>\n"
-"                            <t t-out=\"logged_user\">[Current user]</t> invites you to participate in a survey and provide your feedback on <t t-out=\"employee\">[employee]</t>.\n"
-"                            Please complete the survey before the <t t-out=\"deadline\">[specified deadline]</t>.\n"
+"                            <t t-out=\"logged_user\">[Current user]</t> "
+"invites you to participate in a survey and provide your feedback on <t t-"
+"out=\"employee\">[employee]</t>.\n"
+"                            Please complete the survey before the <t t-"
+"out=\"deadline\">[specified deadline]</t>.\n"
 "                        </span>\n"
-"                        <br>\n"
+"                        <br/>\n"
 "                        Thank you!\n"
-"                        <br><br>\n"
-"                        <div style=\"margin: 16px 0px 16px 0px; text-align: center;\">\n"
-"                            <a t-att-href=\"object.get_start_url()\" style=\"background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;\">\n"
+"                        <br/><br/>\n"
+"                        <div style=\"margin: 16px 0px 16px 0px; text-align: "
+"center;\">\n"
+"                            <a t-att-href=\"object.get_start_url()\" "
+"style=\"background-color: #875A7B; padding: 8px 16px 8px 16px; text-"
+"decoration: none; color: #fff; border-radius: 5px; font-size:13px;\">\n"
 "                                Give your feedback\n"
 "                            </a>\n"
 "                        </div>\n"
-"                    </p>\n"
+"                    \n"
 "                </div>\n"
 "            "
 msgstr ""
-"<t t-set=\"logged_user\" t-value=\"ctx.get('logged_user')\"></t>\n"
-"                <t t-set=\"employee\" t-value=\"ctx.get('employee')\"></t>\n"
-"                <t t-set=\"deadline\" t-value=\"ctx.get('deadline')\"></t>\n"
+"<t t-set=\"logged_user\" t-value=\"ctx.get('logged_user')\"/>\n"
+"                <t t-set=\"employee\" t-value=\"ctx.get('employee')\"/>\n"
+"                <t t-set=\"deadline\" t-value=\"ctx.get('deadline')\"/>\n"
 "                <div style=\"margin: 0px; padding: 0px;\">\n"
-"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
-"                        <p style=\"margin-left:5px\">Beste <t t-out=\"object.partner_id.name or 'participant'\">[deelnemer]</t></p>\n"
-"                        <span>\n"
-"                            <t t-out=\"logged_user\">[Huidige gebruiker]</t> heeft je gevraagd om deel te nemen aan een enquête en je feedback te geven over <t t-out=\"employee\">[werknemer]</t>.\n"
-"                            Zou je de enquête kunnen invullen voor <t t-out=\"deadline\">[bepaalde deadline]</t>.\n"
-"                        </span>\n"
-"                        <br>\n"
+"                   <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
+"\">\n"
+"                        </p><p style=\"margin-left:5px\">Beste <t t-"
+"out=\"object.partner_id.name or 'participant'\">[deelnemer]</t></p>\n"
+"                       <span>\n"
+"                           <t t-out=\"logged_user\">[Huidige gebruiker]</t> "
+"nodigt je uit om deel te nemen aan een enquête en je feedback te geven over "
+"<t t-out=\"employee\">[medewerker]</t>.\n"
+"                            Vul de enquête in voor de <t t-"
+"out=\"deadline\">[opgegeven deadline]</t>.\n"
+"                       </span>\n"
+"                       <br/>\n"
 "                        Hartelijk dank!\n"
-"                        <br><br>\n"
-"                        <div style=\"margin: 16px 0px 16px 0px; text-align: center;\">\n"
-"                            <a t-att-href=\"object.get_start_url()\" style=\"background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;\">\n"
+"                       <br/><br/>\n"
+"                        <div style=\"margin: 16px 0px 16px 0px; text-align: "
+"center;\">\n"
+"                            <a t-att-href=\"object.get_start_url()\" "
+"style=\"background-color: #875A7B; padding: 8px 16px 8px 16px; text-"
+"decoration: none; color: #fff; border-radius: 5px; font-size:13px;\">\n"
 "                                Geef je feedback\n"
 "                            </a>\n"
 "                        </div>\n"
-"                    </p>\n"
+"                    \n"
 "                </div>\n"
 "            "
 
@@ -99,11 +119,11 @@ msgstr ""
 #. odoo-python
 #: code:addons/hr_appraisal_survey/models/hr_appraisal.py:0
 msgid ""
-"A new 360 Feedback report has been completed for the appraisal of "
-"%(employee_name)s."
+"A new 360 Feedback report has been completed for the appraisal of %"
+"(employee_name)s."
 msgstr ""
-"Een nieuw 360 Feedback-rapport is klaar voor de evaluatie "
-"van%(employee_name)s."
+"Een nieuw 360 Feedback-rapport is klaar voor de evaluatie van%"
+"(employee_name)s."
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.arow_3_1_1
@@ -158,7 +178,7 @@ msgstr "Aanvullende opmerkingen"
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.y_360_5_6
 msgid "Admit his/her mistakes"
-msgstr ""
+msgstr "Zijn/haar fouten toegeven"
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_survey_user_input_view_tree
@@ -335,7 +355,7 @@ msgstr "Conclusie"
 #. module: hr_appraisal_survey
 #: model:ir.model,name:hr_appraisal_survey.model_res_config_settings
 msgid "Config Settings"
-msgstr "Configuratie instellingen"
+msgstr "Configuratie-instellingen"
 
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_appraisal_ask_feedback__body
@@ -345,7 +365,7 @@ msgstr "Inhoud"
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.y_360_5_2
 msgid "Create space for different ideas and options to be voiced"
-msgstr "Creëer ruimte voor verschillende ideeën en opties om geuit te worden"
+msgstr "Maak ruimte voor verschillende ideeën en opties om geuit te worden"
 
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,field_description:hr_appraisal_survey.field_appraisal_ask_feedback__create_uid
@@ -415,7 +435,7 @@ msgstr "Schermnaam"
 #. module: hr_appraisal_survey
 #: model:survey.question,title:hr_appraisal_survey.appraisal_360_10
 msgid "Do you have any comment to tell him/her in order to improve?"
-msgstr ""
+msgstr "Heb je een opmerking voor hem/haar om hem/haar te verbeteren?"
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_survey_user_input_view_tree
@@ -477,7 +497,7 @@ msgstr "Ga naar het evaluatieformulier"
 #. module: hr_appraisal_survey
 #: model:survey.question,title:hr_appraisal_survey.appraisal_360_5
 msgid "How does it feel to work with the employee? Is he/she ... "
-msgstr ""
+msgstr "Hoe voelt het om met de werknemer te werken? Is hij/zij ... "
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.appraisal_360_3_sug5
@@ -523,8 +543,8 @@ msgstr "Is bewerker"
 #: model_terms:survey.question,description:hr_appraisal_survey.appraisal_1
 msgid ""
 "It is the joint responsibility of the employee and the supervisor "
-"(appraiser) to establish a feasible work plan for the coming year, including"
-" major employee responsibilities and corresponding benchmarks against which "
+"(appraiser) to establish a feasible work plan for the coming year, including "
+"major employee responsibilities and corresponding benchmarks against which "
 "results will be evaluated."
 msgstr ""
 "Het is de gezamenlijke verantwoordelijkheid van de werknemer en de "
@@ -565,8 +585,8 @@ msgid ""
 "Leadership: create a challenging and motivating work environment aligned "
 "with the company's strategy"
 msgstr ""
-"Leiderschap: maak een uitdagende en motiverende werkomgeving die past bij de"
-" bedrijfsstrategie"
+"Leiderschap: maak een uitdagende en motiverende werkomgeving die past bij de "
+"bedrijfsstrategie"
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.arow_3_2_4
@@ -576,7 +596,7 @@ msgstr "Leiderschap: ondersteun ondergeschikten in hun professionele groei"
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.y_360_5_1
 msgid "Listening well to others"
-msgstr ""
+msgstr "Goed luisteren naar anderen"
 
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.appraisal_ask_feedback_view_form
@@ -591,7 +611,7 @@ msgstr "E-mailsjabloon"
 #. module: hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal_survey.hr_appraisal_view_form
 msgid "Mark as Done"
-msgstr "Markeren als gereed"
+msgstr "Markeren als voltooid"
 
 #. module: hr_appraisal_survey
 #: model_terms:survey.question,description:hr_appraisal_survey.appraisal_3
@@ -634,13 +654,13 @@ msgstr "Optioneel bericht"
 msgid ""
 "Optional translation language (ISO code) to select when sending out an "
 "email. If not set, the english version will be used. This should usually be "
-"a placeholder expression that provides the appropriate language, e.g. {{ "
-"object.partner_id.lang }}."
+"a placeholder expression that provides the appropriate language, e.g. "
+"{{ object.partner_id.lang }}."
 msgstr ""
 "Optionele vertaaltaal (ISO-code) om te selecteren bij het verzenden van een "
 "e-mail. Indien niet ingesteld, wordt de Engelse versie gebruikt. Dit moet "
-"meestal een placeholder zijn die de juiste taal biedt, bijv. {{ "
-"object.partner_id.lang }}."
+"meestal een placeholder zijn die de juiste taal biedt, bijv. "
+"{{ object.partner_id.lang }}."
 
 #. module: hr_appraisal_survey
 #: model_terms:survey.question,description:hr_appraisal_survey.appraisal_1
@@ -650,7 +670,7 @@ msgstr "Algemeen doel van de personeelsevaluatie"
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,help:hr_appraisal_survey.field_survey_user_input__requested_by
 msgid "Partner-related data of the user"
-msgstr "Relatie gerelateerde gegevens van de gebruiker"
+msgstr "Partner gerelateerde gegevens van de gebruiker"
 
 #. module: hr_appraisal_survey
 #: model:survey.question,title:hr_appraisal_survey.appraisal_4_2
@@ -786,8 +806,8 @@ msgstr "Aanzienlijk lager dan de normen en verwachtingen"
 msgid ""
 "Significantly exceeds standards and expectations required of the position"
 msgstr ""
-"Overtreft aanzienlijk de normen en verwachtingen die voor de functie vereist"
-" zijn"
+"Overtreft aanzienlijk de normen en verwachtingen die voor de functie vereist "
+"zijn"
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.x_360_5_3
@@ -855,8 +875,8 @@ msgid ""
 "Team spirit: ability to work efficiently with peers, manage the conflicts "
 "with diplomacy"
 msgstr ""
-"Teamgeest: het vermogen om efficiënt te werken met collega's, het beheer van"
-" de conflicten met diplomatie"
+"Teamgeest: het vermogen om efficiënt te werken met collega's, het beheer van "
+"de conflicten met diplomatie"
 
 #. module: hr_appraisal_survey
 #: model:survey.question.answer,value:hr_appraisal_survey.arow_3_1_10
@@ -866,7 +886,7 @@ msgstr "Technische vaardigheden omtrent de functie-eisen"
 #. module: hr_appraisal_survey
 #: model_terms:survey.survey,description_done:hr_appraisal_survey.appraisal_360_feedback_template
 msgid "Thanks a lot for your time and participation !"
-msgstr ""
+msgstr "Hartelijk dank voor je tijd en deelname!"
 
 #. module: hr_appraisal_survey
 #: model_terms:survey.question,description:hr_appraisal_survey.appraisal_3
@@ -874,8 +894,8 @@ msgid ""
 "The appraiser should rate the employee’s major work accomplishments and "
 "performance according to the metric provided below:"
 msgstr ""
-"De beoordelaar dient de belangrijkste werkverrichtingen en prestaties van de"
-" werknemer te beoordelen aan de hand van onderstaande maatstaf:"
+"De beoordelaar dient de belangrijkste werkverrichtingen en prestaties van de "
+"werknemer te beoordelen aan de hand van onderstaande maatstaf:"
 
 #. module: hr_appraisal_survey
 #: model_terms:survey.question,description:hr_appraisal_survey.appraisal_1
@@ -907,6 +927,8 @@ msgid ""
 "The following employees do not have any email: \n"
 "%s"
 msgstr ""
+"De volgende medewerkers hebben geen e-mail:\n"
+"%s"
 
 #. module: hr_appraisal_survey
 #: model_terms:survey.question,description:hr_appraisal_survey.appraisal_1
@@ -922,11 +944,11 @@ msgstr ""
 #. module: hr_appraisal_survey
 #: model:ir.model.fields,help:hr_appraisal_survey.field_hr_department__appraisal_survey_template_id
 msgid ""
-"This field is used with 360 Feedback setting on Appraisal App, the aim is to"
-" define a default Survey Template related to this department."
+"This field is used with 360 Feedback setting on Appraisal App, the aim is to "
+"define a default Survey Template related to this department."
 msgstr ""
-"Dit veld wordt gebruikt met 360 Feedback-instelling op de evaluatie-app, het"
-" doel is om een standaard enquêtesjabloon te definiëren met betrekking tot "
+"Dit veld wordt gebruikt met 360 Feedback-instelling op de evaluatie-app, het "
+"doel is om een standaard enquêtesjabloon te definiëren met betrekking tot "
 "deze afdeling."
 
 #. module: hr_appraisal_survey
@@ -946,8 +968,8 @@ msgstr "Tijdbeheer: projecten/taken zijn op tijd voltooid"
 #. module: hr_appraisal_survey
 #: model_terms:survey.question,description:hr_appraisal_survey.appraisal_1
 msgid ""
-"To assist employees in their professional growth, through the identification"
-" of strengths and opportunities for development"
+"To assist employees in their professional growth, through the identification "
+"of strengths and opportunities for development"
 msgstr ""
 "Werknemers bijstaan in hun professionele groei, via de identificatie van "
 "sterke punten en ontwikkelingsmogelijkheden"
@@ -967,8 +989,8 @@ msgstr "Totaal aantal enquêtes"
 #. module: hr_appraisal_survey
 #: model:survey.question,title:hr_appraisal_survey.appraisal_5_1
 msgid ""
-"Use the following space to make any comments regarding the above performance"
-" evaluation."
+"Use the following space to make any comments regarding the above performance "
+"evaluation."
 msgstr ""
 "Gebruik de volgende ruimte om commentaar te geven over de prestatie-"
 "evaluatie."
@@ -993,30 +1015,43 @@ msgstr "We zijn collega's, in verschillende teams."
 #: model_terms:survey.survey,description:hr_appraisal_survey.appraisal_360_feedback_template
 msgid ""
 "Welcome to this survey, <br><br>\n"
-"                You've been asked to participate to a 360 Feedback. It's a small survey that will allow managers to get more feedback about their employee. \n"
-"                By working with him/her, you're the best to share your thoughts and explain how your collaboration was.<br><br>\n"
-"                Your answers will be viewed only by the managers. This is not an anonymous survey."
+"                You've been asked to participate to a 360 Feedback. It's a "
+"small survey that will allow managers to get more feedback about their "
+"employee. \n"
+"                By working with him/her, you're the best to share your "
+"thoughts and explain how your collaboration was.<br><br>\n"
+"                Your answers will be viewed only by the managers. This is "
+"not an anonymous survey."
 msgstr ""
+"Welkom bij deze enquête, <br><br>\n"
+"                Je bent gevraagd om deel te nemen aan een 360 Feedback. Het "
+"is een kleine enquête waarmee managers meer feedback kunnen krijgen over hun "
+"medewerker. \n"
+"                Door met hem/haar samen te werken, kun je het beste je "
+"gedachten delen en uitleggen hoe de samenwerking was.<br><br>\n"
+"                Je antwoorden worden alleen bekeken door de managers. Dit is "
+"geen anonieme enquête."
 
 #. module: hr_appraisal_survey
 #: model:survey.question,title:hr_appraisal_survey.appraisal_360_6
 msgid "What should he/she does in order to improve on his/her day-to-day job?"
 msgstr ""
+"Wat zou hij/zij moeten doen om zijn/haar dagelijkse werk te verbeteren?"
 
 #. module: hr_appraisal_survey
 #: model:survey.question,title:hr_appraisal_survey.appraisal_360_7
 msgid "What's his/her greatest strength?"
-msgstr ""
+msgstr "Wat is zijn/haar grootste kracht?"
 
 #. module: hr_appraisal_survey
 #: model:survey.question,title:hr_appraisal_survey.appraisal_360_8
 msgid "What's his/her greatest weakness?"
-msgstr ""
+msgstr "Wat is zijn/haar grootste zwakte?"
 
 #. module: hr_appraisal_survey
 #: model:survey.question,title:hr_appraisal_survey.appraisal_360_3
 msgid "What's the relation between the employee and you?"
-msgstr ""
+msgstr "Wat is de relatie tussen de werknemer en jou?"
 
 #. module: hr_appraisal_survey
 #: model:survey.question,title:hr_appraisal_survey.appraisal_360_2
@@ -1034,7 +1069,8 @@ msgid ""
 "You can create surveys used for appraisals. Design easily your appraisal,\n"
 "                send invitations and analyze answers."
 msgstr ""
-"Je kunt enquêtes maken die worden gebruikt voor evaluaties. Ontwerp eenvoudig je evaluatie,\n"
+"Je kunt enquêtes maken die worden gebruikt voor evaluaties. Ontwerp "
+"eenvoudig je evaluatie,\n"
 "                verstuur uitnodigingen en analyseer antwoorden."
 
 #. module: hr_appraisal_survey

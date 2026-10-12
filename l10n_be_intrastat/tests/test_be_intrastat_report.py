@@ -3,6 +3,7 @@
 
 from lxml import etree
 
+from odoo import Command
 from odoo.tests import tagged
 from odoo.addons.account_reports.tests.common import TestAccountReportsCommon
 
@@ -33,6 +34,11 @@ class TestBEIntrastatReport(TestAccountReportsCommon):
             'intrastat_code_id': cls.env.ref('account_intrastat.commodity_code_2023_25309050').id,
             'weight': 19,
         })
+        cls.product_water = cls.env['product.product'].create({
+            'name': 'Bottle of water',
+            'intrastat_code_id': cls.env.ref('account_intrastat.commodity_code_2018_1022130').id,
+            'weight': 1,
+        })
         cls.inwards_vendor_bill = cls.env['account.move'].create({
             'move_type': 'in_invoice',
             'partner_id': cls.partner_a.id,
@@ -40,7 +46,7 @@ class TestBEIntrastatReport(TestAccountReportsCommon):
             'date': '2022-05-15',
             'intrastat_country_id': italy.id,
             'company_id': cls.company_data['company'].id,
-            'invoice_line_ids': [(0, 0, {
+            'invoice_line_ids': [Command.create({
                 'product_uom_id': cls.env.ref('uom.product_uom_unit').id,
                 'intrastat_transaction_id': cls.env.ref('account_intrastat.account_intrastat_transaction_11').id,
                 'product_id': cls.product_samples.id,
@@ -55,12 +61,37 @@ class TestBEIntrastatReport(TestAccountReportsCommon):
             'date': '2022-05-15',
             'intrastat_country_id': italy.id,
             'company_id': cls.company_data['company'].id,
+            'invoice_line_ids': [
+                Command.create({
+                    'product_uom_id': cls.env.ref('uom.product_uom_unit').id,
+                    'product_id': cls.product_aeroplane.id,
+                    'intrastat_transaction_id': cls.env.ref('account_intrastat.account_intrastat_transaction_11').id,
+                    'quantity': 4,
+                    'price_unit': 234000,
+                }),
+                # line wo product should be excluded
+                Command.create({
+                    'intrastat_transaction_id': cls.env.ref('account_intrastat.account_intrastat_transaction_11').id,
+                    'quantity': 4,
+                    'price_unit': 1234,
+                }),
+            ]
+        })
+
+        cls.vendor_bill_discount_100 = cls.env['account.move'].create({
+            'move_type': 'in_invoice',
+            'partner_id': cls.partner_a.id,
+            'invoice_date': '2022-05-15',
+            'date': '2022-05-15',
+            'intrastat_country_id': italy.id,
+            'company_id': cls.company_data['company'].id,
             'invoice_line_ids': [(0, 0, {
                 'product_uom_id': cls.env.ref('uom.product_uom_unit').id,
-                'product_id': cls.product_aeroplane.id,
                 'intrastat_transaction_id': cls.env.ref('account_intrastat.account_intrastat_transaction_11').id,
-                'quantity': 4,
-                'price_unit': 234000,
+                'product_id': cls.product_water.id,
+                'quantity': 44,
+                'price_unit': 555.44,
+                'discount': 100,
             })]
         })
 
@@ -145,7 +176,7 @@ class TestBEIntrastatReport(TestAccountReportsCommon):
 
     def test_full_export(self):
         """ Test generating an XML export for the whole  """
-        options = self._generate_options(self.report, '2022-05-01', '2022-05-31')
+        options = self._generate_options(self.report, '2022-05-01', '2022-05-31', {'hide_0_lines': True})
         arrivals, dispatches = options['intrastat_type']
         arrivals['selected'], dispatches['selected'] = False, False
         options = self.report.get_options(options)
@@ -169,6 +200,7 @@ class TestBEIntrastatReport(TestAccountReportsCommon):
 
         self.inwards_vendor_bill.action_post()
         self.outwards_customer_invoice.action_post()
+        self.vendor_bill_discount_100.action_post()
 
         self.assertXmlTreeEqual(
             etree.fromstring(self.report_handler.be_intrastat_export_to_xml(options)['file_content']),

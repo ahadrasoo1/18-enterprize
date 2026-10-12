@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 from odoo import fields, models
+from odoo.osv import expression
 from odoo.tools import SQL
 
 
@@ -19,28 +20,46 @@ class AccountJournal(models.Model):
     def _get_open_sale_purchase_query(self, journal_type):
         # OVERRIDE
         assert journal_type in ('sale', 'purchase')
-        query = self.env['account.move.line']._where_calc([
-            ('move_id', 'in', self.env['account.move']._where_calc([
-                *self.env['account.move.line']._check_company_domain(self.env.companies),
-                ('journal_id', 'in', self.ids),
-                ('payment_state', 'in', ('not_paid', 'partial')),
-                ('move_type', '=', 'out_invoice') if journal_type == 'sale' else ('move_type', 'in', ('in_invoice', 'in_refund')),
-                ('state', '=', 'posted'),
-            ])),
-            ('account_type', '=', 'asset_receivable' if journal_type == 'sale' else 'liability_payable'),
+        query = self.env['account.move']._where_calc([
+            *self.env['account.move']._check_company_domain(self.env.companies),
+            ('journal_id', 'in', self.ids),
+            ('payment_state', 'in', ('not_paid', 'partial')),
+            ('move_type', 'in', ('out_invoice', 'out_refund', 'out_receipt') if journal_type == 'sale' else ('in_invoice', 'in_refund', 'in_receipt')),
+            ('state', '=', 'posted'),
         ])
 
-        account_move_alias = query.join(lhs_alias='account_move_line', lhs_column='move_id', rhs_table='account_move', rhs_column='id', link='move_id')
-
         selects = [
-            SQL("account_move_line.journal_id"),
-            SQL("account_move_line.company_id"),
-            SQL("account_move_line.currency_id AS currency"),
-            SQL("account_move_line.date_maturity < %s AS late", fields.Date.context_today(self)),
-            SQL("SUM(%s) AS amount_total_company", SQL.identifier(account_move_alias, 'amount_total_signed')),
-            SQL("SUM(%s) AS amount_total", SQL.identifier(account_move_alias, 'amount_total_signed')),
+            SQL("journal_id"),
+            SQL("company_id"),
+            SQL("currency_id AS currency"),
+            SQL("invoice_date_due < %s AS late", fields.Date.context_today(self)),
+            SQL("SUM(amount_residual_signed) AS amount_total_company"),
+            SQL("SUM((CASE WHEN move_type = 'in_invoice' THEN -1 ELSE 1 END) * amount_residual) AS amount_total"),
             SQL("COUNT(*)"),
-            SQL("%s IN ('yes', 'exception') AS to_pay", SQL.identifier(account_move_alias, 'release_to_pay')),
+            SQL("release_to_pay IN ('yes', 'exception') AS to_pay")
         ]
 
         return query, selects
+
+    def _get_draft_sales_purchases_query(self):
+        # OVERRIDE
+        domain_sale = [
+            ('journal_id', 'in', self.filtered(lambda j: j.type == 'sale').ids),
+            ('move_type', 'in', self.env['account.move'].get_sale_types(include_receipts=True))
+        ]
+
+        domain_purchase = [
+            ('journal_id', 'in', self.filtered(lambda j: j.type == 'purchase').ids),
+            ('move_type', 'in', self.env['account.move'].get_purchase_types(include_receipts=False)),
+            '|',
+            ('invoice_date_due', '<', fields.Date.today()),
+            ('release_to_pay', '=', 'yes')
+        ]
+        domain = expression.AND([
+            [('state', '=', 'draft'), ('payment_state', 'in', ('not_paid', 'partial'))],
+            expression.OR([domain_sale, domain_purchase])
+        ])
+        return self.env['account.move']._where_calc([
+            *self.env['account.move']._check_company_domain(self.env.companies),
+            *domain
+        ])

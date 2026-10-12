@@ -12,7 +12,7 @@ import { isEmpty } from "@html_editor/utils/dom_info";
 import { Wysiwyg } from "@html_editor/wysiwyg";
 import { HtmlMailField } from "@mail/views/web/fields/html_mail_field/html_mail_field";
 import { _t } from "@web/core/l10n/translation";
-import { Component, onWillStart, onWillUpdateProps, useState } from "@odoo/owl";
+import { Component, onWillUpdateProps, useState } from "@odoo/owl";
 
 const cssRulesByElement = new WeakMap();
 
@@ -61,12 +61,6 @@ export class DocumentsMemberInvite extends Component {
         };
         useBus(rpcBus, "RPC:RESPONSE", this.responseCall);
 
-        onWillStart(async () => {
-            this.state.fetchedPartners = await this.getPartners([
-                ["id", "not in", this.props.accessPartners.map((a) => a.partner_id.id)],
-            ]);
-        });
-
         onWillUpdateProps((nextProps) => {
             if (!nextProps.invitePage) {
                 this.state.selectedPartners = [];
@@ -92,9 +86,10 @@ export class DocumentsMemberInvite extends Component {
         const partners = await this.orm.call("res.partner", "web_search_read", [], {
             domain: domain,
             specification: this._getPartnersSpecification(),
-            limit: limit,
+            limit: Math.max(limit, 8),  // Perf: lower bound of 8 for the limit, to hit trigram indexes
+            count_limit: 1, // we don't need the number of records, skip the search_count
         });
-        return partners.records;
+        return partners.records.slice(0, limit);
     }
 
     _getPartnersSpecification() {
@@ -161,6 +156,7 @@ export class DocumentsMemberInvite extends Component {
                 [
                     ...this.props.accessPartners.flatMap((a) => (a.role ? [a.partner_id.id] : [])),
                     ...selectedPartners.map((s) => s.id),
+                    this.props.access.owner_id.partner_id?.id,
                 ],
             ],
             "|",
@@ -168,6 +164,15 @@ export class DocumentsMemberInvite extends Component {
             ["email", "ilike", search.trim()],
         ]);
         this.state.fetchedPartners = [...partners, ...selectedPartners];
+    }
+
+    /**
+     * Passed to SelectMenu in order to match found partners on display_name *and/or* email.
+     * @param {{display_name: string, email: string}} partner
+     * @return {string}
+     */
+    matchPartners(partner) {
+        return `${partner.label} ${partner.email}`;
     }
 
     /**

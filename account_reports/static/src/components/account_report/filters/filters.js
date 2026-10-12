@@ -1,5 +1,5 @@
 import { _t } from "@web/core/l10n/translation";
-import { Component, useState } from "@odoo/owl";
+import { status, Component, useState } from "@odoo/owl";
 
 import { useService } from "@web/core/utils/hooks";
 import { WarningDialog } from "@web/core/errors/error_dialogs";
@@ -481,10 +481,11 @@ export class AccountReportFilters extends Component {
             clearTimeout(this.timeout);
         }
 
-        this.controller.incrementCallNumber();
+        this.controller.loadingCallNumber++;
 
         this.timeout = setTimeout(async () => {
-            await this.controller.reload(optionKey, this.controller.options);
+            if (status(this) !== "destroyed") 
+                await this.controller.reload(optionKey, this.controller.options);
         }, delay);
     }
 
@@ -542,11 +543,6 @@ export class AccountReportFilters extends Component {
             selected_variant_id: reportId,
             sections_source_id: reportId,
         });
-        const cacheKey = this.controller.getCacheKey(reportId, reportId);
-        // if the variant hasn't been loaded yet, set up the call number
-        if (!(cacheKey in this.controller.loadingCallNumberByCacheKey)) {
-            this.controller.incrementCallNumber(cacheKey);
-        }
         await this.controller.displayReport(reportId);
     }
 
@@ -578,11 +574,16 @@ export class AccountReportFilters extends Component {
 
         this.controller.lines = await this.controller.orm.call(
             "account.report",
-            "format_column_values",
+            "dispatch_report_action",
             [
+                this.controller.options.report_id,
                 this.controller.options,
+                "format_column_values_from_client",
                 this.controller.lines,
             ],
+            {
+                context: this.controller.context,
+            }
         );
     }
 

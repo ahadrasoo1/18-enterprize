@@ -18,7 +18,7 @@ _logger = logging.getLogger(__name__)
 
 # Buffer size big enough to hold every string incoming from ctypes libraries
 # The biggest strings stored in this buffer are the receipts
-CTYPES_BUFFER_SIZE = 1000
+CTYPES_BUFFER_SIZE = 10000
 
 # Define pointers and argument types for ctypes function calls
 ulong_pointer = ctypes.POINTER(ctypes.c_ulong)
@@ -82,7 +82,7 @@ class CtypesTerminalDriver(Driver):
         data_message_type = data.get('messageType')
         data['owner'] = self.data.get('owner')
         _logger.debug('%s: _action_default %s %s', self.device_name, data_message_type, data)
-        if data_message_type == 'Transaction':
+        if data_message_type in ['Transaction', 'Balance']:
             if self.terminal_busy:
                 self.send_status(error=f'{self.device_name} is currently busy. Try again later.', request_data=data)
             else:
@@ -97,7 +97,10 @@ class CtypesTerminalDriver(Driver):
             action = self.queue_actions.get()
             action_type = action.get('messageType')
             _logger.debug("%s: Starting next action in queue: %s", self.device_name, action_type)
-            self.processTransaction(action)
+            if action_type == 'Transaction':
+                self.processTransaction(action)
+            elif action_type == 'Balance':
+                self.six_terminal_balance(action)  # Only for Worldline "Six" (TIM)
             self.terminal_busy = False
 
     def _check_transaction_delay(self):
@@ -112,7 +115,7 @@ class CtypesTerminalDriver(Driver):
             _logger.info('%s: Previous transaction is too recent, will sleep for %.2f seconds', self.device_name, delay_diff)
             sleep(delay_diff)
 
-    def send_status(self, value='', response=False, stage=False, ticket=False, ticket_merchant=False, card=False, transaction_id=False, error=False, disconnected=False, request_data=False):
+    def send_status(self, value='', response=False, stage=False, ticket=False, ticket_merchant=False, card=False, card_no=False, transaction_id=False, error=False, disconnected=False, request_data=False):
         self.data = {
             'value': value,
             'Stage': stage,
@@ -120,6 +123,7 @@ class CtypesTerminalDriver(Driver):
             'Ticket': ticket,
             'TicketMerchant': ticket_merchant,
             'Card': card,
+            'CardNo': card_no,
             'PaymentTransactionID': transaction_id,
             'Error': error,
             'Disconnected': disconnected,
@@ -141,4 +145,10 @@ class CtypesTerminalDriver(Driver):
     def cancelTransaction(self, transaction):
         """
         Method implementing the ongoing transaction request cancellation
+        """
+
+    def six_terminal_balance(self, transaction):
+        """
+        Method implementing the terminal balance request (only for Worldline "Six")
+        Not an abstract method as it remains undefined for Worldline
         """

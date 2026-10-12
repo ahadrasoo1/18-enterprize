@@ -1,10 +1,11 @@
 from .common import TestMxEdiPosCommon
 
-from odoo import http
+from odoo import Command, http
 from odoo.addons.l10n_mx_edi.tests.common import EXTERNAL_MODE
 from odoo.addons.point_of_sale.tests.test_frontend import TestPointOfSaleHttpCommon
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 from odoo.tests import tagged
+from datetime import datetime
 
 
 @tagged('post_install_l10n', 'post_install', '-at_install', *(['-standard', 'external'] if EXTERNAL_MODE else []))
@@ -242,6 +243,57 @@ class TestCFDIPosOrder(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
                 'state': 'invoice_sent',
             }])
 
+            gi_document = order.l10n_mx_edi_document_ids.filtered(lambda d: d.state == 'ginvoice_sent')
+            with self.with_mocked_pac_cancel_success():
+                self.env['l10n_mx_edi.invoice.cancel']\
+                    .with_context(gi_document.action_request_cancel()['context'])\
+                    .create({'cancellation_reason': '02'})\
+                    .action_cancel_invoice()
+            self.assertRecordValues(refund, [{'l10n_mx_edi_cfdi_state': False}])
+
+            with self.with_mocked_pac_sign_success():
+                self.env['l10n_mx_edi.global_invoice.create']\
+                    .with_context(order.l10n_mx_edi_action_create_global_invoice()['context'])\
+                    .create({})\
+                    .action_create_global_invoice()
+            self.assertRecordValues(order + refund, [
+                {'l10n_mx_edi_cfdi_state': 'global_sent'},
+                {'l10n_mx_edi_cfdi_state': 'global_sent'},
+            ])
+
+            # Create a second refund against the new global invoice, then simulate the SAT
+            # cron picking up a manual SAT-portal cancellation of that GI. The cascade must
+            # also cover this entry path, not only the Odoo cancellation wizard.
+            with self.with_pos_session(), self.with_mocked_pac_sign_success():
+                refund2 = self._create_order({
+                    'pos_order_lines_ui_args': [
+                        {
+                            'product': self.product,
+                            'quantity': -2.0,
+                            'refunded_orderline_id': order.lines[0].id,
+                        },
+                    ],
+                    'payments': [(self.bank_pm1, -2320.0)],
+                })
+            self.assertRecordValues(refund2, [{'l10n_mx_edi_cfdi_state': 'sent'}])
+
+            gi_document = order.l10n_mx_edi_document_ids\
+                .filtered(lambda d: d.state == 'ginvoice_sent' and d.sat_state != 'skip')
+            with self.with_mocked_pac_cancel_success():
+                gi_document._update_document_sat_state('cancelled')
+            self.assertRecordValues(refund2, [{'l10n_mx_edi_cfdi_state': False}])
+
+            with self.with_mocked_pac_sign_success():
+                self.env['l10n_mx_edi.global_invoice.create']\
+                    .with_context(order.l10n_mx_edi_action_create_global_invoice()['context'])\
+                    .create({})\
+                    .action_create_global_invoice()
+            self.assertRecordValues(order + refund + refund2, [
+                {'l10n_mx_edi_cfdi_state': 'global_sent'},
+                {'l10n_mx_edi_cfdi_state': 'global_sent'},
+                {'l10n_mx_edi_cfdi_state': 'global_sent'},
+            ])
+
     def test_global_invoice_documents(self):
         with self.mx_external_setup(self.frozen_today), self.with_pos_session() as _session:
             order1 = self._create_order({
@@ -290,6 +342,38 @@ class TestCFDIPosOrder(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
                 )
             sent_doc_values['sat_state'] = 'valid'
             self.assertRecordValues(orders.l10n_mx_edi_document_ids, [sent_doc_values])
+
+    def test_global_invoice_from_order_foreign_currency(self):
+        usd = self.env.ref('base.USD')
+        usd.rate_ids = [Command.create({
+            'rate': 1 / 17.0398,
+            'name': self.frozen_today,
+        })]
+        usd_journal = self.env['account.journal'].create({
+            'name': 'Test POS Journal',
+            'type': 'sale',
+            'code': 'TPOS',
+            'currency_id': usd.id
+        })
+        usd_pricelist = self.env['product.pricelist'].create({
+            'name': 'POS Pricelist',
+            'currency_id': usd.id
+        })
+        self.config.journal_id = usd_journal.id
+        self.config.write({
+            'use_pricelist': True,
+            'pricelist_id': usd_pricelist.id,
+            'available_pricelist_ids': usd_pricelist.ids,
+        })
+        with self.mx_external_setup(self.frozen_today), self.with_pos_session() as _session:
+            order = self._create_order({
+                'pos_order_lines_ui_args': [(self.product, 1)],
+                'payments': [(self.bank_pm1, 68.08)],
+            })
+
+            with self.with_mocked_pac_sign_success():
+                order._l10n_mx_edi_cfdi_global_invoice_try_send()
+            self._assert_global_invoice_cfdi_from_orders(order, "test_global_invoice_from_order_foreign_currency")
 
     def test_invoiced_order_then_refund(self):
         with self.mx_external_setup(self.frozen_today):
@@ -550,6 +634,73 @@ class TestCFDIPosOrder(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
             refund = self.env['pos.order'].browse(order.refund()['res_id'])
             self.assertEqual(refund.refunded_order_id, order)
 
+    def test_refund_order_with_negative_line(self):
+        with self.mx_external_setup(self.frozen_today):
+            with self.with_pos_session():
+                order = self._create_order({
+                    'pos_order_lines_ui_args': [
+                        (self.product, 10.0),
+                        (self.product, -1.0),
+                    ],
+                    'payments': [(self.bank_pm1, 10440.0)],
+                })
+                order.partner_id = self.customer
+                with self.with_mocked_pac_sign_success():
+                    action = order._generate_pos_order_invoice()
+                    invoice = self.env['account.move'].browse(action['res_id'])
+                    self.assertRecordValues(invoice, [{'l10n_mx_edi_cfdi_state': 'sent'}])
+
+                refund = self._create_order({
+                    'pos_order_lines_ui_args': [
+                        {
+                            'product': self.product,
+                            'quantity': -10.0,
+                            'refunded_orderline_id': order.lines[0].id,
+                        },
+                        {
+                            'product': self.product,
+                            'quantity': 1.0,
+                            'refunded_orderline_id': order.lines[1].id,
+                        },
+                    ],
+                    'payments': [(self.bank_pm1, -10440.0)],
+                })
+                refund.partner_id = self.customer
+                with self.with_mocked_pac_sign_success():
+                    action = refund._generate_pos_order_invoice()
+                    invoice = self.env['account.move'].browse(action['res_id'])
+                    self.assertRecordValues(invoice, [{'l10n_mx_edi_cfdi_state': 'sent'}])
+
+    def test_refund_order_with_manual_positive_line(self):
+        with self.mx_external_setup(self.frozen_today):
+            with self.with_pos_session():
+                order = self._create_order({
+                    'pos_order_lines_ui_args': [
+                        (self.product, 10.0),
+                    ],
+                    'payments': [(self.bank_pm1, 11600.0)],
+                })
+                order.partner_id = self.customer
+                with self.with_mocked_pac_sign_success():
+                    action = order._generate_pos_order_invoice()
+                    invoice = self.env['account.move'].browse(action['res_id'])
+                    self.assertRecordValues(invoice, [{'l10n_mx_edi_cfdi_state': 'sent'}])
+
+                with self.assertLogs('odoo.addons.point_of_sale.models.pos_order'), self.assertRaises(ValidationError):
+                    self._create_order({
+                        'pos_order_lines_ui_args': [
+                            {
+                                'product': self.product,
+                                'quantity': -10.0,
+                                'refunded_orderline_id': order.lines[0].id,
+                            },
+                            {
+                                'product': self.product,
+                                'quantity': 1.0,
+                            },
+                        ],
+                    })
+
     def test_pos_order_then_invoice_request(self):
         """
         Test that the company name is correctly set as the receptor's name in the CFDI document
@@ -574,6 +725,7 @@ class TestCFDIPosOrder(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
                 'zipcode': '12345',
                 'country_id': self.env.ref('base.mx').id,
                 'phone': "123456789",
+                'vat': 'XAXX010101000',
                 'invoice_l10n_mx_edi_usage': 'D10',
                 'partner_l10n_mx_edi_fiscal_regime': '624',
                 'csrf_token': http.Request.csrf_token(self),
@@ -582,3 +734,50 @@ class TestCFDIPosOrder(TestMxEdiPosCommon, TestPointOfSaleHttpCommon):
                 self.url_open(f'/pos/ticket/validate?access_token={pos_order.access_token}', data=get_invoice_data)
 
             self._assert_invoice_cfdi(pos_order.account_move, 'test_pos_order_then_invoice_request')
+
+    def test_pos_combine_payment_l10n_mx_edi_payment_method(self):
+        """
+        Test that the l10n_mx_edi_payment_method_id is well computed on the payment created from a POS order
+        """
+        # set another payment method than payment_method_transferencia, which is the default value for payment
+        payment_method_electronico = self.env.ref('l10n_mx_edi.payment_method_monedero_electronico')
+        self.bank_pm1.l10n_mx_edi_payment_method_id = payment_method_electronico
+
+        with self.mx_external_setup(self.frozen_today), self.with_pos_session() as session:
+            self._create_order({
+                'pos_order_lines_ui_args': [(self.product, 1)],
+                'payments': [(self.bank_pm1, 1160.0)],
+            })
+
+        payment = self.env['account.payment'].search([('pos_session_id', '=', session.id)])
+        self.assertEqual(payment.l10n_mx_edi_payment_method_id, payment_method_electronico)
+
+    def test_cancelled_refund_order_mx(self):
+        """ Test that cancelled refund order are not considered for global invoices. """
+        with self.mx_external_setup(self.frozen_today), self.with_pos_session():
+            order = self._create_order({
+                'pos_order_lines_ui_args': [
+                    (self.product, 1.0),
+                ],
+                'payments': [(self.bank_pm1, 1160)],
+            })
+            refund = self.env['pos.order'].browse(order.refund()['res_id'])
+            refund.action_pos_order_cancel()
+            with self.with_mocked_pac_sign_success():
+                order._l10n_mx_edi_cfdi_global_invoice_try_send()
+            self.assertEqual(refund.l10n_mx_edi_cfdi_state, False)
+
+    def test_global_invoice_periodicity_month(self):
+        """Test that when creating a global invoice from the order, the month of the global invoice is the month the order was made."""
+        with self.mx_external_setup(self.frozen_today), self.with_pos_session():
+            order_date = datetime(2025, 6, 1, 4, 0, 0)
+            first_order = self._create_order({
+                'pos_order_lines_ui_args': [
+                    (self.product, 1.0),
+                ],
+            })
+            first_order.date_order = order_date
+            with self.with_mocked_pac_sign_success():
+                first_order._l10n_mx_edi_cfdi_global_invoice_try_send()
+            xml_tree = self.get_xml_tree_from_string(first_order.l10n_mx_edi_document_ids.attachment_id.raw)
+            self.assertEqual(int(xml_tree.find('{http://www.sat.gob.mx/cfd/4}InformacionGlobal').attrib['Meses']), 5)

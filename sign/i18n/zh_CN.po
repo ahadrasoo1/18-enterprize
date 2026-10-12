@@ -1,29 +1,27 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* sign
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# 何彬 <vnsoft.he@gmail.com>, 2024
+# Chloe Wang, 2025
+# Jeffery CHEN <jeffery9@gmail.com>, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-26 09:13+0000\n"
+"POT-Creation-Date: 2026-04-10 18:47+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Chinese (China) (https://app.transifex.com/odoo/teams/41243/zh_CN/)\n"
+"Last-Translator: Jeffery CHEN <jeffery9@gmail.com>, 2025\n"
+"Language-Team: Chinese (China) (https://app.transifex.com/odoo/teams/41243/"
+"zh_CN/)\n"
+"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: zh_CN\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-
-#. module: sign
-#. odoo-javascript
-#: code:addons/sign/static/src/dialogs/thank_you_dialog.js:0
-msgid " You can safely close this window."
-msgstr "您可以放心关闭此窗口。"
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_res_partner__signature_count
@@ -32,16 +30,11 @@ msgid "# Signatures"
 msgstr "# 签字"
 
 #. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid "#7898678"
-msgstr "#7898678"
-
-#. module: sign
 #. odoo-python
 #: code:addons/sign/controllers/main.py:0
 msgid ""
-"%(partner)s validated the signature by SMS with the phone number "
-"%(phone_number)s."
+"%(partner)s validated the signature by SMS with the phone number %"
+"(phone_number)s."
 msgstr "%(partner)s已通过短信验证签名，电话号码为%(phone_number)s。"
 
 #. module: sign
@@ -60,7 +53,7 @@ msgstr "%s 已经被编辑和签署"
 #. odoo-python
 #: code:addons/sign/wizard/sign_send_request.py:0
 msgid "%s has been linked to this sign request."
-msgstr ""
+msgstr "%s已链接到此签名请求。"
 
 #. module: sign
 #. odoo-python
@@ -98,11 +91,6 @@ msgstr ""
 "       已请求您在文件上签字"
 
 #. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid "******1234"
-msgstr "******1234"
-
-#. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_portal_my_request
 msgid ""
 "- <em>\n"
@@ -122,31 +110,6 @@ msgstr "- <em>已取消</em>"
 #: model_terms:ir.actions.act_window,help:sign.sign_template_action
 msgid "- or -"
 msgstr "- 或 -"
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid "1001"
-msgstr "1001"
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid "192.168.1.1"
-msgstr "192.168.1.1"
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid "20-03-2000"
-msgstr "20-03-2000"
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid "2023-08-18"
-msgstr "2023-08-18"
-
-#. module: sign
-#: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
-msgid "2023-08-18 - 12:30:45"
-msgstr "2023-08-18 - 12:30:45"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
@@ -171,8 +134,8 @@ msgstr "<b>文档ID：</b>"
 #. module: sign
 #. odoo-javascript
 #: code:addons/sign/static/src/js/tours/sign.js:0
-msgid "<b>Drag & drop “Signature”</b> into the bottom of the document."
-msgstr "<b>拖拽“签字”</b>到文档的底部"
+msgid "<b>Drag & drop \"Signature\"</b> into the bottom of the document."
+msgstr ""
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.green_savings_report
@@ -216,7 +179,8 @@ msgstr "<br/>(邮件未发出)"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_expired
-msgid "<i class=\"fa fa-check\"/> A fresh link has just been sent to your inbox!"
+msgid ""
+"<i class=\"fa fa-check\"/> A fresh link has just been sent to your inbox!"
 msgstr "<i class=\"fa fa-check\"/> 一个新的链接刚刚发送到您的收件箱！"
 
 #. module: sign
@@ -241,7 +205,9 @@ msgstr "<i class=\"fa fa-globe\"/> 视图"
 msgid ""
 "<i class=\"fa fa-info-circle\"/> Links sent via email expire after a set "
 "delay to increase security."
-msgstr "<i class=\"fa fa-info-circle\"/> 通过电子邮件发送的链接会在设定的延迟后失效，以提高安全性。"
+msgstr ""
+"<i class=\"fa fa-info-circle\"/> 通过电子邮件发送的链接会在设定的延迟后失效，"
+"以提高安全性。"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_terms_conditions_setting_banner
@@ -272,14 +238,18 @@ msgstr "<small><i> 等待签字 </i></small>"
 msgid ""
 "<small>Email Verification: The signatory has confirmed control of their "
 "email inbox by clicking on a unique link</small>"
-msgstr "<small>电子邮件验证：签署人通过点击一个唯一的链接确认了对其电子邮件收件箱的控制</small>"
+msgstr ""
+"<small>电子邮件验证：签署人通过点击一个唯一的链接确认了对其电子邮件收件箱的控"
+"制</small>"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
 msgid ""
 "<small>SMS: The signatory has confirmed their control of the phone number "
 "using a unique code sent by SMS</small>"
-msgstr "<small>短信息：签署人通过使用短信息发送的唯一代码确认了对电话号码的控制</small>"
+msgstr ""
+"<small>短信息：签署人通过使用短信息发送的唯一代码确认了对电话号码的控制</"
+"small>"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.res_partner_view_form
@@ -296,12 +266,13 @@ msgstr "<span class=\"o_stat_text\">签署的文档</span>"
 msgid ""
 "<span class=\"text-muted\" invisible=\"not share_link\">Sharing will create "
 "a copy of the file to sign. That file can be reached by the link below. "
-"Every public user using the link will generate a document when the Signature"
-" is complete. The link is private, only those that receive the link will be "
+"Every public user using the link will generate a document when the Signature "
+"is complete. The link is private, only those that receive the link will be "
 "able to sign it.</span>"
 msgstr ""
-"<span class=\"text-muted\" invisible=\"not "
-"share_link\">共享将创建一个要签名的文件副本。可通过下面的链接访问该文件。签名完成后，使用该链接的每个公共用户都将生成一份文件。该链接是私密的，只有收到链接的人才能签名。</span>"
+"<span class=\"text-muted\" invisible=\"not share_link\">共享将创建一个要签名"
+"的文件副本。可通过下面的链接访问该文件。签名完成后，使用该链接的每个公共用户"
+"都将生成一份文件。该链接是私密的，只有收到链接的人才能签名。</span>"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
@@ -319,6 +290,13 @@ msgid "<span>This is a preview of your Terms &amp; Conditions.</span>"
 msgstr "<span>条款和条件预览</span>"
 
 #. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.cancel_sign_request_item_with_confirmation
+msgid ""
+"<span>You won't receive any notification for this signature request anymore."
+"</span>"
+msgstr "<span>您将不再收到该签名请求的任何通知。</span>"
+
+#. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_portal_my_request
 msgid "<strong>Creation Date:</strong>"
 msgstr "<strong>创建日期。</strong>"
@@ -333,8 +311,10 @@ msgstr "<strong>警告</strong> 不要将此电子邮件转发给其他人！<br
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_request
 msgid ""
 "<strong>Warning</strong> do not forward this email to other people!<br/>\n"
-"            They will be able to access this document and sign it as yourself.<br/>\n"
-"            <span>Your IP address and localization are associated to your signature to ensure traceability.</span>"
+"            They will be able to access this document and sign it as "
+"yourself.<br/>\n"
+"            <span>Your IP address and localization are associated to your "
+"signature to ensure traceability.</span>"
 msgstr ""
 "<strong>警告</strong> 不要将此电子邮件转发给其他人！<br/>\n"
 "            他们将能够访问此文档并自行签字。<br/>\n"
@@ -351,7 +331,7 @@ msgstr "短信息将发送到以下电话号码。如果有误，请更新。"
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.message_signature_link
 msgid "A document has been signed and a copy attached to"
-msgstr ""
+msgstr "文件已签署，并将副本附加到"
 
 #. module: sign
 #. odoo-python
@@ -363,8 +343,7 @@ msgstr "非共享签名请求不应有任何签名者与空合作伙伴"
 #. module: sign
 #. odoo-python
 #: code:addons/sign/models/sign_request.py:0
-msgid ""
-"A shared sign request should only have one signer with an empty partner"
+msgid "A shared sign request should only have one signer with an empty partner"
 msgstr "共享签名请求应该只有一个签名者和一个空的合作伙伴"
 
 #. module: sign
@@ -431,13 +410,13 @@ msgstr "动作已执行"
 msgid ""
 "Actions may trigger specific behavior like opening calendar view or "
 "automatically mark as done when a document is uploaded"
-msgstr "操作可能触发特定的行为，如打开日历视图或在上传单据时自动标记"
+msgstr "操作可能触发特定行为，例如打开日历视图或在上传文件时自动标记为已完成"
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request__active
 #: model:ir.model.fields,field_description:sign.field_sign_template__active
 msgid "Active"
-msgstr "已启用"
+msgstr "有效"
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request__activity_ids
@@ -536,12 +515,6 @@ msgid "All Documents"
 msgstr "所有文档"
 
 #. module: sign
-#. odoo-javascript
-#: code:addons/sign/static/src/dialogs/thank_you_dialog.xml:0
-msgid "All done!"
-msgstr "全部搞定！"
-
-#. module: sign
 #. odoo-python
 #: code:addons/sign/models/sign_request.py:0
 msgid "All signers must have valid email addresses"
@@ -574,14 +547,19 @@ msgstr "Antwrep"
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_kanban
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_view_kanban
 msgid "Archive"
-msgstr "存档"
+msgstr "归档"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_form
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_search
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_view_form
 msgid "Archived"
-msgstr "已存档"
+msgstr "已归档"
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.cancel_sign_request_item_with_confirmation
+msgid "Are you sure you want to cancel the sign request?"
+msgstr "您确定要取消签名请求吗？"
 
 #. module: sign
 #: model:ir.model.fields,help:sign.field_sign_request__start_sign
@@ -601,7 +579,7 @@ msgstr "附件"
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request__message_attachment_count
 msgid "Attachment Count"
-msgstr "附件计数"
+msgstr "附件数量"
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request__attachment_ids
@@ -650,7 +628,7 @@ msgstr "新模板中可用"
 #. odoo-python
 #: code:addons/sign/models/sign_request.py:0
 msgid "Back to %s"
-msgstr ""
+msgstr "返回到%s"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.green_savings_report
@@ -676,12 +654,13 @@ msgstr "由"
 #. odoo-javascript
 #: code:addons/sign/static/src/dialogs/sign_name_and_signature_dialog.xml:0
 msgid ""
-"By clicking Adopt & Sign, I agree that the chosen signature/initials will be"
-" a valid electronic representation of my hand-written signature/initials for"
-" all purposes when it is used on documents, including legally binding "
+"By clicking Adopt & Sign, I agree that the chosen signature/initials will be "
+"a valid electronic representation of my hand-written signature/initials for "
+"all purposes when it is used on documents, including legally binding "
 "contracts."
 msgstr ""
-"通过单击采用和签字，我同意所选的签字/姓名首字母将是我的手写签字/姓名首字母的有效电子表示，用于文件（包括具有法律约束力的合同）的所有目的。"
+"通过单击采用和签字，我同意所选的签字/姓名首字母将是我的手写签字/姓名首字母的"
+"有效电子表示，用于文件（包括具有法律约束力的合同）的所有目的。"
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_send_request__message_cc
@@ -694,7 +673,6 @@ msgstr "抄送信息"
 #: code:addons/sign/static/src/dialogs/public_signer_dialog.xml:0
 #: code:addons/sign/static/src/dialogs/sign_name_and_signature_dialog.xml:0
 #: code:addons/sign/static/src/dialogs/sign_refusal_dialog.xml:0
-#: code:addons/sign/static/src/dialogs/thank_you_dialog.xml:0
 #: model:ir.model.fields.selection,name:sign.selection__sign_log__action__cancel
 #: model_terms:ir.ui.view,arch_db:sign.sign_duplicate_template_with_pdf_view_form
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_form
@@ -702,6 +680,11 @@ msgstr "抄送信息"
 #: model_terms:ir.ui.view,arch_db:sign.sign_send_request_view_form
 msgid "Cancel"
 msgstr "取消"
+
+#. module: sign
+#: model_terms:ir.ui.view,arch_db:sign.cancel_sign_request_item_with_confirmation
+msgid "Cancel Sign Request"
+msgstr "取消签署申请"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_kanban
@@ -769,6 +752,12 @@ msgstr "单击开始"
 #: code:addons/sign/static/src/backend_components/sign_template/sign_item_custom_popover.xml:0
 #: code:addons/sign/static/src/dialogs/thank_you_dialog.js:0
 #: code:addons/sign/static/src/js/tours/sign.js:0
+#: model:sign.template,redirect_url_text:sign.template_sign_1
+#: model:sign.template,redirect_url_text:sign.template_sign_2
+#: model:sign.template,redirect_url_text:sign.template_sign_3
+#: model:sign.template,redirect_url_text:sign.template_sign_4
+#: model:sign.template,redirect_url_text:sign.template_sign_5
+#: model:sign.template,redirect_url_text:sign.template_sign_tour
 #: model_terms:ir.ui.view,arch_db:sign.green_savings_report
 #: model_terms:ir.ui.view,arch_db:sign.sign_terms_conditions_setting_banner
 msgid "Close"
@@ -790,7 +779,7 @@ msgstr "颜色指标"
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_portal_my_request
 msgid "Communication history"
-msgstr "传播历史"
+msgstr "沟通历程"
 
 #. module: sign
 #: model:ir.model,name:sign.model_res_company
@@ -852,7 +841,9 @@ msgid ""
 "Configure the field types that can be used to sign documents (placeholder, "
 "auto-completion, ...), as well as the values for selection fields in "
 "signable documents."
-msgstr "配置可用于签署文档的字段类型（占位符、自动完成等），以及可签署文档中选择字段的值。"
+msgstr ""
+"配置可用于签署文档的字段类型（占位符、自动完成等），以及可签署文档中选择字段"
+"的值。"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_duplicate_template_with_pdf_view_form
@@ -893,8 +884,8 @@ msgstr "副本中的联系人"
 #. module: sign
 #: model:ir.model.fields,help:sign.field_sign_send_request__cc_partner_ids
 msgid ""
-"Contacts in copy will be notified by email once the document is either fully"
-" signed or refused."
+"Contacts in copy will be notified by email once the document is either fully "
+"signed or refused."
 msgstr "一旦文件被完全签署或被拒绝，副本中的联系人将通过电子邮件通知。"
 
 #. module: sign
@@ -1025,6 +1016,12 @@ msgid "Delete sign item"
 msgstr "删除签名项目"
 
 #. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/dialogs/thank_you_dialog.js:0
+msgid "Deleted User"
+msgstr ""
+
+#. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.res_config_settings_view_form
 msgid ""
 "Deliver one-time codes by SMS to identify signatories when signing a "
@@ -1060,7 +1057,7 @@ msgstr "演示合作伙伴"
 #: model_terms:ir.ui.view,arch_db:sign.doc_sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_kanban
 msgid "Details"
-msgstr "细节"
+msgstr "详情"
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_res_users__sign_initials
@@ -1157,6 +1154,12 @@ msgid "Document saved as Template."
 msgstr "文件已储存为模板。"
 
 #. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/views/helper/sign_action_helper.xml:0
+msgid "Document to send for signature or to sign yourself."
+msgstr "要发送给他人签名，或您需要自行签名的文件。"
+
+#. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.portal_my_home_sign
 msgid "Document(s) to sign"
 msgstr "要签署的文件"
@@ -1173,6 +1176,9 @@ msgid "Documents"
 msgstr "文档"
 
 #. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/dialogs/thank_you_dialog.xml:0
+#: model_terms:ir.ui.view,arch_db:sign.sign_portal_my_request
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_tree
 msgid "Download"
 msgstr "下载"
@@ -1186,7 +1192,6 @@ msgstr "下载证书"
 #. module: sign
 #. odoo-javascript
 #: code:addons/sign/static/src/backend_components/sign_request/sign_request_control_panel.xml:0
-#: code:addons/sign/static/src/dialogs/thank_you_dialog.js:0
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_form
 msgid "Download Document"
 msgstr "下载文档"
@@ -1207,9 +1212,10 @@ msgstr "拖放"
 #. odoo-javascript
 #: code:addons/sign/static/src/js/tours/sign.js:0
 msgid ""
-"Draw your most beautiful signature!<br>You can also create one automatically"
-" or load a signature from your computer."
-msgstr "画出你最漂亮的签字!<br>你也可以自动创建一个，或者从你的电脑中加载一个签字。"
+"Draw your most beautiful signature!<br>You can also create one automatically "
+"or load a signature from your computer."
+msgstr ""
+"画出你最漂亮的签字!<br>你也可以自动创建一个，或者从你的电脑中加载一个签字。"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.doc_sign
@@ -1238,7 +1244,7 @@ msgstr "编辑"
 #. odoo-javascript
 #: code:addons/sign/static/src/backend_components/sign_template/sign_template_top_bar.js:0
 msgid "Edit Template"
-msgstr ""
+msgstr "编辑模板"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.res_config_settings_view_form
@@ -1417,8 +1423,8 @@ msgstr "Font Awesome图标，例如：fa-tasks"
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.green_savings_report
 msgid ""
-"For 1000kg of paper usage, with 10% of recycled paper, environmental savings"
-" are based on"
+"For 1000kg of paper usage, with 10% of recycled paper, environmental savings "
+"are based on"
 msgstr "对于1000kg的纸张使用，10％的再生纸，环境节约是基于"
 
 #. module: sign
@@ -1620,9 +1626,11 @@ msgstr "如果勾选此项，则需要查看新消息。"
 #: model:ir.model.fields,help:sign.field_sign_request_item__change_authorized
 msgid ""
 "If checked, recipient of a document with this role can be changed after "
-"having sent the request. Useful to replace a signatory who is out of office,"
-" etc."
-msgstr "如果勾选，具有此角色的文档的收件人可以在发送请求后被更改。这对更换不在办公室的签字人很有用，等等。"
+"having sent the request. Useful to replace a signatory who is out of office, "
+"etc."
+msgstr ""
+"如果勾选，具有此角色的文档的收件人可以在发送请求后被更改。这对更换不在办公室"
+"的签字人很有用，等等。"
 
 #. module: sign
 #: model:ir.model.fields,help:sign.field_sign_request__message_has_error
@@ -1633,12 +1641,18 @@ msgstr "如果勾选此项， 某些消息将出现发送错误。"
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_not_enough_credits
 msgid ""
-"If you do not want to receive these notifications anymore, you can disable the extra-authentication step in the\n"
+"If you do not want to receive these notifications anymore, you can disable "
+"the extra-authentication step in the\n"
 "                        <code>\n"
 "                            Sign &gt; Configuration &gt; Roles\n"
 "                        </code>\n"
 "                        menu."
 msgstr ""
+"如果你不再希望接收这些通知，你可以在\n"
+"                        <code>\n"
+"                            签署 &gt; 配置 &gt; 角色\n"
+"                        </code>\n"
+"                        菜单中禁用额外的验证步骤。"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_request
@@ -1724,6 +1738,12 @@ msgstr "正在签字"
 #: model:ir.model.fields,field_description:sign.field_sign_send_request__is_user_signer
 msgid "Is User Signer"
 msgstr "是用户签名者"
+
+#. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/dialogs/thank_you_dialog.xml:0
+msgid "It's signed!"
+msgstr "已签署"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
@@ -1867,7 +1887,7 @@ msgstr "标识"
 #: model:ir.model.fields,field_description:sign.field_sign_request__sign_log_ids
 #: model_terms:ir.ui.view,arch_db:sign.sign_log_view_tree
 msgid "Logs"
-msgstr "纪录"
+msgstr "日志"
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_log__longitude
@@ -1980,7 +2000,7 @@ msgstr "我的收藏夹"
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_search
 msgid "My Requests"
-msgstr "我的请求"
+msgstr "我的申请"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_view_search
@@ -2032,6 +2052,12 @@ msgstr "需要我的签字"
 #: code:addons/sign/static/src/components/sign_request/PDF_iframe.js:0
 msgid "Need a valid PDF to add signature fields!"
 msgstr "需要有效的 PDF 文件来添加签名字段！"
+
+#. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/dialogs/thank_you_dialog.xml:0
+msgid "Need to sign documents?"
+msgstr "需要签署文件？"
 
 #. module: sign
 #: model:ir.actions.act_window,name:sign.action_sign_send_request
@@ -2131,7 +2157,7 @@ msgstr "操作数量"
 #: model:ir.model.fields,field_description:sign.field_sign_item__num_options
 #: model:ir.model.fields,field_description:sign.field_sign_item_radio_set__num_options
 msgid "Number of Radio Button options"
-msgstr ""
+msgstr "单选项数目"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_view_kanban
@@ -2164,6 +2190,12 @@ msgid "Number of pages"
 msgstr "页数"
 
 #. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/dialogs/thank_you_dialog.xml:0
+msgid "Odoo Sign"
+msgstr "Odoo 电子签名"
+
+#. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.green_savings_report
 msgid "One can weighs 15 g"
 msgstr "一个重 15 克。"
@@ -2191,16 +2223,6 @@ msgstr "一个上传的文件无法读取。 它是有效的 PDF 文件吗？"
 #: code:addons/sign/controllers/terms.py:0
 msgid "Oops"
 msgstr "哎呀"
-
-#. module: sign
-#: model:sign.template,redirect_url_text:sign.template_sign_1
-#: model:sign.template,redirect_url_text:sign.template_sign_2
-#: model:sign.template,redirect_url_text:sign.template_sign_3
-#: model:sign.template,redirect_url_text:sign.template_sign_4
-#: model:sign.template,redirect_url_text:sign.template_sign_5
-#: model:sign.template,redirect_url_text:sign.template_sign_tour
-msgid "Open Link"
-msgstr "打开链接"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.canceled_sign_request_item
@@ -2350,17 +2372,17 @@ msgstr "单选按钮"
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_item_radio_set__radio_items
 msgid "Radio Items"
-msgstr ""
+msgstr "单选项"
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_item__radio_set_id
 msgid "Radio button options"
-msgstr ""
+msgstr "单选按钮选项"
 
 #. module: sign
 #: model:ir.model,name:sign.model_sign_item_radio_set
 msgid "Radio button set for keeping radio button items together"
-msgstr ""
+msgstr "单选按钮组，用于将单选按钮项保持在一起"
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request__rating_ids
@@ -2381,6 +2403,7 @@ msgstr "重定向链接"
 #. module: sign
 #. odoo-javascript
 #: code:addons/sign/static/src/dialogs/sign_refusal_dialog.xml:0
+#: code:addons/sign/static/src/dialogs/thank_you_dialog.xml:0
 #: model:ir.model.fields.selection,name:sign.selection__sign_log__action__refuse
 msgid "Refuse"
 msgstr "拒绝"
@@ -2420,7 +2443,7 @@ msgstr "已启用提醒"
 #. module: sign
 #: model:ir.ui.menu,name:sign.sign_reports
 msgid "Reports"
-msgstr "报告"
+msgstr "报表"
 
 #. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request__request_item_infos
@@ -2561,7 +2584,6 @@ msgstr "保存为模版"
 #. module: sign
 #. odoo-javascript
 #: code:addons/sign/static/src/backend_components/sign_template/sign_template_body.js:0
-#: code:addons/sign/static/src/backend_components/sign_template/sign_template_top_bar.js:0
 msgid "Saved"
 msgstr "已保存"
 
@@ -2588,7 +2610,9 @@ msgstr "选择项目"
 msgid ""
 "Select the contact who should sign, according to their role.<br>In this "
 "example, select your own contact to sign the document yourself."
-msgstr "根据其角色选择应签名的联系人。<br>在此示例中，选择您自己的联系人自行签署文档。"
+msgstr ""
+"根据其角色选择应签名的联系人。<br>在此示例中，选择您自己的联系人自行签署文"
+"档。"
 
 #. module: sign
 #: model:ir.model.fields.selection,name:sign.selection__sign_item_type__item_type__selection
@@ -2716,7 +2740,6 @@ msgstr "在签名请求中显示标准条款和条件"
 #: code:addons/sign/static/src/backend_components/sign_request/sign_request_control_panel.js:0
 #: code:addons/sign/static/src/dialogs/next_direct_sign_dialog.js:0
 #: code:addons/sign/static/src/dialogs/sign_name_and_signature_dialog.xml:0
-#: code:addons/sign/static/src/dialogs/thank_you_dialog.xml:0
 #: model:ir.ui.menu,name:sign.menu_document
 #: model_terms:ir.ui.view,arch_db:sign.res_config_settings_view_form
 #: model_terms:ir.ui.view,arch_db:sign.sign_portal_my_request
@@ -2783,7 +2806,7 @@ msgstr "签名发送请求"
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.res_config_settings_view_form
 msgid "Sign Settings"
-msgstr "标志设置"
+msgstr "签名设置"
 
 #. module: sign
 #: model:ir.model,name:sign.model_sign_template_tag
@@ -2808,12 +2831,6 @@ msgstr "签署条款和条件格式"
 
 #. module: sign
 #. odoo-javascript
-#: code:addons/sign/static/src/dialogs/thank_you_dialog.js:0
-msgid "Sign Up for free"
-msgstr "免费注册"
-
-#. module: sign
-#. odoo-javascript
 #: code:addons/sign/static/src/dialogs/sign_name_and_signature_dialog.xml:0
 msgid "Sign all"
 msgstr "签署所有"
@@ -2822,6 +2839,12 @@ msgstr "签署所有"
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_request
 msgid "Sign document"
 msgstr "签署文件"
+
+#. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/dialogs/thank_you_dialog.xml:0
+msgid "Sign now"
+msgstr "立即签名"
 
 #. module: sign
 #. odoo-python
@@ -2850,13 +2873,6 @@ msgstr "签名者发送签名请求"
 msgid ""
 "Sign up for Odoo Sign to manage your own documents and signature requests!"
 msgstr "注册Odoo签字以管理您自己的文档和签字请求！"
-
-#. module: sign
-#. odoo-javascript
-#: code:addons/sign/static/src/dialogs/thank_you_dialog.xml:0
-msgid ""
-"Sign up for Odoo Sign to manage your own documents and signature requests."
-msgstr "注册Odoo Sign应用程序，以管理您的文件和签字请求。"
 
 #. module: sign
 #: model:ir.actions.server,name:sign.sign_reminder_cron_ir_actions_server
@@ -3043,6 +3059,14 @@ msgid "Signed document"
 msgstr "签署文件"
 
 #. module: sign
+#. odoo-python
+#: code:addons/sign/models/sign_request.py:0
+msgid ""
+"Signed documents cannot be deleted for legal reasons. Please archive them "
+"instead."
+msgstr ""
+
+#. module: sign
 #: model:ir.model.fields,field_description:sign.field_sign_request_item__signing_date
 #: model_terms:ir.ui.view,arch_db:sign.sign_portal_my_request
 #: model_terms:ir.ui.view,arch_db:sign.signer_status_wrapper
@@ -3094,7 +3118,9 @@ msgstr "签名顺序"
 msgid ""
 "Since you're the one signing this document, you can do it directly within "
 "Odoo.<br>External users can use the link provided by email."
-msgstr "由于您是签署此文档的人，因此您可以直接在Odoo中签名。<br>外部用户可以使用通过电子邮件提供的链接。"
+msgstr ""
+"由于您是签署此文档的人，因此您可以直接在Odoo中签名。<br>外部用户可以使用通过"
+"电子邮件提供的链接。"
 
 #. module: sign
 #. odoo-javascript
@@ -3137,10 +3163,14 @@ msgstr "报歉，您不能拒绝该文件"
 #. module: sign
 #: model:ir.model.fields,help:sign.field_sign_send_request__set_sign_order
 msgid ""
-"Specify the order for each signer. The signature request only gets sent to                                     the next signers in the sequence when all signers from the previous level have                                     signed the document.\n"
+"Specify the order for each signer. The signature request only gets sent "
+"to                                     the next signers in the sequence when "
+"all signers from the previous level have                                     "
+"signed the document.\n"
 "                                    "
 msgstr ""
-"指定每个签名者的顺序。只有当上一级的所有签名者都签署了文件后，签名请求才会发送给下一级的签名者。\n"
+"指定每个签名者的顺序。只有当上一级的所有签名者都签署了文件后，签名请求才会发"
+"送给下一级的签名者。\n"
 "                                    "
 
 #. module: sign
@@ -3292,14 +3322,17 @@ msgstr "电子邮件中的条款"
 #: model:ir.model.fields,help:sign.field_res_company__sign_terms_type
 #: model:ir.model.fields,help:sign.field_res_config_settings__sign_terms_type
 msgid ""
-"Terms in Email - The text will be displayed at the bottom of every signature request email.\n"
+"Terms in Email - The text will be displayed at the bottom of every signature "
+"request email.\n"
 "\n"
-"        Terms as Web Page - A link will be pasted at the bottom of every signature request email, leading to your content.\n"
+"        Terms as Web Page - A link will be pasted at the bottom of every "
+"signature request email, leading to your content.\n"
 "        "
 msgstr ""
 "电子邮件中的条款 - 该文本将显示在每个签字请求电子邮件的底部。\n"
 "\n"
-"        作为网页的条款 - 一个链接将被粘贴在每封签字请求电子邮件的底部，引导到你的内容。\n"
+"        作为网页的条款 - 一个链接将被粘贴在每封签字请求电子邮件的底部，引导到"
+"你的内容。\n"
 "        "
 
 #. module: sign
@@ -3321,13 +3354,15 @@ msgstr "谢谢！"
 msgid ""
 "That's it, all done!<br>The document is signed, and a copy has been sent by "
 "email to all participants, along with a traceability report."
-msgstr "就是这样，一切都完成了！<br>文档已签名，并已通过电子邮件向所有参与者发送副本以及可追溯性报告。"
+msgstr ""
+"就是这样，一切都完成了！<br>文档已签名，并已通过电子邮件向所有参与者发送副本"
+"以及可追溯性报告。"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.deleted_sign_request
 msgid ""
-"The Odoo Sign document you are trying to reach does not exist. The signature"
-" request might have been deleted or modified."
+"The Odoo Sign document you are trying to reach does not exist. The signature "
+"request might have been deleted or modified."
 msgstr "您尝试访问的Odoo签字文档不存在。签字请求可能已被删除或修改。"
 
 #. module: sign
@@ -3352,8 +3387,8 @@ msgstr "计算基于网站"
 #. odoo-python
 #: code:addons/sign/models/sign_request.py:0
 msgid ""
-"The contact of %(role)s has been changed from %(old_partner)s to "
-"%(new_partner)s."
+"The contact of %(role)s has been changed from %(old_partner)s to %"
+"(new_partner)s."
 msgstr "%(role)s的联系人已从%(old_partner)s更改为%(new_partner)s。"
 
 #. module: sign
@@ -3399,7 +3434,9 @@ msgid ""
 "The integrity of the document's history cannot be verified. This could mean "
 "that signature values or the underlying PDF document may have been modified "
 "after the fact."
-msgstr "无法验证文档历史记录的完整性。这可能意味着签字值或基础PDF文档可能在事后被修改。"
+msgstr ""
+"无法验证文档历史记录的完整性。这可能意味着签字值或基础PDF文档可能在事后被修"
+"改。"
 
 #. module: sign
 #. odoo-python
@@ -3413,7 +3450,7 @@ msgstr "%(partner)s的邮件地址已更新。将自动重新发送请求。"
 #. odoo-python
 #: code:addons/sign/models/sign_request.py:0
 msgid "The mail has been sent to contacts in copy: %(contacts)s"
-msgstr ""
+msgstr "邮件已发送给副本联系人: %(contacts)s"
 
 #. module: sign
 #. odoo-python
@@ -3432,6 +3469,12 @@ msgstr "签名应用程序需要%s角色，且无法删除。"
 #: code:addons/sign/models/sign_request.py:0
 msgid "The sign request has not been fully signed"
 msgstr "签名申请尚未完全签署"
+
+#. module: sign
+#. odoo-python
+#: code:addons/sign/controllers/main.py:0
+msgid "The signature has been canceled by %(partner)s(%(role)s)"
+msgstr "该签署申请已被 %(partner)s(%(role)s)取消"
 
 #. module: sign
 #. odoo-python
@@ -3470,8 +3513,7 @@ msgstr "该模板已经不存在了。"
 #. module: sign
 #. odoo-python
 #: code:addons/sign/wizard/sign_duplicate_template_with_pdf.py:0
-msgid ""
-"The template has more pages than the current file, it can't be applied."
+msgid "The template has more pages than the current file, it can't be applied."
 msgstr "该模板的页数多于当前文件，无法应用。"
 
 #. module: sign
@@ -3482,8 +3524,9 @@ msgid ""
 "number of contacts in copy if the sign request is signed) = total of pages. "
 "We assume that one page weights 0.005 kilograms."
 msgstr ""
-"您保存的工作表总数基于：已发送的签名请求数 x 文档中的工作表数 x（需要签名的联系人数 + 签名请求时副本中的联系人数）= 总页数。我们假设一页重量为"
-" 0.005 千克。"
+"您保存的工作表总数基于：已发送的签名请求数 x 文档中的工作表数 x（需要签名的联"
+"系人数 + 签名请求时副本中的联系人数）= 总页数。我们假设一页重量为 0.005 千"
+"克。"
 
 #. module: sign
 #. odoo-python
@@ -3630,6 +3673,14 @@ msgid "Try Odoo Sign"
 msgstr "尝试Odoo 电子签"
 
 #. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/views/helper/sign_action_helper.xml:0
+msgid "Try a sample contract"
+msgstr "尝试使用模板合同"
+
+#. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/views/helper/sign_action_helper.xml:0
 #: model_terms:ir.actions.act_window,help:sign.sign_template_action
 msgid "Try our sample document"
 msgstr "试用我们的示例文档"
@@ -3720,6 +3771,12 @@ msgstr "上传 PDF 并签名"
 #: model_terms:ir.actions.act_window,help:sign.sign_request_action
 msgid "Upload a PDF file or use an existing template to begin."
 msgstr "上传 PDF 文件或使用现有模板开始。"
+
+#. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/views/helper/sign_action_helper.xml:0
+msgid "Upload a PDF file to create a reusable template."
+msgstr "上传 PDF 文件，创建可重复使用的模板。"
 
 #. module: sign
 #: model_terms:ir.actions.act_window,help:sign.sign_template_action
@@ -3868,9 +3925,13 @@ msgstr "水"
 #. odoo-python
 #: code:addons/sign/models/sign_request.py:0
 msgid ""
-"We can only send reminders in the future - as soon as we find a way to send reminders in the past we'll notify you.\n"
-"In the mean time, please make sure to input a positive number of days for the reminder interval."
-msgstr "我们只能在未来发送提醒。一旦找到发送过去提醒的方法，我们会通知您。同时，请确保输入正数的提醒间隔天数。"
+"We can only send reminders in the future - as soon as we find a way to send "
+"reminders in the past we'll notify you.\n"
+"In the mean time, please make sure to input a positive number of days for "
+"the reminder interval."
+msgstr ""
+"我们只能在未来发送提醒。一旦找到发送过去提醒的方法，我们会通知您。同时，请确"
+"保输入正数的提醒间隔天数。"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.deleted_sign_request
@@ -3894,8 +3955,8 @@ msgstr "每个人签名后，我们都会通过电子邮件将此文件发送给
 #. odoo-javascript
 #: code:addons/sign/static/src/dialogs/sign_refusal_dialog.js:0
 msgid ""
-"We'll send an email to warn other contacts in copy & signers with the reason"
-" you provided."
+"We'll send an email to warn other contacts in copy & signers with the reason "
+"you provided."
 msgstr "我们将发送一封电子邮件，以您提供的原因警告复制和签名者中的其他联系人。"
 
 #. module: sign
@@ -3957,8 +4018,8 @@ msgstr "XYZ123456"
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.deleted_sign_request
 msgid ""
-"You can contact the person who invited you to sign the document by email for"
-" help."
+"You can contact the person who invited you to sign the document by email for "
+"help."
 msgstr "您可以通过电子邮件联系邀请您签署文档的人员以寻求帮助。"
 
 #. module: sign
@@ -3994,7 +4055,8 @@ msgstr "您不能重新分配此签字人"
 msgid ""
 "You cannot share this document by link, because it has fields to be filled "
 "by different roles. Use Send button instead."
-msgstr "此文档不可通过链接共享，因为有字段需要不同角色填写。请改用 \"发送\" 按钮。"
+msgstr ""
+"此文档不可通过链接共享，因为有字段需要不同角色填写。请改用 \"发送\" 按钮。"
 
 #. module: sign
 #. odoo-python
@@ -4035,8 +4097,16 @@ msgstr "您应至少选择一份文档进行下载。"
 #. module: sign
 #. odoo-javascript
 #: code:addons/sign/static/src/dialogs/thank_you_dialog.js:0
-msgid "You will receive the final signed document by email."
-msgstr "您将通过电子邮件收到最终签署的文档。"
+msgid "You will get the signed document by email."
+msgstr "您将通过电子邮件收到已签署的文件。"
+
+#. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/dialogs/thank_you_dialog.js:0
+msgid ""
+"You will get the signed document by email. You may also request a paper copy "
+"from the sender."
+msgstr ""
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.canceled_sign_request_item
@@ -4073,7 +4143,8 @@ msgstr "你的邮件"
 msgid ""
 "Your file is encrypted, PDF's password is required to generate final "
 "document. The final document will be encrypted with the same password."
-msgstr "您的文件已加密，生成最终文档需要PDF密码。最终文档将使用相同的密码进行加密。"
+msgstr ""
+"您的文件已加密，生成最终文档需要PDF密码。最终文档将使用相同的密码进行加密。"
 
 #. module: sign
 #. odoo-javascript
@@ -4114,8 +4185,11 @@ msgstr "和："
 #: model_terms:ir.ui.view,arch_db:sign.sign_template_mail_not_enough_credits
 msgid ""
 "because you don't have enough credits for this operation.\n"
-"                    The signatory was able to finish signing, but was not asked to authenticate fully."
+"                    The signatory was able to finish signing, but was not "
+"asked to authenticate fully."
 msgstr ""
+"因为你没有足够的积分用于此操作。\n"
+"                    签字人能够完成签字，但没有被要求完全完成身份验证。"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.green_report_container
@@ -4149,13 +4223,13 @@ msgstr "demo@email.com"
 #. odoo-javascript
 #: code:addons/sign/static/src/dialogs/sms_signer_dialog.xml:0
 msgid "e.g. +1 415 555 0100"
-msgstr "例如+1 415 555 0100"
+msgstr "例如：+1 415 555 0100"
 
 #. module: sign
 #. odoo-javascript
 #: code:addons/sign/static/src/dialogs/sms_signer_dialog.xml:0
 msgid "e.g. 314159"
-msgstr "例如 314159"
+msgstr "例如： 314159"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_item_role_view_form
@@ -4222,6 +4296,12 @@ msgstr "https://c.environmentalpaper.org/"
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
 msgid "ip"
 msgstr "ip"
+
+#. module: sign
+#. odoo-javascript
+#: code:addons/sign/static/src/dialogs/thank_you_dialog.xml:0
+msgid "is free, forever, with unlimited users - and it's fun to use!"
+msgstr "是永久免费的，用户数不受限制，而且使用起来非常有趣！"
 
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_logs_user
@@ -4308,7 +4388,7 @@ msgstr "淋浴设备"
 #. module: sign
 #: model_terms:ir.ui.view,arch_db:sign.sign_request_view_tree
 msgid "sign"
-msgstr "标志"
+msgstr "签署"
 
 #. module: sign
 #: model:sign.item.type,tip:sign.sign_item_type_signature
@@ -4384,3 +4464,27 @@ msgstr "{{green_report_el_title}}"
 #: model_terms:ir.ui.view,arch_db:sign.green_report_el_pdf
 msgid "{{green_report_el_title}} Summary"
 msgstr "{{green_report_el_title}}总结"
+
+#~ msgid "#7898678"
+#~ msgstr "#7898678"
+
+#~ msgid "******1234"
+#~ msgstr "******1234"
+
+#~ msgid "1001"
+#~ msgstr "1001"
+
+#~ msgid "192.168.1.1"
+#~ msgstr "192.168.1.1"
+
+#~ msgid "20-03-2000"
+#~ msgstr "20-03-2000"
+
+#~ msgid "2023-08-18"
+#~ msgstr "2023-08-18"
+
+#~ msgid "2023-08-18 - 12:30:45"
+#~ msgstr "2023-08-18 - 12:30:45"
+
+#~ msgid "<b>Drag & drop “Signature”</b> into the bottom of the document."
+#~ msgstr "<b>拖拽“签字”</b>到文档的底部"

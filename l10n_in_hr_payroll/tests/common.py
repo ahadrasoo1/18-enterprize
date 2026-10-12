@@ -40,6 +40,7 @@ class TestPayrollCommon(TransactionCase):
             'name': 'Rahul',
             'country_id': self.in_country.id,
             'department_id': self.rd_dept.id,
+            'company_id': self.company_in.id
         })
 
         # I create a new employee “Rahul”
@@ -47,6 +48,7 @@ class TestPayrollCommon(TransactionCase):
             'name': 'Jethalal',
             'country_id': self.in_country.id,
             'department_id': self.rd_dept.id,
+            'company_id': self.company_in.id,
         })
 
         self.res_bank = self.Bank.create({

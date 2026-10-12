@@ -54,7 +54,7 @@ test("concurrent scale switches return in inverse order", async () => {
     let content = getGridContent();
     expect(getActiveScale()).toBe(2);
     expect(content.groupHeaders.map((gh) => gh.title)).toEqual(["December 2018", "January 2019"]);
-    expect(content.range).toBe("From: 12/01/2018 to: 02/28/2019");
+    expect(content.range).toBe("12/01/2018 -> 02/28/2019");
     expect(model.data.records).toHaveLength(6);
 
     // switch to 'week' scale (this rpc will be delayed)
@@ -66,7 +66,7 @@ test("concurrent scale switches return in inverse order", async () => {
     content = getGridContent();
     expect(getActiveScale()).toBe(4);
     expect(content.groupHeaders.map((gh) => gh.title)).toEqual(["December 2018", "January 2019"]);
-    expect(content.range).toBe("From: 12/01/2018 to: 02/28/2019");
+    expect(content.range).toBe("12/01/2018 -> 02/28/2019");
     expect(model.data.records).toHaveLength(6);
 
     // switch to 'year' scale
@@ -77,7 +77,7 @@ test("concurrent scale switches return in inverse order", async () => {
     content = getGridContent();
     expect(getActiveScale()).toBe(0);
     expect(content.groupHeaders.map((gh) => gh.title)).toEqual(["2018", "2019"]);
-    expect(content.range).toBe("From: 12/01/2018 to: 02/28/2019");
+    expect(content.range).toBe("12/01/2018 -> 02/28/2019");
     expect(model.data.records).toHaveLength(6);
 
     firstReloadProm.resolve();
@@ -86,7 +86,7 @@ test("concurrent scale switches return in inverse order", async () => {
     content = getGridContent();
     expect(getActiveScale()).toBe(0);
     expect(content.groupHeaders.map((gh) => gh.title)).toEqual(["2018", "2019"]);
-    expect(content.range).toBe("From: 12/01/2018 to: 02/28/2019");
+    expect(content.range).toBe("12/01/2018 -> 02/28/2019");
     expect(model.data.records).toHaveLength(6);
     expect.verifySteps(["patched"]);
 });
@@ -116,7 +116,7 @@ test("concurrent scale switches return with gantt unavailabilities", async () =>
     let firstReloadProm = null;
     let reloadProm = null;
     onRpc("get_gantt_data", async ({ parent }) => {
-        const result = await parent();
+        const result = parent();
         result.unavailabilities.__default = { false: unavailabilities.shift() };
         await reloadProm;
         return result;
@@ -129,7 +129,7 @@ test("concurrent scale switches return with gantt unavailabilities", async () =>
 
     let content = getGridContent();
     expect(getActiveScale()).toBe(2);
-    expect(content.range).toBe("From: 12/01/2018 to: 02/28/2019");
+    expect(content.range).toBe("12/01/2018 -> 02/28/2019");
     expect(content.groupHeaders.map((h) => h.title)).toEqual(["December 2018", "January 2019"]);
     expect(model.data.records).toHaveLength(6);
     expect(getCellColorProperties("08 December 2018")).toEqual([]);
@@ -145,7 +145,7 @@ test("concurrent scale switches return with gantt unavailabilities", async () =>
 
     content = getGridContent();
     expect(getActiveScale()).toBe(4);
-    expect(content.range).toBe("From: 12/01/2018 to: 02/28/2019");
+    expect(content.range).toBe("12/01/2018 -> 02/28/2019");
     expect(content.groupHeaders.map((h) => h.title)).toEqual(["December 2018", "January 2019"]);
     expect(model.data.records).toHaveLength(6);
     expect(getCellColorProperties("08 December 2018")).toEqual([]);
@@ -163,7 +163,7 @@ test("concurrent scale switches return with gantt unavailabilities", async () =>
 
     content = getGridContent();
     expect(getActiveScale()).toBe(0);
-    expect(content.range).toBe("From: 01/01/2018 to: 12/31/2018");
+    expect(content.range).toBe("01/01/2018 -> 12/31/2018");
     expect(content.groupHeaders.map((h) => h.title)).toEqual(["2018"]);
     expect(model.data.records).toHaveLength(7);
     expect(getCellColorProperties("August 2018")).toEqual(["--Gantt__DayOff-background-color"]);
@@ -174,7 +174,7 @@ test("concurrent scale switches return with gantt unavailabilities", async () =>
 
     content = getGridContent();
     expect(getActiveScale()).toBe(0);
-    expect(content.range).toBe("From: 01/01/2018 to: 12/31/2018");
+    expect(content.range).toBe("01/01/2018 -> 12/31/2018");
     expect(content.groupHeaders.map((h) => h.title)).toEqual(["2018"]);
     expect(model.data.records).toHaveLength(7);
     expect(getCellColorProperties("August 2018")).toEqual(["--Gantt__DayOff-background-color"]);
@@ -193,7 +193,7 @@ test("concurrent range selections", async () => {
 
     let content = getGridContent();
     expect(getActiveScale()).toBe(2);
-    expect(content.range).toBe("From: 12/01/2018 to: 02/28/2019");
+    expect(content.range).toBe("12/01/2018 -> 02/28/2019");
 
     reloadProm = new Deferred();
     firstReloadProm = reloadProm;
@@ -202,7 +202,7 @@ test("concurrent range selections", async () => {
     await selectGanttRange({ startDate: "2019-01-01", stopDate: "2019-01-31" });
     firstReloadProm.resolve();
     content = getGridContent();
-    expect(content.range).toBe("From: 01/01/2019 to: 01/31/2019");
+    expect(content.range).toBe("01/01/2019 -> 01/31/2019");
 });
 
 test("concurrent pill resize and groupBy change", async () => {
@@ -377,7 +377,7 @@ test("concurrent display mode change and fetch", async () => {
     });
 
     let content = getGridContent();
-    expect(content.range).toBe("From: 12/01/2018 to: 02/28/2019");
+    expect(content.range).toBe("12/01/2018 -> 02/28/2019");
     const initialRows = [
         {
             pills: [
@@ -395,13 +395,13 @@ test("concurrent display mode change and fetch", async () => {
     def = new Deferred();
     await selectGanttRange({ startDate: "2018-12-01", stopDate: "2019-06-15" });
     content = getGridContent();
-    expect(content.range).toBe("From: 12/01/2018 to: 06/15/2019");
+    expect(content.range).toBe("12/01/2018 -> 06/15/2019");
     expect(content.rows).toEqual(initialRows);
 
     await click(SELECTORS.sparse);
     await animationFrame();
     content = getGridContent();
-    expect(content.range).toBe("From: 12/01/2018 to: 06/15/2019");
+    expect(content.range).toBe("12/01/2018 -> 06/15/2019");
     expect(content.rows).toEqual([
         {
             pills: [
@@ -428,7 +428,7 @@ test("concurrent display mode change and fetch", async () => {
     def.resolve();
     await animationFrame();
     content = getGridContent();
-    expect(content.range).toBe("From: 12/01/2018 to: 06/15/2019");
+    expect(content.range).toBe("12/01/2018 -> 06/15/2019");
     expect(content.rows).toEqual([
         {
             pills: [

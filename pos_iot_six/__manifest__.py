@@ -16,8 +16,14 @@
     'license': 'OEEL-1',
     'assets': {
         'point_of_sale._assets_pos': [
+            'pos_iot_six/static/src/js/balance_button.js',
             'pos_iot_six/static/src/js/models.js',
             'pos_iot_six/static/src/js/payment_six.js',
+            'pos_iot_six/static/src/xml/balance_button.xml',
+        ],
+        'web.assets_backend': [
+            'pos_iot_six/static/src/js/six_terminal_id_field.*',
+            'pos_iot_six/static/src/css/six_terminal_id_field.css',
         ],
     }
 }

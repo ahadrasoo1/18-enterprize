@@ -237,8 +237,8 @@ test("progress bar has the correct unit", async () => {
     onRpc("get_all_deadlines", () => {
         return { milestone_id: [], project_id: [] };
     });
-    onRpc("get_gantt_data", async ({ kwargs, parent }) => {
-        const result = await parent();
+    onRpc("get_gantt_data", ({ kwargs, parent }) => {
+        const result = parent();
         expect(kwargs.progress_bar_fields).toEqual(["user_ids"]);
         result.progress_bars.user_ids = {
             100: { value: 100, max_value: 100 },
@@ -319,8 +319,8 @@ test("Lines are displayed in alphabetic order, except for the first one", async 
 });
 
 test("Display milestones deadline in project.task gantt view", async () => {
-    onRpc("get_all_deadlines", () => {
-        const [milestone1, milestone2] = Milestone._records;
+    onRpc("get_all_deadlines", function () {
+        const [milestone1, milestone2] = this.env["milestone"];
         return {
             milestone_id: [
                 {
@@ -359,8 +359,8 @@ test("Display milestones deadline in project.task gantt view", async () => {
 });
 
 test("Display milestones deadline in gantt view of tasks in a project", async () => {
-    onRpc("get_all_deadlines", () => {
-        const [milestone1, milestone2] = Milestone._records;
+    onRpc("get_all_deadlines", function () {
+        const [milestone1, milestone2] = this.env["milestone"];
         return {
             milestone_id: [
                 {
@@ -464,7 +464,7 @@ test("Display project and milestones deadline in the gantt view of task", async 
         date: "2021-06-28",
     });
     onRpc("get_all_deadlines", function () {
-        const [milestone1, milestone2] = Milestone._records;
+        const [milestone1, milestone2] = this.env["milestone"];
         return {
             milestone_id: [
                 {
@@ -533,7 +533,7 @@ test("Display project deadline and milestone date in the same date", async () =>
         date: "2021-06-24",
     };
     onRpc("get_all_deadlines", function () {
-        const milestone3 = Milestone._records[2];
+        const milestone3 = this.env["milestone"][2];
         return {
             milestone_id: [
                 {
@@ -570,9 +570,8 @@ test("Display 2 milestones in different project at the same date", async () => {
         deadline: "2021-06-24",
         project_id: 2,
     });
-    onRpc("get_all_deadlines", () => {
-        const milestone3 = Milestone._records[2];
-        const milestone4 = Milestone._records[3];
+    onRpc("get_all_deadlines", function () {
+        const [milestone3, milestone4] = this.env["milestone"].slice(2, 4);
         return {
             milestone_id: [
                 {

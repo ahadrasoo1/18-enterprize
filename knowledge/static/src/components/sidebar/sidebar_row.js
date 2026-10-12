@@ -1,9 +1,10 @@
 /** @odoo-module */
 
 import KnowledgeIcon from "@knowledge/components/knowledge_icon/knowledge_icon";
+import { user } from "@web/core/user";
 import { useService } from "@web/core/utils/hooks";
 
-import { Component, onWillUpdateProps, useState } from "@odoo/owl";
+import { Component, onWillStart, onWillUpdateProps, useState } from "@odoo/owl";
 
 /**
  * The SidebarRow component is responsible of displaying an article (and its
@@ -61,6 +62,10 @@ export class KnowledgeSidebarRow extends Component {
 
         this.state = useState({
             unfolded: false,
+        });
+
+        onWillStart(async () => {
+            this.canCreateArticle = await user.checkAccessRight('knowledge.article', 'create');
         });
 
         onWillUpdateProps(nextProps => {

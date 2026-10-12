@@ -9,7 +9,7 @@ import { stepUtils } from "@stock_barcode/../tests/tours/tour_step_utils";
 // Tours
 // ----------------------------------------------------------------------------
 
-registry.category("web_tour.tours").add('test_receipt_classic_subcontracted_product', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_receipt_classic_subcontracted_product', { steps: () => [
     {
         trigger: '.o_barcode_client_action',
         run: function () {
@@ -57,7 +57,7 @@ registry.category("web_tour.tours").add('test_receipt_classic_subcontracted_prod
 
 ]});
 
-registry.category("web_tour.tours").add('test_receipt_tracked_subcontracted_product', {test: true, steps: () => [
+registry.category("web_tour.tours").add('test_receipt_tracked_subcontracted_product', { steps: () => [
     {
         trigger: '.o_barcode_client_action',
         run: 'scan product_subcontracted',
@@ -115,7 +115,6 @@ registry.category("web_tour.tours").add('test_receipt_tracked_subcontracted_prod
 ]});
 
 registry.category("web_tour.tours").add("test_receipt_flexible_subcontracted_product", {
-    test: true,
     steps: () => [
         {
             trigger: "button.btn-secondary.o_mrp_subcontracting",
@@ -149,8 +148,7 @@ registry.category("web_tour.tours").add("test_receipt_flexible_subcontracted_pro
     ],
 });
 
-registry.category("web_tour.tours").add('test_receipt_subcontract_bom_product_manual_add_src_location', {
-    test: true, steps: () => [
+registry.category("web_tour.tours").add('test_receipt_subcontract_bom_product_manual_add_src_location', { steps: () => [
         { trigger: 'button.o_add_remaining_quantity', run: 'click' },
         { trigger: 'button.o_add_line', run: 'click' },
         {
@@ -163,4 +161,38 @@ registry.category("web_tour.tours").add('test_receipt_subcontract_bom_product_ma
         },
         { trigger: 'button.o_save', run: 'click' },
         { trigger: 'button.o_validate_page', run: 'click' },
+]});
+
+registry.category("web_tour.tours").add('test_partial_subcontract_receipt_and_backorder', {
+    steps: () => [
+        {
+            content: 'Mark the subcontracted product for delivery',
+            trigger: 'div.o_barcode_line:contains("Chocolate Eclairs") button.o_add_remaining_quantity',
+            run: 'click',
+        },
+        {
+            content: 'Await qty_done update',
+            trigger: 'div.o_barcode_line:contains("Chocolate Eclairs") .qty-done:contains("5")',
+            run: () => {},
+        },
+        {
+            content: 'Validate reception',
+            trigger: 'footer.o_barcode_control button.o_validate_page',
+            run: 'click',
+        },
+        {
+            content: 'Await backorder window popup',
+            trigger: 'div.o_barcode_backorder_dialog',
+            run: () => {},
+        },
+        {
+            content: 'Validate the incomplete transfer',
+            trigger: 'div.o_barcode_backorder_dialog button:contains("Validate")',
+            run: 'click',
+        },
+        {
+            content: 'Await backorder notification',
+            trigger: 'div.o_notification_body:contains("Following backorder was created")',
+            run: () => {},
+        },
 ]});

@@ -1,8 +1,7 @@
-# -*- coding: utf-8 -*-
-
 from . import account_move
 from . import account_move_line
 from . import account_move_send
+from . import ir_http
 from . import payment_provider
 from . import payment_token
 from . import payment_transaction

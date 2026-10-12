@@ -104,7 +104,7 @@ class AccountBatchPayment(models.Model):
             f"{bank.acc_number:17.17}",  # DFI Account Number
             f"{self._get_total_cents(payment):010d}",  # Amount
             f"{payment.partner_id.vat or '':15.15}",  # Individual Identification Number (optional)
-            f"{'OFFSET' if is_offset else payment.partner_id.name:22.22}",  # Individual Name
+            f"{'OFFSET' if is_offset else (bank.acc_holder_name or payment.partner_id.name):22.22}",  # Individual Name
             "  ",  # Discretionary Data Field
             "0",  # Addenda Record Indicator
             f"{self.journal_id.nacha_origination_dfi_identification:8.8}",  # Trace Number (80-87)
@@ -128,7 +128,7 @@ class AccountBatchPayment(models.Model):
             f"{self._calculate_aba_hash_for_payments(payments | offset_payment):0>10}",  # Entry Hash
             f"{self._get_total_cents(offset_payment):012d}",  # Total Debit Entry Dollar Amount in Batch
             f"{self._get_total_cents(payments):012d}",  # Total Credit Entry Dollar Amount in Batch
-            f"{self.journal_id.nacha_company_identification:0>10.10}",  # Company Identification
+            f"{self.journal_id.nacha_company_identification:10.10}",  # Company Identification
             f"{'':19.19}",  # Message Authentication Code (leave blank)
             f"{'':6.6}",  # Reserved (leave blank)
             f"{self.journal_id.nacha_origination_dfi_identification:8.8}",  # Originating DFI Identification

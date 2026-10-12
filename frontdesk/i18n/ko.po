@@ -1,22 +1,24 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* frontdesk
-# 
+#
 # Translators:
-# Wil Odoo, 2024
-# 
+# Sarah Park, 2024
+# Daye Jeong, 2025
+# Wil Odoo, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:24+0000\n"
+"POT-Creation-Date: 2025-12-29 18:45+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
+"Last-Translator: Wil Odoo, 2025\n"
 "Language-Team: Korean (https://app.transifex.com/odoo/teams/41243/ko/)\n"
+"Language: ko\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: ko\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. module: frontdesk
@@ -29,13 +31,13 @@ msgstr "%(name)s님의 체크인이 완료되었습니다 . 요청하신 음료:
 #. odoo-python
 #: code:addons/frontdesk/models/frontdesk_visitor.py:0
 msgid "%(station)s Check-In: %(visitor)s"
-msgstr ""
+msgstr "%(station)s 체크인: %(visitor)s"
 
 #. module: frontdesk
 #. odoo-python
 #: code:addons/frontdesk/models/frontdesk_visitor.py:0
 msgid "%(station)s Check-In: %(visitor)s to meet %(host)s"
-msgstr ""
+msgstr "%(station)s 체크인: %(visitor)s 님 %(host)s 미팅"
 
 #. module: frontdesk
 #. odoo-python
@@ -51,19 +53,29 @@ msgstr "'배지 - %s' % (object.name).replace('/', '')"
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.print_visitor_badge
 msgid "22 Oct 24 14:20:10"
-msgstr ""
+msgstr "22 Oct 24 14:20:10"
 
 #. module: frontdesk
 #: model:mail.template,body_html:frontdesk.frontdesk_mail_template
 msgid ""
 "<div>\n"
-"                    <p>Hello <t t-if=\"ctx.get('host_name')\"><t t-out=\"ctx.get('host_name')\"></t>, </t><b><t t-out=\"object.name\"></t></b> <t t-if=\"object.phone\">(<t t-out=\"object.phone\"></t>)</t><t t-if=\"object.company\">, coming from <t t-out=\"object.company\"></t></t> is asking to meet you at <t t-out=\"object.station_id.name\"></t>. Please let them know you'll be there shortly.\n"
+"                    <p>Hello <t t-if=\"ctx.get('host_name')\"><t t-"
+"out=\"ctx.get('host_name')\"/>, </t><b><t t-out=\"object.name\"/></b> <t t-"
+"if=\"object.phone\">(<t t-out=\"object.phone\"/>)</t><t t-"
+"if=\"object.company\">, coming from <t t-out=\"object.company\"/></t> is "
+"asking to meet you at <t t-out=\"object.station_id.name\"/>. Please let them "
+"know you'll be there shortly.\n"
 "                    </p>\n"
 "                </div>\n"
 "            "
 msgstr ""
 "<div>\n"
-"                    <p>안녕하세요 <t t-if=\"ctx.get('host_name')\"><t t-out=\"ctx.get('host_name')\"></t>님, </t><b><t t-out=\"object.name\"></t></b> <t t-if=\"object.phone\">(<t t-out=\"object.phone\"></t>)</t><t t-if=\"object.company\">, <t t-out=\"object.company\"></t></t> 회사에서 <t t-out=\"object.station_id.name\"></t> 의 회의를 요청합니다. 곧 도착할 예정임을 알려주세요.\n"
+"                    <p>안녕하세요, <t t-if=\"ctx.get('host_name')\"><t t-"
+"out=\"ctx.get('host_name')\"/>님. </t><b><t t-out=\"object.name\"/></b> <t t-"
+"if=\"object.phone\">(<t t-out=\"object.phone\"/>)</t><t t-"
+"if=\"object.company\">, <t t-out=\"object.company\"/></t> 회사에서 <t t-"
+"out=\"object.station_id.name\"/> 회의를 요청했습니다. 곧 도착할 예정임을 알려"
+"주세요.\n"
 "                    </p>\n"
 "                </div>\n"
 "            "
@@ -74,11 +86,13 @@ msgid ""
 "<span><b>Congratulations!!!</b> You have created your first visitor.\n"
 "        </span>"
 msgstr ""
+"<span><b>축하합니다!!</b> 첫 방문자를 만들었습니다.\n"
+"        </span>"
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.print_visitor_badge
 msgid "<strong>Visiting:</strong>"
-msgstr ""
+msgstr "<strong>방문:</strong>"
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_drink__active
@@ -423,18 +437,19 @@ msgstr "현장 게스트"
 #: model:sms.template,body:frontdesk.frontdesk_sms_template
 msgid ""
 "Hello, Your visitor {{ object.name }} {{ '(%s)' % object.phone if "
-"object.phone else '' }} {{ '(%s)' % object.company if object.company else ''"
-" }} wants to meet you at {{ object.station_id.name }}. Please let them know "
-"you'll be there shortly."
+"object.phone else '' }} {{ '(%s)' % object.company if object.company else "
+"'' }} wants to meet you at {{ object.station_id.name }}. Please let them "
+"know you'll be there shortly."
 msgstr ""
-"안녕하세요, {{ object.name }} {{ '(%s)' % object.phone if object.phone else '' }}"
-" {{ '(%s)' % object.company if object.company else '' }} 방문자가 있습니다. {{ "
-"object.station_id.name }}에서 뵙고자 합니다. 곧 도착할 예정임을 알려 주세요."
+"안녕하세요, {{ object.name }} {{ '(%s)' % object.phone if object.phone else "
+"'' }} {{ '(%s)' % object.company if object.company else '' }} 방문자가 있습니"
+"다. {{ object.station_id.name }}에서 뵙고자 합니다. 곧 도착할 예정임을 알려 "
+"주세요."
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.print_visitor_badge
 msgid "Henry"
-msgstr ""
+msgstr "Henry"
 
 #. module: frontdesk
 #. odoo-javascript
@@ -477,6 +492,11 @@ msgid "Image"
 msgstr "이미지"
 
 #. module: frontdesk
+#: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_kanban
+msgid "Install"
+msgstr "설치하기"
+
+#. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_frontdesk__is_favorite
 msgid "Is Favorite"
 msgstr "즐겨찾기 여부"
@@ -484,7 +504,7 @@ msgstr "즐겨찾기 여부"
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.print_visitor_badge
 msgid "Karen"
-msgstr ""
+msgstr "Karen"
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_kanban
@@ -557,7 +577,7 @@ msgstr ""
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.print_visitor_badge
 msgid "MY PVT LTD"
-msgstr ""
+msgstr "MY PVT LTD"
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__message
@@ -730,7 +750,7 @@ msgstr "배지 출력"
 #. module: frontdesk
 #: model:ir.actions.report,name:frontdesk.frontdesk_visitor_print_badge
 msgid "Print Visitor Badge"
-msgstr ""
+msgstr "방문자 배지 인쇄"
 
 #. module: frontdesk
 #: model:ir.model.fields,field_description:frontdesk.field_frontdesk_visitor__visitor_properties
@@ -840,7 +860,8 @@ msgstr "모바일 체크인을 실행하려면 웰컴 화면에서 QR 코드를 
 msgid ""
 "Shows a QR code in the interface, for guests to check in from their mobile "
 "phone."
-msgstr "게스트가 핸드폰으로 체크인할 수 있도록 인터페이스에 QR 코드를 표시하세요."
+msgstr ""
+"게스트가 핸드폰으로 체크인할 수 있도록 인터페이스에 QR 코드를 표시하세요."
 
 #. module: frontdesk
 #: model_terms:ir.ui.view,arch_db:frontdesk.frontdesk_frontdesk_view_form
@@ -939,7 +960,7 @@ msgstr "방문자"
 #. module: frontdesk
 #. odoo-javascript
 #: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
-msgid "Welcome"
+msgid "Welcome to"
 msgstr "환영합니다"
 
 #. module: frontdesk
@@ -1034,12 +1055,6 @@ msgstr "예: john@company.com"
 #: code:addons/frontdesk/static/src/end_page/end_page.xml:0
 msgid "has been informed."
 msgstr "정보를 받았습니다."
-
-#. module: frontdesk
-#. odoo-javascript
-#: code:addons/frontdesk/static/src/welcome_page/welcome_page.xml:0
-msgid "to"
-msgstr "종료"
 
 #. module: frontdesk
 #. odoo-javascript

@@ -250,26 +250,47 @@ class TestPayslipComputation(TestPayslipContractBase):
         self.assertEqual(extra_work_line.number_of_hours, 7.0, "It should have 7 hours of extra work")  # Sunday
 
     def test_work_data_with_exceeding_interval(self):
-        self.env['hr.work.entry'].create({
+        # The start and stop dates for these entries are stored in UTC.
+        # Note that the contract for these entries is for a Europe/Brussels
+        # timezone calendar.
+        # Also, note that since these entries are being made for December
+        # dates, the offset will only be +1 between UTC and Europe/Brussels,
+        # instead of +2, normally.
+        #
+        # Finally, we must test the boundaries of the payslip one at a time
+        # to ensure that the datetimes are converted correctly to their
+        # local timezones when computing the durations within the bounds
+        # of the payslip. If we tested both on the payslip at the same time,
+        # the timezone difference would shift them both by an equal amount,
+        # effectively keeping the valid durations the same.
+        entry_exceeding_lower_bound = self.env['hr.work.entry'].create({
             'name': 'Attendance',
             'employee_id': self.richard_emp.id,
             'contract_id': self.contract_cdd.id,
             'work_entry_type_id': self.env.ref('hr_work_entry.work_entry_type_attendance').id,
-            'date_start': datetime(2015, 11, 9, 20, 0),
-            'date_stop': datetime(2015, 11, 10, 7, 0)
-        }).action_validate()
-        self.env['hr.work.entry'].create({
-            'name': 'Attendance',
-            'employee_id': self.richard_emp.id,
-            'contract_id': self.contract_cdd.id,
-            'work_entry_type_id': self.env.ref('hr_work_entry.work_entry_type_attendance').id,
-            'date_start': datetime(2015, 11, 10, 21, 0),
-            'date_stop': datetime(2015, 11, 11, 5, 0),
-        }).action_validate()
-        self.contract_cdd.generate_work_entries(date(2015, 11, 10), date(2015, 11, 10))
-        hours = self.contract_cdd.get_work_hours(date(2015, 11, 10), date(2015, 11, 10))
+            'date_start': datetime(2015, 12, 12, 18, 0),  # 19:00 local time
+            'date_stop': datetime(2015, 12, 13, 2, 0),    # 03:00 local time
+        })
+        entry_exceeding_lower_bound.action_validate()
+        self.contract_cdd.generate_work_entries(date(2015, 12, 13), date(2015, 12, 13))
+        hours = self.contract_cdd.get_work_hours(date(2015, 12, 13), date(2015, 12, 13))
         sum_hours = sum(v for k, v in hours.items() if k in self.env.ref('hr_work_entry.work_entry_type_attendance').ids)
-        self.assertAlmostEqual(sum_hours, 18, delta=0.01, msg='It should count 18 attendance hours')  # 8h normal day + 7h morning + 3h night
+        # 3 hours after the lower bound
+        self.assertAlmostEqual(sum_hours, 3, delta=0.01, msg='It should count 3 attendance hours')
+        entry_exceeding_upper_bound = self.env['hr.work.entry'].create({
+            'name': 'Attendance',
+            'employee_id': self.richard_emp.id,
+            'contract_id': self.contract_cdd.id,
+            'work_entry_type_id': self.env.ref('hr_work_entry.work_entry_type_attendance').id,
+            'date_start': datetime(2015, 12, 14, 18, 0),  # 19:00 local time
+            'date_stop': datetime(2015, 12, 15, 2, 0),    # 03:00 local time
+        })
+        entry_exceeding_upper_bound.action_validate()
+        self.contract_cdd.generate_work_entries(date(2015, 12, 14), date(2015, 12, 14))
+        hours = self.contract_cdd.get_work_hours(date(2015, 12, 14), date(2015, 12, 14))
+        sum_hours = sum(v for k, v in hours.items() if k in self.env.ref('hr_work_entry.work_entry_type_attendance').ids)
+        # 5 hours before the upper bound
+        self.assertAlmostEqual(sum_hours, 5, delta=0.01, msg='It should count 5 attendance hours')
 
     def test_payslip_without_contract(self):
         payslip = self.env['hr.payslip'].create({
@@ -366,6 +387,99 @@ class TestPayslipComputation(TestPayslipContractBase):
         lines = payslip.line_ids
         self.assertEqual(len(lines.filtered(lambda r: r.code == 'BASIC')), 1)
 
+    def test_payslip_with_multiple_input_same_type_aggregations(self):
+        payslip = self.env['hr.payslip'].create({
+            'name': 'Payslip of Richard',
+            'employee_id': self.richard_emp.id,
+            'contract_id': self.contract_cdi.id,
+            'date_from': date(2016, 1, 1),
+            'date_to': date(2016, 1, 31)
+        })
+        self.env['hr.payslip.input'].create([
+            {
+                'payslip_id': payslip.id,
+                'sequence': 1,
+                'input_type_id': self.env.ref("hr_payroll.BASIC").id,
+                'amount': 300,
+                'contract_id': self.contract_cdi.id,
+                'code': 'DED'
+            },
+            {
+                'payslip_id': payslip.id,
+                'sequence': 1,
+                'input_type_id': self.env.ref("hr_payroll.BASIC").id,
+                'amount': 200,
+                'contract_id': self.contract_cdi.id,
+                'code': 'DED'
+            },
+        ])
+        self.developer_pay_structure.write({
+            'rule_ids': [
+            (0, 0, {
+                'name': 'Test 1',
+                'sequence': 1000000,
+                'code': 'TEST1',
+                'category_id': self.env.ref('hr_payroll.ALW').id,
+                'amount_select': 'code',
+                'amount_python_compute': 'result = inputs["DEDUCTION"].amount',
+            }), (0, 0, {
+                'name': 'Test 2',
+                'sequence': 1000000,
+                'code': 'TEST2',
+                'category_id': self.env.ref('hr_payroll.ALW').id,
+                'amount_select': 'code',
+                'amount_python_compute': 'result = inputs["DEDUCTION"][0].amount + inputs["DEDUCTION"][1].amount',
+            }), (0, 0, {
+                'name': 'Test 3',
+                'sequence': 1000000,
+                'code': 'TEST3',
+                'category_id': self.env.ref('hr_payroll.ALW').id,
+                'amount_select': 'code',
+                'amount_python_compute': 'result = inputs["DEDUCTION"][0].amount',
+            }),
+        ]})
+        payslip.compute_sheet()
+        assert(payslip.line_ids.filtered(lambda r: r.code == 'TEST1').total == 500.00)
+        assert(payslip.line_ids.filtered(lambda r: r.code == 'TEST2').total == 500.00)
+        assert(payslip.line_ids.filtered(lambda r: r.code == 'TEST3').total == 300.00)
+
+    def test_payslip_with_multiple_input_same_type_no_matching_rule_aggregations(self):
+        payslip = self.env['hr.payslip'].create({
+            'name': 'Payslip of Richard',
+            'employee_id': self.richard_emp.id,
+            'contract_id': self.contract_cdi.id,
+            'date_from': date(2016, 1, 1),
+            'date_to': date(2016, 1, 31)
+        })
+        input_type = self.env['hr.payslip.input.type'].create({'name': 'ABCD', 'code': 'ABCD'})
+        self.env['hr.payslip.input'].create([
+            {
+                'payslip_id': payslip.id,
+                'sequence': 1,
+                'input_type_id': input_type.id,
+                'amount': 300,
+                'contract_id': self.contract_cdi.id,
+            },
+            {
+                'payslip_id': payslip.id,
+                'sequence': 2,
+                'input_type_id': input_type.id,
+                'amount': 200,
+                'contract_id': self.contract_cdi.id,
+            },
+        ])
+        self.developer_pay_structure.write({'rule_ids': [
+            (0, 0, {
+                'name': 'Non matching code rule',
+                'sequence': 5,
+                'code': 'EFGH',
+                'category_id': self.env.ref('hr_payroll.COMP').id,
+                'amount_select': 'code',
+                'amount_python_compute': 'result = inputs["ABCD"].amount',
+            })]})
+        payslip.compute_sheet()
+        self.assertEqual(payslip.line_ids.filtered(lambda r: r.code == 'EFGH').total, 500.00)
+
     def test_payslip_multiple_inputs_and_attachments_same_type(self):
         self.env['hr.salary.attachment'].create([
             {
@@ -422,3 +536,61 @@ class TestPayslipComputation(TestPayslipContractBase):
             'date_to': date(2016, 1, 31)
         })
         payslip.compute_sheet()
+
+    def test_payslip_warning_message_without_duration_dates(self):
+        payslip = self.env['hr.payslip'].create({
+            'name': 'Payslip of Richard',
+            'employee_id': self.richard_emp.id,
+            'contract_id': self.contract_cdi.id,
+            'date_from': date(2016, 1, 15),
+            'date_to': date(2016, 1, 31)
+        })
+        self.assertTrue(payslip.warning_message)
+
+        payslip_form = Form(payslip)
+        payslip_form.date_from = None
+        self.assertFalse(payslip_form.warning_message)
+
+    def test_out_of_contract_worked_days(self):
+        self.contract_cdi.write({
+            'date_start': datetime.strptime('2025-06-15', '%Y-%m-%d'),
+            'date_end': datetime.strptime('2025-07-15', '%Y-%m-%d'),
+        })
+        payslips = self.env['hr.payslip'].create([
+            {
+                'name': 'February',  # Before contract
+                'employee_id': self.richard_emp.id,
+                'contract_id': self.contract_cdi.id,
+                'struct_id': self.developer_pay_structure.id,
+                'date_from': date(2025, 2, 1),
+                'date_to': date(2025, 2, 28),
+            },
+            {
+                'name': 'June',  # Partial overlap
+                'employee_id': self.richard_emp.id,
+                'contract_id': self.contract_cdi.id,
+                'struct_id': self.developer_pay_structure.id,
+                'date_from': date(2025, 6, 1),
+                'date_to': date(2025, 6, 30),
+            },
+            {
+                'name': 'November',  # After contract
+                'employee_id': self.richard_emp.id,
+                'contract_id': self.contract_cdi.id,
+                'struct_id': self.developer_pay_structure.id,
+                'date_from': date(2025, 11, 1),
+                'date_to': date(2025, 11, 30),
+            },
+        ])
+        payslips._compute_worked_days_line_ids()
+        expectations = {
+            'February': (20.0, 140.0),
+            'June':     (10.0, 70.0),
+            'November': (20.0, 140.0),
+        }
+        out_of_contract_code = self.env.ref('hr_payroll.hr_work_entry_type_out_of_contract').code
+        for payslip in payslips:
+            line = payslip.worked_days_line_ids.filtered(lambda l: l.code == out_of_contract_code)
+            exp_days, exp_hours = expectations[payslip.name]
+            self.assertAlmostEqual(line.number_of_days, exp_days, places=2, msg=f"Wrong days for {payslip.name}")
+            self.assertAlmostEqual(line.number_of_hours, exp_hours, places=2, msg=f"Wrong hours for {payslip.name}")

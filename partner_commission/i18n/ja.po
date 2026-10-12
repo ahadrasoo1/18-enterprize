@@ -1,23 +1,27 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* partner_commission
-# 
+# * partner_commission
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Junko Augias, 2025
+#
+# "Junko Augias (juau)" <juau@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:27+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Japanese (https://app.transifex.com/odoo/teams/41243/ja/)\n"
+"POT-Creation-Date: 2025-12-29 18:48+0000\n"
+"PO-Revision-Date: 2026-02-07 10:31+0000\n"
+"Last-Translator: \"Junko Augias (juau)\" <juau@odoo.com>\n"
+"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-18/"
+"partner_commission/ja/>\n"
+"Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: ja\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 5.14.3\n"
 
 #. module: partner_commission
 #. odoo-python
@@ -38,7 +42,7 @@ msgstr " (%d月 )"
 #. module: partner_commission
 #: model:ir.model.fields,field_description:partner_commission.field_commission_plan__active
 msgid "Active"
-msgstr "有効化"
+msgstr "有効"
 
 #. module: partner_commission
 #: model:res.groups,name:partner_commission.group_commission_manager
@@ -178,13 +182,16 @@ msgstr "ID"
 #. module: partner_commission
 #: model:ir.model.fields,help:partner_commission.field_commission_rule__product_id
 msgid ""
-"If set, the rule does not apply to the whole category but only on the given product.\n"
+"If set, the rule does not apply to the whole category but only on the given "
+"product.\n"
 "The product must belong to the selected category.\n"
 "Use several rules if you need to match multiple products within a category."
 msgstr ""
-"設定された場合、規則はカテゴリ全体に適用されるのではなく、指定されたプロダクトにのみ適用されます。\n"
+"設定された場合、規則はカテゴリ全体に適用されるのではなく、指定されたプロダク"
+"トにのみ適用されます。\n"
 "プロダクトは選択したカテゴリに属している必要があります。\n"
-"カテゴリ内の複数のプロダクトに一致させる必要がある場合は、複数の規則を使用します。"
+"カテゴリ内の複数のプロダクトに一致させる必要がある場合は、複数の規則を使用し"
+"ます。"
 
 #. module: partner_commission
 #: model:ir.model.fields,help:partner_commission.field_purchase_order__invoice_commission_count
@@ -199,7 +206,7 @@ msgstr "仕訳"
 #. module: partner_commission
 #: model:ir.model,name:partner_commission.model_account_move_line
 msgid "Journal Item"
-msgstr "仕訳項目"
+msgstr "仕訳明細"
 
 #. module: partner_commission
 #: model:ir.model.fields,field_description:partner_commission.field_commission_plan__write_uid
@@ -324,7 +331,7 @@ msgstr "購買タイプ"
 #. module: partner_commission
 #: model:ir.model.fields.selection,name:partner_commission.selection__res_company__commission_automatic_po_frequency__quarterly
 msgid "Quarterly"
-msgstr "四半期毎"
+msgstr "四半期"
 
 #. module: partner_commission
 #: model:ir.model.fields,field_description:partner_commission.field_commission_rule__rate
@@ -416,21 +423,25 @@ msgstr "紹介者の委託プランよりも優先されます。"
 msgid ""
 "The commission partner order %s must be checked manually (especially refund "
 "lines which can be duplicated)."
-msgstr "委託取引先オーダ%sは手動で確認する必要があります(特に重複する可能性のある返金明細)"
+msgstr ""
+"委託取引先オーダ%sは手動で確認する必要があります(特に重複する可能性のある返金"
+"明細)"
 
 #. module: partner_commission
 #: model:ir.model.fields,help:partner_commission.field_res_partner_grade__default_commission_plan_id
 msgid ""
 "The default commission plan used for this grade. Can be overwritten on the "
 "partner form."
-msgstr "このレベルではデフォルトの手数料プランが使用されます。取引先フォームで上書きすることができます。"
+msgstr ""
+"このレベルではデフォルトの手数料プランが使用されます。取引先フォームで上書き"
+"することができます。"
 
 #. module: partner_commission
 #: model_terms:ir.ui.view,arch_db:partner_commission.res_config_settings_view_form
 msgid ""
 "The required minimum amount total needed to automatically confirm purchase "
 "orders"
-msgstr "購買オーダの自動確認に必要な最低金額の合計"
+msgstr "購買オーダの自動確定に必要な最低金額の合計"
 
 #. module: partner_commission
 #: model:ir.model.fields.selection,name:partner_commission.selection__res_company__commission_automatic_po_frequency__weekly
@@ -447,4 +458,6 @@ msgstr "手数料に上限があるか"
 msgid ""
 "Whether the commission plan is frozen. When checked, the commission plan "
 "won't automatically be updated according to the partner level."
-msgstr "手数料プランが固定されているかどうか。チェックした場合、手数料プランが取引先レベルに応じて自動的に更新されることはありません。"
+msgstr ""
+"手数料プランが固定されているかどうか。チェックした場合、手数料プランが取引先"
+"レベルに応じて自動的に更新されることはありません。"

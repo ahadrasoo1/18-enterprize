@@ -50,7 +50,7 @@ class CalendarEventCrm(models.Model):
             event._link_with_lead(lead)
             lead.activity_schedule(
                 act_type_xmlid='mail.mail_activity_data_meeting',
-                date_deadline=event.start_date,
+                date_deadline=event._get_activity_deadline_from_start(event.start, event.allday),
                 summary=event.name,
                 user_id=event.user_id.id,
                 calendar_event_id=event.id
@@ -63,7 +63,7 @@ class CalendarEventCrm(models.Model):
             'partner_id': partner.id,
             'type': 'opportunity',
             'user_id': self.user_id.id,
-            'description': self.description,
+            'description': self._get_attendee_description(),
         }
 
     def _link_with_lead(self, lead):

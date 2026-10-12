@@ -6,7 +6,7 @@ patch(AccountReportFilters.prototype, {
     get selectedExtraOptions() {
         let selectedExtraOptionsName = super.selectedExtraOptions;
 
-        if ("include_no_tin" in this.controller.options) {
+        if (this.controller.options.include_no_tin) {
             const includeNoTINName = _t("With Partners without TIN");
 
             selectedExtraOptionsName = selectedExtraOptionsName
@@ -14,7 +14,7 @@ patch(AccountReportFilters.prototype, {
                 : includeNoTINName;
         }
 
-        if ("include_imports" in this.controller.options) {
+        if (this.controller.options.include_imports) {
             const includeImportsName = _t("With Importations");
             selectedExtraOptionsName = selectedExtraOptionsName
                 ? `${selectedExtraOptionsName}, ${includeImportsName}`

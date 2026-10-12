@@ -13,7 +13,6 @@ Accounting reports for Poland
         - Margin-based operations (MR_T/MR_UZ)
         - Bills for agricultural products (VAT_RR)
         - Operations through electronic interfaces (IED)
-        - Invoices done with KSef 
     """,
     'category': 'Accounting/Localizations/Reporting',
     'depends': [
@@ -29,6 +28,7 @@ Accounting reports for Poland
         'data/profit_loss_micro.xml',
         'data/balance_sheet_small.xml',
         'data/balance_sheet_micro.xml',
+        'data/account_report_ec_sales_list_report.xml',
     ],
     'auto_install': True,
     'installable': True,

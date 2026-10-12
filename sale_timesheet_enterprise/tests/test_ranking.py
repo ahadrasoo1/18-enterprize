@@ -38,6 +38,7 @@ class TestSaleTimesheetEnterpriseRanking(TestCommonSaleTimesheet):
             'project_id': cls.project_billable.id,
         })
         cls.employee_user.billable_time_target = 160
+        cls.env['res.config.settings'].create({'timesheet_show_rates': True, 'timesheet_show_leaderboard': True})
 
     def test_fetch_tip(self):
         """ This test will check that a tip is actually returned when calling get_timesheet_ranking_data() with fetch_tip parameter set to true. """
@@ -85,3 +86,29 @@ class TestSaleTimesheetEnterpriseRanking(TestCommonSaleTimesheet):
         ranking_data = self.employee_user.company_id.get_timesheet_ranking_data(self.period_start, self.period_end, self.today, False)
         self.assertEqual(ranking_data['leaderboard'][0]['total_valid_time'], 8.0, 'The employee\'s total valid time should still be 8 since the timesheet\'s date is past today\'s date (and so invalid).')
         self.assertEqual(ranking_data['leaderboard'][0]['total_time'], 16.0, 'The employee\'s total time should be 16.')
+
+    def test_get_billable_time_target(self):
+        """ When 2 users from 2 different companies are linked to the same user, we have 2 values for billable_time_target (1 from each employee),
+        This Test makes sure we get the value of the employee with company = env.company
+        """
+        self.employee_company_B.write({"company_id": self.env.company.id, "billable_time_target": 200})
+        self.employee_manager.write({
+            "company_id": self.company_data_2['company'].id,
+            "user_id": self.employee_company_B.user_id.id,
+            "billable_time_target": 100,
+        })
+
+        self.assertEqual(
+            self.env["hr.employee"].get_billable_time_target(self.employee_company_B.user_id.ids), [{
+                'id': self.employee_company_B.id,
+                'billable_time_target': self.employee_company_B.billable_time_target,
+            }]
+        )
+
+        self.env.company = self.company_data_2['company']
+        self.assertEqual(
+            self.env["hr.employee"].get_billable_time_target(self.employee_company_B.user_id.ids), [{
+                'id': self.employee_manager.id,
+                'billable_time_target': self.employee_manager.billable_time_target
+            }]
+        )

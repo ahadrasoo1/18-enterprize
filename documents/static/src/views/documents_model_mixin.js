@@ -12,6 +12,11 @@ export const DocumentsModelMixin = (component) =>
                 this.originalSelection = params.state?.sharedSelection;
             }
             this.documentService = useService("document.document");
+            this.initialLimit = 40;
+
+            if (!this.defaultOrderBy?.length) {
+                this.defaultOrderBy = [{ name: "create_date", asc: false }];
+            }
         }
 
         exportSelection() {
@@ -24,8 +29,11 @@ export const DocumentsModelMixin = (component) =>
          */
         async load() {
             const selection = this.root?.selection;
-            if (selection && selection.length > 0) {
+            if (!this.originalSelection && selection && selection.length > 0) {
                 this.originalSelection = selection.map((rec) => rec.resId);
+            }
+            for (let arg of arguments) {
+                arg.context['skip_res_field_check'] = true;
             }
             const res = await super.load(...arguments);
             if (this.config.resModel !== "documents.document") {
@@ -37,6 +45,9 @@ export const DocumentsModelMixin = (component) =>
             this._reapplySelection();
             this._computeFileSize();
             this.shortcutTargetRecords = this.orm.isSample ? [] : await this._loadShortcutTargetRecords();
+            if (this.documentService.documentIdToRestore) {
+                this.documentService.documentIdToRestore = undefined;
+            }
             return res;
         }
 
@@ -104,14 +115,50 @@ export const DocumentsModelMixin = (component) =>
         }
     };
 
-export const DocumentsRecordMixin = (component) => class extends component {
+let dataTransfer = null;
 
-    async update() {
-        const originalFolderId = this.data.folder_id[0];
-        const ret = await super.update(...arguments);
-        if (this.data.folder_id && this.data.folder_id[0] !== originalFolderId) {
-            this.model.root._removeRecords(this.model.root.selection.map((rec) => rec.id));
+const setDataTransfer = (ev, name, value) => {
+    dataTransfer = value;
+    return ev.dataTransfer.setData(name, value);
+}
+
+export const DocumentsRecordMixin = (component) => class extends component {
+    setup(config, data, options = {}) {
+        super.setup(...arguments);
+        if (data.id === this.model.documentService.documentIdToRestore) {
+            this.selected = true;
         }
+    }
+
+    async update(changes, options = {}) {
+        if ("name" in changes && !changes.name) {
+            this.model.notification.add(_t("Name cannot be empty."), {
+                type: "danger",
+            });
+            if (Object.keys(changes).length === 1) {
+                this._discard();
+                return;
+            }
+            delete changes.name;
+            this._setEvalContext();
+        }
+        const modelMultiEdit = this.model.multiEdit;
+        let movedRecordsIds = this.model.root.selection.map((rec) => rec.id);
+        if (this.resId === this.model.documentService.previewedDocument?.record.resId) {
+            // As previewed documents are not selected, force `save=true` to save any changes as the record is updated
+            options.save = true;
+            // Prevent multiEditing/moving the selection as it is not what we intend to modify when previewing.
+            this.model.multiEdit = false;
+            movedRecordsIds = [this.model.root.records.find((rec)=> rec.data.id === this.resId).id];
+        }
+        const originalFolderId = this.data.folder_id[0];
+        const ret = await super.update(changes, options);
+        if (this.data.folder_id && this.data.folder_id[0] !== originalFolderId) {
+            this.model.root._removeRecords(movedRecordsIds);
+            // Same as moving when not in preview
+            this.model.env.documentsView.bus.trigger("documents-close-preview");
+        }
+        this.model.multiEdit = modelMultiEdit;
         return ret;
     }
 
@@ -179,7 +226,7 @@ export const DocumentsRecordMixin = (component) => class extends component {
     async onClickPreview(ev) {
         if (this.isRequest()) {
             ev.stopPropagation();
-            // Only supported in the kanban view
+            // kanban view support
             ev.target.querySelector(".o_kanban_replace_document")?.click();
         } else if (this.isViewable()) {
             ev.stopPropagation();
@@ -209,12 +256,49 @@ export const DocumentsRecordMixin = (component) => class extends component {
     }
 
     /**
-     * Upon clicking on a record, we want to select it and unselect other records.
+     * Upon clicking on a record, if it is a file or if ctrl/shift is pressed,
+     * we want to select it else we open the folder.
      */
     onRecordClick(ev, options = {}) {
-        const isKeepSelection =
-            options.isKeepSelection !== undefined ? options.isKeepSelection : ev.ctrlKey || ev.metaKey;
-        const isRangeSelection = options.isRangeSelection !== undefined ? options.isRangeSelection : ev.shiftKey;
+        Object.assign(options, {
+            isKeepSelection: options.isKeepSelection ?? (ev.ctrlKey || ev.metaKey),
+            isRangeSelection: options.isRangeSelection ?? ev.shiftKey,
+        });
+        if (
+            this.model.env.searchModel.getSelectedFolderId() === "TRASH" ||
+            this.data.type !== "folder" ||
+            options.isKeepSelection ||
+            options.isRangeSelection
+        ) {
+            this.selectRecord(ev, options);
+        } else {
+            this.openFolder();
+        }
+    }
+
+    openFolder() {
+        const section = this.model.env.searchModel.getSections()[0];
+        const target = this.isShortcut() ? this.shortcutTarget : this;
+        const folderId = target.data.active ? target.data.id : "TRASH";
+        this._ensureSearchPanelHasFolder(folderId).then(() => {
+            this.model.env.searchModel.toggleCategoryValue(section.id, folderId);
+            this.model.originalSelection = [this.shortcutTarget.resId];
+            this.model.env.documentsView.bus.trigger("documents-expand-folder", { folderId: folderId });
+        });
+    }
+
+    async _ensureSearchPanelHasFolder(folderId) {
+        const folderInPanel = this.model.env.searchModel.getFolderById(folderId);
+        if (!folderInPanel) {
+            return this.model.env.searchModel._reloadSearchModel(true);
+        }
+    }
+
+    /**
+     * Selects records upon click if it is a file or ctrl/shift key is pressed.
+     */
+    selectRecord(ev, options = {}) {
+        const { isKeepSelection, isRangeSelection } = options;
 
         const root = this.model.root;
         const anchor = root._documentsAnchor;
@@ -222,23 +306,23 @@ export const DocumentsRecordMixin = (component) => class extends component {
             root._documentsAnchor = this;
         }
 
-        // Make sure to keep the record if we were in a multi select
-        const isMultiSelect = root.selection.length > 1;
-        let thisSelected = !this.selected;
         if (isRangeSelection && anchor) {
-            const indexFrom = root.records.indexOf(root.records.find((rec) => rec.resId === anchor.resId));
-            const indexTo = root.records.indexOf(this);
+            const selectionDocumentIds = root.selection.map((r) => r.resId);
+            const documentIds = Array.from(
+                document.querySelectorAll(".o_kanban_record:not(.o_kanban_ghost)"),
+            ).map((el) => parseInt(el.querySelector("div").dataset.id));
+            const indexFrom = documentIds.indexOf(anchor.resId);
+            const indexTo = documentIds.indexOf(this.resId);
             const lowerIdx = Math.min(indexFrom, indexTo);
             const upperIdx = Math.max(indexFrom, indexTo) + 1;
-            root.selection.forEach((rec) => (rec.selected = false));
-            // We don't modify the current one as it will be by the toggleSelection below. TODO: improve the method
-            for (let idx = lowerIdx; idx < upperIdx; idx++) {
-                const record = root.records[idx];
-                if (record != this) {
-                    record.selected = true;
-                }
-            }
-        } else if (!isKeepSelection && (isMultiSelect || thisSelected)) {
+
+            const toSelectDocumentIds = [
+                ...new Set([...selectionDocumentIds, ...documentIds.slice(lowerIdx, upperIdx)]),
+            ];
+            root.records.forEach((r) => {
+                r.selected = r != this && toSelectDocumentIds.includes(r.resId);
+            });
+        } else if (!isKeepSelection) {
             root.selection.forEach((rec) => {
                 rec.selected = false;
             });
@@ -246,8 +330,8 @@ export const DocumentsRecordMixin = (component) => class extends component {
         this.toggleSelection();
     }
 
-    async toggleSelection() {
-        await super.toggleSelection();
+    async toggleSelection(selected) {
+        await super.toggleSelection(selected);
 
         if (this.selected) {
             this.model.documentService.logAccess(this.data.access_token);
@@ -257,16 +341,27 @@ export const DocumentsRecordMixin = (component) => class extends component {
     }
 
     /**
-     * Opens the folder upon double click on record with folder as type.
+     * Jump to shortcut targeted file / open targeted folder.
      */
-    onRecordDoubleClick() {
-        const sectionId = this.model.env.searchModel.getSections()[0].id;
-        const folderId = this.isShortcut()
-            ? this.data.type === "folder"
-                ? this.shortcutTarget.data.id
-                : this.shortcutTarget.data.folder_id[0]
-            : this.data.id;
-        this.model.env.searchModel.toggleCategoryValue(sectionId, folderId);
+    jumpToTarget() {
+        const section = this.model.env.searchModel.getSections()[0];
+        let folderId;
+        if (!this.shortcutTarget.data.active) {
+            folderId = "TRASH";
+        } else if (this.shortcutTarget.data.type === "folder") {
+            // Using doc data shortcut_document_id because isContainer record does not (need to) load shortcutTarget.
+            folderId = this.data.shortcut_document_id?.[0] || this.shortcutTarget.data.id;
+        } else if (this.shortcutTarget.data.folder_id) {
+            folderId = this.shortcutTarget.data.folder_id[0];
+        } else if (this.shortcutTarget.data.owner_id[0] === this.model.documentService.store.odoobot.userId) {
+            folderId = "COMPANY";
+        } else if (this.shortcutTarget.data.owner_id[0] === user.userId) {
+            folderId = "MY";
+        }
+        if (!folderId || !this.model.env.searchModel.getFolderById(folderId)) {
+            folderId = "SHARED"; // Inaccessible folder
+        }
+        this.model.env.searchModel.toggleCategoryValue(section.id, folderId);
         this.model.originalSelection = [this.shortcutTarget.resId];
         this.model.env.documentsView.bus.trigger("documents-expand-folder", { folderId: folderId });
     }
@@ -275,23 +370,45 @@ export const DocumentsRecordMixin = (component) => class extends component {
      * Called when starting to drag kanban/list records
      */
     async onDragStart(ev) {
+        const currentFolder = this.model.env.searchModel.getSelectedFolder();
+        if (currentFolder.id === "TRASH") {
+            ev.preventDefault();
+            return this.model.notification.add(
+                _t("You cannot move folders or files when in the trash."),
+                { title: _t("Invalid operation"), type: "warning" }
+            );
+        }
+        if (this.model.root.isDomainSelected) {
+            ev.preventDefault();
+            return this.model.notification.add(
+                _t("Only current page items can be dragged."),
+                { type: "info" }
+            );
+        }
         if (!this.selected) {
-            this.onRecordClick(ev, { isKeepSelection: false, isRangeSelection: false });
+            this.model.root.selection.forEach((rec) => rec.selected = false);
+            this.selected = true;
         }
         const root = this.model.root;
-        const foldersById = this.model.env.searchModel.getFolders().reduce((agg, folder) => {
-            agg[folder.id] = folder;
-            return agg;
-        }, {});
         const draggableRecords = root.selection.filter(
             (record) => (!record.data.lock_uid || record.data.lock_uid[0] === this.context.uid)
-                && record.data.user_permission === 'edit'
-                && (!foldersById[record.data.folder_id[0]] || foldersById[record.data.folder_id[0]].user_permission === "edit")
         );
         if (draggableRecords.length === 0) {
             ev.preventDefault();
             return;
         }
+        const foldersById = Object.fromEntries(
+            this.model.env.searchModel.getFolders().map((folder) => [folder.id, folder])
+        );
+        const movableRecords = draggableRecords.filter(
+            (record) =>
+                record.data.user_permission === "edit" &&
+                (!record.data.folder_id ||
+                    foldersById[record.data.folder_id[0]].user_permission === "edit"),
+        );
+        const nonMovableRecords = draggableRecords.filter(
+            (record) => !movableRecords.includes(record),
+        );
         const lockedCount = root.selection.reduce((count, record) => {
             return count + (record.data.lock_uid && record.data.lock_uid[0] !== this.context.uid);
         }, 0);
@@ -299,10 +416,13 @@ export const DocumentsRecordMixin = (component) => class extends component {
             return count + (record.data.type === "folder");
         }, 0);
         const fileCount = draggableRecords.length - folderCount;
-        ev.dataTransfer.setData(
+        setDataTransfer(
+            ev,
             "o_documents_data",
             JSON.stringify({
                 recordIds: draggableRecords.map((record) => record.resId),
+                movableRecordIds: movableRecords.map((record) => record.resId),
+                nonMovableRecordIds: nonMovableRecords.map((record) => record.resId),
                 lockedCount,
             })
         );
@@ -337,25 +457,32 @@ export const DocumentsRecordMixin = (component) => class extends component {
         if (!this.isValidDragTarget(ev)) {
             return;
         }
-        if (ev.dataTransfer.types.includes("o_documents_data")) {
-            const data = JSON.parse(ev.dataTransfer.getData("o_documents_data"));
-
-            const action_name = ev.ctrlKey ? "action_create_shortcut" : "action_move_documents";
-
-            await this.model.orm.call("documents.document", action_name, [
-                data.recordIds,
-                this.data.id,
-            ]);
-            await this.model.env.searchModel._reloadSearchModel(true);
-
-            if (action_name ===  "action_move_documents") {
-                this.model.notification.add(_t("The document has been moved."), { type: "success" });
-            }
+        if (this.data.user_permission != "edit") {
+            return this.model.notification.add(
+                _t("You don't have the rights to move documents nor create shortcut to that folder."),
+                {
+                    title: _t("Access Error"),
+                    type: "warning",
+                }
+            );
         }
+        if (!dataTransfer) {
+            return;
+        }
+        const data = JSON.parse(dataTransfer);
+
+        this.model.root.selection.forEach((rec) => rec.selected = false);
+        await this.model.documentService.moveOrCreateShortcut(data, this.data.id, ev.ctrlKey);
+        await this.model.env.searchModel._reloadSearchModel(true);
+    
+        dataTransfer = null;
     }
 
-    isValidDragTarget({ dataTransfer }) {
-        const data = JSON.parse(dataTransfer.getData("o_documents_data")); // can only be accessed from the drop event... shitty news...
+    isValidDragTarget(_ev) {
+        if (!dataTransfer) {
+            return false;
+        }
+        const data = JSON.parse(dataTransfer); // can only be accessed from the drop event... shitty news...
         return this.data.type == "folder" && !data.recordIds.includes(this.resId);
     }
 };

@@ -84,7 +84,6 @@ patch(registry.category("web_tour.tours").get("industry_fsm_tour"), {
                 run: "click",
             },
             {
-                isActive: ["auto"],
                 content: _t("Wait for the invoice to show up"),
                 trigger: "span:contains('Customer Invoice')",
             }
@@ -96,32 +95,26 @@ patch(registry.category("web_tour.tours").get("industry_fsm_tour"), {
             fsmTimerStopStepIndex + 1,
             0,
             {
-                in_modal: false,
-                isActive: ["auto"],
                 trigger: ".o_form_project_tasks",
                 id: 'industry_fsm_sale_sign_send_start',
             },
             {
                 trigger: 'button[name="action_preview_worksheet"]',
                 content: markup(_t('<b>Review and sign</b> the <b>task report</b> with your customer.')),
-                position: 'bottom',
+                tooltipPosition: 'bottom',
                 run: "click",
             },
             {
-                in_modal: false,
-                isActive: ["auto"],
                 trigger: ".o_project_portal_sidebar",
             },
             {
                 trigger: 'a[data-bs-target="#modalaccept"]',
                 content: markup(_t('Invite your customer to <b>validate and sign your task report</b>.')),
-                position: 'right',
+                tooltipPosition: 'right',
                 id: 'sign_report',
                 run: "click",
             },
             {
-                in_modal: false,
-                isActive: ["auto"],
                 trigger: ".o_project_portal_sidebar",
             },
             {
@@ -131,8 +124,6 @@ patch(registry.category("web_tour.tours").get("industry_fsm_tour"), {
                 run: "click",
             },
             {
-                in_modal: false,
-                isActive: ["auto"],
                 trigger: ".o_project_portal_sidebar",
             },
             {
@@ -144,57 +135,55 @@ patch(registry.category("web_tour.tours").get("industry_fsm_tour"), {
             {
                 trigger: '.o_web_sign_auto_button',
                 content: markup(_t('Save time by automatically generating a <b>signature</b>.')),
-                position: 'right',
+                tooltipPosition: 'right',
                 run: "click",
             },
             {
-                in_modal: false,
-                isActive: ["auto"],
                 trigger: ".o_project_portal_sidebar",
             },
             {
-                trigger: '.o_portal_sign_submit:enabled',
+                trigger: '.modal .o_portal_sign_submit',
                 content: markup(_t('Validate the <b>signature</b>.')),
-                position: 'left',
+                tooltipPosition: 'left',
                 run: "click",
             },
             {
-                in_modal: false,
-                isActive: ["auto"],
                 trigger: ".o_project_portal_sidebar",
             },
             {
-                trigger: 'a:contains(Back to edit mode)',
+                trigger: "body:not(:has(.modal:contains(sign report))) .alert-info a.alert-link:contains(Back to edit mode)",
                 content: markup(_t('Go back to your Field Service <b>task</b>.')),
-                position: 'right',
+                tooltipPosition: 'right',
                 run: "click",
             },
             {
-                in_modal: false,
-                isActive: ["auto"],
                 trigger: ".o_form_project_tasks",
             },
             {
                 trigger: 'button[name="action_send_report"]',
                 content: markup(_t('<b>Send your task report</b> to your customer.')),
-                position: 'bottom',
+                tooltipPosition: 'bottom',
                 run: "click",
             },
             {
+                trigger: '.modal .o_input',
+                content: markup(_t('<b>Click to edit.')),
+                run: 'click',
+            },
+            {
+                isActive: ["body:not(:has(.modal-footer button.o_mail_send))"],
                 trigger: 'button[name="document_layout_save"]',
                 content: markup(_t('Customize your <b>layout</b>.')),
-                position: 'right',
+                tooltipPosition: 'right',
                 run: "click",
             },
             {
-                in_modal: false,
-                isActive: ["auto"],
                 trigger: ".o_form_project_tasks",
             },
             {
-                trigger: 'button[name="action_send_mail"]',
+                trigger: 'button.o_mail_send',
                 content: markup(_t('<b>Send your task report</b> to your customer.')),
-                position: 'right',
+                tooltipPosition: 'right',
                 run: "click",
                 id: 'industry_fsm_sale_sign_send_end',
             },

@@ -48,7 +48,7 @@ class SendCloud:
         if order:
             to_country = order.partner_shipping_id.country_id.code
             from_country = order.warehouse_id.partner_id.country_id.code
-            error_lines = order.order_line.filtered(lambda line: not line.product_id.weight and not line.is_delivery and line.product_id.type != 'service' and not line.display_type)
+            error_lines = order.order_line._get_invalid_delivery_weight_lines()
             if error_lines:
                 raise UserError(_("The estimated shipping price cannot be computed because the weight is missing for the following product(s): \n %s", ", ".join(error_lines.product_id.mapped('name'))))
             packages = carrier._get_packages_from_order(order, carrier.sendcloud_default_package_type_id)
@@ -107,7 +107,7 @@ class SendCloud:
         parcels = self._prepare_parcel(picking, sender_id, is_return)
 
         # the id of the access_point needs to be passed as parameter following Sendcloud API's
-        if picking.sale_id.pickup_location_data:
+        if picking.sale_id.pickup_location_data and not is_return:
             for parcel in parcels:
                 parcel['to_service_point'] = picking.sale_id.pickup_location_data['id']
 
@@ -177,9 +177,11 @@ class SendCloud:
             if not weight:
                 params['weight'] = shipping_method['properties']['max_weight'] - 1  # the weight of a shipping_method is always in gram
             # the API response is an Array of 1 dict with price and currency (usually EUR)
-            res = self._send_request('shipping-price', params=params)[0]
-            if res.get('price'):
-                shipping_prices[shipping_id] = res
+            res = self._send_request('shipping-price', params=params)
+            if not res:
+                continue
+            if res[0].get('price'):
+                shipping_prices[shipping_id] = res[0]
             elif shipping_id == 8:  # Sendcloud Unstamped Letter
                 # shipping id 8 is a test shipping and does not provide a price, but we still need the flow to continue
                 # the check is done after the request since in the future if price is actually returned it will be passed correctly
@@ -239,18 +241,24 @@ class SendCloud:
                then OR :
                   the key IS present AND it's value IN filter's values
                   the key IS NOT present
+                  the value IS present default value of the filter
             if there are ONLY "other values":
                   the key IS present AND it's value IN filter's values
         Default : return all the ids when there's no user_filters
         Return : set of id
         """
+        default_shipping_functionalities = None
+        try:
+            default_shipping_functionalities = self._get_shipping_functionalities()
+        except Exception as err:
+            self.logger(str(err), f'default shipping functionalities for filtering')
+
         shipping_ids = {m['id'] for m in shipping_methods}
         if not user_filters:
             return shipping_ids
         for func, options in user_filters.items():
             def pass_filter(shipping_method):
-                return (func not in shipping_method['functionalities'] and 'None' in options) or (func in shipping_method['functionalities'] and shipping_method['functionalities'][func] in options)
-
+                return (func not in shipping_method['functionalities'] and ('None' in options or (default_shipping_functionalities and default_shipping_functionalities[func]['default_value'] in options))) or (func in shipping_method['functionalities'] and shipping_method['functionalities'][func] in options)
             filtered_ids = {m['id'] for m in shipping_methods if pass_filter(m)}
             if not filtered_ids:
                 return []
@@ -263,11 +271,12 @@ class SendCloud:
     def _send_request(self, endpoint, method='get', data=None, params=None, route=BASE_URL):
 
         url = url_join(route, endpoint)
-        self.logger(f'{url}\n{method}\n{data}\n{params}', f'sendcloud request {endpoint}')
+        headers = {'Sendcloud-Partner-Id': '280b92c9-afae-4b9f-a66e-957bf5eb2f95'}
+        self.logger(f'{url}\n{headers}\n{method}\n{data}\n{params}', f'sendcloud request {endpoint}')
         if method not in ['get', 'post']:
             raise Exception(f'Unhandled request method {method}')
         try:
-            res = self.session.request(method=method, url=url, json=data, params=params, timeout=60)
+            res = self.session.request(method=method, url=url, headers=headers, json=data, params=params, timeout=60)
             self.logger(f'{res.status_code} {res.text}', f'sendcloud response {endpoint}')
             res = res.json()
         except Exception as err:
@@ -302,16 +311,16 @@ class SendCloud:
                 parcel_items[key] = {
                     'description': commodity.product_id.name,
                     'quantity': commodity.qty,
-                    'weight': float_repr(carrier.sendcloud_convert_weight(commodity.product_id.weight), 3),
+                    'weight': float_repr(max(0.001, carrier.sendcloud_convert_weight(commodity.product_id.weight)), 3),
                     'value': round(value, 2),
-                    'hs_code': hs_code[:8],
+                    'hs_code': hs_code[:12],
                     'origin_country': commodity.country_of_origin or '',
                     'sku': commodity.product_id.barcode or '',
                 }
         return list(parcel_items.values())
 
     def _get_house_number(self, address):
-        house_number = re.search(r"(\d+[-\/]?\d* ?[a-zA-Z]?\d*)(?![a-zA-Z])", address)
+        house_number = re.search(r"(\d+(?:[-\/.]?\d+)* ?[a-zA-Z]?\d*)(?![a-zA-Z])", address)
         if house_number:
             return house_number.group()
         return ' '
@@ -368,7 +377,8 @@ class SendCloud:
         to_europe = to_partner_id.country_id.code in to_partner_id.env.ref('base.europe').country_ids.mapped('code')
         use_multicollo = carrier_id.sendcloud_use_batch_shipping and to_europe
         single_shipping = len(delivery_packages) == 1 or (use_multicollo and len(delivery_packages) <= 20)
-        api_weight = shipping_weight if single_shipping else None
+        #Avg weight for multiple packages in single shipping, sendcloud multiplies it with number of packages
+        api_weight = int(shipping_weight / len(delivery_packages)) if single_shipping else None
 
         # Fetch shipping methods compatible with current picking
         shipping_methods = self._get_shipping_methods(picking.carrier_id, from_country, to_country, api_weight, is_return)
@@ -386,7 +396,7 @@ class SendCloud:
                 message = _('Some packages in your transfer are too heavy for the heaviest available shipping method.')
             message += _("\nTry to distribute your products across your packages so that they weigh less than %(max_weight)s %(unit)s or choose another carrier.", max_weight=user_uom_max_weight, unit=user_weight_uom.name)
             if overweight_products:
-                product_moves = format_list(self.env, overweight_products.mapped('name'))
+                product_moves = format_list(picking.env, overweight_products.mapped('name'))
                 message += _("""\nAdditionally, some individual product(s) are too heavy for the heaviest available shipping method.
                              \nDivide the quantity of the following product(s) across your packages if possible or choose another carrier:\n\t%s""", product_moves)
             raise UserError(message)
@@ -395,7 +405,7 @@ class SendCloud:
         # Assign consequent price to each method, delete the method if no price is available
         for shipping_method in reversed(shipping_methods):
             price = shipping_prices.get(shipping_method['id'], {}).get('price')
-            shipping_method['price'] = price or 0.0
+            shipping_method['price'] = float(price) if price else 0.0
 
         method_shipments = self._assign_packages_to_methods(carrier_id, delivery_packages, shipping_methods, use_multicollo)
         parcel_common = self._prepare_parcel_common_data(picking, is_return, sender_id)
@@ -422,7 +432,7 @@ class SendCloud:
                 if isinstance(pkg, list):
                     max_sizes = self._get_max_package_sizes(pkg)
                     parcel.update({
-                        'weight': float_repr(sum(p.weight for p in pkg), 3),
+                        'weight': float_repr((sum(p.weight for p in pkg)/len(pkg)), 3),  #weight gets multiplied with quantity in sendcloud backend
                         'length': max_sizes['length'],
                         'width': max_sizes['width'],
                         'height': max_sizes['height'],
@@ -516,7 +526,8 @@ class SendCloud:
             return products_values
 
         for line in sale_order.order_line:
-            if line.product_id.type == 'consu' or line.display_type or float_is_zero(line.product_uom_qty, precision_rounding=line.product_uom.rounding):
+            if not line.product_id or line.product_id.type == 'consu' or line.display_type or float_is_zero(line.product_uom_qty, precision_rounding=line.product_uom.rounding) or line.product_uom_qty < 0:
+
                 continue
             if line.product_id.id in products_values:
                 products_values[line.product_id.id]['tot_qty'] += line.product_uom_qty
@@ -568,13 +579,16 @@ class SendCloud:
         apply_rules = carrier_id.sendcloud_shipping_rules
         sendcloud_product_id = carrier_id.sendcloud_return_id if is_return else carrier_id.sendcloud_shipping_id
 
+        shipping_cost = 0.0
         if picking.sale_id:
             currency_name = picking.sale_id.currency_id.name
+            if len(picking.sale_id.picking_ids.filtered(lambda p: p.state == 'done')) <= 1:  # Picking state is updated before the call to send the parcel
+                shipping_cost = sum(sol.price_total for sol in picking.sale_id.order_line if sol.is_delivery)
         else:
             currency_name = picking.company_id.currency_id.name
 
         parcel_common = {
-            'name': to_partner_id.name[:75],
+            'name': (to_partner_id.name or to_partner_id.parent_id.name or '')[:75],
             'company_name': to_partner_id.commercial_company_name[:50] if to_partner_id.commercial_company_name else '',
             'address': to_partner_id.street,
             'address_2': to_partner_id.street2 or '',
@@ -590,9 +604,12 @@ class SendCloud:
             'is_return': is_return,
             'shipping_method_checkout_name': sendcloud_product_id.name,
             'order_number': picking.sale_id.name or picking.name,
-            'customs_shipment_type': 4 if is_return else 2,
-            'customs_invoice_nr': picking.origin or '',
-            'total_order_value_currency': currency_name
+            'total_order_value_currency': currency_name,
+            'customs_information': {
+                'customs_shipment_type': 4 if is_return else 2,
+                'customs_invoice_nr': picking.sale_id.invoice_ids[:1].name or picking.origin or '',
+                'freight_costs': float_repr(shipping_cost, 2),
+            },
         }
         if sender_id:
             # "sender_id" implies that "not is_return" (c.f. send_shipment())
@@ -605,7 +622,7 @@ class SendCloud:
             # we only use from_partner_id in case sender_id is false
             self._validate_partner_details(from_partner_id)
             parcel_common.update({
-                'from_name': from_partner_id.name[:75],
+                'from_name': (from_partner_id.name or from_partner_id.parent_id.name or '')[:75],
                 'from_company_name': from_partner_id.commercial_company_name[:50] if from_partner_id.commercial_company_name else '',
                 'from_house_number': self._get_house_number(from_partner_id.street),
                 'from_address_1': from_partner_id.street or '',
@@ -620,7 +637,7 @@ class SendCloud:
         return parcel_common
 
     def _get_pick_sender_address(self, picking):
-        warehouse_name = picking.location_id.warehouse_id.name.lower().replace(' ', '')
+        warehouse_name = picking._retrieve_warehouse_name().lower().replace(' ', '')
         addresses = self._get_addresses()
         res_id = None
         for addr in addresses:
@@ -630,5 +647,7 @@ class SendCloud:
                 res_id = addr['id']
                 break
         if not res_id:
-            raise UserError(_('No address found with contact name %s on your sendcloud account.', picking.location_id.warehouse_id.name))
+            error_message = _('No address found with contact name %s on your sendcloud account.', picking.location_id.warehouse_id.name)
+            error_message += _(' Please make sure there is an address with the same name under "Address Name (optional)" in your Sendcloud Address configuration.')
+            raise UserError(error_message)
         return res_id

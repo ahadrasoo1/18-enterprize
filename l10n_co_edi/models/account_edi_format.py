@@ -152,7 +152,7 @@ class AccountEdiFormat(models.Model):
             tim['type_code'] = type_code
 
             if type_code == '05':
-                imp2 = abs(amount * 100 / 15)
+                imp2 = abs(values[tax_amount_field] * 100 / 15)
             elif type_code == '34':
                 base_line_x_taxes_data = values['base_line_x_taxes_data']
                 imp2 = sum(
@@ -314,7 +314,7 @@ class AccountEdiFormat(models.Model):
         AccountTax = self.env['account.tax']
         base_amls = invoice.line_ids.filtered(lambda x: x.display_type == 'product')
         base_lines = [invoice._prepare_product_base_line_for_taxes_computation(x) for x in base_amls]
-        tax_amls = invoice.line_ids.filtered(lambda x: x.display_type == 'tax')
+        tax_amls = invoice.line_ids.filtered('tax_repartition_line_id')
         tax_lines = [invoice._prepare_tax_line_for_taxes_computation(x) for x in tax_amls]
         AccountTax._add_tax_details_in_base_lines(base_lines, invoice.company_id)
         AccountTax._round_base_lines_tax_details(base_lines, invoice.company_id, tax_lines=tax_lines)
@@ -327,7 +327,7 @@ class AccountEdiFormat(models.Model):
             rate = base_line['rate']
             tax_details = base_line['tax_details']
             base_line['co_edi_index'] = index
-            base_line['co_price_subtotal'] = tax_details['total_excluded'] + tax_details['delta_base_amount']
+            base_line['co_price_subtotal'] = tax_details['total_excluded'] + tax_details['delta_total_excluded']
 
             if discount == 100:
                 co_price_subtotal_before_discount = (price_unit * quantity) / rate if rate else 0.0
@@ -345,6 +345,8 @@ class AccountEdiFormat(models.Model):
             base_line['co_is_exempt_tax'] = tax_group_covered_goods and tax_group_covered_goods in base_line['tax_ids'].tax_group_id
 
         def grouping_function_tim_sections(base_line, tax_data):
+            if not tax_data:
+                return None
             tax = tax_data['tax']
             return {
                 'amount': tax.amount,
@@ -578,9 +580,9 @@ class AccountEdiFormat(models.Model):
 
         company = move.company_id
         journal = move.journal_id
-        now = fields.Datetime.now()
-        oldest_date = now - timedelta(days=5)
-        newest_date = now + timedelta(days=10)
+        now = fields.Datetime.context_timestamp(self.with_context(tz='America/Bogota'), fields.Datetime.now()).date()
+        oldest_date = now - timedelta(days=6)
+        newest_date = now + timedelta(days=6)
         if not company.sudo().l10n_co_edi_username or not company.sudo().l10n_co_edi_password or not company.l10n_co_edi_company or \
            not company.sudo().l10n_co_edi_account:
             edi_result.append(_("Carvajal credentials are not set on the company, please go to Accounting Settings and set the credentials."))
@@ -598,8 +600,8 @@ class AccountEdiFormat(models.Model):
         if move.l10n_co_edi_type == L10N_CO_EDI_TYPE['Export Invoice'] and \
                 any(l.product_id and not l.product_id.l10n_co_edi_customs_code for l in move.invoice_line_ids):
             edi_result.append(_("Every exportation product must have a customs code."))
-        elif move.invoice_date and not (oldest_date <= fields.Datetime.to_datetime(move.invoice_date) <= newest_date):
-            move.message_post(body=_('The issue date can not be older than 5 days or more than 5 days in the future'))
+        elif move.invoice_date and not (oldest_date <= move.invoice_date <= newest_date):
+            move.message_post(body=_('The issue date can not be older than 6 days or more than 6 days in the future.'))
         elif any(l.product_id and not l.product_id.default_code and \
                  not l.product_id.barcode and not l.product_id.unspsc_code_id for l in move.invoice_line_ids):
             edi_result.append(_("Every product on a line should at least have a product code (barcode, internal, UNSPSC) set."))

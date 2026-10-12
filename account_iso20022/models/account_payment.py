@@ -39,7 +39,7 @@ class AccountPayment(models.Model):
     @api.constrains('payment_method_line_id', 'currency_id')
     def _check_sepa_currency(self):
         for rec in self:
-            if rec.payment_method_id.code == 'sepa_ct' and self.currency_id.name != 'EUR':
+            if rec.payment_method_id.code == 'sepa_ct' and rec.currency_id.name != 'EUR':
                 raise ValidationError(_("SEPA only accepts payments in EUR."))
 
     def _get_payment_method_codes_to_exclude(self):
@@ -54,7 +54,7 @@ class AccountPayment(models.Model):
     @api.depends('payment_method_id')
     def _compute_iso20022_uetr(self):
         payments = self.filtered(
-            lambda p: not p.iso20022_uetr and p.payment_method_id.code == 'sepa_ct'
+            lambda p: not p.iso20022_uetr and p.payment_method_id.code == 'iso20022'
         )
         for payment in payments:
             payment.iso20022_uetr = uuid4()

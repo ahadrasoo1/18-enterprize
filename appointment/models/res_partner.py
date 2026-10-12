@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+import pytz
 from collections import defaultdict
 from datetime import datetime, time
 
@@ -42,7 +43,14 @@ class Partner(models.Model):
         )
         events_excluding_appointment_resource = all_events.filtered(lambda ev: ev.appointment_type_id.schedule_based_on != 'resources')
         for event in events_excluding_appointment_resource:
-            if event.allday or (event.start < date_end and event.stop > date_start):
+            tz = pytz.timezone(event.user_id.tz) if event.user_id.tz else pytz.utc
+            if event.allday:
+                start_utc = tz.localize(event.start).astimezone(pytz.utc).replace(tzinfo=None)
+                stop_utc = tz.localize(event.stop).astimezone(pytz.utc).replace(tzinfo=None)
+            else:
+                start_utc = event.start
+                stop_utc = event.stop
+            if start_utc < date_end and stop_utc > date_start:
                 if event.attendee_ids.filtered_domain(
                         [('state', '!=', 'declined'),
                          ('partner_id', 'in', self.ids)]

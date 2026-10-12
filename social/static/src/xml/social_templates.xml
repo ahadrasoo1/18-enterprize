@@ -36,7 +36,7 @@
             </div>
             <div class="o_social_comments_modal_original_post_content flex-grow-1">
                 <div t-if="isEditable || isDeletable"
-                    class="float-end o_social_icon_dropdown dropdown">
+                    class="float-end o_social_icon_dropdown o_social_manage_post dropdown">
                     <button t-attf-class="btn dropdown-toggle {{ bubble_design ? 'bg-200 px-3 rounded-pill border-0' : '' }}"
                         type="button"
                         id="stream_post_actions"
@@ -153,9 +153,8 @@
                         t-att-class="{'bg-200 o_social_bubble_radius': props.bubble_design}"
                         t-att-placeholder="isCommentReply ? write_reply_text : write_comment_text"
                         t-att-disabled="state.disabled"
-                        t-on-keydown="_onAddComment">
-                        <t t-esc="initialValue || ''"/>
-                    </textarea>
+                        t-on-keydown="_onAddComment"
+                    />
                     <div class="o_social_comment_controls mt-2">
                         <div t-if="canAddImage" class="o_social_comment_add_image o_social_subtle_btn px-3 py-1">
                             <FileUploader
@@ -176,7 +175,7 @@
                 <div t-if="state.attachmentSrc" class="o_social_comment_image_preview py-4">
                     <div class="d-inline-block position-relative">
                         <img class="border shadow" style="max-height: 150px" t-att-src="state.attachmentSrc"/>
-                        <span class="o_social_comment_remove_image position-absolute btn btn-dark rounded-circle mt-2 me-2" style="right: 0"
+                        <span t-if="!state.disabled" class="o_social_comment_remove_image position-absolute btn btn-dark rounded-circle mt-2 me-2" style="right: 0"
                               t-on-click="_onImageRemove">
                             <i class="fa fa-times"/>
                         </span>
@@ -228,7 +227,7 @@
         <t t-if="state.isEditMode" t-component="commentReplyComponent"
            comment="comment"
            originalPost="props.originalPost"
-           initialValue="_htmlEscape(comment.message)"
+           initialValue="comment.message"
            isCommentEdit="true"
            mediaSpecificProps="props.mediaSpecificProps"
            toggleEditMode.bind="_toggleEditMode"
@@ -283,6 +282,12 @@
                                             t-att-src="comment.attachment.media.image.src" alt="Comment Image"
                                             target="_blank">
                                         </img>
+                                        <a t-elif="comment.attachment.type === 'animated_image_video'"
+                                            t-att-href="this.link" target="_blank">
+                                            <img class="o_social_comment_image img-fluid shadow mb-3"
+                                                t-att-src="comment.attachment.media.image.src" alt="Comment GIF">
+                                            </img>
+                                        </a>
                                     </div>
                                 </div>
                                 <div t-if="isManageable()" class="o_social_icon_dropdown o_social_manage_comment dropdown">
@@ -300,7 +305,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="o_social_comment_commands">
                             <t t-if="isLikable">
                                 <a t-attf-class="o_social_comment_like btn btn-sm btn-link px-0 {{ comment.user_likes ? 'o_social_comment_user_likes' : '' }}"
@@ -511,7 +515,7 @@
                 <div class="d-flex flex-nowrap flex-grow-1 px-4 pt-2 pb-3">
                     <t t-set="audience_content">Number of Followers of your channel</t>
                     <div t-if="_hasAudience(socialAccount)"
-                        class="d-flex align-items-center flex-grow-1 pe-3"
+                        class="d-flex align-items-center pe-3"
                         data-bs-toggle="popover" title="Audience"
                         t-att-data-bs-content="audience_content">
                         <t t-call="social.AccountsStatsValue">
@@ -522,7 +526,7 @@
                     </div>
                     <t t-set="engagement_content">Number of times people have engaged with your posts (likes, comments, shares,...)</t>
                     <div t-if="_hasEngagement(socialAccount)"
-                        t-attf-class="d-flex align-items-center justify-content-center flex-grow-1 {{ _hasStories(socialAccount) ? 'px-3' : 'ps-3' }}"
+                        t-attf-class="d-flex align-items-center justify-content-center {{ _hasStories(socialAccount) ? 'px-3' : 'ps-3' }}"
                         data-bs-toggle="popover" title="Engagement"
                         t-att-data-bs-content="engagement_content">
                         <t t-call="social.AccountsStatsValue">
@@ -533,7 +537,7 @@
                     </div>
                     <t t-if="_hasStories(socialAccount)">
                         <t t-set="stories_content">Number of times people who have engaged with your channel have created stories on their friends' or followers' feed (Shares, Reposts...)</t>
-                        <div class="d-flex align-items-center justify-content-end flex-grow-1 ps-3"
+                        <div class="d-flex align-items-center justify-content-end ps-3"
                             data-bs-toggle="popover" title="Stories"
                             t-att-data-bs-content="stories_content">
                             <t t-call="social.AccountsStatsValue">

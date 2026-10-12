@@ -24,13 +24,20 @@
                     <sheet>
                         <field name="company_id" invisible="1"/>
                         <div class="oe_button_box" name="button_box">
-                            <button type="object" name="action_view_payments_to_collect" icon="fa-usd" class="oe_stat_button">
-                                <field name="payments_to_collect_nber" widget="statinfo" string="Collections" help="Payments generated for this mandate that have not yet been collected."/>
+                            <button type="object" name="action_view_payments_to_collect" icon="fa-usd" class="oe_stat_button" invisible="payments_to_collect_nber == 0">
+                                <field name="payments_to_collect_nber" widget="statinfo" string="Collections" help="In-process and completed payments generated under this mandate."/>
                             </button>
 
-                            <button type="object" name="action_view_paid_invoices" icon="fa-pencil-square-o" class="oe_stat_button">
+                            <button type="object" name="action_view_paid_invoices" icon="fa-pencil-square-o" class="oe_stat_button" invisible="not paid_invoice_ids">
                                 <field name="paid_invoices_nber" widget="statinfo" string="Invoices Paid" help="Invoices paid with this mandate."/>
                             </button>
+                        </div>
+                        <div>
+                            <field name="partner_parent_id" invisible="1"/>
+                            <div class="alert alert-warning text-center" invisible="not partner_parent_id" role="alert">
+                                The selected customer is a child of <a type="action" name="action_parent_id_from_sdd_mandate"><field name="partner_parent_id"/></a>.
+                                Make sure the mandate isn't meant for the parent contact.
+                            </div>
                         </div>
 
                         <group>

@@ -50,6 +50,7 @@ export class UserAgent {
     constructor(env, services) {
         this.env = env;
         this.callService = services["voip.call"];
+        this.multiTabService = services.multi_tab;
         this.notificationService = services.notification;
         this.ringtoneService = services["voip.ringtone"];
         this.voip = services.voip;
@@ -113,6 +114,7 @@ export class UserAgent {
             ),
             sessionDescriptionHandlerFactoryOptions: { iceGatheringTimeout: 1000 },
             transportOptions: {
+                keepAliveInterval: 20,
                 server: this.voip.webSocketUrl,
                 traceSip: isDebug,
             },
@@ -134,6 +136,9 @@ export class UserAgent {
     }
 
     async attemptReconnection(attemptCount = 0) {
+        if (this.voip.isUnloading) {
+            return;
+        }
         if (attemptCount > 5) {
             this.voip.triggerError(
                 _t("The WebSocket connection was lost and couldn't be reestablished.")
@@ -146,7 +151,7 @@ export class UserAgent {
         this.attemptingToReconnect = true;
         try {
             await this.__sipJsUserAgent.reconnect();
-            this.registerer.register();
+            await this.registerer.register();
             this.voip.resolveError();
         } catch {
             setTimeout(
@@ -260,20 +265,22 @@ export class UserAgent {
             inviter.delegate = this.sessionDelegate;
             inviter.stateChange.addListener((state) => this._onSessionStateChange(state));
             this.session.sipSession = inviter;
-            this.session.sipSession.invite({
-                requestDelegate: {
-                    onAccept: (response) => this._onOutgoingInvitationAccepted(response),
-                    onProgress: (response) => this._onOutgoingInvitationProgress(response),
-                    onReject: (response) => this._onOutgoingInvitationRejected(response),
-                },
-                sessionDescriptionHandlerOptions: {
-                    constraints: this.mediaConstraints,
-                },
-            }).catch((error) => {
-                if (error.name !== "NotAllowedError") {
-                    throw error;
-                }
-            });
+            this.session.sipSession
+                .invite({
+                    requestDelegate: {
+                        onAccept: (response) => this._onOutgoingInvitationAccepted(response),
+                        onProgress: (response) => this._onOutgoingInvitationProgress(response),
+                        onReject: (response) => this._onOutgoingInvitationRejected(response),
+                    },
+                    sessionDescriptionHandlerOptions: {
+                        constraints: this.mediaConstraints,
+                    },
+                })
+                .catch((error) => {
+                    if (error.name !== "NotAllowedError") {
+                        throw error;
+                    }
+                });
         } catch (error) {
             console.error(error);
             this.voip.triggerError(
@@ -368,7 +375,9 @@ export class UserAgent {
         }
         const { sessionDescriptionHandler } = this.session.sipSession;
         sessionDescriptionHandler.enableReceiverTracks(!this.session.isOnHold);
-        sessionDescriptionHandler.enableSenderTracks(!this.session.isOnHold && !this.session.isMute);
+        sessionDescriptionHandler.enableSenderTracks(
+            !this.session.isOnHold && !this.session.isMute
+        );
     }
 
     _cleanUpRemoteAudio() {
@@ -468,7 +477,9 @@ export class UserAgent {
             sipSession: inviteSession,
         };
         this.softphone.show();
-        this.ringtoneService.incoming.play();
+        if (this.multiTabService.isOnMainTab()) {
+            this.ringtoneService.incoming.play();
+        }
         // TODO send notification
     }
 
@@ -559,7 +570,8 @@ export class UserAgent {
      */
     _onOutgoingInvitationRejected(response) {
         this.ringtoneService.stopPlaying();
-        if (response.message.statusCode === 487) { // Request Terminated
+        if (response.message.statusCode === 487) {
+            // Request Terminated
             // invitation has been cancelled by the user, the session has
             // already been terminated
             return;
@@ -656,7 +668,7 @@ export class UserAgent {
 }
 
 export const userAgentService = {
-    dependencies: ["notification", "voip", "voip.call", "voip.ringtone"],
+    dependencies: ["multi_tab", "notification", "voip", "voip.call", "voip.ringtone"],
     start(env, services) {
         return new UserAgent(env, services);
     },

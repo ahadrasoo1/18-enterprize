@@ -65,8 +65,14 @@ class MrpCostStructure(models.AbstractModel):
                 total_cost_components += cost
             raw_material_moves = list(raw_material_moves.values())
             # Get the cost of scrapped materials
-            scraps = StockMove.search([('production_id', 'in', mos.ids), ('scrapped', '=', True), ('state', '=', 'done')])
 
+            scraps = StockMove.search([
+                '|',
+                ('production_id', 'in', mos.ids),
+                ('raw_material_production_id', 'in', mos.ids),
+                ('scrapped', '=', True),
+                ('state', '=', 'done')
+            ])
             # Get the byproducts and their total + avg per uom cost share amounts
             total_cost_by_product = defaultdict(float)
             qty_by_byproduct = defaultdict(float)
@@ -77,10 +83,10 @@ class MrpCostStructure(models.AbstractModel):
             # => calculate byproduct qtys/cost in same uom + cost shares (they are MO dependent)
             byproduct_moves = mos.move_byproduct_ids.filtered(lambda m: m.state != 'cancel')
             for move in byproduct_moves:
-                qty_by_byproduct[move.product_id] += move.product_qty
+                qty_by_byproduct[move.product_id] += move.product_uom._compute_quantity(move.quantity, move.product_id.uom_id, rounding_method='HALF-UP')
                 # byproducts w/o cost share shouldn't be included in cost breakdown
                 if move.cost_share != 0:
-                    qty_by_byproduct_w_costshare[move.product_id] += move.product_qty
+                    qty_by_byproduct_w_costshare[move.product_id] += move.product_uom._compute_quantity(move.quantity, move.product_id.uom_id, rounding_method='HALF-UP')
                     cost_share = move.cost_share / 100
                     total_cost_by_product[move.product_id] += total_cost_by_mo[move.production_id.id] * cost_share
                     component_cost_by_product[move.product_id] += component_cost_by_mo[move.production_id.id] * cost_share
@@ -94,7 +100,10 @@ class MrpCostStructure(models.AbstractModel):
                 total_cost_by_product[product] += total_cost_by_mo[m.id] * cost_share
                 component_cost_by_product[product] += component_cost_by_mo[m.id] * cost_share
                 operation_cost_by_product[product] += operation_cost_by_mo[m.id] * cost_share
-                mo_qty += sum(m.move_finished_ids.filtered(lambda mo: mo.state == 'done' and mo.product_id == product).mapped('product_qty'))
+                for move in m.move_finished_ids:
+                    if move.state != 'done' or move.product_id != product:
+                        continue
+                    mo_qty += move.product_uom._compute_quantity(move.quantity, m.product_id.uom_id)
             res.append({
                 'product': product,
                 'mo_qty': mo_qty,

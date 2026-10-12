@@ -14,6 +14,7 @@ Accounting reports for Croatia
     'data': [
         'data/balance_sheet.xml',
         'data/profit_loss.xml',
+        'data/account_report_ec_sales_list_report.xml',
     ],
     'installable': True,
     'auto_install': ['l10n_hr', 'account_reports'],

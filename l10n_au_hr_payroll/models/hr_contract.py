@@ -111,6 +111,9 @@ class HrContract(models.Model):
             if contract.country_code != "AU" or contract.wage_type == "hourly":
                 continue
             hours_per_day = contract.resource_calendar_id.hours_per_day
+            if not hours_per_day:
+                contract.hourly_wage = 0.0
+                continue
             daily_wage = Payslip._l10n_au_convert_amount(contract.wage, contract.schedule_pay, "daily")
             contract.hourly_wage = daily_wage / hours_per_day
 
@@ -131,6 +134,9 @@ class HrContract(models.Model):
             return
         hours_per_day = self.resource_calendar_id.hours_per_day
         self.wage = self.env['hr.payslip']._l10n_au_convert_amount(self.l10n_au_yearly_wage, "annually", self.schedule_pay)
+        if not hours_per_day:
+            self.hourly_wage = 0.0
+            return
         self.hourly_wage = self.env['hr.payslip']._l10n_au_convert_amount(self.l10n_au_yearly_wage, "annually", "daily") / hours_per_day
 
     def get_hourly_wages(self):

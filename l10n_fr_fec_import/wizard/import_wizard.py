@@ -275,7 +275,7 @@ class FecImportWizard(models.TransientModel):
                 *self.env['account.account']._check_company_domain(self.company_id),
                 ('code', '=like', code),
             ], order='code', limit=1)
-            for code in ('6580%', '7580%')
+            for code in ('658%', '7580%')
         )
 
         # Check the moves for rounding issues
@@ -502,21 +502,17 @@ class FecImportWizard(models.TransientModel):
             if partner_ref:
                 line_data["partner_id"] = self._make_xml_id('partner', partner_ref)
 
-            # Currency
             if currency_name in cache["res.currency"] and amount_currency:
-                currency = cache["res.currency"][currency_name]
                 line_data.update({
-                    "currency_id": currency.id,
+                    "currency_id": cache["res.currency"][currency_name].id,
                     "amount_currency": amount_currency,
                 })
-            else:
-                currency = self.company_id.currency_id
 
             # Round the values, save the total balance to detect issues
-            credit, debit, balance = self._get_credit_debit_balance(record, currency)
+            credit, debit, balance = self._get_credit_debit_balance(record, self.company_id.currency_id)
             line_data["credit"] = credit
             line_data["debit"] = debit
-            balance_data["balance"] = currency.round(balance_data["balance"] + balance)
+            balance_data["balance"] = self.company_id.currency_id.round(balance_data["balance"] + balance)
 
             # Montantdevise can be positive while the line is credited:
             # => amount_currency and balance (debit - credit) should always have the same sign
@@ -562,7 +558,7 @@ class FecImportWizard(models.TransientModel):
                 template = next((v for k, v in templates.items() if normalize_code(k) == normalize_code(record['code'])), {})
                 if template:
                     for key, value in template.items():
-                        if key not in ['id', 'code']:
+                        if key not in ['id', 'code', 'name']:
                             record[key] = value
                     break
 
@@ -673,7 +669,7 @@ class FecImportWizard(models.TransientModel):
         # Retrieve all the data from the database
         accounts = self.env["account.account"].search(self.env['account.account']._check_company_domain(self.company_id))
         journals = self.env["account.journal"].search(self.env['account.journal']._check_company_domain(self.company_id))
-        partners = self.env["res.partner"].search(self.env['res.partner']._check_company_domain(self.company_id))
+        partners = self.env["res.partner"].search_fetch(domain=self.env['res.partner']._check_company_domain(self.company_id), field_names=['name', 'ref'])
         currencies = self.env["res.currency"].search([])
 
         # Build the cache dictionary

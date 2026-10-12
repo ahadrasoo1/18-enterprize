@@ -13,6 +13,7 @@ from pytz import timezone
 
 from odoo import api, fields, models
 from odoo.addons.account.tools import LegacyHTTPAdapter
+from odoo.addons.iap.tools.iap_tools import iap_jsonrpc
 from odoo.tools.zeep import Client
 from odoo.tools.zeep.helpers import serialize_object
 from odoo.exceptions import UserError
@@ -43,6 +44,7 @@ MAP_CURRENCIES = {
     'Chinese Yuan - Offshore': 'CNH',
     'Chinese Yuan': 'CNY',
     'Colombian Peso': 'COP',
+    'Cuban Peso': 'CUP',
     'Czech Koruna': 'CZK',
     'Danish Krone': 'DKK',
     'Algerian Dinar': 'DZD',
@@ -89,6 +91,7 @@ MAP_CURRENCIES = {
     'Serbian Dinar': 'RSD',
     'Russia Rouble': 'RUB',
     'Saudi Riyal': 'SAR',
+    'Sudanese Pound': 'SDG',
     'Singapore Dollar': 'SGD',
     'Swedish Krona': 'SEK',
     'Syrian pound': 'SYP',
@@ -103,6 +106,7 @@ MAP_CURRENCIES = {
     'Uruguayan Peso': 'UYU',
     'Uzbekistani som': 'UZS',
     'Vietnam Dong': 'VND',
+    'Caribbean Guilder': 'XCG',
     'Yemen Rial': 'YER',
     'South Africa Rand': 'ZAR',
     'Zambian Kwacha': 'ZMW',
@@ -148,20 +152,24 @@ CURRENCY_PROVIDER_SELECTION = [
     (['CH'], 'fta', '[CH] Federal Tax Administration of Switzerland'),
     (['CL'], 'mindicador', '[CL] Central Bank of Chile via mindicador.cl'),
     (['CO'], 'banrepco', '[CO] Bank of the Republic'),
+    (['CU'], 'cu', '[CU] Central Bank of Cuba'),
     (['CZ'], 'cnb', '[CZ] Czech National Bank'),
     (['EG'], 'cbegy', '[EG] Central Bank of Egypt'),
     (['GT'], 'banguat', '[GT] Bank of Guatemala'),
+    (['HU'], 'mnb', '[HU] Magyar Nemzeti Bank'),
+    (['ID'], 'bi', '[ID] Bank Indonesia'),
+    (['IT'], 'boi', '[IT] Bank of Italy'),
     (['MX'], 'banxico', '[MX] Bank of Mexico'),
+    (['MY'], 'bnm', '[MY] Bank Negara Malaysia'),
     (['PE'], 'bcrp', '[PE] SUNAT (replaces Bank of Peru)'),
     (['PL'], 'nbp', '[PL] National Bank of Poland'),
     (['RO'], 'bnr', '[RO] National Bank of Romania'),
     (['SE'], 'srb', '[SE] Sveriges Riksbank'),
-    (['TR'], 'tcmb', '[TR] Central Bank of the Republic of Turkey'),
-    (['UK'], 'hmrc', '[UK] HM Revenue & Customs'),
-    (['MY'], 'bnm', '[MY] Bank Negara Malaysia'),
-    (['ID'], 'bi', '[ID] Bank Indonesia'),
-    (['UY'], 'bcu', '[UY] Uruguayan Central Bank'),
+    (['SI'], 'bsi', '[SI] Bank of Slovenia'),
     (['TH'], 'bot', '[TH] Bank of Thailand'),
+    (['TR'], 'tcmb', '[TR] Central Bank of the Republic of Türkiye'),
+    (['UK'], 'hmrc', '[UK] HM Revenue & Customs'),
+    (['UY'], 'bcu', '[UY] Uruguayan Central Bank'),
 ]
 
 
@@ -285,10 +293,50 @@ class ResCompany(models.Model):
                     else:
                         CurrencyRate.create({'currency_id': currency_object.id, 'rate': rate_value, 'name': date_rate, 'company_id': company.id})
 
+    @api.model
+    def _parse_bsi_data(self, available_currencies):
+        """
+        Fetches exchange rates from the Bank of Slovenia API and parses the JSON response.
+        Rates are provided against EUR and include various currencies.
+        """
+
+        bsi_url = 'https://api.bsi.si/'
+        endpoints = ['exchange/daily', 'exchange/exotic']
+        available_currency_names = available_currencies.mapped('name')
+        currency_rates_entries = []
+        rates = {}
+
+        # Using a session since we're doing requests from multiple endpoints.
+        session = requests.Session()
+        for endpoint in endpoints:
+            try:
+                response = session.get(f"{bsi_url}{endpoint}", timeout=30)
+                response.raise_for_status()
+                currency_rates_entries.extend(response.json().get('data', []))
+            except requests.RequestException as e:
+                _logger.error(e)
+
+        for currency_rate_entry in currency_rates_entries:
+            currency_code = currency_rate_entry.get('code')
+            rate = currency_rate_entry.get('value')
+            date = currency_rate_entry.get('date')
+
+            # Validate values
+            if not (currency_code and rate and date):
+                continue
+            date_obj = datetime.datetime.strptime(date, '%Y-%m-%d').date()
+
+            if currency_code in available_currency_names and rate:
+                rates[currency_code] = (float(rate), date_obj)
+
+        # Include EUR with a fixed rate of 1.0
+        rates['EUR'] = (1.0, datetime.datetime.now().date())
+        return rates
+
     def _parse_fta_data(self, available_currencies):
         ''' Parses the data returned in xml by FTA servers and returns it in a more
         Python-usable form.'''
-        request_url = 'https://www.backend-rates.bazg.admin.ch/api/xmldaily?d=yesterday&locale=en'
+        request_url = 'https://www.backend-rates.bazg.admin.ch/api/xmldaily?d=today&locale=en'
         response = requests.get(request_url, timeout=30)
         response.raise_for_status()
 
@@ -296,8 +344,7 @@ class ResCompany(models.Model):
         available_currency_names = available_currencies.mapped('name')
         xml_tree = etree.fromstring(response.content)
         data = xml2json_from_elementtree(xml_tree)
-        # valid dates (gueltigkeit) may be comma separated, the first one will do
-        date_elem = xml_tree.xpath("//*[local-name() = 'gueltigkeit']")[0]
+        date_elem = xml_tree.xpath("//*[local-name() = 'datum']")[0]
         date_rate = datetime.datetime.strptime(date_elem.text.split(',')[0], '%d.%m.%Y').date()
         for child_node in data['children']:
             if child_node['tag'] == 'devise':
@@ -611,6 +658,7 @@ class ResCompany(models.Model):
             'SF46406': 'JPY',
             'SF46407': 'GBP',
             'SF60653': 'USD',
+            'SF290383': 'CNY',
         }
         for index, currency in foreigns.items():
             if not series.get(index, False):
@@ -629,34 +677,45 @@ class ResCompany(models.Model):
         return rslt
 
     def _parse_xe_com_data(self, available_currencies):
-        """ Parses the currency rates data from xe.com provider.
-        As this provider does not have an API, we directly extract what we need
-        from HTML.
         """
-        url_format = 'http://www.xe.com/currencytables/?from=%(currency_code)s'
+        Parse currency exchange rate data retrieved from the XE.com API.
 
-        # We generate all the exchange rates relative to the USD. This is purely arbitrary.
-        response = requests.get(url_format % {'currency_code': 'USD'}, timeout=30)
-        response.raise_for_status()
+        This function parses exchange rate data for available currencies from the XE.com provider
+        via a JSON-RPC request and processes the data into a structured format. It filters the rates
+        to include only those matching the given `available_currencies`.
 
+        :param available_currencies: A recordset containing available currency objects. Each object
+            is expected to have a `name` attribute representing the currency code (e.g., 'USD', 'EUR').
+        :returns: A dictionary where keys are currency codes (strings) and values are tuples:
+            - The exchange rate (float).
+            - The timestamp of the rate, formatted as a string in `DEFAULT_SERVER_DATE_FORMAT`.
+        :rtype: dict
+
+        Example:
+            If the XE.com API returns the following data:
+                {
+                    '2025-01-21T00:00:00Z': {
+                        'EUR': 1.2345,
+                        'USD': 1.0,
+                    },
+                }
+            and `available_currencies` contains 'USD' and 'EUR',
+            the function will return:
+                {
+                    'EUR': (1.2345, '2025-01-20'),
+                    'USD': (1.0, '2025-01-20'),
+                }
+        """
+        iap_proxy_url = self.env['ir.config_parameter'].sudo().get_param('currency_rate_live.iap_proxy_url', PROXY_URL)
+        currency_data = iap_jsonrpc(f'{iap_proxy_url}/api/currency_rate/1/get_currency_rates', params={'provider': 'xe_com'})
+        available_currency_names = available_currencies.mapped('name')
         rslt = {}
 
-        available_currency_names = available_currencies.mapped('name')
-
-        htmlelem = etree.fromstring(response.content, etree.HTMLParser())
-        rates_entries = htmlelem.xpath(".//div[@id='table-section']//tbody/tr")
-        time_element = htmlelem.xpath(".//div[@id='table-section']/section/p")[0]
-        date_rate = datetime.datetime.strptime(time_element.text, '%b %d, %Y, %H:%M UTC').date()
-
-        if 'USD' in available_currency_names:
-            rslt['USD'] = (1.0, date_rate)
-
-        for rate_entry in rates_entries:
-            # line structure is <th>CODE</th><td>NAME<td><td>UNITS PER CURRENCY</td><td>CURRENCY PER UNIT</td>
-            currency_code = ''.join(rate_entry.find('.//th').itertext()).strip()
-            if currency_code in available_currency_names:
-                rate = float(rate_entry.find("td[2]").text.replace(',', ''))
-                rslt[currency_code] = (rate, date_rate)
+        for timestamp, rates in currency_data.items():
+            for currency, rate in rates.items():
+                if currency in available_currency_names and rate:
+                    date_rate = datetime.datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%SZ")
+                    rslt[currency] = (rate, date_rate.strftime(DEFAULT_SERVER_DATE_FORMAT))
 
         return rslt
 
@@ -779,6 +838,7 @@ class ResCompany(models.Model):
             "UF": "uf",
             "UTM": "utm",
         }
+        timeout = int(icp.get_param('mindicador_api_timeout', 30))
         available_currency_names = available_currencies.mapped('name')
         logger.debug('mindicador: available currency names: %s', available_currency_names)
         today_date = fields.Date.context_today(self.with_context(tz='America/Santiago'))
@@ -791,7 +851,7 @@ class ResCompany(models.Model):
                 logger.debug('Index %s not in available currency name', index)
                 continue
             url = server_url + '/%s/%s' % (currency, request_date)
-            res = requests.get(url, timeout=30)
+            res = requests.get(url, timeout=timeout)
             res.raise_for_status()
             if 'html' in res.text:
                 raise ValueError('Should be json')
@@ -808,56 +868,14 @@ class ResCompany(models.Model):
         Parse function for the Banco de la Republica de Colombia
         * the webservice returns the exchange rate between Colombian Peso (COP) and USD
         """
-        client = Client('https://totoro.banrep.gov.co/OCDEv1.0/Services/NSIStdV21WsService?wsdl')
-        date_time = fields.Datetime.context_timestamp(self, fields.Datetime.now())
+        res = requests.get('https://totoro.banrep.gov.co/nsi-jax-ws/rest/data/ESTAT,DF_TRM_DAILY_LATEST,1.0/all/ALL', timeout=10)
+        res.raise_for_status()
+        tree = etree.fromstring(res.content)
 
-        result = client.service.GetGenericData({
-            'Header': {
-                'ID': 'IDREF2',
-                'Test': 'false',
-                'Prepared': date_time,
-                'Sender': {'id': 'Unknown'},
-                'Receiver': {'id': 'Unknown'}
-            },
-            'Query': {
-                'ReturnDetails': {
-                    'detail': 'Full',
-                    'observationAction': 'Active',
-                    'Structure': {
-                        'dimensionAtObservation': "REFERENCE_AREA",
-                        'structureID': "StructureId",
-                        'Structure': {
-                            'Ref': {
-                                'agencyID': "OECD",
-                                'id': "STES",
-                                'version': "3.0",
-                            }
-                        },
-                    },
-                },
-                'DataWhere': {
-                    'DataSetID': "DF_TRM_DAILY_LATEST",
-                    'Dataflow': {
-                        'Ref': {
-                            'agencyID': "ESTAT",
-                            'id': "DF_TRM_DAILY_LATEST",
-                        },
-                    },
-                    'Or': [
-                        {'DimensionValue': {'ID': 'SUBJECT', 'Value': {'operator': 'equal', '_value_1': 'CCSP'}}},
-                        {'DimensionValue': {'ID': 'UNIT_MEASURE', 'Value': {'operator': 'equal', '_value_1': 'COP'}}},
-                        {'DimensionValue': {'ID': 'REFERENCE_AREA', 'Value': {'operator': 'equal', '_value_1': 'CO'}}},
-                        {'DimensionValue': {'ID': 'FREQ', 'Value': {'operator': 'equal', '_value_1': 'D'}}},
-                        {'DimensionValue': {'ID': 'DOMAIN', 'Value': {'operator': 'equal', '_value_1': 'FINMARK'}}},
-                        {'DimensionValue': {'ID': 'OBS_STATUS', 'Value': {'operator': 'equal', '_value_1': 'A'}}},
-                        {'DimensionValue': {'ID': 'UNIT_MULT', 'Value': {'operator': 'equal', '_value_1': '0'}}},
-                    ],
-                },
-            },
-        })
+        generic_ns = 'http://www.sdmx.org/resources/sdmxml/schemas/v2_1/data/generic'
+        rate = float(tree.find(f'.//{{{generic_ns}}}ObsValue').get('value'))
 
-        rate = float(result.DataSet[0].Series[0].Obs[0].ObsValue.value)
-        time_period = next(x.value for x in result.DataSet[0].Series[0].SeriesKey.Value if x.id == 'TIME_PERIOD')
+        time_period = tree.find(f'.//{{{generic_ns}}}ObsDimension').get('value')
         date = fields.Date.to_string(datetime.datetime.strptime(time_period, '%Y%m%d'))
 
         return {'COP': (1, date), 'USD': (1.0 / rate, date)}
@@ -868,6 +886,7 @@ class ResCompany(models.Model):
         - USD, AUD, DKK, EUR, GBP, CHF, SEK, CAD, KWD, NOK, SAR,
         - JPY, BGN, RON, RUB, IRR, CNY, PKR, QAR, KRW, AZN, AED
         """
+        # For TCMB, the selling rate is used instead of the average of buying and selling rates.
         server_url = 'https://www.tcmb.gov.tr/kurlar/today.xml'
         available_currency_names = set(available_currencies.mapped('name'))
 
@@ -882,7 +901,7 @@ class ResCompany(models.Model):
         root = etree.fromstring(res.text.encode())
         rate_date = fields.Date.to_string(datetime.datetime.strptime(root.attrib['Date'], '%m/%d/%Y'))
         rslt = {
-            currency.attrib['Kod']: (2 / (float(currency.find('ForexBuying').text) + float(currency.find('ForexSelling').text)), rate_date)
+            currency.attrib['Kod']: (1 / float(currency.find('ForexSelling').text), rate_date)
             for currency in root
             if currency.attrib['Kod'] in available_currency_names
         }
@@ -1012,14 +1031,15 @@ class ResCompany(models.Model):
         rate_api_client = Client(wsdl % 'awsbcucotizaciones')
 
         _logger.info("Getting the date of the last currency rate update from the BCU.")
-        last_date = date_api_client.service.Execute()
+        # On the closing date, it gives the rate for the next day
+        last_closing_date = date_api_client.service.Execute()
 
         to_sync_codes = sorted(to_sync_currencies.mapped("name"))
         _logger.info("Getting the currency rates for (%s) from the BCU.", ", ".join(to_sync_codes))
         Entrada = rate_api_client.type_factory('ns0').wsbcucotizacionesin(
             Moneda={'item': to_sync_currencies.mapped(lambda x: iso_to_moneda_map[x.name])},
-            FechaDesde=last_date,
-            FechaHasta=last_date,
+            FechaDesde=last_closing_date,
+            FechaHasta=last_closing_date,
             Grupo=0,
         )
         response = rate_api_client.service.Execute(Entrada)
@@ -1027,18 +1047,19 @@ class ResCompany(models.Model):
             error_message = response.respuestastatus.mensaje
             raise UserError(_('Error updating the currency rates from the BCU: %s.', error_message))
 
-        res = {'UYU': (1.0, last_date)}
+        rate_date = last_closing_date + relativedelta(days=1)
+        res = {'UYU': (1.0, rate_date)}
         for rate_values in response.datoscotizaciones['datoscotizaciones.dato']:
             iso_code = moneda_to_iso_map[rate_values.Moneda]
             rate = 1.0 / serialize_object(rate_values.TCV)
-            res[iso_code] = (rate, last_date)
+            res[iso_code] = (rate, rate_date)
 
         _logger.info("Currency rates have been downloaded from the BCU.")
         return res
 
     def _parse_bnb_data(self, available_currencies):
         """ This method is used to update the currencies by using BNB (Bulgaria National Bank) service API.
-            Rates are given against BGN in an XML file.
+            Rates are given against EUR in an XML file (since Bulgaria joined Eurozone in 2026).
             Source: https://www.bnb.bg/AboutUs/AUFAQ/Contr_Exchange_Rates_FAQ?toLang=_EN
 
             If a currency has no rate, it will be skipped.
@@ -1059,14 +1080,14 @@ class ResCompany(models.Model):
         # Skip the first ROW node that does not contain currency information
         for row in islice(rowset.iterfind('.//ROW'), 1, None):
             code = row.findtext('CODE')
-            rate = row.findtext('REVERSERATE')
+            rate = row.findtext('RATE')
             curr_date = datetime.datetime.strptime(row.findtext('CURR_DATE'), '%d.%m.%Y').date()
 
             if code in available_currency_names and rate:
                 result[code] = (float(rate), curr_date)
 
-        if result and 'BGN' in available_currency_names:
-            result['BGN'] = (1.0, curr_date)
+        if result and 'EUR' in available_currency_names:
+            result['EUR'] = (1.0, curr_date)
         return result
 
     def _parse_bot_data(self, available_currencies):
@@ -1105,6 +1126,35 @@ class ResCompany(models.Model):
 
         if result and 'THB' in available_currency_names and period:
             result['THB'] = (1.0, period)
+
+        return result
+
+    def _parse_boi_data(self, available_currencies):
+        ''' This method is used to update the currencies by using Bank of Italy service provider.
+            Rates are given against EUR
+        '''
+        # Available languages: en, it
+        url = "https://tassidicambio.bancaditalia.it/terzevalute-wf-web/rest/v1.0/latestRates?lang=en"
+        result = {}
+
+        try:
+            response = requests.get(url, headers={"Accept": "application/json"}, timeout=10)
+            response.raise_for_status()
+        except Exception as e:  # noqa: BLE001
+            _logger.error(e)
+            return result
+
+        curr_iso_codes = available_currencies.mapped("name")
+        curr_list = response.json()["latestRates"]
+
+        for curr in curr_list:
+            if curr["isoCode"] in curr_iso_codes:
+                date = fields.Date.to_date(curr["referenceDate"])
+                try:
+                    # If the rate is not a number, skip it
+                    result[curr["isoCode"]] = (float(curr["eurRate"]), date)
+                except ValueError:
+                    continue
 
         return result
 
@@ -1155,9 +1205,12 @@ class ResCompany(models.Model):
         If a currency has no rate, it will be skipped.
         """
         request_url = "https://www.bi.go.id/biwebservice/wskursbi.asmx/getSubKursLokal4"
+        headers = {
+            'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36',
+        }
 
         def _fetched_bi_currency_tables(start_date):
-            response = requests.get(request_url, params={
+            response = requests.get(request_url, headers=headers, params={
                 'startdate': start_date,
             }, timeout=10)
             response.raise_for_status()
@@ -1199,6 +1252,68 @@ class ResCompany(models.Model):
         if 'IDR' not in result:
             result['IDR'] = (1.0, request_date)
 
+        return result
+
+    @api.model
+    def _parse_mnb_data(self, available_currencies):
+        """
+        This method is used to update the currencies by using MNB (Magyar Nemzeti Bank) service API.
+        The bank's latest rates are accessible using the SOAP service: http://www.mnb.hu/arfolyamok.asmx?wsdl
+
+        Source: https://www.mnb.hu/en/arfolyamok
+
+        If a currency has no rate, it will be skipped.
+        """
+        request_url = "http://www.mnb.hu/arfolyamok.asmx?wsdl"
+        client = Client(request_url)
+        rates_el = etree.fromstring(client.service.GetCurrentExchangeRates())
+
+        result = {}
+        try:
+            date = datetime.datetime.strptime(rates_el.find('./Day').attrib['date'], '%Y-%m-%d')
+            rates = {
+                rate_el.attrib['curr']: int(rate_el.attrib['unit']) / float(rate_el.text.replace(',', '.'))
+                for rate_el in rates_el.findall('.//Rate')
+            }
+        except (AttributeError, ValueError):
+            return result
+        
+        for curr in available_currencies.mapped('name') & rates.keys():
+            result[curr] = (rates[curr], date)
+
+        if 'HUF' not in result:
+            result['HUF'] = (1.0, date)
+        return result
+
+    @api.model
+    def _parse_cu_data(self, available_currencies):
+        """ This method is used to update the currencies by using CU service provider.
+        They can be manually verified at: https://www.bc.gob.cu/tasas-de-cambio
+        """
+        url = "https://api.bc.gob.cu/v1/tasas-de-cambio/activas"
+        result = {}
+
+        response = requests.get(url, headers={"Accept": "application/json"}, timeout=30)
+        response.raise_for_status()
+
+        curr_iso_codes = available_currencies.mapped("name")
+        curr_list = response.json()["tasas"]
+        last_date = datetime.datetime.now()
+
+        rate_type = self.env['ir.config_parameter'].sudo().get_param('currency_rate_live.l10n_cu_currency_rate_type', 'tasaOficial')
+
+        for curr in curr_list:
+            code = curr["codigoMoneda"]
+            status = curr["estado"]
+
+            # Skip currencies not requested or not active
+            if code not in curr_iso_codes or status != "ACTIVA":
+                continue
+
+            last_date = fields.Date.to_date(curr["fechaDia"])
+            result[curr["codigoMoneda"]] = (float(1 / curr[rate_type]), last_date)
+
+        result['CUP'] = (1.0, last_date)
         return result
 
     @api.model

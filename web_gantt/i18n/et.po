@@ -1,30 +1,34 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* web_gantt
-# 
+#
 # Translators:
-# Stevin Lilla, 2024
 # Siim Raasuke, 2024
-# 
+# Stevin Lilla, 2024
+# Martin Trigaux, 2024
+# Eneli Õigus <enelioigus@gmail.com>, 2024
+# Anna, 2024
+# Triine Aavik <triine@avalah.ee>, 2024
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:29+0000\n"
+"POT-Creation-Date: 2026-05-22 17:59+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Siim Raasuke, 2024\n"
+"Last-Translator: Triine Aavik <triine@avalah.ee>, 2024\n"
 "Language-Team: Estonian (https://app.transifex.com/odoo/teams/41243/et/)\n"
+"Language: et\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: et\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #. module: web_gantt
 #. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_model.js:0
 msgid "%(hour)sh%(minute)s"
-msgstr ""
+msgstr "%(hour)stundi%(minute)s"
 
 #. module: web_gantt
 #. odoo-python
@@ -36,7 +40,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_model.js:0
 msgid "%sh"
-msgstr ""
+msgstr "%stund"
 
 #. module: web_gantt
 #: model:ir.model,name:web_gantt.model_ir_actions_act_window_view
@@ -45,12 +49,14 @@ msgstr "Toimingu akna vaade"
 
 #. module: web_gantt
 #. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer_controls.js:0
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "Activate dense mode"
 msgstr ""
 
 #. module: web_gantt
 #. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer_controls.js:0
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "Activate sparse mode"
 msgstr ""
@@ -59,13 +65,13 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "Apply"
-msgstr ""
+msgstr "Kinnita"
 
 #. module: web_gantt
 #. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_controller.js:0
 msgid "Are you sure to delete this record?"
-msgstr ""
+msgstr "Kas oled kindel, et soovid antud kirjet kustutada?"
 
 #. module: web_gantt
 #: model:ir.model,name:web_gantt.model_base
@@ -76,13 +82,13 @@ msgstr "Baas"
 #. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "Collapse rows"
-msgstr ""
+msgstr "peida read"
 
 #. module: web_gantt
 #. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_controller.js:0
 msgid "Create"
-msgstr ""
+msgstr "Loo"
 
 #. module: web_gantt
 #. odoo-javascript
@@ -92,9 +98,15 @@ msgstr "Muuda"
 
 #. module: web_gantt
 #. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+msgid "Ending date cannot be before the starting date"
+msgstr ""
+
+#. module: web_gantt
+#. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "Expand rows"
-msgstr ""
+msgstr "Laienda ridu"
 
 #. module: web_gantt
 #. odoo-javascript
@@ -109,6 +121,12 @@ msgid "From"
 msgstr "Kellelt?"
 
 #. module: web_gantt
+#. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer_controls.js:0
+msgid "From: %(from_date)s to: %(to_date)s"
+msgstr ""
+
+#. module: web_gantt
 #: model:ir.model.fields.selection,name:web_gantt.selection__ir_actions_act_window_view__view_mode__gantt
 #: model:ir.model.fields.selection,name:web_gantt.selection__ir_ui_view__type__gantt
 msgid "Gantt"
@@ -118,7 +136,7 @@ msgstr "Gantt"
 #. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_arch_parser.js:0
 msgid "Gantt View"
-msgstr ""
+msgstr "Gantti vaade"
 
 #. module: web_gantt
 #. odoo-python
@@ -194,7 +212,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/web_gantt/models/ir_ui_view.py:0
 msgid "Invalid default_scale '%s' in gantt"
-msgstr ""
+msgstr "Vigane default_scale '%s' ganti vaates"
 
 #. module: web_gantt
 #. odoo-python
@@ -224,7 +242,7 @@ msgstr "Avatud"
 #. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_renderer.js:0
 msgid "Plan"
-msgstr ""
+msgstr "Plaan"
 
 #. module: web_gantt
 #. odoo-python
@@ -237,6 +255,12 @@ msgstr ""
 #: code:addons/web_gantt/static/src/gantt_popover.xml:0
 msgid "Start"
 msgstr "Alusta"
+
+#. module: web_gantt
+#. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+msgid "Starting date cannot be after the ending date"
+msgstr ""
 
 #. module: web_gantt
 #. odoo-javascript
@@ -260,7 +284,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_arch_parser.js:0
 msgid "This month"
-msgstr ""
+msgstr "See kuu"
 
 #. module: web_gantt
 #. odoo-javascript
@@ -272,13 +296,13 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_arch_parser.js:0
 msgid "This week"
-msgstr ""
+msgstr "See nädal"
 
 #. module: web_gantt
 #. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_arch_parser.js:0
 msgid "This year"
-msgstr ""
+msgstr "See aasta"
 
 #. module: web_gantt
 #. odoo-javascript
@@ -302,7 +326,7 @@ msgstr "Kokku"
 #. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_model.js:0
 msgid "Undefined %s"
-msgstr ""
+msgstr "Määramata %s"
 
 #. module: web_gantt
 #. odoo-javascript
@@ -315,7 +339,7 @@ msgstr "Vaade"
 #: model:ir.model.fields,field_description:web_gantt.field_ir_actions_act_window_view__view_mode
 #: model:ir.model.fields,field_description:web_gantt.field_ir_ui_view__type
 msgid "View Type"
-msgstr ""
+msgstr "Vaate tüüp"
 
 #. module: web_gantt
 #. odoo-python
@@ -333,28 +357,22 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_arch_parser.js:0
 msgid "hours"
-msgstr ""
+msgstr "tundi"
 
 #. module: web_gantt
 #. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_arch_parser.js:0
 msgid "minutes"
-msgstr ""
+msgstr "minutit"
 
 #. module: web_gantt
 #. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_arch_parser.js:0
 msgid "months"
-msgstr ""
+msgstr "kuud"
 
 #. module: web_gantt
 #. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "to"
 msgstr "kuni"
-
-#. module: web_gantt
-#. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_row_progress_bar.xml:0
-msgid "{{ props.progressBar.warning }}"
-msgstr ""

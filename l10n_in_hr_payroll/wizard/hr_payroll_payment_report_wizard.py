@@ -4,7 +4,7 @@ import io
 import base64
 from datetime import datetime, date
 
-from odoo import fields, models, _
+from odoo import api, fields, models, _
 from odoo.tools.misc import xlsxwriter
 from odoo.exceptions import UserError
 
@@ -43,7 +43,7 @@ class HrPayrollPaymentReportWizard(models.TransientModel):
         partner_bank_name = partner_bank[0].bank_id.name if partner_bank else ''
         partner_bank_acc_number = partner_bank[0].acc_number if partner_bank else ''
 
-        for payslip in self.payslip_run_id.slip_ids:
+        for payslip in self.payslip_ids:
             report_line_data = self._get_report_data(payslip)
             lines.append(report_line_data)
             total_bysal += report_line_data['bysal']
@@ -74,12 +74,14 @@ class HrPayrollPaymentReportWizard(models.TransientModel):
             'target': 'new',
         }
 
+    @api.model_create_multi
     def create(self, vals_list):
         date = datetime.now()
-        if not vals_list.get('l10n_in_reference'):
-            advice_year = date.strftime('%m-%Y')
-            number = self.env['ir.sequence'].next_by_code('payment.advice')
-            vals_list['l10n_in_reference'] = f"PAY/{advice_year}/{number}"
+        for vals in vals_list:
+            if not vals.get('l10n_in_reference'):
+                advice_year = date.strftime('%m-%Y')
+                number = self.env['ir.sequence'].next_by_code('payment.advice')
+                vals['l10n_in_reference'] = f"PAY/{advice_year}/{number}"
         return super().create(vals_list)
 
     def generate_payment_report_pdf(self):
@@ -116,7 +118,7 @@ class HrPayrollPaymentReportWizard(models.TransientModel):
 
         total_salary = 0
 
-        for row_idx, payslip in enumerate(self.payslip_run_id.slip_ids, start=1):
+        for row_idx, payslip in enumerate(self.payslip_ids, start=1):
             row_data = self._get_report_data(payslip)
             worksheet.write(row_idx, 0, row_idx, cell_format)
             worksheet.write_row(row_idx, 1, row_data.values(), cell_format)
@@ -147,7 +149,7 @@ class HrPayrollPaymentReportWizard(models.TransientModel):
     def _perform_checks(self):
         super()._perform_checks()
         if self.company_id.country_code == 'IN':
-            payslip_ids = self.payslip_run_id.slip_ids.filtered(lambda p: p.state == "done" and p.net_wage > 0)
+            payslip_ids = self.payslip_ids.filtered(lambda p: p.state == "done" and p.net_wage > 0)
             invalid_ifsc_employee_ids = payslip_ids.employee_id._get_employees_with_invalid_ifsc()
             if invalid_ifsc_employee_ids:
                 raise UserError(_(

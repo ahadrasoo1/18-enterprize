@@ -1,22 +1,23 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* documents_spreadsheet
-# 
+#
 # Translators:
-# Wil Odoo, 2024
-# 
+# Rasareeyar Lappiam, 2025
+# Wil Odoo, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-26 09:15+0000\n"
+"POT-Creation-Date: 2025-12-29 18:47+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
+"Last-Translator: Wil Odoo, 2025\n"
 "Language-Team: Thai (https://app.transifex.com/odoo/teams/41243/th/)\n"
+"Language: th\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: th\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. module: documents_spreadsheet
@@ -24,6 +25,12 @@ msgstr ""
 #: code:addons/documents_spreadsheet/wizard/save_spreadsheet_template.py:0
 msgid "\"%s\" saved as template"
 msgstr "บันทึก \"%s\" เป็นเทมเพลตแล้ว"
+
+#. module: documents_spreadsheet
+#. odoo-python
+#: code:addons/documents_spreadsheet/models/documents_document.py:0
+msgid "%(folder)s is used by %(company)s"
+msgstr ""
 
 #. module: documents_spreadsheet
 #. odoo-python
@@ -45,6 +52,18 @@ msgstr "มีสเปรดชีตและผู้ใช้ผสมกั
 #. module: documents_spreadsheet
 #: model:ir.model.constraint,message:documents_spreadsheet.constraint_documents_document_frozen_spreadsheet_access_via_link_access_internal
 msgid "A frozen spreadsheet can not be editable"
+msgstr ""
+
+#. module: documents_spreadsheet
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/demo/files/pipeline_dashboard.json:0
+msgid "Actuals vs Target"
+msgstr "ข้อมูลจริงเทียบกับเป้าหมาย"
+
+#. module: documents_spreadsheet
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/demo/files/pipeline_dashboard.json:0
+msgid "Actuals vs Target status"
 msgstr ""
 
 #. module: documents_spreadsheet
@@ -132,6 +151,13 @@ msgid "Display Name"
 msgstr "แสดงชื่อ"
 
 #. module: documents_spreadsheet
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_document__display_thumbnail
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_save_spreadsheet_template__display_thumbnail
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__display_thumbnail
+msgid "Display Thumbnail"
+msgstr ""
+
+#. module: documents_spreadsheet
 #: model:ir.model,name:documents_spreadsheet.model_documents_document
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_cell_thread__document_id
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_contributor__document_id
@@ -141,7 +167,7 @@ msgstr "เอกสาร"
 #. module: documents_spreadsheet
 #: model:ir.model,name:documents_spreadsheet.model_documents_access
 msgid "Document / Partner"
-msgstr ""
+msgstr "เอกสาร / พาร์ทเนอร์"
 
 #. module: documents_spreadsheet
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_res_company__document_spreadsheet_folder_id
@@ -172,8 +198,14 @@ msgid ""
 "Excel files cannot be previewed or edited directly in Odoo. Opening your "
 "file with Odoo Spreadsheet will allow you to do so."
 msgstr ""
-"ไฟล์ Excel ไม่สามารถดูตัวอย่างหรือแก้ไขได้โดยตรงใน Odoo การเปิดไฟล์ด้วย Odoo"
-" สเปรดชีต สามารถช่วยให้คุณดำเนินการได้"
+"ไฟล์ Excel ไม่สามารถดูตัวอย่างหรือแก้ไขได้โดยตรงใน Odoo การเปิดไฟล์ด้วย Odoo สเปรดชีต "
+"สามารถช่วยให้คุณดำเนินการได้"
+
+#. module: documents_spreadsheet
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/demo/files/pipeline_dashboard.json:0
+msgid "Expected Revenue by Stage"
+msgstr "รายได้ที่คาดหวังตามขั้นตอน"
 
 #. module: documents_spreadsheet
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__file_name
@@ -190,12 +222,12 @@ msgstr ""
 #. module: documents_spreadsheet
 #: model:ir.model.fields.selection,name:documents_spreadsheet.selection__documents_document__handler__frozen_folder
 msgid "Frozen Folder"
-msgstr ""
+msgstr "โฟลเดอร์ที่ตรึงไว้"
 
 #. module: documents_spreadsheet
 #: model:ir.model.fields.selection,name:documents_spreadsheet.selection__documents_document__handler__frozen_spreadsheet
 msgid "Frozen Spreadsheet"
-msgstr ""
+msgstr "สเปรดชีตที่ตรึงไว้"
 
 #. module: documents_spreadsheet
 #. odoo-python
@@ -216,6 +248,11 @@ msgid "Frozen spreadsheets"
 msgstr ""
 
 #. module: documents_spreadsheet
+#: model:ir.model,name:documents_spreadsheet.model_ir_http
+msgid "HTTP Routing"
+msgstr "การกำหนด HTTP"
+
+#. module: documents_spreadsheet
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_document__handler
 msgid "Handler"
 msgstr "ตัวจัดการ"
@@ -226,6 +263,12 @@ msgstr "ตัวจัดการ"
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__id
 msgid "ID"
 msgstr "ไอดี"
+
+#. module: documents_spreadsheet
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/static/src/documents_control_panel/documents_control_panel.xml:0
+msgid "Insert in spreadsheet"
+msgstr "แทรกในสเปรดชีต"
 
 #. module: documents_spreadsheet
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_save_spreadsheet_template__write_uid
@@ -245,6 +288,12 @@ msgstr "อัปเดตครั้งล่าสุดเมื่อ"
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_contributor__last_update_date
 msgid "Last update date"
 msgstr "วันที่อัปเดตล่าสุด"
+
+#. module: documents_spreadsheet
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/demo/files/pipeline_dashboard.json:0
+msgid "Lost Opportunities by Stage"
+msgstr "ผู้ที่มีโอกาสจะซื้อที่ไม่สำเร็จตามขั้นตอน"
 
 #. module: documents_spreadsheet
 #: model_terms:ir.ui.view,arch_db:documents_spreadsheet.spreadsheet_template_view_tree
@@ -277,7 +326,13 @@ msgstr "สเปรดชีตใหม่ที่สร้างในเอ
 #. module: documents_spreadsheet
 #. odoo-javascript
 #. odoo-python
-#: code:addons/documents_spreadsheet/models/spreadsheet_template.py:0
+#: code:addons/documents_spreadsheet/models/documents_document.py:0
+#: code:addons/documents_spreadsheet/static/src/bundle/actions/spreadsheet_action.js:0
+msgid "New spreadsheet created in My Drive"
+msgstr ""
+
+#. module: documents_spreadsheet
+#. odoo-javascript
 #: code:addons/documents_spreadsheet/static/src/bundle/actions/spreadsheet_template/spreadsheet_template_action.js:0
 msgid "New spreadsheet template created"
 msgstr "สร้างเทมเพลตสเปรดชีตใหม่แล้ว"
@@ -287,6 +342,18 @@ msgstr "สร้างเทมเพลตสเปรดชีตใหม่
 #: code:addons/documents_spreadsheet/static/src/documents_view/documents_spreadsheet_controller_mixin.js:0
 msgid "Open with Odoo Spreadsheet"
 msgstr "เปิดด้วยสเปรดชีต Odoo"
+
+#. module: documents_spreadsheet
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/demo/files/pipeline_dashboard.json:0
+msgid "Opportunities by Stage"
+msgstr "โอกาสตามขั้นตอน"
+
+#. module: documents_spreadsheet
+#. odoo-python
+#: code:addons/documents_spreadsheet/models/documents_document.py:0
+msgid "Portal users cannot be the owner of a spreadsheet."
+msgstr ""
 
 #. module: documents_spreadsheet
 #. odoo-javascript
@@ -354,7 +421,7 @@ msgstr "ข้อมูลสเปรดชีต"
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_save_spreadsheet_template__spreadsheet_file_name
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__spreadsheet_file_name
 msgid "Spreadsheet File Name"
-msgstr ""
+msgstr "ชื่อไฟล์สเปรดชีต"
 
 #. module: documents_spreadsheet
 #: model_terms:ir.ui.view,arch_db:documents_spreadsheet.spreadsheet_document_view_kanban
@@ -409,8 +476,7 @@ msgstr "ไฟล์สเปรดชีต"
 msgid ""
 "Spreadsheet files cannot be handled from the Trash. Would you like to "
 "restore this document?"
-msgstr ""
-"ไฟล์สเปรดชีตไม่สามารถจัดการจากถังขยะได้ คุณต้องการกู้คืนเอกสารนี้หรือไม่"
+msgstr "ไฟล์สเปรดชีตไม่สามารถจัดการจากถังขยะได้ คุณต้องการกู้คืนเอกสารนี้หรือไม่"
 
 #. module: documents_spreadsheet
 #. odoo-python
@@ -424,7 +490,7 @@ msgstr "สเปรดชีต"
 #. odoo-python
 #: code:addons/documents_spreadsheet/models/documents_access.py:0
 msgid "Spreadsheets can not be shared in edit mode to non-internal users."
-msgstr ""
+msgstr "ไม่สามารถแชร์สเปรดชีตในโหมดแก้ไขให้กับผู้ใช้ที่ไม่ใช่ภายในได้"
 
 #. module: documents_spreadsheet
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_cell_thread__template_id
@@ -435,6 +501,26 @@ msgstr "เทมเพลต"
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_save_spreadsheet_template__template_name
 msgid "Template Name"
 msgstr "ชื่อแม่แบบ"
+
+#. module: documents_spreadsheet
+#. odoo-python
+#: code:addons/documents_spreadsheet/models/documents_document.py:0
+msgid ""
+"The company for a folder cannot be changed if it is already used as the "
+"spreadsheet workspace for at least one other company: %s"
+msgstr ""
+"ไม่สามารถเปลี่ยนบริษัทสำหรับโฟลเดอร์ได้หากถูกใช้เป็นพื้นที่ทำงานสเปรดชีตสำหรับบริษัทอื่นอย่างน้อยหนึ่งบริษัทแล้ว: "
+"%s"
+
+#. module: documents_spreadsheet
+#. odoo-python
+#: code:addons/documents_spreadsheet/models/res_company.py:0
+msgid ""
+"The company of %(folder)s should either be undefined or set to %(company)s. "
+"Otherwise, it is not possible to link the workspace to the company."
+msgstr ""
+"บริษัทของ %(folder)s ควรไม่มีการกำหนดหรือตั้งค่าเป็น %(company)s ไม่เช่นนั้น "
+"จะไม่สามารถเชื่อมโยงพื้นที่ทำงานกับบริษัทได้"
 
 #. module: documents_spreadsheet
 #. odoo-python
@@ -460,9 +546,9 @@ msgstr "ไม่มีสเปรดชีตที่คุณกำลัง
 #. odoo-javascript
 #: code:addons/documents_spreadsheet/static/src/documents_permission_panel/documents_access_settings.js:0
 msgid ""
-"The spreadsheets can not be shared in edit mode with a link, change Internal"
-" to give write access."
-msgstr ""
+"The spreadsheets can not be shared in edit mode with a link, change Internal "
+"to give write access."
+msgstr "ไม่สามารถแชร์สเปรดชีตในโหมดแก้ไขด้วยลิงก์ได้ ให้เปลี่ยนภายในเพื่อให้สิทธิ์ในการเขียน"
 
 #. module: documents_spreadsheet
 #. odoo-python
@@ -479,7 +565,7 @@ msgstr "ไฟล์ xlsx มีขนาดใหญ่เกินไป"
 #. module: documents_spreadsheet
 #: model_terms:ir.ui.view,arch_db:documents_spreadsheet.documents_error_live_data
 msgid "This spreadsheet contains live data, only internal users can view it."
-msgstr ""
+msgstr "สเปรดชีตนี้ประกอบด้วยข้อมูลสด ซึ่งเฉพาะผู้ใช้ภายในเท่านั้นที่สามารถดูได้"
 
 #. module: documents_spreadsheet
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_document__thumbnail
@@ -491,7 +577,7 @@ msgstr "ภาพขนาดย่อ"
 #. module: documents_spreadsheet
 #: model:ir.model.constraint,message:documents_spreadsheet.constraint_documents_document_spreadsheet_access_via_link
 msgid "To share a spreadsheet in edit mode, add the user in the accesses"
-msgstr ""
+msgstr "หากต้องการแชร์สเปรดชีตในโหมดแก้ไข ให้เพิ่มผู้ใช้ในการเข้าถึง"
 
 #. module: documents_spreadsheet
 #. odoo-javascript
@@ -526,6 +612,12 @@ msgstr "เวิร์กสเปซ"
 #. module: documents_spreadsheet
 #. odoo-python
 #: code:addons/documents_spreadsheet/models/documents_document.py:0
+msgid "You are not allowed to freeze spreadsheets in Company"
+msgstr "คุณไม่ได้รับอนุญาตให้ตรึงสเปรดชีตในบริษัท"
+
+#. module: documents_spreadsheet
+#. odoo-python
+#: code:addons/documents_spreadsheet/models/documents_document.py:0
 msgid "You can not edit a frozen spreadsheet"
 msgstr ""
 
@@ -540,10 +632,16 @@ msgstr ""
 #: code:addons/documents_spreadsheet/static/src/documents_permission_panel/documents_member_invite.js:0
 #: code:addons/documents_spreadsheet/static/src/documents_permission_panel/documents_partner_access.js:0
 msgid "You can not share spreadsheet in edit mode to non-internal user."
-msgstr ""
+msgstr "คุณไม่สามารถแชร์สเปรดชีตในโหมดแก้ไขให้กับผู้ใช้ที่ไม่ใช่ภายในได้"
 
 #. module: documents_spreadsheet
 #. odoo-python
 #: code:addons/documents_spreadsheet/models/documents_document.py:0
 msgid "You don't have access to this document"
 msgstr "คุณไม่มีสิทธิ์เข้าถึงเอกสารนี้"
+
+#. module: documents_spreadsheet
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/demo/files/pipeline_dashboard.json:0
+msgid "of target"
+msgstr ""

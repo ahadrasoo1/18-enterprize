@@ -3,14 +3,9 @@
 import io
 import base64
 
-from odoo.tools.pdf import PdfFileReader  # bt: core PDF layer (core no longer patches PyPDF2)
-try:
-    from PyPDF2.errors import PdfReadError
-except ImportError:
-    from PyPDF2.utils import PdfReadError
-
 from odoo import api, models, fields, _
 from odoo.exceptions import UserError, ValidationError
+from odoo.tools.pdf import PdfFileReader, PdfReadError
 
 class SignDuplicateTemplatePDF(models.TransientModel):
     _name = 'sign.duplicate.template.pdf'
@@ -27,13 +22,14 @@ class SignDuplicateTemplatePDF(models.TransientModel):
         if not self._compare_page_templates(self.original_template_id.datas, self.new_pdf):
             raise UserError(_("The template has more pages than the current file, it can't be applied."))
 
+        self.original_template_id.check_access('write')
         pdf = self.env['ir.attachment'].create({
             'name': self.new_template or self.original_template_id.name,
             'datas': self.new_pdf,
             'type': 'binary'
         })
 
-        new_template = self.original_template_id.copy({
+        new_template = self.original_template_id.sudo().copy({
             'name': pdf.name,
             'attachment_id': pdf.id,
             'active': True,

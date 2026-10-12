@@ -2,9 +2,13 @@
 
 import base64
 import io
+import logging
+from collections import defaultdict
 
 from odoo import models, api
-from odoo.tools.pdf import PdfWriter as PdfFileWriter, PdfFileReader  # bt: core PDF layer (core no longer patches PyPDF2)
+from odoo.tools.pdf import OdooPdfFileReader, OdooPdfFileWriter
+
+_logger = logging.getLogger(__name__)
 
 
 class IrAttachment(models.Model):
@@ -26,13 +30,27 @@ class IrAttachment(models.Model):
         :returns: the new PDF attachments
         """
         vals_list = []
-        pdf_from_files = [PdfFileReader(open_file, strict=False) for open_file in open_files]
+        pdf_from_files = [OdooPdfFileReader(open_file, strict=False) for open_file in open_files]
+        
         for new_file in new_files:
-            output = PdfFileWriter()
+            output = OdooPdfFileWriter()
+            used_pages_by_pdf = defaultdict(set)
             for page in new_file['new_pages']:
-                input_pdf = pdf_from_files[int(page['old_file_index'])]
+                file_index = int(page['old_file_index'])
                 page_index = page['old_page_number'] - 1
+                input_pdf = pdf_from_files[file_index]
                 output.addPage(input_pdf.getPage(page_index))
+                used_pages_by_pdf[file_index].add(page_index)
+                if len(used_pages_by_pdf[file_index]) != input_pdf.getNumPages():
+                    continue
+                try:
+                    for fname, fcontent in input_pdf.getAttachments():
+                        output.addAttachment(name=fname, data=fcontent)
+                except Exception:  # noqa: BLE001
+                    _logger.warning(
+                        'Impossible to add (all) attachments from pdf at index %i',
+                        file_index, exc_info=True,
+                    )
             with io.BytesIO() as stream:
                 output.write(stream)
                 vals_list.append({
@@ -51,8 +69,9 @@ class IrAttachment(models.Model):
         """
         # Special case for documents
         if vals.get('res_model') == 'documents.document' and vals.get('res_id'):
-            document = self.env['documents.document'].browse(vals['res_id'])
-            if document.exists() and not document.attachment_id:
+            document = self.env['documents.document'].search_fetch(
+                [('id', '=', vals['res_id'])], [])
+            if document and not document.attachment_id and document.type == 'binary':
                 document.attachment_id = self[0].id
             return False
 
@@ -85,3 +104,15 @@ class IrAttachment(models.Model):
         if not self._context.get('no_document'):
             self.filtered(lambda a: not (vals.get('res_field') or a.res_field)).sudo()._create_document(vals)
         return super(IrAttachment, self).write(vals)
+
+    def unlink(self):
+        """Unlink linked documents before their attachment_id cascade deletes them."""
+        documents_sudo = self.env['documents.document'].sudo().with_context(active_test=False).search_fetch(
+            [('attachment_id', 'in', self.ids)],
+            ['attachment_id'],
+        )
+        if documents_sudo:
+            linked_attachments = documents_sudo.attachment_id
+            documents_sudo.unlink()
+            return super(IrAttachment, self - linked_attachments).unlink()
+        return super().unlink()

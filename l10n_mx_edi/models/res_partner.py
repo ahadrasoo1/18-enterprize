@@ -37,6 +37,7 @@ class ResPartner(models.Model):
         help="Indicates the way the invoice was/will be paid, where the options could be: "
              "Cash, Nominal Check, Credit Card, etc. Leave empty if unkown and the XML will show 'Unidentified'.",
     )
+    l10n_mx_edi_partner_address_complete = fields.Boolean(compute='_compute_l10n_mx_edi_partner_address_complete')
 
     @api.depends('country_code')
     def _compute_l10n_mx_edi_fiscal_regime(self):
@@ -85,3 +86,8 @@ class ResPartner(models.Model):
         if self.country_code == 'MX':
             return 'MX'
         return super()._deduce_country_code()
+
+    @api.depends('country_id', 'zip', 'vat')
+    def _compute_l10n_mx_edi_partner_address_complete(self):
+        for partner in self:
+            partner.l10n_mx_edi_partner_address_complete = bool(partner.country_id and partner.zip and partner.vat)

@@ -1,24 +1,26 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* account_iso20022
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# Maitê Dietze, 2024
-# 
+# Maitê Dietze, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:26+0000\n"
+"POT-Creation-Date: 2026-01-29 18:45+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Maitê Dietze, 2024\n"
-"Language-Team: Portuguese (Brazil) (https://app.transifex.com/odoo/teams/41243/pt_BR/)\n"
+"Last-Translator: Maitê Dietze, 2025\n"
+"Language-Team: Portuguese (Brazil) (https://app.transifex.com/odoo/teams/"
+"41243/pt_BR/)\n"
+"Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: pt_BR\n"
-"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % "
+"1000000 == 0 ? 1 : 2;\n"
 
 #. module: account_iso20022
 #. odoo-python
@@ -83,6 +85,12 @@ msgstr "Credor"
 #: model:ir.model.fields.selection,name:account_iso20022.selection__account_batch_payment__iso20022_charge_bearer__debt
 msgid "Debtor"
 msgstr "Devedor"
+
+#. module: account_iso20022
+#. odoo-python
+#: code:addons/account_iso20022/models/account_journal.py:0
+msgid "Employee %s has no country in their address."
+msgstr "O fucnionário %s não tem nenhum país em seu endereço."
 
 #. module: account_iso20022
 #: model:ir.model.fields,help:account_iso20022.field_res_company__iso20022_orgid_issr
@@ -151,16 +159,6 @@ msgstr "LEI"
 #: model:ir.model.fields,help:account_iso20022.field_res_users__iso20022_lei
 msgid "Legal Entity Identifier"
 msgstr "Identificador da entidade jurídica"
-
-#. module: account_iso20022
-#. odoo-python
-#: code:addons/account_iso20022/models/account_batch_payment.py:0
-msgid ""
-"Maximum amount is %(maximum_euro)s for payments in Euros, %(maximum_other)s "
-"for other currencies."
-msgstr ""
-"O valor máximo é %(maximum_euro)s para pagamentos em euros, "
-"%(maximum_other)s para outras moedas."
 
 #. module: account_iso20022
 #: model_terms:ir.ui.view,arch_db:account_iso20022.res_partner_sepa_inherit_form
@@ -260,8 +258,7 @@ msgstr "A SEPA só aceita pagamentos em euros."
 msgid ""
 "SEPA only accepts payments in EUR. Some payments are using another currency."
 msgstr ""
-"A SEPA só aceita pagamentos em euros. Alguns pagamentos estão em outra "
-"moeda."
+"A SEPA só aceita pagamentos em euros. Alguns pagamentos estão em outra moeda."
 
 #. module: account_iso20022
 #: model:ir.model.fields,help:account_iso20022.field_account_journal__sepa_pain_version
@@ -287,16 +284,6 @@ msgstr "Compartilhado"
 #: code:addons/account_iso20022/models/account_batch_payment.py:0
 msgid "Some payments are above the maximum amount allowed."
 msgstr "Alguns pagamentos estão acima do valor máximo permitido."
-
-#. module: account_iso20022
-#. odoo-python
-#: code:addons/account_iso20022/models/account_journal_sepa_ct.py:0
-msgid ""
-"Some payments are missing a value for 'UETR', required for the SEPA "
-"Pain.001.001.09 format."
-msgstr ""
-"Há pagamentos que não incluem o valor \"UETR\", necessário para o formato "
-"SEPA Pain.001.001.09."
 
 #. module: account_iso20022
 #. odoo-python
@@ -327,14 +314,17 @@ msgstr "Suíço ISO20022"
 #. odoo-python
 #: code:addons/account_iso20022/models/account_journal.py:0
 msgid ""
-"The BIC code '%(bic_code)s' associated to the bank '%(bank)s' of bank account '%(account)s' of partner '%(partner)s' does not respect the required convention.\n"
+"The BIC code '%(bic_code)s' associated to the bank '%(bank)s' of bank "
+"account '%(account)s' of partner '%(partner)s' does not respect the required "
+"convention.\n"
 "It must contain 8 or 11 characters and match the following structure:\n"
 "- 4 letters: institution code or bank code\n"
 "- 2 letters: country code\n"
 "- 2 letters or digits: location code\n"
 "- 3 letters or digits: branch code, optional\n"
 msgstr ""
-"O código BIC '%(bic_code)s' associado ao banco '%(bank)s' da conta bancária '%(account)s' de parceiro '%(partner)s' não respeita a convenção exigida.\n"
+"O código BIC '%(bic_code)s' associado ao banco '%(bank)s' da conta bancária "
+"'%(account)s' de parceiro '%(partner)s' não respeita a convenção exigida.\n"
 "Ele deve conter 8 ou 11 caracteres e corresponder à seguinte estrutura:\n"
 "- 4 letras: código da instituição ou código do banco\n"
 "- 2 letras: código do país\n"
@@ -345,11 +335,13 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_iso20022/models/res_partner.py:0
 msgid ""
-"The LEI number must contain 20 characters and match the following structure:\n"
+"The LEI number must contain 20 characters and match the following "
+"structure:\n"
 "- 18 alphanumeric characters with capital letters\n"
 "- 2 digits in the end\n"
 msgstr ""
-"O número do LEI deve conter 20 caracteres e corresponder à seguinte estrutura:\n"
+"O número do LEI deve conter 20 caracteres e corresponder à seguinte "
+"estrutura:\n"
 "– 18 caracteres alfanuméricos com letras maiúsculas\n"
 "– 2 dígitos no final\n"
 
@@ -367,7 +359,8 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_iso20022/models/account_batch_payment.py:0
 msgid ""
-"The bank account %(account)s, of journal '%(journal)s', is not of type IBAN.\n"
+"The bank account %(account)s, of journal '%(journal)s', is not of type "
+"IBAN.\n"
 "A valid IBAN account is required to use SEPA features."
 msgstr ""
 "A conta bancária %(account)s, do diário '%(journal)s', não é do tipo IBAN.\n"
@@ -377,8 +370,8 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_iso20022/models/account_batch_payment.py:0
 msgid ""
-"The customer bank account set on some payments does not have an IBAN number."
-" This is required for SEPA."
+"The customer bank account set on some payments does not have an IBAN number. "
+"This is required for SEPA."
 msgstr ""
 "A conta bancária do cliente definida em alguns pagamentos não tem um número "
 "IBAN. Isso é necessário para a SEPA."
@@ -427,8 +420,8 @@ msgid ""
 "Will appear as the name of the party initiating the payment. Limited to 70 "
 "characters."
 msgstr ""
-"Aparecerá como o nome da parte que está iniciando o pagamento. Limitado a 70"
-" caracteres."
+"Aparecerá como o nome da parte que está iniciando o pagamento. Limitado a 70 "
+"caracteres."
 
 #. module: account_iso20022
 #: model:ir.model.fields,help:account_iso20022.field_res_config_settings__iso20022_orgid_issr
@@ -460,3 +453,10 @@ msgstr "pain.001.001.03"
 #: model:ir.model.fields.selection,name:account_iso20022.selection__account_journal__sepa_pain_version__pain_001_001_09
 msgid "pain.001.001.09"
 msgstr "pain.001.001.09"
+
+#~ msgid ""
+#~ "Some payments are missing a value for 'UETR', required for the SEPA "
+#~ "Pain.001.001.09 format."
+#~ msgstr ""
+#~ "Há pagamentos que não incluem o valor \"UETR\", necessário para o formato "
+#~ "SEPA Pain.001.001.09."

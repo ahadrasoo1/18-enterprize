@@ -10,10 +10,18 @@ export class DeliveryButton extends Component {
         Dropdown,
         DropdownItem,
     };
+    static props = {};
 
     setup() {
         this.pos = usePos();
         this.ui = useService("ui");
+    }
+
+    async handleToggle(providerCode) {
+        const toggleStatus = !this.pos.enabledProviders[providerCode];
+        this.pos.enabledProviders[providerCode] = toggleStatus;
+        await this.pos.saveProviderState(this.pos.enabledProviders);
+        await this.pos.updateStoreStatus(toggleStatus, providerCode);
     }
 
     goToOrders(deliveryProvider, upState, filter = "ONGOING") {

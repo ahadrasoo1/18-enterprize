@@ -1,5 +1,13 @@
 import { _t } from "@web/core/l10n/translation";
-import { onMounted, onWillStart, useState, Component, useSubEnv, onWillUnmount } from "@odoo/owl";
+import {
+    onMounted,
+    onWillStart,
+    useState,
+    Component,
+    useSubEnv,
+    onWillUnmount,
+    useExternalListener,
+} from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 import { useSetupAction } from "@web/search/action_hook";
 import { downloadFile } from "@web/core/network/download";
@@ -113,10 +121,10 @@ export class AbstractSpreadsheetAction extends Component {
                 await this.fetchData();
                 this.createModel();
                 this.stores.inject(ModelStore, this.model);
-                await this.execInitCallbacks();
             }
         });
         onMounted(() => {
+            this.execInitCallbacks();
             const commentsStore = this.stores.get(CommentsStore);
             this.props.updateActionState({
                 resId: this.resId,
@@ -135,6 +143,7 @@ export class AbstractSpreadsheetAction extends Component {
         onWillUnmount(() => {
             this.model.off("unexpected-revision-id", this);
         });
+        useExternalListener(window, "afterprint", this.logExport.bind(this));
     }
 
     get navbarProps() {
@@ -200,11 +209,18 @@ export class AbstractSpreadsheetAction extends Component {
     }
 
     async execInitCallbacks() {
-        if (this.asyncInitCallback) {
-            await this.asyncInitCallback(this.model, this.stores);
-        }
-        if (this.initCallback) {
-            this.initCallback(this.model, this.stores);
+        if (!this.props.state?.model || !this.props.state?.data) {
+            if (this.asyncInitCallback) {
+                try {
+                    this.ui.block();
+                    await this.asyncInitCallback(this.model, this.stores);
+                } finally {
+                    this.ui.unblock();
+                }
+            }
+            if (this.initCallback) {
+                this.initCallback(this.model, this.stores);
+            }
         }
     }
 
@@ -244,19 +260,23 @@ export class AbstractSpreadsheetAction extends Component {
      * @protected
      */
     async makeCopy() {
-        const thumbnail = this.getThumbnail();
+        const display_thumbnail = this.getThumbnail();
         const data = this.model.exportData();
         const defaultValues = {
             spreadsheet_data: JSON.stringify(data),
             spreadsheet_snapshot: false,
             spreadsheet_revision_ids: [],
-            thumbnail,
+            display_thumbnail,
         };
         const ids = await this.orm.call(this.resModel, "copy", [[this.resId]], {
             default: defaultValues,
         });
         const id = ids[0];
         this._openSpreadsheet(id);
+    }
+
+    logExport() {
+        this.model.dispatch("LOG_DATASOURCE_EXPORT", { action: "print" });
     }
 
     /**
@@ -274,6 +294,7 @@ export class AbstractSpreadsheetAction extends Component {
         const { name } = detail;
         if (name && name !== this.state.spreadsheetName) {
             this.state.spreadsheetName = name;
+            this.data.name = name;
             this.env.config.setDisplayName(this.state.spreadsheetName);
             if (this.data.writable_rec_name_field) {
                 await this.orm.write(this.resModel, [this.resId], {
@@ -295,7 +316,7 @@ export class AbstractSpreadsheetAction extends Component {
     }
 
     onSpreadsheetLeftUpdateVals() {
-        return { thumbnail: this.getThumbnail() };
+        return { display_thumbnail: this.getThumbnail() };
     }
 
     /**
@@ -362,12 +383,14 @@ export class AbstractSpreadsheetAction extends Component {
         this.ui.block();
         try {
             await waitForDataLoaded(this.model);
+            const sources = this.model.getters.getLoadedDataSources();
             await this.actionService.doAction({
                 type: "ir.actions.client",
                 tag: "action_download_spreadsheet",
                 params: {
                     name: this.state.spreadsheetName,
                     xlsxData: this.model.exportXLSX(),
+                    sources,
                 },
             });
         } finally {

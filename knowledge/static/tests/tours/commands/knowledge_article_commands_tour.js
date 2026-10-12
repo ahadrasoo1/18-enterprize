@@ -19,7 +19,7 @@ import { Editor } from "@html_editor/editor";
 
 /**
  * This is a global knowledge tour testing commands and their usage.
- * 
+ *
  * If you need to edit this tour, here are a few recommendations:
  * - Try to keep the steps light and test specifically your command
  * - Keep the commands modifying the main article at the top
@@ -108,18 +108,19 @@ const fileCommandSteps = [{ // open the command bar
     run: function () {
         openPowerbox(this.anchor);
     },
-}, { // click on the /file command
-    trigger: '.o-we-command-name:contains("File")',
+}, { // click on the /media command
+    trigger: '.o-we-command-name:contains("Media")',
     run: 'click',
-}, { // wait for the media dialog to open
-    trigger: '.o_select_media_dialog',
+}, { // Pick  the "Documents" tab
+    trigger: '.o_select_media_dialog .nav-tabs .nav-link:contains("Documents")',
+    run: 'click',
 }, { // click on the first item of the modal
     trigger: '.o_existing_attachment_cell:contains(Onboarding)',
     run: 'click'
 }, { // wait for the block to appear in the editor
-    trigger: "div[data-embedded='file'] a.o_image",
+    trigger: "[data-embedded='file'] span.o_file_image a",
     run: 'click',
-}, 
+},
 {
     trigger: '.o-FileViewer-view:iframe body:contains(Content)',
 },
@@ -127,12 +128,12 @@ const fileCommandSteps = [{ // open the command bar
     trigger: '.o-FileViewer-headerButton[aria-label="Close"]',
     run: 'click',
 }, {
-    trigger: ".o_embedded_file_name_container:contains(Onboarding)",
+    trigger: ".o_file_name_container:contains(Onboarding)",
     run: function() {
         this.anchor.dispatchEvent(new Event("focus"));
     }
 }, {
-    trigger: ".o_embedded_file_name_container + input",
+    trigger: ".o_file_name_container + input",
     run: function() {
         this.anchor.value = "Renamed";
         this.anchor.dispatchEvent(new Event("blur"));
@@ -302,7 +303,11 @@ const videoCommandSteps = [{ // patch the components
 },
 { // wait for the block to appear in the editor
     trigger: '[data-embedded="video"]',
-    run: "click",
+    run: function () {
+        // ensure that the video element is not in the DOM, to avoid
+        // rendering it in the readonly tour.
+        this.anchor.remove();
+    },
 }];
 
 const unpatchSteps = [{ // unpatch the components
@@ -518,30 +523,30 @@ const embedKanbanActWindowSteps = [{ // manually insert view from act_window obj
  * See: 'knowledgeEmbedViewsFilters' for more details
  */
 
-// const embedViewFiltersSteps = [{
-//     // Check that we have 2 elements in the embedded view
-//     trigger: 'tbody tr.o_data_row:nth-child(2)',
-// }, { // add a simple filter
-//     trigger: '.o_searchview_input_container input',
-//     run: "edit 1",
-// }, {
-//     trigger: 'li[id="1"]',
-//     run: "click",
-// }, { // Check that the filter is effective
-//     trigger: 'tbody:not(tr.o_data_row:nth-child(2))',
-// }, { // Open the filtered article
-//     trigger: 'tbody > tr > td[name="display_name"]',
-//     run: "click",
-// }, { // Wait for the article to be open
-//     trigger: '.o_hierarchy_article_name input:value("Child 1")',
-// }, { // Go back via the pager
-//     trigger: '.o_knowledge_header i.oi-chevron-left',
-//     run: "click",
-// }, { // Check that there is the filter in the searchBar
-//     trigger: '.o_searchview_input_container',
-// }, { // Check that the filter is effective
-//     trigger: 'tbody:not(tr.o_data_row:nth-child(2))',
-// }];
+const embedViewFiltersSteps = [{
+    // Check that we have 2 elements in the embedded view
+    trigger: 'tbody tr.o_data_row:nth-child(2)',
+}, { // add a simple filter
+    trigger: '.o_searchview_input_container input',
+    run: "edit 1",
+}, {
+    trigger: 'li[id="1"]',
+    run: "click",
+}, { // Check that the filter is effective
+    trigger: 'tbody:not(tr.o_data_row:nth-child(2))',
+}, { // Open the filtered article
+    trigger: 'tbody > tr > td[name="display_name"]',
+    run: "click",
+}, { // Wait for the article to be open
+    trigger: '.o_hierarchy_article_name input:value("Child 1")',
+}, { // Go back via the pager
+    trigger: '.o_knowledge_header i.oi-chevron-left',
+    run: "click",
+}, { // Check that there is the filter in the searchBar
+    trigger: '.o_searchview_input_container',
+}, { // Check that the filter is effective
+    trigger: 'tbody:not(tr.o_data_row:nth-child(2))',
+}];
 
 // MISC: Test opening an article item through the kanban view
 
@@ -570,7 +575,7 @@ const embedKanbanEditArticleSteps = [{ // Create a new article using quick creat
  * See '_toInline' knowledge override in html_field.js
  */
 
-const composeBody = '.modal-dialog:contains(Compose Email) [name="body"]';
+const composeBody = ".modal-dialog:contains(Compose Email) [name='body']";
 const articleCommandComposerSteps = [{ // open the chatter
     trigger: '.btn-chatter',
     run: "click",
@@ -580,19 +585,21 @@ const articleCommandComposerSteps = [{ // open the chatter
 }, { // open the full composer
     trigger: "button[aria-label='Full composer']",
     run: "click",
+}, {
+    trigger: `${composeBody} .odoo-editor-editable > div.o-paragraph`,
 }, ...appendArticleLink(`${composeBody}`, 'EditorCommandsArticle'), { // wait for the block to appear in the editor
     trigger: `${composeBody} .o_knowledge_article_link:contains("EditorCommandsArticle")`,
 }, ...appendArticleLink(`${composeBody}`, 'LinkedArticle', `.o_knowledge_article_link:contains("EditorCommandsArticle")`), { // wait for the block to appear in the editor, after the previous one
-    trigger: `${composeBody} .odoo-editor-editable > p > a:nth-child(2).o_knowledge_article_link:contains("LinkedArticle")[contenteditable="false"]`,
+    trigger: `${composeBody} .odoo-editor-editable a:nth-child(2).o_knowledge_article_link:contains("LinkedArticle")[contenteditable="false"]`,
 }, { // verify that the first block is still there and contenteditable=false
-    trigger: `${composeBody} .odoo-editor-editable > p > a:nth-child(1).o_knowledge_article_link:contains("EditorCommandsArticle")[contenteditable="false"]`,
+    trigger: `${composeBody} .odoo-editor-editable a:nth-child(1).o_knowledge_article_link:contains("EditorCommandsArticle")[contenteditable="false"]`,
 }, { // send the message
     trigger: '.o_mail_send',
     run: "click",
 }, {
-    trigger: '.o_widget_knowledge_chatter_panel .o-mail-Thread .o-mail-Message-body > p > a:nth-child(1).o_knowledge_article_link:contains("EditorCommandsArticle")',
+    trigger: '.o_widget_knowledge_chatter_panel .o-mail-Thread .o-mail-Message-body a:nth-child(1).o_knowledge_article_link:contains("EditorCommandsArticle")',
 }, {
-    trigger: '.o_widget_knowledge_chatter_panel .o-mail-Thread .o-mail-Message-body > p > a:nth-child(2).o_knowledge_article_link:contains("LinkedArticle")',
+    trigger: '.o_widget_knowledge_chatter_panel .o-mail-Thread .o-mail-Message-body a:nth-child(2).o_knowledge_article_link:contains("LinkedArticle")',
 }, { // close the chatter
     trigger: '.btn-chatter',
     run: 'click',
@@ -670,8 +677,6 @@ const clipboardUsageSteps = [{ // open the chatter
 
 registry.category("web_tour.tours").add('knowledge_article_commands_tour', {
     url: '/odoo',
-    test: true,
-    checkDelay: 50,
     steps: () => [stepUtils.showAppsMenuItem(), {
     // open the Knowledge App
     trigger: '.o_app[data-menu-xmlid="knowledge.knowledge_menu_root"]',
@@ -691,7 +696,7 @@ registry.category("web_tour.tours").add('knowledge_article_commands_tour', {
     ...embedKanbanActWindowSteps,
     ...embedCardsKanbanSteps,
     // Misc
-    // ...embedViewFiltersSteps, //TODO Waiting for OWL fix (registry main_components App1 with App2 components)
+    ...embedViewFiltersSteps,
     ...embedKanbanEditArticleSteps,
     ...articleCommandUsageSteps,
     ...articleCommandComposerSteps,

@@ -2,7 +2,6 @@
 
 import { registry } from "@web/core/registry";
 import { stepUtils } from "@web_tour/tour_service/tour_utils";
-import * as Dialog from "@point_of_sale/../tests/tours/utils/dialog_util";
 import * as Order from "@point_of_sale/../tests/tours/utils/generic_components/order_widget_util";
 import * as PaymentScreen from "@point_of_sale/../tests/tours/utils/payment_screen_util";
 import { inLeftSide } from "@point_of_sale/../tests/tours/utils/common";
@@ -57,7 +56,6 @@ class TerminalProxy {
 }
 
 registry.category("web_tour.tours").add("payment_terminals_tour", {
-    test: true,
     steps: () =>
         [
             stepUtils.showAppsMenuItem(),
@@ -70,9 +68,14 @@ registry.category("web_tour.tours").add("payment_terminals_tour", {
                 content: "Start session",
                 trigger: ".o_pos_kanban button.oe_kanban_action",
                 run: "click",
+                expectUnloadPage: true,
             },
             // PART 1: Pay exactly the price of order. Should automatically go to receipt screen.
-            Dialog.confirm("Open Register"),
+            {
+                content: "confirm dialog",
+                trigger: ".modal .modal-footer .btn-primary:contains(Open Register)",
+                run: "click",
+            },
             {
                 content: "Waiting for loading to finish",
                 trigger: ".pos .pos-content",
@@ -124,11 +127,8 @@ registry.category("web_tour.tours").add("payment_terminals_tour", {
             },
             ...PaymentScreen.clickPaymentMethod("Cash"),
             ...PaymentScreen.clickNumpad("5"),
-            {
-                content: "Check that the payment is confirmed",
-                trigger: ".button.next.highlight",
-                run: "click",
-            },
+            ...PaymentScreen.validateButtonIsHighlighted(),
+            ...PaymentScreen.clickValidate(),
             {
                 content: "Immediately at the receipt screen.",
                 trigger: '.receipt-screen .button.next.highlight:contains("New Order")',

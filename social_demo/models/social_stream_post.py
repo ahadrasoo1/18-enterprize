@@ -54,7 +54,8 @@ class DemoSocialStreamPost(models.Model):
                 'profile_image_url_https': '/web/image/res.users/2/avatar_128',
                 'authorUrn': 'urn:li:organization:2414183',
             },
-            'message': message
+            'message': message,
+            'comments': {'data': []},
         }
 
     def _linkedin_comment_delete(self, comment_urn):
@@ -136,7 +137,8 @@ class DemoSocialStreamPost(models.Model):
                 'name': 'Mitchell Admin',
                 'profile_image_url_https': '/web/image/res.users/2/avatar_128'
             },
-            'message': message
+            'message': message,
+            'comments': {'data': []},
         }
 
     # ========================================================
@@ -176,7 +178,7 @@ class DemoSocialStreamPost(models.Model):
             'likes': None if is_facebook else {'summary': {'total_count': 4}},
             'reactions': {"LIKE": 3, "CARE": 1} if is_facebook else None,
             'from': {
-                'name': 'Deco Addict',
+                'name': 'Acme Corporation',
                 'profile_image_url_https': '/web/image/res.partner/%s/avatar_128' % res_partner_2.id,
                 'id': 'urn:li:organization:2414183',
             },

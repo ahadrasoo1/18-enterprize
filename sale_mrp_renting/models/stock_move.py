@@ -10,7 +10,7 @@ class StockMove(models.Model):
     def _action_done(self, cancel_backorder=False):
         res = super()._action_done(cancel_backorder=cancel_backorder)
         if self.env.user.has_group('sale_stock_renting.group_rental_stock_picking'):
-            for sale_line in self.sale_line_id:
+            for sale_line in res.sale_line_id:
                 if not sale_line.is_rental or 'phantom' not in sale_line.product_id.bom_ids.mapped('type'):
                     continue
                 bom = self.env['mrp.bom']._bom_find(sale_line.product_id, bom_type='phantom')[sale_line.product_id]
@@ -20,11 +20,7 @@ class StockMove(models.Model):
                     'incoming_moves': lambda m: m.location_id == m.company_id.rental_loc_id,
                     'outgoing_moves': lambda m: m.location_dest_id == m.company_id.rental_loc_id
                 }
-                outgoing_done_moves = sale_line.move_ids.filtered(lambda m: m.location_dest_id == m.company_id.rental_loc_id and m.state == 'done')
                 incoming_done_moves = sale_line.move_ids.filtered(lambda m: m.location_id == m.company_id.rental_loc_id and m.state == 'done')
-                if outgoing_done_moves:
-                    amount_kits_delivered = outgoing_done_moves._compute_kit_quantities(sale_line.product_id, sale_line.product_uom_qty, bom, filters)
-                    sale_line.qty_delivered = -amount_kits_delivered    # because we only use outgoing moves, it will always return a negative value
                 if incoming_done_moves:
                     amount_kits_returned = incoming_done_moves._compute_kit_quantities(sale_line.product_id, sale_line.product_uom_qty, bom, filters)
                     current_qty_returned = amount_kits_returned - sale_line.qty_returned
@@ -32,3 +28,10 @@ class StockMove(models.Model):
                         sale_line._generate_delay_line(current_qty_returned)
                     sale_line.qty_returned = amount_kits_returned
         return res
+
+    def _set_rental_sm_qty(self):
+        self.ensure_one()
+        if self.product_id.is_kits:
+            return self.with_context(skip_picking_assignation=True).action_explode()
+        else:
+            return super()._set_rental_sm_qty()

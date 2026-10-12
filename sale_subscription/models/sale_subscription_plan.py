@@ -101,8 +101,15 @@ class SaleSubscriptionPlan(models.Model):
 
     def _compute_active_subscription_line_count(self):
         self.subscription_line_count = 0
+        domain = [
+            ('order_id.is_subscription', '=', True),
+            ('product_id.recurring_invoice', '=', True),
+            ('subscription_plan_id', 'in', self.ids),
+            ('order_id.subscription_state', 'in', ('3_progress', '4_paused')),
+            ('display_type', '=', False),
+        ]
         line_counts = self.env['sale.order.line'].read_group(
-          [('order_id.is_subscription', '=', True), ('subscription_plan_id', 'in', self.ids), ('order_id.subscription_state', 'in', ('3_progress', '4_paused'))],
+          domain,
           ['__count'],
           ['subscription_plan_id']
         )
@@ -120,13 +127,18 @@ class SaleSubscriptionPlan(models.Model):
         }
 
     def action_open_active_subscription_lines(self):
-        subscription_items_plan = self.env['sale.order'].search([('plan_id', 'in', self.ids), ('is_subscription', '=', True), ('subscription_state', 'in', ['3_progress', '4_paused'])]).order_line
+        subscription_items_plan = self.env['sale.order'].search([
+            ('plan_id', 'in', self.ids),
+            ('is_subscription', '=', True),
+            ('subscription_state', 'in', ['3_progress', '4_paused'])
+        ]).order_line.filtered(lambda line: not line.display_type and line.product_id.recurring_invoice)
         return {
             'name': _('Subscription Items'),
-            'view_mode': 'list,form',
+            'view_mode': 'list',
             'views': [(self.env.ref('sale_subscription.sale_subscription_sale_order_line_list').id, 'list')],
             'search_view_id': [self.env.ref('sale_subscription.sale_subscription_sales_order_line_filter').id],
             'domain': [('id', 'in', subscription_items_plan.ids)],
+            'context': {'create': False},
             'res_model': 'sale.order.line',
             'type': 'ir.actions.act_window',
         }

@@ -1,33 +1,32 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* quality_control
-# 
+# * quality_control
+#
 # Translators:
-# Wil Odoo, 2024
-# 
+# Rasareeyar Lappiam, 2025
+# Wil Odoo, 2025
+#
+# Weblate <noreply-mt-weblate@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Thai (https://app.transifex.com/odoo/teams/41243/th/)\n"
+"POT-Creation-Date: 2026-04-10 18:47+0000\n"
+"PO-Revision-Date: 2026-06-25 22:58+0000\n"
+"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"Language-Team: Thai <https://translate.odoo.com/projects/odoo-18/"
+"quality_control/th/>\n"
+"Language: th\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: th\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 2026.6.1\n"
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_point_view_form_inherit_quality_control
-msgid "% of Operations"
-msgstr "% ของการดำเนินงาน"
-
-#. module: quality_control
-#: model_terms:ir.ui.view,arch_db:quality_control.quality_point_view_form_inherit_quality_control
-msgid "% of Transfers"
-msgstr "% ของการโอน"
+msgid "% of the time"
+msgstr "% oของเวลา"
 
 #. module: quality_control
 #: model:ir.actions.report,print_report_name:quality_control.quality_check_report
@@ -39,11 +38,6 @@ msgstr "'Worksheet_%s' % object.name"
 #: model_terms:ir.ui.view,arch_db:quality_control.worksheet_page
 msgid "15.3 cm"
 msgstr "15.3 ซม."
-
-#. module: quality_control
-#: model_terms:ir.ui.view,arch_db:quality_control.worksheet_page
-msgid "2023-08-15"
-msgstr "2023-08-15"
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_alert_team_dashboard_view_kanban
@@ -111,15 +105,6 @@ msgstr "<span class=\"o_stat_text\">การตรวจสอบคุณภ�
 #: model_terms:ir.ui.view,arch_db:quality_control.stock_picking_view_form_inherit_quality
 msgid "<span class=\"o_stat_text\">Quality Checks</span>"
 msgstr "<span class=\"o_stat_text\">การตรวจสอบคุณภาพ</span>"
-
-#. module: quality_control
-#: model_terms:ir.ui.view,arch_db:quality_control.quality_point_view_form_inherit_quality_control
-msgid ""
-"<span invisible=\"measure_frequency_type in ('all', 'on_demand')\">Every "
-"</span>"
-msgstr ""
-"<span invisible=\"measure_frequency_type in ('all', "
-"'on_demand')\">ทุก</span>"
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_point_view_form_inherit_quality_control
@@ -415,7 +400,8 @@ msgstr "หน่วยวัดเริ่มต้นที่ใช้สำ
 #: model_terms:ir.actions.act_window,help:quality_control.quality_check_action_team
 msgid ""
 "Define Quality Control Points in order to automatically generate\n"
-"              quality checks at the right logistic operation: transfers, manufacturing orders."
+"              quality checks at the right logistic operation: transfers, "
+"manufacturing orders."
 msgstr ""
 "กำหนดจุดควบคุมคุณภาพเพื่อสร้างโดยอัตโนมัติ\n"
 "การตรวจสอบคุณภาพในการดำเนินการด้านโลจิสติกส์ที่เหมาะสม: การโอน ใบสั่งผลิต"
@@ -466,6 +452,12 @@ msgstr "ละทิ้ง"
 #: model:ir.model.fields,field_description:quality_control.field_quality_spreadsheet_template__display_name
 msgid "Display Name"
 msgstr "แสดงชื่อ"
+
+#. module: quality_control
+#: model:ir.model.fields,field_description:quality_control.field_quality_check_spreadsheet__display_thumbnail
+#: model:ir.model.fields,field_description:quality_control.field_quality_spreadsheet_template__display_thumbnail
+msgid "Display Thumbnail"
+msgstr ""
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_spreadsheet_template_view_list
@@ -531,6 +523,11 @@ msgstr "ค่าหน่วยความถี่"
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_check_view_search
+msgid "Future Activities"
+msgstr "กิจกรรมในอนาคต"
+
+#. module: quality_control
+#: model_terms:ir.ui.view,arch_db:quality_control.quality_check_view_search
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_point_view_search
 msgid "Group By"
 msgstr "กลุ่มโดย"
@@ -556,16 +553,15 @@ msgstr ""
 #. module: quality_control
 #: model:ir.model.fields,help:quality_control.field_quality_check_on_demand__lot_id
 msgid ""
-"If you want to specify a lot/serial number before the transfer validation,"
-"                                create a new lot here from this field with "
-"the same exact lot name of the move line you want to add a check for."
-"                                If you want to create a check for all move "
-"lines, leave this field empty."
+"If you want to specify a lot/serial number before the transfer "
+"validation,                                create a new lot here from this "
+"field with the same exact lot name of the move line you want to add a check "
+"for.                                If you want to create a check for all "
+"move lines, leave this field empty."
 msgstr ""
 "หากต้องการระบุล็อต/หมายเลขซีเรียลก่อนการตรวจสอบการโอน "
-"สร้างล็อตใหม่ที่นี่จากฟิลด์นี้ด้วยชื่อล็อตเดียวกันกับเส้นย้ายที่คุณต้องการเพิ่มเช็ค"
-" หากคุณต้องการสร้างการตรวจสอบสำหรับเส้นการเคลื่อนไหวทั้งหมด "
-"ให้ปล่อยฟิลด์นี้ว่างไว้"
+"สร้างล็อตใหม่ที่นี่จากฟิลด์นี้ด้วยชื่อล็อตเดียวกันกับเส้นย้ายที่คุณต้องการเพิ่มเช็ค "
+"หากคุณต้องการสร้างการตรวจสอบสำหรับเส้นการเคลื่อนไหวทั้งหมด ให้ปล่อยฟิลด์นี้ว่างไว้"
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_check_view_search
@@ -577,8 +573,7 @@ msgstr "กำลังดำเนินการ"
 msgid ""
 "In case of Quality Check by Quantity, Move Line on which the Quality Check "
 "applies"
-msgstr ""
-"ในกรณีของการตรวจสอบคุณภาพตามปริมาณ ให้ย้ายรายการที่ใช้การตรวจสอบคุณภาพ"
+msgstr "ในกรณีของการตรวจสอบคุณภาพตามปริมาณ ให้ย้ายรายการที่ใช้การตรวจสอบคุณภาพ"
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_check_view_form
@@ -620,6 +615,11 @@ msgstr "อัปเดตครั้งล่าสุดโดย"
 #: model:ir.model.fields,field_description:quality_control.field_quality_spreadsheet_template__write_date
 msgid "Last Updated on"
 msgstr "อัปเดตครั้งล่าสุดเมื่อ"
+
+#. module: quality_control
+#: model_terms:ir.ui.view,arch_db:quality_control.quality_check_view_search
+msgid "Late Activities"
+msgstr "กิจกรรมล่าสุด"
 
 #. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_check__lot_line_id
@@ -806,12 +806,12 @@ msgstr "การตรวจสอบคุณภาพตามความต
 #. module: quality_control
 #: model:ir.model.fields.selection,name:quality_control.selection__quality_point__measure_frequency_type__on_demand
 msgid "On-demand"
-msgstr ""
+msgstr "ตามความต้องการ"
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.view_quality_check_wizard
 msgid "Open spreadsheet"
-msgstr ""
+msgstr "เปิดสเปรดชีต"
 
 #. module: quality_control
 #: model:ir.model.fields.selection,name:quality_control.selection__quality_check__measure_on__operation
@@ -827,11 +827,14 @@ msgstr "ปฏิบัติการ"
 msgid ""
 "Operation = One quality check is requested at the operation level.\n"
 "                  Product = A quality check is requested per product.\n"
-"                 Quantity = A quality check is requested for each new product quantity registered, with partial quantity checks also possible."
+"                 Quantity = A quality check is requested for each new "
+"product quantity registered, with partial quantity checks also possible."
 msgstr ""
 "การดำเนินงาน = มีคำขอให้ตรวจสอบคุณภาพหนึ่งครั้งในระดับการปฏิบัติงาน\n"
 "                    สินค้า = มีคำขอให้ตรวจสอบคุณภาพต่อสินค้า\n"
-"                    ปริมาณ = มีคำขอให้ตรวจสอบคุณภาพสำหรับปริมาณสินค้าใหม่แต่ละรายการที่ลงทะเบียน โดยสามารถตรวจสอบปริมาณบางส่วนได้เช่นกัน"
+"                    ปริมาณ = "
+"มีคำขอให้ตรวจสอบคุณภาพสำหรับปริมาณสินค้าใหม่แต่ละรายการที่ลงทะเบียน "
+"โดยสามารถตรวจสอบปริมาณบางส่วนได้เช่นกัน"
 
 #. module: quality_control
 #. odoo-python
@@ -1008,9 +1011,7 @@ msgstr "ขั้นตอนการแจ้งเตือนการจั
 msgid ""
 "Quality Alert stages define the different steps a quality alert should go "
 "through."
-msgstr ""
-"ขั้นตอนการแจ้งเตือนคุณภาพจะกำหนดขั้นตอนต่างๆ "
-"ที่การแจ้งเตือนด้านคุณภาพควรดำเนินการ"
+msgstr "ขั้นตอนการแจ้งเตือนคุณภาพจะกำหนดขั้นตอนต่างๆ ที่การแจ้งเตือนด้านคุณภาพควรดำเนินการ"
 
 #. module: quality_control
 #: model:ir.actions.act_window,name:quality_control.quality_alert_action_check
@@ -1184,7 +1185,7 @@ msgstr ""
 #. module: quality_control
 #: model:ir.model,name:quality_control.model_quality_spreadsheet_template
 msgid "Quality check template spreadsheet"
-msgstr ""
+msgstr "สเปรดชีตเทมเพลตการตรวจสอบคุณภาพ"
 
 #. module: quality_control
 #: model_terms:ir.actions.act_window,help:quality_control.quality_point_action
@@ -1229,12 +1230,12 @@ msgstr "ปริมาณของสินค้าที่ทดสอบภ
 #. module: quality_control
 #: model:ir.model.fields,help:quality_control.field_quality_check__qty_failed
 msgid "Quantity of product that failed the quality check"
-msgstr ""
+msgstr "ปริมาณสินค้าที่ไม่ผ่านการตรวจสอบคุณภาพ"
 
 #. module: quality_control
 #: model:ir.model.fields,help:quality_control.field_quality_check__qty_passed
 msgid "Quantity of product that passed the quality check"
-msgstr ""
+msgstr "ปริมาณสินค้าที่ผ่านการตรวจสอบคุณภาพ"
 
 #. module: quality_control
 #: model:ir.model.fields,help:quality_control.field_quality_check__qty_to_test
@@ -1272,7 +1273,7 @@ msgstr "รับผิดชอบ"
 #. odoo-javascript
 #: code:addons/quality_control/static/src/spreadsheet_bundle/quality_check_spreadsheet_action/quality_check_spreadsheet_action.xml:0
 msgid "Save in"
-msgstr ""
+msgstr "บันทึกใน"
 
 #. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_check_on_demand__show_lot_number
@@ -1312,7 +1313,7 @@ msgstr "ข้อมูลสเปรดชีต"
 #: model:ir.model.fields,field_description:quality_control.field_quality_check_spreadsheet__spreadsheet_file_name
 #: model:ir.model.fields,field_description:quality_control.field_quality_spreadsheet_template__spreadsheet_file_name
 msgid "Spreadsheet File Name"
-msgstr ""
+msgstr "ชื่อไฟล์สเปรดชีต"
 
 #. module: quality_control
 #: model:ir.model.fields,field_description:quality_control.field_quality_check_spreadsheet__spreadsheet_revision_ids
@@ -1391,7 +1392,7 @@ msgstr "ชื่อทีม"
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.view_quality_point_kanban
 msgid "Team:"
-msgstr ""
+msgstr "ทีม:"
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_alert_team_view_tree
@@ -1430,6 +1431,13 @@ msgid ""
 "several sheets, specify which one you want to use (e.g. Sheet2!C4). If not "
 "specified, the first sheet is selected by default."
 msgstr ""
+"การตรวจสอบจะถือว่าสำเร็จหากค่าเซลล์ที่แสดงว่าสำเร็จคือ TRUE หากมีชีตหลายชีต "
+"ให้ระบุชีตที่ต้องการใช้ (เช่น Sheet2!C4) หากไม่ได้ระบุไว้ ชีตแรกจะถูกเลือกตามค่าเริ่มต้น"
+
+#. module: quality_control
+#: model:ir.model.fields,help:quality_control.field_quality_point__measure_frequency_value
+msgid "The probability of each quality check being generated"
+msgstr ""
 
 #. module: quality_control
 #. odoo-python
@@ -1448,6 +1456,11 @@ msgstr "ภาพขนาดย่อ"
 #: model:ir.model.fields,field_description:quality_control.field_quality_check_wizard__title
 msgid "Title"
 msgstr "คำนำหน้าชื่อ"
+
+#. module: quality_control
+#: model_terms:ir.ui.view,arch_db:quality_control.quality_check_view_search
+msgid "Today Activities"
+msgstr "กิจกรรมวันนี้"
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_point_view_form_inherit_quality_control
@@ -1486,6 +1499,12 @@ msgstr "ประเภท:"
 #: model_terms:ir.ui.view,arch_db:quality_control.view_quality_check_wizard
 msgid "Unit of Measure"
 msgstr "หน่วยวัด"
+
+#. module: quality_control
+#. odoo-python
+#: code:addons/quality_control/models/quality_spreadsheet_template.py:0
+msgid "Untitled spreadsheet"
+msgstr "สเปรดชีตที่ไม่มีชื่อ"
 
 #. module: quality_control
 #: model_terms:ir.ui.view,arch_db:quality_control.view_quality_check_wizard
@@ -1544,19 +1563,17 @@ msgstr "เขียนบันทึกการตรวจสอบคุณ
 #: code:addons/quality_control/wizard/on_demand_quality_check_wizard.py:0
 msgid ""
 "You can not create quality check for a draft, done or cancelled transfer."
-msgstr ""
-"คุณไม่สามารถสร้างการตรวจสอบคุณภาพที่เป็นฉบับร่าง โอนเสร็จแล้ว "
-"หรือยกเลิกแล้วได้"
+msgstr "คุณไม่สามารถสร้างการตรวจสอบคุณภาพที่เป็นฉบับร่าง โอนเสร็จแล้ว หรือยกเลิกแล้วได้"
 
 #. module: quality_control
 #. odoo-python
 #: code:addons/quality_control/models/quality.py:0
 msgid ""
-"You measured %(measure).2f %(unit)s and it should be between "
-"%(tolerance_min).2f and %(tolerance_max).2f %(unit)s."
+"You measured %(measure).2f %(unit)s and it should be between %"
+"(tolerance_min).2f and %(tolerance_max).2f %(unit)s."
 msgstr ""
-"คุณวัดค่าได้ %(measure).2f %(unit)s และควรอยู่ระหว่าง %(tolerance_min).2f "
-"ถึง %(tolerance_max).2f %(unit)s"
+"คุณวัดค่าได้ %(measure).2f %(unit)s และควรอยู่ระหว่าง %(tolerance_min).2f ถึง %"
+"(tolerance_max).2f %(unit)s"
 
 #. module: quality_control
 #. odoo-python
@@ -1584,3 +1601,6 @@ msgstr "เช่น ผู้เชี่ยวชาญด้านการ�
 #: model_terms:ir.ui.view,arch_db:quality_control.quality_alert_team_view_form
 msgid "e.g. mycompany.com"
 msgstr "เช่น mycompany.com"
+
+#~ msgid "2023-08-15"
+#~ msgstr "2023-08-15"

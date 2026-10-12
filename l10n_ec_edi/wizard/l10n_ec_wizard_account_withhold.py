@@ -296,6 +296,10 @@ class L10nEcWizardAccountWithhold(models.TransientModel):
             return partner.property_account_receivable_id
         return partner.property_account_payable_id
 
+    @api.ondelete(at_uninstall=False)
+    def _unlink_withhold_lines_wizard(self):
+        self.withhold_line_ids.unlink()
+
     # ===== MOVE VALIDATION METHODS =====
 
     @api.model

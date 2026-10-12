@@ -1,10 +1,35 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-from odoo import models
+from odoo import models, _
 
 
 class SaleOrder(models.Model):
     _name = 'sale.order'
     _inherit = ['account.external.tax.mixin', 'sale.order']
+
+    def _get_external_tax_totals(self, amount_total, amount_untaxed, amount_tax):
+        tax_totals = self.tax_totals
+        subtotal = tax_totals['subtotals'] and tax_totals['subtotals'][0] or {}
+        tax_totals['same_tax_base'] = True
+        tax_totals['total_amount_currency'] = amount_total
+        tax_totals['base_amount_currency'] = amount_untaxed
+        tax_totals['tax_amount_currency'] = amount_tax
+        tax_totals['subtotals'] = [
+            {
+                **subtotal,
+                'base_amount_currency': tax_totals['base_amount_currency'],
+                'tax_amount_currency': tax_totals['tax_amount_currency'],
+                'tax_groups': [],
+            }
+        ]
+        if subtotal.get('tax_groups'):
+            tax_group = subtotal['tax_groups'][0]
+            tax_totals['subtotals'][0]['tax_groups'].append({
+                **tax_group,
+                'group_name': _('Taxes'),
+                'base_amount_currency': tax_totals['base_amount_currency'],
+                'tax_amount_currency': tax_totals['tax_amount_currency'],
+            })
+        return tax_totals
 
     def _compute_tax_totals(self):
         """This overrides the standard values which come from
@@ -17,28 +42,7 @@ class SaleOrder(models.Model):
         """
         super()._compute_tax_totals()
         for order in self.filtered('is_tax_computed_externally'):
-            tax_totals = order.tax_totals
-            subtotal = tax_totals['subtotals'][0]
-            tax_totals['same_tax_base'] = True
-            tax_totals['total_amount_currency'] = order.amount_total
-            tax_totals['base_amount_currency'] = order.amount_untaxed
-            tax_totals['tax_amount_currency'] = order.amount_tax
-            tax_totals['subtotals'] = [
-                {
-                    **subtotal,
-                    'base_amount_currency': tax_totals['base_amount_currency'],
-                    'tax_amount_currency': tax_totals['tax_amount_currency'],
-                    'tax_groups': [],
-                }
-            ]
-            if subtotal['tax_groups']:
-                tax_group = subtotal['tax_groups'][0]
-                tax_totals['subtotals'][0]['tax_groups'].append({
-                    **tax_group,
-                    'base_amount_currency': tax_totals['base_amount_currency'],
-                    'tax_amount_currency': tax_totals['tax_amount_currency'],
-                })
-            order.tax_totals = tax_totals
+            order.tax_totals = order._get_external_tax_totals(order.amount_total, order.amount_untaxed, order.amount_tax)
 
     def _compute_amounts(self):
         """ This overrides the standard values for orders using external tax calculation. The round_globally option
@@ -54,6 +58,17 @@ class SaleOrder(models.Model):
             order.amount_total = order.amount_untaxed + order.amount_tax
         super(SaleOrder, self - external_tax_orders)._compute_amounts()
 
+    def _create_account_invoices(self, invoice_vals_list, final):
+        """ Override. Always calculate taxes on final invoices that have down payment lines. We clear tax_ids on
+        invoice lines in _prepare_invoice_line() to avoid confusing users when the tax amount Odoo calculates is
+        different from what Avatax calculated for their SO. But because down payments are based on the total,
+        not subtotal, this can lead to a negative total on the invoice. To avoid the invoice being turned into a
+        credit note, automatically calculate taxes on invoices with a down payment line."""
+        moves = super()._create_account_invoices(invoice_vals_list, final)
+        if final:  # Don't needlessly do this for non-final invoices.
+            moves.filtered(lambda move: any(move.line_ids.sale_line_ids.mapped('is_downpayment')))._get_and_set_external_taxes_on_eligible_records()
+        return moves
+
     def action_confirm(self):
         """ Ensure confirmed orders have the right taxes. """
         self._get_and_set_external_taxes_on_eligible_records()
@@ -66,13 +81,13 @@ class SaleOrder(models.Model):
 
     def _get_and_set_external_taxes_on_eligible_records(self):
         """ account.external.tax.mixin override. """
-        eligible_orders = self.filtered(lambda order: order.is_tax_computed_externally and order.state in ('draft', 'sent', 'sale'))
+        eligible_orders = self.filtered(lambda order: order.is_tax_computed_externally and order.state in ('draft', 'sent', 'sale') and not order.locked)
         eligible_orders._set_external_taxes(*eligible_orders._get_external_taxes())
         return super()._get_and_set_external_taxes_on_eligible_records()
 
     def _get_lines_eligible_for_external_taxes(self):
         """ account.external.tax.mixin override. """
-        return self.order_line.filtered(lambda l: not l.display_type)
+        return self.order_line.filtered(lambda l: not l.display_type and not l.is_downpayment)
 
     def _get_line_data_for_external_taxes(self):
         """ account.external.tax.mixin override. """
@@ -121,16 +136,12 @@ class SaleOrderLine(models.Model):
 
     def _prepare_invoice_line(self, **optional_values):
         """ Override to clear tax_ids on lines. Brazilian taxes are variable and don't have the right amount set in Odoo (always 1%),
-        so taxes are always unless recomputed with button_external_tax_calculation. Although this automatically happens when needed, clearing the
+        so taxes are always wrong unless recomputed with button_external_tax_calculation. Although this automatically happens when needed, clearing the
         taxes here avoids potential confusion.
         """
         res = super()._prepare_invoice_line(**optional_values)
 
-        if self._without_invoice_line_taxes():
+        if self.order_id.is_tax_computed_externally:
             res['tax_ids'] = False
 
         return res
-
-    def _without_invoice_line_taxes(self):
-        """ Can be overridden by any external tax computation service. """
-        return self.order_id.is_tax_computed_externally

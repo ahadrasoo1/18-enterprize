@@ -10,7 +10,7 @@
                         <p>The Manager,</p>
                         <p><strong><span t-out="bank['bank_name']"/></strong></p>
                         <p>Dear Sir/Madam,</p>
-                        <p class="text-center"> <strong>Payment Advice from <span t-out="o.company_id.name"/> A/C no. <span t-out="bank['acc_number']"/><t t-if="o.l10n_in_neft">with NEFT</t><t t-else="">with Cheque No. <span t-out="o.l10n_in_cheque_number"></span></t> form period <span t-out="get_month(current_date)['from_name']"/> to <span t-out="get_month(current_date)['to_name']"/></strong></p>
+                        <p class="text-center"> <strong>Payment Advice from <span t-out="o.company_id.name"/> A/C no. <span t-out="bank['acc_number']"/><t t-if="o.l10n_in_neft">with NEFT</t><t t-else="">with Cheque No. <span t-out="o.l10n_in_cheque_number"></span></t> form period <span t-out="o.payslip_ids.get_month()['from_name']"/> to <span t-out="o.payslip_ids.get_month()['to_name']"/></strong></p>
                         <p><span t-out="note" /></p>
                         <table class="o_ignore_layout_styling table table-sm">
                             <thead>

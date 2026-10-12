@@ -80,6 +80,12 @@
                 <filter string="Refused" name="filter_refused_requests" domain="[('request_status', '=', 'refused')]"/>
                 <separator/>
                 <filter string="Canceled" name="filter_canceled_requests" domain="[('request_status', '=', 'cancel')]"/>
+                <filter invisible="1" string="Late Activities" name="activities_overdue"
+                    domain="[('my_activity_date_deadline', '&lt;', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter invisible="1" string="Today Activities" name="activities_today"
+                    domain="[('my_activity_date_deadline', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter invisible="1" string="Future Activities" name="activities_upcoming_all"
+                    domain="[('my_activity_date_deadline', '&gt;', context_today().strftime('%Y-%m-%d'))]"/>
                 <group string="Group By">
                     <filter string="Request Owner" name="groupby_request_owner"
                         context="{'group_by': 'request_owner_id'}"/>
@@ -143,13 +149,13 @@
                         <h1>
                             <field name="automated_sequence" invisible="1"/>
                             <field name="name" placeholder="E.g: Expenses Paris business trip"
-                                required="1"
+                                required="not automated_sequence"
                                 readonly="automated_sequence"/>
                         </h1>
                     </div>
                     <group>
                         <group name="request_main">
-                            <field name="request_owner_id" domain="[('share', '=', False), ('company_ids', 'in', company_id)]" readonly="not change_request_owner or request_status != 'new'" widget="many2one_avatar_user"/>
+                            <field name="request_owner_id" readonly="not change_request_owner or request_status != 'new'" widget="many2one_avatar_user"/>
                             <field name="category_id" readonly="request_status != 'new'" force_save="1"/>
                             <field name="date_confirmed" groups="base.group_no_one" readonly="1"/>
                             <label for="date" string="Date" invisible="has_date == 'no'"/>
@@ -170,7 +176,7 @@
                                 </div>
                             </div>
                             <field name="location" invisible="has_location == 'no'" readonly="request_status != 'new'" required="has_location == 'required'" placeholder="e.g. Brussels" />
-                            <field name="partner_id" invisible="has_partner == 'no'" readonly="request_status != 'new'" required="has_partner == 'required'"/>
+                            <field name="partner_id" invisible="has_partner == 'no'" readonly="request_status != 'new'" required="has_partner == 'required'" context="{'category_id': ''}"/>
                             <field name="company_id" groups="base.group_multi_company"/>
                         </group>
                         <group name="request_details">
@@ -191,7 +197,7 @@
                             <field name="reason" readonly="request_status != 'new'"/>
                         </page>
                         <page string="Approver(s)" name="approvers">
-                            <field name="approver_ids" mode="list,kanban" readonly="request_status != 'new'">
+                            <field name="approver_ids" mode="list,kanban" readonly="request_status != 'new' or change_request_owner == False">
                                 <list editable="bottom" decoration-success="status=='approved'" decoration-warning="status in ['pending', 'waiting']" decoration-danger="status=='refused'" no_open="1">
                                     <field name="existing_request_user_ids" column_invisible="True"/>
                                     <field name="sequence" column_invisible="True"/>

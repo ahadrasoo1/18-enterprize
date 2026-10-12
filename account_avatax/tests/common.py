@@ -3,11 +3,13 @@ from contextlib import contextmanager, ExitStack
 from unittest import SkipTest
 from unittest.mock import patch
 
+from odoo import Command
 from odoo.addons.account_avatax.lib.avatax_client import AvataxClient
 from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 from odoo.tests.common import TransactionCase
 from .mocked_invoice_1_response import generate_response as generate_response_invoice_1
 from .mocked_invoice_2_response import generate_response as generate_response_invoice_2
+from .mocked_invoice_3_response import generate_response as generate_response_invoice_3
 
 NOTHING = object()
 
@@ -163,7 +165,6 @@ class TestAccountAvataxCommon(TestAvataxCommon, AccountTestInvoicingCommon):
         # Odoo computes (these values would be wrong if a user manually changes it for example).
         cls.example_tax = cls.env["account.tax"].create({
             'name': 'CA STATE 6%',
-            'description': 'CA STATE TAX [06] (6.0000 %)',
             'company_id': cls.env.user.company_id.id,
             'amount': 1,
             'amount_type': 'percent',
@@ -256,4 +257,21 @@ class TestAccountAvataxCommon(TestAvataxCommon, AccountTestInvoicingCommon):
             ]
         })
         response = generate_response_invoice_2(invoice.invoice_line_ids)
+        return invoice, response
+
+    @classmethod
+    def _create_invoice_03_and_expected_response(cls):
+        invoice = cls.env['account.move'].create({
+            'move_type': 'out_invoice',
+            'partner_id': cls.partner.id,
+            'fiscal_position_id': cls.fp_avatax.id,
+            'invoice_line_ids': [
+                Command.create({
+                    'product_id': cls.product_accounting.id,
+                    'tax_ids': None,
+                    'price_unit': cls.product_accounting.list_price,
+                }),
+            ]
+        })
+        response = generate_response_invoice_3(invoice.invoice_line_ids)
         return invoice, response

@@ -9,6 +9,7 @@ class ModelAction(models.Model):
     name = fields.Char()
     confirmed = fields.Boolean()
     step = fields.Integer()
+    partner_id = fields.Many2one("res.partner")
 
     def action_confirm(self):
         for rec in self:
@@ -46,6 +47,8 @@ class Model2(models.Model):
     name = fields.Char()
     model2_id = fields.Many2one("test.studio_export.model2")
     model3_id = fields.Many2one("test.studio_export.model3")
+    res_model = fields.Char()
+    res_id = fields.Many2oneReference(model_field="res_model")
 
 
 class Model3(models.Model):

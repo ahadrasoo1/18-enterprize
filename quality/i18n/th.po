@@ -1,22 +1,22 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* quality
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
+"POT-Creation-Date: 2026-05-22 17:54+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
 "Last-Translator: Wil Odoo, 2024\n"
 "Language-Team: Thai (https://app.transifex.com/odoo/teams/41243/th/)\n"
+"Language: th\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: th\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. module: quality
@@ -36,8 +36,13 @@ msgid ""
 "A Python dictionary that will be evaluated to provide default values when "
 "creating new records for this alias."
 msgstr ""
-"พจนานุกรม Python "
-"ที่จะถูกประเมินเพื่อให้เป็นค่าเริ่มต้นเมื่อสร้างการบันทึกใหม่สำหรับนามแฝงนี้"
+"พจนานุกรม Python ที่จะถูกประเมินเพื่อให้เป็นค่าเริ่มต้นเมื่อสร้างการบันทึกใหม่สำหรับนามแฝงนี้"
+
+#. module: quality
+#. odoo-python
+#: code:addons/quality/models/quality.py:0
+msgid "A quality team must have a company assigned."
+msgstr ""
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert__message_needaction
@@ -400,10 +405,9 @@ msgstr "ไอดี"
 #. module: quality
 #: model:ir.model.fields,help:quality.field_quality_alert_team__alias_parent_thread_id
 msgid ""
-"ID of the parent record holding the alias (example: project holding the task"
-" creation alias)"
-msgstr ""
-"ไอดีของบันทึกหลักที่มีนามแฝง (ตัวอย่าง: โปรเจ็กต์ที่มีนามแฝงในการสร้างงาน)"
+"ID of the parent record holding the alias (example: project holding the task "
+"creation alias)"
+msgstr "ไอดีของบันทึกหลักที่มีนามแฝง (ตัวอย่าง: โปรเจ็กต์ที่มีนามแฝงในการสร้างงาน)"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert__activity_exception_icon
@@ -442,9 +446,7 @@ msgstr "ถ้าเลือก ข้อความบางข้อคว�
 msgid ""
 "If set, this content will automatically be sent out to unauthorized users "
 "instead of the default message."
-msgstr ""
-"หากตั้งค่าไว้ "
-"เนื้อหานี้จะถูกส่งไปยังผู้ใช้ที่ไม่ได้รับอนุญาตโดยอัตโนมัติแทนข้อความเริ่มต้น"
+msgstr "หากตั้งค่าไว้ เนื้อหานี้จะถูกส่งไปยังผู้ใช้ที่ไม่ได้รับอนุญาตโดยอัตโนมัติแทนข้อความเริ่มต้น"
 
 #. module: quality
 #: model_terms:ir.ui.view,arch_db:quality.quality_alert_view_search
@@ -658,9 +660,8 @@ msgid ""
 "attached, even if they did not reply to it. If set, this will disable the "
 "creation of new records completely."
 msgstr ""
-"ไอดีทางเลือกของเธรด (บันทึก) ที่จะแนบข้อความขาเข้าทั้งหมด "
-"แม้ว่าพวกเขาจะไม่ตอบกลับก็ตาม หากตั้งค่าไว้ "
-"การดำเนินการนี้จะปิดใช้งานการสร้างการบันทึกใหม่ทั้งหมด"
+"ไอดีทางเลือกของเธรด (บันทึก) ที่จะแนบข้อความขาเข้าทั้งหมด แม้ว่าพวกเขาจะไม่ตอบกลับก็ตาม "
+"หากตั้งค่าไว้ การดำเนินการนี้จะปิดใช้งานการสร้างการบันทึกใหม่ทั้งหมด"
 
 #. module: quality
 #: model:quality.reason,name:quality.reason_other
@@ -680,13 +681,12 @@ msgstr "ไอดีเธรดการบันทึกหลัก"
 #. module: quality
 #: model:ir.model.fields,help:quality.field_quality_alert_team__alias_parent_model_id
 msgid ""
-"Parent model holding the alias. The model holding the alias reference is not"
-" necessarily the model given by alias_model_id (example: project "
+"Parent model holding the alias. The model holding the alias reference is not "
+"necessarily the model given by alias_model_id (example: project "
 "(parent_model) and task (model))"
 msgstr ""
-"โมเดลหลักที่ถือนามแฝง "
-"โมเดลที่มีการอ้างอิงนามแฝงไม่จำเป็นต้องเป็นโมเดลที่กำหนดโดย alias_model_id "
-"(ตัวอย่าง: project (parent_model) and task (model))"
+"โมเดลหลักที่ถือนามแฝง โมเดลที่มีการอ้างอิงนามแฝงไม่จำเป็นต้องเป็นโมเดลที่กำหนดโดย "
+"alias_model_id (ตัวอย่าง: project (parent_model) and task (model))"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_check__partner_id
@@ -720,7 +720,8 @@ msgid ""
 "Policy to post a message on the document using the mailgateway.\n"
 "- everyone: everyone can post\n"
 "- partners: only authenticated partners\n"
-"- followers: only followers of the related document or members of following channels\n"
+"- followers: only followers of the related document or members of following "
+"channels\n"
 msgstr ""
 "นโยบายการโพสต์ข้อความบนเอกสารโดยใช้เมลล์เกตเวย์\n"
 "- ทุกคน: ทุกคนโพสต์ได้\n"
@@ -957,13 +958,12 @@ msgstr "ประเภทการทดสอบ"
 #. module: quality
 #: model:ir.model.fields,help:quality.field_quality_alert_team__alias_model_id
 msgid ""
-"The model (Odoo Document Kind) to which this alias corresponds. Any incoming"
-" email that does not reply to an existing record will cause the creation of "
-"a new record of this model (e.g. a Project Task)"
+"The model (Odoo Document Kind) to which this alias corresponds. Any incoming "
+"email that does not reply to an existing record will cause the creation of a "
+"new record of this model (e.g. a Project Task)"
 msgstr ""
 "โมเดล (ชนิดเอกสาร Odoo) ซึ่งสอดคล้องกับนามแฝงนี้ "
-"อีเมลขาเข้าที่ไม่ตอบกลับบันทึกที่มีอยู่จะทำให้เกิดการสร้างบันทึกใหม่ของโมเดลนี้"
-" (เช่น โปรเจ็กต์งาน)"
+"อีเมลขาเข้าที่ไม่ตอบกลับบันทึกที่มีอยู่จะทำให้เกิดการสร้างบันทึกใหม่ของโมเดลนี้ (เช่น โปรเจ็กต์งาน)"
 
 #. module: quality
 #: model:ir.model.fields,help:quality.field_quality_alert_team__alias_name
@@ -971,8 +971,7 @@ msgid ""
 "The name of the email alias, e.g. 'jobs' if you want to catch emails for "
 "<jobs@example.odoo.com>"
 msgstr ""
-"ชื่อของนามแฝงอีเมล เช่น 'งาน' หากคุณต้องการรับอีเมลสำหรับ "
-"<jobs@example.odoo.com>"
+"ชื่อของนามแฝงอีเมล เช่น 'งาน' หากคุณต้องการรับอีเมลสำหรับ <jobs@example.odoo.com>"
 
 #. module: quality
 #: model:res.groups,comment:quality.group_quality_manager

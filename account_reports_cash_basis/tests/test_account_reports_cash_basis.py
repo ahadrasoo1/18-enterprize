@@ -201,8 +201,8 @@ class TestAccountReports(TestAccountReportsCommon):
             [   0,                                       4,              5,              6],
             [
                 # Accounts.
+                ('101403 Outstanding Receipts',        115,              0,            115),
                 ('121000 Account Receivable',            0,            115,           -115),
-                ('OSTR00 Outstanding Receipts',        115,              0,            115),
                 # Report Total.
                 ('Total',                              115,            115,             0),
             ],
@@ -218,10 +218,10 @@ class TestAccountReports(TestAccountReportsCommon):
             [   0,                                       4,              5,              6],
             [
                 # Accounts.
+                ('101403 Outstanding Receipts',        115,              0,            115),
                 ('121000 Account Receivable',          115,            115,              0),
                 ('251000 Tax Received',                  0,             15,            -15),
                 ('400000 Product Sales',                 0,            100,           -100),
-                ('OSTR00 Outstanding Receipts',        115,              0,            115),
                 # Report Total.
                 ('Total',                              230,            230,             0),
             ],
@@ -353,7 +353,6 @@ class TestAccountReports(TestAccountReportsCommon):
         )
 
     def test_cash_basis_general_ledger_load_more_lines(self):
-        self.env['account.account'].search([('code', '=', 'OSTR00')]).code = '101403'
         invoice_date = fields.Date.from_string('2023-01-01')
         invoice = self.init_invoice('out_invoice', amounts=[3000.0], taxes=[], partner=self.partner_a, invoice_date=invoice_date, post=True)
         for _ in range(3):
@@ -378,8 +377,8 @@ class TestAccountReports(TestAccountReportsCommon):
                 ('121000 Account Receivable',           3460.0,     3460.0,     0.0),
                 # Expanded line
                 ('400000 Product Sales',                0,          3000.0,     -3000.0),
-                ('INV/2023/00001',                      0,          2000.0,     -2000.0),  # The 2 first payments are grouped
-                ('Load more...',                        '',         '',          ''),
+                ('INV/2023/00001',                      0,          3000.0,     -3000.0),
+                # No 'Load more...' line since all three payments should be grouped in one line.
                 ('Total 400000 Product Sales',          0,          3000.0,     -3000.0),
                 ('999999 Undistributed Profits/Losses', 0,          460.0,      -460.0),
                 # Report Total.
@@ -388,38 +387,13 @@ class TestAccountReports(TestAccountReportsCommon):
             options,
         )
 
-        load_more_1 = report.get_expanded_lines(
-            options,
-            lines[5]['id'],
-            lines[7]['groupby'],
-            '_report_expand_unfoldable_line_general_ledger',
-            lines[7]['progress'],
-            lines[7]['offset'],
-            None,
-        )
-
-        self.assertLinesValues(
-            load_more_1,
-            #   Name, Debit, Credit, Balance
-            [0, 5, 6, 7],
-            [
-                ('INV/2023/00001', 0, 1000.0, -3000.0),  # The last payment is displayed on another line
-            ],
-            options,
-        )
-
     # ------------------------------------------------------
     # Audit Cell of Reports with Cash Basis Filter Activated
     # ------------------------------------------------------
 
-    def _get_line_from_xml_id(self, lines, report, xml_id):
-        line_id = self.env.ref(xml_id).id
-        line = next(x for x in lines if report._get_model_info_from_id(x['id']) == ('account.report.line', line_id))
-        return line
-
     def _audit_line(self, options, report, line_xml_id):
         lines = report._get_lines(options)
-        line = self._get_line_from_xml_id(lines, report, line_xml_id)
+        line = report._get_line_from_xml_id(lines, line_xml_id)
         return report.action_audit_cell(options, self._get_audit_params_from_report_line(options, self.env.ref(line_xml_id), line))
 
     def _create_misc_entry(self, invoice_date, debit_account_id, credit_account_id):
@@ -1011,3 +985,105 @@ class TestAccountReports(TestAccountReportsCommon):
 
         # All 5 invoices, first 3 and last partially paid (2 payments on invoice_2)
         self.assert_line_values(report, '2016-03-10', [0, 620, 120, 1360.0], cash_basis=True, analytic=True)
+
+    def test_cash_basis_move_multi_account(self):
+        receivable_account_2 = self.copy_account(self.receivable_account_1)
+        receivable_account_3 = self.copy_account(self.receivable_account_1)
+        # Invoice with 2 receivable lines on 2 different accounts
+        invoice = self.env['account.move'].create({
+            'move_type': 'entry',
+            'date': '2017-01-01',
+            'journal_id': self.company_data['default_journal_misc'].id,
+            'line_ids': [
+                (0, 0, {'debit': 50.0, 'credit': 0.0, 'account_id': receivable_account_2.id}),
+                (0, 0, {'debit': 50.0, 'credit': 0.0, 'account_id': receivable_account_2.id}),
+                (0, 0, {'debit': 200.0, 'credit': 0.0, 'account_id': receivable_account_3.id}),
+                (0, 0, {'debit': 0.0, 'credit': 300.0, 'account_id': self.revenue_account_1.id}),
+            ],
+        })
+        invoice.action_post()
+
+        # Payment of 70% for the first receivable account line
+        payment_1 = self.env['account.move'].create({
+            'move_type': 'entry',
+            'date': '2017-02-01',
+            'journal_id': self.liquidity_journal_1.id,
+            'line_ids': [
+                (0, 0, {'debit': 0.0, 'credit': 70.0, 'account_id': receivable_account_2.id}),
+                (0, 0, {'debit': 70.0, 'credit': 0.0, 'account_id': self.liquidity_account.id}),
+            ],
+        })
+        payment_1.action_post()
+        self._reconcile_on((invoice + payment_1).line_ids, receivable_account_2)
+
+        # Check the cash basis option.
+        self.env['res.currency'].search([('name', '!=', 'USD')]).with_context(force_deactivate=True).active = False
+        report = self.env.ref('account_reports.general_ledger_report')
+        options = self._generate_options(
+            report,
+            fields.Date.from_string('2017-01-01'),
+            fields.Date.from_string('2017-12-31'),
+            default_options={'report_cash_basis': True}
+        )
+        self.assertLinesValues(
+            report._get_lines(options),
+            #   Name                                    Debit       Credit        Balance
+            [   0,                                      4,          5,            6],
+            [
+                # Accounts.
+                ('101401 Bank',                         530.0,      0.0,      530.0),
+                ('121000 Account Receivable',           460.0,      460.0,      0.0),
+                (receivable_account_2.display_name,     70.0,       70.0,       0.0),
+                ('400000 Product Sales',                0.0,        70.0,     -70.0),
+                ('999999 Undistributed Profits/Losses', 0.0,        460.0,   -460.0),
+                # Report Total.
+                ('Total',                               1060.0,     1060.0,     0.0),
+            ],
+            options
+        )
+
+        # First payment of 20% for the second receivable account line
+        payment_2 = self.env['account.move'].create({
+            'move_type': 'entry',
+            'date': '2017-03-01',
+            'journal_id': self.liquidity_journal_1.id,
+            'line_ids': [
+                (0, 0, {'debit': 0.0, 'credit': 40.0, 'account_id': receivable_account_3.id}),
+                (0, 0, {'debit': 40.0, 'credit': 0.0, 'account_id': self.liquidity_account.id}),
+            ],
+        })
+        payment_2.action_post()
+        self._reconcile_on((invoice + payment_2).line_ids, receivable_account_3)
+        # Second payment of 20% for the second receivable account line
+        payment_3 = self.env['account.move'].create({
+            'move_type': 'entry',
+            'date': '2017-04-01',
+            'journal_id': self.liquidity_journal_1.id,
+            'line_ids': [
+                (0, 0, {'debit': 0.0, 'credit': 40.0, 'account_id': receivable_account_3.id}),
+                (0, 0, {'debit': 40.0, 'credit': 0.0, 'account_id': self.liquidity_account.id}),
+            ],
+        })
+        payment_3.action_post()
+        self._reconcile_on((invoice + payment_3).line_ids, receivable_account_3)
+
+        # Delete the temporary cash basis table manually in order to run another _get_lines in the same transaction
+        self.env.cr.execute("DROP TABLE cash_basis_temp_account_move_line")
+
+        self.assertLinesValues(
+            report._get_lines(options),
+            #   Name                                    Debit       Credit        Balance
+            [   0,                                      4,          5,            6],
+            [
+                # Accounts.
+                ('101401 Bank',                         610.0,      0.0,      610.0),
+                ('121000 Account Receivable',           460.0,      460.0,      0.0),
+                (receivable_account_2.display_name,     70.0,       70.0,       0.0),
+                (receivable_account_3.display_name,     80.0,       80.0,       0.0),
+                ('400000 Product Sales',                0.0,        150.0,   -150.0),
+                ('999999 Undistributed Profits/Losses', 0.0,        460.0,   -460.0),
+                # Report Total.
+                ('Total',                               1220.0,     1220.0,     0.0),
+            ],
+            options
+        )

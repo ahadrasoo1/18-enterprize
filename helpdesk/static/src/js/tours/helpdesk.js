@@ -14,7 +14,6 @@ registry.category("web_tour.tours").add("helpdesk_tour", {
             run: "click",
         },
         {
-            isActive: ["auto"],
             trigger: ".o_helpdesk_ticket_btn",
         },
         {
@@ -24,7 +23,6 @@ registry.category("web_tour.tours").add("helpdesk_tour", {
             run: "click",
         },
         {
-            isActive: ["auto"],
             trigger: ".o_helpdesk_ticket_kanban_view",
         },
         {
@@ -34,61 +32,81 @@ registry.category("web_tour.tours").add("helpdesk_tour", {
             run: "click",
         },
         {
-            isActive: ["auto"],
             trigger: ".o_form_editable",
         },
         {
-    trigger: '.field_name textarea',
+    trigger: '.o_field_widget input.o_input',
     content: markup(_t('Enter the <b>subject</b> of your ticket <br/><i>(e.g. Problem with my installation, Wrong order, etc.).</i>')),
     tooltipPosition: 'right',
-            run: "edit Test",
+            run: "edit SAP is bad, paid by Odoo",
         },
         {
-            isActive: ["auto"],
             trigger: ".o_form_editable",
         },
         {
-    trigger: '.o_field_widget.field_partner_id',
+    isActive: ["manual"],
+    trigger: ".o_field_widget[name='partner_id']",
+    content: markup(_t('Select the <b>customer</b> of your ticket.')),
+    tooltipPosition: "top",
+    run: "click",
+        },
+        {
+    isActive: ["auto"],
+    trigger: 'div[name=partner_id] input',
     content: markup(_t('Select the <b>customer</b> of your ticket.')),
     tooltipPosition: 'top',
-            run: "click",
+            run: "edit Admin",
         },
         {
-            isActive: ["auto"],
             trigger: ".o_form_editable",
         },
         {
-    trigger: '.o_field_widget.field_user_id',
-    content: markup(_t('Assign the ticket to a <b>member of your team</b>.')),
-    tooltipPosition: 'right',
+            isActive: ["auto"],
+            trigger: ".ui-autocomplete > li > a:not(:has(i.fa))",
             run: "click",
+            tooltipPosition: "right",
         },
         {
-            isActive: ["auto"],
             trigger: ".o_form_view",
         },
         {
-    trigger: ".o-mail-Chatter-topbar button:contains(Send message)",
+    trigger: '.o_kanban_quick_create button.o_kanban_add',
+    content: _t('Save this ticket and the modifications you\'ve made to it.'),
+    tooltipPosition: 'bottom',
+            run: "click",
+        },
+        {
+            trigger: ".o_form_view",
+        },
+        {
+    trigger: '.o_kanban_record',
+    content: _t('Open the ticket.'),
+    tooltipPosition: 'bottom',
+            run: "click",
+        },
+        {
+            trigger: ".o_form_view",
+        },
+        {
+    trigger: ".o-mail-Chatter-topbar button.o-mail-Chatter-sendMessage",
     content: markup(_t("Use the chatter to <b>send emails</b> and communicate efficiently with your customers. Add new people to the followers' list to make them aware of the progress of this ticket.")),
     tooltipPosition: "bottom",
             run: "click",
         },
         {
-            isActive: ["auto"],
             trigger: ".o_form_view",
         },
         {
-    trigger: "button:contains(Log note)",
+    trigger: "button.o-mail-Chatter-logNote",
     content: markup(_t("<b>Log notes</b> for internal communications (you will only notify the persons you specifically tag). Use <b>@ mentions</b> to ping a colleague or <b># mentions</b> to contact a group of people.")),
     tooltipPosition: "bottom",
             run: "click",
         },
         {
-            isActive: ["auto"],
             trigger: ".o_form_view .o_form_saved",
         },
         {
-    trigger: "button:contains(Activities)",
+    trigger: "button.o-mail-Chatter-activity",
     content: markup(_t("Use <b>activities</b> to organize your daily work.")),
     run: "click",
         },
@@ -99,7 +117,6 @@ registry.category("web_tour.tours").add("helpdesk_tour", {
     run: "click",
         },
         {
-            isActive: ["auto"],
             trigger: ".o_form_view",
         },
         {
@@ -117,19 +134,19 @@ registry.category("web_tour.tours").add("helpdesk_tour", {
         {
     trigger: ".o_column_quick_create .o_quick_create_folded",
     content: markup(_t('Adapt your <b>pipeline</b> to your workflow by adding <b>stages</b> <i>(e.g. Awaiting Customer Feedback, etc.).</i>')),
-    tooltipPosition: 'right',
+    tooltipPosition: 'bottom',
     run: "click",
         },
         {
     trigger: ".o_column_quick_create .o_kanban_add",
     content: _t("Add your stage and place it at the right step of your workflow by dragging & dropping it."),
-    tooltipPosition: 'right',
+    tooltipPosition: 'bottom',
     run: "click",
         },
         {
-            isActive: ["auto"],
-    trigger: ".o_column_quick_create .o_kanban_add",
-    content: "Clicking on 'Add' when input name is empty won't do anything, 'Add' will still be displayed",
-}
+            trigger: ".o_column_quick_create .o_kanban_add",
+            content:
+                "Clicking on 'Add' when input name is empty won't do anything, 'Add' will still be displayed",
+        },
     ],
 });

@@ -142,7 +142,16 @@ export class GridRenderer extends Component {
     }
 
     get rowHeight() {
-        return this.isMobile ? 48:32;
+        const baseHeight = this.isMobile ? 48 : 32;
+        /*
+         * On mobile devices, grouped by fields are stacked vertically.
+         * By default, the base height accommodates up to 2 fields.
+         * For each additional field beyond the first 2, we add 20px to maintain proper spacing.
+         */
+        const extraHeight = this.isMobile
+            ? Math.max(0, this.props.model.rowFields.length - 2) * 20
+            : 0;
+        return baseHeight + extraHeight;
     }
 
     get virtualRows() {
@@ -576,7 +585,6 @@ export class GridRenderer extends Component {
                 context,
             });
         } else {
-            const noActivitiesFound = _t("No activities found");
             // retrieve form and list view ids from the action
             const { views = [] } = this.env.config;
             const openRecordsViews = ["list", "form"].map((viewType) => {
@@ -590,11 +598,17 @@ export class GridRenderer extends Component {
                 views: openRecordsViews,
                 domain,
                 context,
-                help: markup(
-                    `<p class='o_view_nocontent_smiling_face'>${escape(noActivitiesFound)}</p>`
-                ),
+                help: this._getNoContentHelper(),
             });
         }
+    }
+
+    /** Return grid cell action helper when no records are found. */
+    _getNoContentHelper() {
+        const noActivitiesFound = _t("No activities found");
+        return  markup(
+            `<p class='o_view_nocontent_smiling_face'>${escape(noActivitiesFound)}</p>`
+        );
     }
 
     onMagnifierGlassClick(section, column) {

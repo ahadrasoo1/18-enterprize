@@ -1,26 +1,29 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* account_accountant
-# 
+# * account_accountant
+#
 # Translators:
 # Martin Trigaux, 2024
 # Ryanto The <ry.the77@gmail.com>, 2024
-# Wil Odoo, 2024
-# Abe Manyo, 2024
-# 
+# Wil Odoo, 2025
+# Abe Manyo, 2025
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
+# "Nurul Aini Akrima Sabila (nuaas)" <nuaas@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
-"PO-Revision-Date: 2024-09-25 09:43+0000\n"
-"Last-Translator: Abe Manyo, 2024\n"
-"Language-Team: Indonesian (https://app.transifex.com/odoo/teams/41243/id/)\n"
+"POT-Creation-Date: 2026-04-10 18:48+0000\n"
+"PO-Revision-Date: 2026-06-13 09:22+0000\n"
+"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"Language-Team: Indonesian <https://translate.odoo.com/projects/odoo-18/"
+"account_accountant/id/>\n"
+"Language: id\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: id\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 2026.6.1\n"
 
 #. module: account_accountant
 #. odoo-python
@@ -36,8 +39,8 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_accountant/models/bank_rec_widget_line.py:0
 msgid ""
-"%(display_name_html)s with an open amount of %(open_amount)s will be reduced"
-" by %(amount)s."
+"%(display_name_html)s with an open amount of %(open_amount)s will be reduced "
+"by %(amount)s."
 msgstr ""
 "%(display_name_html)s dengan jumlah terbuka %(open_amount)s akan dikurangi "
 "sebesar %(amount)s.  "
@@ -62,22 +65,14 @@ msgstr ""
 "Anda</b>"
 
 #. module: account_accountant
-#. odoo-javascript
-#: code:addons/account_accountant/static/src/js/tours/account_accountant.js:0
-msgid ""
-"<br>See how to manage your customer invoices in the "
-"<b>Customers/Invoices</b> menu"
-msgstr ""
-"<br>Lihat cara mengelola faktur pelanggan Anda di menu "
-"<b>Pelanggan/Faktur</b>"
-
-#. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.account_reconcile_model_form_inherit_account_accountant
 msgid ""
-"<i title=\"Run manually\" role=\"img\" aria-label=\"Run manually\" class=\"fa fa-refresh\"/>\n"
+"<i title=\"Run manually\" role=\"img\" aria-label=\"Run manually\" "
+"class=\"fa fa-refresh\"/>\n"
 "                            Run manually"
 msgstr ""
-"<i title=\"Run manually\" role=\"img\" aria-label=\"Run manually\" class=\"fa fa-refresh\"/>\n"
+"<i title=\"Run manually\" role=\"img\" aria-label=\"Run manually\" "
+"class=\"fa fa-refresh\"/>\n"
 "                            Jalankan secara manual"
 
 #. module: account_accountant
@@ -98,6 +93,15 @@ msgstr "<span class=\"o_stat_text\">Laporan Bank</span>"
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_account_reconcile_wizard
 msgid ""
+"<span class=\"oe_inline o_form_label mx-3\" invisible=\"reco_currency_id == "
+"company_currency_id\"> in </span>"
+msgstr ""
+"<span class=\"oe_inline o_form_label mx-3\" invisible=\"reco_currency_id == "
+"company_currency_id\"> di </span>"
+
+#. module: account_accountant
+#: model_terms:ir.ui.view,arch_db:account_accountant.view_account_reconcile_wizard
+msgid ""
 "<span class=\"oe_inline o_form_label mx-3\" "
 "invisible=\"single_currency_mode\"> in </span>"
 msgstr ""
@@ -107,105 +111,111 @@ msgstr ""
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_account_change_lock_date
 msgid ""
-"<span class=\"text-muted o_form_label\" invisible=\"not min_fiscalyear_lock_date_exception_for_me_id                                                  or not min_fiscalyear_lock_date_exception_for_everyone_id\">\n"
-"                                      <span style=\"white-space: pre\">; </span>\n"
+"<span class=\"text-danger o_form_label\" invisible=\"hard_lock_date == "
+"current_hard_lock_date\">\n"
+"                                            <i>This change is irreversible</"
+"i>\n"
+"                                        </span>"
+msgstr ""
+"<span class=\"text-danger o_form_label\" invisible=\"hard_lock_date == "
+"current_hard_lock_date\">\n"
+"                                            <i>Perubahan ini tidak dapat "
+"dibatalkan</i>\n"
+"                                        </span>"
+
+#. module: account_accountant
+#: model_terms:ir.ui.view,arch_db:account_accountant.view_account_change_lock_date
+msgid ""
+"<span class=\"text-muted o_form_label\" invisible=\"not "
+"min_fiscalyear_lock_date_exception_for_me_id                                                  "
+"or not min_fiscalyear_lock_date_exception_for_everyone_id\">\n"
+"                                      <span style=\"white-space: pre\">; </"
+"span>\n"
 "                                </span>"
 msgstr ""
-"<span class=\"text-muted o_form_label\" invisible=\"not min_fiscalyear_lock_date_exception_for_me_id                                                  or not min_fiscalyear_lock_date_exception_for_everyone_id\">\n"
-"                                      <span style=\"white-space: pre\">; </span>\n"
+"<span class=\"text-muted o_form_label\" invisible=\"not "
+"min_fiscalyear_lock_date_exception_for_me_id                                                  "
+"or not min_fiscalyear_lock_date_exception_for_everyone_id\">\n"
+"                                      <span style=\"white-space: pre\">; </"
+"span>\n"
 "                                </span>"
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_account_change_lock_date
 msgid ""
-"<span class=\"text-muted o_form_label\" invisible=\"not min_purchase_lock_date_exception_for_me_id                                                  or not min_purchase_lock_date_exception_for_everyone_id\">\n"
-"                                      <span style=\"white-space: pre\">; </span>\n"
+"<span class=\"text-muted o_form_label\" invisible=\"not "
+"min_purchase_lock_date_exception_for_me_id                                                  "
+"or not min_purchase_lock_date_exception_for_everyone_id\">\n"
+"                                      <span style=\"white-space: pre\">; </"
+"span>\n"
 "                                </span>"
 msgstr ""
-"<span class=\"text-muted o_form_label\" invisible=\"not min_purchase_lock_date_exception_for_me_id                                                  or not min_purchase_lock_date_exception_for_everyone_id\">\n"
-"                                      <span style=\"white-space: pre\">; </span>\n"
+"<span class=\"text-muted o_form_label\" invisible=\"not "
+"min_purchase_lock_date_exception_for_me_id                                                  "
+"or not min_purchase_lock_date_exception_for_everyone_id\">\n"
+"                                      <span style=\"white-space: pre\">; </"
+"span>\n"
 "                                </span>"
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_account_change_lock_date
 msgid ""
-"<span class=\"text-muted o_form_label\" invisible=\"not min_sale_lock_date_exception_for_me_id                                                  or not min_sale_lock_date_exception_for_everyone_id\">\n"
-"                                      <span style=\"white-space: pre\">; </span>\n"
+"<span class=\"text-muted o_form_label\" invisible=\"not "
+"min_sale_lock_date_exception_for_me_id                                                  "
+"or not min_sale_lock_date_exception_for_everyone_id\">\n"
+"                                      <span style=\"white-space: pre\">; </"
+"span>\n"
 "                                </span>"
 msgstr ""
-"<span class=\"text-muted o_form_label\" invisible=\"not min_sale_lock_date_exception_for_me_id                                                  or not min_sale_lock_date_exception_for_everyone_id\">\n"
-"                                      <span style=\"white-space: pre\">; </span>\n"
+"<span class=\"text-muted o_form_label\" invisible=\"not "
+"min_sale_lock_date_exception_for_me_id                                                  "
+"or not min_sale_lock_date_exception_for_everyone_id\">\n"
+"                                      <span style=\"white-space: pre\">; </"
+"span>\n"
 "                                </span>"
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_account_change_lock_date
 msgid ""
-"<span class=\"text-muted o_form_label\" invisible=\"not min_tax_lock_date_exception_for_me_id                                                  or not min_tax_lock_date_exception_for_everyone_id\">\n"
-"                                      <span style=\"white-space: pre\">; </span>\n"
+"<span class=\"text-muted o_form_label\" invisible=\"not "
+"min_tax_lock_date_exception_for_me_id                                                  "
+"or not min_tax_lock_date_exception_for_everyone_id\">\n"
+"                                      <span style=\"white-space: pre\">; </"
+"span>\n"
 "                                </span>"
 msgstr ""
-"<span class=\"text-muted o_form_label\" invisible=\"not min_tax_lock_date_exception_for_me_id                                                  or not min_tax_lock_date_exception_for_everyone_id\">\n"
-"                                      <span style=\"white-space: pre\">; </span>\n"
+"<span class=\"text-muted o_form_label\" invisible=\"not "
+"min_tax_lock_date_exception_for_me_id                                                  "
+"or not min_tax_lock_date_exception_for_everyone_id\">\n"
+"                                      <span style=\"white-space: pre\">; </"
+"span>\n"
 "                                </span>"
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_account_change_lock_date
 msgid ""
-"<span class=\"text-muted\" invisible=\"hard_lock_date != current_hard_lock_date\">\n"
-"                                    <i>to ensure inalterability</i>\n"
-"                                </span>\n"
-"                                <span class=\"text-danger o_form_label\" invisible=\"hard_lock_date == current_hard_lock_date\">\n"
-"                                    <i>This change is irreversible</i>\n"
-"                                </span>"
-msgstr ""
-"<span class=\"text-muted\" invisible=\"hard_lock_date != current_hard_lock_date\">\n"
-"                                    <i>untuk memastikan inalterability</i>\n"
-"                                </span>\n"
-"                                <span class=\"text-danger o_form_label\" invisible=\"hard_lock_date == current_hard_lock_date\">\n"
-"                                    <i>Perubahan ini tidak dapat diubah kembali</i>\n"
-"                                </span>"
-
-#. module: account_accountant
-#: model_terms:ir.ui.view,arch_db:account_accountant.view_account_change_lock_date
-msgid ""
-"<span class=\"text-muted\" invisible=\"min_fiscalyear_lock_date_exception_for_me_id or min_fiscalyear_lock_date_exception_for_everyone_id\">\n"
+"<span class=\"text-muted\" "
+"invisible=\"min_fiscalyear_lock_date_exception_for_me_id or "
+"min_fiscalyear_lock_date_exception_for_everyone_id\">\n"
 "                                    <i>but allow exceptions</i>\n"
 "                                </span>"
 msgstr ""
-"<span class=\"text-muted\" invisible=\"min_fiscalyear_lock_date_exception_for_me_id or min_fiscalyear_lock_date_exception_for_everyone_id\">\n"
+"<span class=\"text-muted\" "
+"invisible=\"min_fiscalyear_lock_date_exception_for_me_id or "
+"min_fiscalyear_lock_date_exception_for_everyone_id\">\n"
 "                                    <i>tapi izinkan pengecualian</i>\n"
 "                                </span>"
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_account_change_lock_date
 msgid ""
-"<span class=\"text-muted\" invisible=\"min_purchase_lock_date_exception_for_me_id or min_purchase_lock_date_exception_for_everyone_id\">\n"
-"                                    <i>to lock bills</i>\n"
-"                                </span>"
-msgstr ""
-"<span class=\"text-muted\" invisible=\"min_purchase_lock_date_exception_for_me_id or min_purchase_lock_date_exception_for_everyone_id\">\n"
-"                                    <i>untuk mengunci tagihan</i>\n"
-"                                </span>"
-
-#. module: account_accountant
-#: model_terms:ir.ui.view,arch_db:account_accountant.view_account_change_lock_date
-msgid ""
-"<span class=\"text-muted\" invisible=\"min_sale_lock_date_exception_for_me_id or min_sale_lock_date_exception_for_everyone_id\">\n"
-"                                    <i>to lock invoices</i>\n"
-"                                </span>"
-msgstr ""
-"<span class=\"text-muted\" invisible=\"min_sale_lock_date_exception_for_me_id or min_sale_lock_date_exception_for_everyone_id\">\n"
-"                                    <i>untuk mengunci faktur</i>\n"
-"                                </span>"
-
-#. module: account_accountant
-#: model_terms:ir.ui.view,arch_db:account_accountant.view_account_change_lock_date
-msgid ""
-"<span class=\"text-muted\" invisible=\"min_tax_lock_date_exception_for_me_id or min_tax_lock_date_exception_for_everyone_id\">\n"
+"<span class=\"text-muted\" invisible=\"min_tax_lock_date_exception_for_me_id "
+"or min_tax_lock_date_exception_for_everyone_id\">\n"
 "                                    <i>after a tax closing</i>\n"
 "                                </span>"
 msgstr ""
-"<span class=\"text-muted\" invisible=\"min_tax_lock_date_exception_for_me_id or min_tax_lock_date_exception_for_everyone_id\">\n"
+"<span class=\"text-muted\" invisible=\"min_tax_lock_date_exception_for_me_id "
+"or min_tax_lock_date_exception_for_everyone_id\">\n"
 "                                    <i>setelah closing pajak</i>\n"
 "                                </span>"
 
@@ -220,28 +230,34 @@ msgid "<span class=\"tip_button_text\">Register your Accounting Firm</span>"
 msgstr "<span class=\"tip_button_text\">Daftarkan kantor Akuntan Anda</span>"
 
 #. module: account_accountant
+#: model_terms:ir.ui.view,arch_db:account_accountant.view_account_reconcile_wizard
+msgid "<span> (</span>"
+msgstr "<span> (</span>"
+
+#. module: account_accountant
+#: model_terms:ir.ui.view,arch_db:account_accountant.view_account_reconcile_wizard
+msgid "<span>)</span>"
+msgstr "<span>)</span>"
+
+#. module: account_accountant
 #: model_terms:web_tour.tour,rainbow_man_message:account_accountant.account_accountant_tour
 msgid ""
-"<span><strong><b>Good job!</b> You went through all steps of this tour.</strong>\n"
-"            <br>See how to manage your customer invoices in the <b>Customers/Invoices</b> menu\n"
+"<span><strong><b>Good job!</b> You went through all steps of this tour.</"
+"strong>\n"
+"            <br>See how to manage your customer invoices in the <b>Customers/"
+"Invoices</b> menu\n"
 "        </span>"
 msgstr ""
-"<span><strong><b>Good job!</b> Anda menyelesaikan semua langkah-langkah di tur ini.</strong>\n"
-"            <br>Lihat bagaimana cara mengelola faktur pelanggan Anda di menu <b>Pelanggan/Faktur</b> \n"
+"<span><strong><b>Good job!</b> Anda menyelesaikan semua langkah-langkah di "
+"tur ini.</strong>\n"
+"            <br>Lihat bagaimana cara mengelola faktur pelanggan Anda di menu "
+"<b>Pelanggan/Faktur</b> \n"
 "        </span>"
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_account_change_lock_date
 msgid "<span>Exception</span>"
 msgstr "<span>Pengecualian</span>"
-
-#. module: account_accountant
-#. odoo-javascript
-#: code:addons/account_accountant/static/src/js/tours/account_accountant.js:0
-msgid ""
-"<strong><b>Good job!</b> You went through all steps of this tour.</strong>"
-msgstr ""
-"<strong><b>Selamat!</b> Anda telah melalui semua langkah tur ini.</strong>"
 
 #. module: account_accountant
 #. odoo-javascript
@@ -295,11 +311,6 @@ msgstr "Akun digunakan untuk biaya yang ditangguhkan"
 #: model:ir.model.fields,help:account_accountant.field_res_config_settings__deferred_revenue_account_id
 msgid "Account used for deferred revenues"
 msgstr "Akun digunakan untuk pendapatan yang ditangguhkan"
-
-#. module: account_accountant
-#: model_terms:ir.ui.view,arch_db:account_accountant.res_partner_view_form
-msgid "Accounting"
-msgstr "Akuntansi"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_auto_reconcile_wizard__account_ids
@@ -370,18 +381,6 @@ msgid "Amount"
 msgstr "Jumlah"
 
 #. module: account_accountant
-#. odoo-javascript
-#: code:addons/account_accountant/static/src/components/bank_reconciliation/bank_rec_form.xml:0
-msgid "Amount (Company Currency)"
-msgstr "Jumlah (Mata Uang Perusahaan)"
-
-#. module: account_accountant
-#. odoo-javascript
-#: code:addons/account_accountant/static/src/components/bank_reconciliation/bank_rec_form.xml:0
-msgid "Amount (Foreign Currency)"
-msgstr "Jumlah (Mata Uang Asing)"
-
-#. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_bank_rec_widget_line__amount_currency
 msgid "Amount Currency"
 msgstr "Jumlah Mata Uang"
@@ -414,8 +413,8 @@ msgstr "Jumlah dalam mata uang perusahaa"
 msgid ""
 "An entry will transfer %(amount)s from %(from_account)s to %(to_account)s."
 msgstr ""
-"Sebuah entri akan mentransfer %(amount)s dari  ke %(from_account)s ke "
-"%(to_account)s."
+"Sebuah entri akan mentransfer %(amount)s dari  ke %(from_account)s ke %"
+"(to_account)s."
 
 #. module: account_accountant
 #. odoo-javascript
@@ -427,7 +426,7 @@ msgstr "Analitik"
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_bank_rec_widget_line__analytic_distribution
 msgid "Analytic Distribution"
-msgstr "Analisa Distribusi"
+msgstr "Distribusi Analitik"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_bank_rec_widget_line__analytic_precision
@@ -438,6 +437,56 @@ msgstr "Ketelitian Analitik"
 #: model:ir.model.fields,field_description:account_accountant.field_res_config_settings__use_anglo_saxon
 msgid "Anglo-Saxon Accounting"
 msgstr "Akuntansi berdasar Anglo-Saxon"
+
+#. module: account_accountant
+#: model:ir.model.fields,help:account_accountant.field_account_change_lock_date__current_hard_lock_date
+#: model:ir.model.fields,help:account_accountant.field_account_change_lock_date__hard_lock_date
+msgid ""
+"Any entry up to and including that date will be postponed to a later time, "
+"in accordance with its journal sequence. This lock date is irreversible and "
+"does not allow any exception."
+msgstr ""
+"Entry apa pun sampai dengan dan termasuk tanggal tersebut akan ditunda "
+"sampai tanggal berikutnya, sesuai dengan urutan jurnal. Tanggal kunci ini "
+"tidak dapat dibatalkan dan tidak mengizinkan pengecualian apa pun."
+
+#. module: account_accountant
+#: model:ir.model.fields,help:account_accountant.field_account_change_lock_date__fiscalyear_lock_date
+msgid ""
+"Any entry up to and including that date will be postponed to a later time, "
+"in accordance with its journal's sequence."
+msgstr ""
+"Entry apa pun sampai dengan dan termasuk tanggal tersebut akan ditunda "
+"sampai tanggal berikutnya, sesuai dengan urutan jurnal."
+
+#. module: account_accountant
+#: model:ir.model.fields,help:account_accountant.field_account_change_lock_date__tax_lock_date
+msgid ""
+"Any entry with taxes up to and including that date will be postponed to a "
+"later time, in accordance with its journal's sequence. The tax lock date is "
+"automatically set when the tax closing entry is posted."
+msgstr ""
+"Entry apa pun dengan pajak sampai dengan dan termasuk tanggal tersebut akan "
+"ditunda sampai tanggal berikutnya, sesuai dengan urutan jurnal. Tanggal "
+"kunci pajak secara otomatis ditetapkan saat entry closing pajak dipost."
+
+#. module: account_accountant
+#: model:ir.model.fields,help:account_accountant.field_account_change_lock_date__purchase_lock_date
+msgid ""
+"Any purchase entry prior to and including this date will be postponed to a "
+"later date, in accordance with its journal's sequence."
+msgstr ""
+"Entry pembelian apa pun sebelum dan termasuk tanggal ini akan ditunda sampai "
+"tanggal berikutnya, sesuai dengan urutan jurnal"
+
+#. module: account_accountant
+#: model:ir.model.fields,help:account_accountant.field_account_change_lock_date__sale_lock_date
+msgid ""
+"Any sales entry prior to and including this date will be postponed to a "
+"later date, in accordance with its journal's sequence."
+msgstr ""
+"Entry penjualan apa pun sebelum dan termasuk tanggal ini akan ditunda sampai "
+"tanggal sebelumnya, sesuai dengan urutan jurnal."
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_bank_statement__message_attachment_count
@@ -550,8 +599,7 @@ msgstr "Ganti Tanggal yang Dikunci"
 
 #. module: account_accountant
 #: model:ir.model.fields,help:account_accountant.field_account_reconcile_wizard__to_check
-msgid ""
-"Check if you are not certain of all the information of the counterpart."
+msgid "Check if you are not certain of all the information of the counterpart."
 msgstr "Periksa bila Anda tidak yakin mengenai semua informasi counterpart."
 
 #. module: account_accountant
@@ -619,6 +667,12 @@ msgstr "Pengaturan Konfigurasi"
 
 #. module: account_accountant
 #. odoo-javascript
+#: code:addons/account_accountant/static/src/js/tours/account_accountant.js:0
+msgid "Confirm the transaction."
+msgstr "Konfirmasi transaksi."
+
+#. module: account_accountant
+#. odoo-javascript
 #: code:addons/account_accountant/static/src/components/bank_reconciliation/rainbowman_content.xml:0
 msgid "Congrats, you're all done!"
 msgstr "Selamat, Anda sudah selesai!"
@@ -649,6 +703,12 @@ msgstr "Buat Laporan"
 #: model_terms:ir.actions.act_window,help:account_accountant.action_account_group_tree
 msgid "Create a new account group"
 msgstr "Create a new account group"
+
+#. module: account_accountant
+#. odoo-javascript
+#: code:addons/account_accountant/static/src/js/tours/account_accountant.js:0
+msgid "Create a new transaction."
+msgstr "Buat transaksi baru."
 
 #. module: account_accountant
 #. odoo-javascript
@@ -745,7 +805,7 @@ msgstr "Tanggal di mana penangguhan pengeluaran/pendapatan akan dimulai"
 #: model:ir.model.fields.selection,name:account_accountant.selection__res_company__deferred_expense_amount_computation_method__day
 #: model:ir.model.fields.selection,name:account_accountant.selection__res_company__deferred_revenue_amount_computation_method__day
 msgid "Days"
-msgstr "Hari-Hari"
+msgstr "Hari"
 
 #. module: account_accountant
 #. odoo-javascript
@@ -934,7 +994,7 @@ msgstr "Dokumen"
 #. odoo-python
 #: code:addons/account_accountant/wizard/account_change_lock_date.py:0
 msgid "Draft Entries"
-msgstr "Entri Draft"
+msgstr "Draft Entri"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_reconcile_wizard__edit_mode
@@ -971,8 +1031,8 @@ msgstr "Ending Date, included in the fiscal year."
 #: model:ir.model.fields,help:account_accountant.field_res_company__invoicing_switch_threshold
 #: model:ir.model.fields,help:account_accountant.field_res_config_settings__invoicing_switch_threshold
 msgid ""
-"Every payment and invoice before this date will receive the 'From Invoicing'"
-" status, hiding all the accounting entries related to it. Use this option "
+"Every payment and invoice before this date will receive the 'From Invoicing' "
+"status, hiding all the accounting entries related to it. Use this option "
 "after installing Accounting if you were using only Invoicing before, before "
 "importing all your actual accounting data in to Odoo."
 msgstr ""
@@ -985,6 +1045,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:account_accountant.field_account_change_lock_date__exception_duration
 msgid "Exception Duration"
 msgstr "Durasi Pengecualian"
+
+#. module: account_accountant
+#: model:ir.model.fields,field_description:account_accountant.field_account_change_lock_date__exception_needed_fields
+msgid "Exception Needed Fields"
+msgstr "Exception Needed Fields"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_change_lock_date__exception_reason
@@ -1106,8 +1171,8 @@ msgid ""
 msgstr ""
 "Dari tampilan daftar manapun, pilih lebih dari satu record dan daftar akan "
 "dapat diedit. Bila Anda mengupdate sebuah cell, record yang dipilih akan "
-"semuanya diperbarui bersamaan. Gunakan fitur ini untuk mengupdate lebih dari"
-" satu entri jurnal dari Buku Besar Umum, atau dari tampilan Jurnal apapun."
+"semuanya diperbarui bersamaan. Gunakan fitur ini untuk mengupdate lebih dari "
+"satu entri jurnal dari Buku Besar Umum, atau dari tampilan Jurnal apapun."
 
 #. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__res_company__deferred_expense_amount_computation_method__full_months
@@ -1148,9 +1213,14 @@ msgid "Hard Lock"
 msgstr "Kunci Keras"
 
 #. module: account_accountant
+#: model:ir.model.fields,field_description:account_accountant.field_account_move_line__has_abnormal_deferred_dates
+msgid "Has Abnormal Deferred Dates"
+msgstr "Memiliki Tanggal Didefer yang Abnormal"
+
+#. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_move_line__has_deferred_moves
 msgid "Has Deferred Moves"
-msgstr "Memiliki Pergerakkan yang Ditunda"
+msgstr "Memiliki Pergerakan yang Ditunda"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_bank_statement__has_message
@@ -1182,17 +1252,29 @@ msgstr "Bila dicentang, beberapa pesan mungkin memiliki kesalahan pengiriman."
 #: model:ir.model.fields,help:account_accountant.field_bank_rec_widget__st_line_checked
 msgid ""
 "If this checkbox is not ticked, it means that the user was not sure of all "
-"the related information at the time of the creation of the move and that the"
-" move needs to be checked again."
+"the related information at the time of the creation of the move and that the "
+"move needs to be checked again."
 msgstr ""
 "Apabila kotak centang ini tidak ditandai, itu berarti user tidak yakin "
 "dengan semua informasi terkait saat membuat pergerakan dan pergerakan "
 "tersebut perlu diperiksa lagi."
 
 #. module: account_accountant
+#. odoo-javascript
+#: code:addons/account_accountant/static/src/components/bank_reconciliation/bank_rec_form.xml:0
+msgid "In Company Currency"
+msgstr "Dalam Mata Uang Perusahaa"
+
+#. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_move_line_reconcile_tree
 msgid "In Currency"
 msgstr "Pada Mata Uang"
+
+#. module: account_accountant
+#. odoo-javascript
+#: code:addons/account_accountant/static/src/components/bank_reconciliation/bank_rec_form.xml:0
+msgid "In Foreign Currency"
+msgstr "Dalam Mata Uang Asing"
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_account_move_line_search_bank_rec_widget
@@ -1203,16 +1285,22 @@ msgstr "Barang Masuk"
 #. odoo-python
 #: code:addons/account_accountant/models/res_config_settings.py:0
 msgid ""
-"Incorrect fiscal year date: day is out of range for month. Month: %(month)s;"
-" Day: %(day)s"
+"Incorrect fiscal year date: day is out of range for month. Month: %(month)s; "
+"Day: %(day)s"
 msgstr ""
-"Tanggal tahun fiskal: tanggal hari di luar jarak untuk bulan. Bulan: "
-"%(month)s; Hari: %(day)s"
+"Tanggal tahun fiskal: tanggal hari di luar jarak untuk bulan. Bulan: %"
+"(month)s; Hari: %(day)s"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_bank_rec_widget_line__index
 msgid "Index"
 msgstr "Indeks"
+
+#. module: account_accountant
+#. odoo-python
+#: code:addons/account_accountant/demo/account_accountant_demo.py:0
+msgid "Insurance 12 months"
+msgstr "Asuransi 12 bulan"
 
 #. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__bank_rec_widget__state__invalid
@@ -1227,13 +1315,17 @@ msgstr "Laporan tidak valid"
 #. module: account_accountant
 #: model:ir.model.fields,help:account_accountant.field_bank_rec_widget__state
 msgid ""
-"Invalid: The bank transaction can't be validate since the suspense account is still involved\n"
+"Invalid: The bank transaction can't be validate since the suspense account "
+"is still involved\n"
 "Valid: The bank transaction can be validated.\n"
-"Reconciled: The bank transaction has already been processed. Nothing left to do."
+"Reconciled: The bank transaction has already been processed. Nothing left to "
+"do."
 msgstr ""
-"Tidak valid: Transaksi bank tidak dapat divalidasi karena akun yang ditangguhkan masih termasuk\n"
+"Tidak valid: Transaksi bank tidak dapat divalidasi karena akun yang "
+"ditangguhkan masih termasuk\n"
 "Valid: Transaksi bank dapat divalidasi.\n"
-"Rekonsiliasi: Transaksi bank sudah diproses. Tidak ada lagi yang perlu dilakukan."
+"Rekonsiliasi: Transaksi bank sudah diproses. Tidak ada lagi yang perlu "
+"dilakukan."
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_account_move_line_list_bank_rec_widget
@@ -1243,6 +1335,11 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_move_line_reconcile_tree
 msgid "Invoice Date"
 msgstr "Tanggal Faktur"
+
+#. module: account_accountant
+#: model:res.groups,name:account_accountant.group_account_basic
+msgid "Invoicing & Banks"
+msgstr "Penagihan & Bank"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_res_company__invoicing_switch_threshold
@@ -1346,8 +1443,8 @@ msgstr "Artikel jurnal di mana nomor pencocokan belum ditetapkan"
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_account_move_line_reconcile_search
 msgid ""
-"Journal items where the account allows reconciliation no matter the residual"
-" amount"
+"Journal items where the account allows reconciliation no matter the residual "
+"amount"
 msgstr ""
 "Item jurnal di mana akun memungkinkan rekonsiliasi tidak peduli jumlah sisa"
 
@@ -1412,20 +1509,6 @@ msgid "Let’s go back to the dashboard."
 msgstr "Mari kembali ke dashboard."
 
 #. module: account_accountant
-#: model:ir.model.fields,help:account_accountant.field_account_change_lock_date__hard_lock_date
-msgid "Like the \"Everyone Lock\", but no exceptions are possible."
-msgstr ""
-"Seperti \"Kunci Semua Orang\", tapi tidak ada pengecualian yang dapat "
-"dilakukan."
-
-#. module: account_accountant
-#: model:ir.model.fields,help:account_accountant.field_account_change_lock_date__current_hard_lock_date
-msgid "Like the \"Global Lock Date\", but no exceptions are possible."
-msgstr ""
-"Seperti \"Tanggal Kunci Global\", tapi tidak ada pengecualian yang dapat "
-"dilakukan,."
-
-#. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_auto_reconcile_wizard__line_ids
 #: model:ir.model.fields,field_description:account_accountant.field_bank_rec_widget__line_ids
 msgid "Line"
@@ -1443,18 +1526,18 @@ msgstr "Kunci Tanggal"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_change_lock_date__fiscalyear_lock_date
-msgid "Lock Everyone"
-msgstr "Kunci Semua Orang"
+msgid "Lock Everything"
+msgstr "Kunci Semuanya"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_change_lock_date__fiscalyear_lock_date_for_everyone
-msgid "Lock Everyone For Everyone"
-msgstr "Kunci Semua Orang Untuk Semua Orang"
+msgid "Lock Everything For Everyone"
+msgstr "Kunci Semuanya Untuk Semua Orang"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_change_lock_date__fiscalyear_lock_date_for_me
-msgid "Lock Everyone For Me"
-msgstr "Kunci Semua Orang Untuk Saya"
+msgid "Lock Everything For Me"
+msgstr "Kunci Semuanya Untuk Saya"
 
 #. module: account_accountant
 #: model:ir.actions.act_window,name:account_accountant.action_view_account_change_lock_date
@@ -1550,7 +1633,7 @@ msgstr "Cocok"
 #. odoo-python
 #: code:addons/account_accountant/models/account_payment.py:0
 msgid "Matched Transactions"
-msgstr "Transaksi-Transaksi Cocok"
+msgstr "Transaksi Cocok"
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_move_line_reconcile_tree
@@ -1560,7 +1643,7 @@ msgstr "Sesuai"
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_bank_rec_widget__matching_rules_allow_auto_reconcile
 msgid "Matching Rules Allow Auto Reconcile"
-msgstr "Peraturan Pencocokkan Memungkinkan Rekonsiliasi Otomatis"
+msgstr "Peraturan Pencocokan Memungkinkan Rekonsiliasi Otomatis"
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_bank_statement_line_quick_create_form_bank_rec_widget
@@ -1641,6 +1724,11 @@ msgid "Misc"
 msgstr "Lain-lain"
 
 #. module: account_accountant
+#: model:ir.model,name:account_accountant.model_ir_model
+msgid "Models"
+msgstr "Model"
+
+#. module: account_accountant
 #: model:ir.model.fields.selection,name:account_accountant.selection__res_company__deferred_expense_amount_computation_method__month
 #: model:ir.model.fields.selection,name:account_accountant.selection__res_company__deferred_revenue_amount_computation_method__month
 msgid "Months"
@@ -1672,6 +1760,13 @@ msgstr "Nama"
 #: model:ir.model.fields,field_description:account_accountant.field_bank_rec_widget_line__narration
 msgid "Narration"
 msgstr "Narasi"
+
+#. module: account_accountant
+#: model_terms:ir.ui.view,arch_db:account_accountant.view_account_change_lock_date
+msgid "Need an irreversible lock to ensure inalterability, for all users?"
+msgstr ""
+"Butuh kunci yang tidak dapat dibatalkan untuk memastikan ketidakberubahan, "
+"untuk semua user?"
 
 #. module: account_accountant
 #. odoo-javascript
@@ -1764,8 +1859,7 @@ msgstr "Pada validasi tagihan"
 #: code:addons/account_accountant/wizard/account_change_lock_date.py:0
 msgid "Only Billing Administrators are allowed to change lock dates!"
 msgstr ""
-"Hanya Administrator Tagihan yang diperbolehkan untuk mengganti tanggal "
-"tutup!"
+"Hanya Administrator Tagihan yang diperbolehkan untuk mengganti tanggal tutup!"
 
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.view_account_reconcile_wizard
@@ -1926,46 +2020,6 @@ msgid ""
 msgstr ""
 "Atur lebih dahulu untuk membuat entri jurnal saat pencocokan faktur dan "
 "pembayaran"
-
-#. module: account_accountant
-#: model:ir.model.fields,help:account_accountant.field_account_change_lock_date__fiscalyear_lock_date
-msgid ""
-"Prevents Journal Entry creation or modification up to the defined date "
-"inclusive for all users. As a closed period, all accounting operations are "
-"prohibited."
-msgstr ""
-"Mencegah pembuatan atau modifikasi Entri Jurnal sebelum tanggal yang "
-"ditetapkan untuk semua user. Sebagai periode tertutup, semua operasi "
-"akuntasi dilarang."
-
-#. module: account_accountant
-#: model:ir.model.fields,help:account_accountant.field_account_change_lock_date__tax_lock_date
-msgid ""
-"Prevents Tax Returns modification up to the defined date inclusive (Journal "
-"Entries involving taxes). The Tax Return Lock Date is automatically set when"
-" the corresponding Journal Entry is posted."
-msgstr ""
-"Mencegah modifikasi SPT sebelum tanggal yang ditentukan (Entri Jurnal yang "
-"melibatkan pajak). Tanggal kunci SPT secara otomatis ditetapkan saat Entri "
-"Jurnal yang sesua di-post."
-
-#. module: account_accountant
-#: model:ir.model.fields,help:account_accountant.field_account_change_lock_date__purchase_lock_date
-msgid ""
-"Prevents creation and modification of entries in purchase journals up to the"
-" defined date inclusive"
-msgstr ""
-"Mencegah pembuatan dan modifikasi entri di jurnal purchase sampai dengan "
-"tanggal yang didefinisikan, inklusif"
-
-#. module: account_accountant
-#: model:ir.model.fields,help:account_accountant.field_account_change_lock_date__sale_lock_date
-msgid ""
-"Prevents creation and modification of entries in sales journals up to the "
-"defined date inclusive"
-msgstr ""
-"Mencegah pembuatan dan modifikasi entri di jurnal sales sampai dengan "
-"tanggal yang didefinisikan, inklusif"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_bank_statement__rating_ids
@@ -2147,9 +2201,21 @@ msgstr "Model Reco yang Dipilih"
 
 #. module: account_accountant
 #. odoo-javascript
+#: code:addons/account_accountant/static/src/js/tours/account_accountant.js:0
+msgid "Set an amount."
+msgstr "Tetapkan jumlah."
+
+#. module: account_accountant
+#. odoo-javascript
 #: code:addons/account_accountant/static/src/components/bank_reconciliation/bank_rec_form.xml:0
 msgid "Set as Checked"
 msgstr "Tetapkan sebagai Diperiksa"
+
+#. module: account_accountant
+#. odoo-javascript
+#: code:addons/account_accountant/static/src/js/tours/account_accountant.js:0
+msgid "Set the payment reference."
+msgstr "Tetapkan referensi pembayaran."
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_change_lock_date__show_draft_entries_warning
@@ -2161,6 +2227,11 @@ msgstr "Tunjukkan Peringatan Draft Entri"
 #: model:ir.model.fields,field_description:account_accountant.field_account_move__show_signature_area
 msgid "Show Signature Area"
 msgstr "Tunjukkan Kolom Tanda Tangan"
+
+#. module: account_accountant
+#: model:ir.model.fields,field_description:account_accountant.field_res_config_settings__module_sign
+msgid "Sign"
+msgstr "Sign"
 
 #. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_account_bank_statement_line__signature
@@ -2225,6 +2296,11 @@ msgid "Source Debit"
 msgstr "Source Debit"
 
 #. module: account_accountant
+#: model:ir.model.fields,field_description:account_accountant.field_bank_rec_widget_line__source_rate
+msgid "Source Rate"
+msgstr "Tarif Sumber"
+
+#. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_bank_rec_widget__st_line_id
 msgid "St Line"
 msgstr "St Line"
@@ -2263,6 +2339,12 @@ msgid "Statement Line"
 msgstr "Baris Laporan"
 
 #. module: account_accountant
+#. odoo-python
+#: code:addons/account_accountant/demo/account_accountant_demo.py:0
+msgid "Subscription 12 months"
+msgstr "Langganan 12 bulan"
+
+#. module: account_accountant
 #: model:ir.model.fields,field_description:account_accountant.field_bank_rec_widget_line__suggestion_amount_currency
 msgid "Suggestion Amount Currency"
 msgstr "Jumlah Mata Suggestion"
@@ -2283,6 +2365,7 @@ msgid "Suggestions"
 msgstr "Saran"
 
 #. module: account_accountant
+#: model:ir.model,name:account_accountant.model_account_tax
 #: model:ir.model.fields,field_description:account_accountant.field_account_reconcile_wizard__tax_id
 #: model:ir.model.fields,field_description:account_accountant.field_bank_rec_widget_line__tax_ids
 msgid "Tax"
@@ -2334,8 +2417,8 @@ msgstr ""
 #. module: account_accountant
 #: model:ir.model.fields,help:account_accountant.field_bank_rec_widget_line__amount_transaction_currency
 msgid ""
-"The amount expressed in an optional other currency if it is a multi-currency"
-" entry."
+"The amount expressed in an optional other currency if it is a multi-currency "
+"entry."
 msgstr ""
 "Jumlah yang dinyatakan dalam pilihan mata uang lain jika beberapa mata uang "
 "berlaku."
@@ -2369,8 +2452,8 @@ msgid ""
 "The date you set violates the lock date of one of your entry. It will be "
 "overriden by the following date : %(replacement_date)s"
 msgstr ""
-"Tanggal yang Anda tetapkan melanggar salah satu entri Anda. Tanggal tersebut"
-" akan diganti dengan  tanggal berikut : %(replacement_date)s"
+"Tanggal yang Anda tetapkan melanggar salah satu entri Anda. Tanggal tersebut "
+"akan diganti dengan  tanggal berikut : %(replacement_date)s"
 
 #. module: account_accountant
 #: model:ir.model.fields,help:account_accountant.field_account_bank_statement_line__deferred_move_ids
@@ -2407,10 +2490,11 @@ msgstr ""
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.res_config_settings_view_form
 msgid ""
-"The invoices up to this date will not be taken into account as accounting "
+"The invoices before this date will not be taken into account as accounting "
 "entries"
 msgstr ""
-"Faktur sampai tanggal ini tidak akan diperhitungkan sebagai entri akuntansi"
+"Faktur-faktur sebelum tanggal ini tidak akan diperhitungkan sebagai entri "
+"akuntansi"
 
 #. module: account_accountant
 #: model:ir.model.fields,help:account_accountant.field_bank_rec_widget_line__transaction_currency_id
@@ -2426,8 +2510,8 @@ msgstr "Faktur original yang membuat entri yang ditangguhkan"
 #. module: account_accountant
 #: model_terms:ir.ui.view,arch_db:account_accountant.res_config_settings_view_form
 msgid ""
-"The system will try to predict the product on vendor bill lines based on the"
-" label of the line"
+"The system will try to predict the product on vendor bill lines based on the "
+"label of the line"
 msgstr ""
 "Sistem akan mencoba memperkirakan produk pada baris tagihan vendor "
 "berdasarkan label pada baris"
@@ -2439,7 +2523,8 @@ msgid ""
 "                                You should either post or delete them."
 msgstr ""
 "Masih terdapat entri draft di periode yang Anda ingin kunci.\n"
-"                                 Anda sebaiknya memposting atau menghapus mereka."
+"                                 Anda sebaiknya memposting atau menghapus "
+"mereka."
 
 #. module: account_accountant
 #. odoo-python
@@ -2450,6 +2535,18 @@ msgid ""
 msgstr ""
 "Transaksi bank ini akan secara otomatis divalidasi menggunakan model "
 "rekonsiliasi '%s'."
+
+#. module: account_accountant
+#. odoo-python
+#: code:addons/account_accountant/models/bank_rec_widget.py:0
+msgid ""
+"This bank transaction is locked up tighter than a squirrel in a nut factory! "
+"You can't hit the reset button on it. So, do you want to \"unreconcile\" it "
+"instead?"
+msgstr ""
+"Transaksi bank ini sangat dikunci erat. Anda tidak dapat memencet tombol "
+"reset untuk transaksi ini. Namun, Anda dapat \"membatalkan rekonsiliasi\". "
+"Apakah Anda ingin melakukan ini?"
 
 #. module: account_accountant
 #. odoo-python
@@ -2601,6 +2698,12 @@ msgid "View"
 msgstr "Tampilan"
 
 #. module: account_accountant
+#. odoo-python
+#: code:addons/account_accountant/models/bank_rec_widget.py:0
+msgid "View Reconciled Entries"
+msgstr "Lihat Entri-Entri yang Direkonsiliasi"
+
+#. module: account_accountant
 #. odoo-javascript
 #: code:addons/account_accountant/static/src/components/bank_reconciliation/bank_rec_form.xml:0
 msgid "View models"
@@ -2664,10 +2767,17 @@ msgstr ""
 
 #. module: account_accountant
 #. odoo-python
+#: code:addons/account_accountant/models/bank_rec_widget.py:0
+msgid "You can't hit the reset button on a secured bank transaction."
+msgstr ""
+"Anda tidak dapat memencet tombol reset pada transaksi bank yang diamankan."
+
+#. module: account_accountant
+#. odoo-python
 #: code:addons/account_accountant/models/account_move.py:0
 msgid ""
-"You cannot change the account for a deferred line in %(move_name)s if it has"
-" already been deferred."
+"You cannot change the account for a deferred line in %(move_name)s if it has "
+"already been deferred."
 msgstr ""
 "Anda tidak dapat mengubah akun untuk baris yang ditunda di %(move_name)s "
 "bila sudah ditunda."
@@ -2684,8 +2794,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_accountant/models/account_move.py:0
 msgid ""
-"You cannot create a deferred entry with a start date later than the end "
-"date."
+"You cannot create a deferred entry with a start date later than the end date."
 msgstr ""
 "Anda tidak dapat membuat entri yang ditangguhkan dengan tanggal mulai "
 "sebelum tanggal akhir."
@@ -2693,8 +2802,7 @@ msgstr ""
 #. module: account_accountant
 #. odoo-python
 #: code:addons/account_accountant/models/account_move.py:0
-msgid ""
-"You cannot generate deferred entries for a miscellaneous journal entry."
+msgid "You cannot generate deferred entries for a miscellaneous journal entry."
 msgstr ""
 "Anda tidak dapat membuat entri yang ditangguhkan untuk entri jurnal "
 "miscellaneous."
@@ -2724,8 +2832,7 @@ msgstr "Anda tidak dapat menetapkan Tanggal Kunci di masa depan."
 #. module: account_accountant
 #. odoo-python
 #: code:addons/account_accountant/models/bank_rec_widget_line.py:0
-msgid ""
-"You might want to %(btn_start)sfully reconcile%(btn_end)s the document."
+msgid "You might want to %(btn_start)sfully reconcile%(btn_end)s the document."
 msgstr ""
 "Anda mungkin ingin %(btn_start)s sepenuhnya merekonsiliasi %(btn_end)s "
 "dokumen."
@@ -2737,8 +2844,8 @@ msgid ""
 "You might want to make a %(btn_start)spartial reconciliation%(btn_end)s "
 "instead."
 msgstr ""
-"Sebagai gantinya Anda mungkin ingin %(btn_start)s merekonsiliasi setengah "
-"%(btn_end)s saja."
+"Sebagai gantinya Anda mungkin ingin %(btn_start)s merekonsiliasi setengah %"
+"(btn_end)s saja."
 
 #. module: account_accountant
 #. odoo-python

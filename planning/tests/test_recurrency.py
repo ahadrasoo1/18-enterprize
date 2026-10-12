@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details
 
 from datetime import datetime, timedelta
@@ -540,6 +539,43 @@ class TestRecurrencySlotGeneration(TestCommonPlanning):
         self.assertEqual(len(list(filter(lambda recu: recu.id == empty_recurrency_id, self.env['planning.recurrency'].search([])))), 0, 'the empty recurrency we created should not be in the db anymore')
         recurrencies = self.env['planning.recurrency'].search([])
         self.assertFalse(len(list(filter(lambda recu: len(recu.slot_ids) == 0, recurrencies))), 'cron with no slot gets deleted (there is no original slot to copy from)')
+
+    @freeze_time('2025-01-01 8:00:00')
+    def test_recurrency_slot_deletion(self):
+        """ Check cron on existing slots after auto deletion of other recurrence """
+
+        slot_a, slot_b = self.env['planning.slot'].create([
+            {
+                'start_datetime': datetime(2025, 1, 1, 8, 0, 0),
+                'end_datetime': datetime(2025, 1, 1, 17, 0, 0),
+                'resource_id': self.resource_bert.id,
+                'repeat': True,
+                'repeat_type': 'until',
+                'repeat_interval': 1,
+                'repeat_unit': 'day',
+                'repeat_until': datetime(2025, 1, 10, 8, 0, 0),
+            },
+            {
+                'start_datetime': datetime(2025, 1, 1, 8, 0, 0),
+                'end_datetime': datetime(2025, 1, 1, 17, 0, 0),
+                'resource_id': self.resource_joseph.id,
+                'repeat': True,
+                'repeat_type': 'until',
+                'repeat_interval': 1,
+                'repeat_unit': 'day',
+                'repeat_until': datetime(2025, 1, 10, 8, 0, 0),
+            },
+        ])
+
+        # delete all slots on first recurrency
+        slot_a.recurrency_id.slot_ids.unlink()
+
+        # delete last slot on second recurrency
+        slot_b.recurrency_id.slot_ids.filtered(lambda s: s.start_datetime == datetime(2025, 1, 10, 8, 0, 0)).unlink()
+
+        self.env['planning.recurrency']._cron_schedule_next()
+
+        self.assertTrue(slot_b.recurrency_id.slot_ids.filtered(lambda s: s.start_datetime == datetime(2025, 1, 10, 8, 0, 0)), "Recurrency cron should have re-created the deleted slot")
 
     @freeze_time('2020-01-01 08:00:00')
     def test_recurrency_change_date(self):
@@ -1085,6 +1121,51 @@ class TestRecurrencySlotGeneration(TestCommonPlanning):
         # slots in the weekend should have the same allocated hours of the recurring shift
         self.assertEqual(all(slot.allocated_hours == 7 for slot in generated_slots), True,
                          'All the generated slots should have the same allocated hours')
+
+    @freeze_time('2022-01-10 10:00:00')
+    def test_fully_flexible_employee_recurring_shifts_with_conflicts(self):
+        """
+        Test that recurring shifts are assigned to fully flexible employees even if they generate conflicts with existing shifts.
+        """
+        # Create an employee working fully flexible hours
+        self.employee_bert.resource_calendar_id = False
+
+        # Plan some shifts for the employee
+        shift = self.env['planning.slot'].create({
+            'resource_id': self.employee_bert.resource_id.id,
+            'start_datetime': datetime(2022, 1, 10, 10, 0),
+            'end_datetime': datetime(2022, 1, 10, 17, 0),
+        })
+
+        # Create a recurring shift for the employee
+        self.env['planning.slot'].create({
+            'resource_id': self.employee_bert.resource_id.id,
+            'start_datetime': datetime(2022, 1, 10, 9, 0),      # Monday
+            'end_datetime': datetime(2022, 1, 10, 18, 0),       # shift of 9 hours
+            'repeat': True,
+            'repeat_interval': 1,
+            'repeat_unit': 'day',
+            'repeat_type': 'until',
+            'repeat_until': datetime(2022, 1, 16, 23, 59, 59),  # Sunday
+        })
+
+        # Fetch all shifts for the employee within the week
+        shifts = self.env['planning.slot'].search([
+            ('id', '!=', shift.id),
+            ('resource_id', '=', self.employee_bert.resource_id.id),
+            ('start_datetime', '>=', datetime(2022, 1, 10, 0, 0)),
+            ('end_datetime', '<=', datetime(2022, 1, 16, 23, 59, 59)),
+        ])
+
+        # Verify that there are 8 shifts in total (7 recurring shifts)
+        self.assertEqual(len(shifts), 7, "There should be 7 recurring shifts for the employee.")
+        shift_count_per_start_day = {}
+        for shift in shifts:
+            start_day = shift.start_datetime.day
+            self.assertNotIn(start_day, shift_count_per_start_day, "There should be one shift per day.")
+            shift_count_per_start_day[start_day] = True
+            self.assertEqual(shift.start_datetime.hour, 9, "Recurring shift should start at 9:00 AM.")
+            self.assertEqual(shift.end_datetime.hour, 18, "Recurring shift should end at 6:00 PM.")
 
     def test_edit_all_shifts_end_datetime(self):
         self.configure_recurrency_span(1)

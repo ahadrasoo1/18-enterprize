@@ -1,6 +1,6 @@
 /** @odoo-module **/
 
-import { loadBundle } from "@web/core/assets";
+import { browser } from '@web/core/browser/browser'
 import { formatDateTime } from '@web/core/l10n/dates';
 import { rpc } from "@web/core/network/rpc";
 import { registry } from '@web/core/registry';
@@ -59,6 +59,7 @@ class KnowledgeTopbar extends Component {
 
         onWillStart(async () => {
             this.isInternalUser = await user.hasGroup('base.group_user');
+            this.canCreateArticle = await user.checkAccessRight('knowledge.article', 'create');
         });
 
         useEffect((optionsBtn) => {
@@ -189,6 +190,11 @@ class KnowledgeTopbar extends Component {
         }
     }
 
+    toggleFullWidth() {
+        this.props.record.update({full_width: !this.props.record.data.full_width});
+        browser.dispatchEvent(new Event("resize"));
+    }
+
     /**
      * Copy the current article in private section and open it.
      */
@@ -215,7 +221,6 @@ class KnowledgeTopbar extends Component {
      *
      */
     async exportToPdf() {
-        await loadBundle("knowledge.assets_knowledge_print");
         window.print();
     }
 
@@ -323,6 +328,7 @@ export const knowledgeTopbar = {
     component: KnowledgeTopbar,
     fieldDependencies: [
         { name: "create_uid", type: "many2one", relation: "res.users" },
+        { name: "display_name", type: "char" },
         { name: "html_field_history_metadata", type: "jsonb" },
         { name: "last_edition_uid", type: "many2one", relation: "res.users" },
         { name: "parent_path", type: "char" },

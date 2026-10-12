@@ -1,23 +1,27 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* mrp_maintenance
-# 
+# * mrp_maintenance
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Sergio Zanchetta <primes2h@gmail.com>, 2025
+# "Marianna Ciofani (cima)" <cima@odoo.com>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:27+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Italian (https://app.transifex.com/odoo/teams/41243/it/)\n"
+"POT-Creation-Date: 2025-12-29 18:47+0000\n"
+"PO-Revision-Date: 2025-10-14 10:37+0000\n"
+"Last-Translator: \"Marianna Ciofani (cima)\" <cima@odoo.com>\n"
+"Language-Team: Italian <https://translate.odoo.com/projects/odoo-18/"
+"mrp_maintenance/it/>\n"
+"Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: it\n"
-"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=(n == 1) ? 0 : ((n != 0 && n % 1000000 == "
+"0) ? 1 : 2);\n"
+"X-Generator: Weblate 5.12.2\n"
 
 #. module: mrp_maintenance
 #: model_terms:ir.ui.view,arch_db:mrp_maintenance.mrp_production_view_form_inherit_maintenance
@@ -76,8 +80,7 @@ msgstr "Blocca Centro di Lavoro"
 
 #. module: mrp_maintenance
 #: model:ir.model.fields,help:mrp_maintenance.field_maintenance_request__recurring_leaves_count
-msgid ""
-"Block the workcenter for this many time slots in the future in advance."
+msgid "Block the workcenter for this many time slots in the future in advance."
 msgstr "Blocca in anticipo il centro di lavoro per gli slot di tempo futuri."
 
 #. module: mrp_maintenance
@@ -89,7 +92,7 @@ msgstr "Azienda"
 #. module: mrp_maintenance
 #: model:ir.model.fields,help:mrp_maintenance.field_mrp_workcenter__estimated_next_failure
 msgid "Computed as Latest Failure Date + MTBF"
-msgstr "Ultima data di guasto + MTBF"
+msgstr "Calcolato come data del guasto più recente + MTBF"
 
 #. module: mrp_maintenance
 #: model_terms:ir.actions.act_window,help:mrp_maintenance.maintenance_workcenter_action
@@ -99,7 +102,7 @@ msgstr "Crea un nuovo centro di produzione"
 #. module: mrp_maintenance
 #: model:maintenance.equipment,name:mrp_maintenance.equipment_furniture1
 msgid "Crosscut Saw: 8 ppi."
-msgstr "Saracco: 8 denti per pollice."
+msgstr "Sega a taglio trasversale: 8 punti per pollice."
 
 #. module: mrp_maintenance
 #: model:ir.model.fields,field_description:mrp_maintenance.field_mrp_workcenter__maintenance_open_count
@@ -131,28 +134,28 @@ msgstr "Attrezzatura"
 #. module: mrp_maintenance
 #: model_terms:ir.ui.view,arch_db:mrp_maintenance.mrp_workcenter_view_form_inherit_maintenance
 msgid "Est. Next Failure"
-msgstr "Stima prossimo guasto"
+msgstr "Prossimo guasto stim."
 
 #. module: mrp_maintenance
 #: model_terms:ir.ui.view,arch_db:mrp_maintenance.mrp_workcenter_view_form_inherit_maintenance
 msgid "Estimated Next Failure"
-msgstr "Stima prossimo guasto"
+msgstr "Prossimo guasto stimato"
 
 #. module: mrp_maintenance
 #: model:ir.model.fields,field_description:mrp_maintenance.field_mrp_workcenter__estimated_next_failure
 msgid "Estimated time before next failure (in days)"
-msgstr "Tempo stimato prima il prossimo guasto (in giorni)"
+msgstr "Tempo stimato prima del prossimo guasto (in giorni)"
 
 #. module: mrp_maintenance
 #: model:ir.model.fields,field_description:mrp_maintenance.field_mrp_workcenter__expected_mtbf
 msgid "Expected MTBF"
-msgstr "MTBF previsto"
+msgstr "MTBF atteso"
 
 #. module: mrp_maintenance
 #: model:ir.model.fields,help:mrp_maintenance.field_mrp_workcenter__expected_mtbf
 #: model_terms:ir.ui.view,arch_db:mrp_maintenance.mrp_workcenter_view_form_inherit_maintenance
 msgid "Expected Mean Time Between Failure"
-msgstr "Tempo medio previsto fra i guasti"
+msgstr "Tempo medio atteso tra i guasti (MTBF)"
 
 #. module: mrp_maintenance
 #: model_terms:ir.actions.act_window,help:mrp_maintenance.mrp_workcenter_request_action_from_workcenter
@@ -305,29 +308,34 @@ msgstr "Ordine di produzione"
 #. module: mrp_maintenance
 #: model_terms:ir.actions.act_window,help:mrp_maintenance.maintenance_workcenter_action
 msgid ""
-"Manufacturing operations are processed at Work Centers. A Work Center can be composed of\n"
-"            workers and/or machines, they are used for costing, scheduling, capacity planning, etc."
+"Manufacturing operations are processed at Work Centers. A Work Center can be "
+"composed of\n"
+"            workers and/or machines, they are used for costing, scheduling, "
+"capacity planning, etc."
 msgstr ""
-"Le operazioni di produzione vengono elaborate nei centri di lavoro. Questi ultimi possono essere costituiti da\n"
-"                lavoratori e/o macchine, usati per la stima dei costi, programmazione, pianificazione della capacità ecc."
+"Le operazioni di produzione vengono elaborate nei centri di lavoro. Questi "
+"ultimi possono essere costituiti da\n"
+"                lavoratori e/o macchine, usati per la stima dei costi, "
+"programmazione, pianificazione della capacità ecc."
 
 #. module: mrp_maintenance
 #: model_terms:ir.ui.view,arch_db:mrp_maintenance.mrp_workcenter_view_form_inherit_maintenance
 msgid "Mean Time Between Failure"
-msgstr "Tempo medio fra i guasti"
+msgstr "Tempo medio tra i guasti"
 
 #. module: mrp_maintenance
 #: model:ir.model.fields,help:mrp_maintenance.field_mrp_workcenter__mtbf
 msgid ""
 "Mean Time Between Failure, computed based on done corrective maintenances."
 msgstr ""
-"Tempo medio fra i guasti, calcolato in base alle riparazioni effettuate. "
+"Tempo medio tra i guasti, calcolato in base alle manutenzioni a guasto "
+"effettuate."
 
 #. module: mrp_maintenance
 #: model:ir.model.fields,help:mrp_maintenance.field_mrp_workcenter__mttr
 #: model_terms:ir.ui.view,arch_db:mrp_maintenance.mrp_workcenter_view_form_inherit_maintenance
 msgid "Mean Time To Repair"
-msgstr "Tempo medio fino alla riparazione"
+msgstr "Tempo medio di riparazione"
 
 #. module: mrp_maintenance
 #: model:ir.model.fields,field_description:mrp_maintenance.field_mrp_workcenter__message_has_error
@@ -348,7 +356,7 @@ msgstr "Scadenza mie attività"
 #. odoo-python
 #: code:addons/mrp_maintenance/models/mrp_maintenance.py:0
 msgid "New Maintenance Request"
-msgstr "Nuova Richiesta Manutenzione"
+msgstr "Nuova richiesta di manutenzione"
 
 #. module: mrp_maintenance
 #: model:ir.model.fields,field_description:mrp_maintenance.field_mrp_workcenter__activity_calendar_event_id
@@ -378,7 +386,7 @@ msgstr "Numero di azioni"
 #. module: mrp_maintenance
 #: model:ir.model.fields,field_description:mrp_maintenance.field_mrp_workcenter__message_has_error_counter
 msgid "Number of errors"
-msgstr "Numero di azioni"
+msgstr "Numero di errori"
 
 #. module: mrp_maintenance
 #: model:ir.model.fields,field_description:mrp_maintenance.field_mrp_production__maintenance_count
@@ -388,7 +396,7 @@ msgstr "Numero di manutenzioni richieste"
 #. module: mrp_maintenance
 #: model:ir.model.fields,help:mrp_maintenance.field_mrp_workcenter__message_needaction_counter
 msgid "Number of messages requiring action"
-msgstr "Numero di messagig che richiedono un'azione"
+msgstr "Numero di messaggi che richiedono un'azione"
 
 #. module: mrp_maintenance
 #: model:ir.model.fields,help:mrp_maintenance.field_mrp_workcenter__message_has_error_counter
@@ -484,8 +492,8 @@ msgid ""
 "The schedule has changed from %(desired_date)s to %(effective_date)s due to "
 "planned manufacturing orders."
 msgstr ""
-"La programmazione è stata spostata dal %(desired_date)s al "
-"%(effective_date)s per via di ordini di produzione già pianificati."
+"La programmazione è stata spostata dal %(desired_date)s al %"
+"(effective_date)s per via di ordini di produzione già pianificati."
 
 #. module: mrp_maintenance
 #. odoo-python
@@ -517,11 +525,19 @@ msgstr "Cronologia comunicazioni sito web"
 #. module: mrp_maintenance
 #: model:ir.model.fields,help:mrp_maintenance.field_maintenance_stage__create_leaves
 msgid ""
-"When this box is unticked, and the maintenance is of the type 'Work Center', no leave is created on the respective work center when a maintenance request is created.\n"
-"If the box is ticked, the work center is automatically blocked for the listed duration, either at the specified date, or as soon as possible, if the work center is unavailable then."
+"When this box is unticked, and the maintenance is of the type 'Work Center', "
+"no leave is created on the respective work center when a maintenance request "
+"is created.\n"
+"If the box is ticked, the work center is automatically blocked for the "
+"listed duration, either at the specified date, or as soon as possible, if "
+"the work center is unavailable then."
 msgstr ""
-"Quando questa casella è deselezionata e la manutenzione è di tipo 'Centro di lavoro', non viene creato alcun congedo sul rispettivo centro di lavoro quando viene creata una richiesta di manutenzione.\n"
-"Se la casella è selezionata, il centro di lavoro viene automaticamente bloccato per la durata indicata, alla data specificata o il prima possibile, se il centro di lavoro non è disponibile in quel momento."
+"Quando questa casella è deselezionata e la manutenzione è di tipo 'Centro di "
+"lavoro', non viene creato alcun congedo sul rispettivo centro di lavoro "
+"quando viene creata una richiesta di manutenzione.\n"
+"Se la casella è selezionata, il centro di lavoro viene automaticamente "
+"bloccato per la durata indicata, alla data specificata o il prima possibile, "
+"se il centro di lavoro non è disponibile in quel momento."
 
 #. module: mrp_maintenance
 #: model:ir.model,name:mrp_maintenance.model_mrp_workcenter

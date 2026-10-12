@@ -1,5 +1,6 @@
 
 from unittest.mock import patch
+from lxml import etree
 
 import odoo
 
@@ -80,6 +81,7 @@ class TestStudioIrModel(TransactionCase):
                 'partner_id': self.partner_elon.id,
                 'name': 'Elon Tusk',
                 'email': 'elon@spacex.com',
+                'display_name': 'Elon Tusk',
                 'lang': None,
                 'reason': 'Contact',
             },
@@ -89,6 +91,22 @@ class TestStudioIrModel(TransactionCase):
         sms_suggested_recipients = bfr._mail_get_partner_fields(introspect_fields=False)
         self.assertIn('x_studio_partner_id', sms_suggested_recipients,
                       'custom partner field should be included in sms communications')
+
+        self.assertTrue(model.is_mail_activity)
+        # resist to field name changes across versions
+        self.assertTrue("activity_user_id" in self.env[model.model]._fields)
+        got_views = self.env[model.model].get_views([(False, "search")])
+        search_view = etree.fromstring(got_views["views"]["search"]["arch"])
+
+        expected_filters = {
+            'activities_overdue': "[('my_activity_date_deadline', '<', context_today().strftime('%Y-%m-%d'))]",
+            'activities_today': "[('my_activity_date_deadline', '=', context_today().strftime('%Y-%m-%d'))]",
+            'activities_upcoming_all': "[('my_activity_date_deadline', '>', context_today().strftime('%Y-%m-%d'))]"
+        }
+
+        for filter_name, expected_domain in expected_filters.items():
+            filter_element = search_view.xpath(f"//filter[@name='{filter_name}']")[0]
+            self.assertEqual(filter_element.get("domain"), expected_domain)
 
     def test_02_model_option_active(self):
         """Test that the `active` behaviour is set up correctly."""
@@ -455,6 +473,20 @@ class TestStudioIrModel(TransactionCase):
                 {'xml_id': 'web_studio.xmlid', 'record': record}
             ])
 
+    def test_ir_default_company_fields(self):
+        model = self.env['ir.model'].create({
+            'name': 'Rockets',
+            'model': 'x_rockets',
+            'field_id': [
+                Command.create({'name': 'x_studio_company_id', 'ttype': 'many2one', 'relation': 'res.company'}),
+                Command.create({'name': 'x_company_id', 'ttype': 'many2one', 'relation': 'res.company'}),
+            ]
+        })
+        self.env["res.company"].create({"name": "new company test"})
+        defaults = self.env["ir.default"].search([("field_id", "in", model.field_id.ids)])
+        self.assertEqual(len(defaults), 2)
+        self.assertEqual(defaults.mapped("field_id"), model.field_id.filtered(lambda f: f.relation == "res.company"))
+
 
 @tagged("-at_install", "post_install")
 class TestStudioIrModelHardcoded(TransactionCase):
@@ -463,66 +495,131 @@ class TestStudioIrModelHardcoded(TransactionCase):
             Should be executed at post install time because obviously the models should all
             have a chance to get up to date.
         """
-        modules = self.env["ir.module.module"].search([])
-        module_names = set(modules.mapped("name"))
         needed_modules = {
             "account",
+            "account_edi",
+            "account_edi_ubl_cii",
+            "analytic",
+            "appointment",
+            "auth_signup",
+            "base",
+            "base_automation",
+            "calendar",
             "crm",
             "documents",
+            "event",
             "helpdesk",
             "hr",
+            "hr_recruitment",
             "knowledge",
+            "loyalty",
+            "mail",
+            "mail_mobile",
+            "maintenance",
+            "mrp",
+            "phone_validation",
             "planning",
+            "point_of_sale",
+            "portal",
+            "pos_loyalty",
+            "pos_preparation_display",
+            "pos_restaurant",
             "product",
             "project",
+            "purchase",
+            "purchase_stock",
             "quality",
+            "repair",
+            "resource",
             "sale",
+            "sale_management",
+            "sale_planning",
+            "sale_project",
+            "sale_stock",
+            "sale_subscription",
+            "sales_team",
+            "sign",
             "stock",
             "survey",
             "uom",
+            "web_editor",
+            "web_map",
+            "web_studio",
             "website",
+            "website_sale",
             "worksheet",
         }
-        self.assertTrue(module_names.issuperset(needed_modules))
+        modules = self.env["ir.module.module"].search([('name', 'in', list(needed_modules))])
+        self.assertEqual(len(needed_modules), len(modules))
 
-        installed = self.env["ir.module.module"]._installed().keys()
-        if not all(name in installed for name in needed_modules):
+        if ms := [m.name for m in modules if m.state != 'installed']:
             # At least one needed module is not installed, so we would not be able
             # to assert the hardcoded lists, so we skip the rest of the test.
-            return
+            self.skipTest(f"Missing required modules {', '.join(ms)}")
+
+        def check_ownership(model: str, field_name: str | None = None) -> None:
+            self.assertIn(model, self.env, f"Unknown model {model}")
+            if field_name:
+                field = self.env[model]._fields.get(field_name)
+                self.assertIsNotNone(field, f"Unknown field {model}.{field_name}")
+                # sadly Field._module returns the module which last overrode
+                # the field, and Field._modules has unstable ordering, so if
+                # the field was overridden walk the MRO from the top
+                module = field._module if len(field._modules) == 1 else next(
+                    cls
+                    for cls in reversed(self.registry[model].mro())
+                    if hasattr(cls, field_name)
+                )._module
+                seen_modules.add(module)
+                self.assertIn(
+                    module,
+                    needed_modules,
+                    f"{model}.{field_name} was not added by a listed module",
+                )
+            else:
+                seen_modules.add(self.env[model]._original_module)
+                self.assertIn(
+                    self.env[model]._original_module,
+                    needed_modules,
+                    f"{model} was not added by a listed module",
+                )
+
+        seen_modules = set()
 
         for model, defaults in PRESET_MODELS_DEFAULTS:
-            self.assertIn(model, self.env)
+            check_ownership(model)
             for field in defaults:
                 self.assertIn(field, self.env["studio.export.model"]._fields)
 
         for model, fields in DEFAULT_FIELDS_TO_EXCLUDE.items():
             for field in fields:
-                self.assertIn(field, self.env[model]._fields)
+                check_ownership(model, field)
 
         for model, fields in ABSTRACT_MODEL_FIELDS_TO_EXCLUDE.items():
             for field in fields:
-                self.assertIn(field, self.env[model]._fields)
+                check_ownership(model, field)
 
         for model, fields in FIELDS_TO_EXPORT.items():
             for field in fields:
-                self.assertIn(field, self.env[model]._fields)
+                check_ownership(model, field)
 
         for model in DEFAULT_MODELS_TO_EXPORT:
-            self.assertIn(model, self.env)
+            check_ownership(model)
 
         for model in RELATED_MODELS_TO_EXCLUDE:
-            self.assertIn(model, self.env)
+            check_ownership(model)
 
         for model in MODELS_WITH_NOUPDATE:
-            self.assertIn(model, self.env)
+            check_ownership(model)
 
         for model, fields in RELATIONS_NOT_TO_EXPORT.items():
             for field in fields:
-                self.assertIn(field, self.env[model]._fields)
+                check_ownership(model, field)
 
         for model, field in XML_FIELDS:
-            self.assertIn(field, self.env[model]._fields)
+            check_ownership(model, field)
+
+        self.assertEqual(needed_modules, seen_modules)
 
     def test_24_export_all_required_fields(self):
         """Test that all required fields are exported"""

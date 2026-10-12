@@ -1,40 +1,47 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* iap_extract
-# 
+# * iap_extract
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Manon Rondou, 2025
+#
+# "Manon Rondou (ronm)" <ronm@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:27+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: French (https://app.transifex.com/odoo/teams/41243/fr/)\n"
+"POT-Creation-Date: 2025-12-29 18:47+0000\n"
+"PO-Revision-Date: 2026-01-17 09:07+0000\n"
+"Last-Translator: \"Manon Rondou (ronm)\" <ronm@odoo.com>\n"
+"Language-Team: French <https://translate.odoo.com/projects/odoo-18/"
+"iap_extract/fr/>\n"
+"Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: fr\n"
-"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : "
+"((n != 0 && n % 1000000 == 0) ? 1 : 2);\n"
+"X-Generator: Weblate 5.14.3\n"
 
 #. module: iap_extract
 #: model:mail.template,body_html:iap_extract.iap_extract_no_credit
 msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
-"    <p>Dear,<br></p>\n"
-"    <p>There are no more credits on your IAP OCR account.<br>\n"
+"    <p>Dear,<br/></p>\n"
+"    <p>There are no more credits on your IAP OCR account.<br/>\n"
 "    You can charge your IAP OCR account in the settings page.</p>\n"
-"    <p>Best regards,<br></p>\n"
+"    <p>Best regards,<br/></p>\n"
 "    <p>Odoo S.A.</p>\n"
 "</div>"
 msgstr ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
-"    <p>Bonjour,<br></p>\n"
-"    <p>Il n'y a plus de crédits sur votre compte IAP pour l'utilisation de l'OCR.<br>\n"
-"    Vous pouvez charger votre compte IAP pour l'utilisation de l'OCR sur la page des paramètres.</p>\n"
-"    <p>Cordialement,<br></p>\n"
+"    <p>Bonjour,<br/></p>\n"
+"    <p>Il n'y a plus de crédit sur votre compte IAP pour l'utilisation de "
+"l'OCR.<br/>\n"
+"    Vous pouvez charger votre compte IAP pour l'utilisation de l'OCR sur la "
+"page des paramètres.</p>\n"
+"    <p>Cordialement,<br/></p>\n"
 "    <p>Odoo S.A.</p>\n"
 "</div>"
 
@@ -50,6 +57,8 @@ msgid ""
 "All fields will be automatically populated by Artificial Intelligence, it "
 "might take 5 seconds."
 msgstr ""
+"Tous les champs seront automatiquement remplis par l'intelligence "
+"artificielle, cela peut prendre 5 secondes."
 
 #. module: iap_extract
 #. odoo-python
@@ -101,9 +110,12 @@ msgstr "Flux complété"
 #. module: iap_extract
 #: model:iap.service,description:iap_extract.iap_service_ocr
 msgid ""
-"Digitize your scanned or PDF vendor bills, expenses and resumes with OCR and"
-" Artificial Intelligence."
+"Digitize your scanned or PDF vendor bills, expenses and resumes with OCR and "
+"Artificial Intelligence."
 msgstr ""
+"Numérisez vos factures fournisseurs scannées ou PDF, vos dépenses et vos CV "
+"avec la reconnaissance optique de caractères (OCR) et l'intelligence "
+"artificielle."
 
 #. module: iap_extract
 #. odoo-python
@@ -121,7 +133,7 @@ msgstr "Document envoyé pour numérisation"
 #. odoo-javascript
 #: code:addons/iap_extract/static/src/components/status_header/status.xml:0
 msgid "Document successfully parsed. Please refresh."
-msgstr ""
+msgstr "Document correctement analysé. Veuillez actualiser."
 
 #. module: iap_extract
 #: model:iap.service,unit_name:iap_extract.iap_service_ocr
@@ -147,7 +159,7 @@ msgstr "Extraire les éléments traités"
 #. module: iap_extract
 #: model:ir.model.fields,field_description:iap_extract.field_extract_mixin__extract_state
 msgid "Extract state"
-msgstr "Extraire état"
+msgstr "Statut d’extraction"
 
 #. module: iap_extract
 #: model:ir.model.fields,field_description:iap_extract.field_extract_mixin__extract_status
@@ -293,8 +305,7 @@ msgstr "Réessayer"
 #: code:addons/iap_extract/models/extract_mixin.py:0
 msgid "Server is currently under maintenance. Please retry later"
 msgstr ""
-"Le serveur est actuellement en maintenance. Veuillez réessayer "
-"ultérieurement"
+"Le serveur est actuellement en maintenance. Veuillez réessayer ultérieurement"
 
 #. module: iap_extract
 #. odoo-python
@@ -312,11 +323,11 @@ msgstr "Certains documents ont été omis, car ils étaient déjà numérisés"
 #. odoo-python
 #: code:addons/iap_extract/models/extract_mixin.py:0
 msgid ""
-"The 'invoice_ocr' IAP account token is invalid. Please delete it to let Odoo"
-" generate a new one or fill it with a valid token."
+"The 'invoice_ocr' IAP account token is invalid. Please delete it to let Odoo "
+"generate a new one or fill it with a valid token."
 msgstr ""
-"Le jeton du compte IAP 'invoice_cor' n'est pas valide. Veuillez le supprimer"
-" pour permettre à Odoo d'en générer un nouveau ou le remplir avec un jeton "
+"Le jeton du compte IAP 'invoice_cor' n'est pas valide. Veuillez le supprimer "
+"pour permettre à Odoo d'en générer un nouveau ou le remplir avec un jeton "
 "valide."
 
 #. module: iap_extract
@@ -373,8 +384,9 @@ msgstr "Validation en attente"
 #. module: iap_extract
 #. odoo-javascript
 #: code:addons/iap_extract/static/src/components/status_header/status.xml:0
-msgid "You don't have enough credit to extract data from your"
+msgid "You don't have enough credit to extract data from your document."
 msgstr ""
+"Vous n'avez pas assez de crédits pour extraire des données de votre document."
 
 #. module: iap_extract
 #. odoo-python
@@ -390,36 +402,6 @@ msgstr ""
 #: code:addons/iap_extract/models/extract_mixin.py:0
 msgid "Your document contains too many pages"
 msgstr "Votre document comporte trop de pages"
-
-#. module: iap_extract
-#. odoo-javascript
-#: code:addons/iap_extract/static/src/components/status_header/status.js:0
-msgid "document"
-msgstr "document"
-
-#. module: iap_extract
-#. odoo-javascript
-#: code:addons/iap_extract/static/src/components/status_header/status.js:0
-msgid "expense"
-msgstr "note de frais"
-
-#. module: iap_extract
-#. odoo-javascript
-#: code:addons/iap_extract/static/src/components/status_header/status.js:0
-msgid "invoice"
-msgstr ""
-
-#. module: iap_extract
-#. odoo-javascript
-#: code:addons/iap_extract/static/src/components/status_header/status.js:0
-msgid "resume"
-msgstr ""
-
-#. module: iap_extract
-#. odoo-javascript
-#: code:addons/iap_extract/static/src/components/status_header/status.js:0
-msgid "statement"
-msgstr ""
 
 #. module: iap_extract
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_bank_statement__extract_state__extract_not_ready

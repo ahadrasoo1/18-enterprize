@@ -33,12 +33,13 @@ QUnit.module(
                     coucou: {
                         fields: {
                             id: { string: "Id", type: "integer" },
-                            display_name: { string: "Name", type: "char", store: true },
+                            display_name: { string: "Name", type: "char", store: true, groupable: true },
                             m2o: {
                                 string: "Product",
                                 type: "many2one",
                                 relation: "product",
                                 store: true,
+                                groupable: true,
                             },
                             char_field: { type: "char", string: "A char" },
                             priority: {
@@ -96,7 +97,7 @@ QUnit.module(
             const originalConsoleWarn = console.warn;
             patchWithCleanup(console, {
                 warn: (msg) => {
-                    if (msg !== "'kanban-box' is deprecated, use 'kanban-card' API instead") {
+                    if (msg !== "'kanban-box' is deprecated, define a 'card' template instead") {
                         originalConsoleWarn(msg);
                     }
                 },
@@ -1417,7 +1418,7 @@ QUnit.module(
             const _console = window.console;
             window.console = Object.assign(Object.create(_console), {
                 warn(msg) {
-                    if (msg !== "'kanban-box' is deprecated, use 'kanban-card' API instead") {
+                    if (msg !== "'kanban-box' is deprecated, define a 'card' template instead") {
                         assert.step(msg);
                     }
                 },

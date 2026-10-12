@@ -58,7 +58,7 @@ class ShipRocket:
         """
         data = {
             'email': self.carrier.shiprocket_email,
-            'password': self.carrier.shiprocket_password,
+            'password': self.carrier.sudo().shiprocket_password,
         }
         return self._make_api_request('external/auth/login', 'POST', data)
 
@@ -67,7 +67,7 @@ class ShipRocket:
         Generate an access token for shiprocket.
         The token is automatically generates after 9 days as it expires.
         """
-        if not (self.carrier.shiprocket_email and self.carrier.shiprocket_password):
+        if not (self.carrier.shiprocket_email and self.carrier.sudo().shiprocket_password):
             action = self.carrier.env.ref('delivery.action_delivery_carrier_form')
             raise RedirectWarning(
                 _("Please configure Shiprocket credentials in the shipping method"), action.id,
@@ -153,6 +153,9 @@ class ShipRocket:
             rate_json = self._make_api_request('external/courier/international/serviceability', data=data, token=self._get_token())
         if rate_json and rate_json.get('data'):
             available_couriers = rate_json['data'].get('available_courier_companies')
+            available_couriers = [
+                courier for courier in available_couriers if not courier.get('odablock')
+            ]
             recommended_by = ''
             selected_couriers = False
             for available_courier in available_couriers:
@@ -238,7 +241,7 @@ class ShipRocket:
         tax_ids = stock_move.sale_line_id and stock_move.sale_line_id.sudo().tax_id or stock_move.product_id.sudo().taxes_id
         for tax in tax_ids.flatten_taxes_hierarchy():
             tax_tag_ids = tax.invoice_repartition_line_ids.tag_ids
-            if tax_tag_ids and any(tax.env.ref(f"l10n_in.tax_tag_{gst}gst", False) in tax_tag_ids for gst in ["c", "s", "i"]):
+            if tax_tag_ids and any((tax.env.ref(f"l10n_in.tax_tag_{gst}gst", False) or tax.env['account.account.tag']) in tax_tag_ids for gst in ["c", "s", "i"]):
                 gst_tax_amount += tax.amount
         return gst_tax_amount
 
@@ -317,6 +320,8 @@ class ShipRocket:
         net_weight_in_kg = self.carrier._shiprocket_convert_weight(package.weight)
         line_vals = self._get_shipping_lines(package, picking).values()
         payment_method = "Prepaid" if self.carrier.shiprocket_payment_method == "prepaid" else "COD"
+        discount_order_lines = picking.sale_id.order_line.filtered(lambda ol: ol._is_discount_line())
+        total_discount = abs(sum(discount_order_lines.mapped('price_total')))
         return {
             "request_pickup": self.carrier.shiprocket_pickup_request,
             "print_label": True,
@@ -353,6 +358,7 @@ class ShipRocket:
             "shipping_email": partner.email,
             "shipping_phone": self._get_phone(partner),
             "order_items": list(line_vals),
+            "total_discount": total_discount,
             "sub_total": self._get_subtotal(line_vals),
             "payment_method": payment_method,
             "shipping_charges": ship_charges,
@@ -389,7 +395,9 @@ class ShipRocket:
             # need courier code, as the rate request and forward shipment APIs must have to use the same courier code.
             courier_code = rate_response.get('courier_code')
             # ship_charges is mandatory as forward shipment API will not return it in response, used in subtotal.
-            ship_charges = rate_response.get('price')
+            carrier_product_id = self.carrier.product_id
+            carrier_order_lines = picking.sale_id.order_line.filtered(lambda ol: ol.product_id == carrier_product_id)
+            ship_charges = sum(carrier_order_lines.mapped('price_unit'))
             parcel = self._prepare_parcel(picking, package, courier_code, ship_charges, index=index)
             parcel_dict[package] = parcel
         return parcel_dict
@@ -442,7 +450,13 @@ class ShipRocket:
                 if order_id:
                     res['order_ids'].append(str(order_id))
                 res['all_pack'][delivery_package]['order_details'] = order_details
-                res['exact_price'] += float(order_details.get('data', {}).get('charges', {}).get('freight_charges', '0.00'))
+
+                exact_price = order_details.get('data', {}).get('charges', {}).get('freight_charges', '0.00')
+                try:
+                    exact_price = float(exact_price)
+                except ValueError:
+                    exact_price = 0
+                res['exact_price'] += exact_price
             else:
                 picking.message_post(body=_('AWB assignment was unsuccessful: %s') % (self._shiprocket_get_error_message(order_response)))
         return res

@@ -1,23 +1,25 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* delivery_usps
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Manon Rondou, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
+"POT-Creation-Date: 2025-12-29 18:50+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
+"Last-Translator: Manon Rondou, 2025\n"
 "Language-Team: French (https://app.transifex.com/odoo/teams/41243/fr/)\n"
+"Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: fr\n"
-"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % "
+"1000000 == 0 ? 1 : 2;\n"
 
 #. module: delivery_usps
 #: model:ir.model.fields.selection,name:delivery_usps.selection__delivery_carrier__usps_intl_non_delivery_option__abandon
@@ -160,7 +162,7 @@ msgstr "Boîte moyenne à prix fixe"
 #. module: delivery_usps
 #: model:ir.model.fields.selection,name:delivery_usps.selection__delivery_carrier__usps_content_type__merchandise
 msgid "Merchandise"
-msgstr "Marchandise"
+msgstr "Marchandises"
 
 #. module: delivery_usps
 #: model:ir.model.fields,field_description:delivery_usps.field_delivery_carrier__usps_intl_non_delivery_option
@@ -225,8 +227,7 @@ msgstr "Colis"
 
 #. module: delivery_usps
 #: model:ir.model.fields,help:delivery_usps.field_delivery_carrier__usps_machinable
-msgid ""
-"Please check on USPS website to ensure that your package is machinable."
+msgid "Please check on USPS website to ensure that your package is machinable."
 msgstr ""
 "Veuillez vérifier sur le site internet d'USPS si votre colis est machinable."
 
@@ -386,10 +387,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/delivery_usps/models/usps_request.py:0
 msgid ""
-"The estimated shipping price cannot be computed because the weight is missing for the following product(s): \n"
+"The estimated shipping price cannot be computed because the weight is "
+"missing for the following product(s): \n"
 " %s"
 msgstr ""
-"Le prix d'expédition estimé ne peut pas être calculé car le poids manque pour le(s) produit(s) suivant(s) : \n"
+"Le prix d'expédition estimé ne peut pas être calculé car le poids manque "
+"pour le(s) produit(s) suivant(s) : \n"
 " %s"
 
 #. module: delivery_usps
@@ -433,8 +436,13 @@ msgstr "Type de conteneur"
 
 #. module: delivery_usps
 #: model:ir.model.fields.selection,name:delivery_usps.selection__delivery_carrier__delivery_type__usps
-msgid "USPS"
-msgstr "USPS"
+msgid "USPS (Legacy)"
+msgstr "USPS (Legacy)"
+
+#. module: delivery_usps
+#: model:ir.model.fields,field_description:delivery_usps.field_delivery_carrier__usps_label_file_type
+msgid "USPS (Legacy) Label File Type"
+msgstr "Type de fichier d'étiquette USPS (Legacy)"
 
 #. module: delivery_usps
 #: model_terms:ir.ui.view,arch_db:delivery_usps.view_delivery_carrier_form_with_provider_usps
@@ -454,8 +462,8 @@ msgid ""
 "USPS Domestic is used only to ship inside of the U.S.A. Please change the "
 "delivery method into USPS International."
 msgstr ""
-"USPS Domestic est utilisé uniquement pour les envois à l'intérieur des "
-"États-Unis. Modifiez le mode de livraison en USPS International."
+"USPS Domestic est utilisé uniquement pour les envois à l'intérieur des États-"
+"Unis. Modifiez le mode de livraison en USPS International."
 
 #. module: delivery_usps
 #: model:ir.model.fields,field_description:delivery_usps.field_delivery_carrier__usps_first_class_mail_type
@@ -479,11 +487,6 @@ msgstr ""
 "États-Unis. Modifiez le mode de livraison en USPS Domestic."
 
 #. module: delivery_usps
-#: model:ir.model.fields,field_description:delivery_usps.field_delivery_carrier__usps_label_file_type
-msgid "USPS Label File Type"
-msgstr "Type de fichier d'étiquette USPS "
-
-#. module: delivery_usps
 #: model:ir.model.fields,field_description:delivery_usps.field_delivery_carrier__usps_mail_type
 msgid "USPS Mail Type"
 msgstr "Type de courrier USPS"
@@ -492,12 +495,6 @@ msgstr "Type de courrier USPS"
 #: model:ir.model.fields,field_description:delivery_usps.field_delivery_carrier__usps_service
 msgid "USPS Service"
 msgstr "Service USPS"
-
-#. module: delivery_usps
-#: model_terms:ir.ui.view,arch_db:delivery_usps.res_config_settings_view_form_sale
-#: model_terms:ir.ui.view,arch_db:delivery_usps.res_config_settings_view_form_stock
-msgid "USPS Shipping Methods"
-msgstr "Modes d'expédition USPS"
 
 #. module: delivery_usps
 #: model:ir.model.fields,field_description:delivery_usps.field_delivery_carrier__usps_username

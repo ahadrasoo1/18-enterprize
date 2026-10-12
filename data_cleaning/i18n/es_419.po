@@ -1,24 +1,29 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* data_cleaning
-# 
+# * data_cleaning
+#
 # Translators:
-# Wil Odoo, 2024
 # Patricia Gutiérrez Capetillo <pagc@odoo.com>, 2024
-# 
+# Wil Odoo, 2025
+# Fernanda Alvarez, 2025
+# "Fernanda Alvarez (mfar)" <mfar@odoo.com>, 2025, 2026.
+# Weblate <noreply-mt-weblate@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:29+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Patricia Gutiérrez Capetillo <pagc@odoo.com>, 2024\n"
-"Language-Team: Spanish (Latin America) (https://app.transifex.com/odoo/teams/41243/es_419/)\n"
+"POT-Creation-Date: 2026-04-03 18:59+0000\n"
+"PO-Revision-Date: 2026-04-15 11:33+0000\n"
+"Last-Translator: \"Fernanda Alvarez (mfar)\" <mfar@odoo.com>\n"
+"Language-Team: Spanish (Latin America) <https://translate.odoo.com/projects/"
+"odoo-18/data_cleaning/es_419/>\n"
+"Language: es_419\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: es_419\n"
-"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=(n == 1) ? 0 : ((n != 0 && n % 1000000 == "
+"0) ? 1 : 2);\n"
+"X-Generator: Weblate 5.16.2\n"
 
 #. module: data_cleaning
 #. odoo-python
@@ -57,6 +62,7 @@ msgstr ""
 "Puede validar cambios"
 
 #. module: data_cleaning
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_model_form
 #: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_model_form
 msgid "<span class=\"me-1\">Every</span>"
 msgstr "<span class=\"me-1\">Cada</span>"
@@ -78,6 +84,7 @@ msgstr "Un campo solo puede aparecer una vez."
 
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_cleaning_rule__action
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_model_form
 #: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_record_list
 msgid "Action"
 msgstr "Acción"
@@ -114,7 +121,7 @@ msgstr "Todo en minúsculas"
 #. module: data_cleaning
 #: model:ir.model.fields.selection,name:data_cleaning.selection__data_cleaning_rule__action_trim__all
 msgid "All Spaces"
-msgstr "Todo con espacios"
+msgstr "Todos los espacios"
 
 #. module: data_cleaning
 #: model:ir.model.fields.selection,name:data_cleaning.selection__data_cleaning_rule__action_case__upper
@@ -136,8 +143,8 @@ msgstr "Archivado"
 #. odoo-javascript
 #: code:addons/data_cleaning/static/src/views/data_merge_list_view.js:0
 msgid ""
-"Are you sure that you want to merge the selected records in their respective"
-" group?"
+"Are you sure that you want to merge the selected records in their respective "
+"group?"
 msgstr ""
 "¿Está seguro de que desea fusionar los registros seleccionados en sus "
 "respectivos grupos?"
@@ -170,6 +177,16 @@ msgstr "Mayúsculas y minúsculas"
 #: code:addons/data_cleaning/models/data_merge_rule.py:0
 msgid "Case/Accent Insensitive Match"
 msgstr "Coincidencia que no distingue entre mayúsculas, minúsculas y acentos"
+
+#. module: data_cleaning
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_model_form
+msgid "Clean"
+msgstr "Claro"
+
+#. module: data_cleaning
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_model_form
+msgid "Cleaning Actions"
+msgstr "Acciones de limpieza"
 
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_cleaning_model__cleaning_mode
@@ -209,14 +226,13 @@ msgstr "Empresa"
 #: model_terms:ir.actions.act_window,help:data_cleaning.action_data_merge_record
 #: model_terms:ir.actions.act_window,help:data_cleaning.action_data_merge_record_notification
 msgid "Configure rules to identify duplicate records"
-msgstr "Configure reglas para identificar registros duplicados"
+msgstr "Configura reglas para identificar registros duplicados"
 
 #. module: data_cleaning
 #: model_terms:ir.actions.act_window,help:data_cleaning.action_data_cleaning_record
 #: model_terms:ir.actions.act_window,help:data_cleaning.action_data_cleaning_record_notification
 msgid "Configure rules to identify records to clean"
-msgstr ""
-"Configure las reglas para identificar los registros que se deben depurar "
+msgstr "Configura reglas para identificar los registros a limpiar"
 
 #. module: data_cleaning
 #: model:ir.model,name:data_cleaning.model_res_partner
@@ -439,8 +455,7 @@ msgstr "Duplicados a fusionar"
 
 #. module: data_cleaning
 #: model:ir.model.fields,help:data_cleaning.field_data_merge_model__create_threshold
-msgid ""
-"Duplicates with a similarity below this threshold will not be suggested"
+msgid "Duplicates with a similarity below this threshold will not be suggested"
 msgstr ""
 "No se sugerirán duplicados con una similitud por debajo de este umbral."
 
@@ -518,8 +533,8 @@ msgstr "Ocultar botón de acción de fusión"
 #: model:ir.model.fields,help:data_cleaning.field_data_cleaning_rule__action_case
 msgid ""
 "How the type case is set by the rule. 'First Letters to Uppercase' sets "
-"every letter to lowercase except the first letter of each word, which is set"
-" to uppercase."
+"every letter to lowercase except the first letter of each word, which is set "
+"to uppercase."
 msgstr ""
 "Cómo se establece el tipo de letra por regla. 'Primera letra en mayúscula' "
 "determina que todas las letras estén en minúsculas, excepto por la primera "
@@ -550,8 +565,8 @@ msgid ""
 "If True, the generic data merge tool is available in the contextual menu of "
 "this model."
 msgstr ""
-"Si es True, la herramienta genérica de fusión de datos está disponible en el"
-" menú contextual de este modelo."
+"Si es True, la herramienta genérica de fusión de datos está disponible en el "
+"menú contextual de este modelo."
 
 #. module: data_cleaning
 #: model:ir.model.fields,help:data_cleaning.field_data_merge_model__is_contextual_merge_action
@@ -565,11 +580,15 @@ msgstr ""
 #. module: data_cleaning
 #: model:ir.model.fields,help:data_cleaning.field_ir_model__hide_merge_action
 msgid ""
-"If the model already has a custom merge method, the class attribute `_merge_disabled` is set to true on\n"
-"             that model and the generic data merge action should not be available on that model."
+"If the model already has a custom merge method, the class attribute "
+"`_merge_disabled` is set to true on\n"
+"             that model and the generic data merge action should not be "
+"available on that model."
 msgstr ""
-"Si el modelo ya tiene un método de fusión personalizado, el atributo de clase \"_merge_disabled\" se establece como verdadero en\n"
-"             ese modelo y la acción genérica de fusión de datos no debería estar disponible en ese modelo."
+"Si el modelo ya tiene un método de fusión personalizado, el atributo de "
+"clase \"_merge_disabled\" se establece como verdadero en\n"
+"             ese modelo y la acción genérica de fusión de datos no debería "
+"estar disponible en ese modelo."
 
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_record__is_deleted
@@ -622,14 +641,12 @@ msgstr "Lista de otros modelos con referencia a este registro"
 #. module: data_cleaning
 #: model:ir.model.fields,help:data_cleaning.field_data_cleaning_model__notify_user_ids
 msgid "List of users to notify when there are new records to clean"
-msgstr ""
-"Lista de usuarios a notificar cuando hay nuevos registros que limpiar."
+msgstr "Lista de usuarios a notificar cuando hay nuevos registros que limpiar."
 
 #. module: data_cleaning
 #: model:ir.model.fields,help:data_cleaning.field_data_merge_model__notify_user_ids
 msgid "List of users to notify when there are new records to merge"
-msgstr ""
-"Lista de usuarios a notificar cuando hay nuevos registros por fusionar"
+msgstr "Lista de usuarios a notificar cuando hay nuevos registros por fusionar"
 
 #. module: data_cleaning
 #: model:ir.model.fields.selection,name:data_cleaning.selection__data_cleaning_model__cleaning_mode__manual
@@ -794,6 +811,7 @@ msgstr "Nombre del registro"
 
 #. module: data_cleaning
 #: model_terms:ir.ui.view,arch_db:data_cleaning.data_merge_record_view_search_merge_action
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_model_form
 #: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_record_search
 #: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_record_search
 msgid "Records"
@@ -849,6 +867,11 @@ msgstr "Reglas"
 #: model:ir.model.fields.selection,name:data_cleaning.selection__data_cleaning_rule__action__html
 msgid "Scrap HTML"
 msgstr "Desechar HTML"
+
+#. module: data_cleaning
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_model_form
+msgid "Select a model to configure cleaning actions"
+msgstr "Seleccione un modelo para configurar las acciones de limpieza"
 
 #. module: data_cleaning
 #: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_model_form
@@ -930,8 +953,16 @@ msgid ""
 "The Python module `phonenumbers` is not installed. Format phone will not "
 "work."
 msgstr ""
-"El modulo de Python con el nombre \"phonenumbers\" no está instalado. El "
-"formato del número de teléfono no será útil."
+"El módulo `phonenumbers` de Python no está instalado. La función para "
+"formatear teléfonos no funcionará."
+
+#. module: data_cleaning
+#. odoo-javascript
+#: code:addons/data_cleaning/static/src/views/data_merge_list_view.js:0
+msgid "The connection timed out. Please try merging fewer records at once."
+msgstr ""
+"Se agotó el tiempo de espera de la conexión. Intenta fusionar menos "
+"registros al mismo tiempo."
 
 #. module: data_cleaning
 #: model:ir.model.constraint,message:data_cleaning.constraint_data_cleaning_model_check_notif_freq

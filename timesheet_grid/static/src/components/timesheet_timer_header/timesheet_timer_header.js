@@ -4,7 +4,7 @@ import { Field, getPropertyFieldInfo } from "@web/views/fields/field";
 import { TimesheetDisplayTimer } from "../timesheet_display_timer/timesheet_display_timer";
 import { useService, useAutofocus } from "@web/core/utils/hooks";
 import { user } from "@web/core/user";
-import { Component, onWillStart, onWillUpdateProps, useRef, useExternalListener } from "@odoo/owl";
+import { Component, onWillStart, useRef, useExternalListener } from "@odoo/owl";
 
 export class TimesheetTimerHeader extends Component {
     static template = "timesheet_grid.TimesheetTimerHeader";
@@ -35,12 +35,11 @@ export class TimesheetTimerHeader extends Component {
         this.startButton = useRef("startButton");
         this.stopButton = useRef("stopButton");
         onWillStart(async () => await this.onWillStart());
-        onWillUpdateProps((nextProps) => this.onWillUpdateProps(nextProps));
         useAutofocus({ refName: "startButton" });
         useAutofocus({ refName: "stopButton" });
         useExternalListener(document.body, "click", (ev) => {
             if (
-                ev.target.closest(".modal") ||
+                ev.target.closest(".modal, .popover") ||
                 ["input", "textarea"].includes(ev.target.tagName.toLowerCase())
             ) {
                 return;
@@ -50,20 +49,18 @@ export class TimesheetTimerHeader extends Component {
     }
 
     async onWillStart() {
-        if (this.props.timesheet && this.props.timesheet.data.name === "/") {
-            this._clearTimesheetName();
-        }
         this.isProjectManager = await user.hasGroup('project.group_project_manager');
-    }
-
-    onWillUpdateProps(nextProps) {
-        if (nextProps.timesheet && nextProps.timesheet.data.name === "/") {
-            this._clearTimesheetName(nextProps.timesheet);
-        }
     }
 
     getIsProjectManager() {
         return this.isProjectManager;
+    }
+
+    // deprecated
+    onWillUpdateProps(nextProps) {
+        if (nextProps.timesheet && nextProps.timesheet.data.name === "/") {
+            this._clearTimesheetName(nextProps.timesheet);
+        }
     }
 
     //----------------------------------------------------------------------
@@ -89,10 +86,18 @@ export class TimesheetTimerHeader extends Component {
     get viewType() {
         return this.env.config.viewType;
     }
+
+    getFieldType(fieldName) {
+        if (fieldName === "task_id") {
+            return "task_with_hours";
+        }
+        return this.props.fields[fieldName].type;
+    }
+
     get fieldsInfo() {
         return {
             task_id: {
-                ...getPropertyFieldInfo({ name: "task_id", type: "task_with_hours" }),
+                ...getPropertyFieldInfo({ name: "task_id", type: this.getFieldType("task_id") }),
                 viewType: this.viewType,
                 context: this.props.fields.task_id.context,
             },
@@ -102,9 +107,9 @@ export class TimesheetTimerHeader extends Component {
     //--------------------------------------------------------------------------
     // Business Methods
     //--------------------------------------------------------------------------
-
+    // deprecated
     _clearTimesheetName(timesheet = null) {
-        (timesheet || this.props.timesheet).update({ name: "" }, { silent: true });
+            (timesheet || this.props.timesheet).update({ name: "" }, { silent: true });
     }
 
     //--------------------------------------------------------------------------
@@ -116,7 +121,7 @@ export class TimesheetTimerHeader extends Component {
     }
 
     async _onClickStopTimer(ev) {
-        if (await this.props.timesheet.save()) {
+        if (await this.props.timesheet?.save()) {
             await this.props.onTimerStopped();
         }
     }

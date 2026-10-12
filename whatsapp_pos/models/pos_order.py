@@ -6,7 +6,7 @@ from odoo import models, _
 class PosOrder(models.Model):
     _inherit = 'pos.order'
 
-    def action_sent_receipt_on_whatsapp(self, phone, ticket_image):
+    def action_sent_receipt_on_whatsapp(self, phone, ticket_image, basic_image=False):
         if not self or not self.config_id.whatsapp_enabled or not self.config_id.receipt_template_id or not phone:
             return
         self.ensure_one()
@@ -43,9 +43,6 @@ class PosOrder(models.Model):
 
     def _get_whatsapp_safe_fields(self):
         return {'partner_id.name', 'name', 'company_id.name'}
-
-    def _mail_get_partners(self):
-        return {pos_order.id: pos_order.partner_id for pos_order in self}
 
     def action_send_whatsapp(self):
         return {

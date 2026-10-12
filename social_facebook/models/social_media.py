@@ -3,7 +3,7 @@
 
 import requests
 
-from odoo import _, models, fields
+from odoo import _, models, fields, tools
 from odoo.exceptions import UserError
 from werkzeug.urls import url_encode, url_join
 
@@ -38,11 +38,7 @@ class SocialMediaFacebook(models.Model):
 
     def _add_facebook_accounts_from_configuration(self, facebook_app_id):
         base_facebook_url = 'https://www.facebook.com/v17.0/dialog/oauth?%s'
-        params = {
-            'client_id': facebook_app_id,
-            'redirect_uri': url_join(self.get_base_url(), "social_facebook/callback"),
-            'response_type': 'token',
-            'scope': ','.join([
+        scopes = [
                 'pages_manage_ads',
                 'pages_manage_metadata',
                 'pages_read_engagement',
@@ -50,7 +46,14 @@ class SocialMediaFacebook(models.Model):
                 'pages_manage_engagement',
                 'pages_manage_posts',
                 'read_insights'
-            ])
+        ]
+        if not self.env['ir.config_parameter'].sudo().get_param('social.facebook_no_business_management'):
+            scopes.append("business_management")
+        params = {
+            'client_id': facebook_app_id,
+            'redirect_uri': url_join(self.get_base_url(), "social_facebook/callback"),
+            'response_type': 'token',
+            'scope': ','.join(scopes),
         }
 
         return {
@@ -67,8 +70,10 @@ class SocialMediaFacebook(models.Model):
 
         iap_add_accounts_url = requests.get(url_join(social_iap_endpoint, 'api/social/facebook/1/add_accounts'),
             params={
+                'db_uuid': self.env['ir.config_parameter'].sudo().get_param('database.uuid'),
                 'returning_url': url_join(self.get_base_url(), 'social_facebook/callback'),
-                'db_uuid': self.env['ir.config_parameter'].sudo().get_param('database.uuid')
+                'client_host_url': self.get_base_url(),
+                'deletion_shared_secret': self._get_social_facebook_deletion_shared_secret(),
             },
             timeout=5
         ).text
@@ -81,3 +86,7 @@ class SocialMediaFacebook(models.Model):
             'url': iap_add_accounts_url,
             'target': 'self'
         }
+
+    def _get_social_facebook_deletion_shared_secret(self):
+        """Shared secret between the database and IAP, derived from the database secret."""
+        return tools.hmac(self.env(su=True), 'social_facebook-deletion_shared_secret', None)

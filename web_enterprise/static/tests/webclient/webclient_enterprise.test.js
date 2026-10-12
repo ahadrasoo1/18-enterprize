@@ -1,8 +1,9 @@
 import { beforeEach, describe, expect, test } from "@odoo/hoot";
-import { click, queryAll, queryFirst } from "@odoo/hoot-dom";
-import { animationFrame } from "@odoo/hoot-mock";
+import { click, keyDown, queryAll, queryFirst } from "@odoo/hoot-dom";
+import { animationFrame, Deferred, mockMatchMedia } from "@odoo/hoot-mock";
 import { Component, onMounted, xml } from "@odoo/owl";
 import {
+    clearRegistry,
     contains,
     defineActions,
     defineMenus,
@@ -58,8 +59,7 @@ defineActions([
         xml_id: "action_1",
         name: "Partners Action 1",
         res_model: "partner",
-        type: "ir.actions.act_window",
-        views: [[1, "kanban"]],
+        views: [[false, "kanban"]],
     },
     {
         id: 2,
@@ -71,11 +71,9 @@ defineActions([
         xml_id: "action_3",
         name: "Partners",
         res_model: "partner",
-        mobile_view_mode: "kanban",
-        type: "ir.actions.act_window",
         views: [
             [false, "list"],
-            [1, "kanban"],
+            [false, "kanban"],
             [false, "form"],
         ],
     },
@@ -84,10 +82,9 @@ defineActions([
         xml_id: "action_4",
         name: "Partners Action 4",
         res_model: "partner",
-        type: "ir.actions.act_window",
         views: [
-            [1, "kanban"],
-            [2, "list"],
+            [false, "kanban"],
+            [false, "list"],
             [false, "form"],
         ],
     },
@@ -97,7 +94,6 @@ defineActions([
         name: "Create a Partner",
         res_model: "partner",
         target: "new",
-        type: "ir.actions.act_window",
         views: [[false, "form"]],
     },
     {
@@ -107,7 +103,6 @@ defineActions([
         res_id: 2,
         res_model: "partner",
         target: "inline",
-        type: "ir.actions.act_window",
         views: [[false, "form"]],
     },
     {
@@ -127,17 +122,9 @@ defineActions([
 ]);
 
 defineMenus([
-    {
-        id: "root",
-        name: "root",
-        appID: "root",
-        children: [
-            // id:0 is a hack to not load anything at webClient mount
-            { id: 0, children: [], name: "UglyHack", appID: 0, xmlid: "menu_0" },
-            { id: 1, children: [], name: "App1", appID: 1, actionID: 1001, xmlid: "menu_1" },
-            { id: 2, children: [], name: "App2", appID: 2, actionID: 1002, xmlid: "menu_2" },
-        ],
-    },
+    { id: 0 }, // prevents auto-loading the first action
+    { id: 1, name: "App1", appID: 1, actionID: 1001, xmlid: "menu_1" },
+    { id: 2, name: "App2", appID: 2, actionID: 1002, xmlid: "menu_2" },
 ]);
 class Partner extends models.Model {
     name = fields.Char();
@@ -204,27 +191,27 @@ beforeEach(() => {
 // Those tests rely on hidden view to be in CSS: display: none
 describe("basic flow with home menu", () => {
     stepAllNetworkCalls();
-    onRpc("/web/dataset/call_kw/partner/get_formview_action", () => {
-        return {
-            type: "ir.actions.act_window",
-            res_model: "partner",
-            view_type: "form",
-            view_mode: "form",
-            views: [[false, "form"]],
-            target: "current",
-            res_id: 2,
-        };
-    });
-    defineMenus([
-        {
-            id: "root",
-            name: "root",
-            appID: "root",
-            children: [
-                { id: 1, children: [], name: "App1", appID: 1, actionID: 4, xmlid: "menu_1" },
-            ],
-        },
-    ]);
+    onRpc("partner", "get_formview_action", () => ({
+        type: "ir.actions.act_window",
+        res_model: "partner",
+        view_type: "form",
+        view_mode: "form",
+        views: [[false, "form"]],
+        target: "current",
+        res_id: 2,
+    }));
+    defineMenus(
+        [
+            {
+                id: 1,
+                name: "App1",
+                appID: 1,
+                actionID: 4,
+                xmlid: "menu_1",
+            },
+        ],
+        { mode: "replace" }
+    );
     test("1 -- start up", async () => {
         await mountWebClientEnterprise();
         expect.verifySteps(["/web/webclient/translations", "/web/webclient/load_menus"]);
@@ -262,8 +249,9 @@ describe("basic flow with home menu", () => {
         expect(".o_breadcrumb .active").toHaveText("First record");
     });
 
-    test.tags("desktop")("4 -- push a third action in the breadcrumb", async () => {
-        Partner._views["form,false"] = `
+    test.tags("desktop");
+    test("4 -- push a third action in the breadcrumb", async () => {
+        Partner._views["form"] = `
             <form>
                 <field name="display_name"/>
                 <field name="parent_id" open_target="current"/>
@@ -280,7 +268,7 @@ describe("basic flow with home menu", () => {
         await contains('.o_field_widget[name="parent_id"] .o_external_button', {
             visible: false,
         }).click();
-        expect.verifySteps(["get_views", "web_read"]);
+        expect.verifySteps(["get_formview_action", "get_views", "web_read"]);
         expect(".o_form_view").toHaveCount(1);
         expect(".o_breadcrumb .active").toHaveText("Second record");
         // The third one is the active one
@@ -288,7 +276,7 @@ describe("basic flow with home menu", () => {
     });
 
     test("5 -- switch to HomeMenu from an action with 2 breadcrumbs", async () => {
-        Partner._views["form,false"] = `
+        Partner._views["form"] = `
             <form>
                 <field name="display_name"/>
                 <field name="parent_id" open_target="current"/>
@@ -305,16 +293,17 @@ describe("basic flow with home menu", () => {
         await contains('.o_field_widget[name="parent_id"] .o_external_button', {
             visible: false,
         }).click();
-        expect.verifySteps(["get_views", "web_read"]);
+        expect.verifySteps(["get_formview_action", "get_views", "web_read"]);
         await goToHomeMenu();
         expect.verifySteps([]);
         expect(".o_menu_toggle").toHaveClass("o_menu_toggle_back");
         expect(".o_home_menu").toHaveCount(1);
-        expect(".o_form_view").not.toBeVisible();
+        expect(".o_form_view").not.toHaveCount();
     });
 
-    test.tags("desktop")("6 -- back to underlying action with many breadcrumbs", async () => {
-        Partner._views["form,false"] = `
+    test.tags("desktop");
+    test("6 -- back to underlying action with many breadcrumbs", async () => {
+        Partner._views["form"] = `
             <form>
                 <field name="display_name"/>
                 <field name="parent_id" open_target="current"/>
@@ -331,7 +320,7 @@ describe("basic flow with home menu", () => {
         await contains('.o_field_widget[name="parent_id"] .o_external_button', {
             visible: false,
         }).click();
-        expect.verifySteps(["get_views", "web_read"]);
+        expect.verifySteps(["get_formview_action", "get_views", "web_read"]);
         await contains(".o_menu_toggle").click();
 
         // can't click again too soon because of the mutex in home_menu
@@ -351,17 +340,18 @@ describe("basic flow with home menu", () => {
 });
 
 test("restore the newly created record in form view", async () => {
-    defineActions([
-        {
-            id: 6,
-            xml_id: "action_6",
-            name: "Partner",
-            res_model: "partner",
-            target: "current",
-            type: "ir.actions.act_window",
-            views: [[false, "form"]],
-        },
-    ]);
+    defineActions(
+        [
+            {
+                id: 6,
+                xml_id: "action_6",
+                name: "Partner",
+                res_model: "partner",
+                views: [[false, "form"]],
+            },
+        ],
+        { mode: "replace" }
+    );
     await mountWebClientEnterprise();
 
     await getService("action").doAction(6);
@@ -371,7 +361,7 @@ test("restore the newly created record in form view", async () => {
     await contains(".o_form_button_save").click();
     expect(".o_breadcrumb .active").toHaveText("red right hand");
     await goToHomeMenu();
-    expect(".o_form_view").not.toBeVisible();
+    expect(".o_form_view").not.toHaveCount();
 
     // can't click again too soon because of the mutex in home_menu
     // service (waiting for the url to be updated)
@@ -383,7 +373,8 @@ test("restore the newly created record in form view", async () => {
     expect(".o_breadcrumb .active").toHaveText("red right hand");
 });
 
-test.tags("desktop")("fast clicking on restore (implementation detail)", async () => {
+test.tags("desktop");
+test("fast clicking on restore (implementation detail)", async () => {
     expect.assertions(8);
 
     let doVeryFastClick = false;
@@ -409,7 +400,7 @@ test.tags("desktop")("fast clicking on restore (implementation detail)", async (
     await animationFrame();
     await contains(".o_menu_toggle").click(); // go to home menu
     expect(".o_home_menu").toBeVisible();
-    expect(".delayed_client_action").not.toBeVisible();
+    expect(".delayed_client_action").not.toHaveCount();
 
     doVeryFastClick = true;
     await contains(".o_menu_toggle").click(); // back
@@ -417,7 +408,7 @@ test.tags("desktop")("fast clicking on restore (implementation detail)", async (
     expect(".delayed_client_action").toHaveCount(1);
     await animationFrame(); // waiting for DelayedClientAction
     expect(".o_home_menu").toBeVisible();
-    expect(".delayed_client_action").not.toBeVisible();
+    expect(".delayed_client_action").not.toHaveCount();
 
     await contains(".o_menu_toggle").click(); // back
     await animationFrame();
@@ -465,68 +456,54 @@ test("supports attachments of apps deleted", async () => {
     // LPE fixme: may not be necessary anymore since menus are not HomeMenu props anymore
     defineMenus([
         {
-            id: "root",
-            name: "root",
-            appID: "root",
-            children: [
-                {
-                    id: 1,
-                    appID: 1,
-                    actionID: 1,
-                    xmlid: "",
-                    name: "Partners",
-                    children: [],
-                    webIconData: "",
-                    webIcon: "bloop,bloop",
-                },
-            ],
+            id: 1,
+            appID: 1,
+            actionID: 1,
+            xmlid: "",
+            name: "Partners",
+            webIconData: "",
+            webIcon: "bloop,bloop",
         },
     ]);
-    serverState.debug = true;
+    serverState.debug = "1";
     await mountWebClientEnterprise();
     expect(".o_home_menu").toHaveCount(1);
 });
 
-test.tags("desktop")(
-    "debug manager resets to global items when home menu is displayed",
-    async () => {
-        const debugRegistry = registry.category("debug");
-        debugRegistry.category("default").add("item_1", () => {
-            return {
-                type: "item",
-                description: "globalItem",
-                callback: () => {},
-                sequence: 10,
-            };
-        });
-        onRpc("has_access", () => {
-            return true;
-        });
-        serverState.debug = true;
-        await mountWebClientEnterprise();
-        await contains(".o_debug_manager .dropdown-toggle").click();
-        expect(".dropdown-item:contains('globalItem')").toHaveCount(1);
-        expect(".dropdown-item:contains('View: Kanban')").toHaveCount(0);
+test.tags("desktop");
+test("debug manager resets to global items when home menu is displayed", async () => {
+    const debugRegistry = registry.category("debug");
+    debugRegistry.category("default").add("item_1", () => ({
+        type: "item",
+        description: "globalItem",
+        callback: () => {},
+        sequence: 10,
+    }));
+    onRpc("has_access", () => true);
+    serverState.debug = "1";
+    await mountWebClientEnterprise();
+    await contains(".o_debug_manager .dropdown-toggle").click();
+    expect(".dropdown-item:contains('globalItem')").toHaveCount(1);
+    expect(".dropdown-item:contains('View: Kanban')").toHaveCount(0);
 
-        await contains(".o_debug_manager .dropdown-toggle").click();
-        await getService("action").doAction(1);
-        await contains(".o_debug_manager .dropdown-toggle").click();
-        expect(".dropdown-item:contains('globalItem')").toHaveCount(1);
-        expect(".dropdown-item:contains('View: Kanban')").toHaveCount(1);
+    await contains(".o_debug_manager .dropdown-toggle").click();
+    await getService("action").doAction(1);
+    await contains(".o_debug_manager .dropdown-toggle").click();
+    expect(".dropdown-item:contains('globalItem')").toHaveCount(1);
+    expect(".dropdown-item:contains('View: Kanban')").toHaveCount(1);
 
-        await contains(".o_menu_toggle").click();
-        await contains(".o_debug_manager .dropdown-toggle").click();
-        expect(".dropdown-item:contains('globalItem')").toHaveCount(1);
-        expect(".dropdown-item:contains('View: Kanban')").toHaveCount(0);
+    await contains(".o_menu_toggle").click();
+    await contains(".o_debug_manager .dropdown-toggle").click();
+    expect(".dropdown-item:contains('globalItem')").toHaveCount(1);
+    expect(".dropdown-item:contains('View: Kanban')").toHaveCount(0);
 
-        await contains(".o_debug_manager .dropdown-toggle").click();
-        await getService("action").doAction(3);
-        await contains(".o_debug_manager .dropdown-toggle").click();
-        expect(".dropdown-item:contains('globalItem')").toHaveCount(1);
-        expect(".dropdown-item:contains('View: List')").toHaveCount(1);
-        expect(".dropdown-item:contains('View: Kanban')").toHaveCount(0);
-    }
-);
+    await contains(".o_debug_manager .dropdown-toggle").click();
+    await getService("action").doAction(3);
+    await contains(".o_debug_manager .dropdown-toggle").click();
+    expect(".dropdown-item:contains('globalItem')").toHaveCount(1);
+    expect(".dropdown-item:contains('View: List')").toHaveCount(1);
+    expect(".dropdown-item:contains('View: Kanban')").toHaveCount(0);
+});
 
 test("url state is well handled when going in and out of the HomeMenu", async () => {
     patchWithCleanup(browser.location, {
@@ -642,42 +619,21 @@ test("url state is well handled when going in and out of the HomeMenu", async ()
     expect(browser.location.href).toBe("http://example.com/odoo/action-1002");
 });
 
-// TODO: JUM
-test.skip("underlying action's menu items are invisible when HomeMenu is displayed", async () => {
+test.tags("desktop");
+test("underlying action's menu items are invisible when HomeMenu is displayed", async () => {
     defineMenus([
         {
-            id: "root",
-            name: "root",
-            appID: "root",
+            id: 1,
             children: [
-                // id:0 is a hack to not load anything at webClient mount
                 {
-                    id: 0,
-                    children: [],
-                    name: "UglyHack",
-                    appID: 0,
-                    xmlid: "menu_0",
-                },
-                {
-                    id: 1,
-                    children: [
-                        {
-                            id: 99,
-                            children: [],
-                            name: "SubMenu",
-                            appID: 1,
-                            actionID: 1002,
-                            xmlid: "",
-                            webIconData: undefined,
-                            webIcon: false,
-                        },
-                    ],
-                    name: "App1",
+                    id: 99,
+                    name: "SubMenu",
                     appID: 1,
-                    actionID: 1001,
-                    xmlid: "menu_1",
+                    actionID: 1002,
+                    xmlid: "",
+                    webIconData: undefined,
+                    webIcon: false,
                 },
-                { id: 2, children: [], name: "App2", appID: 2, actionID: 1002, xmlid: "menu_2" },
             ],
         },
     ]);
@@ -767,45 +723,33 @@ test("Apps are reordered at startup based on session's user settings", async () 
     expect(apps[1]).toHaveText("App1", { message: "second displayed app is App1" });
 });
 
-// TODO: JUM
-test.skip("Share URL item is present in the user menu when running as PWA", async () => {
-    patchWithCleanup(browser, {
-        matchMedia(media) {
-            if (media === "(display-mode: standalone)") {
-                return { matches: true };
-            } else {
-                super.matchMedia(...arguments);
-            }
-        },
-    });
-
+test.tags("desktop");
+test("Share URL item is present in the user menu when running as PWA", async () => {
+    mockMatchMedia({ ["display-mode"]: "standalone" });
+    clearRegistry(registry.category("user_menuitems"));
+    // This service adds a "Dark Mode" item to the user menu items on start
+    registry.category("services").remove("color_scheme");
     registry.category("user_menuitems").add("share_url", shareUrlMenuItem);
+
     await mountWithCleanup(UserMenu);
     await contains(".o_user_menu button").click();
+
     expect(".o-dropdown--menu .dropdown-item").toHaveCount(1);
-    expect(".o-dropdown--menu .dropdown-item span").toHaveText("Share", {
-        message: "share button is visible",
-    });
+    expect(".o-dropdown--menu .dropdown-item").toHaveText("Share");
 });
 
-// TODO: JUM
-test.skip("Share URL item is not present in the user menu when not running as PWA", async () => {
-    patchWithCleanup(browser, {
-        matchMedia(media) {
-            if (media === "(display-mode: standalone)") {
-                return { matches: false };
-            } else {
-                super.matchMedia(...arguments);
-            }
-        },
-    });
-
+test.tags("desktop");
+test("Share URL item is not present in the user menu when not running as PWA", async () => {
+    mockMatchMedia({ ["display-mode"]: "browser" });
+    clearRegistry(registry.category("user_menuitems"));
+    // This service adds a "Dark Mode" item to the user menu items on start
+    registry.category("services").remove("color_scheme");
     registry.category("user_menuitems").add("share_url", shareUrlMenuItem);
+
     await mountWithCleanup(UserMenu);
     await contains(".o_user_menu button").click();
-    expect(".o-dropdown--menu .dropdown-item").toHaveCount(0, {
-        message: "share button is not visible",
-    });
+
+    expect(".o-dropdown--menu .dropdown-item").not.toHaveCount();
 });
 
 test("Navigate to an application from the HomeMenu should generate only one pushState", async () => {
@@ -835,4 +779,21 @@ test("Navigate to an application from the HomeMenu should generate only one push
     await animationFrame();
     expect(".o_home_menu").toHaveCount(1);
     expect.verifySteps(["/odoo", "/odoo/action-1002", "/odoo", "/odoo/action-1001", "/odoo"]);
+});
+
+test.tags("desktop");
+test("Should not crash when opening an app via palette and immediately entering input in the palette search", async () => {
+    await mountWebClientEnterprise();
+
+    const def = new Deferred();
+    onRpc("web_search_read", () => def);
+    await keyDown("a");
+    await animationFrame();
+    await keyDown("Enter");
+    await keyDown("a");
+    await animationFrame();
+    def.resolve();
+    await animationFrame();
+    expect(".test_client_action").toHaveCount(1);
+    expect(".test_client_action").toHaveText("ClientAction_Id 1");
 });

@@ -34,13 +34,13 @@ class Subscription extends models.Model {
 
     _records = [
         { id: 1, start: "2017-07-12", stop: "2017-08-11", recurring: 10 },
-        { id: 2, start: "2017-08-14", stop: null, recurring: 20 },
+        { id: 2, start: "2017-08-14", recurring: 20 },
         { id: 3, start: "2017-08-21", stop: "2017-08-29", recurring: 10 },
-        { id: 4, start: "2017-08-21", stop: null, recurring: 20 },
-        { id: 5, start: "2017-08-23", stop: null, recurring: 10 },
-        { id: 6, start: "2017-08-24", stop: null, recurring: 22 },
+        { id: 4, start: "2017-08-21", recurring: 20 },
+        { id: 5, start: "2017-08-23", recurring: 10 },
+        { id: 6, start: "2017-08-24", recurring: 22 },
         { id: 7, start: "2017-08-24", stop: "2017-08-29", recurring: 10 },
-        { id: 8, start: "2017-08-24", stop: null, recurring: 22 },
+        { id: 8, start: "2017-08-24", recurring: 22 },
     ];
 }
 
@@ -51,13 +51,13 @@ class Lead extends models.Model {
 
     _records = [
         { id: 1, start: "2017-07-12", stop: "2017-08-11", revenue: 1200.2 },
-        { id: 2, start: "2017-08-14", stop: null, revenue: 500 },
+        { id: 2, start: "2017-08-14", revenue: 500 },
         { id: 3, start: "2017-08-21", stop: "2017-08-29", revenue: 5599.99 },
-        { id: 4, start: "2017-08-21", stop: null, revenue: 13500 },
-        { id: 5, start: "2017-08-23", stop: null, revenue: 6000 },
-        { id: 6, start: "2017-08-24", stop: null, revenue: 1499.99 },
+        { id: 4, start: "2017-08-21", revenue: 13500 },
+        { id: 5, start: "2017-08-23", revenue: 6000 },
+        { id: 6, start: "2017-08-24", revenue: 1499.99 },
         { id: 7, start: "2017-08-24", stop: "2017-08-29", revenue: 16000 },
-        { id: 8, start: "2017-08-24", stop: null, revenue: 22000 },
+        { id: 8, start: "2017-08-24", revenue: 22000 },
     ];
 }
 
@@ -331,19 +331,34 @@ test("cohort view with aggregator equals to sum should only visible in measures"
     expect(queryAllTexts(".dropdown-menu span")).toEqual(["Recurring Price", "Count"]);
 });
 
-test("export cohort", async () => {
-    expect.assertions(6);
+test("export cohort button should be disabled when no data", async () => {
+    expect.assertions(1);
 
+    Subscription._records = [];
+
+    await mountView({
+        type: "cohort",
+        resModel: "subscription",
+        arch: '<cohort string="Subscription" date_start="start" date_stop="stop" />',
+    });
+
+    expect("button.o_cohort_download_button").toHaveAttribute("disabled");
+});
+
+test("export cohort", async () => {
+    expect.assertions(7);
+
+    const downloadDef = new Deferred();
     patchWithCleanup(download, {
-        _download: (options) => {
-            const data = JSON.parse(options.data.data);
+        _download: async (options) => {
+            const data = JSON.parse(await options.data.data.text());
             expect(options.url).toBe("/web/cohort/export");
             expect(data.interval_string).toBe("Day");
             expect(data.measure_string).toBe("Count");
             expect(data.date_start_string).toBe("Start");
             expect(data.date_stop_string).toBe("Stop");
             expect(data.title).toBe("Subscription");
-            return Promise.resolve();
+            downloadDef.resolve();
         },
     });
 
@@ -353,10 +368,14 @@ test("export cohort", async () => {
         arch: '<cohort string="Subscription" date_start="start" date_stop="stop" />',
     });
 
+    expect("button.o_cohort_download_button").not.toHaveAttribute("disabled");
+
     await contains(".o_cohort_download_button").click();
+    await downloadDef;
 });
 
-test.tags("desktop")("when clicked on cell redirects to the correct list/form view ", async () => {
+test.tags("desktop");
+test("when clicked on cell redirects to the correct list/form view ", async () => {
     Subscription._views = {
         cohort: `
                 <cohort string="Subscriptions" date_start="start" date_stop="stop" measure="__count" interval="week" />`,
@@ -380,7 +399,6 @@ test.tags("desktop")("when clicked on cell redirects to the correct list/form vi
                     <field name="recurring"/>
                     <field name="start"/>
                 </form>`,
-        search: `<search></search>`,
     };
 
     await mountWithCleanup(WebClient);
@@ -471,75 +489,72 @@ test("test backward timeline", async () => {
     expect(values[14]).toHaveText("100%", { message: "col 15 should display 100 percent" });
 });
 
-test.tags("desktop")(
-    "when clicked on cell redirects to the action list/form view passed in context",
-    async () => {
-        Subscription._views = {
-            cohort: `
+test.tags("desktop");
+test("when clicked on cell redirects to the action list/form view passed in context", async () => {
+    Subscription._views = {
+        cohort: `
                 <cohort string="Subscriptions" date_start="start" date_stop="stop" measure="__count" interval="week" />`,
-            "list,my_list_view": `
+        "list,my_list_view": `
                 <list>
                     <field name="start"/>
                     <field name="stop"/>
                 </list>`,
-            "form,my_form_view": `
+        "form,my_form_view": `
                 <form>
                     <field name="start"/>
                     <field name="stop"/>
                 </form>`,
-            list: `
+        list: `
                 <list>
                     <field name="recurring"/>
                     <field name="start"/>
                 </list>`,
-            form: `
+        form: `
                 <form>
                     <field name="recurring"/>
                     <field name="start"/>
                 </form>`,
-            search: `<search></search>`,
-        };
+    };
 
-        await mountWithCleanup(WebClient);
+    await mountWithCleanup(WebClient);
 
-        await getService("action").doAction({
-            name: "Subscriptions",
-            res_model: "subscription",
-            type: "ir.actions.act_window",
-            views: [[false, "cohort"]],
-            context: { list_view_id: "my_list_view", form_view_id: "my_form_view" },
-        });
+    await getService("action").doAction({
+        name: "Subscriptions",
+        res_model: "subscription",
+        type: "ir.actions.act_window",
+        views: [[false, "cohort"]],
+        context: { list_view_id: "my_list_view", form_view_id: "my_form_view" },
+    });
 
-        // Going to the list view, while clicking Period / Count cell
-        await contains("td.o_cohort_value").click();
+    // Going to the list view, while clicking Period / Count cell
+    await contains("td.o_cohort_value").click();
 
-        expect(".o_list_view th:eq(1)").toHaveText("Start", {
-            message: "First field in the list view should be start",
-        });
-        expect(".o_list_view th:eq(2)").toHaveText("Stop", {
-            message: "First field in the list view should be start",
-        });
-        // Going back to cohort view
-        await contains(".o_back_button").click();
-        // Going to the list view
-        await contains("td div.o_cohort_value").click();
-        expect(".o_list_view th:eq(1)").toHaveText("Start", {
-            message: "First field in the list view should be start",
-        });
-        expect(".o_list_view th:eq(2)").toHaveText("Stop", {
-            message: "First field in the list view should be start",
-        });
-        // Going to the form view
-        await contains(".o_list_view .o_data_row .o_data_cell").click();
+    expect(".o_list_view th:eq(1)").toHaveText("Start", {
+        message: "First field in the list view should be start",
+    });
+    expect(".o_list_view th:eq(2)").toHaveText("Stop", {
+        message: "First field in the list view should be start",
+    });
+    // Going back to cohort view
+    await contains(".o_back_button").click();
+    // Going to the list view
+    await contains("td div.o_cohort_value").click();
+    expect(".o_list_view th:eq(1)").toHaveText("Start", {
+        message: "First field in the list view should be start",
+    });
+    expect(".o_list_view th:eq(2)").toHaveText("Stop", {
+        message: "First field in the list view should be start",
+    });
+    // Going to the form view
+    await contains(".o_list_view .o_data_row .o_data_cell").click();
 
-        expect(".o_form_view .o_field_widget:eq(0)").toHaveAttribute("name", "start", {
-            message: "First field in the form view should be start",
-        });
-        expect(".o_form_view .o_field_widget:eq(1)").toHaveAttribute("name", "stop", {
-            message: "Second field in the form view should be stop",
-        });
-    }
-);
+    expect(".o_form_view .o_field_widget:eq(0)").toHaveAttribute("name", "start", {
+        message: "First field in the form view should be start",
+    });
+    expect(".o_form_view .o_field_widget:eq(1)").toHaveAttribute("name", "stop", {
+        message: "Second field in the form view should be stop",
+    });
+});
 
 test("rendering of a cohort view with comparison", async () => {
     expect.assertions(31);
@@ -753,9 +768,7 @@ test("non empty cohort view with sample data", async () => {
 
 test("concurrent reloads: add a filter, and directly toggle a measure", async () => {
     let def;
-    onRpc("get_cohort_data", () => {
-        return Promise.resolve(def);
-    });
+    onRpc("get_cohort_data", () => def);
     await mountView({
         type: "cohort",
         resModel: "subscription",

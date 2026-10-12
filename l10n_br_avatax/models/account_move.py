@@ -1,5 +1,5 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-from odoo import models, api, fields
+from odoo import Command, api, fields, models
 
 
 class AccountMove(models.Model):
@@ -25,6 +25,18 @@ class AccountMove(models.Model):
                 move.l10n_br_is_avatax and move.l10n_latam_document_type_id == self.env.ref("l10n_br.dt_SE")
             )
 
+    def _get_external_taxes(self):
+        """ Override of account.external.tax.mixin. """
+        for invoice in self.filtered('l10n_br_is_avatax'):
+            # This type of transaction requires installments with a `grossValue` before subtracted taxes. Clear any
+            # already existing taxes to ensure that previous tax calculations haven't altered the down payment lines.
+            if invoice.l10n_br_is_service_transaction and invoice._l10n_br_get_installments():
+                invoice.invoice_line_ids.filtered('tax_ids').write({
+                    'tax_ids': [Command.clear()]
+                })
+
+        return super()._get_external_taxes()
+
     def _l10n_br_get_origin_invoice(self):
         return self.debit_origin_id or self.reversed_entry_id
 
@@ -41,7 +53,7 @@ class AccountMove(models.Model):
     def _l10n_br_get_invoice_refs(self):
         """account.external.tax.mixin override."""
         if origin := self._l10n_br_get_origin_invoice():
-            return self._l10n_br_invoice_refs_for_code("documentCode", f"account.move_{origin.id}")
+            return self._l10n_br_invoice_refs_for_code("documentCode", f"{origin._name}_{origin.id}")
 
         return {}
 
@@ -71,3 +83,14 @@ class AccountMove(models.Model):
                 for index, payment in enumerate(payments.sorted("date_maturity"))
             ],
         }
+
+    def _l10n_br_build_avatax_line(self, product, qty, unit_price, total, discount, line_id):
+        """ Override of account.external.tax.mixin. Swap out the product name for line description on invoices.
+        TODO: remove this in master and provide a description directly in _get_line_data_for_external_taxes so we avoid
+              having to browse (and do something similar on sale orders). """
+        res = super()._l10n_br_build_avatax_line(product, qty, unit_price, total, discount, line_id)
+
+        # Transform the descriptions of the lines to something Avatax will trim correctly.
+        name = self.env["account.move.line"].browse(line_id).name
+        res["itemDescriptor"]["description"] = name and name.replace("\n", " | ")
+        return res

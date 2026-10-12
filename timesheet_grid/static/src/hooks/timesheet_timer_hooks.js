@@ -5,6 +5,7 @@ import { Domain } from "@web/core/domain";
 import { useService } from "@web/core/utils/hooks";
 import { patch } from "@web/core/utils/patch";
 import { DynamicRecordList } from "@web/model/relational_model/dynamic_record_list";
+import { DynamicGroupList } from "@web/model/relational_model/dynamic_group_list";
 import { getPropertyFieldInfo } from "@web/views/fields/field";
 import {
     useState,
@@ -30,6 +31,7 @@ export class TimesheetTimerRendererHook {
     setup() {
         this.orm = useService("orm");
         this.timesheetUOMService = useService("timesheet_uom");
+        this.notification = useService("notification");
         this.timerState = useState({
             timesheetId: undefined,
             addTimeMode: false,
@@ -95,7 +97,7 @@ export class TimesheetTimerRendererHook {
     async onWillUpdateProps(nextProps) {
         await this._fetchRunningTimer();
         await this._popRecord(nextProps.list);
-        if (this.timesheet) {
+        if (this.timesheet && this.env.config.viewType === 'kanban') {
             await this.propsList.enterEditMode(this.timesheet);
         }
         this._setAddTimeMode(this.timerState.addTimeMode);
@@ -173,7 +175,10 @@ export class TimesheetTimerRendererHook {
                 this.timerState.timesheetId,
             ]);
         }
-        this.propsList._removeRecords([this.timesheet.id]);
+        const timesheetId = this.timesheet?.id;
+        if (timesheetId) {
+            this.propsList._removeRecords([timesheetId]);
+        }
         this.timesheet = undefined;
         this._resetTimerState();
         this.propsList.model.load();
@@ -186,6 +191,9 @@ export class TimesheetTimerRendererHook {
                 this.timesheet.resId === this.timerState.timesheetId) ||
             this.timerState.otherCompany
         ) {
+            if (this.timesheet?.data.project_id) {
+                this.timesheet = undefined;
+            }
             return;
         }
 
@@ -193,10 +201,59 @@ export class TimesheetTimerRendererHook {
         if (!timesheet && propsList instanceof DynamicRecordList) {
             timesheet = await propsList.addExistingRecord(this.timerState.timesheetId, true);
         }
+        /*
+            If the timesheet was not found in the propsList, and the view is grouped, this means that the timesheet
+            should be placed in one of the folded section. But since the records of the folded section are not loaded,
+            we don't have access to a DynamicRecordList directly.
+        */
+        if (!timesheet && propsList instanceof DynamicGroupList) {
+            const foldedList = this._getFoldedList(propsList);
+            let recordList = await this._getDynamicRecordList(foldedList);
+            /*
+                We do not need to target the correct folded section, any one is fine.
+                When a section is unfolded, the records are loaded, so it make sense that the record appears inside the
+                correct section. Before the section is unfolded though, it's still unclear why the record is computed in
+                the correct section total despite it being added in a random recordList from the view.
+            */
+            timesheet = await recordList.addExistingRecord(this.timerState.timesheetId, true);
+        }
         if (!timesheet) {
             return;
         }
         this.timesheet = timesheet;
+    }
+
+    /*
+        list : the props list that was passed to the popRecord method.
+        return : the first dynamicGroupList that is folded.
+    */
+    _getFoldedList(list) {
+        for (const groupId in list.groups) {
+            if (list.groups[groupId]._config.isFolded) {
+                return list.groups[groupId].list;
+            }
+            // the current group is unfolded, but it contains other dynamicGroupList, we have to check them too.
+            if (list.groups[groupId].list instanceof DynamicGroupList) {
+                const foldedList =  this._getFoldedList(list.groups[groupId].list);
+                if (foldedList) {
+                    return foldedList;
+                }
+            }
+        }
+        // all the subgroups of the list are unfolded, we can not use this list as default.
+        return false;
+    }
+
+    async _getDynamicRecordList(list) {
+        while (list instanceof DynamicGroupList) {
+            // This means that the current DynamicGroupList contains a DynamicRecordList
+            if (list.groups[0] !== undefined) {
+                return list.group[0].list;
+            }
+            await list.load();
+            list = list.groups[0].list;
+        }
+        return list;
     }
 
     async _fetchRunningTimer() {
@@ -234,6 +291,7 @@ export class TimesheetTimerRendererHook {
     _onKeydown(ev) {
         if (
             this.propsList.editedRecord ||
+            ev.target.closest(".modal") ||
             ['input', 'textarea'].includes(ev.target.tagName.toLowerCase())
         ) {
             return;
@@ -323,7 +381,10 @@ const patchController = () => ({
     get modelParams() {
         const params = super.modelParams;
         params.hooks.onRecordChanged = async (record) => {
-            if (record.isNew && record.data.project_id) {
+            if (record.isNew) {
+                if (!record.data.project_id || !record.data.is_timer_running) {
+                    return params;
+                }
                 const { project_id, task_id, employee_id, user_id, company_id } = record.data;
                 await record.model.orm.call(record.resModel, "action_start_new_timesheet_timer", [
                     {
@@ -334,12 +395,15 @@ const patchController = () => ({
                         company_id: company_id && company_id[0],
                     },
                 ]);
-            } else {
-                await record.model.orm.write(
-                    record.resModel,
-                    [record.resId],
-                    this.onChangeWriteValues(record)
-                );
+            } else if (record.data.is_timer_running) {
+                const writeValues = this.onChangeWriteValues(record);
+                if (writeValues.project_id != false) {
+                    await record.model.orm.write(
+                        record.resModel,
+                        [record.resId],
+                        writeValues
+                    );
+                }
             }
         };
         return params;

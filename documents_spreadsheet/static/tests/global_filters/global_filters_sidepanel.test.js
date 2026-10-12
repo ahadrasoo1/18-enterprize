@@ -1,12 +1,14 @@
 import {
     defineDocumentSpreadsheetModels,
     DocumentsDocument,
+    getBasicData,
+    getBasicServerData,
 } from "@documents_spreadsheet/../tests/helpers/data";
 import { createSpreadsheetFromListView } from "@documents_spreadsheet/../tests/helpers/list_helpers";
 import { createSpreadsheetFromPivotView } from "@documents_spreadsheet/../tests/helpers/pivot_helpers";
 import { createSpreadsheet } from "@documents_spreadsheet/../tests/helpers/spreadsheet_test_utils";
 import { beforeEach, describe, expect, getFixture, test } from "@odoo/hoot";
-import { queryFirst } from "@odoo/hoot-dom";
+import { queryAllTexts, queryAllValues, queryFirst } from "@odoo/hoot-dom";
 import { animationFrame, mockDate } from "@odoo/hoot-mock";
 import { helpers } from "@odoo/o-spreadsheet";
 import { insertChartInSpreadsheet } from "@spreadsheet/../tests/helpers/chart";
@@ -16,13 +18,7 @@ import {
     selectCell,
     setCellContent,
 } from "@spreadsheet/../tests/helpers/commands";
-import {
-    IrModel,
-    Partner,
-    getBasicData,
-    getBasicPivotArch,
-    getBasicServerData,
-} from "@spreadsheet/../tests/helpers/data";
+import { getBasicPivotArch, IrModel, Partner } from "@spreadsheet/../tests/helpers/data";
 import { assertDateDomainEqual } from "@spreadsheet/../tests/helpers/date_domain";
 import { getCellValue } from "@spreadsheet/../tests/helpers/getters";
 import {
@@ -33,18 +29,18 @@ import { insertListInSpreadsheet } from "@spreadsheet/../tests/helpers/list";
 import { insertPivotInSpreadsheet } from "@spreadsheet/../tests/helpers/pivot";
 import { toRangeData } from "@spreadsheet/../tests/helpers/zones";
 import { RELATIVE_DATE_RANGE_TYPES } from "@spreadsheet/helpers/constants";
+import * as domainHelpers from "@web/../tests/core/tree_editor/condition_tree_editor_test_helpers";
 import {
     contains,
     defineModels,
     fields,
+    makeServerError,
     models,
     onRpc,
-    serverState,
 } from "@web/../tests/web_test_helpers";
-import * as domainHelpers from "@web/../tests/core/tree_editor/condition_tree_editor_test_helpers";
 
-import { user } from "@web/core/user";
 import { monthsOptions } from "@spreadsheet/assets_backend/constants";
+import { user } from "@web/core/user";
 import { QUARTER_OPTIONS } from "@web/search/utils/dates";
 
 defineDocumentSpreadsheetModels();
@@ -101,6 +97,10 @@ async function selectFieldMatching(fieldName, fieldMatching = target) {
 
 async function saveGlobalFilter() {
     await contains(".o_global_filter_save").click();
+}
+
+async function cancelGlobalFilterEdition() {
+    await contains(".o_global_filter_cancel").click();
 }
 
 async function editGlobalFilterLabel(label) {
@@ -238,12 +238,11 @@ test("Create a new text global filter with a default value from a range", async 
     selectCell(model, "B1");
     await animationFrame();
     await animationFrame(); // SelectionInput component needs an extra tick to update
-    const options = [...target.querySelectorAll("select option")].map((el) => el.textContent);
-    expect(options).toEqual(["Choose a value...", "hello"]);
+    expect(queryAllTexts("select option")).toEqual(["Choose a value...", "hello"]);
     await contains("select").select("hello");
     await saveGlobalFilter();
     const [globalFilter] = model.getters.getGlobalFilters();
-    expect(globalFilter.defaultValue).toEqual("hello");
+    expect(globalFilter.defaultValue).toBe("hello");
 });
 
 test("Create a new text global filter, set a default value ,then restrict values to range", async function () {
@@ -257,11 +256,10 @@ test("Create a new text global filter, set a default value ,then restrict values
     selectCell(model, "B1");
     await animationFrame();
     await animationFrame(); // SelectionInput component needs an extra tick to update
-    const options = [...target.querySelectorAll("select option")].map((el) => el.textContent);
-    expect(options).toEqual(["Choose a value...", "hello", "hi"]);
+    expect(queryAllTexts("select option")).toEqual(["Choose a value...", "hello", "hi"]);
     await saveGlobalFilter();
     const [globalFilter] = model.getters.getGlobalFilters();
-    expect(globalFilter.defaultValue).toEqual("hi");
+    expect(globalFilter.defaultValue).toBe("hi");
 });
 
 test("edit a text global filter with a default value not from the range", async function () {
@@ -279,12 +277,11 @@ test("edit a text global filter with a default value not from the range", async 
     await openGlobalFilterSidePanel();
     // open edition panel
     await contains(".pivot_filter_input .fa-cog").click();
-    const options = [...target.querySelectorAll("select option")].map((el) => el.textContent);
-    expect(target.querySelector("select").value).toEqual("Hi");
-    expect(options).toEqual(["Choose a value...", "hello", "Hi"]);
+    expect("select").toHaveValue("Hi");
+    expect(queryAllTexts("select option")).toEqual(["Choose a value...", "hello", "Hi"]);
     await saveGlobalFilter(); // save without changing anything
     const [globalFilter] = model.getters.getGlobalFilters();
-    expect(globalFilter.defaultValue).toEqual("Hi");
+    expect(globalFilter.defaultValue).toBe("Hi");
 });
 
 test("check range text filter but don't select any range", async function () {
@@ -326,7 +323,6 @@ test("Create a new relational global filter", async function () {
                                 <field name="product_id" type="row"/>
                                 <field name="probability" type="measure"/>
                             </pivot>`,
-                "partner,false,search": `<search/>`,
             },
         },
     });
@@ -345,6 +341,71 @@ test("Create a new relational global filter", async function () {
         chain: "product_id",
         type: "many2one",
     });
+});
+
+test("Can select ID in relation filter", async function () {
+    const { model, pivotId } = await createSpreadsheetFromPivotView({
+        serverData: {
+            models: getBasicData(),
+            views: {
+                "partner,false,pivot": `
+                    <pivot string="Partners">
+                        <field name="foo" type="col"/>
+                        <field name="product_id" type="row"/>
+                        <field name="probability" type="measure"/>
+                    </pivot>`,
+            },
+        },
+    });
+    await openGlobalFilterSidePanel();
+    await clickCreateFilter("relation");
+    await selectModelForRelation("partner");
+    await saveGlobalFilter();
+    const [globalFilter] = model.getters.getGlobalFilters();
+    expect(model.getters.getPivotFieldMatching(pivotId, globalFilter.id)).toEqual({
+        chain: "id",
+        type: "integer",
+    });
+});
+
+test("Cannot select ID in date filter", async function () {
+    await createSpreadsheetFromPivotView({
+        serverData: {
+            models: getBasicData(),
+            views: {
+                "partner,false,pivot": `
+                    <pivot string="Partners">
+                        <field name="foo" type="col"/>
+                        <field name="product_id" type="row"/>
+                        <field name="probability" type="measure"/>
+                    </pivot>`,
+            },
+        },
+    });
+    await openGlobalFilterSidePanel();
+    await clickCreateFilter("date");
+    await contains(".o_model_field_selector_value").click();
+    expect(target.querySelectorAll("[data-name='id']").length).toBe(0);
+});
+
+test("Cannot select ID in text filter", async function () {
+    await createSpreadsheetFromPivotView({
+        serverData: {
+            models: getBasicData(),
+            views: {
+                "partner,false,pivot": `
+                    <pivot string="Partners">
+                        <field name="foo" type="col"/>
+                        <field name="product_id" type="row"/>
+                        <field name="probability" type="measure"/>
+                    </pivot>`,
+            },
+        },
+    });
+    await openGlobalFilterSidePanel();
+    await clickCreateFilter("text");
+    await contains(".o_model_field_selector_value").click();
+    expect(target.querySelectorAll("[data-name='id']").length).toBe(0);
 });
 
 test("Create a new many2many relational global filter", async function () {
@@ -491,7 +552,6 @@ test("Prevent selection of a Field Matching before the Related model", async fun
                                     <field name="product_id" type="row"/>
                                     <field name="probability" type="measure"/>
                                 </pivot>`,
-                "partner,false,search": `<search/>`,
             },
         },
         mockRPC: async function (route, args) {
@@ -561,8 +621,8 @@ test("Display name for 'Relation' global filter values can be updated correctly"
 });
 
 test("Only related models can be selected", async function () {
-    const data = getBasicData();
     defineModels([Vehicle, Computer]);
+    const data = getBasicData();
     data["ir.model"].records = [
         ...IrModel._records,
         {
@@ -601,21 +661,22 @@ test("Only related models can be selected", async function () {
                                 <field name="product_id" type="row"/>
                                 <field name="probability" type="measure"/>
                             </pivot>`,
-                "partner,false,search": `<search/>`,
             },
         },
     });
     await openGlobalFilterSidePanel();
     await clickCreateFilter("relation");
     await contains(".o_side_panel_related_model input").click();
-    const [model1, model2, model3, model4, model5] = target.querySelectorAll(
+    const [model1, model2, model3, model4, model5, model6, model7] = target.querySelectorAll(
         ".o-autocomplete--dropdown-item a"
     );
-    expect(model1).toHaveText("Computer");
-    expect(model2).toHaveText("Document");
-    expect(model3).toHaveText("Product");
-    expect(model4).toHaveText("Users");
-    expect(model5).toHaveText("Vehicle");
+    expect(model1).toHaveText("Apple");
+    expect(model2).toHaveText("Computer");
+    expect(model3).toHaveText("Document");
+    expect(model4).toHaveText("Partner");
+    expect(model5).toHaveText("Product");
+    expect(model6).toHaveText("Users");
+    expect(model7).toHaveText("Vehicle");
 });
 
 test("Edit an existing global filter", async function () {
@@ -647,7 +708,6 @@ test("Trying to duplicate a filter label will trigger a toaster", async function
                                 <field name="product_id" type="row"/>
                                 <field name="probability" type="measure"/>
                             </pivot>`,
-                "partner,false,search": `<search/>`,
             },
         },
     });
@@ -1213,9 +1273,7 @@ test("Choose any year in a year picker by clicking the picker", async function (
         message: "The picker should be displaying the years",
     });
 
-    const selectYearSpans = target.querySelectorAll("button.o_date_item_cell");
-    const year2024 = [...selectYearSpans].find((el) => el.textContent === "2024");
-    await contains(year2024).click();
+    await contains("button.o_date_item_cell:contains(2024)").click();
 
     expect(year).toHaveValue("2024");
     expect(model.getters.getGlobalFilterValue(THIS_YEAR_GLOBAL_FILTER.id)).toEqual({
@@ -1343,24 +1401,18 @@ test("Readonly user can update relation filter values", async function () {
 
     await openGlobalFilterSidePanel();
 
-    const pivot = target.querySelector(".pivot_filter_section");
     expect(".pivot_filter_section").toHaveCount(1);
     expect("i.o_side_panel_filter_icon.fa-cog").toHaveCount(0);
     expect("i.o_side_panel_filter_icon.fa-times").toHaveCount(1);
-    expect(pivot.querySelector(".o_side_panel_filter_label")).toHaveText("Relation Filter");
+    expect(".pivot_filter_section .o_side_panel_filter_label").toHaveText("Relation Filter");
     expect(tagSelector).toHaveCount(1);
-    expect([...pivot.querySelectorAll(tagSelector)].map((el) => el.textContent.trim())).toEqual([
-        "xpad",
-    ]);
+    expect(queryAllTexts(`.pivot_filter_section ${tagSelector}`)).toEqual(["xpad"]);
 
-    await contains(pivot.querySelector(".pivot_filter_input input.o-autocomplete--input")).click();
+    await contains(".pivot_filter_section .pivot_filter_input input.o-autocomplete--input").click();
     await contains("ul.ui-autocomplete li:first-child").click();
 
     expect(tagSelector).toHaveCount(2);
-    expect([...pivot.querySelectorAll(tagSelector)].map((el) => el.textContent.trim())).toEqual([
-        "xpad",
-        "xphone",
-    ]);
+    expect(queryAllTexts(`.pivot_filter_section ${tagSelector}`)).toEqual(["xpad", "xphone"]);
     expect(model.getters.getGlobalFilterValue("42")).toEqual([41, 37]);
 });
 
@@ -1370,7 +1422,7 @@ test("Change all domains -> Set corresponding model should allow saving", async 
     const vehicle_ids = fields.Many2many({ relation: "vehicle", string: "Vehicle" });
     Partner._fields.vehicle_ids = vehicle_ids;
     serverData.models["ir.model"].records = [
-        ...IrModel,
+        ...IrModel._records,
         {
             id: 34,
             name: "Vehicle",
@@ -1498,21 +1550,18 @@ test("Can clear a relation filter values", async function () {
 
     await openGlobalFilterSidePanel();
 
-    const pivot = target.querySelector(".pivot_filter_section");
     expect(".pivot_filter_section").toHaveCount(1);
     expect("i.o_side_panel_filter_icon.fa-cog").toHaveCount(1);
     expect("i.o_side_panel_filter_icon.fa-times").toHaveCount(0);
-    expect(pivot.querySelector(".o_side_panel_filter_label")).toHaveText("Relation Filter");
+    expect(".pivot_filter_section .o_side_panel_filter_label").toHaveText("Relation Filter");
     expect(tagSelector).toHaveCount(0);
-    expect([...pivot.querySelectorAll(tagSelector)].map((el) => el.textContent.trim())).toEqual([]);
+    expect(queryAllTexts(`.pivot_filter_section ${tagSelector}`)).toEqual([]);
 
-    await contains(pivot.querySelector(".pivot_filter_input input.o-autocomplete--input")).click();
+    await contains(".pivot_filter_section .pivot_filter_input input.o-autocomplete--input").click();
     await contains("ul.ui-autocomplete li:first-child").click();
 
     expect(tagSelector).toHaveCount(1);
-    expect([...pivot.querySelectorAll(tagSelector)].map((el) => el.textContent.trim())).toEqual([
-        "xphone",
-    ]);
+    expect(queryAllTexts(`.pivot_filter_section ${tagSelector}`)).toEqual(["xphone"]);
     expect("i.o_side_panel_filter_icon.fa-times").toHaveCount(1);
     expect(model.getters.getPivotComputedDomain(pivotId)).toEqual([["product_id", "in", [37]]]);
 
@@ -1520,7 +1569,7 @@ test("Can clear a relation filter values", async function () {
     await contains("i.o_side_panel_filter_icon.fa-times").click();
     expect("i.o_side_panel_filter_icon.fa-times").toHaveCount(0);
     expect(tagSelector).toHaveCount(0);
-    expect([...pivot.querySelectorAll(tagSelector)].map((el) => el.textContent.trim())).toEqual([]);
+    expect(queryAllTexts(`.pivot_filter_section ${tagSelector}`)).toEqual([]);
     expect(model.getters.getPivotComputedDomain(pivotId)).toEqual([]);
 });
 
@@ -1528,9 +1577,6 @@ test("Can clear automatic default user with the global clear button", async func
     const uid = user.userId;
     const tagSelector = ".o_multi_record_selector .badge";
     const serverData = getBasicServerData();
-    serverData.models["res.users"].records = [
-        { id: uid, name: "Mitchell", active: true, partner_id: serverState.partnerId },
-    ];
     const { model, pivotId } = await createSpreadsheetFromPivotView({ serverData });
     await addGlobalFilter(
         model,
@@ -1547,14 +1593,11 @@ test("Can clear automatic default user with the global clear button", async func
     );
 
     await openGlobalFilterSidePanel();
-    const pivot = target.querySelector(".pivot_filter_section");
     expect(model.getters.getPivotComputedDomain(pivotId)).toEqual([["user_ids", "in", [uid]]]);
-    expect([...pivot.querySelectorAll(tagSelector)].map((el) => el.textContent.trim())).toEqual([
-        "Mitchell",
-    ]);
+    expect(queryAllTexts(`.pivot_filter_section ${tagSelector}`)).toEqual(["Mitchell Admin"]);
     // clear filter
     await contains("i.o_side_panel_filter_icon.fa-times").click();
-    expect([...pivot.querySelectorAll(tagSelector)].map((el) => el.textContent.trim())).toEqual([]);
+    expect(queryAllTexts(`.pivot_filter_section ${tagSelector}`)).toEqual([]);
     expect(model.getters.getPivotComputedDomain(pivotId)).toEqual([]);
 });
 
@@ -1603,7 +1646,7 @@ test("Changing the range of a date global filter reset the default value", async
     await openGlobalFilterSidePanel();
     await contains(".o_side_panel_filter_icon.fa-cog").click();
     const timeRangeOption = target.querySelectorAll(
-        ".o_spreadsheet_filter_editor_side_panel .o_side_panel_section"
+        ".o_spreadsheet_filter_editor_side_panel .o-section"
     )[1];
     const selectField = timeRangeOption.querySelector("select");
     await contains(selectField).select("fixedPeriod");
@@ -1638,18 +1681,18 @@ test("Changing the range of a date global filter reset the current value", async
     const pivotDomain = model.getters.getPivotComputedDomain(pivotId);
     assertDateDomainEqual("date", "2022-07-04", "2022-07-10", pivotDomain);
     const editFilter = target.querySelector(".o_side_panel_filter_icon.fa-cog");
-    expect(model.getters.getGlobalFilterValue("42")).toEqual("last_week");
+    expect(model.getters.getGlobalFilterValue("42")).toBe("last_week");
 
     // Edit filter range and save
     await contains(editFilter).click();
     const timeRangeOption = target.querySelectorAll(
-        ".o_spreadsheet_filter_editor_side_panel .o_side_panel_section"
+        ".o_spreadsheet_filter_editor_side_panel .o-section"
     )[1];
     const selectField = timeRangeOption.querySelector("select");
     await contains(selectField).select("fixedPeriod");
     await contains("input[name=date_automatic_filter]").click();
     const automaticTimeRangeOption = target.querySelectorAll(
-        ".o_spreadsheet_filter_editor_side_panel .o_side_panel_section"
+        ".o_spreadsheet_filter_editor_side_panel .o-section"
     )[2];
     const selectPeriodField = automaticTimeRangeOption.querySelector("select");
     await contains(selectPeriodField).select("this_quarter");
@@ -1724,19 +1767,18 @@ test("Filter edit side panel is initialized with the correct values", async func
     await openGlobalFilterSidePanel();
     await contains(".o-sidePanel .fa-cog").click();
 
-    const panel = target.querySelector(".o-sidePanel");
-    expect(panel.querySelectorAll(".o-input")[0]).toHaveValue("This month");
-    expect(panel.querySelectorAll(".o-input")[1]).toHaveValue("fixedPeriod");
+    expect(".o-sidePanel .o-input:eq(0)").toHaveValue("This month");
+    expect(".o-sidePanel .o-input:eq(1)").toHaveValue("fixedPeriod");
 
-    const pivotField = panel.querySelectorAll(".o_spreadsheet_field_matching ")[0];
-    const pivotFieldValue = pivotField.querySelector(".o_model_field_selector_value span");
-    expect(pivotFieldValue.textContent.trim()).toBe("Date");
-    expect(pivotField.querySelector("select")).toHaveValue("0");
+    const pivotField = ".o-sidePanel .o_spreadsheet_field_matching:eq(0)";
+    const pivotFieldValue = `${pivotField} .o_model_field_selector_value span`;
+    expect(pivotFieldValue).toHaveText("Date");
+    expect(`${pivotField} select`).toHaveValue("0");
 
-    const listField = panel.querySelectorAll(".o_spreadsheet_field_matching ")[1];
-    const listFieldValue = listField.querySelector(".o_model_field_selector_value span");
-    expect(listFieldValue.textContent.trim()).toBe("Date");
-    expect(listField.querySelector("select")).toHaveValue("1");
+    const listField = ".o-sidePanel .o_spreadsheet_field_matching:eq(1)";
+    const listFieldValue = `${listField} .o_model_field_selector_value span`;
+    expect(listFieldValue).toHaveText("Date");
+    expect(`${listField} select`).toHaveValue("1");
 });
 
 test("Empty field is marked as warning", async function () {
@@ -1874,16 +1916,15 @@ test("invalid fixed period automatic value is removed when changing disabledPeri
     await openGlobalFilterSidePanel();
     await contains("i.o_side_panel_filter_icon.fa-cog").click();
 
-    const automaticValueSelect = target.querySelector(".date_filter_automatic_value");
-    expect(automaticValueSelect.value).toBe("this_month");
+    expect(".date_filter_automatic_value").toHaveValue("this_month");
 
     // Disable "month" period
     await contains(".o-sidePanelBody input[name='month']").click();
-    expect(automaticValueSelect.value).toBe("this_year");
-    const options = [...automaticValueSelect.querySelectorAll("option")].map(
-        (option) => option.value
-    );
-    expect(options).toEqual(["this_year", "this_quarter"]);
+    expect(".date_filter_automatic_value").toHaveValue("this_year");
+    expect(queryAllValues(".date_filter_automatic_value option")).toEqual([
+        "this_year",
+        "this_quarter",
+    ]);
 });
 
 test("Disabled period section is not present for non fixedPeriod date filters", async function () {
@@ -1906,4 +1947,67 @@ test("Disabled period section is not present for non fixedPeriod date filters", 
 
     await contains(range).select("relative");
     expect("input[name='month']").toHaveCount(0);
+});
+
+test("Cannot create a filter if a datasource is in error", async function () {
+    const spreadsheetData = {
+        lists: {
+            1: {
+                id: 1,
+                columns: ["foo", "contact_name"],
+                domain: [],
+                model: "unknown",
+                orderBy: [],
+                context: {},
+                fieldMatching: {},
+            },
+        },
+    };
+    const serverData = getBasicServerData();
+    serverData.models["documents.document"].records = [
+        DocumentsDocument._records[0], // res_company.document_spreadsheet_folder_id
+        {
+            id: 45,
+            spreadsheet_data: JSON.stringify(spreadsheetData),
+            name: "Spreadsheet",
+            handler: "spreadsheet",
+        },
+    ];
+    await createSpreadsheet({
+        serverData,
+        spreadsheetId: 45,
+        mockRPC: async function (route, { model, method, kwargs }) {
+            if (model === "unknown" && method === "fields_get") {
+                throw makeServerError({ code: 404 });
+            }
+        },
+    });
+    await openGlobalFilterSidePanel();
+    for (const type of Object.keys(FILTER_CREATION_SELECTORS)) {
+        await clickCreateFilter(type);
+        expect(".o-validation-error").toHaveCount(1);
+        expect(".o_global_filter_save").toHaveCount(0);
+        await cancelGlobalFilterEdition();
+    }
+});
+
+test("Default value and subdomain are hidden for invalid relational filters", async () => {
+    const { model } = await createSpreadsheetFromPivotView({
+        mockRPC: async function (route, { model, method, kwargs }) {
+            if (model === "unknown" && method === "fields_get") {
+                throw makeServerError({ code: 404 });
+            }
+        },
+    });
+    const filter = /** @type {FixedPeriodDateGlobalFilter} */ ({
+        id: "43",
+        type: "relation",
+        label: "Relational Filter",
+        modelName: "unknown",
+    });
+    await addGlobalFilter(model, filter);
+    await openGlobalFilterSidePanel();
+    expect(".o-filter-value .o-validation").toHaveCount(1);
+    await contains(".o_side_panel_filter_icon.fa-cog").click();
+    expect(".o_multi_record_selector").toHaveCount(0);
 });

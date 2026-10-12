@@ -62,10 +62,11 @@
                 <button string="Refund" name="refund_sheet" type='object' invisible="not has_refund_slip or credit_note or state not in ('done', 'paid')"
                     confirm="Another refund payslip with the same amount has been found. Do you want to create a new one?"/>
                 <button string="Set to Draft" name="action_payslip_draft" type="object" invisible="state != 'cancel'"/>
+                <button string="Unpaid" name="action_payslip_unpaid" type="object" invisible="state != 'paid'"/>
                 <button string="Compute Sheet" name="compute_sheet" type="object" invisible="state != 'draft' or credit_note" class="oe_highlight" help="Recompute the payslip lines only, not the worked days / input lines"/>
                 <button string="Compute Sheet" name="compute_sheet" type="object" invisible="state != 'verify' or credit_note" help="Recompute the payslip lines only, not the worked days / input lines"/>
                 <button string="Cancel" name="action_payslip_cancel" type="object" invisible="state not in ('draft', 'done', 'verify')"/>
-                <button string="Print" name="action_print_payslip" type="object"/>
+                <button string="Print" name="action_print_payslip" type="object" invisible= "not line_ids"/>
                 <button string="Export Payslip" name="action_export_payslip" type="object" invisible="not is_superuser"/>
                 <field name="state" widget="statusbar" statusbar_visible="draft,done,paid"/>
             </header>
@@ -95,7 +96,7 @@
                         <field name="image_1920" widget='image' class="oe_avatar m-0" options='{"zoom": true, "preview_image":"avatar_128"}'/>
                     </div>
                 </div>
-                <div class="alert alert-warning" role="alert" invisible="not warning_message">
+                <div class="alert alert-warning" name="payslip_alert" role="alert" invisible="not warning_message">
                     <field name="warning_message" style="white-space: pre-wrap;"/>
                 </div>
                 <group col="4">
@@ -172,7 +173,7 @@
                                 <field name="_allowed_input_type_ids" column_invisible="True"/>
                                 <field name="input_type_id"/>
                                 <field name="name"/>
-                                <field name="amount"/>
+                                <field name="amount" widget="float_without_trailing_zeros"/>
                                 <field name="contract_id" column_invisible="True"/>
                                 <field name="sequence" column_invisible="True"/>
                             </list>
@@ -298,7 +299,7 @@
         <field name="path">payslips-to-pay</field>
         <field name="view_mode">list,kanban,form,pivot,activity</field>
         <field name="search_view_id" ref="view_hr_payslip_filter"/>
-        <field name="domain">[('state', 'in', ['draft', 'verify'])]</field>
+        <field name="domain">[('state', '=', 'done')]</field>
     </record>
     <record id="action_view_hr_payslip_form" model="ir.actions.act_window">
         <field name="name">Employee Payslips</field>
@@ -330,7 +331,9 @@
         <field name="binding_view_types">list</field>
         <field name="state">code</field>
         <field name="code">
-            records.compute_sheet()
+result = records.compute_sheet()
+if isinstance(result, dict):
+    action = result
         </field>
     </record>
 

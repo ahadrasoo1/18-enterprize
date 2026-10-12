@@ -14,10 +14,10 @@ class WorksheetValidationController extends FormController {
     }
 
     async validate() {
-        await this.saveButtonClicked({ closable:false });
-        const record = this.model.root.data;
         const context = this.model.root.context;
-        if (record.mode != "readonly") {
+        await this.saveButtonClicked({ closable: !context['quality_wizard_id'] });
+        const record = this.model.root.data;
+        if (record.mode != "readonly" && context['quality_wizard_id']) {
             context['from_worksheet'] = true
             const action = await this.orm.call(
                 "quality.check",
@@ -32,7 +32,6 @@ class WorksheetValidationController extends FormController {
     }
 
     async discard() {
-        await this.saveButtonClicked({ closable:false });
         await super.discard();
         const record = this.model.root.data;
         const context = this.model.root.context;

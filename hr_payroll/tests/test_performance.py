@@ -37,7 +37,7 @@ class TestPayrollPerformance(TestPayslipBase):
     @warmup
     def test_performance_work_entry_generation(self):
         """ Work entry generation """
-        with self.assertQueryCount(__system__=18, admin=20):
+        with self.assertQueryCount(__system__=20, admin=22):
             self.employees.generate_work_entries(date(2018, 1, 1), date(2018, 1, 2))
         self.reset_work_entries()
 

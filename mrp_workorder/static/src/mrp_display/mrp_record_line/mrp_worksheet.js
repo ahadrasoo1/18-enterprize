@@ -21,7 +21,7 @@ export class MrpWorksheet extends QualityCheck {
 
     async clicked() {
         let worksheetData = false;
-        if (this.props.record.data.worksheet) {
+        if (this.props.record.data.has_worksheet) {
             const sheet = await this.props.record.model.orm.read(
                 "mrp.workorder",
                 [this.props.record.resId],

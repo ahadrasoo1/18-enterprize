@@ -1,34 +1,37 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* sale_planning
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Marta Wacławek, 2024
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:28+0000\n"
+"POT-Creation-Date: 2025-12-29 18:48+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
+"Last-Translator: Marta Wacławek, 2024\n"
 "Language-Team: Polish (https://app.transifex.com/odoo/teams/41243/pl/)\n"
+"Language: pl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: pl\n"
-"Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
+"Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && "
+"(n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && "
+"n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
 
 #. module: sale_planning
 #. odoo-python
 #: code:addons/sale_planning/controllers/main.py:0
 msgid "(%(remaining_hours)s remaining)"
-msgstr ""
+msgstr "(%(remaining_hours)s pozostało)"
 
 #. module: sale_planning
 #: model_terms:ir.ui.view,arch_db:sale_planning.planning_shift_ics_description_inherit
 msgid "<b>Sales Order Item:</b>"
-msgstr ""
+msgstr "<b>Pozycja zamówienia sprzedaży:</b>"
 
 #. module: sale_planning
 #: model_terms:ir.ui.view,arch_db:sale_planning.planning_slot_view_form_inherit_sale_planning
@@ -39,6 +42,11 @@ msgid ""
 "cancellation of the sales order.\" invisible=\"sale_order_state != "
 "'cancel'\"/>"
 msgstr ""
+"<span class=\"fa fa-exclamation-triangle text-warning\" title=\"Zamówienie "
+"sprzedaży powiązane z tą zmianą zostało anulowane. Zalecamy aktualizację "
+"pozycji zamówienia sprzedaży lub anulowanie harmonogramu tej zmiany zgodnie "
+"z anulowaniem zamówienia sprzedaży.\" invisible=\"sale_order_state != "
+"'cancel'\"/>"
 
 #. module: sale_planning
 #: model_terms:ir.ui.view,arch_db:sale_planning.view_order_form_inherit_sale_planning
@@ -53,7 +61,7 @@ msgstr "<span class=\"o_stat_text\">Zamówienie sprzedaży</span>"
 #. module: sale_planning
 #: model_terms:ir.ui.view,arch_db:sale_planning.view_order_form_inherit_sale_planning
 msgid "<span class=\"o_stat_text\">To Plan</span>"
-msgstr ""
+msgstr "<span class=\"o_stat_text\">Do zaplanowania</span>"
 
 #. module: sale_planning
 #: model_terms:ir.ui.view,arch_db:sale_planning.product_template_form_view_invoice_policy_inherit_sale_planning
@@ -62,6 +70,9 @@ msgid ""
 "                        as\n"
 "                    </span>"
 msgstr ""
+"<span invisible=\"not planning_enabled\" class=\"oe_inline me-2\">\n"
+"                        jako\n"
+"                    </span>"
 
 #. module: sale_planning
 #: model_terms:ir.ui.view,arch_db:sale_planning.planning_slot_view_gantt_inherit_sale_planning
@@ -72,9 +83,11 @@ msgstr "<strong>Pozycja zamówienia sprzedaży -</strong>"
 #. odoo-javascript
 #: code:addons/sale_planning/static/src/views/planning_hooks.js:0
 msgid ""
-"All open shifts and sales orders have already been assigned, or there are no"
-" resources available to take them at this time."
+"All open shifts and sales orders have already been assigned, or there are no "
+"resources available to take them at this time."
 msgstr ""
+"Wszystkie wolne zmiany i zamówienia sprzedaży zostały już przydzielone lub "
+"nie ma dostępnych zasobów, które mogłyby je w tej chwili objąć."
 
 #. module: sale_planning
 #: model:ir.model.fields,field_description:sale_planning.field_planning_slot__allocated_hours
@@ -133,12 +146,21 @@ msgstr "Technik IT"
 msgid ""
 "If enabled, a shift will automatically be generated for the selected role "
 "when confirming the Sales Order.                 With the 'auto plan' "
-"feature, only employees with this role will be automatically assigned shifts"
-" for Sales Orders containing this service.                 The system will "
-"consider employee availability and the remaining time to be planned."
-"                 You can also manually schedule open shifts for your Sales "
-"Order or assign them to any employee you prefer."
+"feature, only employees with this role will be automatically assigned shifts "
+"for Sales Orders containing this service.                 The system will "
+"consider employee availability and the remaining time to be "
+"planned.                 You can also manually schedule open shifts for your "
+"Sales Order or assign them to any employee you prefer."
 msgstr ""
+"Jeśli włączone, zmiana zostanie automatycznie wygenerowana dla wybranej roli "
+"podczas potwierdzania zamówienia sprzedaży.                                 "
+"Funkcja „auto plan” sprawia, że zmiany będą automatycznie przypisywane tylko "
+"pracownikom posiadającym tę rolę w przypadku zamówień sprzedaży "
+"zawierających tę usługę.                             System uwzględni "
+"dostępność pracowników oraz pozostały czas do "
+"zaplanowania.                      Możesz również ręcznie zaplanować otwarte "
+"zmiany dla swojego zamówienia sprzedaży lub przypisać je do dowolnego "
+"pracownika, którego wybierzesz."
 
 #. module: sale_planning
 #: model_terms:ir.ui.view,arch_db:sale_planning.planning_slot_view_search_inherit_sale_planning
@@ -161,18 +183,20 @@ msgid ""
 "Only slots linked to a Sales Order with a plannable service can be "
 "unscheduled."
 msgstr ""
+"Tylko sloty powiązane z zamówieniem sprzedaży z usługą planowaną mogą być "
+"niezaplanowane."
 
 #. module: sale_planning
 #. odoo-javascript
 #: code:addons/sale_planning/static/src/views/planning_hooks.js:0
 msgid "Open shifts and sales orders assigned"
-msgstr ""
+msgstr "Otwarte zmiany i zamówienia sprzedaży zostały pomyślnie przypisane."
 
 #. module: sale_planning
 #. odoo-javascript
 #: code:addons/sale_planning/static/src/views/planning_hooks.js:0
 msgid "Open shifts and sales orders unscheduled"
-msgstr ""
+msgstr "Niezaplanowane otwarte zmiany i zamówienia sprzedaży"
 
 #. module: sale_planning
 #: model_terms:product.template,description:sale_planning.developer_product_product_template
@@ -189,7 +213,7 @@ msgstr "Usługi planowania"
 #. module: sale_planning
 #: model_terms:ir.ui.view,arch_db:sale_planning.product_template_form_view_invoice_policy_inherit_sale_planning
 msgid "Plan shifts for your orders for employees who have this role."
-msgstr ""
+msgstr "Planuj zmiany dla swoich zleceń dla pracowników, którzy mają tę rolę."
 
 #. module: sale_planning
 #. odoo-python
@@ -256,7 +280,7 @@ msgstr "Pozycja zamówienia sprzedaży"
 #. module: sale_planning
 #: model_terms:ir.ui.view,arch_db:sale_planning.planning_shift_ics_description_inherit
 msgid "Sales Order Item:"
-msgstr ""
+msgstr "Pozycja zamówienia sprzedaży:"
 
 #. module: sale_planning
 #: model:ir.model,name:sale_planning.model_sale_order_line
@@ -266,7 +290,7 @@ msgstr "Pozycja zamówienia sprzedaży"
 #. module: sale_planning
 #: model:ir.model.fields,field_description:sale_planning.field_planning_slot__sale_order_state
 msgid "Sales Order State"
-msgstr ""
+msgstr "Stan zamówienia sprzedaży"
 
 #. module: sale_planning
 #: model:ir.model.fields,help:sale_planning.field_planning_slot__sale_line_id
@@ -316,18 +340,21 @@ msgid ""
 "There are no hours left to plan, or there are no resources available at the "
 "time."
 msgstr ""
+"Nie ma dostępnych godzin do zaplanowania, lub nie ma aktualnie dostępnych "
+"zasobów."
 
 #. module: sale_planning
 #. odoo-javascript
 #: code:addons/sale_planning/static/src/views/sale_planning_gantt/sale_planning_gantt_renderer.js:0
 msgid "There are no sales order items to plan."
-msgstr ""
+msgstr "Nie ma pozycji zamówienia sprzedaży do zaplanowania."
 
 #. module: sale_planning
 #. odoo-python
 #: code:addons/sale_planning/models/planning_slot.py:0
 msgid "This Sale Order Item doesn't have a target value of planned hours."
 msgstr ""
+"Ta pozycja zamówienia sprzedaży nie ma wartości docelowej planowanych godzin."
 
 #. module: sale_planning
 #. odoo-javascript
@@ -337,6 +364,8 @@ msgid ""
 msgstr "Ten zasób nie jest dostępny dla tej zmiany w wybranym okresie."
 
 #. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/views/sale_planning_gantt/sale_planning_gantt_renderer.js:0
 #: model_terms:ir.ui.view,arch_db:sale_planning.planning_slot_view_gantt_inherit_sale_planning
 #: model_terms:ir.ui.view,arch_db:sale_planning.planning_view_form_in_gantt_inherit_sale_planning
 msgid "Unschedule"
@@ -357,20 +386,24 @@ msgstr "Planer pracy"
 #. odoo-python
 #: code:addons/sale_planning/models/planning_slot.py:0
 msgid "You are attempting to create a slot for a cancelled sales order."
-msgstr ""
+msgstr "Próbujesz utworzyć slot dla anulowanego zamówienia sprzedaży."
 
 #. module: sale_planning
 #. odoo-python
 #: code:addons/sale_planning/models/sale_order.py:0
 msgid ""
-"You cannot update the company for sales order %(order_name)s as it's linked to shifts in another company.\n"
+"You cannot update the company for sales order %(order_name)s as it's linked "
+"to shifts in another company.\n"
 "Please transfer shifts %(slots_names)s to the destination company first."
 msgstr ""
+"Nie można zaktualizować firmy dla zamówienia sprzedaży%(order_name)s, "
+"ponieważ jest ono powiązane ze zmianami w innej firmie.\n"
+"Najpierw przenieś zmiany %(slots_names)s do firmy docelowej."
 
 #. module: sale_planning
 #: model_terms:ir.ui.view,arch_db:sale_planning.planning_role_view_tree_inherit_sale_planning
 msgid "e.g. Cleaning Services"
-msgstr ""
+msgstr "np. Usługi sprzątania"
 
 #. module: sale_planning
 #: model_terms:ir.ui.view,arch_db:sale_planning.product_template_form_view_invoice_policy_inherit_sale_planning

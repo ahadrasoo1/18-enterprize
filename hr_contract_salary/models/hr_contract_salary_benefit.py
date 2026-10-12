@@ -209,7 +209,7 @@ class HrContractSalaryBenefit(models.Model):
                 raise ValidationError(_('The minimum value for the slider should be inferior to the maximum value.'))
 
     @api.constrains('display_type', 'res_field_id')
-    def _check_min_inferior_to_max(self):
+    def _check_benefits_field(self):
         for record in self:
             if not record.res_field_id and record.display_type != 'always':
                 raise ValidationError(_('Benefits that are not linked to a field should always be displayed.'))

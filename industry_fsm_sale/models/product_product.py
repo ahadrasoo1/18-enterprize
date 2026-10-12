@@ -54,7 +54,7 @@ class ProductProduct(models.Model):
                         }
                         if task.under_warranty:
                             vals['price_unit'] = 0
-                        if product.service_type == 'manual':
+                        if all_editable_lines[0].qty_delivered_method == 'manual':
                             vals['qty_delivered'] = all_editable_lines[0].product_uom_qty + diff_qty
                         all_editable_lines[0].with_context(fsm_no_message_post=True).write(vals)
                         continue
@@ -62,7 +62,7 @@ class ProductProduct(models.Model):
                     for line in all_editable_lines:
                         new_line_qty = max(0, line.product_uom_qty + diff_qty)
                         diff_qty += line.product_uom_qty - new_line_qty
-                        if product.service_type == 'manual':
+                        if line.qty_delivered_method == 'manual':
                             line.with_context(fsm_no_message_post=True).qty_delivered = new_line_qty
                         line.with_context(fsm_no_message_post=True).product_uom_qty = new_line_qty
                         if task.under_warranty:
@@ -79,12 +79,12 @@ class ProductProduct(models.Model):
                     }
                     if task.under_warranty:
                         vals['price_unit'] = 0
-                    if product.service_type == 'manual':
-                        vals['qty_delivered'] = diff_qty
                     if task.sale_order_id.order_line:
                         vals['sequence'] = max(task.sale_order_id.order_line.mapped('sequence')) + 1
 
                     sol_sudo = SaleOrderLine_sudo.create(vals)
+                    if sol_sudo.qty_delivered_method == 'manual':
+                        sol_sudo.qty_delivered = diff_qty
 
     @api.model
     def _search_fsm_quantity(self, operator, value):

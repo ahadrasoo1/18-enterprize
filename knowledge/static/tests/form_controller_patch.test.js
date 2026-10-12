@@ -43,7 +43,6 @@ test("cannot search for article when creating invalid record", async () => {
     await mountView({
         type: "form",
         resModel: "res.partner",
-        viewId: 1,
         arch: /* xml */ `
             <form string="Partners">
                 <sheet>

@@ -10,8 +10,6 @@
         'l10n_ch_hr_payroll_account',
         'documents_l10n_ch_hr_payroll',
     ],
-    'demo': [
-        'data/l10n_ch_hr_payroll_account_demo.xml',
-    ],
     'license': 'OEEL-1',
+    'installable': False,
 }

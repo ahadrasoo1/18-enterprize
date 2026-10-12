@@ -33,7 +33,9 @@
 }
 
 .o-thread-popover {
+    width: $o-mail-ChatWindow-width;
     overflow-y: auto;
+
     /** counteract the generic content-box set on "o-spreadsheet *"  */
     * {
         box-sizing: border-box !important;
@@ -44,9 +46,11 @@
         width: 100%;
     }
 
+    .o-cell-thread, .o-thread-start-composer {
+        background-color: white;
+    }
+
     .o-thread-highlight {
-        &, .o-cell-thread {
-            background-color: #E8EDFF;
-        }
+        background-color: #E8EDFF;
     }
 }

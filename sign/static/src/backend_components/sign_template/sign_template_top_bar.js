@@ -91,6 +91,7 @@ export class SignTemplateTopBar extends Component {
     async onTemplateSaveClick() {
         const templateId = this.props.signTemplate.id;
         this.state.properties = await this.orm.call("sign.template", "write", [[templateId], { active: true }]);
+        this.props.signTemplate.active = true;
         this.notification.add(_t("Document saved as Template."), { type: "success" });
         return this.state.properties;
     }
@@ -128,10 +129,8 @@ export class SignTemplateTopBar extends Component {
     }
 
     async saveChanges(record, changes) {
-        const res = await this.orm.call("sign.template", "write", [[record.resId], changes]);
-        if (res) {
-            this.notification.add(_t("Saved"), { type: "success" });
-        }
+        const result = await this.orm.write("sign.template", [record.resId], changes);
+        return result;
     }
 
     get showEditButton() {

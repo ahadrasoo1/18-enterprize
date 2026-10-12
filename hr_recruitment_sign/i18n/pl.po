@@ -1,23 +1,26 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* hr_recruitment_sign
-# 
+#
 # Translators:
-# Wil Odoo, 2024
-# 
+# Wil Odoo, 2025
+# Marta Wacławek, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:27+0000\n"
+"POT-Creation-Date: 2025-12-29 18:47+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
+"Last-Translator: Marta Wacławek, 2025\n"
 "Language-Team: Polish (https://app.transifex.com/odoo/teams/41243/pl/)\n"
+"Language: pl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: pl\n"
-"Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
+"Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && "
+"(n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && "
+"n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
 
 #. module: hr_recruitment_sign
 #: model:ir.model.fields,field_description:hr_recruitment_sign.field_hr_applicant__sign_request_count
@@ -28,7 +31,7 @@ msgstr "# Podpisów"
 #. odoo-python
 #: code:addons/hr_recruitment_sign/wizard/hr_recruitment_sign_document_wizard.py:0
 msgid "%(partner)s and %(responsible)s are the signatories."
-msgstr ""
+msgstr "%(partner)s oraz %(responsible)s są sygatariuszami."
 
 #. module: hr_recruitment_sign
 #: model_terms:ir.ui.view,arch_db:hr_recruitment_sign.hr_applicant_sign_view_form
@@ -68,12 +71,7 @@ msgstr "Załącznik"
 #. module: hr_recruitment_sign
 #: model:ir.model,name:hr_recruitment_sign.model_hr_candidate
 msgid "Candidate"
-msgstr ""
-
-#. module: hr_recruitment_sign
-#: model:ir.model.fields,field_description:hr_recruitment_sign.field_hr_recruitment_sign_document_wizard__partner_name
-msgid "Candidates's Name"
-msgstr ""
+msgstr "Kandydat"
 
 #. module: hr_recruitment_sign
 #: model:ir.model.fields,field_description:hr_recruitment_sign.field_hr_recruitment_sign_document_wizard__partner_id
@@ -118,12 +116,18 @@ msgstr "Dokumenty do podpisu"
 #. module: hr_recruitment_sign
 #: model:ir.model.fields,help:hr_recruitment_sign.field_hr_recruitment_sign_document_wizard__sign_template_ids
 msgid ""
-"Documents to sign. Only documents with 1 or 2 different responsible are selectable.\n"
-"        Documents with 1 responsible will only have to be signed by the applicant while documents with 2 different responsible will have to be signed by both the applicant and the responsible.\n"
+"Documents to sign. Only documents with 1 or 2 different responsible are "
+"selectable.\n"
+"        Documents with 1 responsible will only have to be signed by the "
+"applicant while documents with 2 different responsible will have to be "
+"signed by both the applicant and the responsible.\n"
 "        "
 msgstr ""
-"Dokumenty do podpisania. Można wybrać tylko dokumenty z 1 lub 2 różnymi odpowiedzialnymi.\n"
-"Dokumenty z 1 osobą odpowiedzialną będą musiały być podpisane tylko przez aplikanta, natomiast dokumenty z 2 różnymi osobami odpowiedzialnymi będą musiały być podpisane zarówno przez aplikanta jak i osobę odpowiedzialną."
+"Dokumenty do podpisania. Można wybrać tylko dokumenty z 1 lub 2 różnymi "
+"odpowiedzialnymi.\n"
+"Dokumenty z 1 osobą odpowiedzialną będą musiały być podpisane tylko przez "
+"aplikanta, natomiast dokumenty z 2 różnymi osobami odpowiedzialnymi będą "
+"musiały być podpisane zarówno przez aplikanta jak i osobę odpowiedzialną."
 
 #. module: hr_recruitment_sign
 #: model:ir.model.fields,field_description:hr_recruitment_sign.field_hr_recruitment_sign_document_wizard__has_both_template
@@ -159,8 +163,8 @@ msgstr "Wiadomość"
 #. odoo-python
 #: code:addons/hr_recruitment_sign/wizard/hr_recruitment_sign_document_wizard.py:0
 msgid ""
-"No appropriate template could be found, please make sure you configured them"
-" properly."
+"No appropriate template could be found, please make sure you configured them "
+"properly."
 msgstr ""
 "Nie znaleziono odpowiedniego szablonu. Upewnij się, że zostały poprawnie "
 "skonfigurowane."
@@ -180,6 +184,11 @@ msgstr "Tylko %s musi podpisać."
 #: model_terms:ir.ui.view,arch_db:hr_recruitment_sign.hr_recruitment_sign_view
 msgid "Optional Message..."
 msgstr "Opcjonalna wiadomość"
+
+#. module: hr_recruitment_sign
+#: model:ir.model.fields,field_description:hr_recruitment_sign.field_hr_recruitment_sign_document_wizard__partner_name
+msgid "Partner Name"
+msgstr "Nazwa partnera"
 
 #. module: hr_recruitment_sign
 #: model:ir.model.fields,field_description:hr_recruitment_sign.field_hr_recruitment_sign_document_wizard__possible_template_ids

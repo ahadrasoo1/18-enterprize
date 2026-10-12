@@ -17,7 +17,7 @@
         <field name="name">Avalara Logging</field>
         <field name="res_model">ir.logging</field>
         <field name="view_mode">list,form</field>
-        <field name="domain">[('name', '=', 'Avatax')]</field>
+        <field name="domain">[('name', 'in', ['Avatax', 'Avatax US'])]</field>
     </record>
 
     <record id="res_config_settings_view_form" model="ir.ui.view">
@@ -28,7 +28,7 @@
             <setting id="rounding_method" position="after">
                 <setting id="avatax_settings" string="AvaTax" help="Automatically compute tax rates in the US and Canada."
                          documentation="/applications/finance/accounting/taxation/taxes/avatax.html"
-                         invisible="country_code not in ('US', 'CA')">
+                         invisible="country_code not in ('US', 'CA')" company_dependent="1">
                     <field name="setting_account_avatax"/>
                     <div class="content-group" invisible="not setting_account_avatax">
                         <div class="row mt16">

@@ -21,9 +21,13 @@ class TestL10nBeReportsPostWizard(TestAccountReportsCommon):
             'phone': '+32475123456',
         })
         cls.report = cls.env.ref('l10n_be.tax_report_vat')
-        cls.options = cls._generate_options(cls.report, '2019-11-01', '2019-11-30')
-        action = cls.env['account.tax.report.handler'].with_context({'override_tax_closing_warning': True}).action_periodic_vat_entries(cls.options)
-        cls.tax_return_move = cls.env['account.move'].browse(action['res_id'])
+        cls.options, cls.tax_return_move = cls._setup_tax_return_move('2019-11-01', '2019-11-30')
+
+    @classmethod
+    def _setup_tax_return_move(cls, date_from, date_to):
+        options = cls._generate_options(cls.report, date_from, date_to)
+        action = cls.env['account.tax.report.handler'].with_context({'override_tax_closing_warning': True}).action_periodic_vat_entries(options)
+        return options, cls.env['account.move'].browse(action['res_id'])
 
     def test_posting_opens_wizard(self):
         ''' Test that posting the tax report opens the wizard
@@ -128,3 +132,39 @@ class TestL10nBeReportsPostWizard(TestAccountReportsCommon):
             self.get_xml_tree_from_string(attachment_ids.raw),
             self.get_xml_tree_from_string(expected_xml),
         )
+
+    def test_be_provision_account(self):
+        """ For the change of provisioning account in 2026-05-01, test these four cases:
+            - old date, existing partner, existing old bank account
+            - new date, existing partner, existing new bank account
+            - old date, created partner, created old bank account
+            - new date, created partner, created new bank account
+        """
+        move_dates = ['2026-02-01', '2026-05-01'] * 2
+        expected_acc_numbers = ['BE22679200300047', 'BE41679200364210'] * 2
+
+        def get_fps_partner():
+            return self.env['res.partner'].search([('name', '=ilike', 'FPS Finance%')])
+
+        for idx, (move_date, expected_acc_number) in enumerate(zip(move_dates, expected_acc_numbers)):
+            bank_account = self.env['res.partner.bank']
+            if idx >= 2:
+                get_fps_partner().unlink()  # also delete the previously created res.partner.bank
+            else:
+                bank_account = self.env['res.partner.bank'].create({
+                    'partner_id': get_fps_partner().id,
+                    'acc_number': expected_acc_number,
+                    'allow_out_payment': True,
+                })
+            scenario = f'date={move_date}, fps_account={get_fps_partner().exists().name}'
+            with self.subTest(scenario=scenario):
+                self.options, self.tax_return_move = self._setup_tax_return_move(move_date, move_date)
+                wizard = self.env['l10n_be.vat.pay.wizard'].create({'move_id': self.tax_return_move.id})
+                if bank_account:
+                    self.assertEqual(wizard.partner_bank_id, bank_account)
+                else:
+                    self.assertRecordValues(wizard.partner_bank_id, [{
+                        'sanitized_acc_number': expected_acc_number,
+                        'partner_id': get_fps_partner().id,
+                        'allow_out_payment': True,
+                    }])

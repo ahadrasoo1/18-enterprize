@@ -1,22 +1,24 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* mrp_plm
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Thi Huong Nguyen, 2025
+# Duy BQ <duybq86@gmail.com>, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
+"POT-Creation-Date: 2026-04-10 18:47+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
+"Last-Translator: Duy BQ <duybq86@gmail.com>, 2025\n"
 "Language-Team: Vietnamese (https://app.transifex.com/odoo/teams/41243/vi/)\n"
+"Language: vi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: vi\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. module: mrp_plm
@@ -29,13 +31,13 @@ msgstr "# Tệp đính kèm"
 #: model:ir.model.fields,field_description:mrp_plm.field_product_product__eco_count
 #: model:ir.model.fields,field_description:mrp_plm.field_product_template__eco_count
 msgid "# ECOs"
-msgstr "# LTĐKT"
+msgstr "# Thay đổi"
 
 #. module: mrp_plm
 #. odoo-python
 #: code:addons/mrp_plm/models/mrp_eco.py:0
 msgid "%(approval_name)s %(approver_name)s %(approval_status)s this ECO"
-msgstr "%(approval_name)s %(approver_name)s %(approval_status)s LTĐKT này"
+msgstr "%(approval_name)s %(approver_name)s %(approval_status)s Thay đổi này"
 
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_type_dashboard_view_kanban
@@ -51,21 +53,24 @@ msgstr ""
 #: code:addons/mrp_plm/models/mrp_eco.py:0
 msgid ""
 "<p class=\"o_view_nocontent_smiling_face\">\n"
-"                        Upload files to your ECO, that will be applied to the product later\n"
+"                        Upload files to your ECO, that will be applied to "
+"the product later\n"
 "                    </p><p>\n"
-"                        Use this feature to store any files, like drawings or specifications.\n"
+"                        Use this feature to store any files, like drawings "
+"or specifications.\n"
 "                    </p>"
 msgstr ""
 "<p class=\"o_view_nocontent_smiling_face\">\n"
-"Tải tập tin lên LTĐKT sẽ được áp dụng cho sản phẩm sau này\n"
+"Tải tập tin lên Thay đổi sẽ được áp dụng cho sản phẩm sau này\n"
 "</p><p>\n"
-"Sử dụng tính năng này để lưu bất kỳ tập tin nào, như bản vẽ hoặc thông số kỹ thuật.\n"
+"Sử dụng tính năng này để lưu bất kỳ tập tin nào, như bản vẽ hoặc thông số kỹ "
+"thuật.\n"
 "</p>"
 
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_plm_production_form_view
 msgid "<span class=\"o_stat_text\">ECO(S)</span>"
-msgstr "<span class=\"o_stat_text\">(Các) LTĐKT</span>"
+msgstr "<span class=\"o_stat_text\">(Các) Thay đổi</span>"
 
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_form
@@ -78,8 +83,15 @@ msgid ""
 "A Python dictionary that will be evaluated to provide default values when "
 "creating new records for this alias."
 msgstr ""
-"Một từ điển Python sẽ được đánh giá để cung cấp giá trị mặc định khi tạo bản"
-" ghi mới cho bí danh này. "
+"Một từ điển Python sẽ được đánh giá để cung cấp giá trị mặc định khi tạo bản "
+"ghi mới cho bí danh này. "
+
+#. module: mrp_plm
+#. odoo-python
+#: code:addons/mrp_plm/models/mrp_eco.py:0
+msgid "A user cannot be assigned more than once to the same stage"
+msgstr ""
+"Mỗi người dùng không thể được phân công trên một lần vào cùng một giai đoạn"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__message_needaction
@@ -316,12 +328,12 @@ msgstr "Chờ xác nhận"
 #. module: mrp_plm
 #: model:ir.model,name:mrp_plm.model_report_mrp_report_bom_structure
 msgid "BOM Overview Report"
-msgstr "Báo cáo tổng quan ĐMNL"
+msgstr "Báo cáo tổng quan BoM"
 
 #. module: mrp_plm
 #: model:mrp.eco.type,name:mrp_plm.ecotype_bom_update
 msgid "BOM Updates"
-msgstr "Cập nhật ĐMNL"
+msgstr "Cập nhật BoM"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_routing_change__upd_time_mode_batch
@@ -336,7 +348,7 @@ msgstr "Định mức nguyên liệu"
 #. module: mrp_plm
 #: model:ir.model,name:mrp_plm.model_mrp_bom_line
 msgid "Bill of Material Line"
-msgstr "Dòng định mức nguyên liệu"
+msgstr "Chi tiết định mức"
 
 #. module: mrp_plm
 #. odoo-python
@@ -355,7 +367,8 @@ msgid ""
 "              used to make a finished product; through a manufacturing\n"
 "              order or a pack of products."
 msgstr ""
-"Định mức nguyên liệu cho phép bạn xác định một danh sách nguyên liệu\n"
+"Định mức nguyên liệu cho phép bạn xác định một danh sách các vật tư, nguyên "
+"liệu, bán thành phẩm \n"
 "cần dùng để tạo ra thành phẩm; thông qua một lệnh sản xuất\n"
 "hoặc gói sản phẩm."
 
@@ -382,40 +395,40 @@ msgstr "Giai đoạn chặn"
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_bom_change__byproduct_id
 msgid "BoM By-Product"
-msgstr "Phụ phẩm ĐMNL"
+msgstr "Phụ phẩm BoM"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_bom_change__bom_line_id
 msgid "BoM Line"
-msgstr "Dòng ĐMNL"
+msgstr "Dòng BoM"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__bom_rebase_ids
 msgid "BoM Rebase"
-msgstr "Rebase ĐMNL"
+msgstr "Rebase BoM"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__new_bom_revision
 msgid "BoM Revision"
-msgstr "Sửa đổi ĐMNL"
+msgstr "Sửa đổi BoM"
 
 #. module: mrp_plm
 #. odoo-python
 #: code:addons/mrp_plm/models/mrp_production.py:0
 msgid "BoM Suggestions from %(mo_name)s"
-msgstr "Gợi ý ĐMNL từ %(mo_name)s"
+msgstr "Gợi ý BoM từ %(mo_name)s"
 
 #. module: mrp_plm
 #. odoo-javascript
 #: code:addons/mrp_plm/static/src/components/bom_overview_table/mrp_bom_overview_table.xml:0
 #: model_terms:ir.ui.view,arch_db:mrp_plm.report_mrp_bom_inherit_mrp_plm
 msgid "BoM Version"
-msgstr "Phiên bản ĐMNL"
+msgstr "Phiên bản BoM"
 
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_kanban
 msgid "BoM:"
-msgstr "ĐMNL:"
+msgstr "BoM:"
 
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_form
@@ -444,7 +457,8 @@ msgid ""
 "Cannot create an ECO if the Manufacturing Order doesn't use a Bill of "
 "Materials"
 msgstr ""
-"Không thể tạo một LTĐKT nếu Lệnh sản xuất không sử dụng Định mức nguyên liệu"
+"Không thể tạo một Phiếu Thay đổi nếu Lệnh sản xuất không sử dụng Định mức "
+"nguyên liệu"
 
 #. module: mrp_plm
 #: model:ir.ui.menu,name:mrp_plm.menu_mrp_plm_changes
@@ -454,17 +468,17 @@ msgstr "Thay đổi"
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_form
 msgid "Changes made in previous eco"
-msgstr "Thay đổi được thực hiện trong LTĐKT trước"
+msgstr "Thay đổi được thực hiện trong Thay đổi trước"
 
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_form
 msgid "Changes made on old bill of materials"
-msgstr "Thay đổi được thực hiện trong định mức nguyên liệu cũ"
+msgstr "Phiếu Thay đổi được thực hiện trong Định mức nguyên liệu cũ"
 
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_form
 msgid "Changes made on the new revision bill of materials"
-msgstr "Thay đổi được thực hiện trong định mức nguyên liệu sửa đổi"
+msgstr "Phiếu Thay đổi được thực hiện trong Định mức nguyên liệu sửa đổi"
 
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_form
@@ -502,12 +516,12 @@ msgstr "Công ty"
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_form
 msgid "Component Changes"
-msgstr "Thay đổi nguyên liệu"
+msgstr "Thay đổi thành phần"
 
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_form
 msgid "Component Rebase"
-msgstr "Rebase nguyên liệu"
+msgstr "Rebase thành phần"
 
 #. module: mrp_plm
 #: model:ir.ui.menu,name:mrp_plm.menu_mrp_plm_configuration
@@ -535,18 +549,18 @@ msgstr "Đã sử dụng trong hoạt động"
 #. module: mrp_plm
 #: model:ir.actions.server,name:mrp_plm.action_production_order_create_eco
 msgid "Create ECO"
-msgstr "Tạo LTĐKT"
+msgstr "Tạo Thay đổi"
 
 #. module: mrp_plm
 #: model_terms:ir.actions.act_window,help:mrp_plm.mrp_eco_stage_action
 msgid "Create a new ECO stage"
-msgstr "Tạo giai đoạn LTĐKT mới"
+msgstr "Tạo giai đoạn Thay đổi mới"
 
 #. module: mrp_plm
 #: model_terms:ir.actions.act_window,help:mrp_plm.mrp_eco_type_action_dashboard
 #: model_terms:ir.actions.act_window,help:mrp_plm.mrp_eco_type_action_form
 msgid "Create a new ECO type"
-msgstr "Tạo loại LTĐKT mới"
+msgstr "Tạo loại Thay đổi mới"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__create_uid
@@ -590,7 +604,7 @@ msgstr "Giá trị Mặc định"
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_form
 msgid "Define the approval roles on the ECO stages."
-msgstr "Xác định vai trò phê duyệt trong các giai đoạn LTĐKT. "
+msgstr "Xác định vai trò phê duyệt trong các giai đoạn Thay đổi. "
 
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_kanban
@@ -607,7 +621,7 @@ msgstr "Mô tả"
 #. module: mrp_plm
 #: model:ir.model.fields,help:mrp_plm.field_mrp_eco_stage__description
 msgid "Description and tooltips of the stage states."
-msgstr "Mô tả và tooltip của các trạng thái giai đoạn. "
+msgstr "Mô tả và chú thích của các trạng thái giai đoạn. "
 
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_form
@@ -617,7 +631,7 @@ msgstr "Mô tả thay đổi và lý do. "
 #. module: mrp_plm
 #: model:ir.model.fields,help:mrp_plm.field_mrp_eco__bom_change_ids
 msgid "Difference between old BoM and new BoM revision"
-msgstr "Sự khác biệt giữa ĐMNL cũ và ĐMNL mới"
+msgstr "Sự khác biệt giữa BoM cũ và BoM mới"
 
 #. module: mrp_plm
 #: model:ir.model.fields,help:mrp_plm.field_mrp_eco__routing_change_ids
@@ -655,100 +669,100 @@ msgstr "Hoàn tất"
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_approval__eco_id
 msgid "ECO"
-msgstr "LTĐKT"
+msgstr "Thay đổi"
 
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_graph
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_pivot
 msgid "ECO Analysis"
-msgstr "Phân tích LTĐKT"
+msgstr "Phân tích Thay đổi"
 
 #. module: mrp_plm
 #: model:ir.model,name:mrp_plm.model_mrp_eco_approval
 #: model:mail.activity.type,name:mrp_plm.mail_activity_eco_approval
 msgid "ECO Approval"
-msgstr "Phê duyệt LTĐKT"
+msgstr "Phê duyệt Thay đổi"
 
 #. module: mrp_plm
 #: model:ir.model,name:mrp_plm.model_mrp_eco_approval_template
 msgid "ECO Approval Template"
-msgstr "Mẫu phê duyệt LTĐKT"
+msgstr "Mẫu phê duyệt Thay đổi"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__bom_change_ids
 msgid "ECO BoM Changes"
-msgstr "Thay đổi ĐMNL LTĐKT"
+msgstr "Thay đổi BoM Thay đổi"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__bom_change_ids_on_byproduct
 msgid "ECO BoM Changes - By-Product"
-msgstr "Thay đổi ĐMNL LTĐKT - Phụ phẩm"
+msgstr "Thay đổi BoM Thay đổi - Phụ phẩm"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__bom_change_ids_on_line
 msgid "ECO BoM Changes - Component"
-msgstr "Thay đổi ĐMNL LTĐKT - Nguyên liệu"
+msgstr "Thay đổi BoM Thay đổi - Thành phần"
 
 #. module: mrp_plm
 #: model:ir.model,name:mrp_plm.model_mrp_eco_bom_change
 msgid "ECO BoM changes"
-msgstr "Thay đổi ĐMNL LTĐKT"
+msgstr "Thay đổi BoM Thay đổi"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_bom_change__eco_rebase_id
 msgid "ECO Rebase"
-msgstr "Rebase LTĐKT"
+msgstr "Rebase Thay đổi"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__routing_change_ids
 msgid "ECO Routing Changes"
-msgstr "Thay đổi tuyến LTĐKT"
+msgstr "Thay đổi tuyến Thay đổi"
 
 #. module: mrp_plm
 #: model:ir.model,name:mrp_plm.model_mrp_eco_stage
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_approval__eco_stage_id
 msgid "ECO Stage"
-msgstr "Giai đoạn LTĐKT"
+msgstr "Giai đoạn Thay đổi"
 
 #. module: mrp_plm
 #: model:ir.actions.act_window,name:mrp_plm.mrp_eco_stage_action
 #: model:ir.ui.menu,name:mrp_plm.menu_mrp_plm_eco_stages
 msgid "ECO Stages"
-msgstr "Giai đoạn LTĐKT"
+msgstr "Giai đoạn Thay đổi"
 
 #. module: mrp_plm
 #: model:ir.actions.act_window,name:mrp_plm.mrp_eco_tag_action
 #: model:ir.model,name:mrp_plm.model_mrp_eco_tag
 #: model:ir.ui.menu,name:mrp_plm.menu_mrp_plm_eco_tag
 msgid "ECO Tags"
-msgstr "Thẻ LTĐKT"
+msgstr "Thẻ Thay đổi"
 
 #. module: mrp_plm
 #: model:ir.model,name:mrp_plm.model_mrp_eco_type
 msgid "ECO Type"
-msgstr "Loại LTĐKT"
+msgstr "Loại Thay đổi"
 
 #. module: mrp_plm
 #: model:ir.actions.act_window,name:mrp_plm.mrp_eco_type_action_form
 #: model:ir.ui.menu,name:mrp_plm.menu_mrp_plm_eco_types
 msgid "ECO Types"
-msgstr "Loại LTĐKT"
+msgstr "Loại Thay đổi"
 
 #. module: mrp_plm
 #: model_terms:ir.actions.act_window,help:mrp_plm.mrp_eco_stage_action
 msgid "ECO stages give the different stages for the Engineering Change Orders"
 msgstr ""
-"Giai đoạn LTĐKT tạo các giai đoạn khác nhau cho Lệnh thay đổi kỹ thuật"
+"Giai đoạn Thay đổi tạo các giai đoạn khác nhau cho Lệnh thay đổi kỹ thuật"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_bom__eco_ids
 msgid "ECO to be applied"
-msgstr "LTĐKT được áp dụng"
+msgstr "Thay đổi được áp dụng"
 
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_bom_view_form_inherit_plm
 msgid "ECO(s)"
-msgstr "(Các) LTĐKT"
+msgstr "(Các) Thay đổi"
 
 #. module: mrp_plm
 #. odoo-javascript
@@ -766,29 +780,29 @@ msgstr "(Các) LTĐKT"
 #: model_terms:ir.ui.view,arch_db:mrp_plm.product_template_view_form_inherit_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.report_mrp_bom_inherit_mrp_plm
 msgid "ECOs"
-msgstr "LTĐKT"
+msgstr "Thay đổi"
 
 #. module: mrp_plm
 #. odoo-python
 #: code:addons/mrp_plm/models/mrp_eco.py:0
 msgid "Eco"
-msgstr "LTĐKT"
+msgstr "Thay đổi"
 
 #. module: mrp_plm
 #. odoo-python
 #: code:addons/mrp_plm/models/mrp_eco.py:0
 msgid "Eco BoM"
-msgstr "ĐMNL LTĐKT"
+msgstr "BoM Thay đổi"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_production__eco_count
 msgid "Eco Count"
-msgstr "Số LTĐKT"
+msgstr "Số Thay đổi"
 
 #. module: mrp_plm
 #: model:ir.model,name:mrp_plm.model_mrp_eco_routing_change
 msgid "Eco Routing changes"
-msgstr "Thay đổi tuyến LTĐKT"
+msgstr "Thay đổi tuyến Thay đổi"
 
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_kanban
@@ -833,7 +847,7 @@ msgstr "Thay đổi kỹ thuật"
 #. module: mrp_plm
 #: model:ir.model,name:mrp_plm.model_mrp_eco
 msgid "Engineering Change Order (ECO)"
-msgstr "Lệnh thay đổi kỹ thuật (LTĐKT)"
+msgstr "Lệnh thay đổi kỹ thuật (Thay đổi)"
 
 #. module: mrp_plm
 #: model:ir.actions.act_window,name:mrp_plm.mrp_eco_action
@@ -944,8 +958,8 @@ msgstr "ID"
 #. module: mrp_plm
 #: model:ir.model.fields,help:mrp_plm.field_mrp_eco_type__alias_parent_thread_id
 msgid ""
-"ID of the parent record holding the alias (example: project holding the task"
-" creation alias)"
+"ID of the parent record holding the alias (example: project holding the task "
+"creation alias)"
 msgstr ""
 "ID của bản ghi chính chứa bí danh (ví dụ: dự án chứa bí danh tạo nhiệm vụ)"
 
@@ -988,8 +1002,8 @@ msgid ""
 "If the active field is set to False, it will allow you to hide the "
 "engineering change order without removing it."
 msgstr ""
-"Nếu trường đang hoạt động được đặt là Sai, bạn sẽ được phép ẩn lệnh thay đổi"
-" kỹ thuật mà không cần xóa. "
+"Nếu trường đang hoạt động được đặt là Sai, bạn sẽ được phép ẩn lệnh thay đổi "
+"kỹ thuật mà không cần xóa. "
 
 #. module: mrp_plm
 #: model:ir.model.fields,help:mrp_plm.field_mrp_eco__will_update_version
@@ -997,6 +1011,8 @@ msgid ""
 "If unchecked, the version of the product/BoM will remain unchanged once the "
 "ECO is applied"
 msgstr ""
+"Nếu không được chọn, phiên bản sản phẩm/BoM sẽ không thay đổi sau khi Thay "
+"đổi được áp dụng"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_bom__image_128
@@ -1105,7 +1121,7 @@ msgstr "Hoạt động chậm trễ"
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_production__latest_bom_id
 msgid "Latest Bom"
-msgstr "ĐMNL mới nhất"
+msgstr "BoM mới nhất"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_type__alias_incoming_local
@@ -1122,11 +1138,13 @@ msgstr "Phát hiện gửi đến dựa trên phần cục bộ"
 #: model_terms:ir.actions.act_window,help:mrp_plm.mrp_eco_action_report
 msgid ""
 "Manage your products and bills of materials changes with the ECO's.\n"
-"              Gather the related documentation and receive the necessary approvals\n"
+"              Gather the related documentation and receive the necessary "
+"approvals\n"
 "              before applying your changes."
 msgstr ""
-"Quản lý thay đổi định mức nguyên liệu và sản phẩm bằng LTĐKT.\n"
-"              Thu thập tài liệu hướng dẫn liên quan và nhận phê duyệt cần thiết\n"
+"Quản lý thay đổi Định mức nguyên liệu và sản phẩm bằng Phiếu Thay đổi.\n"
+"              Thu thập tài liệu hướng dẫn liên quan và nhận phê duyệt cần "
+"thiết\n"
 "              trước khi áp dụng thay đổi. "
 
 #. module: mrp_plm
@@ -1147,7 +1165,7 @@ msgstr "Lệnh sản xuất"
 #. module: mrp_plm
 #: model:ir.ui.menu,name:mrp_plm.menu_mrp_plm_master_data
 msgid "Master Data"
-msgstr "Dữ liệu chủ"
+msgstr "Dữ liệu chính"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__message_has_error
@@ -1169,12 +1187,12 @@ msgstr "Thay đổi chế độ"
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_tag_view_search
 msgid "Mrp Eco Tags"
-msgstr "Thẻ LTĐKT SX"
+msgstr "Thẻ Thay đổi SX"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__my_activity_date_deadline
 msgid "My Activity Deadline"
-msgstr "Hạn chót hoạt động của tôi"
+msgstr "Thời hạn hoạt động của tôi"
 
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_search
@@ -1208,12 +1226,12 @@ msgstr "Định mức nguyên liệu mới"
 #. odoo-python
 #: code:addons/mrp_plm/models/mrp_production.py:0
 msgid "New BoM from %(mo_name)s"
-msgstr "ĐMNL mới từ %(mo_name)s"
+msgstr "BoM mới từ %(mo_name)s"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__current_bom_id
 msgid "New Bom"
-msgstr "ĐMNL mới"
+msgstr "BoM mới"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_bom_change__new_operation_id
@@ -1243,7 +1261,7 @@ msgstr "Sự kiện trên lịch cho hoạt động tiếp theo"
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__activity_date_deadline
 msgid "Next Activity Deadline"
-msgstr "Hạn chót cho hoạt động tiếp theo"
+msgstr "Thời hạn cho hoạt động tiếp theo"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__activity_summary
@@ -1258,7 +1276,7 @@ msgstr "Loại hoạt động tiếp theo"
 #. module: mrp_plm
 #: model_terms:ir.actions.act_window,help:mrp_plm.mrp_bom_action_kanban
 msgid "No bill of materials found. Let's create one!"
-msgstr "Không có định mức nguyên liệu. Hãy tạo mới!"
+msgstr "Không có Định mức nguyên liệu nào được tìm thấy. Hãy tạo mới!"
 
 #. module: mrp_plm
 #: model_terms:ir.actions.act_window,help:mrp_plm.mrp_eco_action
@@ -1314,7 +1332,7 @@ msgstr "Số tin nhắn bị gửi lỗi"
 #. module: mrp_plm
 #: model:ir.model.fields,help:mrp_plm.field_mrp_eco_stage__final_stage
 msgid "Once the changes are applied, the ECOs will be moved to this stage."
-msgstr "Khi thay đổi được áp dụng, LTĐKT sẽ được chuyển sang giai đoạn này."
+msgstr "Khi thay đổi được áp dụng, Thay đổi sẽ được chuyển sang giai đoạn này."
 
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_form
@@ -1381,7 +1399,7 @@ msgid ""
 "selection, when the ECO is in that stage."
 msgstr ""
 "Ghi đè giá trị mặc định được hiển thị cho trạng thái bị chặn của lựa chọn "
-"kanban khi ĐMNL ở giai đoạn đó. "
+"kanban khi Thay đổi ở giai đoạn đó. "
 
 #. module: mrp_plm
 #: model:ir.model.fields,help:mrp_plm.field_mrp_eco__legend_done
@@ -1391,7 +1409,7 @@ msgid ""
 "selection, when the ECO is in that stage."
 msgstr ""
 "Ghi đè giá trị mặc định được hiển thị cho trạng thái hoàn tất của lựa chọn "
-"kanban khi ĐMNL ở giai đoạn đó. "
+"kanban khi Thay đổi ở giai đoạn đó. "
 
 #. module: mrp_plm
 #: model:ir.model.fields,help:mrp_plm.field_mrp_eco__legend_normal
@@ -1401,7 +1419,7 @@ msgid ""
 "selection, when the ECO is in that stage."
 msgstr ""
 "Ghi đè giá trị mặc định được hiển thị cho trạng thái bình thường của lựa "
-"chọn kanban khi ĐMNL ở giai đoạn đó. "
+"chọn kanban khi Thay đổi ở giai đoạn đó. "
 
 #. module: mrp_plm
 #: model:ir.ui.menu,name:mrp_plm.menu_mrp_plm_dashboard
@@ -1412,12 +1430,12 @@ msgstr "Tổng quan"
 #: model:ir.module.category,name:mrp_plm.module_category_manufacturing_product_lifecycle_management_(plm)
 #: model:ir.ui.menu,name:mrp_plm.menu_mrp_plm_root
 msgid "PLM"
-msgstr "QLVĐSP"
+msgstr "Sản phẩm"
 
 #. module: mrp_plm
 #: model:ir.actions.act_window,name:mrp_plm.mrp_eco_type_action_dashboard
 msgid "PLM Overview"
-msgstr "Tổng quan QLVĐSP"
+msgstr "Tổng quan Sản phẩm"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_type__alias_parent_model_id
@@ -1432,8 +1450,8 @@ msgstr "ID luồng bản ghi chính"
 #. module: mrp_plm
 #: model:ir.model.fields,help:mrp_plm.field_mrp_eco_type__alias_parent_model_id
 msgid ""
-"Parent model holding the alias. The model holding the alias reference is not"
-" necessarily the model given by alias_model_id (example: project "
+"Parent model holding the alias. The model holding the alias reference is not "
+"necessarily the model given by alias_model_id (example: project "
 "(parent_model) and task (model))"
 msgstr ""
 "Mô hình chính chứa bí danh này. Mô hình chứa tham chiếu bí danh không nhất "
@@ -1446,17 +1464,19 @@ msgid ""
 "Policy to post a message on the document using the mailgateway.\n"
 "- everyone: everyone can post\n"
 "- partners: only authenticated partners\n"
-"- followers: only followers of the related document or members of following channels\n"
+"- followers: only followers of the related document or members of following "
+"channels\n"
 msgstr ""
 "Chính sách cho phép đăng tin nhắn lên tài liệu sử dụng cổng email.\n"
 "- mọi người: mọi người có thể đăng\n"
 "- đối tác: chỉ các đối tác đã xác thực\n"
-"- người theo dõi: chỉ những người theo dõi của tài liệu liên quan hoặc thành viên của kênh đang theo dõi\n"
+"- người theo dõi: chỉ những người theo dõi của tài liệu liên quan hoặc thành "
+"viên của kênh đang theo dõi\n"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_bom__previous_bom_id
 msgid "Previous BoM"
-msgstr "ĐMNL trước đó"
+msgstr "BoM trước đó"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_bom_change__old_operation_id
@@ -1466,12 +1486,12 @@ msgstr "Đã sử dụng trong hoạt động trước đó"
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__previous_change_ids
 msgid "Previous ECO Changes"
-msgstr "Thay đổi LTĐKT trước đó"
+msgstr "Thay đổi Thay đổi trước đó"
 
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_form
 msgid "Previous Eco Component Changes"
-msgstr "Thay đổi nguyên liệu LTĐKT trước đó"
+msgstr "Thay đổi thành phần Thay đổi trước đó"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_bom_change__old_uom_id
@@ -1525,7 +1545,7 @@ msgstr "Sản xuất"
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_bom__active
 msgid "Production Ready"
-msgstr "Sản xuất sẵn sàng"
+msgstr "Sẵn sàng sản xuất"
 
 #. module: mrp_plm
 #: model:ir.ui.menu,name:mrp_plm.menu_mrp_plm_products
@@ -1568,8 +1588,8 @@ msgstr "Rebase"
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_form
 msgid "Rebase new revision of BoM with previous eco bom and old bom changes."
 msgstr ""
-"Rebase bản sửa đổi mới của ĐMNL với các thay đổi ĐMNL LTĐKT trước đây và "
-"ĐMNL cũ."
+"Rebase bản sửa đổi mới của BoM với các thay đổi BoM Thay đổi trước đây và "
+"BoM cũ."
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_type__alias_force_thread_id
@@ -1584,7 +1604,7 @@ msgstr "Nhãn kanban đỏ"
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__name
 msgid "Reference"
-msgstr "Mã tham chiếu"
+msgstr "Tham chiếu"
 
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_form
@@ -1616,7 +1636,7 @@ msgstr "Báo cáo"
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_approval__required_user_ids
 msgid "Requested Users"
-msgstr "Người dùng yêu cầu"
+msgstr "Người yêu cầu"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__user_id
@@ -1637,7 +1657,7 @@ msgstr "Vai trò"
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_search
 msgid "Routing"
-msgstr "Tuyến"
+msgstr "Qui trình sản xuất"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__message_has_sms_error
@@ -1682,7 +1702,7 @@ msgstr "Giai đoạn"
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_stage_view_form
 msgid "Stage Description and Tooltips"
-msgstr "Tooltip và mô tả giai đoạn"
+msgstr "Chú thích và mô tả giai đoạn"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_type__stage_ids
@@ -1727,8 +1747,8 @@ msgstr "Đã rebase thành công!"
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_form
 msgid ""
-"System will automatically resolved the conflict(s) and apply changes. Do you"
-" agree?"
+"System will automatically resolved the conflict(s) and apply changes. Do you "
+"agree?"
 msgstr ""
 "Hệ thống sẽ tự động xử lý (các) xung đột và áp dụng thay đổi. Bạn có đồng ý "
 "không?"
@@ -1780,12 +1800,12 @@ msgstr "Mẫu"
 #. module: mrp_plm
 #: model:res.groups,comment:mrp_plm.group_plm_manager
 msgid "The PLM manager manages products lifecycle management"
-msgstr "Người quản lý QLVĐSP sẽ quản lý vòng đời sản phẩm"
+msgstr "Người quản lý Sản phẩm sẽ quản lý vòng đời sản phẩm"
 
 #. module: mrp_plm
 #: model:res.groups,comment:mrp_plm.group_plm_user
 msgid "The PLM user uses products lifecycle management"
-msgstr "Người dùng QLVĐSP sẽ sử dụng quản lý vòng đời sản phẩm"
+msgstr "Người dùng Sản phẩm sẽ sử dụng quản lý vòng đời sản phẩm"
 
 #. module: mrp_plm
 #: model:ir.model.fields,help:mrp_plm.field_product_product__version
@@ -1796,9 +1816,9 @@ msgstr "Phiên bản hiện tại của sản phẩm."
 #. module: mrp_plm
 #: model:ir.model.fields,help:mrp_plm.field_mrp_eco_type__alias_model_id
 msgid ""
-"The model (Odoo Document Kind) to which this alias corresponds. Any incoming"
-" email that does not reply to an existing record will cause the creation of "
-"a new record of this model (e.g. a Project Task)"
+"The model (Odoo Document Kind) to which this alias corresponds. Any incoming "
+"email that does not reply to an existing record will cause the creation of a "
+"new record of this model (e.g. a Project Task)"
 msgstr ""
 "Mô hình (Loại tài liệu Odoo) mà bí danh này tương tác. Mọi email đến mà "
 "không phải là email trả lời một bản ghi hiện có sẽ tạo ra một bản ghi mới "
@@ -1810,8 +1830,8 @@ msgid ""
 "The name of the email alias, e.g. 'jobs' if you want to catch emails for "
 "<jobs@example.odoo.com>"
 msgstr ""
-"Tên của bí danh email, ví dụ: 'jobs' nếu bạn muốn nhận email gửi đến địa chỉ"
-" <jobs@example.odoo.com>"
+"Tên của bí danh email, ví dụ: 'jobs' nếu bạn muốn nhận email gửi đến địa chỉ "
+"<jobs@example.odoo.com>"
 
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_stage_view_form
@@ -1829,7 +1849,7 @@ msgstr "Cần áp dụng"
 #: model:ir.model.fields.selection,name:mrp_plm.selection__mrp_eco__state__confirmed
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_search
 msgid "To Do"
-msgstr "Cần làm"
+msgstr "Việc cần làm"
 
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_search
@@ -1872,7 +1892,7 @@ msgstr "Cập nhật"
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__will_update_version
 msgid "Update Version"
-msgstr ""
+msgstr "Cập nhật phiên bản"
 
 #. module: mrp_plm
 #: model:res.groups,name:mrp_plm.group_plm_user
@@ -1883,6 +1903,11 @@ msgstr "Người dùng"
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_approval_template__user_ids
 msgid "Users"
 msgstr "Người dùng"
+
+#. module: mrp_plm
+#: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_form
+msgid "V"
+msgstr ""
 
 #. module: mrp_plm
 #: model:mrp.eco.stage,name:mrp_plm.ecostage_bom_update_validated
@@ -1943,8 +1968,8 @@ msgstr "Khu vực sản xuất"
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_stage_view_form
 msgid ""
-"You can also add a description to help your coworkers understand the meaning"
-" and purpose of the stage."
+"You can also add a description to help your coworkers understand the meaning "
+"and purpose of the stage."
 msgstr ""
 "Bạn cũng có thể thêm mô tả để giúp đồng nghiệp hiểu ý nghĩa và mục đích của "
 "giai đoạn. "
@@ -1962,8 +1987,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/mrp_plm/models/mrp_eco.py:0
 msgid "You cannot change the stage, as approvals are required in the process."
-msgstr ""
-"Bạn không thể thay đổi giai đoạn, vì cần có phê duyệt trong quy trình."
+msgstr "Bạn không thể thay đổi giai đoạn, vì cần có phê duyệt trong quy trình."
 
 #. module: mrp_plm
 #. odoo-python

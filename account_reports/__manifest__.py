@@ -11,7 +11,9 @@ Accounting Reports
     'depends': ['accountant'],
     'data': [
         'security/ir.model.access.csv',
+        'security/account_reports_security.xml',
         'data/pdf_export_templates.xml',
+        'data/customer_reports_pdf_export_templates.xml',
         'data/balance_sheet.xml',
         'data/cash_flow_report.xml',
         'data/executive_summary.xml',
@@ -22,6 +24,8 @@ Accounting Reports
         'data/trial_balance.xml',
         'data/sales_report.xml',
         'data/partner_ledger.xml',
+        'data/customer_statement.xml',
+        'data/followup_report.xml',
         'data/multicurrency_revaluation_report.xml',
         'data/deferred_reports.xml',
         'data/journal_report.xml',

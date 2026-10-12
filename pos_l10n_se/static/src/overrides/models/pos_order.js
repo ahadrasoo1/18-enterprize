@@ -31,8 +31,8 @@ patch(PosOrder.prototype, {
         result.blackboxSeData = {
             posID: this.config.name,
             orderSequence: order.sequence_number,
-            unitID: order.blackbox_unit_id,
-            blackboxSignature: order.blackbox_signature,
+            unitID: order.sweden_blackbox_unit_id,
+            blackboxSignature: order.sweden_blackbox_signature,
             isReprint: order.isReprint,
             originalOrderDate: deserializeDateTime(order.creation_date).toFormat(
                 "HH:mm dd/MM/yyyy"

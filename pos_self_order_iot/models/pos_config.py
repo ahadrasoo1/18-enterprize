@@ -1,6 +1,6 @@
 import logging
 
-from odoo import fields, models
+from odoo import api, fields, models
 
 _logger = logging.getLogger(__name__)
 
@@ -31,3 +31,8 @@ class PosConfig(models.Model):
     def get_available_iot_box_ids(self):
         self.available_iot_box_ids = self.env['iot.box'].search([('can_be_kiosk', '=', True)])
         return self.available_iot_box_ids.read(['id', 'name', 'ip_url'])
+
+    @api.model
+    def _load_pos_self_data_fields(self, pos_config_id):
+        fields = super()._load_pos_self_data_fields(pos_config_id)
+        return fields + ['available_iot_box_ids', 'iface_printer_id']

@@ -234,11 +234,11 @@ class TestAccountBankStatementImportCamt(AccountTestInvoicingCommon):
         imported_statement = self.env['account.bank.statement'].search([('company_id', '=', self.env.company.id)], order='id desc', limit=1)
         self.assertEqual(len(imported_statement.line_ids), 3)
         self.assertEqual(imported_statement.line_ids[0].payment_ref, 'label01')
-        self.assertEqual(imported_statement.line_ids[0].amount, expected_amounts[0])
+        self.assertEqual(usd_currency.round(imported_statement.line_ids[0].amount), expected_amounts[0])
         self.assertEqual(imported_statement.line_ids[1].payment_ref, 'label02')
-        self.assertEqual(imported_statement.line_ids[1].amount, expected_amounts[1])
+        self.assertEqual(usd_currency.round(imported_statement.line_ids[1].amount), expected_amounts[1])
         self.assertEqual(imported_statement.line_ids[2].payment_ref, 'label03')
-        self.assertEqual(imported_statement.line_ids[2].amount, expected_amounts[2])
+        self.assertEqual(usd_currency.round(imported_statement.line_ids[2].amount), expected_amounts[2])
 
     def test_camt_with_several_tx_details(self):
         self._test_camt_with_several_tx_details('camt_053_several_tx_details.xml')
@@ -261,6 +261,12 @@ class TestAccountBankStatementImportCamt(AccountTestInvoicingCommon):
     def test_camt_with_several_tx_details_and_multicurrency_04(self):
         self._test_camt_with_several_tx_details('camt_053_several_tx_details_and_multicurrency_04.xml',
             expected_amounts=LARGE_AMOUNTS)
+
+    def test_camt_with_several_tx_details_and_multicurrency_05(self):
+        # Tests when the rounded sum is different by one cent from the sum of the rounded amounts after applying the currency rate.
+        # The difference is put on the largest amount (positive or negative)
+        self._test_camt_with_several_tx_details('camt_053_several_tx_details_and_multicurrency_05.xml',
+            expected_amounts=[-18918.02, -23508.64, -7573.34])
 
     def test_camt_with_several_tx_details_and_charges(self):
         self._test_camt_with_several_tx_details('camt_053_several_tx_details_and_charges.xml')
@@ -371,6 +377,15 @@ class TestAccountBankStatementImportCamt(AccountTestInvoicingCommon):
         self.assertEqual(self.env.company.currency_id.id, usd_currency.id)
         self._test_minimal_camt_file_import('camt_053_minimal_charges_02.xml', usd_currency)
 
+    def test_charges_camt_file_import_03(self):
+        """
+        This test aims to import a statement having transactions including charges in their
+        total amount. In that case, we need to check that the retrieved amount is correct.
+        """
+        usd_currency = self.env.ref('base.USD')
+        self.assertEqual(self.env.company.currency_id.id, usd_currency.id)
+        self._test_minimal_camt_file_import('camt_053_minimal_charges_03.xml', usd_currency)
+
     def test_import_already_fully_imported_catm_without_opening_balance(self):
         """
         Test the scenario when you have a CAMT file where one statement does not
@@ -435,3 +450,24 @@ class TestAccountBankStatementImportCamt(AccountTestInvoicingCommon):
         self.assertRecordValues(imported_statement.line_ids, [{
             'amount': 1672.98,
         }])
+
+    def test_camt_file_import_namespace(self):
+        """
+        Ensures that CAMT files using namespaces can be imported.
+        """
+        usd_currency = self.env.ref('base.USD')
+        self.assertEqual(self.env.company.currency_id.id, usd_currency.id)
+        self._test_minimal_camt_file_import('camt_053_namespace.xml', usd_currency)
+
+    def test_camt_file_import_custom_code(self):
+        """
+        Ensures that CAMT files with custom codes can be imported.
+        """
+        usd_currency = self.env.ref('base.USD')
+        self.assertEqual(self.env.company.currency_id.id, usd_currency.id)
+        self._test_minimal_camt_file_import('camt_053_custom_codes.xml', usd_currency)
+        bank_st_record = self.env['account.bank.statement'].search(
+            [('name', '=', '2514988305.2019-02-13')]
+        ).filtered(lambda bk_stmt: bk_stmt.currency_id == usd_currency).ensure_one()
+        line = bank_st_record.line_ids.ensure_one()
+        self.assertEqual(line.transaction_type, "custom_code: custom_family (custom_subfamily)")

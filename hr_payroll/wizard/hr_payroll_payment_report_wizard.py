@@ -3,7 +3,7 @@ import csv
 
 from io import StringIO
 
-from odoo import fields, models, _
+from odoo import api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools import format_list
 from odoo.tools.misc import format_date
@@ -14,12 +14,16 @@ class HrPayrollPaymentReportWizard(models.TransientModel):
     _name = 'hr.payroll.payment.report.wizard'
     _description = 'HR Payroll Payment Report Wizard'
 
-    payslip_run_id = fields.Many2one('hr.payslip.run')
-    payslip_ids = fields.Many2many('hr.payslip', required=True)
+    payslip_run_id = fields.Many2one('hr.payslip.run', check_company=True)
+    payslip_ids = fields.Many2many('hr.payslip', required=True, check_company=True)
     export_format = fields.Selection([
         ('csv', 'CSV'),
     ], string='Export Format', required=True, default='csv')
-    company_id = fields.Many2one('res.company', default=lambda self: self.env.company)
+    company_id = fields.Many2one('res.company', compute="_compute_company_id")
+
+    @api.depends('payslip_ids')
+    def _compute_company_id(self):
+        self.company_id = self.payslip_ids[0].company_id
 
     def _create_csv_binary(self):
         output = StringIO()

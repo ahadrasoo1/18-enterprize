@@ -47,7 +47,7 @@ class sale_order(models.Model):
             for line in rec.order_line.sudo():
                 po_vals['order_line'] += [(0, 0, rec._prepare_purchase_order_line_data(line, rec.date_order, company))]
             purchase_order = self.env['purchase.order'].create(po_vals)
-            msg = _("Automatically generated from %(origin)s of company %(company)s.", origin=self.name, company=company.name)
+            msg = _("Automatically generated from %(origin)s of company %(company)s.", origin=self.name, company=rec.company_id.name)
             purchase_order.message_post(body=msg)
 
             # write customer reference field on SO
@@ -73,7 +73,7 @@ class sale_order(models.Model):
             'partner_id': company_partner.id,
             'date_order': self.date_order,
             'company_id': company.id,
-            'fiscal_position_id': company_partner.property_account_position_id.id,
+            'fiscal_position_id': self.env['account.fiscal.position']._get_fiscal_position(company_partner).id,
             'payment_term_id': company_partner.property_supplier_payment_term_id.id,
             'auto_generated': True,
             'auto_sale_order_id': self.id,
@@ -92,7 +92,7 @@ class sale_order(models.Model):
             :rtype company : res.company record
         """
         # price on PO so_line should be so_line - discount
-        price = so_line.price_unit - (so_line.price_unit * (so_line.discount / 100))
+        price = so_line.price_unit or 0.0
         quantity = so_line.product_id and so_line.product_uom._compute_quantity(so_line.product_uom_qty, so_line.product_id.uom_po_id) or so_line.product_uom_qty
         price = so_line.product_id and so_line.product_uom._compute_price(price, so_line.product_id.uom_po_id) or price
         return {
@@ -101,7 +101,8 @@ class sale_order(models.Model):
             'product_id': so_line.product_id and so_line.product_id.id or False,
             'product_uom': so_line.product_id and so_line.product_id.uom_po_id.id or so_line.product_uom.id,
             'price_unit': price or 0.0,
+            'discount': so_line.discount or 0.0,
             'company_id': company.id,
-            'date_planned': so_line.order_id.expected_date or date_order,
+            'date_planned': so_line.order_id.commitment_date or so_line.order_id.expected_date or date_order,
             'display_type': so_line.display_type,
         }

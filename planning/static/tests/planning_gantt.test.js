@@ -1,17 +1,19 @@
 import { beforeEach, describe, expect, test } from "@odoo/hoot";
-import { click, queryAll, queryAllTexts, queryFirst } from "@odoo/hoot-dom";
+import { click, queryAll, queryAllTexts, queryFirst, waitFor } from "@odoo/hoot-dom";
 import { animationFrame, mockDate, mockTimeZone } from "@odoo/hoot-mock";
 import {
     clickSave,
     contains,
+    defineActions,
     getFacetTexts,
+    getService,
     mockService,
+    mountWithCleanup,
     onRpc,
     patchWithCleanup,
 } from "@web/../tests/web_test_helpers";
 import {
     CLASSES,
-    SELECTORS,
     clickCell,
     dragPill,
     editPill,
@@ -20,20 +22,35 @@ import {
     hoverGridCell,
     mountGanttView,
     resizePill,
+    SELECTORS,
+    selectRange,
 } from "@web_gantt/../tests/web_gantt_test_helpers";
 
 import { Domain } from "@web/core/domain";
+import { redirect } from "@web/core/utils/urls";
+import { WebClient } from "@web/webclient/webclient";
 
 import {
     definePlanningModels,
+    HrEmployee,
     PlanningSlot,
     ResourceResource,
-    HrEmployee,
 } from "./planning_mock_models";
 
 describe.current.tags("desktop");
 
 definePlanningModels();
+
+defineActions([
+    {
+        id: 1,
+        name: "Planning slot Action 1",
+        res_model: "planning.slot",
+        type: "ir.actions.act_window",
+        mobile_view_mode: "gantt",
+        views: [[false, "gantt"]],
+    },
+]);
 
 const getProgressBars = () => ({
     resource_id: {
@@ -46,6 +63,37 @@ const getProgressBars = () => ({
         },
     },
 });
+
+async function reccureneceDeletionTemplate(mode) {
+    onRpc("planning.slot", "action_address_recurrency", ({ args }) => {
+        expect.step(`Recurency Delete in mode ${args[1]}`);
+        return true;
+    });
+
+    const ganttViewProps = _getCreateViewArgsForGanttViewTotalsTests();
+    ganttViewProps.groupBy = ["resource_id"];
+
+    PlanningSlot._records[0].repeat = true;
+    await mountGanttView(ganttViewProps);
+
+    expect(".o_gantt_pill:not(.o_gantt_consolidated_pill)").toHaveCount(1);
+
+    click(".o_gantt_pill");
+    await animationFrame();
+
+    click("button:contains('Delete')");
+    await animationFrame();
+
+    expect(".o_dialog").toHaveCount(1);
+    expect(".modal-title").toHaveText("Delete Recurring Shift");
+    await animationFrame();
+    click(`input[id="${mode}"]`);
+    await animationFrame();
+
+    click(".o_dialog button:contains(Delete Recurring Shift)");
+    await animationFrame();
+    expect.verifySteps([`Recurency Delete in mode ${mode}`]);
+}
 
 async function ganttResourceWorkIntervalRPC() {
     return [
@@ -98,6 +146,7 @@ function _getCreateViewArgsForGanttViewTotalsTests() {
                 <field name="allocated_percentage"/>
                 <field name="resource_id"/>
                 <field name="name"/>
+                <field name="repeat"/>
             </gantt>
         `,
     };
@@ -106,6 +155,13 @@ function _getCreateViewArgsForGanttViewTotalsTests() {
 beforeEach(() => {
     ResourceResource._records = [{ id: 1, name: "Resource 1", employee_id: 1 }];
     HrEmployee._records = [{ id: 1, name: "Employee 1" }];
+    PlanningSlot._views = {
+        form: `<form>
+                    <field name="start_datetime"/>
+                    <field name="end_datetime"/>
+                </form>`,
+        list: `<list><field name="name"/></list>`,
+    };
     onRpc("has_group", () => true);
 });
 
@@ -182,11 +238,11 @@ test('add record in empty gantt with sample="1"', async function () {
     });
 
     expect(".o_gantt_view .o_content").toHaveClass("o_view_sample_data");
-    const rowHeaders = [...queryAll(".o_gantt_row_headers .o_gantt_row_header")];
-    expect(rowHeaders.length).toBeGreaterThan(2);
-    const firstRowHeader = rowHeaders[0];
-    expect(firstRowHeader).toHaveText("Open Shifts");
-    expect(firstRowHeader).not.toHaveClass("o_sample_data_disabled");
+    expect(queryAll(".o_gantt_row_headers .o_gantt_row_header").length).toBeGreaterThan(2);
+    expect(".o_gantt_row_headers .o_gantt_row_header:first").toHaveText("Open Shifts");
+    expect(".o_gantt_row_headers .o_gantt_row_header:first").not.toHaveClass(
+        "o_sample_data_disabled"
+    );
 
     await clickCell("01 December 2018", "Open Shifts");
     await contains(".modal .o_form_view .o_field_widget[name=name] input").edit("new shift");
@@ -274,7 +330,7 @@ test("gantt view totals height is taking unavailability into account instead of 
 
     // 2022-10-09 and 2022-10-15 are days off => no pill has to be found in first and last columns
     expect(
-        [...queryAll(".o_gantt_row_total .o_gantt_pill_wrapper")].map(
+        queryAll(".o_gantt_row_total .o_gantt_pill_wrapper").map(
             (el) => el.style.gridColumn.split(" / ")[0]
         )
     ).toEqual(["c2", "c3", "c4", "c5", "c6"], {
@@ -283,7 +339,7 @@ test("gantt view totals height is taking unavailability into account instead of 
     });
 
     // Max of allocated hours = 4:00 (50% * 8:00)
-    expect([...queryAll(".o_gantt_row_total .o_gantt_pill")].map((el) => el.style.height)).toEqual([
+    expect(queryAll(".o_gantt_row_total .o_gantt_pill").map((el) => el.style.height)).toEqual([
         "45%", // => 2:00 = 50% of 4:00 => 0.5 * 90% = 45%
         "56.25%", // => 2:30 = 62.5% of 4:00 => 0.625 * 90% = 56.25%
         "67.5%", // => 3:00 = 75% of 4:00 => 0.75 * 90% = 67.5%
@@ -346,12 +402,12 @@ test("reload data after having unlink a record in planning_form", async function
 
 test("progress bar has the correct unit", async () => {
     const makeViewArgs = _getCreateViewArgsForGanttViewTotalsTests();
-    onRpc("get_gantt_data", async ({ kwargs, parent }) => {
-        const result = await parent();
+    onRpc("get_gantt_data", ({ kwargs, parent }) => {
+        const result = parent();
         expect(kwargs.progress_bar_fields).toEqual(["resource_id"]);
         result.progress_bars = getProgressBars();
         return result;
-    })
+    });
 
     await mountGanttView({
         ...makeViewArgs,
@@ -426,11 +482,11 @@ test("the grouped gantt view is coloured correctly and the occupancy percentage 
     ];
 
     onRpc("gantt_resource_work_interval", ganttResourceWorkIntervalRPC);
-    onRpc("get_gantt_data", async ({ parent }) => {
-        const result = await parent();
+    onRpc("get_gantt_data", ({ parent }) => {
+        const result = parent();
         result.progress_bars = getProgressBars();
-        return result
-    })
+        return result;
+    });
 
     await mountGanttView({
         resModel: "planning.slot",
@@ -635,9 +691,6 @@ test("Test split tool in gantt view", async function () {
 
 test("Test highlight shifts added by executed action", async function () {
     mockDate("2022-10-05 00:00:00", +1);
-    patchWithCleanup(luxon.Settings, {
-        defaultZone: luxon.IANAZone.create("UTC"),
-    });
     PlanningSlot._records = [
         {
             id: 1,
@@ -655,9 +708,9 @@ test("Test highlight shifts added by executed action", async function () {
         },
     ];
 
-    onRpc("action_copy_previous_week", async function () {
-        if (PlanningSlot._records.length === 2) {
-            const newSlotId = await this.env["planning.slot"].create({
+    onRpc("action_copy_previous_week", function () {
+        if (this.env["planning.slot"].length === 2) {
+            const newSlotId = this.env["planning.slot"].create({
                 name: "shift 3",
                 start_datetime: "2022-10-07 16:00:00",
                 end_datetime: "2022-10-07 18:00:00",
@@ -666,11 +719,11 @@ test("Test highlight shifts added by executed action", async function () {
             return [[newSlotId], [1]];
         }
         return false;
-    })
-    onRpc("auto_plan_ids", async function() {
-        await this.env["planning.slot"].write([2], { resource_id: 1 });
+    });
+    onRpc("auto_plan_ids", function () {
+        this.env["planning.slot"].write([2], { resource_id: 1 });
         return { open_shift_assigned: [2] };
-    })
+    });
     onRpc("gantt_resource_work_interval", ganttResourceWorkIntervalRPC);
 
     await mountGanttView({
@@ -691,7 +744,9 @@ test("Test highlight shifts added by executed action", async function () {
             </search>`,
     });
 
-    await click(".o_control_panel_main_buttons .o_gantt_buttons_container button > i.fa-caret-down");
+    await click(
+        ".o_control_panel_main_buttons .o_gantt_buttons_container button > i.fa-caret-down"
+    );
     await animationFrame();
 
     expect(".o_gantt_button_copy_previous_week").toHaveCount(1, {
@@ -720,7 +775,9 @@ test("Test highlight shifts added by executed action", async function () {
     rows = getGridContent().rows;
     expect(rows.map((r) => r.title)).toEqual(["Open Shifts", "Resource 1"]);
 
-    await click(".o_control_panel_main_buttons .o_gantt_buttons_container button > i.fa-caret-down");
+    await click(
+        ".o_control_panel_main_buttons .o_gantt_buttons_container button > i.fa-caret-down"
+    );
     await animationFrame();
     await click(".o_popover.dropdown-menu .o_gantt_button_auto_plan"); // click on copy button in desktop view
     await animationFrame();
@@ -735,6 +792,79 @@ test("Test highlight shifts added by executed action", async function () {
         message: "Shifts Planned facet should be still active.",
     });
     expect(".o_gantt_pill").toHaveCount(2, { message: "2 pills should be in the gantt view." });
+});
+
+test("Verify Hours in Planning Dialog When Clicking on cell for Off Days and Working Days in Gantt View", async function () {
+    mockDate("2022-10-13 00:00:00", +1);
+    onRpc("gantt_resource_work_interval", ganttResourceWorkIntervalRPC);
+    await mountGanttView({
+        resModel: "planning.slot",
+        arch: `
+            <gantt
+                js_class="planning_gantt"
+                default_scale="month"
+                date_start="start_datetime"
+                date_stop="end_datetime"
+                plan="0"
+                display_unavailability="1"
+                default_group_by="resource_id"
+            />
+        `,
+    });
+    await hoverGridCell("14 October 2022", "Open Shifts");
+    await clickCell("14 October 2022", "Open Shifts");
+    await waitFor(".o_dialog .o_form_view");
+    expect(`.o_field_widget[name="start_datetime"] input`).toHaveValue("10/14/2022 00:00:00", {
+        message: "The start date should be the minimum time for the selected date.",
+    });
+    expect(`.o_field_widget[name="end_datetime"] input`).toHaveValue("10/15/2022 00:00:00", {
+        message: "The end date should be the maximum time for the selected date.",
+    });
+    await contains(`.modal-dialog .o_form_button_save`).click();
+});
+
+test("Verify Hours in Planning Dialog When Clicking 'New' Button for Off Days in Gantt View", async function () {
+    mockDate("2024-10-19 00:00:00", +1);
+    const unavailabilities = {
+        resource_id: {
+            false: [
+                {
+                    start: "2024-10-17 10:00:00",
+                    stop: "2024-10-20 14:00:00",
+                },
+            ],
+        },
+    };
+    onRpc("get_gantt_data", ({ parent }) => {
+        const result = parent();
+        result.unavailabilities = unavailabilities;
+        return result;
+    });
+    onRpc("gantt_resource_work_interval", ganttResourceWorkIntervalRPC);
+    await mountGanttView({
+        resModel: "planning.slot",
+        arch: `
+            <gantt
+                js_class="planning_gantt"
+                default_scale="week"
+                date_start="start_datetime"
+                date_stop="end_datetime"
+                display_unavailability="1"
+                default_group_by="resource_id"
+            />
+        `,
+    });
+
+    click(".o_gantt_button_add.btn-primary");
+    await animationFrame();
+    await waitFor(".o_dialog .o_form_view");
+    expect(`.o_field_widget[name="start_datetime"] input`).toHaveValue("10/19/2024 00:00:00", {
+        message: "The start date should be the minimum time for the selected date",
+    });
+    expect(`.o_field_widget[name="end_datetime"] input`).toHaveValue("10/19/2024 23:59:59", {
+        message: "The end date should be the maximum time for the selected date.",
+    });
+    await contains(`.modal-dialog .o_form_button_save`).click();
 });
 
 test("The date should take into the account when created through the button in Gantt View", async function () {
@@ -770,9 +900,172 @@ test("The date should take into the account when created through the button in G
     await contains(".modal .o_form_view .o_field_widget[name=name] input").edit("New Shift");
     await clickSave();
 
-    expect(queryAllTexts(".o_gantt_pill_wrapper")).toEqual(["First Record","New Shift"],
-        { message: "Records should be match for Shifts" });
+    expect(queryAllTexts(".o_gantt_pill_wrapper")).toEqual(["First Record", "New Shift"], {
+        message: "Records should be match for Shifts",
+    });
 
-    expect([...queryAll(".o_gantt_pill_wrapper")].map((node) => node.style.gridRow.split(' / ')[0])).
-        toEqual(["r2","r2"], { message: "The record should be added to the Resource column" });
+    expect(
+        queryAll(".o_gantt_pill_wrapper").map((node) => node.style.gridRow.split(" / ")[0])
+    ).toEqual(["r2", "r2"], { message: "The record should be added to the Resource column" });
+});
+
+test("Gantt Popover delete confirmation", async () => {
+    const ganttViewProps = _getCreateViewArgsForGanttViewTotalsTests();
+    ganttViewProps.groupBy = ["resource_id"];
+    await mountGanttView(ganttViewProps);
+
+    expect(".o_gantt_pill:not(.o_gantt_consolidated_pill)").toHaveCount(1);
+
+    click(".o_gantt_pill");
+    await animationFrame();
+
+    click("button:contains('Delete')");
+    await animationFrame();
+
+    expect(".o_dialog").toHaveCount(1);
+    expect(".modal-title").toHaveText("Confirmation");
+    click(".o_dialog button:contains('Delete')");
+    await animationFrame();
+
+    expect(".o_gantt_pill:not(.o_gantt_consolidated_pill)").toHaveCount(0);
+});
+
+test("Gantt Popover recurrence delete confirmation in mode subsequent", async () => {
+    await reccureneceDeletionTemplate("subsequent");
+});
+
+test("Gantt Popover recurrence delete confirmation in mode all", async () => {
+    await reccureneceDeletionTemplate("all");
+});
+
+test("date_start in url", async function () {
+    PlanningSlot._records = [];
+    PlanningSlot._views = {
+        gantt: `
+            <gantt
+                js_class="planning_gantt"
+                date_start="start_datetime"
+                date_stop="end_datetime"
+            />`,
+    };
+
+    redirect(`/web?date_start=2020-12-10#action=1&view_type=gantt`);
+    await mountWithCleanup(WebClient);
+    await animationFrame();
+
+    const { groupHeaders, range } = getGridContent();
+    expect(groupHeaders.map((gh) => gh.title)).toEqual(["December 2020"]);
+    expect(range).toEqual("December 2020");
+});
+
+test("date_start and date_end in url (same week)", async function () {
+    PlanningSlot._records = [];
+    PlanningSlot._views = {
+        gantt: `
+            <gantt
+                js_class="planning_gantt"
+                date_start="start_datetime"
+                date_stop="end_datetime"
+            />`,
+    };
+
+    redirect(`/web?date_start=2020-12-06&date_end=2020-12-10#action=1&view_type=gantt`);
+    await mountWithCleanup(WebClient);
+    await animationFrame();
+
+    const { groupHeaders, range } = getGridContent();
+    expect(groupHeaders.map((gh) => gh.title)).toEqual(["W50 2020"]);
+    expect(range).toEqual("W50 2020");
+});
+
+test("date_start and date_end in url (same month)", async function () {
+    PlanningSlot._records = [];
+    PlanningSlot._views = {
+        gantt: `
+            <gantt
+                js_class="planning_gantt"
+                date_start="start_datetime"
+                date_stop="end_datetime"
+            />`,
+    };
+
+    redirect(`/web?date_start=2020-12-06&date_end=2020-12-24#action=1&view_type=gantt`);
+    await mountWithCleanup(WebClient);
+    await animationFrame();
+
+    const { groupHeaders, range } = getGridContent();
+    expect(groupHeaders.map((gh) => gh.title)).toEqual(["December 2020"]);
+    expect(range).toEqual("December 2020");
+});
+
+test("date_start and date_end in url (not in same month)", async function () {
+    PlanningSlot._records = [];
+    PlanningSlot._views = {
+        gantt: `
+            <gantt
+                js_class="planning_gantt"
+                date_start="start_datetime"
+                date_stop="end_datetime"
+            />`,
+    };
+
+    redirect(`/web?date_start=2020-12-06&date_end=2021-01-04#action=1&view_type=gantt`);
+    await mountWithCleanup(WebClient);
+    await animationFrame();
+
+    const { groupHeaders, range } = getGridContent();
+    expect(groupHeaders.map((gh) => gh.title)).toEqual(["December 2020", "January 2021"]);
+    expect(range).toEqual("12/06/2020 -> 01/04/2021");
+});
+
+test("publish on gantt view: default end_datetime should cover full range", async function () {
+    expect.assertions(10);
+
+    mockTimeZone(0);
+    mockDate("2018-11-20 18:00:00");
+    // Expect env localization with {weekStart: 7}
+    const ranges = [
+        ["Today", "2018-11-20 23:59:59"],
+        ["This week", "2018-11-24 23:59:59"],
+        ["This month", "2018-11-30 23:59:59"],
+        ["This quarter", "2018-12-31 23:59:59"],
+        ["This year", "2018-12-31 23:59:59"],
+    ];
+    PlanningSlot._records.push({
+        name: "First Record",
+        start_datetime: "2018-11-20 07:00:00",
+        end_datetime: "2018-11-20 17:00:00",
+        resource_id: 1,
+    });
+    onRpc("gantt_resource_work_interval", ganttResourceWorkIntervalRPC);
+
+    await mountGanttView({
+        resModel: "planning.slot",
+        arch: `
+            <gantt
+                js_class="planning_gantt"
+                date_start="start_datetime"
+                date_stop="end_datetime"
+            />
+        `,
+    });
+
+    let currentExpectedDate = null;
+    patchWithCleanup(getService("action"), {
+        async doAction(action, options) {
+            expect(action).toBe("planning.planning_send_action", {
+                message: "should open 'Send Planning By Email' form view",
+            });
+            expect(options.additionalContext.default_end_datetime).toBe(currentExpectedDate);
+        },
+    });
+
+    for (const [label, date] of ranges) {
+        currentExpectedDate = date;
+
+        await selectRange(label);
+
+        click(".o_gantt_button_send_all.btn-primary");
+        await animationFrame();
+    }
 });

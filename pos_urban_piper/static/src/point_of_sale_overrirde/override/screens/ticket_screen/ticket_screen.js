@@ -1,4 +1,5 @@
 import { _t } from "@web/core/l10n/translation";
+import { AlertDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 import { TicketScreen } from "@point_of_sale/app/screens/ticket_screen/ticket_screen";
 import { patch } from "@web/core/utils/patch";
 import { SelectionPopup } from "@point_of_sale/app/utils/input_popups/selection_popup";
@@ -59,20 +60,12 @@ patch(TicketScreen.prototype, {
     },
 
     async _updateScreenState(order, filterState, upState = "") {
-        const stateOverride = {
-            search: {
-                fieldName: "DELIVERYPROVIDER",
-                searchTerm: order?.delivery_provider_id?.name,
-            },
-            filter: filterState,
-        };
-        this.env.services.ui.block();
-        this._setOrder(this._getEmptyOrder(false));
-        this.closeTicketScreen();
-        setTimeout(() => {
-            this.pos.showScreen("TicketScreen", { stateOverride, upState });
-            this.env.services.ui.unblock();
-        }, 300);
+        this.state.upState = upState;
+        await this.onSearch({
+            fieldName: "DELIVERYPROVIDER",
+            searchTerm: order?.delivery_provider_id?.name,
+        });
+        await this.onFilterSelected(filterState);
     },
 
     async _updateOrderStatus(order, status, code = null) {
@@ -90,19 +83,25 @@ patch(TicketScreen.prototype, {
         const response = await this._updateOrderStatus(syncedOrder, "Acknowledged");
         const status = await this._handleResponse(response, syncedOrder, "acknowledged");
         if (status) {
+            await this.pos._sendDeliveryOrderForPreparation(syncedOrder);
             await this._updateScreenState(syncedOrder, "ACTIVE_ORDERS");
-        }
-        try {
-            await this.pos.sendOrderInPreparation(syncedOrder);
-        } catch {
-            this.pos.notification.add(_t("Error to send in preparation display."), {
-                type: "warning",
-                sticky: false,
-            });
+            syncedOrder.uiState.orderAcceptTime = luxon.DateTime.now().ts;
         }
     },
 
     async _rejectOrder(order) {
+        if (
+            ["deliveroo", "justeat", "hungerstation"].includes(
+                order.delivery_provider_id.technical_name
+            )
+        ) {
+            return this.dialog.add(AlertDialog, {
+                title: _t("Error"),
+                body: _t(`Rejecting this order is not allowed for "%(providerName)s"`, {
+                    providerName: order.delivery_provider_id.name,
+                }),
+            });
+        }
         this.dialog.add(SelectionPopup, {
             title: _t("Reject Order"),
             list: [
@@ -123,17 +122,23 @@ patch(TicketScreen.prototype, {
                 const response = await this._updateOrderStatus(order, "Cancelled", code);
                 const status = await this._handleResponse(response, order, "cancelled");
                 if (status) {
-                    await this._updateScreenState(order, "ACTIVE_ORDERS");
-                    if (last_order_status !== "placed") {
-                        await this.pos.sendOrderInPreparation(order, true);
+                    if (
+                        Object.keys(order.last_order_preparation_change.lines).length == 0 &&
+                        last_order_status !== "placed"
+                    ) {
+                        if (order.general_note) {
+                            order.last_order_preparation_change.generalNote = order.general_note;
+                        }
+                        await this.pos.checkPreparationStateAndSentOrderInPreparation(order, true);
                     }
+                    await this._updateScreenState(order, "ACTIVE_ORDERS");
                     order.uiState.displayed = false;
                     if (order.id === this.pos.get_order()?.id) {
                         const orderList = this._getOrderList();
                         if (orderList.length == 1) {
                             this.pos.add_new_order();
                         } else {
-                            this._selectNextOrder(order);
+                            this.pos.selectNextOrder();
                         }
                     }
                     await this.pos.deleteOrders([order]);
@@ -145,7 +150,7 @@ patch(TicketScreen.prototype, {
 
     async _doneOrder(order) {
         const response = await this._updateOrderStatus(order, "Food Ready");
-        const status = await this._handleResponse(response, order, "food_ready", "");
+        const status = await this._handleResponse(response, order, "food_ready");
         if (status) {
             await this._updateScreenState(order, "SYNCED", "DONE");
         }
@@ -153,8 +158,18 @@ patch(TicketScreen.prototype, {
 
         // make sure the order is identified as paid.
         order = this.pos.models["pos.order"].get(order.id);
+        this.state.selectedOrderUuid = order.uuid;
         order.set_screen_data({ name: "" });
-        order.uiState.locked = true;
+    },
+
+    async _dispatchOrder(order) {
+        const response = await this._updateOrderStatus(order, "Dispatched");
+        await this._handleResponse(response, order, "dispatched");
+    },
+
+    async _completeOrder(order) {
+        const response = await this._updateOrderStatus(order, "Completed");
+        await this._handleResponse(response, order, "completed");
     },
 
     async _onInfoOrder(order) {

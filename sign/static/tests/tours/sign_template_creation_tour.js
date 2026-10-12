@@ -2,56 +2,9 @@
 
 import { registry } from "@web/core/registry";
 import { stepUtils } from "@web_tour/tour_service/tour_utils";
-
-function triggerDragEvent(element, type, data = {}) {
-    const event = new DragEvent(type, { bubbles: true });
-    for (const key in data) {
-        Object.defineProperty(event, key, {
-            value: data[key],
-        });
-    }
-    element.dispatchEvent(event);
-}
-
-function dragAndDropSignItemAtHeight(type, page, height = 0.5, width = 0.5) {
-    const iframe = document.querySelector("iframe");
-    const iframeDocument = iframe.contentWindow.document;
-    const signItemTypeButtons = iframeDocument.querySelectorAll(
-        ".o_sign_field_type_toolbar_items .o_sign_field_type_button"
-    );
-    const from = Array.from(signItemTypeButtons).find((el) => el.innerText === type);
-
-    const to = iframeDocument.querySelector(`.page[data-page-number="${page}"]`);
-    const toPosition = to.getBoundingClientRect();
-    toPosition.x += iframe.contentWindow.scrollX + to.clientWidth * width;
-    toPosition.y += iframe.contentWindow.scrollY + to.clientHeight * height;
-
-    const dataTransferObject = {};
-    const dataTransferMock = {
-        setData: (key, value) => {
-            dataTransferObject[key] = value;
-        },
-        getData: (key) => {
-            return dataTransferObject[key];
-        },
-        setDragImage: () => {},
-    };
-
-    triggerDragEvent(from, "dragstart", {
-        dataTransfer: dataTransferMock,
-    });
-
-    triggerDragEvent(to, "drop", {
-        pageX: toPosition.x,
-        pageY: toPosition.y,
-        dataTransfer: dataTransferMock,
-    });
-
-    triggerDragEvent(from, "dragend");
-}
+import tourUtils from "@sign/js/tours/tour_utils";
 
 registry.category("web_tour.tours").add("sign_template_creation_tour", {
-    test: true,
     url: "/odoo?debug=1",
     steps: () => [
         stepUtils.showAppsMenuItem(),
@@ -95,27 +48,28 @@ registry.category("web_tour.tours").add("sign_template_creation_tour", {
         },
         {
             content: "Wait for page to be loaded",
-            trigger: ":iframe .page",
+            trigger: ":iframe .page[data-page-number='1'] .textLayer",
+            timeout: 30000, //In view mode, pdf loading can take a long time
         },
         {
             content: "Drop Signature Item",
-            trigger: ":iframe body",
-            run: function () {
-                dragAndDropSignItemAtHeight("Signature", 1, 0.5, 0.25);
+            trigger: ":iframe .o_sign_field_type_button:contains(Signature)",
+            run() {
+                tourUtils.dragAndDropSignItemAtHeight(this.anchor, 0.5, 0.25);
             },
         },
         {
             content: "Drop Name Sign Item",
-            trigger: ":iframe body",
-            run: function () {
-                dragAndDropSignItemAtHeight("Name", 1, 0.25, 0.25);
+            trigger: ":iframe .o_sign_field_type_button:contains(Name)",
+            run() {
+                tourUtils.dragAndDropSignItemAtHeight(this.anchor, 0.25, 0.25);
             },
         },
         {
             content: "Drop Text Sign Item",
-            trigger: ":iframe body",
-            run: function () {
-                dragAndDropSignItemAtHeight("Text", 1, 0.15, 0.25);
+            trigger: ":iframe .o_sign_field_type_button:contains(Text)",
+            run() {
+                tourUtils.dragAndDropSignItemAtHeight(this.anchor, 0.15, 0.25);
             },
         },
         {
@@ -140,9 +94,9 @@ registry.category("web_tour.tours").add("sign_template_creation_tour", {
         },
         {
             content: "Drop Selection Sign Item",
-            trigger: ":iframe body",
-            run: function () {
-                dragAndDropSignItemAtHeight("Selection", 1, 0.75, 0.25);
+            trigger: ":iframe .o_sign_field_type_button:contains(Selection)",
+            run() {
+                tourUtils.dragAndDropSignItemAtHeight(this.anchor, 0.75, 0.25);
             },
         },
         {

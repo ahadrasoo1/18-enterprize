@@ -1,23 +1,27 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* delivery_dhl
-# 
+# * delivery_dhl
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Manon Rondou, 2025
+# Erwin van der Ploeg <erwin@odooexperts.nl>, 2025
+# Bren Driesen <brdri@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Dutch (https://app.transifex.com/odoo/teams/41243/nl/)\n"
+"POT-Creation-Date: 2025-12-29 18:50+0000\n"
+"PO-Revision-Date: 2026-03-11 13:02+0000\n"
+"Last-Translator: Bren Driesen <brdri@odoo.com>\n"
+"Language-Team: Dutch <https://translate.odoo.com/projects/odoo-18/"
+"delivery_dhl/nl/>\n"
+"Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: nl\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.16.2\n"
 
 #. module: delivery_dhl
 #: model_terms:ir.ui.view,arch_db:delivery_dhl.view_delivery_carrier_form_with_provider_dhl
@@ -162,7 +166,7 @@ msgstr "Centimeters"
 #. module: delivery_dhl
 #: model:ir.model.fields,help:delivery_dhl.field_delivery_carrier__dhl_dutiable
 msgid "Check this if your package is dutiable."
-msgstr "Controleer dit wanneer je verpakking belastbaar is."
+msgstr "Controleer dit wanneer je pakket belastbaar is."
 
 #. module: delivery_dhl
 #: model_terms:ir.ui.view,arch_db:delivery_dhl.view_delivery_carrier_form_with_provider_dhl
@@ -182,8 +186,8 @@ msgstr "D - Express wereldwijd"
 #. module: delivery_dhl
 #: model:ir.model.fields.selection,name:delivery_dhl.selection__delivery_carrier__delivery_type__dhl
 #: model:ir.model.fields.selection,name:delivery_dhl.selection__stock_package_type__package_carrier_type__dhl
-msgid "DHL"
-msgstr "DHL"
+msgid "DHL (Legacy)"
+msgstr "DHL (Legacy)"
 
 #. module: delivery_dhl
 #: model:ir.model.fields,field_description:delivery_dhl.field_delivery_carrier__dhl_account_number
@@ -214,11 +218,6 @@ msgid "DHL EU -> International"
 msgstr "DHL EU -> Internationaal"
 
 #. module: delivery_dhl
-#: model:ir.model.fields,field_description:delivery_dhl.field_delivery_carrier__dhl_default_package_type_id
-msgid "DHL Package Type"
-msgstr "DHL verpakkingssoort"
-
-#. module: delivery_dhl
 #: model:ir.model.fields,field_description:delivery_dhl.field_delivery_carrier__dhl_password
 msgid "DHL Password"
 msgstr "DHL wachtwoord"
@@ -227,12 +226,6 @@ msgstr "DHL wachtwoord"
 #: model:ir.model.fields,field_description:delivery_dhl.field_delivery_carrier__dhl_product_code
 msgid "DHL Product"
 msgstr "DHL product"
-
-#. module: delivery_dhl
-#: model_terms:ir.ui.view,arch_db:delivery_dhl.res_config_settings_view_form_sale
-#: model_terms:ir.ui.view,arch_db:delivery_dhl.res_config_settings_view_form_stock
-msgid "DHL Shipping Methods"
-msgstr "DHL verzendwijzes"
 
 #. module: delivery_dhl
 #. odoo-python
@@ -277,6 +270,11 @@ msgstr ""
 #: code:addons/delivery_dhl/models/dhl_request.py:0
 msgid "DHL password is missing, please modify your delivery method settings."
 msgstr "DHL wachtwoord ontbreekt, verander je verzendwijze instellingen."
+
+#. module: delivery_dhl
+#: model:ir.model.fields,field_description:delivery_dhl.field_delivery_carrier__dhl_default_package_type_id
+msgid "DHLxw Package Type"
+msgstr "DHLxw-pakkettype"
 
 #. module: delivery_dhl
 #: model:ir.model.fields,field_description:delivery_dhl.field_delivery_carrier__dhl_duty_payment
@@ -418,7 +416,7 @@ msgstr "Verpakkingsdimensie  eenheid"
 #. module: delivery_dhl
 #: model:ir.model.fields,field_description:delivery_dhl.field_delivery_carrier__dhl_package_weight_unit
 msgid "Package Weight Unit"
-msgstr "Gewichtseenheid verpakking"
+msgstr "Gewichtseenheid pakket"
 
 #. module: delivery_dhl
 #. odoo-python
@@ -427,8 +425,8 @@ msgid ""
 "Please define an incoterm in the associated sale order or set a default "
 "incoterm for the company in the accounting's settings."
 msgstr ""
-"Definieer een incoterm in de bijbehorende verkooporder of stel een standaard"
-" incoterm in voor het bedrijf in de instellingen van de boekhouding."
+"Definieer een incoterm in de bijbehorende verkooporder of stel een standaard "
+"incoterm in voor het bedrijf in de instellingen van de boekhouding."
 
 #. module: delivery_dhl
 #. odoo-python
@@ -485,12 +483,12 @@ msgstr "Verzending aangemaakt in DHL <br/> <b>Traceernummer: </b>%s"
 #. module: delivery_dhl
 #: model:ir.model,name:delivery_dhl.model_delivery_carrier
 msgid "Shipping Methods"
-msgstr "Verzendwijzes"
+msgstr "Verzendmethoden"
 
 #. module: delivery_dhl
 #: model:ir.model,name:delivery_dhl.model_stock_package_type
 msgid "Stock package type"
-msgstr "Verpakkingssoort:"
+msgstr "Pakkettype:"
 
 #. module: delivery_dhl
 #: model:ir.model.fields.selection,name:delivery_dhl.selection__delivery_carrier__dhl_product_code__t
@@ -511,28 +509,34 @@ msgstr ""
 #. odoo-python
 #: code:addons/delivery_dhl/models/dhl_request.py:0
 msgid ""
-"The address of your company warehouse is missing or wrong (Missing field(s) :\n"
+"The address of your company warehouse is missing or wrong (Missing "
+"field(s) :\n"
 " %s)"
 msgstr ""
-"Het adres van je bedrijfsmagazijn ontbreekt of is foutief. (Mist veld(en) : \n"
+"Het adres van je bedrijfsmagazijn ontbreekt of is foutief. (Mist "
+"veld(en) : \n"
 "%s)"
 
 #. module: delivery_dhl
 #: model:ir.model.fields,help:delivery_dhl.field_delivery_carrier__dhl_custom_data_request
 msgid ""
 "The custom data in DHL is organized like the inside of a json file.\n"
-"        There are 3 possible keys: 'rate', 'ship', 'return', to which you can add your custom data.\n"
+"        There are 3 possible keys: 'rate', 'ship', 'return', to which you "
+"can add your custom data.\n"
 "        More info on https://xmlportal.dhl.com/"
 msgstr ""
-"De aangepaste gegevens in DHL zijn georganiseerd als de binnenkant van een json-bestand. \n"
-"Er zijn 3 mogelijke sleutels: 'rate', 'ship', 'return', waaraan je je aangepaste gegevens kan toevoegen. \n"
+"De aangepaste gegevens in DHL zijn georganiseerd als de binnenkant van een "
+"json-bestand. \n"
+"Er zijn 3 mogelijke sleutels: 'rate', 'ship', 'return', waaraan je je "
+"aangepaste gegevens kan toevoegen. \n"
 "Meer info op https://xmlportal.dhl.com/"
 
 #. module: delivery_dhl
 #. odoo-python
 #: code:addons/delivery_dhl/models/dhl_request.py:0
 msgid ""
-"The estimated shipping price cannot be computed because the weight is missing for the following product(s): \n"
+"The estimated shipping price cannot be computed because the weight is "
+"missing for the following product(s): \n"
 " %s"
 msgstr ""
 "De geschatte verzendkosten kunnen niet worden berekend omdat het gewicht "
@@ -583,7 +587,7 @@ msgstr "Je kunt je DHL bezorging niet annuleren zonder ophaaldatum."
 #. odoo-python
 #: code:addons/delivery_dhl/models/delivery_dhl.py:0
 msgid "You cannot delete the commercial invoice sequence."
-msgstr "Je kan de handelsfactuurreeks niet verwijderen."
+msgstr "Je kunt de handelsfactuurreeks niet verwijderen."
 
 #. module: delivery_dhl
 #: model:ir.model.fields.selection,name:delivery_dhl.selection__delivery_carrier__dhl_product_code__z

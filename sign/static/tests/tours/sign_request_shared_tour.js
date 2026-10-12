@@ -3,7 +3,6 @@
 import { registry } from "@web/core/registry";
 
 registry.category("web_tour.tours").add("shared_sign_request_tour", {
-    test: true,
     url: "/odoo",
     steps: () => [
         {
@@ -55,6 +54,7 @@ registry.category("web_tour.tours").add("shared_sign_request_tour", {
                 const url = share_link.match(regex)[0];
                 window.location.href = window.location.origin + url;
             },
+            expectUnloadPage: true,
         },
         {
             content: "Fill the sign item",
@@ -85,22 +85,21 @@ registry.category("web_tour.tours").add("shared_sign_request_tour", {
             run: "click",
         },
         {
-            trigger: '.modal-title:contains("All done!")',
-        },
-        {
-            content: "Download Document",
-            trigger: "button.btn.btn-primary",
+            trigger: `.modal-title:contains("It's signed!")`,
         },
     ],
 });
 
 registry.category("web_tour.tours").add("sign_resend_expired_link_tour", {
-    test: true,
     steps: () => [
+        {
+            trigger: "a:contains(Send a new link)",
+        },
         {
             trigger: ".btn.btn-primary",
             content: "Click to resend the url",
-            run() {},
+            run: "click",
+            expectUnloadPage: true,
         },
     ],
 });

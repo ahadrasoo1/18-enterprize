@@ -45,13 +45,34 @@ class HrPayslip(models.Model):
                 'data/hr_salary_rule_category_data.xml',
                 'data/hr_payroll_structure_type_data.xml',
                 'data/hr_rule_parameters_data.xml',
+                'data/res_partner_data.xml',
                 'data/salary_rules/hr_salary_rule_ind_emp_data.xml',
                 'data/salary_rules/hr_salary_rule_regular_pay_data.xml',
                 'data/salary_rules/hr_salary_rule_worker_data.xml',
             ])]
 
     def _get_base_local_dict(self):
-        return {**super()._get_base_local_dict(), '_': self.env._}
+        return {**super()._get_base_local_dict(), '_': lambda *a, **kw: self.env._(*a, **kw)}  # pylint: disable=E8502
 
     def _get_employee_timeoff_data(self):
         return self.env['hr.leave.type'].with_company(self.company_id).with_context(employee_id=self.employee_id.id).get_allocation_data_request()
+
+    def get_month(self):
+        from_date = min(self.mapped('date_from'))
+        to_date = max(self.mapped('date_to'))
+        return {
+            'from_name': format_date(self.env, from_date, date_format='long'),
+            'to_name': format_date(self.env, to_date, date_format='long')
+        }
+
+    def action_payslip_payment_report(self, export_format='advice'):
+        action = super().action_payslip_payment_report()
+        if self.company_id.country_code != 'IN':
+            return action
+        action.update({
+            'context': {
+                **action['context'],
+                'default_export_format': export_format,
+            },
+        })
+        return action

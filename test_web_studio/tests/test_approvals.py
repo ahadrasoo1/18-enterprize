@@ -32,6 +32,14 @@ class TestStudioApprovals(TransactionCase):
             "email": "test_2@test_2.test_2",
             "groups_id": [Command.link(cls.env.ref("base.group_user").id)]
         })
+        cls.attrs_before['test.studio.model_action'].update((
+            'action_confirm',
+            'action_step',
+        ))
+        cls.attrs_before['test.studio.model_action2'].update((
+            'action_confirm',
+            'action_step',
+        ))
 
     def test_approval_method_two_models(self):
         IrModel = self.env["ir.model"]
@@ -567,6 +575,7 @@ class TestStudioApprovals(TransactionCase):
         self.assertEqual(len(spec["entries"]), 0)
 
     def test_create_base_automation(self):
+        self.addCleanup(self.env['base.automation']._unregister_hook)
         IrModel = self.env["ir.model"]
 
         def _mocked__base_automation_data_for_model(self, model_id):

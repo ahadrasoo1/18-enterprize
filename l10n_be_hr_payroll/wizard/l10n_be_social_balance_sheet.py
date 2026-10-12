@@ -3,13 +3,16 @@
 
 import base64
 import collections
+import logging
 
 from io import BytesIO
 from dateutil.relativedelta import relativedelta
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
-from odoo.tools.misc import xlsxwriter, format_date
+from odoo.tools.misc import xlsxwriter, format_date, format_time
+
+_logger = logging.getLogger(__name__)
 
 
 class L10nBeSocialBalanceSheet(models.TransientModel):
@@ -172,6 +175,8 @@ class L10nBeSocialBalanceSheet(models.TransientModel):
                 ['GROSS', 'CAR.PRIV', 'ONSSEMPLOYER', 'MEAL_V_EMP', 'PUB.TRANS', 'REP.FEES', 'IP.PART'], vals_list=['total', 'quantity'])
             for payslip in payslips:
                 gender = payslip.employee_id.gender
+                if gender not in ['male', 'female']:
+                    raise UserError(_('Please configure a gender (either male or female) for the following employee: %s', payslip.employee_id.name))
                 calendar = payslip.contract_id.resource_calendar_id
                 contract_type = 'full' if calendar.full_time_required_hours == calendar.hours_per_week else 'part'
                 gross = round(line_values['GROSS'][payslip.id]['total'], 2) - round(line_values['IP.PART'][payslip.id]['total'], 2)
@@ -232,6 +237,17 @@ class L10nBeSocialBalanceSheet(models.TransientModel):
             }
 
             for contract in end_contracts:
+                if contract.contract_type_id not in mapped_types:
+                    _logger.info(_("The contract %(contract_name)s for %(employee)s is not of one the following types: CDI, CDD. Replacement, For a clearly defined work", contract_name=contract.name, employee=contract.employee_id.name))
+                    continue
+                structure_type = contract.structure_type_id
+                if cip and contract.contract_type_id == cip:
+                    # CIP Contracts are considered as trainees
+                    structure_type = cp200_students
+                if structure_type not in mapped_categories:
+                    _logger.info(_("The contract %(contract_name)s for %(employee)s is not of one the following types: CP200 Employees or Student", contract_name=contract.name, employee=contract.employee_id.name))
+                    continue
+
                 gender = contract.employee_id.gender
                 calendar = contract.resource_calendar_id
                 contract_time = 'full' if calendar.full_time_required_hours == calendar.hours_per_week else 'part'
@@ -239,8 +255,6 @@ class L10nBeSocialBalanceSheet(models.TransientModel):
                 workers_data['105'][contract_time] += 1
                 workers_data['105']['fte'] += 1 * calendar.work_time_rate / 100.0
 
-                if contract.contract_type_id not in mapped_types:
-                    raise UserError(_("The contract %(contract_name)s for %(employee)s is not of one the following types: CDI, CDD. Replacement, For a clearly defined work", contract_name=contract.name, employee=contract.employee_id.name))
                 contract_type = mapped_types[contract.contract_type_id]
                 workers_data[contract_type][contract_time] += 1
                 workers_data[contract_type]['fte'] += 1 * calendar.work_time_rate / 100.0
@@ -254,13 +268,6 @@ class L10nBeSocialBalanceSheet(models.TransientModel):
                 workers_data[gender_certificate_code][contract_time] += 1
                 workers_data[gender_certificate_code]['fte'] += 1 * calendar.work_time_rate / 100.0
 
-                structure_type = contract.structure_type_id
-                if cip and contract.contract_type_id == cip:
-                    # CIP Contracts are considered as trainees
-                    structure_type = cp200_students
-
-                if structure_type not in mapped_categories:
-                    raise UserError(_("The contract %(contract_name)s for %(employee)s is not of one the following types: CP200 Employees or Student", contract_name=contract.name, employee=contract.employee_id.name))
                 category_code = mapped_categories[structure_type]
                 workers_data[category_code][contract_time] += 1
                 workers_data[category_code]['fte'] += 1 * calendar.work_time_rate / 100.0
@@ -299,6 +306,9 @@ class L10nBeSocialBalanceSheet(models.TransientModel):
                 employee = payslip.employee_id
                 contract = payslip.contract_id
                 gender = payslip.employee_id.gender
+                if contract.contract_type_id not in in_mapped_types:
+                    _logger.info(_("The contract %(contract_name)s for %(employee)s is not of one the following types: CDI, CDD. Replacement, For a clearly defined work", contract_name=contract.name, employee=contract.employee_id.name))
+                    continue
                 calendar = contract.resource_calendar_id
                 contract_time = 'full' if calendar.full_time_required_hours == calendar.hours_per_week else 'part'
                 if employee not in in_employees and employee.first_contract_date and (date_from <= employee.first_contract_date <= date_to):
@@ -307,8 +317,6 @@ class L10nBeSocialBalanceSheet(models.TransientModel):
                     workers_data['205'][contract_time] += 1
                     workers_data['205']['fte'] += 1 * calendar.work_time_rate / 100.0
 
-                    if contract.contract_type_id not in in_mapped_types:
-                        raise UserError(_("The contract %(contract_name)s for %(employee)s is not of one the following types: CDI, CDD. Replacement, For a clearly defined work", contract_name=contract.name, employee=contract.employee_id.name))
                     contract_type = in_mapped_types[contract.contract_type_id]
                     workers_data[contract_type][contract_time] += 1
                     workers_data[contract_type]['fte'] += 1 * calendar.work_time_rate / 100.0
@@ -319,8 +327,6 @@ class L10nBeSocialBalanceSheet(models.TransientModel):
                     workers_data['305'][contract_time] += 1
                     workers_data['305']['fte'] += 1 * calendar.work_time_rate / 100.0
 
-                    if contract.contract_type_id not in out_mapped_types:
-                        raise UserError(_("The contract %(contract_name)s for %(employee)s is not of one the following types: CDI, CDD. Replacement, For a clearly defined work", contract_name=contract.name, employee=contract.employee_id.name))
                     contract_type = out_mapped_types[contract.contract_type_id]
                     workers_data[contract_type][contract_time] += 1
                     workers_data[contract_type]['fte'] += 1 * calendar.work_time_rate / 100.0
@@ -367,15 +373,15 @@ class L10nBeSocialBalanceSheet(models.TransientModel):
                 report_data[code] = 0
             if i == number_of_months_period:
                 reports_data['social_balance_sheet'] = report_data
+                report_data['year'] = date_from.strftime('%Y')
             else:
-                report_data['month'] = date_from.strftime('%B')
+                report_data['month'] = format_date(self.env, date_from, date_format='MMMM')
                 report_data['year'] = date_from.strftime('%Y')
                 reports_data['SBS{:0{}}'.format(i, max_int_len)] = report_data
         return collections.OrderedDict(sorted(reports_data.items(), key=lambda t: t[0], reverse=True))
 
     def print_report(self):
         report_data = self._get_report_data()
-        report_data.pop('social_balance_sheet')
         filename = _(
             'SocialBalance-%(date_from)s-%(date_to)s.pdf',
             date_from=format_date(self.env, self.date_from),
@@ -430,7 +436,11 @@ class L10nBeSocialBalanceSheet(models.TransientModel):
             },
             'established': {
                 'header': _('Established on'),
-                'value': self.create_date.strftime("%d %B %Y at %H:%M:%S"),
+                'value': _(
+                    "%(established_date)s at %(established_time)s",
+                    established_date=format_date(self.env, self.create_date, date_format='long'),
+                    established_time=format_time(self.env, self.create_date),
+                )
             },
             'joint_committees': {
                 'header': _('Number of joint committees'),
@@ -438,7 +448,11 @@ class L10nBeSocialBalanceSheet(models.TransientModel):
             },
             'period': {
                 'header': _('Period'),
-                'value': _('%(date_from)s to %(date_to)s', date_from=self.date_from.strftime("%d %B %Y"), date_to=self.date_to.strftime("%d %B %Y")),
+                'value': _(
+                    '%(date_from)s to %(date_to)s',
+                    date_from=format_date(self.env, self.date_from, date_format='long'),
+                    date_to=format_date(self.env, self.date_to, date_format='long'),
+                ),
             },
             'currency': {
                 'header': _('Currency'),
@@ -585,7 +599,7 @@ class L10nBeSocialBalanceSheet(models.TransientModel):
                         ],
                     },
                     'public_transport': {
-                        'header': _('Public Transportion'),
+                        'header': _('Public Transportation'),
                         'values': [
                             report_data['102']['public_transport']['male']['full']
                             + report_data['102']['public_transport']['female']['full'],
@@ -681,7 +695,7 @@ class L10nBeSocialBalanceSheet(models.TransientModel):
                         ],
                     },
                     'public_transport': {
-                        'header': _('Public Transportion'),
+                        'header': _('Public Transportation'),
                         'values': [
                             report_data['102']['public_transport']['male']['part']
                             + report_data['102']['public_transport']['female']['part'],

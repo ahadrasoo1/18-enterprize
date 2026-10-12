@@ -13,10 +13,8 @@ export class AccountReportSearchBar extends Component {
         this.controller = useState(this.env.controller);
 
         onMounted(() => {
-            if (this.props.initialQuery) {
-                this.searchText.el.value = this.props.initialQuery;
-                this.search();
-            }
+            this.searchText.el.value = this.props.initialQuery || "";
+            this.search();
         });
     }
 
@@ -24,11 +22,14 @@ export class AccountReportSearchBar extends Component {
     // Search
     //------------------------------------------------------------------------------------------------------------------
     search() {
-        const query = this.searchText.el.value.trim().toLowerCase();
+        const inputText = this.searchText.el.value.trim();
+        const query = inputText.toLowerCase();
         const linesIDsMatched = [];
 
         if (query.length) {
             for (const line of this.controller.lines) {
+                if (!line.name) continue;
+
                 const lineName = line.name.trim().toLowerCase();
                 const match = (lineName.indexOf(query) !== -1);
 
@@ -36,11 +37,8 @@ export class AccountReportSearchBar extends Component {
                     linesIDsMatched.push(line.id);
                 }
             }
-        }
-
-        if (linesIDsMatched.length) {
             this.controller.lines_searched = linesIDsMatched;
-            this.controller.updateOption("filter_search_bar", query);
+            this.controller.updateOption("filter_search_bar", inputText);
         } else {
             delete this.controller.lines_searched;
             this.controller.deleteOption("filter_search_bar");

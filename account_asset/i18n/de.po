@@ -1,23 +1,23 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* account_asset
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# Larissa Manderfeld, 2024
-# 
+# Larissa Manderfeld, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
+"POT-Creation-Date: 2025-12-29 18:45+0000\n"
 "PO-Revision-Date: 2024-09-25 09:43+0000\n"
-"Last-Translator: Larissa Manderfeld, 2024\n"
+"Last-Translator: Larissa Manderfeld, 2025\n"
 "Language-Team: German (https://app.transifex.com/odoo/teams/41243/de/)\n"
+"Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: de\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #. module: account_asset
@@ -78,8 +78,8 @@ msgid ""
 "%s Future entries will be recomputed to depreciate the asset following the "
 "changes."
 msgstr ""
-"%s Künftige Posten werden neu berechnet, um den Vermögensgegenstand nach den"
-" Änderungen abzuschreiben."
+"%s Künftige Posten werden neu berechnet, um den Vermögensgegenstand nach den "
+"Änderungen abzuschreiben."
 
 #. module: account_asset
 #. odoo-python
@@ -102,9 +102,9 @@ msgstr "(inkl."
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid ""
-"A depreciation entry will be posted on and including the date %(date)s. "
-"<br/> %(extra_text)s Future entries will be recomputed to depreciate the "
-"asset following the changes."
+"A depreciation entry will be posted on and including the date %(date)s. <br/"
+"> %(extra_text)s Future entries will be recomputed to depreciate the asset "
+"following the changes."
 msgstr ""
 "Ein Abschreibungsposten wird am %(date)s und einschließlich dieses Datums "
 "gebucht. <br/> %(extra_text)s Zukünftige Buchungen werden neu berechnet, um "
@@ -114,26 +114,26 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid ""
-"A depreciation entry will be posted on and including the date %(date)s.<br/>"
-" A disposal entry will be posted on the %(account_type)s account "
-"<b>%(account)s</b>."
+"A depreciation entry will be posted on and including the date %(date)s.<br/> "
+"A disposal entry will be posted on the %(account_type)s account <b>%"
+"(account)s</b>."
 msgstr ""
 "Ein Abschreibungsposten wird am %(date)s und einschließlich dieses Datums "
-"gebucht.<br/> Ein Veräußerungsposten wird auf das %(account_type)s-Konto "
-"<b>%(account)s</b> gebucht."
+"gebucht.<br/> Ein Veräußerungsposten wird auf das %(account_type)s-Konto <b>%"
+"(account)s</b> gebucht."
 
 #. module: account_asset
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid ""
-"A depreciation entry will be posted on and including the date %(date)s.<br/>"
-" A second entry will neutralize the original income and post the  outcome of"
-" this sale on account <b>%(account)s</b>."
+"A depreciation entry will be posted on and including the date %(date)s.<br/> "
+"A second entry will neutralize the original income and post the  outcome of "
+"this sale on account <b>%(account)s</b>."
 msgstr ""
 "Ein Abschreibungsposten wird am %(date)s und einschließlich dieses Datums "
 "gebucht.<br/> Eine zweite Buchung wird die ursprüngliche Einnahme "
-"neutralisieren und das Ergebnis dieses Verkaufs auf dem Konto "
-"<b>%(account)s</b> verbuchen."
+"neutralisieren und das Ergebnis dieses Verkaufs auf dem Konto <b>%"
+"(account)s</b> verbuchen."
 
 #. module: account_asset
 #. odoo-python
@@ -168,8 +168,8 @@ msgid ""
 "A non deductible tax value of %(tax_value)s was added to %(name)s's initial "
 "value of %(purchase_value)s"
 msgstr ""
-"Ein nichtabzugsfähiger Steuerwert von %(tax_value)s wurde zum ursprünglichen"
-" Wert von %(name)s in Höhe von %(purchase_value)s hinzugefügt."
+"Ein nichtabzugsfähiger Steuerwert von %(tax_value)s wurde zum ursprünglichen "
+"Wert von %(name)s in Höhe von %(purchase_value)s hinzugefügt."
 
 #. module: account_asset
 #: model:ir.model,name:account_asset.model_account_account
@@ -180,8 +180,8 @@ msgstr "Konto"
 #: model:ir.model.fields,help:account_asset.field_account_asset__account_type
 msgid ""
 "Account Type is used for information purpose, to generate country-specific "
-"legal reports, and set the rules to close a fiscal year and generate opening"
-" entries."
+"legal reports, and set the rules to close a fiscal year and generate opening "
+"entries."
 msgstr ""
 "Der Kontotyp wird zu Informationszwecken verwendet, um länderspezifische "
 "gesetzliche Berichte zu erstellen und die Regeln für den Abschluss eines "
@@ -205,8 +205,7 @@ msgstr ""
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_asset__account_asset_id
-msgid ""
-"Account used to record the purchase of the asset at its original price."
+msgid "Account used to record the purchase of the asset at its original price."
 msgstr ""
 "Konto, auf dem der Kauf der Anlage zu seinem ursprünglichen Preis verbucht "
 "wird."
@@ -219,8 +218,7 @@ msgstr "Konto, auf dem die Buchungszeile im Falle eines Gewinns verbucht wird"
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_res_company__gain_account_id
 msgid ""
-"Account used to write the journal item in case of gain while selling an "
-"asset"
+"Account used to write the journal item in case of gain while selling an asset"
 msgstr ""
 "Konto, das für die Buchungszeile im Falle eines Gewinns beim Verkauf einer "
 "Anlage verwendet wird"
@@ -228,14 +226,12 @@ msgstr ""
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_asset_modify__loss_account_id
 msgid "Account used to write the journal item in case of loss"
-msgstr ""
-"Konto, auf dem die Buchungszeile im Falle eines Verlusts verbucht wird"
+msgstr "Konto, auf dem die Buchungszeile im Falle eines Verlusts verbucht wird"
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_res_company__loss_account_id
 msgid ""
-"Account used to write the journal item in case of loss while selling an "
-"asset"
+"Account used to write the journal item in case of loss while selling an asset"
 msgstr ""
 "Konto, das für die Buchungszeile im Falle eines Verlusts beim Verkauf einer "
 "Anlage verwendet wird"
@@ -326,8 +322,8 @@ msgstr "Import des bereits abgeschriebenen Betrags"
 #: model:ir.model.fields,help:account_asset.field_account_asset__parent_id
 msgid "An asset has a parent when it is the result of gaining value"
 msgstr ""
-"Ein Vermögenswert hat ein übergeordnetes Element, wenn er das Ergebnis eines"
-" Wertzuwachses ist"
+"Ein Vermögenswert hat ein übergeordnetes Element, wenn er das Ergebnis eines "
+"Wertzuwachses ist"
 
 #. module: account_asset
 #. odoo-python
@@ -621,12 +617,14 @@ msgid ""
 "Choose the method to use to compute the amount of depreciation lines.\n"
 "  * Straight Line: Calculated on basis of: Gross Value / Duration\n"
 "  * Declining: Calculated on basis of: Residual Value * Declining Factor\n"
-"  * Declining then Straight Line: Like Declining but with a minimum depreciation value equal to the straight line value."
+"  * Declining then Straight Line: Like Declining but with a minimum "
+"depreciation value equal to the straight line value."
 msgstr ""
 "Wählen Sie eine Methode zur Berechnung des Betrags der Abschreibungszeilen.\n"
 "* Linear: Berechnet auf der Basis von: Bruttowert/Dauer\n"
 "* Degressiv: Berechnet auf der Grundlage von: Restwert * Degressionsfaktor\n"
-"* Degressiv, dann linear: Analog zur degressiven Abschreibung, jedoch mit einem Mindestabschreibungswert in Höhe des linearen Wertes."
+"* Degressiv, dann linear: Analog zur degressiven Abschreibung, jedoch mit "
+"einem Mindestabschreibungswert in Höhe des linearen Wertes."
 
 #. module: account_asset
 #: model:ir.model.fields.selection,name:account_asset.selection__account_asset__state__close
@@ -1084,20 +1082,19 @@ msgstr "Falls markiert, erfordern neue Nachrichten Ihre Aufmerksamkeit."
 #: model:ir.model.fields,help:account_asset.field_account_asset__message_has_error
 #: model:ir.model.fields,help:account_asset.field_account_asset__message_has_sms_error
 msgid "If checked, some messages have a delivery error."
-msgstr ""
-"Falls markiert, weisen einige Nachrichten einen Zustellungsfehler auf."
+msgstr "Falls markiert, weisen einige Nachrichten einen Zustellungsfehler auf."
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_asset__already_depreciated_amount_import
 msgid ""
-"In case of an import from another software, you might need to use this field"
-" to have the right depreciation table report. This is the value that was "
+"In case of an import from another software, you might need to use this field "
+"to have the right depreciation table report. This is the value that was "
 "already depreciated with entries not computed from this model"
 msgstr ""
 "Im Falle eines Imports aus einer anderen Software müssen Sie dieses Feld "
 "möglicherweise verwenden, um den richtigen Abschreibungstabellenbericht zu "
-"erhalten. Dies ist der Wert, der bereits mit Posten abgeschrieben wurde, die"
-" nicht aus diesem Modell berechnet wurden"
+"erhalten. Dies ist der Wert, der bereits mit Posten abgeschrieben wurde, die "
+"nicht aus diesem Modell berechnet wurden"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_asset_modify__informational_text
@@ -1542,8 +1539,8 @@ msgstr "Abschreibung fortsetzen"
 #. odoo-python
 #: code:addons/account_asset/wizard/asset_modify.py:0
 msgid ""
-"Reverse the depreciation entries posted in the future in order to modify the"
-" depreciation"
+"Reverse the depreciation entries posted in the future in order to modify the "
+"depreciation"
 msgstr ""
 "Die zukünftig gebuchten Abschreibungsbuchungen stornieren, um die "
 "Abschreibung zu ändern"
@@ -1619,8 +1616,8 @@ msgid ""
 "Starting date of the period used in the prorata calculation of the first "
 "depreciation"
 msgstr ""
-"Datum des Beginns des Zeitraums, der für die anteilige Berechnung der ersten"
-" Abschreibung verwendet wird"
+"Datum des Beginns des Zeitraums, der für die anteilige Berechnung der ersten "
+"Abschreibung verwendet wird"
 
 #. module: account_asset
 #: model:ir.model.fields,field_description:account_asset.field_account_asset__state
@@ -1668,12 +1665,12 @@ msgstr ""
 #: code:addons/account_asset/models/account_asset.py:0
 msgid ""
 "The account %(exp_acc)s has been credited by %(exp_delta)s, while the "
-"account %(dep_acc)s has been debited by %(dep_delta)s. This corresponds to "
-"%(move_count)s cancelled %(word)s:"
+"account %(dep_acc)s has been debited by %(dep_delta)s. This corresponds to %"
+"(move_count)s cancelled %(word)s:"
 msgstr ""
-"Dem Konto %(exp_acc)s wurden %(exp_delta)s gutgeschrieben, während das Konto"
-" %(dep_acc)s mit %(dep_delta)s belastet wurde. Das entspricht %(move_count)s"
-" stornierten %(word)s:"
+"Dem Konto %(exp_acc)s wurden %(exp_delta)s gutgeschrieben, während das Konto "
+"%(dep_acc)s mit %(dep_delta)s belastet wurde. Das entspricht %(move_count)s "
+"stornierten %(word)s:"
 
 #. module: account_asset
 #: model:ir.model.fields,help:account_asset.field_account_asset__method_period
@@ -1822,21 +1819,36 @@ msgstr "Website-Kommunikationsverlauf"
 #: model:ir.model.fields,help:account_asset.field_account_asset__state
 msgid ""
 "When an asset is created, the status is 'Draft'.\n"
-"If the asset is confirmed, the status goes in 'Running' and the depreciation lines can be posted in the accounting.\n"
-"The 'On Hold' status can be set manually when you want to pause the depreciation of an asset for some time.\n"
+"If the asset is confirmed, the status goes in 'Running' and the depreciation "
+"lines can be posted in the accounting.\n"
+"The 'On Hold' status can be set manually when you want to pause the "
+"depreciation of an asset for some time.\n"
 "You can manually close an asset when the depreciation is over.\n"
 "By cancelling an asset, all depreciation entries will be reversed"
 msgstr ""
 "Beim Anlegen eines Vermögensgegenstandes ist der Status „Entwurf“.\n"
-"Wird der Vermögensgegenstand bestätigt, geht der Status auf „Laufend“ und die Abschreibungszeilen können in der Buchhaltung gebucht werden.\n"
-"Der Status „Zurückgestellt“ kann manuell gesetzt werden, wenn die Abschreibung eines Vermögensgegenstandes für einige Zeit unterbrochen werden soll.\n"
-"Nach Ablauf der Abschreibung kann ein Vermögensgegenstand manuell abgeschlossen werden. Wird ein Vermögensgegenstand storniert, werden alle Abschreibungsbuchungen rückgängig gemacht"
+"Wird der Vermögensgegenstand bestätigt, geht der Status auf „Laufend“ und "
+"die Abschreibungszeilen können in der Buchhaltung gebucht werden.\n"
+"Der Status „Zurückgestellt“ kann manuell gesetzt werden, wenn die "
+"Abschreibung eines Vermögensgegenstandes für einige Zeit unterbrochen werden "
+"soll.\n"
+"Nach Ablauf der Abschreibung kann ein Vermögensgegenstand manuell "
+"abgeschlossen werden. Wird ein Vermögensgegenstand storniert, werden alle "
+"Abschreibungsbuchungen rückgängig gemacht"
 
 #. module: account_asset
 #: model:ir.model.fields.selection,name:account_asset.selection__account_asset__method_period__12
 #: model:ir.model.fields.selection,name:account_asset.selection__asset_modify__method_period__12
 msgid "Years"
 msgstr "Jahre"
+
+#. module: account_asset
+#. odoo-javascript
+#: code:addons/account_asset/static/src/views/fields/properties/properties_field.js:0
+msgid "You can add Property fields only on Assets with an Asset Model set."
+msgstr ""
+"Sie können Eigenschaftsfelder nur zu Vermögenswerten hinzufügen, für die ein "
+"Vermögensmodell festgelegt ist."
 
 #. module: account_asset
 #. odoo-python
@@ -1854,6 +1866,15 @@ msgstr ""
 msgid "You can't re-evaluate the asset before the lock date."
 msgstr ""
 "Sie können einen Vermögensgegenstand nicht vor dem Sperrdatum neu bewerten."
+
+#. module: account_asset
+#. odoo-python
+#: code:addons/account_asset/models/account_asset.py:0
+msgid ""
+"You cannot add or remove bills when the asset is already running or closed."
+msgstr ""
+"Sie können keine Rechnungen hinzufügen oder entfernen, wenn der "
+"Vermögensgegenstand bereits läuft oder geschlossen wurde."
 
 #. module: account_asset
 #. odoo-python
@@ -1894,10 +1915,13 @@ msgstr "Sie dürfen kein Dokument löschen, welches den Status %s hat."
 #: code:addons/account_asset/models/account_asset.py:0
 msgid ""
 "You cannot delete an asset linked to posted entries.\n"
-"You should either confirm the asset, then, sell or dispose of it, or cancel the linked journal entries."
+"You should either confirm the asset, then, sell or dispose of it, or cancel "
+"the linked journal entries."
 msgstr ""
-"Sie können einen Vermögensgegenstand, der mit Buchungen verknüpft ist, nicht löschen.\n"
-"Sie sollten den Vermögensgegenstand entweder bestätigen und dann verkaufen oder veräußern oder die verknüpften Journalbuchungen stornieren."
+"Sie können einen Vermögensgegenstand, der mit Buchungen verknüpft ist, nicht "
+"löschen.\n"
+"Sie sollten den Vermögensgegenstand entweder bestätigen und dann verkaufen "
+"oder veräußern oder die verknüpften Journalbuchungen stornieren."
 
 #. module: account_asset
 #. odoo-python

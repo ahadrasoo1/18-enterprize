@@ -97,10 +97,4 @@ patch(BankRecKanbanController.prototype, {
         }
     },
 
-    async handleLineClicked(ev, line){
-        if (line.data.flag != 'new_batch') {
-            super.handleLineClicked(ev, line);
-        }
-    },
-
 });

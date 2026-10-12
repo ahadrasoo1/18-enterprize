@@ -1,35 +1,43 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* account_budget
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# Maitê Dietze, 2024
-# 
+# Maitê Dietze, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:26+0000\n"
+"POT-Creation-Date: 2025-12-29 18:46+0000\n"
 "PO-Revision-Date: 2024-09-25 09:43+0000\n"
-"Last-Translator: Maitê Dietze, 2024\n"
-"Language-Team: Portuguese (Brazil) (https://app.transifex.com/odoo/teams/41243/pt_BR/)\n"
+"Last-Translator: Maitê Dietze, 2025\n"
+"Language-Team: Portuguese (Brazil) (https://app.transifex.com/odoo/teams/"
+"41243/pt_BR/)\n"
+"Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: pt_BR\n"
-"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % "
+"1000000 == 0 ? 1 : 2;\n"
 
 #. module: account_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_kanban
-msgid "<i class=\"fa fa-clock-o me-1\" role=\"img\" aria-label=\"Period\" title=\"Period\"/>"
-msgstr "<i class=\"fa fa-clock-o me-1\" role=\"img\" aria-label=\"Period\" title=\"Period\"/>"
+msgid ""
+"<i class=\"fa fa-clock-o me-1\" role=\"img\" aria-label=\"Period\" "
+"title=\"Period\"/>"
+msgstr ""
+"<i class=\"fa fa-clock-o me-1\" role=\"img\" aria-label=\"Period\" "
+"title=\"Period\"/>"
 
 #. module: account_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.budget_split_wizard_form_view
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_form
-msgid "<i class=\"fa fa-long-arrow-right mx-2\" aria-label=\"to\" title=\"to\"/>"
-msgstr "<i class=\"fa fa-long-arrow-right mx-2\" aria-label=\"to\" title=\"to\"/>"
+msgid ""
+"<i class=\"fa fa-long-arrow-right mx-2\" aria-label=\"to\" title=\"to\"/>"
+msgstr ""
+"<i class=\"fa fa-long-arrow-right mx-2\" aria-label=\"to\" title=\"to\"/>"
 
 #. module: account_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.budget_report_view_search
@@ -92,8 +100,8 @@ msgid ""
 "Amount supposed to be Billed/Invoiced, formula = (Budget Amount / Budget "
 "Days) x Budget Days Completed"
 msgstr ""
-"Valor que deve ser cobrado/faturado, fórmula = (Valor do orçamento / Dias do"
-" orçamento) x Dias do orçamento concluídos"
+"Valor que deve ser cobrado/faturado, fórmula = (Valor do orçamento / Dias do "
+"orçamento) x Dias do orçamento concluídos"
 
 #. module: account_budget
 #: model:ir.model,name:account_budget.model_account_analytic_account
@@ -156,6 +164,7 @@ msgstr "Análise orçamentária"
 #. module: account_budget
 #: model:ir.model,name:account_budget.model_budget_line
 #: model:ir.model.fields,field_description:account_budget.field_account_analytic_account__budget_line_ids
+#: model:ir.model.fields,field_description:account_budget.field_budget_report__budget_line_id
 msgid "Budget Line"
 msgstr "Linha de orçamento"
 
@@ -682,6 +691,12 @@ msgstr ""
 "Atrasado: data de vencimento já passou\n"
 "Hoje: data da atividade é hoje\n"
 "Planejado: atividades futuras."
+
+#. module: account_budget
+#. odoo-python
+#: code:addons/account_budget/models/budget_line.py:0
+msgid "The 'End Date' must be greater than or equal to 'Start Date'."
+msgstr "A \"Data final\" deve ser maior ou igual à \"Data inicial\"."
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_line__theoritical_amount

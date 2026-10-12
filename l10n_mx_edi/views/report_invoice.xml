@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <template id="l10n_mx_fiscal_regime_receptor">
-      <t t-if="o.partner_id.l10n_mx_edi_fiscal_regime">
-          <p name="l10n_mx_fiscal_regime_receptor">
-              Fiscal Regime: <span t-field="o.partner_id.l10n_mx_edi_fiscal_regime">601</span>
-          </p>
+      <t t-set="invoice_partner" t-value="o.partner_id if o.partner_id.type == 'invoice' else o.partner_id.commercial_partner_id"/>
+      <t t-if="invoice_partner.l10n_mx_edi_fiscal_regime or o.l10n_mx_edi_cfdi_to_public">
+          <div name="l10n_mx_fiscal_regime_receptor">
+              <span>Fiscal Regime: </span>
+              <span t-if="not o.l10n_mx_edi_cfdi_to_public" t-field="invoice_partner.l10n_mx_edi_fiscal_regime">601</span>
+              <span t-else="">Without fiscal obligations</span>
+          </div>
       </t>
     </template>
     <template id="report_invoice_document" inherit_id="account.report_invoice_document" primary="True">
@@ -14,13 +17,31 @@
                 <span t-out="o.l10n_mx_edi_cfdi_supplier_rfc">EKU9003173C9</span>
             </span>
             <t t-call="l10n_mx_edi.l10n_mx_fiscal_regime_receptor"/>
+            <div name="identification_no" t-if="o.l10n_mx_edi_cfdi_to_public and
+                o.partner_id.country_code != 'MX' and o.partner_id.vat">
+                <span>Identification No.: </span>
+                <span t-field="o.partner_id.vat"/>
+            </div>
+        </xpath>
+        <xpath expr="//div[hasclass('row')]//div[@id='partner_vat_address_not_same_as_shipping']//span" position="attributes">
+            <attribute name="t-field"/>
+            <attribute name="t-out">o.l10n_mx_edi_cfdi_customer_rfc or o.partner_id.vat</attribute>
         </xpath>
         <xpath expr="//div[hasclass('row')]//div[@id='partner_vat_address_same_as_shipping']" position="after">
             <span t-if="o.company_id.vat != o.l10n_mx_edi_cfdi_supplier_rfc" name="l10n_mx_edi_cfdi_supplier_rfc">
                 <span>XML VAT: </span>
-                <span t-out="o.l10n_mx_edi_cfdi_supplier_rfc">EKU9003173C9</span>
+                <span t-field="o.l10n_mx_edi_cfdi_supplier_rfc">EKU9003173C9</span>
             </span>
             <t t-call="l10n_mx_edi.l10n_mx_fiscal_regime_receptor"/>
+            <div name="identification_no" t-if="o.l10n_mx_edi_cfdi_to_public and
+                o.partner_id.country_code != 'MX' and o.partner_id.vat">
+                <span>Identification No.: </span>
+                <span t-field="o.partner_id.vat"/>
+            </div>
+        </xpath>
+        <xpath expr="//div[hasclass('row')]//div[@id='partner_vat_address_same_as_shipping']//span" position="attributes">
+            <attribute name="t-field"/>
+            <attribute name="t-out">o.l10n_mx_edi_cfdi_customer_rfc or o.partner_id.vat</attribute>
         </xpath>
         <xpath expr="//div[hasclass('row')]//div[@id='partner_vat_no_shipping']" position="after">
             <span t-if="o.company_id.vat != o.l10n_mx_edi_cfdi_supplier_rfc" name="l10n_mx_edi_cfdi_supplier_rfc">
@@ -28,6 +49,15 @@
                 <span t-out="o.l10n_mx_edi_cfdi_supplier_rfc">EKU9003173C9</span>
             </span>
             <t t-call="l10n_mx_edi.l10n_mx_fiscal_regime_receptor"/>
+            <div name="identification_no" t-if="o.l10n_mx_edi_cfdi_to_public and
+                o.partner_id.country_code != 'MX' and o.partner_id.vat">
+                <span>Identification No.: </span>
+                <span t-field="o.partner_id.vat"/>
+            </div>
+        </xpath>
+        <xpath expr="//div[hasclass('row')]//div[@id='partner_vat_no_shipping']//span" position="attributes">
+            <attribute name="t-field"/>
+            <attribute name="t-out">o.l10n_mx_edi_cfdi_customer_rfc or o.partner_id.vat</attribute>
         </xpath>
 
         <xpath expr="//div[@name='customer_code']" position="after">
@@ -59,12 +89,13 @@
 
         <!-- Add new column on invoice lines: Predial Account -->
         <xpath expr="//table[@name='invoice_line_table']//th[@name='th_quantity']" position="before">
-            <th class="text-end" name="th_predial_account">
+            <t t-set="has_l10n_mx_edi_predial_account" t-value="any(line.product_id.l10n_mx_edi_predial_account for line in o.invoice_line_ids)"/>
+            <th t-if="has_l10n_mx_edi_predial_account" class="text-end" name="th_predial_account">
                 <span>Predial Account</span>
             </th>
         </xpath>
         <xpath expr="//table[@name='invoice_line_table']//td[@name='td_quantity']" position="before">
-            <td t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}" name="td_predial_account">
+            <td t-if="has_l10n_mx_edi_predial_account" t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}" name="td_predial_account">
                 <span t-out="line.product_id.l10n_mx_edi_predial_account"></span>
             </td>
         </xpath>
@@ -104,7 +135,7 @@
                         <span>Digital stamp of the emitter</span>
                     </div>
                     <div class="digital-stamp-content">
-                        <span t-out="cfdi_values.get('sello_sat')">No identificado</span>
+                        <span t-out="cfdi_values.get('sello')">No identificado</span>
                     </div>
                     <div class="digital-stamp">
                         <span>Digital stamp SAT</span>

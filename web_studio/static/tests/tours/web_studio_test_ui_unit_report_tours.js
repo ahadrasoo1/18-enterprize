@@ -7,6 +7,7 @@ import { assertEqual, stepNotInStudio, nextTick } from "@web_studio/../tests/tou
 import { cookie } from "@web/core/browser/cookie";
 import { Editor } from "@html_editor/editor";
 import { nodeSize } from "@html_editor/utils/position";
+import { waitUntil } from "@odoo/hoot-dom";
 
 const getBoundingClientRect = Element.prototype.getBoundingClientRect;
 
@@ -139,10 +140,36 @@ function patchReportEditorModelForSilentSave() {
     };
 }
 
+registry
+    .category("web_tour.tours")
+    .add("web_studio.test_disable_fields_commands_when_unavailable", {
+        steps: () => [
+            {
+                trigger: ".o-web-studio-report-editor-wysiwyg :iframe .odoo-editor-editable p",
+                async run(helpers) {
+                    const el = this.anchor;
+                    openEditorPowerBox(el);
+                },
+            },
+            {
+                trigger: ".o-we-powerbox .o-we-command-name",
+                run: (target) => {
+                    const commands = Array.from(
+                        document.querySelectorAll(".o-we-command-name")
+                    ).map((e) => e.textContent);
+
+                    if (commands.includes("Field") || commands.includes("Dynamic Table")) {
+                        throw new Error(
+                            "`Field`|`Dynamic Table` shouldn't be present when we don't have a record"
+                        );
+                    }
+                },
+            },
+        ],
+    });
+
 let silentPatch;
 registry.category("web_tour.tours").add("web_studio.test_basic_report_edition", {
-    test: true,
-    sequence: 260,
     steps: () => [
         {
             trigger: ".o_web_studio_sidebar input[id='name']",
@@ -181,8 +208,6 @@ registry.category("web_tour.tours").add("web_studio.test_basic_report_edition", 
 });
 
 registry.category("web_tour.tours").add("web_studio.test_basic_report_edition_xml", {
-    test: true,
-    sequence: 260,
     steps: () => [
         {
             trigger: ".o_web_studio_sidebar button[name='report_edit_sources']",
@@ -257,8 +282,6 @@ registry.category("web_tour.tours").add("web_studio.test_basic_report_edition_xm
 });
 
 registry.category("web_tour.tours").add("web_studio.test_basic_report_edition_discard", {
-    test: true,
-    sequence: 260,
     steps: () => [
         {
             trigger: ".o_web_studio_sidebar input[id='name']",
@@ -296,8 +319,6 @@ registry.category("web_tour.tours").add("web_studio.test_basic_report_edition_di
 });
 
 registry.category("web_tour.tours").add("web_studio.test_basic_report_edition_cancel_discard", {
-    test: true,
-    sequence: 260,
     steps: () => [
         {
             trigger: ".o_web_studio_sidebar input[id='name']",
@@ -338,8 +359,6 @@ registry.category("web_tour.tours").add("web_studio.test_basic_report_edition_ca
 });
 
 registry.category("web_tour.tours").add("web_studio.test_basic_report_edition_xml_discard", {
-    test: true,
-    sequence: 260,
     steps: () => [
         {
             trigger: ".o_web_studio_sidebar button[name='report_edit_sources']",
@@ -370,8 +389,6 @@ registry.category("web_tour.tours").add("web_studio.test_basic_report_edition_xm
 });
 
 registry.category("web_tour.tours").add("web_studio.test_basic_report_edition_error", {
-    test: true,
-    sequence: 260,
     steps: () => [
         {
             trigger: ".o-web-studio-report-editor-wysiwyg :iframe .odoo-editor-editable p:eq(0)",
@@ -384,8 +401,8 @@ registry.category("web_tour.tours").add("web_studio.test_basic_report_edition_er
                 const editor = editorsWeakMap.get(this.anchor.ownerDocument);
                 const telse = editor.document.createElement("t");
                 telse.setAttribute("t-else", "");
-                editor.shared.domInsert(telse);
-                editor.dispatch("ADD_STEP");
+                editor.shared.dom.insert(telse);
+                editor.shared.history.addStep();
             },
         },
         {
@@ -413,8 +430,6 @@ registry.category("web_tour.tours").add("web_studio.test_basic_report_edition_er
 });
 
 registry.category("web_tour.tours").add("web_studio.test_basic_report_edition_xml_error", {
-    test: true,
-    sequence: 260,
     steps: () => [
         {
             trigger: ".o_web_studio_sidebar button[name='report_edit_sources']",
@@ -454,8 +469,6 @@ registry.category("web_tour.tours").add("web_studio.test_basic_report_edition_xm
 });
 
 registry.category("web_tour.tours").add("web_studio.test_report_reset_archs", {
-    test: true,
-    sequence: 260,
     steps: () => [
         {
             trigger: ".o_web_studio_sidebar button[name='report_reset_archs']",
@@ -482,8 +495,6 @@ registry.category("web_tour.tours").add("web_studio.test_report_reset_archs", {
 let downloadProm;
 const steps = [];
 registry.category("web_tour.tours").add("web_studio.test_print_preview", {
-    test: true,
-    sequence: 260,
     steps: () => [
         {
             trigger: ".o_web_studio_sidebar button[name='report_print_preview']",
@@ -516,8 +527,6 @@ registry.category("web_tour.tours").add("web_studio.test_print_preview", {
 });
 
 registry.category("web_tour.tours").add("web_studio.test_table_rendering", {
-    test: true,
-    sequence: 260,
     steps: () => [
         {
             trigger:
@@ -569,8 +578,6 @@ registry.category("web_tour.tours").add("web_studio.test_table_rendering", {
 });
 
 registry.category("web_tour.tours").add("web_studio.test_field_placeholder", {
-    test: true,
-    sequence: 260,
     steps: () => [
         {
             // 1 sec delay to make sure we call the download route
@@ -596,13 +603,14 @@ registry.category("web_tour.tours").add("web_studio.test_field_placeholder", {
                 );
                 assertEqual(this.anchor.scrollTop, 0);
                 this.anchor.scrollTop = 9999;
-                await new Promise(requestAnimationFrame);
-                const newPlaceholderbox = getBoundingClientRect.call(
-                    document.querySelector(".o-web-studio-field-dynamic-placeholder")
-                );
-                // The field placeholder should have followed its anchor, and it happens that the anchor's container
-                // has been scrolled, so the anchor has moved upwards (and is actually outside of the viewPort, to the top)
-                assertEqual(placeholderBox.top > newPlaceholderbox.top, true);
+                await waitUntil(() => {
+                    const newPlaceholderbox = getBoundingClientRect.call(
+                        document.querySelector(".o-web-studio-field-dynamic-placeholder")
+                    );
+                    // The field placeholder should have followed its anchor, and it happens that the anchor's container
+                    // has been scrolled, so the anchor has moved upwards (and is actually outside of the viewPort, to the top)
+                    return placeholderBox.top > newPlaceholderbox.top;
+                });
             },
         },
         {
@@ -648,8 +656,6 @@ registry.category("web_tour.tours").add("web_studio.test_field_placeholder", {
 });
 
 registry.category("web_tour.tours").add("web_studio.test_add_field_blank_report", {
-    test: true,
-    sequence: 260,
     steps: () => [
         {
             // edit reports
@@ -689,13 +695,14 @@ registry.category("web_tour.tours").add("web_studio.test_add_field_blank_report"
                 );
                 assertEqual(this.anchor.scrollTop, 0);
                 this.anchor.scrollTop = 9999;
-                await new Promise(requestAnimationFrame);
-                const newPlaceholderbox = getBoundingClientRect.call(
-                    document.querySelector(".o-web-studio-field-dynamic-placeholder")
-                );
-                // The field placeholder should have followed its anchor, and it happens that the anchor's container
-                // has been scrolled, so the anchor has moved upwards (and is actually outside of the viewPort, to the top)
-                assertEqual(placeholderBox.top > newPlaceholderbox.top, true);
+                await waitUntil(() => {
+                    const newPlaceholderbox = getBoundingClientRect.call(
+                        document.querySelector(".o-web-studio-field-dynamic-placeholder")
+                    );
+                    // The field placeholder should have followed its anchor, and it happens that the anchor's container
+                    // has been scrolled, so the anchor has moved upwards (and is actually outside of the viewPort, to the top)
+                    return placeholderBox.top > newPlaceholderbox.top;
+                });
             },
         },
         {
@@ -738,8 +745,6 @@ registry.category("web_tour.tours").add("web_studio.test_add_field_blank_report"
 });
 
 registry.category("web_tour.tours").add("web_studio.test_toolbar_appearance", {
-    test: true,
-    sequence: 260,
     steps: () => [
         {
             trigger: ".o-web-studio-report-editor-wysiwyg :iframe .odoo-editor-editable .to_edit",
@@ -775,8 +780,6 @@ registry.category("web_tour.tours").add("web_studio.test_toolbar_appearance", {
 });
 
 registry.category("web_tour.tours").add("web_studio.test_edition_without_lang", {
-    test: true,
-    sequence: 260,
     steps: () => [
         {
             trigger: ".o-web-studio-report-editor-wysiwyg :iframe .odoo-editor-editable p:eq(1)",
@@ -829,8 +832,6 @@ registry.category("web_tour.tours").add("web_studio.test_edition_without_lang", 
 });
 
 registry.category("web_tour.tours").add("web_studio.test_report_xml_other_record", {
-    test: true,
-    sequence: 260,
     steps: () => [
         {
             trigger: ".o_web_studio_sidebar button[name='report_edit_sources']",
@@ -841,12 +842,9 @@ registry.category("web_tour.tours").add("web_studio.test_report_xml_other_record
         },
         {
             trigger: ".o-web-studio-report-container :iframe body p:contains(partner_1)",
-            run() {
-                assertEqual(
-                    document.querySelector(".o-web-studio-report-search-record input").value,
-                    "partner_1"
-                );
-            },
+        },
+        {
+            trigger: ".o-web-studio-report-search-record input:value(partner_1)",
         },
         {
             trigger: ".o-web-studio-report-pager .o_pager_next",
@@ -854,19 +852,14 @@ registry.category("web_tour.tours").add("web_studio.test_report_xml_other_record
         },
         {
             trigger: ".o-web-studio-report-container :iframe body p:contains(partner_2)",
-            run() {
-                assertEqual(
-                    document.querySelector(".o-web-studio-report-search-record input").value,
-                    "partner_2"
-                );
-            },
+        },
+        {
+            trigger: ".o-web-studio-report-search-record input:value(partner_2)",
         },
     ],
 });
 
 registry.category("web_tour.tours").add("web_studio.test_partial_eval", {
-    test: true,
-    sequence: 260,
     steps: () => [
         {
             trigger: ".o-web-studio-report-container :iframe .odoo-editor-editable .lol",
@@ -890,8 +883,6 @@ registry.category("web_tour.tours").add("web_studio.test_partial_eval", {
 });
 
 registry.category("web_tour.tours").add("web_studio.test_render_multicompany", {
-    test: true,
-    sequence: 260,
     steps: () => [
         {
             trigger: ".o-web-studio-report-container :iframe .odoo-editor-editable .test_layout",
@@ -907,8 +898,6 @@ registry.category("web_tour.tours").add("web_studio.test_render_multicompany", {
 });
 
 registry.category("web_tour.tours").add("web_studio.test_add_non_searchable_field", {
-    test: true,
-    sequence: 260,
     steps: () => [
         {
             trigger: ".o-web-studio-report-editor-wysiwyg :iframe .odoo-editor-editable p:eq(2)",
@@ -924,7 +913,7 @@ registry.category("web_tour.tours").add("web_studio.test_add_non_searchable_fiel
         {
             trigger:
                 ".o-web-studio-field-dynamic-placeholder .o_model_field_selector_popover_search input",
-            run: "edit New",
+            run: "edit Avatar",
         },
         {
             trigger: "[data-name=avatar_1024] > button.o_model_field_selector_popover_item_name",
@@ -950,8 +939,6 @@ registry.category("web_tour.tours").add("web_studio.test_add_non_searchable_fiel
 });
 
 registry.category("web_tour.tours").add("web_studio.test_report_edition_binary_field", {
-    test: true,
-    sequence: 260,
     steps: () => [
         {
             trigger: ".o-web-studio-report-editor-wysiwyg :iframe .odoo-editor-editable p:eq(2)",
@@ -1041,8 +1028,6 @@ registry.category("web_tour.tours").add("web_studio.test_report_edition_binary_f
 });
 
 registry.category("web_tour.tours").add("web_studio.test_report_edition_dynamic_table", {
-    test: true,
-    sequence: 260,
     steps: () => [
         {
             trigger: ".o-web-studio-report-editor-wysiwyg :iframe .odoo-editor-editable p:eq(2)",
@@ -1132,8 +1117,6 @@ registry.category("web_tour.tours").add("web_studio.test_report_edition_dynamic_
 });
 
 registry.category("web_tour.tours").add("web_studio.test_saving_xml_editor_reload", {
-    test: true,
-    sequence: 260,
     steps: () => [
         {
             trigger: "button[name='report_edit_sources']",
@@ -1180,8 +1163,6 @@ registry.category("web_tour.tours").add("web_studio.test_saving_xml_editor_reloa
 });
 
 registry.category("web_tour.tours").add("web_studio.test_error_at_loading", {
-    test: true,
-    sequence: 260,
     steps: () => [
         {
             trigger: "body:not(:has(.o_error_dialog)) .o-web-studio-report-editor",
@@ -1207,8 +1188,6 @@ registry.category("web_tour.tours").add("web_studio.test_error_at_loading", {
 });
 
 registry.category("web_tour.tours").add("web_studio.test_error_at_loading_debug", {
-    test: true,
-    sequence: 260,
     steps: () => [
         {
             trigger: "body:not(:has(.o_error_dialog)) .o-web-studio-report-editor",
@@ -1242,8 +1221,6 @@ registry.category("web_tour.tours").add("web_studio.test_error_at_loading_debug"
 });
 
 registry.category("web_tour.tours").add("web_studio.test_xml_and_form_diff", {
-    test: true,
-    sequence: 260,
     steps: () => [
         {
             trigger: ".o-web-studio-report-editor-wysiwyg :iframe .odoo-editor-editable p:eq(2)",
@@ -1299,8 +1276,6 @@ registry.category("web_tour.tours").add("web_studio.test_xml_and_form_diff", {
 });
 
 registry.category("web_tour.tours").add("web_studio.test_record_model_differs_from_action", {
-    test: true,
-    sequence: 260,
     steps: () => {
         const stepsToAssert = [];
 
@@ -1355,7 +1330,6 @@ registry.category("web_tour.tours").add("web_studio.test_record_model_differs_fr
 });
 
 registry.category("web_tour.tours").add("web_studio.test_remove_branding_on_copy", {
-    test: true,
     steps: () => [
         {
             trigger: "body :iframe .odoo-editor-editable#wrapwrap",
@@ -1365,7 +1339,7 @@ registry.category("web_tour.tours").add("web_studio.test_remove_branding_on_copy
                 const originNode = this.anchor.querySelector(`[ws-view-id]`);
                 const copy = originNode.cloneNode(true);
                 originNode.insertAdjacentElement("afterend", copy);
-                editor.dispatch("ADD_STEP");
+                editor.shared.history.addStep();
                 // Wait for a full macrotask tick and a frame to let the mutation observer
                 // of the ReportEditorWysiwyg to catch up on the change and finish its operations
                 await nextTick();
@@ -1380,7 +1354,6 @@ registry.category("web_tour.tours").add("web_studio.test_remove_branding_on_copy
 });
 
 registry.category("web_tour.tours").add("web_studio.test_different_view_document_name", {
-    test: true,
     steps: () => [
         {
             trigger: ".o_web_studio_sidebar button[name='report_edit_sources']",
@@ -1408,7 +1381,6 @@ registry.category("web_tour.tours").add("web_studio.test_different_view_document
 });
 
 registry.category("web_tour.tours").add("web_studio.test_edit_main_arch", {
-    test: true,
     steps: () => [
         {
             trigger: ":iframe .odoo-editor-editable .outside-t-call",
@@ -1418,7 +1390,7 @@ registry.category("web_tour.tours").add("web_studio.test_edit_main_arch", {
                 const newNode = doc.createElement("div");
                 newNode.classList.add("added");
                 this.anchor.insertAdjacentElement("beforebegin", newNode);
-                editor.dispatch("ADD_STEP");
+                editor.shared.history.addStep();
                 await nextTick();
             },
         },
@@ -1433,7 +1405,6 @@ registry.category("web_tour.tours").add("web_studio.test_edit_main_arch", {
 });
 
 registry.category("web_tour.tours").add("web_studio.test_edit_in_t_call", {
-    test: true,
     steps: () => [
         {
             trigger: ":iframe .odoo-editor-editable .in-t-call",
@@ -1443,7 +1414,7 @@ registry.category("web_tour.tours").add("web_studio.test_edit_in_t_call", {
                 const newNode = doc.createElement("div");
                 newNode.classList.add("added");
                 this.anchor.insertAdjacentElement("beforebegin", newNode);
-                editor.dispatch("ADD_STEP");
+                editor.shared.history.addStep();
                 await nextTick();
             },
         },
@@ -1458,7 +1429,6 @@ registry.category("web_tour.tours").add("web_studio.test_edit_in_t_call", {
 });
 
 registry.category("web_tour.tours").add("web_studio.test_edit_main_and_in_t_call", {
-    test: true,
     steps: () => [
         {
             trigger: ":iframe .odoo-editor-editable#wrapwrap",
@@ -1469,13 +1439,13 @@ registry.category("web_tour.tours").add("web_studio.test_edit_main_and_in_t_call
                 newNode0.classList.add("added0");
                 const target0 = this.anchor.querySelector(".outside-t-call");
                 target0.insertAdjacentElement("beforebegin", newNode0);
-                editor.dispatch("ADD_STEP");
+                editor.shared.history.addStep();
                 await nextTick();
                 const newNode1 = doc.createElement("div");
                 newNode1.classList.add("added1");
                 const target1 = this.anchor.querySelector(".in-t-call");
                 target1.insertAdjacentElement("beforebegin", newNode1);
-                editor.dispatch("ADD_STEP");
+                editor.shared.history.addStep();
                 await nextTick();
             },
         },
@@ -1485,13 +1455,11 @@ registry.category("web_tour.tours").add("web_studio.test_edit_main_and_in_t_call
         },
         {
             trigger: ".o-web-studio-save-report:not(.btn-primary)",
-            run() {},
         },
     ],
 });
 
 registry.category("web_tour.tours").add("web_studio.test_image_crop", {
-    test: true,
     steps: () => [
         {
             trigger: "body :iframe .odoo-editor-editable .myimg",
@@ -1508,7 +1476,6 @@ registry.category("web_tour.tours").add("web_studio.test_image_crop", {
 });
 
 registry.category("web_tour.tours").add("web_studio.test_translations_are_copied", {
-    test: true,
     steps: () => [
         {
             trigger: "body :iframe .odoo-editor-editable#wrapwrap div:contains(term2)",
@@ -1518,7 +1485,7 @@ registry.category("web_tour.tours").add("web_studio.test_translations_are_copied
                 const newNode = doc.createElement("div");
                 (newNode.textContent = "term3 from edition"),
                     this.anchor.insertAdjacentElement("beforebegin", newNode);
-                editor.dispatch("ADD_STEP");
+                editor.shared.history.addStep();
                 return nextTick();
             },
         },
@@ -1533,8 +1500,6 @@ registry.category("web_tour.tours").add("web_studio.test_translations_are_copied
 });
 
 registry.category("web_tour.tours").add("web_studio.test_reports_view_concurrence", {
-    test: true,
-    sequence: 260,
     steps: () => [
         {
             trigger: ".o_menu_sections li:contains('Reports')",
@@ -1546,6 +1511,112 @@ registry.category("web_tour.tours").add("web_studio.test_reports_view_concurrenc
         },
         {
             trigger: ".o-web-studio-report-editor",
+        },
+    ],
+});
+
+registry.category("web_tour.tours").add("web_studio.test_dont_translate_on_save", {
+    steps: () => [
+        {
+            trigger: "body :iframe .odoo-editor-editable#wrapwrap p.test-origin",
+            async run() {
+                const doc = this.anchor.ownerDocument;
+                const el = doc.createElement("span");
+                el.textContent = "new content";
+                this.anchor.insertAdjacentElement("beforebegin", el);
+                const editor = editorsWeakMap.get(doc);
+                editor.shared.history.addStep();
+                await nextTick();
+            },
+        },
+        {
+            trigger: ".o-web-studio-save-report.btn-primary",
+            run: "click",
+        },
+        {
+            trigger: ".o-web-studio-save-report:not(.btn-primary)",
+        },
+        {
+            trigger: "body :iframe .odoo-editor-editable#wrapwrap span",
+            run() {
+                const doc = this.anchor.ownerDocument;
+                const selection = doc.getSelection();
+                selection.removeAllRanges();
+                const range = doc.createRange();
+                range.selectNode(this.anchor);
+                selection.addRange(range);
+            },
+        },
+        {
+            trigger: ".o-we-toolbar button[name='bold']",
+            run: "click",
+        },
+        {
+            trigger: ".o-web-studio-save-report.btn-primary",
+            run: "click",
+        },
+        {
+            trigger: ".o-web-studio-save-report:not(.btn-primary)",
+        },
+    ],
+});
+
+registry.category("web_tour.tours").add("web_studio.test_do_not_delete_unspecial_spans", {
+    steps: () => [
+        {
+            trigger: "body :iframe .odoo-editor-editable#wrapwrap span",
+            run() {
+                insertText(this.anchor, "added");
+            },
+        },
+        {
+            trigger: ".o-web-studio-save-report.btn-primary",
+            run: "click",
+        },
+        {
+            trigger: ".o-web-studio-save-report:not(.btn-primary)",
+        },
+    ],
+});
+
+registry.category("web_tour.tours").add("web_studio.test_edit_header_only_company", {
+    steps: () => [
+        {
+            trigger: "body :iframe .odoo-editor-editable#wrapwrap .header img",
+            run() {
+                const el = this.anchor;
+                const span = el.ownerDocument.createElement("span");
+                span.classList.add("studio-added");
+                el.insertAdjacentElement("afterend", span);
+                openEditorPowerBox(span);
+            },
+        },
+        {
+            trigger: ".o-we-powerbox .o-we-command:contains(Insert a field)",
+            run: "click",
+        },
+        {
+            trigger: ".o_model_field_selector_popover_item_name:contains(Company ID)",
+            run: "click",
+        },
+        {
+            trigger: ".o_model_field_selector_default_value_input input",
+            run: "edit studio company id",
+        },
+        {
+            trigger: ".o_model_field_selector_popover button:contains(Insert)",
+            run: "click",
+        },
+        {
+            trigger:
+                "body :iframe .odoo-editor-editable#wrapwrap .header [t-field]:contains(studio company id)",
+        },
+        {
+            trigger: ".o-web-studio-save-report.btn-primary",
+            run: "click",
+        },
+        {
+            trigger: ".o-web-studio-save-report:not(.btn-primary)",
         },
     ],
 });

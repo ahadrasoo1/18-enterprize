@@ -1,23 +1,27 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* delivery_easypost
-# 
+# * delivery_easypost
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Tony Ng, 2025
+#
+# "Tony Ng (ngto)" <ngto@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Chinese (Taiwan) (https://app.transifex.com/odoo/teams/41243/zh_TW/)\n"
+"POT-Creation-Date: 2025-12-29 18:45+0000\n"
+"PO-Revision-Date: 2026-05-18 19:53+0000\n"
+"Last-Translator: \"Tony Ng (ngto)\" <ngto@odoo.com>\n"
+"Language-Team: Chinese (Traditional Han script) <https://translate.odoo.com/"
+"projects/odoo-18/delivery_easypost/zh_Hant/>\n"
+"Language: zh_TW\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: zh_TW\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 5.17\n"
 
 #. module: delivery_easypost
 #: model_terms:ir.ui.view,arch_db:delivery_easypost.view_delivery_carrier_form_inherit_delivery_easypost
@@ -31,11 +35,14 @@ msgstr ""
 #. module: delivery_easypost
 #: model_terms:ir.ui.view,arch_db:delivery_easypost.view_delivery_carrier_form_inherit_delivery_easypost
 msgid ""
-"<b>Once your account is created, go to your Dashboard and click on the arrow next to your username to configure your carrier accounts. </b>\n"
-"                <b>You can add new carrier accounts on the right side of the same page.</b>\n"
+"<b>Once your account is created, go to your Dashboard and click on the arrow "
+"next to your username to configure your carrier accounts. </b>\n"
+"                <b>You can add new carrier accounts on the right side of the "
+"same page.</b>\n"
 "                <br/>"
 msgstr ""
-"<b>建立帳戶後，請前往Dashboard，按一下使用者名稱旁邊的箭頭圖示，配置你的貨運商帳戶。</b>\n"
+"<b>建立帳戶後，請前往Dashboard，按一下使用者名稱旁邊的箭頭圖示，配置你的貨運"
+"商帳戶。</b>\n"
 "                <b>你可在同一頁面的右側，新增新的貨運商帳戶。</b>\n"
 "                <br/>"
 
@@ -75,7 +82,7 @@ msgstr "承運商"
 #: model:ir.model.fields,field_description:delivery_easypost.field_easypost_service__easypost_carrier
 #: model:ir.model.fields,field_description:delivery_easypost.field_stock_package_type__easypost_carrier
 msgid "Carrier Prefix"
-msgstr "Carrier Prefix"
+msgstr "承運商字首"
 
 #. module: delivery_easypost
 #: model:ir.model,name:delivery_easypost.model_delivery_carrier_easypost
@@ -133,9 +140,7 @@ msgstr "顯示名稱"
 msgid ""
 "Do not forget to load your Easypost carrier accounts for a valid "
 "configuration."
-msgstr ""
-"Do not forget to load your Easypost carrier accounts for a valid "
-"configuration."
+msgstr "記得載入你的 Easypost 貨運商帳戶，以取得有效配置。"
 
 #. module: delivery_easypost
 #: model:ir.model.fields.selection,name:delivery_easypost.selection__delivery_carrier__easypost_label_file_type__epl2
@@ -161,7 +166,7 @@ msgstr "Easypost Carrier Type ID, technical for API request"
 #. module: delivery_easypost
 #: model_terms:ir.ui.view,arch_db:delivery_easypost.view_delivery_carrier_form_inherit_delivery_easypost
 msgid "Easypost Configuration"
-msgstr "Easypost Configuration"
+msgstr "Easypost 配置"
 
 #. module: delivery_easypost
 #. odoo-python
@@ -230,8 +235,7 @@ msgstr "識別號"
 #. module: delivery_easypost
 #: model:ir.model.fields,help:delivery_easypost.field_delivery_carrier__easypost_default_service_id
 msgid "If not set, the less expensive available service level will be chosen."
-msgstr ""
-"If not set, the less expensive available service level will be chosen."
+msgstr "If not set, the less expensive available service level will be chosen."
 
 #. module: delivery_easypost
 #: model:ir.model.fields,field_description:delivery_easypost.field_delivery_carrier__easypost_insurance_fee_minimum
@@ -247,14 +251,16 @@ msgstr "保險費用率（美元）"
 #. odoo-python
 #: code:addons/delivery_easypost/models/easypost_request.py:0
 msgid ""
-"It seems Easypost do not provide shipments for this order.                We"
-" advise you to try with another package type or service level."
-msgstr "Easypost 似乎不為此訂單提供運輸服務。                建議嘗試其他包裹類型或服務級別。"
+"It seems Easypost do not provide shipments for this order.                We "
+"advise you to try with another package type or service level."
+msgstr ""
+"Easypost 似乎不為此訂單提供運輸服務。                建議嘗試其他貨件類型或服"
+"務級別。"
 
 #. module: delivery_easypost
 #: model_terms:ir.ui.view,arch_db:delivery_easypost.view_delivery_carrier_form_inherit_delivery_easypost
 msgid "Label Format"
-msgstr "Label Format"
+msgstr "標籤格式"
 
 #. module: delivery_easypost
 #: model:ir.model.fields,field_description:delivery_easypost.field_delivery_carrier_easypost__write_uid
@@ -292,7 +298,7 @@ msgstr "PNG"
 #. odoo-python
 #: code:addons/delivery_easypost/models/easypost_request.py:0
 msgid "Package type used in pack %s is not configured for easypost."
-msgstr "Package type used in pack %s is not configured for easypost."
+msgstr "包裝「%s」使用的包裝類型，未在 easypost 配置。"
 
 #. module: delivery_easypost
 #. odoo-python
@@ -346,7 +352,7 @@ msgstr "送件已在 Easypost 建立<br/><b>追蹤號碼：</b> %s<br/>"
 #. module: delivery_easypost
 #: model:ir.model,name:delivery_easypost.model_delivery_carrier
 msgid "Shipping Methods"
-msgstr "寄送方式"
+msgstr "運送方式"
 
 #. module: delivery_easypost
 #: model_terms:ir.ui.view,arch_db:delivery_easypost.view_delivery_carrier_form_inherit_delivery_easypost
@@ -407,18 +413,19 @@ msgstr ""
 #. odoo-python
 #: code:addons/delivery_easypost/models/easypost_request.py:0
 msgid ""
-"The estimated price cannot be computed because the weight of your product is"
-" missing."
+"The estimated price cannot be computed because the weight of your product is "
+"missing."
 msgstr "無法計算估計價格，因為您的產品重量缺失。"
 
 #. module: delivery_easypost
 #. odoo-python
 #: code:addons/delivery_easypost/models/easypost_request.py:0
 msgid ""
-"The estimated shipping price cannot be computed because the weight is missing for the following product(s): \n"
+"The estimated shipping price cannot be computed because the weight is "
+"missing for the following product(s): \n"
 " %s"
 msgstr ""
-"The estimated shipping price cannot be computed because the weight is missing for the following product(s): \n"
+"由於以下產品缺漏重量資料，因此未能估算預計運費：\n"
 " %s"
 
 #. module: delivery_easypost
@@ -452,7 +459,7 @@ msgstr "未知的錯誤"
 #. odoo-python
 #: code:addons/delivery_easypost/models/easypost_request.py:0
 msgid "Unspecified field"
-msgstr "Unspecified field"
+msgstr "未指明欄位"
 
 #. module: delivery_easypost
 #. odoo-python

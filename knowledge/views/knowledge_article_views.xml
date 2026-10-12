@@ -82,11 +82,11 @@
                                             <!-- Article body -->
                                             <div class="o_knowledge_editor mt-3">
                                                 <field name="body" widget="knowledge_html" class="o_field_html" no_label="1" groups="base.group_user"
-                                                    options="{'collaborative': true, 'resizable': False, 'embedded_components': true}"
+                                                    options="{'collaborative': true, 'resizable': False, 'embedded_components': true, 'baseContainer': 'P'}"
                                                     readonly="is_locked or not user_can_write or not active"/>
                                                 <!-- Portal users get some commands disabled, notably /image and /file, as they don't have access to ir.attachment -->
                                                 <field name="body" widget="knowledge_html" class="o_field_html" no_label="1" groups="base.group_portal"
-                                                    options="{'collaborative': true, 'resizable': False, 'embedded_components': true, 'disableImage': true, 'disableVideo': true, 'disableFile': true}"
+                                                    options="{'collaborative': true, 'resizable': False, 'embedded_components': true, 'disableImage': true, 'disableVideo': true, 'disableFile': true, 'baseContainer': 'P'}"
                                                     readonly="is_locked or not user_can_write or not active"/>
                                             </div>
                                         </div>
@@ -281,7 +281,7 @@
             <kanban create="0" class="o_knowledge_article_kanban_view">
                 <field name="is_user_favorite"/>
                 <templates>
-                    <t t-name="card" class="o_knowledge_kanban_card h-100">
+                    <t t-name="card" class="o_knowledge_kanban_card">
                         <div class="d-flex align-items-center">
                             <field name="display_name" class="flex-grow-1 lead text-truncate"/>
                             <!-- When the user does not have 'write' access on an article, the user will not be
@@ -414,6 +414,13 @@
                     domain="[('active', '=', False)]"/>
                 <filter name="filter_trashed" string="Trashed"
                     domain="[('active', '=', False), ('to_delete', '=', True)]"/>
+                <filter invisible="1" string="Late Activities" name="activities_overdue"
+                    domain="[('my_activity_date_deadline', '&lt;', context_today().strftime('%Y-%m-%d'))]"
+                    help="Show all records whose next activity date is past"/>
+                <filter invisible="1" string="Today Activities" name="activities_today"
+                    domain="[('my_activity_date_deadline', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter invisible="1" string="Future Activities" name="activities_upcoming_all"
+                    domain="[('my_activity_date_deadline', '&gt;', context_today().strftime('%Y-%m-%d'))]"/>
                 <group expand="0" string="Group By">
                     <filter name="group_by_category" domain="[]" context="{'group_by': 'category'}"/>
                     <filter name="group_by_menu_article" context="{'group_by': 'root_article_id'}"/>

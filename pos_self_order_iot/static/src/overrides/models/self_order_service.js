@@ -11,6 +11,7 @@ patch(SelfOrder.prototype, {
     async setup(env, services) {
         this.iot_longpolling = services.iot_longpolling;
         await super.setup(...arguments);
+        this.iot_longpolling.setLna(odoo.use_lna);
 
         if (!this.config.iface_print_via_proxy || this.config.self_ordering_mode !== "kiosk") {
             return;

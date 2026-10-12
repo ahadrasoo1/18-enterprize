@@ -1,12 +1,10 @@
 /** @odoo-module **/
 
 import { Domain } from "@web/core/domain";
+import { _t } from "@web/core/l10n/translation";
 import { useService } from "@web/core/utils/hooks";
 import { RelationalModel } from "@web/model/relational_model/relational_model";
-import {
-    DocumentsModelMixin,
-    DocumentsRecordMixin,
-} from "../documents_model_mixin";
+import { DocumentsModelMixin, DocumentsRecordMixin } from "../documents_model_mixin";
 
 export class DocumentsKanbanModel extends DocumentsModelMixin(RelationalModel) {
     setup() {
@@ -15,21 +13,45 @@ export class DocumentsKanbanModel extends DocumentsModelMixin(RelationalModel) {
     }
 
     /**
-     * Ensure that when coming from a URL with a document token, the document is present in the first page.
+     * Ensure that when coming for a specific document, it is present as the first document
+     * on the first page. Notify the user if the requested document wasn't found.
      */
     async _loadData(config) {
         const data = await super._loadData(config);
+        // This getter resets the DocumentIdToRestore, we'll restore it if we do have the record.
         const documentIdToRestore = this.documentService.getOnceDocumentIdToRestore();
-        if (
-            documentIdToRestore &&
-            !data.records.some((record) => record.id === documentIdToRestore)
-        ) {
+        if (!documentIdToRestore) {
+            return data;
+        }
+        const idxToRestore = data.records.findIndex((r) => r.id === documentIdToRestore);
+        if (idxToRestore !== -1) {
+            const recordToRestore = data.records.splice(idxToRestore, 1)[0]; // take it out
+            data.records.splice(0, 0, recordToRestore); // put it at the top of the list
+            this.documentService.documentIdToRestore = documentIdToRestore;
+        } else {
             const missingData = await super._loadData({
                 ...config,
-                domain: Domain.and([config.domain, [["id", "=", documentIdToRestore]]]).toList(),
+                domain: Domain.and([
+                    config.domain,
+                    [
+                        ["id", "=", documentIdToRestore],
+                        ["active", "in", [true, false]],
+                    ],
+                ]).toList(),
+                limit: 1,
             });
             if (missingData?.records?.length) {
-                data.records.push(missingData.records[0]);
+                const addedRecord = missingData.records[0];
+                data.records.splice(0, 0, addedRecord); // put it at the top of the list
+                data.records.pop(); // Remove the last item to not overflow page
+                if (!addedRecord.active) {
+                    this.documentService.archivedDocumentRestored = addedRecord;
+                }
+                this.documentService.documentIdToRestore = documentIdToRestore;
+            } else {
+                this.notification.add(_t("Document not found or inaccessible."), {
+                    type: "danger",
+                });
             }
         }
         return data;
@@ -45,6 +67,9 @@ export class DocumentsKanbanRecord extends DocumentsRecordMixin(RelationalModel.
         await this.model.env.documentsView.bus.trigger("documents-upload-files", {
             files: ev.target.files,
             accessToken: this.data.access_token,
+            context: {
+                document_id: this.data.id,
+            }
         });
         ev.target.value = "";
     }

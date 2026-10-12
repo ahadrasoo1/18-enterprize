@@ -4,7 +4,7 @@
 {
     'name': 'Belgium - Payroll - Fleet',
     'category': 'Human Resources',
-    'depends': ['l10n_be_hr_payroll', 'fleet'],
+    'depends': ['l10n_be_hr_payroll', 'hr_fleet'],
     'version': '1.0',
     'data': [
         'security/ir.model.access.csv',

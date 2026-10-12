@@ -1,5 +1,5 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-from odoo import models, Command
+from odoo import models, Command, _
 from collections import defaultdict
 
 
@@ -12,10 +12,12 @@ class AccountMove(models.Model):
         because it uses the percentage amount on the tax which will always be 1%. This sets the correct totals using
         account.move.line fields set by `_set_external_taxes()`. """
         super()._compute_tax_totals()
-        for move in self.filtered(lambda move: move.is_tax_computed_externally and move.tax_totals):
+        for move in self.filtered(lambda move: move.is_tax_computed_externally and
+                                               move.tax_totals and
+                                               move.move_type in ('out_invoice', 'out_refund')):
             lines = move.invoice_line_ids.filtered(lambda l: l.display_type == 'product')
             tax_totals = move.tax_totals
-            subtotal = tax_totals['subtotals'][0]
+            subtotal = tax_totals['subtotals'] and tax_totals['subtotals'][0] or {}
             tax_totals['same_tax_base'] = True
             tax_totals['total_amount_currency'] = move.currency_id.round(sum(lines.mapped('price_total')))
             tax_totals['base_amount_currency'] = move.currency_id.round(sum(lines.mapped('price_subtotal')))
@@ -28,10 +30,11 @@ class AccountMove(models.Model):
                     'tax_groups': [],
                 }
             ]
-            if subtotal['tax_groups']:
+            if subtotal.get('tax_groups'):
                 tax_group = subtotal['tax_groups'][0]
                 tax_totals['subtotals'][0]['tax_groups'].append({
                     **tax_group,
+                    'group_name': _('Taxes'),
                     'base_amount_currency': tax_totals['base_amount_currency'],
                     'tax_amount_currency': tax_totals['tax_amount_currency'],
                 })
@@ -53,19 +56,18 @@ class AccountMove(models.Model):
 
     def _filtered_external_tax_moves(self):
         return self.filtered(lambda move: move.is_tax_computed_externally and
-                                          move.move_type in ('out_invoice', 'out_refund'))
+                                          move.move_type in ('out_invoice', 'out_refund') and
+                                          not move._is_downpayment())
 
     def _get_and_set_external_taxes_on_eligible_records(self):
         """ account.external.tax.mixin override. """
-        eligible_moves = self._filtered_external_tax_moves().filtered(
-            lambda move: move.state != 'posted' and not move._is_downpayment()
-        )
+        eligible_moves = self._filtered_external_tax_moves().filtered(lambda move: move.state != 'posted')
         eligible_moves._set_external_taxes(*eligible_moves._get_external_taxes())
         return super()._get_and_set_external_taxes_on_eligible_records()
 
     def _get_lines_eligible_for_external_taxes(self):
         """ account.external.tax.mixin override. """
-        return self.invoice_line_ids.filtered(lambda line: line.display_type == 'product')
+        return self.invoice_line_ids.filtered(lambda line: line.display_type == 'product' and not line._get_downpayment_lines())
 
     def _get_date_for_external_taxes(self):
         """ account.external.tax.mixin override. """
@@ -115,13 +117,20 @@ class AccountMove(models.Model):
             move.line_ids = line_ids_commands
         for move in self:
             for tax, external_amount in summary.get(move, {}).items():
-                tax_line = move.line_ids.filtered(lambda l: l.tax_line_id == tax)
+                tax_lines = move.line_ids.filtered(lambda l: l.tax_line_id == tax)
+                if not tax_lines:
+                    continue
 
                 # Check that the computed taxes are close enough. For exemptions this could not be the case
                 # since some integrations will return the non-exempt rate%. In that case this will manually fix the tax
                 # lines to what the external service says they should be.
-                if tax_line and move.currency_id.compare_amounts(tax_line.amount_currency, external_amount):
-                    accounting_line_ids_commands[move].append(Command.update(tax_line.id, {'amount_currency': external_amount}))
+                computed_taxes = sum(tax_lines.mapped('amount_currency'))
+                if move.currency_id.compare_amounts(computed_taxes, external_amount) != 0:
+                    diff = external_amount - computed_taxes
+                    for i, tax_line in enumerate(tax_lines):
+                        line_diff = move.currency_id.round(diff / (len(tax_lines) - i))
+                        diff -= line_diff
+                        accounting_line_ids_commands[move].append(Command.update(tax_line.id, {'amount_currency': tax_line.amount_currency + line_diff}))
 
         # Force custom values for the accounting side.
         for move, line_ids_commands in accounting_line_ids_commands.items():

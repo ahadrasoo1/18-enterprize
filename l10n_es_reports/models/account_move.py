@@ -26,30 +26,63 @@ class AccountMove(models.Model):
                 )
         return super()._auto_init()
 
+    # TODO: remove in master
     def _default_mod_347_invoice_type(self):
         if self.is_invoice(True):
             return 'regular'
 
     def _default_mod_349_invoice_type(self):
-        invoice_type = self.env.context.get('move_type', False)
+        return self._map_mod_349_invoice_type_to_code(self.env.context.get('move_type', False))
 
-        if invoice_type == 'in_invoice':
+    def _map_mod_349_invoice_type_to_code(self, invoice_type):
+        if invoice_type in ['in_invoice', 'in_refund']:
             return 'A'
-        if invoice_type == 'out_invoice':
+        if invoice_type in ['out_invoice', 'out_refund']:
             return 'E'
+        return False
 
     def _mod_349_selection_values(self):
         context = self.env.context
         if context.get('move_type') in self.get_sale_types():
-            return[('E', _("E - Supply")), ('T', _("T - Triangular Operation")), ('S', _("S - Services sale")), ('M', _("M - Supply without taxes")), ('H', _("H - Supply without taxes delivered by a legal representative"))]
+            return [
+                ('E', _("E - Supply")),
+                ('T', _("T - Triangular Operation")),
+                ('S', _("S - Services sale")),
+                ('M', _("M - Supply without taxes")),
+                ('H', _("H - Supply without taxes delivered by a legal representative")),
+                ('R', _("R - Transfers of goods made under consignment sales agreements")),
+                ('D', _("D - Returns of goods previously sent from the TAI")),
+                ('C', _("C - Replacements of goods")),
+            ]
         if context.get('move_type') in self.get_purchase_types():
-            return [('A', _("A - Acquisition")), ('T', _("T - Triangular Operation")), ('I', _("I - Services acquisition"))]
+            return [
+                ('A', _("A - Acquisition")),
+                ('T', _("T - Triangular Operation")),
+                ('I', _("I - Services acquisition")),
+            ]
         # If no type is given in context, we give access to every possible value for the field
-        return [('A', _("A - Acquisition")), ('E', _("E - Supply")), ('T', _("T - Triangular Operation")), ('S', _("S - Services sale")), ('I', _("I - Services acquisition")), ('M', _("M - Supply without taxes")), ('H', _("H - Supply without taxes delivered by a legal representative"))]
+        return [
+            ('A', _("A - Acquisition")),
+            ('E', _("E - Supply")),
+            ('T', _("T - Triangular Operation")),
+            ('S', _("S - Services sale")),
+            ('I', _("I - Services acquisition")),
+            ('M', _("M - Supply without taxes")),
+            ('H', _("H - Supply without taxes delivered by a legal representative")),
+            ('R', _("R - Transfers of goods made under consignment sales agreements")),
+            ('D', _("D - Returns of goods previously sent from the TAI")),
+            ('C', _("C - Replacements of goods")),
+        ]
 
-    l10n_es_reports_mod347_invoice_type = fields.Selection(string="Type for mod 347", selection=[('regular', "Regular operation"), ('insurance', "Insurance operation")], default=_default_mod_347_invoice_type, help="Defines the category into which this invoice falls for mod 347 report.")
+    l10n_es_reports_mod347_invoice_type = fields.Selection(
+        string="Type for mod 347",
+        selection=[('regular', "Regular operation"), ('insurance', "Insurance operation")],
+        compute='_compute_l10n_es_reports_mod347_invoice_type',
+        store=True,
+        help="Defines the category into which this invoice falls for mod 347 report.",
+    )
     l10n_es_reports_mod347_available = fields.Boolean(string="Available for Mod347", compute="_compute_l10n_es_reports_mod347_available", help="True if and only if the invoice MIGHT need to be reported on mod 347, i.e. it concerns an operation from a Spanish headquarter.")
-    l10n_es_reports_mod349_invoice_type = fields.Selection(string="Type for mod 349", selection="_mod_349_selection_values", help="Defines the category into which this invoice falls for mod 349 report", default=_default_mod_349_invoice_type)
+    l10n_es_reports_mod349_invoice_type = fields.Selection(string="Type for mod 349", selection="_mod_349_selection_values", store=True, compute="_compute_l10n_es_reports_mod349_invoice_type", help="Defines the category into which this invoice falls for mod 349 report", default=_default_mod_349_invoice_type)
     l10n_es_reports_mod349_available = fields.Boolean(string="Available for Mod349", store=True, compute="_compute_l10n_es_reports_mod349_available", help="True if and only if the invoice must be reported on mod 349 report, i.e. it concerns an intracommunitary operation.")
 
 
@@ -71,10 +104,24 @@ class AccountMove(models.Model):
         rslt = super(AccountMove, self)._get_refund_copy_fields()
         return rslt + ['l10n_es_reports_mod347_invoice_type', 'l10n_es_reports_mod349_invoice_type']
 
-    @api.onchange('partner_id')
+    # TODO: remove in master
     def _onchange_partner_id_set_347_invoice_type(self):
         for record in self:
             record.l10n_es_reports_mod347_invoice_type = False if record.partner_id.country_code != 'ES' else 'regular'
+
+    @api.depends('partner_id.country_code', 'invoice_line_ids.tax_ids')
+    def _compute_l10n_es_reports_mod347_invoice_type(self):
+        for record in self:
+            withholding_taxes = record.invoice_line_ids.tax_ids.filtered(lambda tax: tax.l10n_es_type == 'retencion')
+            regular = record.is_invoice(True) and record.partner_id.country_code == 'ES'
+            record.l10n_es_reports_mod347_invoice_type = 'regular' if regular and not withholding_taxes else False
+
+    @api.depends('partner_id.country_code', 'move_type')
+    def _compute_l10n_es_reports_mod349_invoice_type(self):
+        for record in self:
+            regular = record.partner_id.country_code == 'ES'
+            invoice_type = self._map_mod_349_invoice_type_to_code(record.move_type)
+            record.l10n_es_reports_mod349_invoice_type = invoice_type if not regular and record.is_invoice(True) and record.l10n_es_reports_mod349_available else False
 
     def _post(self, soft=True):
         """ Overridden to require Spanish invoice type to be set if the company
@@ -99,6 +146,5 @@ class AccountMove(models.Model):
         moves = super().create(vals_list)
         for move in moves:
             if not move.l10n_es_reports_mod349_invoice_type:
-                move.l10n_es_reports_mod349_invoice_type = move.with_context(
-                    move_type=move.move_type)._default_mod_349_invoice_type()
+                move = move.with_context(skip_is_manually_modified=True)
         return moves

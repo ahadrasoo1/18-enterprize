@@ -5,12 +5,13 @@ import { loadJS } from "@web/core/assets";
 import { cookie } from "@web/core/browser/cookie";
 import { markup } from "@odoo/owl";
 const actionRegistry = registry.category('actions');
-/* global OdooFin, debugMode */
+/* global OdooFin */
 
 function OdooFinConnector(parent, action) {
     const orm = parent.services.orm;
     const actionService = parent.services.action;
     const notificationService = parent.services.notification;
+    const debugMode = parent.debug;
 
     const id = action.id;
     action.params.colorScheme = cookie.get("color_scheme");
@@ -59,17 +60,21 @@ function OdooFinConnector(parent, action) {
                             return;
                     }
                 },
-                onAddBank: async function () {
+                onAddBank: async function (data) {
                     // If the user doesn't find his bank
-                    actionResult = await orm.call('account.online.link', 'create_new_bank_account_action',
-                    [], {context: action.context});
-                    actionResult.help = markup(actionResult.help)
+                    actionResult = await orm.call(
+                        "account.online.link",
+                        "create_new_bank_account_action",
+                        [[id], data],
+                        { context: action.context }
+                    );
                     return actionService.doAction(actionResult);
                 }
             };
             // propagate parent debug mode to iframe
-            if(typeof debugMode !== 'undefined' && debugMode)
-                params.data['debug'] = debugMode;
+            if (typeof debugMode !== "undefined" && debugMode) {
+                params.data["debug"] = debugMode;
+            }
             OdooFin.create(params);
             OdooFin.open();
         });

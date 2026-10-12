@@ -2,7 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import models, fields, api, _
-from odoo.exceptions import UserError
+from odoo.exceptions import RedirectWarning, UserError
 import json
 import requests
 import logging
@@ -48,7 +48,7 @@ class HmrcVatObligation(models.Model):
         return headers
 
     @api.model
-    def retrieve_vat_obligations(self, vat, from_date, to_date, status=''):
+    def retrieve_vat_obligations(self, vat, from_date, to_date, client_data=None, status=''):
         """ Retrieve vat obligations
 
         The User should be logged in before doing this
@@ -63,7 +63,8 @@ class HmrcVatObligation(models.Model):
 
         user = self.env.user
         bearer = user.l10n_uk_hmrc_vat_token
-        headers = self._get_auth_headers(bearer)
+        headers = self._get_auth_headers(bearer, client_data)
+        self.env['hmrc.service']._validate_fraud_prevention_headers(headers)
 
         url = self.env['hmrc.service']._get_endpoint_url('/organisations/vat/%s/obligations' % vat)
         params = {
@@ -99,11 +100,25 @@ class HmrcVatObligation(models.Model):
 
     def _get_vat(self):
         # Use company's VAT if company is British, otherwise try to look for a UK fiscal position.
-        foreign_vat = False
-        if not self.env.company.country_id.code == 'GB':
-            foreign_vat = self.env.company.fiscal_position_ids.filtered(lambda fp: fp.country_id.code == 'GB').foreign_vat
+        vat = ""
+        report = self.env.ref('l10n_uk.tax_report')
+        options = report.get_options({})
+        if (tax_unit := options.get('tax_unit')) and tax_unit != 'company_only':
+            vat = self.env['account.tax.unit'].browse(tax_unit).vat
 
-        vat = foreign_vat or self.env.company.vat
+        if not vat:
+            foreign_vat = False
+            if self.env.company.country_id.code != 'GB':
+                foreign_vat = self.env.company.fiscal_position_ids.filtered(lambda fp: fp.country_id.code == 'GB').foreign_vat
+
+            vat = foreign_vat or self.env.company.vat
+
+        if not vat:
+            raise RedirectWarning(
+                self.env._("No VAT number associated with %(company_name)s. Please define one", company_name=self.env.company.name),
+                self.env.company._get_records_action(),
+                self.env._("Company Settings")
+            )
 
         # The VAT sent to HMRC should not include the GB or XI prefix.
         if vat.startswith(('GB', 'XI')):
@@ -111,7 +126,7 @@ class HmrcVatObligation(models.Model):
 
         return vat
 
-    def import_vat_obligations(self):
+    def import_vat_obligations(self, client_data=None):
         today = datetime.date.today()
         res = self.env['hmrc.service']._login()
         if res: # If you can not login, return url for re-login
@@ -121,10 +136,11 @@ class HmrcVatObligation(models.Model):
         obligations = self.retrieve_vat_obligations(
             self._get_vat(),
             (today + relativedelta(months=-6)).strftime('%Y-%m-%d'),
-            (today + relativedelta(months=6,leapdays=-1)).strftime('%Y-%m-%d'))
-
+            (today + relativedelta(months=6,leapdays=-1)).strftime('%Y-%m-%d'),
+            client_data
+        )
         for new_obligation in obligations:
-            obligation = self.env['l10n_uk.vat.obligation'].search([('currency_table_period_key', '=', new_obligation.get('periodKey')),
+            obligation = self.env['l10n_uk.vat.obligation'].search([('period_key', '=', new_obligation.get('periodKey')),
                                                                  ('company_id', '=', self.env.company.id)])
             status = 'open' if new_obligation['status'] == 'O' else 'fulfilled'
             if not obligation:
@@ -133,7 +149,7 @@ class HmrcVatObligation(models.Model):
                                     'date_received': new_obligation.get('received'),
                                     'date_due': new_obligation['due'],
                                     'status': status,
-                                    'currency_table_period_key': new_obligation['periodKey'],
+                                    'period_key': new_obligation['periodKey'],
                                     'company_id': self.env.company.id,
                                     })
             elif obligation.status != status or obligation.date_received != new_obligation.get('received'):
@@ -186,6 +202,7 @@ class HmrcVatObligation(models.Model):
         if res: # If you can not login, return url for re-login
             return res
         headers = self._get_auth_headers(self.env.user.l10n_uk_hmrc_vat_token, data)
+        self.env['hmrc.service']._validate_fraud_prevention_headers(headers)
 
         url = self.env['hmrc.service']._get_endpoint_url('/organisations/vat/%s/returns' % vat)
         data = values.copy()

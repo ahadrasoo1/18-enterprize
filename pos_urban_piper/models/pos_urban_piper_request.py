@@ -4,7 +4,7 @@ import json
 
 from datetime import datetime
 
-from odoo import Command
+from odoo import _, Command
 from odoo.tools import html2plaintext
 
 from urllib.parse import quote
@@ -13,8 +13,7 @@ from werkzeug.urls import url_join
 _logger = logging.getLogger(__name__)
 
 EVENT_TYPES = [
-    'order_placed', 'order_status_update',
-    'rider_status_update', 'item_state_toggle', 'store_action'
+    'store_creation', 'store_action', 'inventory_update', 'item_state_toggle', 'order_placed', 'order_status_update', 'rider_status_update'
 ]
 UP_LANGUAGES = ['hi', 'ar', 'ja', 'pt', 'fr', 'es']
 
@@ -39,19 +38,26 @@ class UrbanPiperClient:
             'Authorization': f'apikey {user_name}:{api_key}',
             'Content-Type': 'application/json'
         }
-        access_url = 'https://pos-int.urbanpiper.com/' + endpoint
+        urbanpiper_url = 'https://pos-int.urbanpiper.com/' if self.config.env['ir.config_parameter'].sudo().get_param('pos_urban_piper.is_production_mode') == 'False' else 'https://api.urbanpiper.com/'
+        access_url = urbanpiper_url + endpoint
         try:
             # Make the API request
             response = self.session.request(method, access_url, json=data, headers=headers, timeout=timeout)
             # Parse the response as JSON
             response_json = response.json()
+            # raise an error if the response is not successful
+            response.raise_for_status()
             return response_json
         except requests.exceptions.ConnectionError as error:
             _logger.warning('Connection Error: %r with the given URL %r', error, access_url)
-            return {'errors': {'timeout': 'Cannot reach the server. Please try again later.'}}
+            return {'errors': {'timeout': _('Cannot reach the server. Please try again later.')}}
+        except requests.exceptions.HTTPError as error:
+            message = response_json.get("message")
+            _logger.warning('HTTPError: %r', message or error)
+            return {'errors': {'HTTPError': message or str(error)}}
         except json.decoder.JSONDecodeError as error:
             _logger.warning('JSONDecodeError: %r', error)
-            return {'errors': {'JSONDecodeError': str(error)}}
+            return {'errors': {'JSONDecodeError': _('Failed to parse server response.')}}
 
     def configure_webhook(self):
         """
@@ -82,6 +88,26 @@ class UrbanPiperClient:
             }
             self._make_api_request(endpoint, data=payload)
 
+    def request_store_create(self):
+        """
+        Request to create a store in UrbanPiper.
+        """
+        endpoint = 'external/api/v1/stores/'
+        data = {
+            'stores': [
+                {
+                    'name': self.config.with_context(lang="en_US").name,
+                    'city': self.config.company_id.city,
+                    'ref_id': self.config.urbanpiper_store_identifier
+                }
+            ]
+        }
+        name_translations = self.config.get_field_translations('name')
+        data['stores'][0]['translations'] = self._get_translations(name_translations, 'name')
+        data = self.config.prepare_store_data(data)
+        response_json = self._make_api_request(endpoint, data=data)
+        return response_json
+
     def request_sync_menu(self):
         """
         Sync menu in urban piper.
@@ -93,12 +119,17 @@ class UrbanPiperClient:
             ('urbanpiper_pos_config_ids', 'in', self.config.ids),
             ('type', '!=', 'combo')
         ]
+        # For the US & UK regions, there is an issue on the UrbanPiper side. They require the entire product catalog, but currently, we are only sending the updated products.
+        full_sync_required_providers = ['justeat', 'grubhub', 'doordash', 'ubereats']
         products = self.config.env['product.template'].search(product_domain)
-        pos_products = products.filtered(lambda product: (
-            not product.urban_piper_status_ids or
-            self.config.id not in product.urban_piper_status_ids.config_id.ids or
-            any(ups.config_id.id in self.config.ids and not ups.is_product_linked for ups in product.urban_piper_status_ids)
-        ))
+        pos_products = products
+        flush = self.config.env.context.get('flush')
+        if not flush and not any(provider.technical_name in full_sync_required_providers for provider in self.config.urbanpiper_delivery_provider_ids):
+            pos_products = products.filtered(lambda product: (
+                not product.urban_piper_status_ids or
+                self.config.id not in product.urban_piper_status_ids.config_id.ids or
+                any(ups.config_id.id in self.config.ids and not ups.is_product_linked for ups in product.urban_piper_status_ids)
+            ))
         pos_products_without_pos_categ_ids = pos_products.filtered(lambda p: not p.pos_categ_ids)
         pos_other_categ_id = self.config.env['pos.category'].search([('name', 'ilike', 'other')], limit=1)
         if not pos_other_categ_id:
@@ -107,19 +138,21 @@ class UrbanPiperClient:
             })
         pos_products_without_pos_categ_ids.pos_categ_ids = pos_other_categ_id
         pos_categories = pos_products.pos_categ_ids
+        # The UrbanPiper platform only supports a single level of sub-categories.
+        pos_categories |= pos_categories.parent_id
         pos_attribute_products = pos_products.filtered(lambda p: p.attribute_line_ids)
         payload = {
-            'flush_categories': False,
+            'flush_categories': flush,
             'categories': self._prepare_categories_data(pos_categories),                      # pos categories
-            'flush_items': False,
+            'flush_items': flush,
             'items': self._prepare_items_data(pos_products),                                  # pos products
-            'flush_option_groups': False,
+            'flush_option_groups': flush,
             'option_groups': self._prepare_option_groups_data(pos_attribute_products),        # pos attributes
-            'flush_options': False,
+            'flush_options': flush,
             'options': self._prepare_option_data(pos_attribute_products),                     # pos attribute values
-            'flush_taxes': False,
+            'flush_taxes': flush,
             'taxes': self.config.prepare_taxes_data(pos_products),                            # pos taxes
-            'flush_charges': False,
+            'flush_charges': flush,
             'charges': self._prepare_charges_data()                                           # pos charges
         }
         # If we have multiple products, we should increase the timeout to 90 seconds.
@@ -149,7 +182,7 @@ class UrbanPiperClient:
         for translation in field_translations[0]:
             lang = translation['lang'].split('_')[0]
             translations.append({
-                'lang': lang,
+                'language': lang,
                 field: translation['value']
             }) if lang in UP_LANGUAGES else None
         return translations
@@ -165,11 +198,14 @@ class UrbanPiperClient:
         for category in pos_categories:
             categ_dict = {
                 'ref_id': str(category.id),
-                'name': category.name,
+                'name': category.with_context(lang="en_US").name,
                 'sort_order': category.sequence,
                 'active': True,
-                'img_url': self._get_public_image_url(category),
             }
+            if img_url := self._get_public_image_url(category):
+                categ_dict['img_url'] = img_url
+            if category.parent_id:
+                categ_dict['parent_ref_id'] = str(category.parent_id.id)
             name_translations = category.get_field_translations('name')
             categ_dict['translations'] = self._get_translations(name_translations, 'name')
             category_lst.append(categ_dict)
@@ -187,17 +223,18 @@ class UrbanPiperClient:
             )
             item = {
                 'ref_id': self.get_item_ref_id(product),
-                'title': product.name,
-                'description': html2plaintext(product.public_description) if product.public_description else '',
+                'title': product.with_context(lang="en_US").name,
+                'description': html2plaintext(product.with_context(lang="en_US").public_description) if product.public_description else '',
                 'price': product.taxes_id.compute_all(
                     product_price, product.currency_id, 1)[self.config._get_total_tax_tag()],
                 'weight': product.weight,
                 'food_type': product.urbanpiper_meal_type,
                 'category_ref_ids': [str(i) for i in product.pos_categ_ids.ids],
                 'recommended': product.is_recommended_on_urbanpiper,
-                'img_url': self._get_public_image_url(product),
                 'available': True,
             }
+            if img_url := self._get_public_image_url(product):
+                item['img_url'] = img_url
             name_translations = product.get_field_translations('name')
             description_translations = product.get_field_translations('public_description')
             translations = []
@@ -211,7 +248,18 @@ class UrbanPiperClient:
                         'description': desc_dict.get(lang, '')
                     })
             item['translations'] = translations
-            updated_item = self.config.update_items_dict(product, item)
+            # dynamic tag syncing for provider tags and default tags
+            tags = item.setdefault('tags', {})
+            default_tags = []
+            for product_tag in product.product_tag_ids:
+                default_tags.append(product_tag.name)
+            alcohol_tag = 'alcohol-present' if product.is_alcoholic_on_urbanpiper else 'alcohol-absent'
+            if alcohol_tag not in default_tags:
+                default_tags.append(alcohol_tag)
+            tags['default'] = default_tags
+            for provider in self.config.urbanpiper_delivery_provider_ids:
+                tags[provider.technical_name] = default_tags
+            updated_item = self.config.update_urbanpiper_item_data(item, product)
             item_lst.append(updated_item)
         return item_lst
 
@@ -225,10 +273,12 @@ class UrbanPiperClient:
             for attr_line in product.attribute_line_ids:
                 group = {
                     'ref_id': f'{product.id}-{attr_line.attribute_id.id}',
-                    'title': attr_line.attribute_id.name,
+                    'title': attr_line.attribute_id.with_context(lang="en_US").name,
                     'active': True,
                     'multi_options_enabled': bool(attr_line.attribute_id.display_type == 'multi'),
-                    'item_ref_ids': [self.get_item_ref_id(product)]
+                    'item_ref_ids': [self.get_item_ref_id(product)],
+                    'min_selectable': 0,
+                    'max_selectable': 30 if any(provider.technical_name == "doordash" for provider in self.config.urbanpiper_delivery_provider_ids) else -1
                 }
                 if attr_line.attribute_id.display_type != 'multi':
                     group['min_selectable'] = 1
@@ -248,15 +298,17 @@ class UrbanPiperClient:
             for option_group in product.attribute_line_ids:
                 for option in option_group.value_ids:
                     product_option = self.config.env['product.template.attribute.value'].search([
+                        ('ptav_active', '=', True),
                         ('product_tmpl_id', '=', product.id),
                         ('product_attribute_value_id', '=', option.id)
-                    ])
+                    ], limit=1)
                     value_dict = {
                         'ref_id': f'{product.id}-{option.id}',
-                        'title': option.name,
+                        'title': option.with_context(lang="en_US").name,
                         'available': True,
                         'opt_grp_ref_ids': [f'{product.id}-{i}' for i in option.attribute_id.ids],
-                        'price': product_option.price_extra or option.default_extra_price
+                        'price': product_option.price_extra or option.default_extra_price,
+                        'food_type': product.urbanpiper_meal_type,
                     }
                     name_translations = option.get_field_translations('name')
                     value_dict['translations'] = self._get_translations(name_translations, 'title')
@@ -273,7 +325,7 @@ class UrbanPiperClient:
         def get_charge_data(product):
             return {
                 'code': 'PC_F' if product == product_packaging else 'DC_F',
-                'title': product.name,
+                'title': product.with_context(lang="en_US").name,
                 'active': True,
                'structure': {
                     'applicable_on': 'order.order_subtotal',
@@ -285,7 +337,7 @@ class UrbanPiperClient:
         return [
             get_charge_data(product)
             for product in [product_packaging, product_delivery]
-            if product
+            if product and product.list_price > 0
         ]
 
     def register_item_toggle(self, products, status):
@@ -303,60 +355,105 @@ class UrbanPiperClient:
         response_json = self._make_api_request(endpoint, method='POST', data=payload)
         return response_json
 
-    def request_status_update(self, order_id, new_status, message=None):
+    def urbanpiper_attribute_value_toggle(self, values, status):
+        """
+        Enable/Disable the attribute's value on the urbanpiper store. (If menu is synced with urban piper)
+        """
+        value_lst_str = [f'{value.product_tmpl_id.id}-{value.product_attribute_value_id.id}' for value in values]
+        endpoint = 'hub/api/v1/items/'
+        payload = {
+            'location_ref_id': self.config.urbanpiper_store_identifier,
+            'item_ref_ids': [],
+            'option_ref_ids': value_lst_str,
+            'action': 'enable' if status else 'disable'
+        }
+        response_json = self._make_api_request(endpoint, method='POST', data=payload)
+        return response_json
+
+    def request_status_update(self, order_id, new_status, code=None):
         """
         Update status in Urban Piper
         """
         endpoint = f'external/api/v1/orders/{order_id}/status/'
         payload = {
             'new_status': new_status,
-            'reason_code': message
+            'reason_code': code
         }
         response_json = self._make_api_request(endpoint, method='PUT', data=payload)
         if response_json:
             if response_json.get('status') == 'success':
                 return True, ''
             else:
-                return False, response_json.get('message')
+                return False, response_json.get('message') or next(iter(response_json.get("errors", {}).values()), "")
         else:
             return False, 'Failed to update status in Urban Piper'
+
+    def urbanpiper_order_reference_update(self, order):
+        """
+        Update order reference in Urban Piper
+        """
+        endpoint = f'external/api/v1/orders/{order.delivery_identifier}/'
+        payload = {
+            "reference_id": order.name
+        }
+        self._make_api_request(endpoint, method='PUT', data=payload)
 
     def urbanpiper_store_status_update(self, status):
         """
         Change store status in urban piper.
         """
-        for delivery_provider in self.config.urbanpiper_delivery_provider_ids:
+        provider_name = self.config._context.get('provider_name')
+        platforms = [provider_name] if provider_name else [p.technical_name for p in self.config.urbanpiper_delivery_provider_ids]
+        if platforms:
             payload = {
                 'location_ref_id': self.config.urbanpiper_store_identifier,
-                'platforms': [delivery_provider.technical_name],
-                'action': status and 'enable' or 'disable',
+                'platforms': platforms,
+                'action': 'enable' if status else 'disable',
             }
-            response_json = self._make_api_request('hub/api/v1/location/', data=payload)
-            return response_json
+            self._make_api_request('hub/api/v1/location/', data=payload)
+
+    def _get_jpeg_datas(self, datas):
+        """
+        Get the image data in jpeg format.
+        """
+        try:
+            data_uri = self.config.env['ir.qweb'].with_context(webp_as_jpg=True)._get_converted_image_data_uri(datas)
+            _header, base64_data = data_uri.split('base64,', 1)
+            return base64_data
+        except TypeError:
+            return datas
 
     def _get_public_image_url(self, record):
         """
-        Get public image url for the product and categories.
+        Get public image URL for the given record (product or category).
+        Converts webp to jpeg if necessary.
+        Returns False if no image is available for the record.
         """
         base_url = self.config.urbanpiper_webhook_url
+        image_data = record.image_1920 if record._name == 'product.template' else record.image_128
+        if not image_data:
+            return False
         attachment = record.env['ir.attachment'].search([
             ('res_model', '=', record._name),
             ('res_id', '=', record.id),
             ('type', '=', 'binary'),
             ('public', '=', True),
+            ('mimetype', '=', 'image/jpg'),
         ], limit=1)
+        datas = self._get_jpeg_datas(image_data)
         if attachment:
-            attachment.datas = record.image_1920 if record._name == 'product.template' else record.image_128
+            attachment.datas = datas
         else:
             attachment = record.env['ir.attachment'].create({
-                'name': f'{record.name}.png',
+                'name': record.name,
                 'type': 'binary',
-                'datas': record.image_1920 if record._name == 'product.template' else record.image_128,
+                'datas': datas,
                 'res_model': record._name,
                 'res_id': record.id,
                 'public': True,
+                'mimetype': 'image/jpg',
             })
-        local_url = attachment.local_url + '.png'
+        local_url = attachment.local_url
         return url_join(base_url, local_url)
 
     def request_refresh_webhooks(self):
@@ -365,6 +462,8 @@ class UrbanPiperClient:
         When the user switches the database, they can press the refresh webhook button to
         update the webhook parameters according to the new database.
         """
+        self.config.urbanpiper_webhook_url = self.config.get_base_url()   # registring webhook
+        self._register_webhook()
         wehbook_json = self._make_api_request('external/api/v1/webhooks?limit=50', method='GET')
         webhooks = wehbook_json.get('webhooks')
         response_json = {}

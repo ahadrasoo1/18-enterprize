@@ -33,15 +33,23 @@ class ResConfigSettings(models.TransientModel):
             },
         }
 
-    @api.depends('company_id')
+    @api.depends('account_tax_periodicity', 'company_id', 'fiscalyear_last_day', 'fiscalyear_last_month')
     def _compute_account_reports_show_per_company_setting(self):
         custom_start_country_codes = self._get_country_codes_with_another_tax_closing_start_date()
         countries = self.env['account.fiscal.position'].search([
             ('company_id', '=', self.env.company.id),
             ('foreign_vat', '!=', False),
         ]).mapped('country_id') + self.env.company.account_fiscal_country_id
+        countries_to_always_show = bool(set(countries.mapped('code')) & custom_start_country_codes)
         for config_settings in self:
-            config_settings.account_reports_show_per_company_setting = bool(set(countries.mapped('code')) & custom_start_country_codes)
+            if countries_to_always_show:
+                config_settings.account_reports_show_per_company_setting = True
+            else:
+                max_last_day = monthrange(fields.Date.today().year, int(config_settings.fiscalyear_last_month))[1]
+                if config_settings.account_tax_periodicity == 'monthly':
+                    config_settings.account_reports_show_per_company_setting = max_last_day != config_settings.fiscalyear_last_day
+                else:
+                    config_settings.account_reports_show_per_company_setting = config_settings.fiscalyear_last_month != '12' or config_settings.fiscalyear_last_day != max_last_day
 
     def open_company_dependent_report_settings(self):
         self.ensure_one()

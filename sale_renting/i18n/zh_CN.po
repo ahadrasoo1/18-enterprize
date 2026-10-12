@@ -1,23 +1,26 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* sale_renting
-# 
+#
 # Translators:
 # Wil Odoo, 2024
+# 何彬 <vnsoft.he@gmail.com>, 2024
 # Chloe Wang, 2024
-# 
+# Raymond Yu <cl_yu@hotmail.com>, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
+"POT-Creation-Date: 2026-04-10 18:47+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Chloe Wang, 2024\n"
-"Language-Team: Chinese (China) (https://app.transifex.com/odoo/teams/41243/zh_CN/)\n"
+"Last-Translator: Raymond Yu <cl_yu@hotmail.com>, 2025\n"
+"Language-Team: Chinese (China) (https://app.transifex.com/odoo/teams/41243/"
+"zh_CN/)\n"
+"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: zh_CN\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. module: sale_renting
@@ -44,7 +47,7 @@ msgstr "%(amount)s / %(duration)s"
 
 #. module: sale_renting
 #. odoo-python
-#: code:addons/sale_renting/controllers/utils.py:0
+#: code:addons/sale_renting/models/product_template.py:0
 #: code:addons/sale_renting/models/sale_order_recurrence.py:0
 msgid "%(duration)s %(unit)s"
 msgstr "%(duration)s %(unit)s"
@@ -62,8 +65,8 @@ msgid ""
 "(object.rental_status not in ('draft', 'sent') and 'Delivery or Return "
 "Receipt - %s' %(object.name)) or 'Order - %s' % (object.name)"
 msgstr ""
-"(object.rental_status not in ('draft', 'sent') and '发出/退回接收单 - %s' "
-"%(object.name)) or '订单 - %s' % (object.name)"
+"(object.rental_status not in ('draft', 'sent') and '发出/退回接收单 - %s' %"
+"(object.name)) or '订单 - %s' % (object.name)"
 
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.report_rental_order_document
@@ -74,16 +77,6 @@ msgstr "123 Main St"
 #: model:sale.temporal.recurrence,name:sale_renting.recurrence_2_weeks
 msgid "2 Weeks"
 msgstr "2 周"
-
-#. module: sale_renting
-#: model_terms:ir.ui.view,arch_db:sale_renting.report_rental_order_document
-msgid "2023-08-01"
-msgstr "2023-08-01"
-
-#. module: sale_renting
-#: model_terms:ir.ui.view,arch_db:sale_renting.report_rental_order_document
-msgid "2023-08-10"
-msgstr "2023-08-10"
 
 #. module: sale_renting
 #: model:sale.temporal.recurrence,name:sale_renting.recurrence_3_hours
@@ -120,18 +113,22 @@ msgstr "<span class=\"o_stat_text\">租赁中</span>"
 #: model_terms:ir.ui.view,arch_db:sale_renting.rental_order_form_view
 msgid ""
 "<span invisible=\"duration_days != 1\"> day </span>\n"
-"                    <span invisible=\"duration_days in [0,1]\"> days </span>\n"
-"                    <span invisible=\"duration_days == 0 or remaining_hours == 0\">and </span>"
+"                    <span invisible=\"duration_days in [0,1]\"> days </"
+"span>\n"
+"                    <span invisible=\"duration_days == 0 or remaining_hours "
+"== 0\">and </span>"
 msgstr ""
 "<span invisible=\"duration_days != 1\">天 </span>\n"
 "                    <span invisible=\"duration_days in [0,1]\">天 </span>\n"
-"                    <span invisible=\"duration_days == 0 or remaining_hours == 0\">和 </span>"
+"                    <span invisible=\"duration_days == 0 or remaining_hours "
+"== 0\">和 </span>"
 
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.rental_order_form_view
 msgid ""
 "<span invisible=\"remaining_hours != 1\"> hour </span>\n"
-"                    <span invisible=\"remaining_hours in [0,1]\"> hours </span>"
+"                    <span invisible=\"remaining_hours in [0,1]\"> hours </"
+"span>"
 msgstr ""
 "<span invisible=\"remaining_hours != 1\">小时 </span>\n"
 "                    <span invisible=\"remaining_hours in [0,1]\">小时 </span>"
@@ -140,6 +137,11 @@ msgstr ""
 #: model_terms:web_tour.tour,rainbow_man_message:sale_renting.rental_tour
 msgid "<span><b>Good job!</b> You went through all steps of this tour.</span>"
 msgstr "<span><b>干得好！</b> 您完成了所有步骤！</span>"
+
+#. module: sale_renting
+#: model_terms:ir.ui.view,arch_db:sale_renting.report_rental_order_document
+msgid "<strong class=\"d-block mt-3\">Shipping Address:</strong>"
+msgstr "<strong class=\"d-block mt-3\">运送地址:</strong>"
 
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.rental_schedule_view_gantt
@@ -162,11 +164,6 @@ msgid "<strong>Salesperson:</strong>"
 msgstr "<strong>销售员:</strong>"
 
 #. module: sale_renting
-#: model_terms:ir.ui.view,arch_db:sale_renting.report_rental_order_document
-msgid "<strong>Shipping Address:</strong>"
-msgstr "<strong>送货地址：</strong>"
-
-#. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.rental_schedule_view_gantt
 msgid "<strong>Status — </strong>"
 msgstr "<strong>状态 — </strong>"
@@ -175,12 +172,12 @@ msgstr "<strong>状态 — </strong>"
 #. odoo-python
 #: code:addons/sale_renting/models/product_template.py:0
 msgid "A rental combo product can only contain rental products."
-msgstr ""
+msgstr "租赁组合产品只能包含租赁产品。"
 
 #. module: sale_renting
 #: model:ir.model.fields,field_description:sale_renting.field_sale_temporal_recurrence__active
 msgid "Active"
-msgstr "启用"
+msgstr "有效"
 
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.product_template_form_view_rental
@@ -197,7 +194,7 @@ msgstr "逾期归还的费用"
 #: model:ir.model.fields,help:sale_renting.field_product_template__rent_ok
 #: model:ir.model.fields,help:sale_renting.field_sale_order_line__is_product_rentable
 msgid "Allow renting of this product."
-msgstr "允许租赁本产品"
+msgstr "允许租赁本产品."
 
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.res_config_settings_view_form
@@ -231,6 +228,7 @@ msgstr "取消"
 #: model:ir.model.fields.selection,name:sale_renting.selection__sale_rental_report__state__cancel
 #: model:ir.model.fields.selection,name:sale_renting.selection__sale_rental_schedule__rental_status__cancel
 #: model:ir.model.fields.selection,name:sale_renting.selection__sale_rental_schedule__state__cancel
+#: model_terms:ir.ui.view,arch_db:sale_renting.rental_schedule_view_gantt
 msgid "Cancelled"
 msgstr "已取消"
 
@@ -318,7 +316,7 @@ msgstr "创建新时段"
 #. module: sale_renting
 #: model_terms:ir.actions.act_window,help:sale_renting.rental_order_action
 msgid "Create a new quotation, the first step of a new rental!"
-msgstr "创建一个新的报价，租赁的第一步"
+msgstr "创建一个新的报价，租赁的第一步！"
 
 #. module: sale_renting
 #: model_terms:ir.actions.act_window,help:sale_renting.product_pricing_action
@@ -366,7 +364,7 @@ msgstr "创建日期"
 #: model:ir.model.fields,field_description:sale_renting.field_product_pricing__currency_id
 #: model:ir.model.fields,field_description:sale_renting.field_sale_rental_report__currency_id
 msgid "Currency"
-msgstr "币种"
+msgstr "币别"
 
 #. module: sale_renting
 #: model:ir.model.fields,field_description:sale_renting.field_product_product__product_pricing_ids
@@ -748,7 +746,8 @@ msgstr "确定"
 msgid ""
 "Once the quotation is confirmed, it becomes a rental order.<br> You will be "
 "able to create an invoice and collect the payment."
-msgstr "一旦报价被确认，它就变成了租赁订单。<br> 你将能够创建结算单并收取款项。"
+msgstr ""
+"一旦报价被确认，它就变成了租赁订单。<br> 你将能够创建结算单并收取款项。"
 
 #. module: sale_renting
 #. odoo-javascript
@@ -777,7 +776,7 @@ msgstr "单据日期"
 #. module: sale_renting
 #: model:ir.model.fields,field_description:sale_renting.field_rental_order_wizard_line__order_line_id
 msgid "Order Line"
-msgstr "订单行"
+msgstr "订单明细"
 
 #. module: sale_renting
 #: model:ir.model.fields,field_description:sale_renting.field_sale_rental_schedule__name
@@ -787,7 +786,7 @@ msgstr "订单关联"
 #. module: sale_renting
 #: model:ir.model.fields,field_description:sale_renting.field_sale_rental_schedule__order_line_id
 msgid "Order line #"
-msgstr "订单行"
+msgstr "订单明细"
 
 #. module: sale_renting
 #: model:ir.ui.menu,name:sale_renting.rental_order_menu
@@ -1060,7 +1059,7 @@ msgstr "租赁分析"
 #. module: sale_renting
 #: model:ir.model,name:sale_renting.model_sale_rental_report
 msgid "Rental Analysis Report"
-msgstr "租赁分析报告"
+msgstr "租赁分析报表"
 
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.rental_schedule_view_form
@@ -1172,7 +1171,7 @@ msgstr "租赁价格规则"
 #. module: sale_renting
 #: model:ir.ui.menu,name:sale_renting.menu_rental_reporting
 msgid "Reporting"
-msgstr "报告"
+msgstr "报表"
 
 #. module: sale_renting
 #: model_terms:ir.ui.view,arch_db:sale_renting.product_template_form_view_rental
@@ -1242,7 +1241,7 @@ msgstr "销售订单"
 #. module: sale_renting
 #: model:ir.model,name:sale_renting.model_sale_order_line
 msgid "Sales Order Line"
-msgstr "销售订单行"
+msgstr "销售订单明细"
 
 #. module: sale_renting
 #: model:ir.model.fields,field_description:sale_renting.field_sale_rental_schedule__team_id
@@ -1399,16 +1398,20 @@ msgstr "没有计划中的借出或归还。"
 #. module: sale_renting
 #: model:ir.model.fields,help:sale_renting.field_res_config_settings__extra_day
 msgid ""
-"This is the default extra cost per day set on newly created products. You "
-"can change this value for existing products directly on the product itself."
-msgstr "这是新建租赁产品时，默认的每天附加价格。 对已存在产品，你可以直接在产品窗体直接更改金额。"
+"This is the default extra cost per day set on newly created products.You can "
+"change this value for existing products directly on the product itself."
+msgstr ""
+"这是为新创建的产品设置的默认每日额外费用。您可以直接在产品上更改现有产品的此"
+"值。"
 
 #. module: sale_renting
 #: model:ir.model.fields,help:sale_renting.field_res_config_settings__extra_hour
 msgid ""
-"This is the default extra cost per hour set on newly created products. You "
+"This is the default extra cost per hour set on newly created products.You "
 "can change this value for existing products directly on the product itself."
-msgstr "这是新建租赁产品时，默认的每小时附加价格。 对已存在产品，你可以直接在产品窗体直接更改金额。"
+msgstr ""
+"这是为新创建的产品设置的默认每小时额外费用。您可以直接在产品上更改现有产品的"
+"这一数值。"
 
 #. module: sale_renting
 #: model:ir.model.fields,help:sale_renting.field_res_config_settings__extra_product
@@ -1540,8 +1543,8 @@ msgstr "年"
 #. module: sale_renting
 #: model_terms:ir.actions.act_window,help:sale_renting.rental_product_template_action
 msgid ""
-"You can also create additional products or services to sell by checking *Can"
-" be Sold* in the product form (e.g. insurance)."
+"You can also create additional products or services to sell by checking *Can "
+"be Sold* in the product form (e.g. insurance)."
 msgstr "您也可以创建额外的产品或服务用于销售，只需勾选 *可销售* (例如保险)。"
 
 #. module: sale_renting
@@ -1574,7 +1577,7 @@ msgstr "归还数量不得大于借出数量。"
 msgid ""
 "You cannot have multiple pricing for the same variant, recurrence and "
 "pricelist"
-msgstr "同一变体、递归和价目表不能有多个定价"
+msgstr "同一变体、递归和价格表不能有多个定价"
 
 #. module: sale_renting
 #: model:ir.model.constraint,message:sale_renting.constraint_sale_order_line_rental_stock_coherence
@@ -1597,3 +1600,9 @@ msgstr "所有变体"
 #: model_terms:ir.ui.view,arch_db:sale_renting.res_config_settings_view_form
 msgid "hours"
 msgstr "小时"
+
+#~ msgid "2023-08-01"
+#~ msgstr "2023-08-01"
+
+#~ msgid "2023-08-10"
+#~ msgstr "2023-08-10"

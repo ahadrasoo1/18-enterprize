@@ -1,40 +1,42 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* iap_extract
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Erwin van der Ploeg <erwin@odooexperts.nl>, 2025
+# Manon Rondou, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:27+0000\n"
+"POT-Creation-Date: 2025-12-29 18:47+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
+"Last-Translator: Manon Rondou, 2025\n"
 "Language-Team: Dutch (https://app.transifex.com/odoo/teams/41243/nl/)\n"
+"Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: nl\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #. module: iap_extract
 #: model:mail.template,body_html:iap_extract.iap_extract_no_credit
 msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
-"    <p>Dear,<br></p>\n"
-"    <p>There are no more credits on your IAP OCR account.<br>\n"
+"    <p>Dear,<br/></p>\n"
+"    <p>There are no more credits on your IAP OCR account.<br/>\n"
 "    You can charge your IAP OCR account in the settings page.</p>\n"
-"    <p>Best regards,<br></p>\n"
+"    <p>Best regards,<br/></p>\n"
 "    <p>Odoo S.A.</p>\n"
 "</div>"
 msgstr ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
-"    <p>Beste,<br></p>\n"
-"    <p>Er staan geen credits meer op je IAP OCR-account.<br>\n"
-"    Je kan je IAP OCR-account laden in de instellingenpagina.</p>\n"
-"    <p>Vriendelijke groeten,<br></p>\n"
+"    <p>Beste,<br/></p>\n"
+"    <p>Er staan geen credits meer op je IAP OCR account.<br/>\n"
+"    Je kunt je IAP OCR-account opladen in de instellingenpagina.</p>\n"
+"    <p>Vriendelijke groeten,<br/></p>\n"
 "    <p>Odoo S.A.</p>\n"
 "</div>"
 
@@ -50,6 +52,8 @@ msgid ""
 "All fields will be automatically populated by Artificial Intelligence, it "
 "might take 5 seconds."
 msgstr ""
+"Alle velden worden automatisch ingevuld door Artificial Intelligence, dit "
+"kan 5 seconden duren."
 
 #. module: iap_extract
 #. odoo-python
@@ -101,9 +105,11 @@ msgstr "Voltooide flow"
 #. module: iap_extract
 #: model:iap.service,description:iap_extract.iap_service_ocr
 msgid ""
-"Digitize your scanned or PDF vendor bills, expenses and resumes with OCR and"
-" Artificial Intelligence."
+"Digitize your scanned or PDF vendor bills, expenses and resumes with OCR and "
+"Artificial Intelligence."
 msgstr ""
+"Digitaliseer je gescande of PDF-leveranciersfacturen, declaraties en cv's "
+"met OCR en kunstmatige intelligentie."
 
 #. module: iap_extract
 #. odoo-python
@@ -121,7 +127,7 @@ msgstr "Document verstuurd voor digitalisering"
 #. odoo-javascript
 #: code:addons/iap_extract/static/src/components/status_header/status.xml:0
 msgid "Document successfully parsed. Please refresh."
-msgstr ""
+msgstr "Document succesvol verwerkt. Graag vernieuwen."
 
 #. module: iap_extract
 #: model:iap.service,unit_name:iap_extract.iap_service_ocr
@@ -162,7 +168,7 @@ msgstr "Volgers"
 #. module: iap_extract
 #: model:ir.model.fields,field_description:iap_extract.field_extract_mixin__message_partner_ids
 msgid "Followers (Partners)"
-msgstr "Volgers (Relaties)"
+msgstr "Volgers (Partners)"
 
 #. module: iap_extract
 #: model:ir.model.fields,field_description:iap_extract.field_extract_mixin__has_message
@@ -311,8 +317,8 @@ msgstr ""
 #. odoo-python
 #: code:addons/iap_extract/models/extract_mixin.py:0
 msgid ""
-"The 'invoice_ocr' IAP account token is invalid. Please delete it to let Odoo"
-" generate a new one or fill it with a valid token."
+"The 'invoice_ocr' IAP account token is invalid. Please delete it to let Odoo "
+"generate a new one or fill it with a valid token."
 msgstr ""
 "Het IAP-accounttoken 'invoice_ocr' is ongeldig. Verwijder deze om Odoo een "
 "nieuwe te laten genereren of vul het met een geldige token."
@@ -371,8 +377,8 @@ msgstr "Wachten op validatie"
 #. module: iap_extract
 #. odoo-javascript
 #: code:addons/iap_extract/static/src/components/status_header/status.xml:0
-msgid "You don't have enough credit to extract data from your"
-msgstr ""
+msgid "You don't have enough credit to extract data from your document."
+msgstr "Je hebt niet voldoende krediet om gegevens uit je document te halen."
 
 #. module: iap_extract
 #. odoo-python
@@ -380,7 +386,7 @@ msgstr ""
 msgid ""
 "Your PDF file is protected by a password. The OCR can't extract data from it"
 msgstr ""
-"Jouw PDF bestand is beveiligd met een wachtwoord. De OCR kan de data niet "
+"Je PDF bestand is beveiligd met een wachtwoord. De OCR kan de data niet "
 "uitlezen"
 
 #. module: iap_extract
@@ -388,36 +394,6 @@ msgstr ""
 #: code:addons/iap_extract/models/extract_mixin.py:0
 msgid "Your document contains too many pages"
 msgstr "Je documenten bevatten te veel pagina's"
-
-#. module: iap_extract
-#. odoo-javascript
-#: code:addons/iap_extract/static/src/components/status_header/status.js:0
-msgid "document"
-msgstr "document"
-
-#. module: iap_extract
-#. odoo-javascript
-#: code:addons/iap_extract/static/src/components/status_header/status.js:0
-msgid "expense"
-msgstr "onkosten"
-
-#. module: iap_extract
-#. odoo-javascript
-#: code:addons/iap_extract/static/src/components/status_header/status.js:0
-msgid "invoice"
-msgstr ""
-
-#. module: iap_extract
-#. odoo-javascript
-#: code:addons/iap_extract/static/src/components/status_header/status.js:0
-msgid "resume"
-msgstr ""
-
-#. module: iap_extract
-#. odoo-javascript
-#: code:addons/iap_extract/static/src/components/status_header/status.js:0
-msgid "statement"
-msgstr ""
 
 #. module: iap_extract
 #: model:ir.model.fields.selection,name:iap_extract.selection__account_bank_statement__extract_state__extract_not_ready

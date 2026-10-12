@@ -35,6 +35,7 @@
                 js_class="social_stream_post_kanban_view">
                 <field name="author_name"/>
                 <field name="author_link"/>
+                <field name="is_author"/> <!-- Needed for edit/delete buttons -->
                 <field name="post_link"/>
                 <field name="published_date"/>
                 <field name="link_url"/>
@@ -84,8 +85,8 @@
                                     target="_blank">
                                     <img t-if="record.link_image_url.raw_value" class="me-2 flex-shrink-0" t-att-src="record.link_image_url.raw_value" alt="Link Image"/>
                                     <div class="o_social_stream_post_link_text">
-                                        <field class="fw-bold text-truncate" name="link_title"/>
-                                        <field class="text-truncate" name="link_description"/>
+                                        <field class="d-block fw-bold text-truncate" name="link_title"/>
+                                        <field class="d-block text-truncate" name="link_description"/>
                                     </div>
                                 </a>
                                 <div t-if="has_attachments"

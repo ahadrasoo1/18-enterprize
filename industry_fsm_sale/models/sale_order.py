@@ -3,7 +3,7 @@
 from collections import defaultdict
 
 from odoo import api, models, fields, _
-from odoo.tools import float_is_zero
+from odoo.tools import float_compare, float_is_zero
 
 class SaleOrder(models.Model):
     _inherit = ['sale.order']
@@ -22,7 +22,7 @@ class SaleOrder(models.Model):
     @api.returns('mail.message', lambda value: value.id)
     def message_post(self, **kwargs):
         if self.env.context.get('fsm_no_message_post'):
-            return False
+            return self.env['mail.message']
         return super().message_post(**kwargs)
 
     def action_confirm(self):
@@ -50,6 +50,11 @@ class SaleOrder(models.Model):
                     grouped_lines[line.product_id] |= line
             return grouped_lines
         return super()._get_product_catalog_record_lines(product_ids, **kwarg)
+
+    def action_add_from_catalog(self):
+        if len(self.tasks_ids) == 1 and self.tasks_ids.allow_material:
+            return self.tasks_ids.action_fsm_view_material()
+        return super().action_add_from_catalog()
 
 
 class SaleOrderLine(models.Model):
@@ -89,9 +94,18 @@ class SaleOrderLine(models.Model):
             lambda sol:
                 sol.task_id.is_fsm
                 and float_is_zero(sol.price_unit, precision_rounding=sol.currency_id.rounding)
-                and sol.invoice_status in (None, 'to_invoice')
+                and sol.invoice_status not in ('invoiced', 'upselling')
         )
-        sol_from_task_without_amount.invoice_status = 'no'
+        sol_from_task_with_anglo = sol_from_task_without_amount.filtered(
+            lambda sol: sol.company_id.anglo_saxon_accounting
+        )
+        precision = self.env['decimal.precision'].precision_get('Product Unit of Measure')
+        sol_from_task_with_anglo_invoiced = sol_from_task_with_anglo.filtered(
+            lambda sol: float_compare(sol.qty_invoiced, sol.product_uom_qty, precision_digits=precision) >= 0
+        )
+        sol_from_task_with_anglo_invoiced.invoice_status = 'invoiced'
+        (sol_from_task_with_anglo - sol_from_task_with_anglo_invoiced).invoice_status = 'to invoice'
+        (sol_from_task_without_amount - sol_from_task_with_anglo).invoice_status = 'no'
         super(SaleOrderLine, self - sol_from_task_without_amount)._compute_invoice_status()
 
     @api.depends('price_unit')
@@ -101,10 +115,15 @@ class SaleOrderLine(models.Model):
                 sol.task_id.is_fsm
                 and float_is_zero(sol.price_unit, precision_rounding=sol.currency_id.rounding)
         )
-        sol_from_task_without_amount.qty_to_invoice = 0.0
-        super(SaleOrderLine, self - sol_from_task_without_amount)._compute_qty_to_invoice()
+        sol_from_task_with_anglo_or_prepaid_service = sol_from_task_without_amount.filtered(
+            lambda sol:
+                sol.company_id.anglo_saxon_accounting
+                or (sol.product_id.type == 'service' and sol.product_id.service_policy == 'ordered_prepaid')
+        )
+        sol_without_anglo_or_prepaid_service = sol_from_task_without_amount - sol_from_task_with_anglo_or_prepaid_service
+        sol_without_anglo_or_prepaid_service.qty_to_invoice = 0.0
+        super(SaleOrderLine, self - sol_without_anglo_or_prepaid_service)._compute_qty_to_invoice()
 
     def action_add_from_catalog(self):
-        if len(self.task_id) == 1 and self.task_id.allow_material:
-            return self.task_id.action_fsm_view_material()
+        # TODO: remove me in master
         return super().action_add_from_catalog()

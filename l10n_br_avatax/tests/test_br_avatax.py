@@ -9,7 +9,9 @@ from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 from odoo.addons.l10n_br_avatax.models.account_external_tax_mixin import AccountExternalTaxMixinL10nBR
 from odoo.exceptions import UserError
 from odoo.tests.common import tagged
+from odoo import Command
 from .mocked_invoice_response import generate_response
+from .mocked_credit_note_response import generate_response as credit_note_generate_response
 
 _logger = logging.getLogger(__name__)
 
@@ -139,8 +141,8 @@ class TestAvalaraBrCommon(AccountTestInvoicingCommon):
     @classmethod
     @contextmanager
     def _capture_request_br(cls, return_value=None):
-        with patch(f'{AccountExternalTaxMixinL10nBR.__module__}.AccountExternalTaxMixinL10nBR._l10n_br_iap_request', return_value=return_value):
-            yield
+        with patch(f'{AccountExternalTaxMixinL10nBR.__module__}.AccountExternalTaxMixinL10nBR._l10n_br_iap_request', return_value=return_value) as mocked:
+            yield mocked
 
     @classmethod
     def _create_invoice_01_and_expected_response(cls):
@@ -308,6 +310,90 @@ class TestAvalaraBrInvoice(TestAvalaraBrInvoiceCommon):
         self.assertEqual(payload['header']['operationType'], 'salesReturn', 'The operationType for credit notes should be returnSales.')
         self.assertEqual(payload['header']['invoicesRefs'][0]['documentCode'], f'account.move_{invoice.id}', 'The credit note should reference the original invoice.')
 
+    def test_06_service_invoice_with_installments(self):
+        """Test that service invoices with installments clear tax_ids when using Avalara. It's necessary because Avalara
+        expects installments to be sent without taxes for service invoices."""
+        invoice, response = self._create_invoice_01_and_expected_response()
+        rio_city = self.env.ref("l10n_br.city_br_002")
+
+        invoice.invoice_payment_term_id = self.pay_terms_b.id
+        invoice.l10n_latam_document_type_id = self.env.ref("l10n_br.dt_SE").id
+        invoice.partner_id.city_id = rio_city
+
+        # Mark all products as services and assign service code
+        for line in invoice.invoice_line_ids:
+            line.tax_ids = self.tax_sale_a
+            line.product_id.write({
+                'type': 'service',
+                'l10n_br_property_service_code_origin_id': self.env['l10n_br.service.code'].create({
+                    'code': '12345',
+                    'city_id': rio_city.id,
+                }),
+            })
+
+        # Ensure there's a tax amount
+        self.assertGreater(invoice.amount_tax, 0, "There should be a tax amount on this invoice.")
+
+        with self._capture_request_br(return_value=response) as captured:
+            invoice._get_external_taxes()
+
+        expected_untaxed_terms = invoice.invoice_payment_term_id._compute_terms(
+            invoice.date,
+            invoice.currency_id,
+            invoice.company_id,
+            tax_amount=0,
+            tax_amount_currency=0,
+            sign=1,
+            untaxed_amount=invoice.amount_untaxed,
+            untaxed_amount_currency=invoice.amount_untaxed,
+        )
+
+        self.assertEqual(
+            [installment['grossValue'] for installment in captured.call_args[0][1]['header']['payment']['installment']],
+            [term['company_amount'] for term in expected_untaxed_terms['line_ids']],
+            "Installments should be sent without taxes."
+        )
+
+    def test_07_credit_note_with_included_tax(self):
+        product = self.env['product.product'].create({
+            'name': 'Test Product',
+            'default_code': 'PROD2',
+            'list_price': 800.00,
+            'standard_price': 800.00,
+            'l10n_br_ncm_code_id': self.env.ref('l10n_br_avatax.02062990').id,
+            'l10n_br_source_origin': '0',
+            'l10n_br_sped_type': 'FOR PRODUCT',
+            'l10n_br_use_type': 'production',
+            'supplier_taxes_id': None,
+        })
+
+        credit_note = self.env['account.move'].create({
+            'move_type': 'out_refund',
+            'partner_id': self.partner.id,
+            'fiscal_position_id': self.fp_avatax.id,
+            'invoice_date': '2021-01-01',
+            'invoice_line_ids': [
+                Command.create({
+                    'product_id': product.id,
+                    'tax_ids': None,
+                    'price_unit': product.list_price,
+                }),
+            ],
+        })
+
+        response = credit_note_generate_response(credit_note.invoice_line_ids)
+        with self._capture_request_br(return_value=response):
+            credit_note.action_post()
+
+        expected_amounts = {
+            'amount_total': 800.0,
+            'amount_untaxed': 704.0,
+            'amount_tax': 96.0,
+        }
+        self.assertRecordValues(credit_note, [expected_amounts])
+        self.assertEqual(credit_note.tax_totals['total_amount_currency'], expected_amounts['amount_total'])
+        self.assertEqual(credit_note.tax_totals['base_amount_currency'], expected_amounts['amount_untaxed'])
+
 
 @tagged('post_install_l10n', '-at_install', 'post_install')
 class TestAvalaraBrSettings(TestAvalaraBrInvoiceCommon):
@@ -356,6 +442,15 @@ class TestAvalaraBrSettings(TestAvalaraBrInvoiceCommon):
         with self._capture_request_br(return_value=return_value), \
              self.assertRaisesRegex(UserError, 'Login já utlizado'):
             self.settings.create_account()
+
+    def test_04_no_false(self):
+        """ Do not send "false" to the API for empty fields. It will populate "false" in some of the fields on Avatax's side
+        and cause issues during EDI. """
+        with self._capture_request_br(return_value={}) as mocked_request:
+            self.settings.create_account()
+
+        for k, v in mocked_request.call_args[0][1].items():
+            self.assertNotEqual(v, False, f"{k} was False instead of empty string")
 
 
 @tagged('external_l10n', 'external', '-at_install', 'post_install', '-standard')

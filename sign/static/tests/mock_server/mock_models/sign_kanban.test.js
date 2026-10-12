@@ -9,10 +9,8 @@ defineModels([SignTemplate, SignTemplateTag]);
 
 describe.current.tags("desktop");
 
-let pyEnv;
-
 beforeEach(async () => {
-    pyEnv = await startServer();
+    const pyEnv = await startServer();
     const attachmentId = pyEnv["ir.attachment"].create({
         name: "yop.pdf",
         res_model: "sign.template",
@@ -44,23 +42,18 @@ test("Drop to upload file in kanban", async () => {
     fileInput.files = dataTransfer.files;
     await dragoverFiles(".o_content", dataTransfer.files);
     await dropFiles(".o_dropzone", dataTransfer.files);
-    onRpc("/web/dataset/call_kw/sign.template/create_with_attachment_data", async (request) => {
+    onRpc("sign.template", "create_with_attachment_data", function ({ args, model }) {
         step("attachment create");
-        const values = await request.json();
-        if (values.params.method === "create_with_attachment_data") {
-            expect(values.params.model).toBe("sign.template");
-            expect(values.params.args.length).toBe(3);
-            const attachmentID = pyEnv["ir.attachment"].create({
-                name: values.params.args[0],
-                res_model: values.params.model,
-                datas: values.params.args[1],
-            });
-            const signTemplate = pyEnv[values.params.model].create({
-                attachment_id: attachmentID,
-                active: true,
-            });
-            return signTemplate;
-        }
+        expect(args.length).toBe(3);
+        const attachmentID = this.env["ir.attachment"].create({
+            name: args[0],
+            res_model: model,
+            datas: args[1],
+        });
+        return this.env[model].create({
+            attachment_id: attachmentID,
+            active: true,
+        });
     });
     expect(".o_dropzone").toHaveCount(1);
     await assertSteps(["attachment create"]);

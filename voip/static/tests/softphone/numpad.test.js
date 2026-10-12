@@ -65,6 +65,19 @@ test("Cursor range selection is taken into account when clicking Backspace.", as
     await contains("input[placeholder='Enter the number…'][data-value='0123456']");
 });
 
+test("Selection starting at the beginning is removed when clicking Backspace.", async () => {
+    await start();
+    await click(".o_menu_systray button[title='Open Softphone']");
+    await click("button[title='Open Numpad']");
+    await insertText("input[placeholder='Enter the number…']", "0123456");
+    const input = document.querySelector("input[placeholder='Enter the number…']");
+    input.setSelectionRange(0, 2);
+    await click("button[title='Backspace']");
+    expect(input.selectionStart).toBe(0);
+    expect(input.selectionEnd).toBe(0);
+    await contains("input[placeholder='Enter the number…']", { value: "23456" });
+});
+
 test("When cursor is at the beginning of the input, clicking Backspace does nothing.", async () => {
     await start();
     await click(".o_menu_systray button[title='Open Softphone']");

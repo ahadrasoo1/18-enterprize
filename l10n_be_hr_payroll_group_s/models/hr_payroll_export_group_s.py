@@ -3,8 +3,9 @@
 from datetime import datetime
 from math import ceil
 
-from odoo import api, models, fields, _
-from odoo.exceptions import UserError
+from odoo import api, models, fields
+from odoo.exceptions import RedirectWarning, UserError
+from odoo.osv.expression import AND
 
 
 class L10nBeHrPayrollExportGroupS(models.Model):
@@ -17,6 +18,28 @@ class L10nBeHrPayrollExportGroupS(models.Model):
     @api.model
     def _country_restriction(self):
         return 'BE'
+
+    @api.model
+    def default_get(self, fields):
+        res = super().default_get(fields)
+        if not (companies := self.env.companies.filtered(
+            lambda company: company.group_s_code and company.country_id.code == self._country_restriction())
+        ):
+            raise RedirectWarning(
+                self.env._('The companies must have an affiliation number to export to Group S.'),
+                action=self.env.ref('hr_payroll.action_hr_payroll_configuration').id,
+                button_text=self.env._('Go to Settings')
+            )
+        if 'company_id' in fields:
+            res['company_id'] = self.env.company.id \
+                if self.env.company in companies else companies[0].id
+        return res
+
+    def _get_company_domain(self):
+        return AND([
+            super()._get_company_domain(),
+            [('group_s_code', '!=', False)]
+        ])
 
     def _compose_group_s_starter(self):
         """Group S requires a start line composed of a series of fixed-length fields.
@@ -38,9 +61,9 @@ class L10nBeHrPayrollExportGroupS(models.Model):
         ```
         eg: 000PTG001202405171618120000654321EUR  000001 ODOO
         """
-        affiliation_number = '0000' + self.env.company.group_s_code
+        affiliation_number = self.env.company.group_s_code and '0000' + self.env.company.group_s_code
         if not affiliation_number:
-            raise UserError(_('The company must have an affiliation number to export to Group S.'))
+            raise UserError(self.env._('The company must have an affiliation number to export to Group S.'))
         create_date = datetime.now().strftime('%Y%m%d%H%M%S')
         return '000' + 'PTG' + '002' + create_date + affiliation_number + 'EUR ' + ' ' * 8 + 'ODOO' + '\n'
 
@@ -85,9 +108,9 @@ class L10nBeHrPayrollExportGroupS(models.Model):
         }
 
         if not reference_contract.schedule_pay:
-            raise UserError(_('The pay schedule of the contracts must be set to export to Group S.'))
-        if not reference_contract.schedule_pay in remuneration_interval_to_group_s_code:
-            raise UserError(_('The pay schedule of the contracts is not supported by Group S.'))
+            raise UserError(self.env._('The pay schedule of the contracts must be set to export to Group S.'))
+        if reference_contract.schedule_pay not in remuneration_interval_to_group_s_code:
+            raise UserError(self.env._('The pay schedule of the contracts is not supported by Group S.'))
 
         return '003' + self.period_stop.strftime('%Y%m') + '1' \
             + employee_type_to_group_s_code[employee_type] + '02' \
@@ -110,11 +133,6 @@ class L10nBeHrPayrollExportGroupS(models.Model):
         ```
         eg: 0060000000012320240401
         """
-        if not contract.group_s_code:
-            raise UserError(_(
-                'The contract %(contract)s must have a Group S code to export to Group S.',
-                contract=contract.name
-            ))
         start_date = contract.date_start.strftime('%Y%m%d') if contract.date_start > self.period_start \
             else self.period_start.strftime('%Y%m%d')
         return '006' + '00000' + contract.group_s_code + start_date + '\n'
@@ -182,7 +200,7 @@ class L10nBeHrPayrollExportGroupS(models.Model):
         employee_entries = ''
         for contract in employee_line.contract_ids:
             if not contract.schedule_pay == reference_contract.schedule_pay:
-                raise UserError(_('The pay schedule of the contracts must be the same to export to Group S.'))
+                raise UserError(self.env._('The pay schedule of the contracts must be the same to export to Group S.'))
             if len(employee_line.contract_ids) > 1:
                 we_by_day_and_code_in_contract = {
                     date: we_by_code for date, we_by_code in we_by_day_and_code.items()
@@ -234,19 +252,19 @@ class L10nBeHrPayrollExportGroupS(models.Model):
         [36]       - 4      - ASCII     - file extension                (.dat)
         ```
         """
-        self.env.company.group_s_sequence_number += 1
-        if len(str(self.env.company.group_s_sequence_number)):
-            self.env.company.group_s_sequence_number = 0
+        self.company_id.group_s_sequence_number += 1
+        if len(str(self.company_id.group_s_sequence_number)) > 5:
+            self.company_id.group_s_sequence_number = 0
         return '_'.join([
             'FIPAI', 'PTG',
-            f'{int(self.env.company.group_s_code):06d}',
-            f'{self.env.company.id:06d}',
-            f'{self.env.company.group_s_sequence_number:05d}',
+            f'{int(self.company_id.group_s_code):06d}',
+            f'{self.company_id.id:06d}',
+            f'{self.company_id.group_s_sequence_number:05d}',
             datetime.now().strftime('%Y%m%d'), '000000.dat'
         ])
 
     def _get_name(self):
-        return _('Export to Group S')
+        return self.env._('Export to Group S')
 
 
 class L10nBeHrPayrollExportGroupSEmployee(models.Model):
@@ -255,3 +273,10 @@ class L10nBeHrPayrollExportGroupSEmployee(models.Model):
     _inherit = 'hr.work.entry.export.employee.mixin'
 
     export_id = fields.Many2one('l10n.be.hr.payroll.export.group.s')
+
+    def _relations_to_check(self):
+        return super()._relations_to_check() + [
+            (self.env._('companies'), 'export_id.company_id.group_s_code'),
+            (self.env._('contracts'), 'contract_ids.group_s_code'),
+            (self.env._('work entry types'), 'work_entry_ids.work_entry_type_id.group_s_code'),
+        ]

@@ -45,13 +45,13 @@ class StockPicking(models.Model):
             amazon_pickings._check_sales_order_line_completion()
             # Flag the pickings linked to Amazon that are the last step of a (multi-step) delivery
             # route as pending synchronization.
-            last_step_amazon_pickings = amazon_pickings.filtered(
-                lambda p: p.location_dest_id.usage == 'customer'
+            pickings_requiring_amazon_sync = amazon_pickings.filtered(
+                lambda p: p.location_dest_id.usage == 'customer' and p.amazon_sync_status != 'done'
             )
-            super(StockPicking, last_step_amazon_pickings).write(
+            super(StockPicking, pickings_requiring_amazon_sync).write(
                 dict(amazon_sync_status='pending', **vals)
             )
-            pickings -= last_step_amazon_pickings
+            pickings -= pickings_requiring_amazon_sync
         return super(StockPicking, pickings).write(vals)
 
     def _check_sales_order_line_completion(self):
@@ -100,6 +100,7 @@ class StockPicking(models.Model):
             lambda p: p.sale_id
             and p.sale_id.amazon_order_ref
             and p.location_dest_id.usage == 'customer'
+            and p.amazon_sync_status != 'done'
         )  # In sudo mode to read the field on sale.order
         for picking_sudo in amazon_pickings_sudo:
             if not picking_sudo.carrier_id.name:
@@ -211,9 +212,16 @@ class StockPicking(models.Model):
 
                 # Add the fulfillment data.
                 fulfillment_data_ = ElementTree.SubElement(order_fulfillment_, 'FulfillmentData')
+                carrier_code_ = picking_.with_context(
+                    amazon_carrier_name_fallback='Other'
+                )._get_formatted_carrier_name()
+                ElementTree.SubElement(fulfillment_data_, 'CarrierCode').text = carrier_code_
                 ElementTree.SubElement(
                     fulfillment_data_, 'CarrierName'
                 ).text = picking_._get_formatted_carrier_name()
+                ElementTree.SubElement(
+                    fulfillment_data_, 'ShippingMethod'
+                ).text = picking_.carrier_id.name
                 ElementTree.SubElement(
                     fulfillment_data_, 'ShipperTrackingNumber'
                 ).text = picking_.carrier_tracking_ref
@@ -273,7 +281,8 @@ class StockPicking(models.Model):
             if carrier_key in ('fixed', 'base_on_rule'):  # The delivery carrier is a custom one
                 carrier_key = self.carrier_id.name  # Fallback on the carrier name
             carrier_key = ''.join(filter(str.isalnum, carrier_key)).lower()  # Normalize the key
-            shipper_name = const.AMAZON_CARRIER_NAMES_MAPPING.get(carrier_key, self.carrier_id.name)
+            fallback = self.env.context.get('amazon_carrier_name_fallback', self.carrier_id.name)
+            shipper_name = const.AMAZON_CARRIER_NAMES_MAPPING.get(carrier_key, fallback)
         return shipper_name
 
     def _get_confirmed_order_lines(self):

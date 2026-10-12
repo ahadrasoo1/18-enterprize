@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import fields, models, _
+from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 from odoo.tools.date_utils import start_of, end_of, add, subtract
 from odoo.tools.misc import format_date
@@ -46,6 +46,13 @@ class Company(models.Model):
     mrp_mps_show_actual_demand_year_minus_2 = fields.Boolean(
         'Display Actual Demand Before Year', default=False)
 
+    @api.model
+    def _is_field_mps_display_group(self, fname):
+        return (
+            self._fields[fname].type == 'boolean' and
+            fname.startswith(('mrp_mps', 'x_mrp_mps', 'x_studio_mrp_mps'))
+        )
+
     def _get_date_range(self, years=False, force_period=False):
         """ Return the date range for a production schedude depending the
         manufacturing period and the number of columns to display specify by the
@@ -78,7 +85,7 @@ class Company(models.Model):
                     week_num=format_date(self.env, date_start, date_format='w'),
                     start_date=format_date(self.env, date_start, date_format='d'),
                     end_date=format_date(self.env, date_stop, date_format='d'),
-                    month=format_date(self.env, date_start, date_format='MMM')
+                    month=format_date(self.env, date_stop, date_format='MMM')
                 ))
             else:
                 dates_as_str.append(format_date(self.env, date_start, date_format='MMM d'))
@@ -90,4 +97,12 @@ class Company(models.Model):
                 or ('manufacturing_period_to_display_week' in vals and vals['manufacturing_period_to_display_week'] <= 0)
                 or ('manufacturing_period_to_display_day' in vals and vals['manufacturing_period_to_display_day'] <= 0)):
             raise UserError(_("Manufacturing Settings: Your Master Production Schedule must always display at least 1 period."))
+        if len(vals) == 1:
+            fname, = vals.keys()
+            if self._is_field_mps_display_group(fname) and self.env.user.has_group('mrp.group_mrp_manager'):
+                return super(Company, self.sudo()).write(vals)
         return super().write(vals)
+
+    def save_company_settings(self, vals):
+        """ Function to call from JS to avoid a full reload of the page and context. """
+        return self.write(vals)

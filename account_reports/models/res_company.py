@@ -139,6 +139,24 @@ class ResCompany(models.Model):
 
         return res
 
+    def _get_closing_report_for_tax_closing_move(self, report, fpos):
+        closing_report = report
+
+        if not closing_report.country_id and closing_report.root_report_id:
+            # Fallback to root report if we're using a non-localized variant (typically the grouped tax reports)
+            closing_report = closing_report.root_report_id
+
+        target_country = (fpos and fpos.country_id) or self.env.company.account_fiscal_country_id
+        country_variants = [variant for variant in (closing_report.root_report_id or closing_report).variant_report_ids if variant.country_id == target_country]
+        if len(country_variants) > 1:
+            # More than one national variant available: use the generic tax report
+            closing_report = self.env.ref('account.generic_tax_report')
+        elif country_variants and closing_report.country_id != target_country:
+            # Only one national variant available: select it
+            closing_report = country_variants[0]
+
+        return closing_report
+
     def _get_and_update_tax_closing_moves(self, in_period_date, report, fiscal_positions=None, include_domestic=False):
         """ Searches for tax closing moves. If some are missing for the provided parameters,
         they are created in draft state. Also, existing moves get updated in case of configuration changes
@@ -156,17 +174,20 @@ class ResCompany(models.Model):
             fiscal_positions = []
 
         # Compute period dates depending on the date
-        period_start, period_end = self._get_tax_closing_period_boundaries(in_period_date, report)
-        periodicity = self._get_tax_periodicity(report)
         tax_closing_journal = self._get_tax_closing_journal()
 
         all_closing_moves = self.env['account.move']
         for fpos in itertools.chain(fiscal_positions, [False] if include_domestic else []):
+            closing_report = self._get_closing_report_for_tax_closing_move(report, fpos)
+
+            period_start, period_end = self._get_tax_closing_period_boundaries(in_period_date, closing_report)
+            periodicity = self._get_tax_periodicity(closing_report)
+
             fpos_id = fpos.id if fpos else False
             tax_closing_move = self.env['account.move'].search([
                 ('state', '=', 'draft'),
                 ('company_id', '=', self.id),
-                ('tax_closing_report_id', '=', report.id),
+                ('tax_closing_report_id', '=', closing_report.id),
                 ('date', '>=', period_start),
                 ('date', '<=', period_end),
                 ('fiscal_position_id', '=', fpos.id if fpos else None),
@@ -185,14 +206,14 @@ class ResCompany(models.Model):
                 raise UserError(error)
 
             # Compute tax closing description
-            ref = _("%(report_label)s: %(period)s", report_label=self._get_tax_closing_report_display_name(report), period=self._get_tax_closing_move_description(periodicity, period_start, period_end, fpos, report))
+            ref = _("%(report_label)s: %(period)s", report_label=self._get_tax_closing_report_display_name(closing_report), period=self._get_tax_closing_move_description(periodicity, period_start, period_end, fpos, closing_report))
 
             # Values for update/creation of closing move
             closing_vals = {
                 'company_id': self.id,# Important to specify together with the journal, for branches
                 'journal_id': tax_closing_journal.id,
                 'date': period_end,
-                'tax_closing_report_id': report.id,
+                'tax_closing_report_id': closing_report.id,
                 'fiscal_position_id': fpos_id,
                 'ref': ref,
                 'name': '/', # Explicitly set a void name so that we don't set the sequence for the journal and don't consume a sequence number
@@ -205,10 +226,10 @@ class ResCompany(models.Model):
                 tax_closing_move = self.env['account.move'].create(closing_vals)
 
             # Create a reminder activity if it doesn't exist
-            activity = self._get_tax_closing_reminder_activity(report.id, period_end, fpos_id)
+            activity = self._get_tax_closing_reminder_activity(closing_report.id, period_end, fpos_id)
             tax_closing_options = tax_closing_move._get_tax_closing_report_options(tax_closing_move.company_id, tax_closing_move.fiscal_position_id, tax_closing_move.tax_closing_report_id, tax_closing_move.date)
-            if not activity and report._get_sender_company_for_export(tax_closing_options) == tax_closing_move.company_id:
-                self._generate_tax_closing_reminder_activity(report, period_end, fpos)
+            if not activity and closing_report._get_sender_company_for_export(tax_closing_options) == tax_closing_move.company_id:
+                self._generate_tax_closing_reminder_activity(closing_report, period_end, fpos)
 
             all_closing_moves += tax_closing_move
 
@@ -272,8 +293,9 @@ class ResCompany(models.Model):
         self.ensure_one()
         tax_closing_activity_type = self.env.ref('account_reports.tax_closing_activity_type')
         return self._get_tax_closing_journal().activity_ids.filtered(
-            lambda act: act.activity_type_id == tax_closing_activity_type and act.account_tax_closing_params['report_id'] == report_id
-                and fields.Date.from_string(act.account_tax_closing_params['tax_closing_end_date']) == period_end and act.account_tax_closing_params['fpos_id'] == fpos_id
+            lambda act: act.account_tax_closing_params and (act.activity_type_id == tax_closing_activity_type and act.account_tax_closing_params['report_id'] == report_id
+                                                            and fields.Date.from_string(act.account_tax_closing_params['tax_closing_end_date']) == period_end
+                                                            and act.account_tax_closing_params['fpos_id'] == fpos_id)
         )
 
     def _get_tax_closing_move_description(self, periodicity, period_start, period_end, fiscal_position, report):
@@ -301,7 +323,7 @@ class ResCompany(models.Model):
                     ('country_id', '=', self.account_fiscal_country_id.id),
                     ('state_ids', '!=', False),
                 ])
-                state_codes = [self.state_id.code] if vat_fpos_with_state_count else []
+                state_codes = [self.state_id.code] if self.state_id and vat_fpos_with_state_count else []
 
             if state_codes:
                 region_string = " (%s - %s)" % (country_code, ', '.join(state_codes))

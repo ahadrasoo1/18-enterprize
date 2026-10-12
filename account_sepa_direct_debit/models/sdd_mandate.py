@@ -3,8 +3,11 @@
 from datetime import datetime
 
 from odoo import Command, api, fields, models, _
-from odoo.exceptions import RedirectWarning, UserError
+from odoo.exceptions import RedirectWarning, UserError, ValidationError
 from odoo.tools import SQL
+
+SDD_MIN_PRENOT_PERIOD = 2
+SDD_FIRST_MIN_PRENOT_PERIOD = 5
 
 
 class SDDMandate(models.Model):
@@ -56,6 +59,12 @@ class SDDMandate(models.Model):
         check_company=True,
         help="Customer whose payments are to be managed by this mandate.",
     )
+    partner_parent_id = fields.Many2one(
+        related='partner_id.parent_id',
+        comodel_name='res.partner',
+        string="Parent Partner",
+        readonly=True,
+    )
     company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.company, help="Company for whose invoices the mandate can be used.")
     partner_bank_id = fields.Many2one(
         comodel_name='res.partner.bank',
@@ -79,7 +88,7 @@ class SDDMandate(models.Model):
     )
     pre_notification_period = fields.Integer(
         string="Pre-notification",
-        default=2, required=True,
+        default=SDD_MIN_PRENOT_PERIOD, required=True,
         help="The minimum notice period in days, used to inform the customer prior to collection.",
     )
     sdd_scheme = fields.Selection(string="SDD Scheme", selection=[('CORE', 'CORE'), ('B2B', 'B2B')],
@@ -94,17 +103,14 @@ class SDDMandate(models.Model):
         help="Number of invoices paid with this mandate.")
     payment_ids = fields.One2many(string='Payments', comodel_name='account.payment',
         compute='_compute_from_moves',
-        help="Payments generated thanks to this mandate.")
+        help="In-process and completed payments generated under this mandate.")
     payments_to_collect_nber = fields.Integer(string='Direct Debit Payments to Collect',
         compute='_compute_from_moves',
-        help="Number of Direct Debit payments to be collected for this mandate, that is, the number of payments that "
-             "have been generated and posted thanks to this mandate and still needs their XML file to be generated and "
-             "sent to the bank to debit the customer's account.")
+        help="Number of in-process and completed payments generated under this mandate.")
     mandate_pdf_file = fields.Binary(
         string="Mandate Form PDF",
         attachment=True,
         copy=False,
-        groups='account.group_account_readonly',
         readonly=True,
     )
 
@@ -141,29 +147,20 @@ class SDDMandate(models.Model):
             return
 
         results = dict(
-            self.env['account.move']._read_group([
-                ('sdd_mandate_id', 'in', self.ids),
-                ('move_type', 'in', ('out_invoice', 'out_refund', 'in_invoice', 'in_refund'))
-            ], groupby=['sdd_mandate_id'], aggregates=['id:array_agg'])
-        )
-
-        for mandate in self:
-            invoice_ids = results.get(mandate, [])
-            mandate.paid_invoice_ids = [Command.set(invoice_ids)]
-            mandate.paid_invoices_nber = len(invoice_ids)
-
-        results = dict(
             self.env['account.payment']._read_group([
                 ('sdd_mandate_id', 'in', self.ids),
                 ('payment_method_code', 'in', self.env['account.payment.method']._get_sdd_payment_method_code()),
-                ('move_id.state', '=', 'posted'),
-            ], groupby=['sdd_mandate_id'], aggregates=['id:array_agg'])
+                ('state', 'in', ('in_process', 'paid')),
+            ], groupby=['sdd_mandate_id'], aggregates=['id:recordset'])
         )
 
         for mandate in self:
-            payment_ids = results.get(mandate, [])
-            mandate.payment_ids = [Command.set(payment_ids)]
-            mandate.payments_to_collect_nber = len(payment_ids)
+            payments = results.get(mandate, self.env['account.payment'])
+            mandate.payment_ids = [Command.set(payments.ids)]
+            mandate.payments_to_collect_nber = len(payments)
+            invoices = payments.reconciled_invoice_ids.filtered(lambda move: move.payment_state == 'paid')
+            mandate.paid_invoice_ids = [Command.set(invoices.ids)]
+            mandate.paid_invoices_nber = len(invoices)
 
     def _update_and_partition_state_by_validity(self):
         """
@@ -188,6 +185,8 @@ class SDDMandate(models.Model):
                     expiring_mandates += mandate  # Used to send warnings
                 else:
                     valid_mandates += mandate
+            elif today < mandate.start_date:
+                invalid_mandates += mandate
             else:
                 to_close += mandate
                 invalid_mandates += mandate
@@ -210,16 +209,13 @@ class SDDMandate(models.Model):
         payments_collected_per_mandate = dict(self.env['account.payment']._read_group([
                 ('sdd_mandate_id', 'in', self.ids),
                 ('payment_method_code', 'in', self.env['account.payment.method']._get_sdd_payment_method_code()),
-                ('state', 'in', ('in_process', 'paid')),
-                ('move_id.state', '=', 'posted'),
+                ('state', '=', 'paid'),
             ],
             groupby=['sdd_mandate_id'],
             aggregates=['id:recordset'],
         ))
         for mandate in self:
-            payments_collected = payments_collected_per_mandate.get(mandate, self.env['account.payment']).filtered(
-                lambda payment: (payment.move_id.currency_id.is_zero(payment.move_id.amount_residual))
-            )
+            payments_collected = payments_collected_per_mandate.get(mandate, self.env['account.payment'])
 
             dates = [mandate.end_date] if mandate.end_date else []
             dates.append(max(payments_collected.mapped('date'), default=mandate.start_date) + delay_36_months)
@@ -287,22 +283,14 @@ class SDDMandate(models.Model):
                 record.state = 'closed'
 
     def action_view_paid_invoices(self):
-        return {
-            'type': 'ir.actions.act_window',
-            'name': _('Paid Invoices'),
-            'res_model': 'account.move',
-            'view_mode': 'list,form',
-            'domain': [('id', 'in', self.mapped('paid_invoice_ids').ids)],
-        }
+        return self.paid_invoice_ids._get_records_action(name=_('Paid Invoices'))
 
     def action_view_payments_to_collect(self):
-        return {
-            'type': 'ir.actions.act_window',
-            'name': _('Payments to Collect'),
-            'res_model': 'account.payment',
-            'view_mode': 'list,form',
-            'domain': [('id', 'in', self.mapped('payment_ids').ids), ('state', '=', 'posted')],
-        }
+        return self.payment_ids._get_records_action(name=_('Payments to Collect'))
+
+    def action_parent_id_from_sdd_mandate(self):
+        parent = self.partner_id.parent_id
+        return parent._get_records_action(name=_("Partner's Parent"))
 
     @api.constrains('end_date', 'start_date')
     def _validate_end_date(self):
@@ -319,11 +307,18 @@ class SDDMandate(models.Model):
     @api.constrains('pre_notification_period')
     def _validate_pre_notification_period(self):
         for mandate in self:
-            if mandate.pre_notification_period < 2:  # Minimum required for collection
+            if mandate.pre_notification_period < SDD_MIN_PRENOT_PERIOD:  # Minimum required for collection
                 raise UserError(_(
-                    "SEPA regulations set the minimum pre-notification period to a minimum of 2 days "
-                    "to allow enough time for the customer to check that their account is adequately funded."
+                    "SEPA regulations set the minimum pre-notification period to a minimum of %s days "
+                    "to allow enough time for the customer to check that their account is adequately funded.",
+                    SDD_MIN_PRENOT_PERIOD
                 ))
+
+    @api.constrains('partner_id', 'partner_bank_id')
+    def _validate_partner_bank_id(self):
+        for mandate in self:
+            if mandate.partner_bank_id and mandate.partner_id != mandate.partner_bank_id.partner_id:
+                raise ValidationError(_("Mandate customer and bank account need to match."))
 
     def _ensure_required_data(self):
         """ Helper to make sure we don't send/validate a mandate missing the required data """

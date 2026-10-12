@@ -1481,8 +1481,8 @@ class TestAccountReportsFilters(TestAccountReportsCommon, odoo.tests.HttpCase):
         )
 
         # Test 'tax_units' filter, with an existing tax unit object
-        self.single_date_report.availability_condition = 'country'
         self.single_date_report.country_id = self.env.ref('base.be')
+        self.single_date_report.availability_condition = 'country'
 
         tax_unit = self.env['account.tax.unit'].create({
             'name': "Test Tax Unit",
@@ -1574,9 +1574,9 @@ class TestAccountReportsFilters(TestAccountReportsCommon, odoo.tests.HttpCase):
             {},
             {
                 'string': 'Aug 2024',
-                'period_type': 'tax_period',
+                'period_type': 'month',
                 'mode': 'range',
-                'filter': 'previous_tax_period',
+                'filter': 'previous_month',
                 'period': -1,
                 'date_from': '2024-08-01',
                 'date_to': '2024-08-31',
@@ -1589,9 +1589,9 @@ class TestAccountReportsFilters(TestAccountReportsCommon, odoo.tests.HttpCase):
             {'date': {'period': -8, 'filter': 'previous_tax_period'}},
             {
                 'string': 'Jan 2024',
-                'period_type': 'tax_period',
+                'period_type': 'month',
                 'mode': 'range',
-                'filter': 'previous_tax_period',
+                'filter': 'previous_month',
                 'period': -8,
                 'date_from': '2024-01-01',
                 'date_to': '2024-01-31',
@@ -1606,12 +1606,48 @@ class TestAccountReportsFilters(TestAccountReportsCommon, odoo.tests.HttpCase):
             {'date': {'period': -1, 'filter': 'previous_tax_period'}},
             {
                 'string': '2023',
-                'period_type': 'tax_period',
+                'period_type': 'year',
                 'mode': 'range',
-                'filter': 'previous_tax_period',
+                'filter': 'previous_year',
                 'period': -1,
                 'date_from': '2023-01-01',
                 'date_to': '2023-12-31',
                 'currency_table_period_key': '2023-01-01_2023-12-31',
             },
         )
+
+    def test_send_customer_statement_without_template(self):
+        """Test sending the customer statement without an email template."""
+        report = self.env.ref('account_reports.customer_statement_report')
+        options = report.get_options({})
+        options['partner_ids'] = [self.partner.id]
+
+        wizard = self.env['account.report.send'].create({
+            'account_report_id': report.id,
+            'mail_subject': 'Customer Statement',
+            'report_options': options,
+        })
+        self.assertEqual(wizard.mode, 'single')
+        self.assertFalse(wizard.mail_template_id)
+
+        wizard.action_send_and_print()
+
+    @freeze_time('2020-01-16')
+    def test_hide_line_at_0_tour_load_more_line(self):
+        report = self.env.ref('account_reports.general_ledger_report')
+        report.filter_hide_0_lines = 'optional'
+        report.load_more_limit = 1
+        self.env['account.move'].create([{
+            'move_type': 'entry',
+            'date': '2020-01-15',
+            'line_ids': [Command.create({
+                'partner_id': self.partner_a.id,
+                'debit': 0.0,
+                'credit': 0.0,
+                'name': f"Coucou les biloutes {i}",
+                'account_id': self.company_data['default_account_payable'].id,
+                'journal_id': self.company_data['default_journal_misc'].id,
+            })],
+        } for i in range(2)]).action_post()
+
+        self.start_tour("/odoo", 'account_reports_hide_0_lines_load_more', login=self.env.user.login)

@@ -1,22 +1,24 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* stock_barcode_mrp
-# 
+#
 # Translators:
-# Wil Odoo, 2024
-# 
+# Daye Jeong, 2024
+# Sarah Park, 2025
+# Wil Odoo, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:28+0000\n"
+"POT-Creation-Date: 2025-12-29 18:49+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
+"Last-Translator: Wil Odoo, 2025\n"
 "Language-Team: Korean (https://app.transifex.com/odoo/teams/41243/ko/)\n"
+"Language: ko\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: ko\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. module: stock_barcode_mrp
@@ -207,7 +209,7 @@ msgstr "전체 생산"
 #. odoo-javascript
 #: code:addons/stock_barcode_mrp/static/src/components/header.xml:0
 msgid "Producing"
-msgstr ""
+msgstr "생산"
 
 #. module: stock_barcode_mrp
 #: model_terms:ir.ui.view,arch_db:stock_barcode_mrp.mrp_product_selector
@@ -249,9 +251,13 @@ msgstr "품목을 스캔하여 주문을 필터링합니다."
 
 #. module: stock_barcode_mrp
 #. odoo-javascript
-#: code:addons/stock_barcode_mrp/static/src/kanban/stock_barcode_kanban_renderer.xml:0
-msgid "Scan an"
-msgstr "스캔"
+#: code:addons/stock_barcode_mrp/static/src/kanban/stock_barcode_kanban_renderer.js:0
+msgid ""
+"Scan an %(bold_start)s order %(bold_end)s or a %(bold_start)s product %"
+"(bold_end)s to filter your records"
+msgstr ""
+"%(bold_start)s 주문서%(bold_end)s 또는 %(bold_start)s 품목%(bold_end)s을 스캔"
+"하면 레코드가 분류됩니다"
 
 #. module: stock_barcode_mrp
 #. odoo-javascript
@@ -282,7 +288,9 @@ msgstr "제조 주문이 취소되었습니다."
 msgid ""
 "The lines with a kit have been replaced with their components. Please check "
 "the picking before the final validation."
-msgstr "키트가 있는 항목이 해당 구성 요소로 대체되었습니다. 최종 승인 전에 픽업 내용을 확인하시기 바랍니다."
+msgstr ""
+"키트가 있는 항목이 해당 구성 요소로 대체되었습니다. 최종 승인 전에 픽업 내용"
+"을 확인하시기 바랍니다."
 
 #. module: stock_barcode_mrp
 #. odoo-javascript
@@ -326,11 +334,14 @@ msgstr "단위"
 #. module: stock_barcode_mrp
 #: model:ir.model.fields,help:stock_barcode_mrp.field_stock_move_line__manual_consumption
 msgid ""
-"When activated, then the registration of consumption for that component is recorded manually exclusively.\n"
-"If not activated, and any of the components consumption is edited manually on the manufacturing order, Odoo assumes manual consumption also."
+"When activated, then the registration of consumption for that component is "
+"recorded manually exclusively.\n"
+"If not activated, and any of the components consumption is edited manually "
+"on the manufacturing order, Odoo assumes manual consumption also."
 msgstr ""
 "활성화된 경우, 해당 부품에 대한 사용 내역은 수동으로만 기록됩니다.\n"
-"활성화하지 않고 부품에 대한 사용 내역을 제조 주문에서 수동으로 편집한 경우 Odoo는 수동 기록 내역도 함께 가정합니다."
+"활성화하지 않고 부품에 대한 사용 내역을 제조 주문에서 수동으로 편집한 경우 "
+"Odoo는 수동 기록 내역도 함께 가정합니다."
 
 #. module: stock_barcode_mrp
 #: model:ir.model,name:stock_barcode_mrp.model_mrp_production_backorder
@@ -340,29 +351,11 @@ msgstr "완료로 표시하거나 잔여 주문을 생성하는 마법사"
 #. module: stock_barcode_mrp
 #. odoo-javascript
 #: code:addons/stock_barcode_mrp/static/src/models/barcode_mrp_model.js:0
+msgid "You are expected to scan one or more products."
+msgstr "하나 이상의 제품을 스캔해야 합니다."
+
+#. module: stock_barcode_mrp
+#. odoo-javascript
+#: code:addons/stock_barcode_mrp/static/src/models/barcode_mrp_model.js:0
 msgid "You can't add the final product of a MO as a byproduct."
 msgstr "MO의 완제품을 부산물로 추가할 수 없습니다."
-
-#. module: stock_barcode_mrp
-#. odoo-javascript
-#: code:addons/stock_barcode_mrp/static/src/kanban/stock_barcode_kanban_renderer.xml:0
-msgid "or a"
-msgstr ""
-
-#. module: stock_barcode_mrp
-#. odoo-javascript
-#: code:addons/stock_barcode_mrp/static/src/kanban/stock_barcode_kanban_renderer.xml:0
-msgid "order"
-msgstr ""
-
-#. module: stock_barcode_mrp
-#. odoo-javascript
-#: code:addons/stock_barcode_mrp/static/src/kanban/stock_barcode_kanban_renderer.xml:0
-msgid "product"
-msgstr "품목"
-
-#. module: stock_barcode_mrp
-#. odoo-javascript
-#: code:addons/stock_barcode_mrp/static/src/kanban/stock_barcode_kanban_renderer.xml:0
-msgid "to filter your records"
-msgstr ""

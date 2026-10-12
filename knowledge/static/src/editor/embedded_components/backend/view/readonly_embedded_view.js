@@ -143,7 +143,8 @@ export class ReadonlyEmbeddedViewComponent extends Component {
         // can we use res_id: false and thus make one method for select and create?
         this.actionService.doAction({
             res_model: this.action.res_model,
-            views: [this.action.views.find((_, type) => type === "form") || [false, "form"]],
+            type: 'ir.actions.act_window',
+            views: [this.action.views.find(([_, type]) => type === "form") || [false, "form"]],
         });
     }
 
@@ -227,7 +228,7 @@ export class ReadonlyEmbeddedViewComponent extends Component {
      */
     openView() {
         this.saveFilters();
-        const props = this.additionalViewProps || {};
+        const props = { ...(this.additionalViewProps || {}) };
         if (this.action.context.orderBy) {
             try {
                 props.orderBy = JSON.parse(this.action.context.orderBy);

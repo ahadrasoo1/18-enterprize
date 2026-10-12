@@ -5,7 +5,6 @@ import { stepUtils } from "@web_tour/tour_service/tour_utils";
 import { accountTourSteps } from "@account/js/tours/account";
 
 registry.category("web_tour.tours").add("account_accountant_batch_payment_bank_rec_widget", {
-    test: true,
     url: "/odoo",
     steps: () => [
         stepUtils.showAppsMenuItem(),
@@ -78,6 +77,45 @@ registry.category("web_tour.tours").add("account_accountant_batch_payment_bank_r
         {
             content: "check that we're back on the dashboard",
             trigger: 'a:contains("Customer Invoices")',
+        },
+    ],
+});
+
+registry.category("web_tour.tours").add("account_accountant_batch_payment_bank_rec_widget_batch_line_clickable", {
+    url: "/odoo",
+    steps: () => [
+        stepUtils.showAppsMenuItem(),
+        ...accountTourSteps.goToAccountMenu("Open the accounting module"),
+        {
+            trigger: ".o_breadcrumb",
+        },
+        {
+            content: "Open the bank reconciliation widget",
+            trigger: "button.btn-secondary[name='action_open_reconcile']",
+            run: "click",
+        },
+        {
+            content: "Click on the 'batch_payments_tab'",
+            trigger: "a[name='batch_payments_tab']",
+            run: "click",
+        },
+        {
+            content: "Mount BATCH0001",
+            trigger: "div.bank_rec_widget_form_batch_payments_list_anchor table.o_list_table td[name='name']:contains('BATCH0001')",
+            run: "click",
+        },
+        {
+            content: "The batch should be selected",
+            trigger: "div.bank_rec_widget_form_batch_payments_list_anchor table.o_list_table tr.o_rec_widget_list_selected_item",
+        },
+        {
+            content: "Click batch row for BATCH0001",
+            trigger: ".o_data_row.o_selected_row.o_list_no_open.o_bank_rec_second_line:contains('BATCH0001')",
+            run: "click",
+        },
+        {
+            content: "Wait for Manual Operations tab to open",
+            trigger: "div[name='analytic_distribution']:not(:visible)",
         },
     ],
 });

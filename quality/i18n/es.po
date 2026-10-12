@@ -1,29 +1,34 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* quality
-# 
+# * quality
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Pedro M. Baeza <pedro.baeza@tecnativa.com>, 2025
+# "Larissa Manderfeld (lman)" <lman@odoo.com>, 2025.
+# "Noemi Pla Garcia (nopl)" <nopl@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Spanish (https://app.transifex.com/odoo/teams/41243/es/)\n"
+"POT-Creation-Date: 2026-05-22 17:54+0000\n"
+"PO-Revision-Date: 2026-06-13 09:17+0000\n"
+"Last-Translator: \"Noemi Pla Garcia (nopl)\" <nopl@odoo.com>\n"
+"Language-Team: Spanish <https://translate.odoo.com/projects/odoo-18/quality/"
+"es/>\n"
+"Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: es\n"
-"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=(n == 1) ? 0 : ((n != 0 && n % 1000000 == "
+"0) ? 1 : 2);\n"
+"X-Generator: Weblate 2026.6.1\n"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert_team__alert_count
 #: model:ir.model.fields,field_description:quality.field_quality_check__alert_count
 msgid "# Quality Alerts"
-msgstr "# Alertas de calidad"
+msgstr "N. ° de alertas de calidad"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert_team__check_count
@@ -38,6 +43,12 @@ msgid ""
 msgstr ""
 "Un diccionario Python que será evaluado para proporcionar valores por "
 "defecto al crear nuevos registros para este alias."
+
+#. module: quality
+#. odoo-python
+#: code:addons/quality/models/quality.py:0
+msgid "A quality team must have a company assigned."
+msgstr ""
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert__message_needaction
@@ -79,7 +90,7 @@ msgstr "Estado de la actividad"
 #: model:ir.model.fields,field_description:quality.field_quality_alert__activity_type_icon
 #: model:ir.model.fields,field_description:quality.field_quality_check__activity_type_icon
 msgid "Activity Type Icon"
-msgstr "Icono de tipo de actvidad"
+msgstr "Icono de tipo de actividad"
 
 #. module: quality
 #: model_terms:ir.ui.view,arch_db:quality.quality_check_view_activity
@@ -308,7 +319,7 @@ msgstr "Descripción"
 #: model:ir.model.fields,field_description:quality.field_quality_reason__display_name
 #: model:ir.model.fields,field_description:quality.field_quality_tag__display_name
 msgid "Display Name"
-msgstr "Nombre mostrado"
+msgstr "Nombre para mostrar"
 
 #. module: quality
 #: model_terms:ir.ui.view,arch_db:quality.quality_alert_view_search
@@ -402,11 +413,11 @@ msgstr "ID"
 #. module: quality
 #: model:ir.model.fields,help:quality.field_quality_alert_team__alias_parent_thread_id
 msgid ""
-"ID of the parent record holding the alias (example: project holding the task"
-" creation alias)"
+"ID of the parent record holding the alias (example: project holding the task "
+"creation alias)"
 msgstr ""
-"ID del registro padre que tiene el alias. (ejemplo: el proyecto que contiene"
-" el alias para la creación de tareas)"
+"ID del registro padre que tiene el alias. (ejemplo: el proyecto que contiene "
+"el alias para la creación de tareas)"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert__activity_exception_icon
@@ -683,12 +694,12 @@ msgstr "ID del hilo del registro padre"
 #. module: quality
 #: model:ir.model.fields,help:quality.field_quality_alert_team__alias_parent_model_id
 msgid ""
-"Parent model holding the alias. The model holding the alias reference is not"
-" necessarily the model given by alias_model_id (example: project "
+"Parent model holding the alias. The model holding the alias reference is not "
+"necessarily the model given by alias_model_id (example: project "
 "(parent_model) and task (model))"
 msgstr ""
-"Modelo padre que contiene el alias. El modelo que contiene la referencia del"
-" alias no es necesariamente el modelo dado por alias_model_id (example: "
+"Modelo padre que contiene el alias. El modelo que contiene la referencia del "
+"alias no es necesariamente el modelo dado por alias_model_id (example: "
 "project (parent_model) and task (model))"
 
 #. module: quality
@@ -723,12 +734,15 @@ msgid ""
 "Policy to post a message on the document using the mailgateway.\n"
 "- everyone: everyone can post\n"
 "- partners: only authenticated partners\n"
-"- followers: only followers of the related document or members of following channels\n"
+"- followers: only followers of the related document or members of following "
+"channels\n"
 msgstr ""
-"Política para publicar un mensaje en el documento utilizando el servidor de correo.\n"
-"- todo el mundo: todos pueden publicar\n"
-"- contactos: sólo contactos autenticados\n"
-"- seguidores: sólo seguidores del documento relacionado o miembros de los siguientes canales\n"
+"Política para enviar un mensaje en el documento usando la pasarela de "
+"correo.\n"
+"- Todos: cualquiera puede enviar\n"
+"- Contactos: sólo contactos autenticados\n"
+"- Seguidores: sólo seguidores del documento relacionado o miembros de los "
+"siguientes canales\n"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert__action_preventive
@@ -964,9 +978,9 @@ msgstr "Tipo de prueba"
 #. module: quality
 #: model:ir.model.fields,help:quality.field_quality_alert_team__alias_model_id
 msgid ""
-"The model (Odoo Document Kind) to which this alias corresponds. Any incoming"
-" email that does not reply to an existing record will cause the creation of "
-"a new record of this model (e.g. a Project Task)"
+"The model (Odoo Document Kind) to which this alias corresponds. Any incoming "
+"email that does not reply to an existing record will cause the creation of a "
+"new record of this model (e.g. a Project Task)"
 msgstr ""
 "El modelo (Tipo de documento de Odoo) al que corresponde este alias. "
 "Cualquier correo entrante que no sea respuesta a un registro existente, "
@@ -979,8 +993,8 @@ msgid ""
 "The name of the email alias, e.g. 'jobs' if you want to catch emails for "
 "<jobs@example.odoo.com>"
 msgstr ""
-"El nombre de este alias de correo electrónico. Por ejemplo, \"trabajos\",  "
-"si lo que quiere es obtener los correos para <trabajos@example.odoo.com>"
+"El nombre de este alias de correo electrónico, por ejemplo, «vacantes» para "
+"recibir los correos enviados a <vacantes@ejemplo.odoo.com>"
 
 #. module: quality
 #: model:res.groups,comment:quality.group_quality_manager

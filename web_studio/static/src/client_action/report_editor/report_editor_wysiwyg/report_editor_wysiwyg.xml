@@ -4,6 +4,7 @@
     <t t-call="web_studio.ReportEditorWysiwyg.Sidebar" />
     <div class="o-web-studio-report-editor-wysiwyg h-100 w-100 position-relative">
       <UndoRedo state="undoRedoState"/>
+      <LocalOverlayContainer localOverlay="overlayRef" identifier="env.localOverlayContainerKey"/>
       <ReportEditorIframe iframeKey="reportEditorModel.reportQweb || ''" iframeSource="reportQweb" onIframeLoaded.bind="onIframeLoaded" />
     </div>
 </t>
@@ -67,7 +68,7 @@
 
 <t t-name="web_studio.FieldDynamicPlaceholder">
   <div class="o-web-studio-field-dynamic-placeholder">
-    <div class="px-1 pt-3 bg-secondary" t-if="Object.keys(sortedVariables).length > 1">
+    <div class="px-1 pt-3 bg-secondary" t-if="Object.keys(this.props.sortedVariables).length > 1">
       <label class="text-small text-bold mb-2"  for="o_studio_report_field_model">Current model:</label>
       <SelectMenu
         choices="sortedVariables"

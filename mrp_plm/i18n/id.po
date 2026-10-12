@@ -1,23 +1,27 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* mrp_plm
-# 
+# * mrp_plm
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Abe Manyo, 2025
+#
+# "Nurul Aini Akrima Sabila (nuaas)" <nuaas@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Indonesian (https://app.transifex.com/odoo/teams/41243/id/)\n"
+"POT-Creation-Date: 2026-04-10 18:47+0000\n"
+"PO-Revision-Date: 2026-06-23 09:09+0000\n"
+"Last-Translator: \"Nurul Aini Akrima Sabila (nuaas)\" <nuaas@odoo.com>\n"
+"Language-Team: Indonesian <https://translate.odoo.com/projects/odoo-18/"
+"mrp_plm/id/>\n"
+"Language: id\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: id\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 2026.6.1\n"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__document_count
@@ -51,15 +55,19 @@ msgstr ""
 #: code:addons/mrp_plm/models/mrp_eco.py:0
 msgid ""
 "<p class=\"o_view_nocontent_smiling_face\">\n"
-"                        Upload files to your ECO, that will be applied to the product later\n"
+"                        Upload files to your ECO, that will be applied to "
+"the product later\n"
 "                    </p><p>\n"
-"                        Use this feature to store any files, like drawings or specifications.\n"
+"                        Use this feature to store any files, like drawings "
+"or specifications.\n"
 "                    </p>"
 msgstr ""
 "<p class=\"o_view_nocontent_smiling_face\">\n"
-"                        Unggah file ke ECO Anda, yang akan diterapkan ke produk nanti\n"
+"                        Unggah file ke ECO Anda, yang akan diterapkan ke "
+"produk nanti\n"
 "                    </p><p>\n"
-"                        Gunakan fitur ini untuk menyimpan file apapun, seperti gambar atau spesifikasi.\n"
+"                        Gunakan fitur ini untuk menyimpan file apapun, "
+"seperti gambar atau spesifikasi.\n"
 "                    </p>"
 
 #. module: mrp_plm
@@ -78,8 +86,14 @@ msgid ""
 "A Python dictionary that will be evaluated to provide default values when "
 "creating new records for this alias."
 msgstr ""
-"Kamus Python yang akan dievaluasi untuk memberikan nilai baku ketika membuat"
-" catatan baru untuk alias ini."
+"Kamus Python yang akan dievaluasi untuk memberikan nilai baku ketika membuat "
+"catatan baru untuk alias ini."
+
+#. module: mrp_plm
+#. odoo-python
+#: code:addons/mrp_plm/models/mrp_eco.py:0
+msgid "A user cannot be assigned more than once to the same stage"
+msgstr "User tidak dapat ditugaskan lebih dari satu kali ke tahap yang sama"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__message_needaction
@@ -110,7 +124,7 @@ msgstr "Status Aktivitas"
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__activity_type_icon
 msgid "Activity Type Icon"
-msgstr "Ikon Jenis Aktifitas"
+msgstr "Ikon Jenis Aktivitas"
 
 #. module: mrp_plm
 #: model:ir.model.fields.selection,name:mrp_plm.selection__mrp_eco_bom_change__change_type__add
@@ -356,7 +370,8 @@ msgid ""
 "              order or a pack of products."
 msgstr ""
 "BoM memungkinkan Anda untuk mendefinisikan daftar komponen\n"
-"              yang digunakan untuk membuat produk jadi; melalui manufacturing\n"
+"              yang digunakan untuk membuat produk jadi; melalui "
+"manufacturing\n"
 "              order atau paket produk."
 
 #. module: mrp_plm
@@ -443,8 +458,7 @@ msgstr "Dapat Ditolak"
 msgid ""
 "Cannot create an ECO if the Manufacturing Order doesn't use a Bill of "
 "Materials"
-msgstr ""
-"Tidak dapat membuat ECO bila Manufacturing Order tidak menggunakan BOM"
+msgstr "Tidak dapat membuat ECO bila Manufacturing Order tidak menggunakan BOM"
 
 #. module: mrp_plm
 #: model:ir.ui.menu,name:mrp_plm.menu_mrp_plm_changes
@@ -945,10 +959,10 @@ msgstr "ID"
 #. module: mrp_plm
 #: model:ir.model.fields,help:mrp_plm.field_mrp_eco_type__alias_parent_thread_id
 msgid ""
-"ID of the parent record holding the alias (example: project holding the task"
-" creation alias)"
+"ID of the parent record holding the alias (example: project holding the task "
+"creation alias)"
 msgstr ""
-"ID dari catatan induk alias (contoh: proyek yang menahan pembuatan alias "
+"ID dari catatan induk alias (contoh: project yang menahan pembuatan alias "
 "tugas)"
 
 #. module: mrp_plm
@@ -999,6 +1013,8 @@ msgid ""
 "If unchecked, the version of the product/BoM will remain unchanged once the "
 "ECO is applied"
 msgstr ""
+"Bila tidak dicentang, versi produk/BoM akan tetap tidak diubah setelah ECO "
+"diterapkan"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_bom__image_128
@@ -1102,7 +1118,7 @@ msgstr "Terakhir Diperbarui pada"
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_search
 msgid "Late Activities"
-msgstr "Aktifitas terakhir"
+msgstr "Aktivitas terakhir"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_production__latest_bom_id
@@ -1124,11 +1140,13 @@ msgstr "Local-part based incoming detection"
 #: model_terms:ir.actions.act_window,help:mrp_plm.mrp_eco_action_report
 msgid ""
 "Manage your products and bills of materials changes with the ECO's.\n"
-"              Gather the related documentation and receive the necessary approvals\n"
+"              Gather the related documentation and receive the necessary "
+"approvals\n"
 "              before applying your changes."
 msgstr ""
 "Kelola produk dan perubahan BoM Anda dengan ECO.\n"
-"              Kumpulkan dokumentasi terkait dan dapatkan persetujuan yang dibutuhkan\n"
+"              Kumpulkan dokumentasi terkait dan dapatkan persetujuan yang "
+"dibutuhkan\n"
 "              sebelum menerapkan perubahan Anda."
 
 #. module: mrp_plm
@@ -1176,7 +1194,7 @@ msgstr "Tag Eco Mrp"
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__my_activity_date_deadline
 msgid "My Activity Deadline"
-msgstr "Deadline Kegiatan Saya"
+msgstr "Tenggat Aktivitas Saya"
 
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_search
@@ -1245,7 +1263,7 @@ msgstr "Kalender Acara Aktivitas Berikutnya"
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__activity_date_deadline
 msgid "Next Activity Deadline"
-msgstr "Batas Waktu Aktivitas Berikutnya"
+msgstr "Tenggat Aktivitas Berikutnya"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__activity_summary
@@ -1434,12 +1452,12 @@ msgstr "Catatan Induk ID File"
 #. module: mrp_plm
 #: model:ir.model.fields,help:mrp_plm.field_mrp_eco_type__alias_parent_model_id
 msgid ""
-"Parent model holding the alias. The model holding the alias reference is not"
-" necessarily the model given by alias_model_id (example: project "
+"Parent model holding the alias. The model holding the alias reference is not "
+"necessarily the model given by alias_model_id (example: project "
 "(parent_model) and task (model))"
 msgstr ""
 "Model induk dengan alias. Model yang memiliki referensi alias ini tidak "
-"selalu berarti model yang diberikan oleh alias_model_id (contoh: proyek "
+"selalu berarti model yang diberikan oleh alias_model_id (contoh: project "
 "(parent_model) dan tugas (model))"
 
 #. module: mrp_plm
@@ -1448,7 +1466,8 @@ msgid ""
 "Policy to post a message on the document using the mailgateway.\n"
 "- everyone: everyone can post\n"
 "- partners: only authenticated partners\n"
-"- followers: only followers of the related document or members of following channels\n"
+"- followers: only followers of the related document or members of following "
+"channels\n"
 msgstr ""
 "Kebijakan untuk mengirimkan pesan di dokumen menggunakan mailgateway.\n"
 "- semua orang: setiap orang dapat mengirim\n"
@@ -1728,8 +1747,8 @@ msgstr "Sukses Direbase!"
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_form
 msgid ""
-"System will automatically resolved the conflict(s) and apply changes. Do you"
-" agree?"
+"System will automatically resolved the conflict(s) and apply changes. Do you "
+"agree?"
 msgstr ""
 "Sistem akan secara otomatis menyelesaikan konflik dan menerapkan perbuahan. "
 "Apakah Anda setuju?"
@@ -1772,8 +1791,7 @@ msgstr ""
 #: model:ir.model.fields,help:mrp_plm.field_mrp_eco__user_can_reject
 msgid "Technical field to check if reject by current user is possible"
 msgstr ""
-"Field teknis untuk memeriksa apakah penolakan oleh user saat ini "
-"memungkinkan"
+"Field teknis untuk memeriksa apakah penolakan oleh user saat ini memungkinkan"
 
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_approval__approval_template_id
@@ -1799,13 +1817,13 @@ msgstr "Versi produk saat ini."
 #. module: mrp_plm
 #: model:ir.model.fields,help:mrp_plm.field_mrp_eco_type__alias_model_id
 msgid ""
-"The model (Odoo Document Kind) to which this alias corresponds. Any incoming"
-" email that does not reply to an existing record will cause the creation of "
-"a new record of this model (e.g. a Project Task)"
+"The model (Odoo Document Kind) to which this alias corresponds. Any incoming "
+"email that does not reply to an existing record will cause the creation of a "
+"new record of this model (e.g. a Project Task)"
 msgstr ""
 "Model (Jenis Dokumen Odoo) di mana alias ini dikaitkan. Email masuk yang "
 "tidak menjawab catatan yang sudah ada akan menyebabkan pembuatan rekor baru "
-"model ini (misalnya tugas proyek)"
+"model ini (misalnya tugas project)"
 
 #. module: mrp_plm
 #: model:ir.model.fields,help:mrp_plm.field_mrp_eco_type__alias_name
@@ -1813,8 +1831,8 @@ msgid ""
 "The name of the email alias, e.g. 'jobs' if you want to catch emails for "
 "<jobs@example.odoo.com>"
 msgstr ""
-"Nama email alias, misalnya 'pekerjaan' jika Anda ingin menangkap email untuk"
-" <jobs@example.odoo.com>"
+"Nama email alias, misalnya 'pekerjaan' jika Anda ingin menangkap email untuk "
+"<jobs@example.odoo.com>"
 
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_stage_view_form
@@ -1875,7 +1893,7 @@ msgstr "Perbarui"
 #. module: mrp_plm
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco__will_update_version
 msgid "Update Version"
-msgstr ""
+msgstr "Update Versi"
 
 #. module: mrp_plm
 #: model:res.groups,name:mrp_plm.group_plm_user
@@ -1886,6 +1904,11 @@ msgstr "Pengguna"
 #: model:ir.model.fields,field_description:mrp_plm.field_mrp_eco_approval_template__user_ids
 msgid "Users"
 msgstr "Pengguna"
+
+#. module: mrp_plm
+#: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_view_form
+msgid "V"
+msgstr ""
 
 #. module: mrp_plm
 #: model:mrp.eco.stage,name:mrp_plm.ecostage_bom_update_validated
@@ -1946,8 +1969,8 @@ msgstr "Pusat kerja"
 #. module: mrp_plm
 #: model_terms:ir.ui.view,arch_db:mrp_plm.mrp_eco_stage_view_form
 msgid ""
-"You can also add a description to help your coworkers understand the meaning"
-" and purpose of the stage."
+"You can also add a description to help your coworkers understand the meaning "
+"and purpose of the stage."
 msgstr ""
 "Anda juga dapat menambahkan keterangan untuk membantu rekan kerja Anda "
 "memahami arti dan tujuan panggung."
@@ -1958,7 +1981,8 @@ msgid ""
 "You can define here labels that will be displayed for the state instead\n"
 "                            of the default labels."
 msgstr ""
-"Anda dapat mendefinisikan di sini label yang akan ditampilkan untuk status alih-alih\n"
+"Anda dapat mendefinisikan di sini label yang akan ditampilkan untuk status "
+"alih-alih\n"
 "                            label default."
 
 #. module: mrp_plm

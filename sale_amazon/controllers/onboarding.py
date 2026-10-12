@@ -32,7 +32,9 @@ def compute_oauth_signature(account_id):
 
 class AmazonController(http.Controller):
 
-    @http.route('/amazon/return', type='http', methods=['GET'], auth='user')
+    @http.route(
+        '/amazon/return', type='http', methods=['GET'], auth='user', website=True, sitemap=False
+    )
     def amazon_return_from_authorization(self, **data):
         """ Request a refresh token from the OAuth token and redirect to the account form.
 
@@ -57,7 +59,14 @@ class AmazonController(http.Controller):
             raise Forbidden()
 
         # Store the Amazon data on the account.
-        account = request.env['amazon.account'].browse(account_id).exists()
+        account = (
+            request
+            .env['amazon.account']
+            .browse(account_id)
+            .exists()
+            # Expand allowed companies since the route restricts access to the website company.
+            .with_context(allowed_company_ids=request.env.user._get_company_ids())
+        )
         if not account:
             raise ValidationError(_("Could not find Amazon account with id %s", account_id))
         account.seller_key = seller_key
@@ -72,7 +81,7 @@ class AmazonController(http.Controller):
         except (UserError, ValidationError) as e:
             return request.render(
                 'sale_amazon.authorization_error',
-                qcontext={'error_message': e['name'], 'account_url': account_url},
+                qcontext={'error_message': str(e), 'account_url': account_url},
             )
 
         return request.redirect(account_url, local=False)

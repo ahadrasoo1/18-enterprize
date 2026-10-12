@@ -3,20 +3,20 @@
 # 	* crm_helpdesk
 #
 # Translators:
-# Krisztián Juhász <juhasz.krisztian@josafar.hu>, 2022
-# gezza <geza.nagy@oregional.hu>, 2022
-# Martin Trigaux, 2022
-# krnkris, 2022
-# Ákos Nagy <akos.nagy@oregional.hu>, 2022
-# Tamás Németh <ntomasz81@gmail.com>, 2022
+# Tamás Dombos, 2024
+# krnkris, 2024
+# Tamás Németh <ntomasz81@gmail.com>, 2024
+# Ákos Nagy <akos.nagy@oregional.hu>, 2024
+# Martin Trigaux, 2024
+# gezza <geza.nagy@oregional.hu>, 2025
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 15.5alpha1+e\n"
+"Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-16 16:01+0000\n"
-"PO-Revision-Date: 2022-09-22 05:45+0000\n"
-"Last-Translator: Tamás Németh <ntomasz81@gmail.com>, 2022\n"
+"POT-Creation-Date: 2025-12-29 18:45+0000\n"
+"PO-Revision-Date: 2024-09-25 09:44+0000\n"
+"Last-Translator: gezza <geza.nagy@oregional.hu>, 2025\n"
 "Language-Team: Hungarian (https://app.transifex.com/odoo/teams/41243/hu/)\n"
 "Language: hu\n"
 "MIME-Version: 1.0\n"
@@ -25,9 +25,15 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #. module: crm_helpdesk
-#: model_terms:ir.ui.view,arch_db:crm_helpdesk.helpdesk_ticket_to_lead_view_form
-msgid "Convert"
+#. odoo-python
+#: code:addons/crm_helpdesk/wizard/helpdesk_ticket_to_lead.py:0
+msgid "An archived ticket cannot be converted into a lead."
 msgstr ""
+
+#. module: crm_helpdesk
+#: model:ir.model.fields,field_description:crm_helpdesk.field_helpdesk_ticket_to_lead__convert_to
+msgid "Conversion Action"
+msgstr "Átalakítási akció"
 
 #. module: crm_helpdesk
 #: model:ir.model,name:crm_helpdesk.model_helpdesk_ticket_to_lead
@@ -36,9 +42,20 @@ msgid "Convert Ticket to Lead"
 msgstr ""
 
 #. module: crm_helpdesk
-#: model:ir.actions.act_window,name:crm_helpdesk.helpdesk_ticket_to_lead_action
+#. odoo-python
+#: code:addons/crm_helpdesk/models/helpdesk_ticket.py:0
+#: model_terms:ir.ui.view,arch_db:crm_helpdesk.helpdesk_ticket_to_lead_view_form
+#: model_terms:ir.ui.view,arch_db:crm_helpdesk.helpdesk_ticket_view_form_inherited
 msgid "Convert to Lead"
 msgstr ""
+
+#. module: crm_helpdesk
+#. odoo-python
+#: code:addons/crm_helpdesk/models/helpdesk_ticket.py:0
+#: model_terms:ir.ui.view,arch_db:crm_helpdesk.helpdesk_ticket_to_lead_view_form
+#: model_terms:ir.ui.view,arch_db:crm_helpdesk.helpdesk_ticket_view_form_inherited
+msgid "Convert to Opportunity"
+msgstr "Átalakítás lehetőséggé"
 
 #. module: crm_helpdesk
 #: model:ir.actions.act_window,name:crm_helpdesk.crm_lead_convert2ticket_action
@@ -46,6 +63,11 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:crm_helpdesk.crm_lead_view_form
 msgid "Convert to Ticket"
 msgstr ""
+
+#. module: crm_helpdesk
+#: model:ir.model.fields.selection,name:crm_helpdesk.selection__helpdesk_ticket_to_lead__convert_to__convert
+msgid "Convert to opportunity"
+msgstr "Átalakítás lehetőséggé"
 
 #. module: crm_helpdesk
 #: model_terms:ir.ui.view,arch_db:crm_helpdesk.crm_lead_convert2ticket_view_form
@@ -80,7 +102,7 @@ msgstr "Ügyfél"
 #: model_terms:ir.ui.view,arch_db:crm_helpdesk.crm_lead_convert2ticket_view_form
 #: model_terms:ir.ui.view,arch_db:crm_helpdesk.helpdesk_ticket_to_lead_view_form
 msgid "Discard"
-msgstr ""
+msgstr "Elvetés"
 
 #. module: crm_helpdesk
 #: model:ir.model.fields,field_description:crm_helpdesk.field_crm_lead_convert2ticket__display_name
@@ -94,15 +116,27 @@ msgid "Do not link to a customer"
 msgstr "Ne kapcsolja ügyfélhez"
 
 #. module: crm_helpdesk
+#: model:ir.model.fields,field_description:crm_helpdesk.field_helpdesk_ticket_to_lead__force_assignment
+msgid "Force assignment"
+msgstr "Hozzárendelés kényszerítése"
+
+#. module: crm_helpdesk
 #: model:ir.model,name:crm_helpdesk.model_helpdesk_ticket
 msgid "Helpdesk Ticket"
-msgstr "Ügyfélszolgálati hibajegy"
+msgstr "Ügyfélszolgálati jegy"
 
 #. module: crm_helpdesk
 #: model:ir.model.fields,field_description:crm_helpdesk.field_crm_lead_convert2ticket__id
 #: model:ir.model.fields,field_description:crm_helpdesk.field_helpdesk_ticket_to_lead__id
 msgid "ID"
-msgstr "Azonosító"
+msgstr "ID"
+
+#. module: crm_helpdesk
+#: model:ir.model.fields,help:crm_helpdesk.field_helpdesk_ticket_to_lead__force_assignment
+msgid ""
+"If checked, forces salesman to be updated on updated opportunities even if "
+"already set."
+msgstr ""
 
 #. module: crm_helpdesk
 #: model:ir.model.fields,field_description:crm_helpdesk.field_crm_lead_convert2ticket__write_uid
@@ -114,7 +148,7 @@ msgstr "Frissítette"
 #: model:ir.model.fields,field_description:crm_helpdesk.field_crm_lead_convert2ticket__write_date
 #: model:ir.model.fields,field_description:crm_helpdesk.field_helpdesk_ticket_to_lead__write_date
 msgid "Last Updated on"
-msgstr "Frissítve ekkor"
+msgstr "Frissítve"
 
 #. module: crm_helpdesk
 #: model:ir.model.fields,field_description:crm_helpdesk.field_crm_lead_convert2ticket__lead_id
@@ -134,6 +168,12 @@ msgstr ""
 
 #. module: crm_helpdesk
 #. odoo-python
+#: code:addons/crm_helpdesk/wizard/crm_lead_convert2ticket.py:0
+msgid "Lead converted into ticket %s"
+msgstr ""
+
+#. module: crm_helpdesk
+#. odoo-python
 #: code:addons/crm_helpdesk/wizard/helpdesk_ticket_to_lead.py:0
 msgid "Lead created"
 msgstr "Érdeklődés létrehozva"
@@ -142,6 +182,12 @@ msgstr "Érdeklődés létrehozva"
 #: model:ir.model.fields.selection,name:crm_helpdesk.selection__helpdesk_ticket_to_lead__action__exist
 msgid "Link to an existing customer"
 msgstr "Összekapcsolás egy meglévő ügyféllel"
+
+#. module: crm_helpdesk
+#. odoo-python
+#: code:addons/crm_helpdesk/wizard/helpdesk_ticket_to_lead.py:0
+msgid "Opportunity created"
+msgstr ""
 
 #. module: crm_helpdesk
 #: model:ir.model.fields,field_description:crm_helpdesk.field_helpdesk_ticket_to_lead__action
@@ -167,19 +213,19 @@ msgstr "Csapat"
 #. module: crm_helpdesk
 #. odoo-python
 #: code:addons/crm_helpdesk/wizard/helpdesk_ticket_to_lead.py:0
-msgid "The archived ticket can not converted as lead."
+msgid "This lead has been created from ticket: %s"
 msgstr ""
 
 #. module: crm_helpdesk
 #. odoo-python
 #: code:addons/crm_helpdesk/wizard/helpdesk_ticket_to_lead.py:0
-msgid "This lead has been created from ticket: %s"
+msgid "This opportunity has been created from ticket: %s"
 msgstr ""
 
 #. module: crm_helpdesk
 #: model:ir.model.fields,field_description:crm_helpdesk.field_helpdesk_ticket_to_lead__ticket_id
 msgid "Ticket"
-msgstr "Hibajegy"
+msgstr "Jegy"
 
 #. module: crm_helpdesk
 #. odoo-python
@@ -188,12 +234,7 @@ msgid "Ticket Converted"
 msgstr ""
 
 #. module: crm_helpdesk
-#: model:ir.model.fields,field_description:crm_helpdesk.field_crm_lead_convert2ticket__ticket_type_id
-msgid "Ticket Type"
-msgstr "Hibajegy típusa"
-
-#. module: crm_helpdesk
 #. odoo-python
 #: code:addons/crm_helpdesk/wizard/crm_lead_convert2ticket.py:0
-msgid "Ticket created"
+msgid "Ticket Created"
 msgstr "Hibajegy létrehozva"

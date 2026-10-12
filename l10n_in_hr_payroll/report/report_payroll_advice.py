@@ -2,7 +2,7 @@
 
 import time
 
-from odoo import api, models
+from odoo import api, models, tools
 
 
 class payroll_advice_report(models.AbstractModel):
@@ -17,8 +17,8 @@ class payroll_advice_report(models.AbstractModel):
         if slip:
             from_date = slip.date_from
             to_date = slip.date_to
-            res['from_name'] = from_date.strftime('%d') + '-' + from_date.strftime('%B') + '-' + from_date.strftime('%Y')
-            res['to_name'] = to_date.strftime('%d') + '-' + to_date.strftime('%B') + '-' + to_date.strftime('%Y')
+            res['from_name'] = tools.format_date(self.env, from_date, date_format='dd-MMMM-Y')
+            res['to_name'] = tools.format_date(self.env, to_date, date_format='dd-MMMM-Y')
         return res
 
     @api.model

@@ -138,6 +138,14 @@
                         <div class="o_sign_button_content" t-if="my_sign_item.state == 'completed'">View Document</div>
                         <div class="o_sign_button_content" t-else="">Sign</div>
                     </a>
+                    <a t-if="my_sign_item.sign_request_id.state == 'signed'"
+                       class="btn btn-light ms-1"
+                       t-attf-href="/sign/download/{{my_sign_item.sign_request_id.id}}/{{my_sign_item.sign_request_id.access_token}}/completed"
+                       title="Download"
+                       target="_blank"
+                       role="button">
+                        <i class="fa fa-download"/>
+                    </a>
                 </div>
             </div>
             <hr/>

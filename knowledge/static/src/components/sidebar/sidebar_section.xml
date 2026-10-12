@@ -34,7 +34,7 @@
                     t-on-click="searchHiddenArticle">
                     <i class="fa fa-fw fa-eye" title="Join a hidden article"/>
                 </button>
-                <button class="o_section_create btn rounded p-0 ms-1" t-on-click="createRoot">
+                <button t-if="canCreateArticle" class="o_section_create btn rounded p-0 ms-1" t-on-click="createRoot">
                     <i class="fa fa-fw fa-plus" title="Create a new article in workspace"/>
                 </button>
             </t>
@@ -56,7 +56,7 @@
             <t t-set="sectionName">Private</t>
             <t t-set="sectionClass" t-value="'flex-fill'"/>
             <t t-set="dataSection" t-value="'private'"/>
-            <t t-set="headerButtons">
+            <t t-if="canCreateArticle" t-set="headerButtons">
                 <button t-attf-class="o_section_create btn rounded p-0 #{ !(isInternalUser || props.rootIds) ? 'border-0' : '' }" role="button"
                     t-on-click="createRoot">
                     <i class="fa fa-fw fa-plus" t-attf-title="Create a new private article"/>

@@ -32,6 +32,61 @@
         <field name="rule_parameter_id" ref="rule_parameter_cis_ci_co2"/>
         <field name="date_from" eval="datetime(2024, 1, 1).date()"/>
     </record>
+    <record id="rule_parameter_cis_ci_co2_2025" model="hr.rule.parameter.value">
+        <field name="parameter_value">[
+            (936, 40000, 192, 0),
+            (40001, 79999, 192, -0.0048),
+        ]</field>
+        <field name="rule_parameter_id" ref="rule_parameter_cis_ci_co2"/>
+        <field name="date_from" eval="datetime(2025, 1, 1).date()"/>
+    </record>
+
+    <!-- CIM -->
+    <!-- Source: https://impotsdirects.public.lu/fr/az/c/cim.html -->
+    <record id="rule_parameter_cim" model="hr.rule.parameter">
+        <field name="name">Lux Single-Parent Tax Credit: CIM</field>
+        <field name="code">l10n_lu_cim</field>
+        <field name="country_id" ref="base.lu"/>
+        <field name="description" type="html">
+<div>
+    <strong>Single-Parent Tax Credit (CIM):</strong>
+    <p>Passed parameters are used in the computation of the CIM. They are in the given order:</p>
+    <ul>
+        <li><code>gross_lower</code></li>
+        <li><code>gross_upper</code></li>
+        <li><code>amount_lower</code></li>
+        <li><code>base_amount_mid</code></li>
+        <li><code>rate_mid</code></li>
+        <li><code>amount_upper</code></li>
+    </ul>
+    <p><strong>Computation:</strong></p>
+    <ul>
+        <li>If the yearly taxable income is less than <code>gross_lower</code>, the CIM is <code>amount_lower</code>.</li>
+        <li>If it's between <code>gross_lower</code> and <code>gross_upper</code>, the CIM is computed as follows:
+            <ul>
+                <li><code>base_amount_mid - (yearly_taxable_income - gross_lower) * rate_mid</code></li>
+            </ul>
+        </li>
+        <li>If it's more than <code>gross_upper</code>, the CIM is <code>amount_upper</code>.</li>
+    </ul>
+    <p><strong>Source:</strong> <a href="https://impotsdirects.public.lu/fr/az/c/cim.html" target="_blank">Luxembourg Tax Authorities</a></p>
+</div>
+        </field>
+    </record>
+    <record id="rule_parameter_cim_2023" model="hr.rule.parameter.value">
+        <field name="parameter_value">
+            (60000, 105000, 2505, 2505, 0.039, 750)
+        </field>
+        <field name="rule_parameter_id" ref="rule_parameter_cim"/>
+        <field name="date_from" eval="datetime(2023, 1, 1).date()"/>
+    </record>
+    <record id="rule_parameter_cim_2025" model="hr.rule.parameter.value">
+        <field name="parameter_value">
+            (60000, 105000, 3504, 3504, 0.0612, 750)
+        </field>
+        <field name="rule_parameter_id" ref="rule_parameter_cim"/>
+        <field name="date_from" eval="datetime(2025, 1, 1).date()"/>
+    </record>
 
     <!-- CIP -->
     <!-- Source: https://impotsdirects.public.lu/fr/az/c/CIP/cip2024.html -->
@@ -66,6 +121,14 @@
         <field name="rule_parameter_id" ref="rule_parameter_cip_ci_co2"/>
         <field name="date_from" eval="datetime(2024, 1, 1).date()"/>
     </record>
+    <record id="rule_parameter_cip_ci_co2_2025" model="hr.rule.parameter.value">
+        <field name="parameter_value">[
+            (300, 40000, 192, 0),
+            (40001, 79999, 192, -0.0048),
+        ]</field>
+        <field name="rule_parameter_id" ref="rule_parameter_cip_ci_co2"/>
+        <field name="date_from" eval="datetime(2025, 1, 1).date()"/>
+    </record>
 
     <!-- CISSM -->
     <!-- Source: https://impotsdirects.public.lu/fr/az/c/credit-impot-salaire-social-minimum.html -->
@@ -78,6 +141,11 @@
         <field name="parameter_value">70</field>
         <field name="rule_parameter_id" ref="rule_parameter_cissm_max_amount"/>
         <field name="date_from" eval="datetime(2019, 1, 1).date()"/>
+    </record>
+    <record id="rule_parameter_cissm_max_amount_2025" model="hr.rule.parameter.value">
+        <field name="parameter_value">81</field>
+        <field name="rule_parameter_id" ref="rule_parameter_cissm_max_amount"/>
+        <field name="date_from" eval="datetime(2025, 1, 1).date()"/>
     </record>
 
     <record id="rule_parameter_cissm_lower_bound" model="hr.rule.parameter">

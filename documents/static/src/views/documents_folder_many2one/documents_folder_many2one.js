@@ -11,6 +11,7 @@ export class DocumentsFolderMany2One extends Many2OneField {
             additionalContext: {
                 no_documents_unique_folder_id: true,
                 searchpanel_default_folder_id: this.resId,
+                documents_show_default_breadcrumb: true,
             },
         });
     }

@@ -46,7 +46,6 @@ class TestSubscriptionPayments(PaymentCommon, TestSubscriptionCommon, MockEmail)
             })
             self.subscription._onchange_sale_order_template_id()
             self.subscription.action_confirm()
-            self.mock_send_success_count = 0
             self.env['sale.order']._cron_recurring_create_invoice()
             self.subscription.transaction_ids._post_process()
             self.assertEqual(self.subscription.subscription_state, '3_progress', 'subscription with online payment and a payment method set should stay opened when transaction succeeds')
@@ -62,7 +61,6 @@ class TestSubscriptionPayments(PaymentCommon, TestSubscriptionCommon, MockEmail)
                 all(tax_line.tax_line_id == self.tax_10 for tax_line in invoice.line_ids.filtered('tax_line_id')),
                 'The invoice tax lines should be set and should all use the tax set on the subscription products')
 
-            self.mock_send_success_count = 0
             start_date = fields.Date.today() - relativedelta(months=1)
             recurring_next_date = fields.Date.today() - relativedelta(days=1)
             self.subscription.payment_token_id = False
@@ -82,7 +80,6 @@ class TestSubscriptionPayments(PaymentCommon, TestSubscriptionCommon, MockEmail)
             # 2) batch: we need to avoid taking subscription two time. flag remains until the end of the last trigger
             failing_subs.order_line.qty_to_invoice = 1
             self.env['sale.order']._create_recurring_invoice(batch_size=3)
-            self.assertFalse(self.mock_send_success_count)
             failing_result = [not res for res in failing_subs.mapped('payment_exception')]
             self.assertTrue(all(failing_result), "The subscription are not flagged anymore")
             failing_result = [not res for res in failing_subs.mapped('is_batch')]
@@ -114,7 +111,6 @@ class TestSubscriptionPayments(PaymentCommon, TestSubscriptionCommon, MockEmail)
                 'sale_order_template_id': subscription_tmpl.id,
             })
             self.subscription._onchange_sale_order_template_id()
-            self.mock_send_success_count = 0
             with freeze_time("2021-01-03"):
                 self.subscription.order_line = [Command.clear()]
                 self.subscription.write({
@@ -141,8 +137,8 @@ class TestSubscriptionPayments(PaymentCommon, TestSubscriptionCommon, MockEmail)
                 # Two products are invoiced
                 self.assertEqual(len(invoice.invoice_line_ids), 2, 'Two lines are invoiced')
                 self.assertEqual(self.subscription.next_invoice_date, datetime.date(2021, 2, 3), 'the next invoice date should be updated')
-                self.assertEqual(invoice.invoice_line_ids[0].name, 'BaseTestProduct month cheap\n1 Months 01/03/2021 to 02/02/2021', 'Invoice line description must be based on order line description')
-                self.assertEqual(invoice.invoice_line_ids[1].name, 'TestProduct2 month expensive\n1 Months 01/03/2021 to 02/02/2021', 'Invoice line description must be based on order line description')
+                self.assertEqual(invoice.invoice_line_ids[0].name, 'BaseTestProduct\nmonth cheap\n1 Months 01/03/2021 to 02/02/2021', 'Invoice line description must be based on order line description')
+                self.assertEqual(invoice.invoice_line_ids[1].name, 'TestProduct2\nmonth expensive\n1 Months 01/03/2021 to 02/02/2021', 'Invoice line description must be based on order line description')
 
             with freeze_time("2021-02-03"):
                 self.env.invalidate_all()
@@ -807,52 +803,150 @@ class TestSubscriptionPayments(PaymentCommon, TestSubscriptionCommon, MockEmail)
         of its invoices is paid within the next invoicing date.
         """
         # Confirm subscription, generate invoice and then close it.
-        subscription = self.subscription
-        subscription.action_confirm()
-        subscription._create_recurring_invoice()
-        subscription.set_close()
+        with freeze_time("2025-08-08"):
+            subscription = self.subscription
+            subscription.action_confirm()
+            subscription._create_recurring_invoice()
 
-        # Ensure that the subscription is churned, and that the next invoice
-        # date happens after today. The transaction date must be less than
-        # this date for the subscription to be successfuly re-opened.
-        self.assertEqual(
-            subscription.subscription_state,
-            "6_churn",
-            "The subscription must be churned after closing it."
-        )
-        self.assertTrue(
-            datetime.datetime.now().date() <= subscription.next_invoice_date,
-            "For sub reopening, we must have payment date <= next invoice date."
-        )
+        with freeze_time("2025-09-14"):
+            # only some reasons can allow reopening.
+            close_reason = self.env.ref('sale_subscription.close_reason_auto_close_limit_reached')
+            subscription.set_close(close_reason_id=close_reason.id)
 
-        # Create and process the payment transaction for the invoice.
-        # Ensure that the subscription got re-opened after paying it.
-        tx = self.env["payment.transaction"].create(
-            self._get_payment_values(subscription, subscription.invoice_ids.ids)
-        )
-        tx._set_done()
-        tx._post_process()
-        self.assertEqual(tx.state, 'done')
-        self.assertEqual(
-            subscription.subscription_state,
-            "3_progress",
-            "Churned subscription must be re-opened after paying the invoice."
-        )
+            # Ensure that the subscription is churned, and that the next invoice
+            # date happens after today. The transaction date must be less than
+            # this date for the subscription to be successfuly re-opened.
+            self.assertEqual(
+                subscription.subscription_state,
+                "6_churn",
+                "The subscription must be churned after closing it."
+            )
+
+            cutoff_date = datetime.datetime.now().date() - relativedelta(days=subscription.plan_id.auto_close_limit)
+            self.assertTrue(
+                cutoff_date <= subscription.next_invoice_date,
+                "For sub reopening, we must have payment date <= next invoice date."
+            )
+
+            # Create and process the payment transaction for the invoice.
+            # Ensure that the subscription got re-opened after paying it.
+            tx = self.env["payment.transaction"].create(
+                self._get_payment_values(subscription, subscription.invoice_ids.ids)
+            )
+            tx._set_done()
+            tx._post_process()
+            self.assertEqual(tx.state, 'done')
+            self.assertEqual(
+                subscription.subscription_state,
+                "3_progress",
+                "Churned subscription must be re-opened after paying the invoice."
+            )
+
+    def test_successful_reopen_churned_subscription_manual(self):
+        """
+        Ensure that a churned subscription is reopened when a invoices pay
+        through (bank transafer,..) within the next invoicing date.
+        """
+        # Confirm subscription, generate invoice and then close it.
+        with freeze_time("2025-08-08"):
+            subscription = self.subscription
+            subscription.action_confirm()
+            invoice = subscription._create_recurring_invoice()
+
+        with freeze_time("2025-09-14"):
+            # only some reasons can allow reopening.
+            close_reason = self.env.ref('sale_subscription.close_reason_auto_close_limit_reached')
+            subscription.set_close(close_reason_id=close_reason.id)
+
+            # Ensure that the subscription is churned, and that the next invoice
+            # date happens after today. The transaction date must be less than
+            # this date for the subscription to be successfully re-opened.
+            self.assertEqual(
+                subscription.subscription_state,
+                "6_churn",
+                "The subscription must be churned after closing it."
+            )
+            cutoff_date = datetime.datetime.now().date() - relativedelta(days=subscription.plan_id.auto_close_limit)
+            self.assertTrue(
+                cutoff_date <= subscription.next_invoice_date,
+                "For sub reopening, we must have payment date cutoff_date <= next invoice date."
+            )
+
+            # make payment on invoice for reopen subscription
+            self.env['account.payment.register']\
+                .with_context(active_model='account.move', active_ids=invoice.ids)\
+                .create({})\
+                ._create_payments()
+
+            self.assertTrue(
+                invoice.payment_state in ['in_payment', 'paid'],
+                "Ensure that the invoice's payment state is either 'in_payment' or 'paid'"
+            )
+            # Ensure that the subscription got re-opened after paying it.
+            self.assertEqual(
+                subscription.subscription_state,
+                "3_progress",
+                "Churned subscription must be re-opened after paying the invoice."
+            )
+
+    def test_credit_note_payment_not_reopen_churned_subscription(self):
+        """
+        Ensure that a churned subscription is NOT reopened when a credit note
+        is paid. Only invoice payments should reopen churned subscriptions.
+        """
+        with freeze_time("2025-08-08"):
+            subscription = self.subscription
+            subscription.action_confirm()
+            invoice = subscription._create_recurring_invoice()
+            self.env['account.payment.register'].with_context(active_model='account.move', active_ids=invoice.ids).create({
+                'payment_date': invoice.date,
+            })._create_payments()
+            subscription.set_close()
+            self.assertEqual(
+                subscription.subscription_state,
+                "6_churn",
+                "The subscription must be churned after closing it."
+            )
+
+            refund_wizard = self.env['account.move.reversal'].with_context(active_model="account.move", active_ids=invoice.ids).create({
+                'reason': 'Test credit note',
+                'journal_id': invoice.journal_id.id,
+            })
+            res = refund_wizard.refund_moves()
+            credit_note = self.env['account.move'].browse(res['res_id'])
+            self.assertEqual(credit_note.move_type, 'out_refund', "Must be a credit note")
+            credit_note.action_post()
+            self.env['account.payment.register'].with_context(active_model='account.move', active_ids=credit_note.ids).create({
+                'payment_date': credit_note.date,
+            })._create_payments()
+
+            self.assertEqual(credit_note.payment_state, credit_note._get_invoice_in_payment_state())
+            self.assertEqual(
+                subscription.subscription_state,
+                "6_churn",
+                "Churned subscription must NOT be re-opened after paying a credit note."
+            )
 
     def test_unsuccessful_reopen_churned_subscription(self):
         """
         Ensure that a churned subscription is not re-opened when
-        any of its invoices is paid after the next invoicing date.
+        an invoice is paid after the allowed auto_close_limit
+        period from the next invoicing date.
         """
         # Confirm subscription, generate invoice and then close it.
         subscription = self.subscription
+        subscription.plan_id.auto_close_limit = 5
         subscription.action_confirm()
         subscription._create_recurring_invoice()
         subscription.set_close()
 
         # Simulate the payment transaction for the invoice one week after the
-        # next invoicing date and ensure that the subscription wasn't reopened.
-        with freeze_time(subscription.next_invoice_date + relativedelta(weeks=1)):
+        # (next_invoice_date + auto_close_limit) and ensure that the subscription
+        # wasn't reopened.
+        late_payment_date = subscription.next_invoice_date + relativedelta(
+            days=subscription.plan_id.auto_close_limit + 7
+        )
+        with freeze_time(late_payment_date):
             tx_2 = self.env["payment.transaction"].create(
                 self._get_payment_values(subscription, subscription.invoice_ids.ids)
             )
@@ -890,3 +984,34 @@ class TestSubscriptionPayments(PaymentCommon, TestSubscriptionCommon, MockEmail)
         )
         invoice._post()
         self.assertFalse(self.subscription.pending_transaction, "The pending transaction flag should not remain")
+
+    def test_manual_invoice_from_other_company_website(self):
+        company = self.env['res.company'].create({'name': "Website Company"})
+        public_user = self.env.ref('base.public_user')
+        public_user.sudo().write({
+            'company_id': company.id,
+            'company_ids': [Command.set([company.id])]})
+
+        with freeze_time('2024-01-01'):
+            subscription = self.subscription
+            subscription.action_confirm()
+            test_payment_token = self.env['payment.token'].create({
+                'payment_details': 'Test',
+                'partner_id': subscription.partner_id.id,
+                'provider_id': self.dummy_provider.id,
+                'payment_method_id': self.payment_method_id,
+                'provider_ref': 'test'
+            })
+            payment_with_token = self.env['account.payment'].create({
+                'amount': subscription.amount_total,
+                'currency_id': subscription.currency_id.id,
+                'partner_id': self.user_portal.partner_id.id,
+                'payment_token_id': test_payment_token.id
+            })
+            inv = subscription._create_invoices()
+            payment_with_token.move_id = inv.id
+            payment_with_token.write({'state': 'paid'})
+            tx = payment_with_token._create_payment_transaction()
+            subscription.write({'transaction_ids': [Command.set(tx.ids)]})
+            tx._set_done()
+            tx.with_user(public_user).sudo()._post_process()

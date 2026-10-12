@@ -43,10 +43,13 @@ export class MasterProductionScheduleModel extends EventBus {
             [productionScheduleId, this.domain],
         ).then((productionScheduleIds) => {
             productionScheduleIds.push(productionScheduleId);
+            const visibleScheduleIds = new Set(this.data.production_schedule_ids.map(ps => ps.id));
+            const filteredScheduleIds = productionScheduleIds.filter(id => visibleScheduleIds.has(id));
             return this.orm.call(
                 'mrp.production.schedule',
                 'get_production_schedule_view_state',
-                [productionScheduleIds, this.scale],
+                [filteredScheduleIds, this.scale],
+                {context: {'compute_only_parent_schedules': true}},
             );
         }).then((production_schedule_ids) => {
             for (var i = 0; i < production_schedule_ids.length; i++) {
@@ -270,10 +273,10 @@ export class MasterProductionScheduleModel extends EventBus {
      */
     _saveCompanySettings(values) {
         this.mutex.exec(() => {
-            this.orm.write(
+            this.orm.call(
                 'res.company',
-                [this.data.company_id],
-                values,
+                'save_company_settings',
+                [this.data.company_id, values],
             ).then(() => {
                 this.load();
             });

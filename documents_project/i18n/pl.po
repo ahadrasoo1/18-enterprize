@@ -1,27 +1,32 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* documents_project
-# 
+# * documents_project
+#
 # Translators:
-# Wil Odoo, 2024
-# 
+# Marta Wacławek, 2025
+# Wil Odoo, 2025
+#
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-26 09:15+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Polish (https://app.transifex.com/odoo/teams/41243/pl/)\n"
+"POT-Creation-Date: 2025-12-29 18:47+0000\n"
+"PO-Revision-Date: 2026-05-13 16:53+0000\n"
+"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"Language-Team: Polish <https://translate.odoo.com/projects/odoo-18/"
+"documents_project/pl/>\n"
+"Language: pl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: pl\n"
-"Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
+"Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && "
+"(n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && "
+"n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
+"X-Generator: Weblate 5.17\n"
 
 #. module: documents_project
 #: model:ir.actions.server,name:documents_project.ir_actions_server_tag_add_draft
-#: model:ir.actions.server,name:documents_project.ir_actions_server_tag_remove_draft
 msgid "Add Tag Draft"
 msgstr ""
 
@@ -33,7 +38,7 @@ msgstr ""
 #. module: documents_project
 #: model:ir.actions.server,name:documents_project.ir_actions_server_tag_add_validated
 msgid "Add Tag Validated"
-msgstr ""
+msgstr "Dodaj znacznik Zatwierdzony"
 
 #. module: documents_project
 #: model:ir.actions.server,name:documents_project.ir_actions_server_ask_for_validation_code
@@ -43,7 +48,7 @@ msgstr ""
 #. module: documents_project
 #: model:ir.actions.server,name:documents_project.ir_actions_server_ask_for_validation
 msgid "Ask for validation"
-msgstr ""
+msgstr "Poproś o sprawdzenie"
 
 #. module: documents_project
 #: model:ir.model,name:documents_project.model_ir_attachment
@@ -85,6 +90,7 @@ msgstr "Dokument"
 
 #. module: documents_project
 #. odoo-python
+#: code:addons/documents_project/controllers/portal.py:0
 #: code:addons/documents_project/models/project_project.py:0
 #: model:ir.actions.act_window,name:documents_project.action_view_documents_project_project
 #: model:ir.actions.act_window,name:documents_project.action_view_documents_project_task
@@ -134,14 +140,22 @@ msgstr ""
 #. module: documents_project
 #. odoo-python
 #: code:addons/documents_project/models/documents_document.py:0
-msgid "Invalid project search"
+msgid ""
+"Impossible to update write `res_id` without `access_internal` for records "
+"with different `res_models` when some are linked to projects or tasks."
 msgstr ""
 
 #. module: documents_project
 #. odoo-python
 #: code:addons/documents_project/models/documents_document.py:0
+msgid "Invalid project search"
+msgstr "Nieprawidłowe wyszukiwanie projektu"
+
+#. module: documents_project
+#. odoo-python
+#: code:addons/documents_project/models/documents_document.py:0
 msgid "Invalid task search"
-msgstr ""
+msgstr "Nieprawidłowe zadanie wyszukiwania"
 
 #. module: documents_project
 #: model:ir.actions.server,name:documents_project.ir_actions_server_mark_as_draft_code
@@ -151,7 +165,7 @@ msgstr ""
 #. module: documents_project
 #: model:ir.actions.server,name:documents_project.ir_actions_server_mark_as_draft
 msgid "Mark as draft"
-msgstr ""
+msgstr "Oznacz jako wersję roboczą"
 
 #. module: documents_project
 #. odoo-python
@@ -171,14 +185,24 @@ msgid "Projects"
 msgstr "Projekty"
 
 #. module: documents_project
+#: model:ir.actions.server,name:documents_project.ir_actions_server_tag_remove_draft
+msgid "Remove Tag Draft"
+msgstr ""
+
+#. module: documents_project
 #: model:ir.actions.server,name:documents_project.ir_actions_server_tag_remove_to_validate
 msgid "Remove Tag To Validate"
-msgstr ""
+msgstr "Usuń tag Do zatwierdzenia"
 
 #. module: documents_project
 #: model:ir.actions.server,name:documents_project.ir_actions_server_tag_remove_validated
 msgid "Remove Tag Validated"
 msgstr ""
+
+#. module: documents_project
+#: model:ir.model,name:documents_project.model_documents_tag
+msgid "Tag"
+msgstr "Tag"
 
 #. module: documents_project
 #: model:ir.model,name:documents_project.model_project_task
@@ -190,19 +214,19 @@ msgstr "Zadanie"
 #. odoo-python
 #: code:addons/documents_project/models/documents_document.py:0
 msgid "Task created from document %s"
-msgstr ""
+msgstr "Zadanie utworzone z dokumentu %s"
 
 #. module: documents_project
 #. odoo-python
 #: code:addons/documents_project/models/documents_document.py:0
 msgid "Task created from documents"
-msgstr ""
+msgstr "Zadanie utworzone z dokumentów"
 
 #. module: documents_project
 #. odoo-python
 #: code:addons/documents_project/models/project_task.py:0
 msgid "Task's Documents"
-msgstr ""
+msgstr "Dokumenty zadania"
 
 #. module: documents_project
 #. odoo-python
@@ -211,21 +235,51 @@ msgid ""
 "The \"%(folder)s\" folder should either be in the \"%(company)s\" company "
 "like this project or be open to all companies."
 msgstr ""
+"Folder \"%(folder)s\" powinien być w firmie \"%(company)s\" tak jak ten "
+"projekt, lub być dostępny dla wszystkich firm."
 
 #. module: documents_project
 #. odoo-python
 #: code:addons/documents_project/models/documents_document.py:0
 msgid ""
-"The \"%s\" folder is required by the Project application and cannot be "
+"The \"%s\" workspace is required by the Project application and cannot be "
+"archived."
+msgstr ""
+"Obszar roboczy \"%s\"jest wymagany przez aplikację Projekt i nie można go "
+"zarchiwizować."
+
+#. module: documents_project
+#. odoo-python
+#: code:addons/documents_project/models/documents_document.py:0
+msgid ""
+"The \"%s\" workspace is required by the Project application and cannot be "
 "deleted."
 msgstr ""
+"Obszar roboczy \"%s\" jest wymagany przez aplikację Project i nie można go "
+"usunąć."
 
 #. module: documents_project
 #. odoo-python
 #: code:addons/documents_project/models/documents_document.py:0
 msgid ""
-"This folder should remain in the same company as the \"%(project)s\" project"
-" to which it is linked. Please update the company of the \"%(project)s\" "
+"This action can't be performed, as it would remove the workspaces used by "
+"the following projects:\n"
+"%(projects)s\n"
+"To continue, choose different workspaces or turn off the Documents feature "
+"for these projects."
+msgstr ""
+"Ta akcja nie może zostać przeprowadzona, ponieważ spowodowałoby to usunięcie "
+"obszarów roboczych, z których korzystają projekty:\n"
+"%(projects)s\n"
+"Aby kontynuować, wybierz inne obszary robocze lub wyłącz funkcję Dokumentów "
+"dla tych projektów."
+
+#. module: documents_project
+#. odoo-python
+#: code:addons/documents_project/models/documents_document.py:0
+msgid ""
+"This folder should remain in the same company as the \"%(project)s\" project "
+"to which it is linked. Please update the company of the \"%(project)s\" "
 "project, or leave the company of this workspace empty."
 msgstr ""
 
@@ -233,10 +287,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/documents_project/models/documents_document.py:0
 msgid ""
-"This folder should remain in the same company as the following projects to which it is linked:\n"
+"This folder should remain in the same company as the following projects to "
+"which it is linked:\n"
 "%s\n"
 "\n"
-"Please update the company of those projects, or leave the company of this workspace empty."
+"Please update the company of those projects, or leave the company of this "
+"workspace empty."
 msgstr ""
 
 #. module: documents_project
@@ -246,8 +302,8 @@ msgid ""
 "Upload <span class=\"fw-normal\">a file or </span>drag <span class=\"fw-"
 "normal\">it here.</span>"
 msgstr ""
-"Prześlij <span class=\"fw-normal\">plik</span> lub przeciągnij go "
-"</span>tutaj.</span>"
+"Prześlij <span class=\"fw-normal\">plik</span> lub przeciągnij go </"
+"span>tutaj.</span>"
 
 #. module: documents_project
 #: model:ir.model.fields,field_description:documents_project.field_project_task__folder_user_permission
@@ -268,11 +324,23 @@ msgstr ""
 #. odoo-python
 #: code:addons/documents_project/models/project_project.py:0
 msgid ""
-"You cannot change the company of this project, because its workspace is linked to the other following projects that are still in the \"%(other_company)s\" company:\n"
+"You cannot change the company of this project, because its workspace is "
+"linked to the other following projects that are still in the \"%"
+"(other_company)s\" company:\n"
 "%(other_workspaces)s\n"
 "\n"
-"Please update the company of all projects so that they remain in the same company as their workspace, or leave the company of the \"%(workspace)s\" workspace blank."
+"Please update the company of all projects so that they remain in the same "
+"company as their workspace, or leave the company of the \"%(workspace)s\" "
+"workspace blank."
 msgstr ""
+"Nie można zmienić firmy tego projektu, ponieważ jego obszar roboczy jest "
+"powiązany z innymi następującymi projektami, które nadal znajdują się w "
+"firmie \"%(other_company)s\":\n"
+"%(other_workspaces)s\n"
+"\n"
+"Zaktualizuj firmę wszystkich projektów, aby pozostały w tej samej firmie, co "
+"ich obszar roboczy, lub pozostaw firmę obszaru roboczego \"%(workspace)s\" "
+"pustą."
 
 #. module: documents_project
 #. odoo-python
@@ -284,10 +352,10 @@ msgstr ""
 #. odoo-python
 #: code:addons/documents_project/models/documents_document.py:0
 msgid "You cannot set a company on the %s folder."
-msgstr ""
+msgstr "Nie możesz skonfigurować firmy w folderze %s."
 
 #. module: documents_project
 #. odoo-python
 #: code:addons/documents_project/models/documents_document.py:0
 msgid "new %(model)s from %(new_record)s"
-msgstr ""
+msgstr "nowy %(model)s od %(new_record)s"

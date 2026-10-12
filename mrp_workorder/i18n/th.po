@@ -1,23 +1,28 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* mrp_workorder
-# 
+# * mrp_workorder
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Rasareeyar Lappiam, 2025
+#
+# Weblate <noreply-mt-weblate@weblate.org>, 2026.
+# Nusara Boonma <nuboo@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Thai (https://app.transifex.com/odoo/teams/41243/th/)\n"
+"POT-Creation-Date: 2026-04-10 18:48+0000\n"
+"PO-Revision-Date: 2026-07-05 17:09+0000\n"
+"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"Language-Team: Thai <https://translate.odoo.com/projects/odoo-18/"
+"mrp_workorder/th/>\n"
+"Language: th\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: th\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 2026.6.1\n"
 
 #. module: mrp_workorder
 #. odoo-python
@@ -147,8 +152,7 @@ msgstr "คำสั่งงานเพิ่มเติม"
 msgid ""
 "Additional instructions that can be created and visualised from both here "
 "and the shop floor interface."
-msgstr ""
-"คำแนะนำเพิ่มเติมที่สามารถสร้างและแสดงภาพได้จากทั้งที่นี่และอินเทอร์เฟซของพื้นที่ผลิต"
+msgstr "คำแนะนำเพิ่มเติมที่สามารถสร้างและแสดงภาพได้จากทั้งที่นี่และอินเทอร์เฟซของพื้นที่ผลิต"
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_workorder__all_employees_allowed
@@ -157,7 +161,7 @@ msgstr "อนุญาตสำหรับพนักงานทุกคน
 
 #. module: mrp_workorder
 #. odoo-javascript
-#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_workcenter_dialog.js:0
+#: code:addons/mrp_workorder/static/src/mrp_display/mrp_display.js:0
 msgid "All MO"
 msgstr "All MO"
 
@@ -185,7 +189,12 @@ msgstr "เก็บถาวรแล้ว"
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_workorder__employee_assigned_ids
 msgid "Assigned"
-msgstr "มอบหมายแล้ว"
+msgstr "ผู้ได้รับมอบหมาย"
+
+#. module: mrp_workorder
+#: model_terms:ir.ui.view,arch_db:mrp_workorder.view_employee_form_account
+msgid "Attendance/Point of Sale/Manufacturing"
+msgstr "การเข้างาน/การขายหน้าร้าน/การผลิต"
 
 #. module: mrp_workorder
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_production_tree_view_planning
@@ -242,6 +251,12 @@ msgstr "ผลตอบรับ BoM (%(production)s - %(operation)s)"
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_point__bom_product_ids
 msgid "Bom Product"
 msgstr "สินค้า Bom"
+
+#. module: mrp_workorder
+#. odoo-javascript
+#: code:addons/mrp_workorder/static/src/components/pin_popup.xml:0
+msgid "C"
+msgstr "C"
 
 #. module: mrp_workorder
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workorder_view_form_tablet
@@ -472,7 +487,7 @@ msgstr "เสร็จสิ้น"
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_workorder__done_check_ids
 msgid "Done Check"
-msgstr ""
+msgstr "ตรวจสอบเสร็จสิ้น"
 
 #. module: mrp_workorder
 #. odoo-javascript
@@ -570,7 +585,7 @@ msgstr "ไอคอนแบบฟอนต์ที่ยอดเยี่ย
 #. odoo-python
 #: code:addons/mrp_workorder/models/quality.py:0
 msgid "Google Doc"
-msgstr ""
+msgstr "Google Doc"
 
 #. module: mrp_workorder
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.quality_point_view_form_inherit_mrp
@@ -586,7 +601,7 @@ msgstr "URL ของ Google Doc"
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_workorder__has_operation_note
 msgid "Has Description"
-msgstr ""
+msgstr "มีคำอธิบาย"
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_production_additional_workorder__id
@@ -614,7 +629,7 @@ msgstr "รูปภาพ/PDF"
 #. odoo-javascript
 #: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_menu_dialog.xml:0
 msgid "Improvement Suggestion"
-msgstr ""
+msgstr "ข้อเสนอแนะในการปรับปรุง"
 
 #. module: mrp_workorder
 #. odoo-javascript
@@ -628,8 +643,7 @@ msgstr "กำลังดำเนินการ"
 msgid ""
 "In case of Quality Check by Quantity, Move Line on which the Quality Check "
 "applies"
-msgstr ""
-"ในกรณีของการตรวจสอบคุณภาพตามปริมาณ ให้ย้ายรายการที่ใช้การตรวจสอบคุณภาพ"
+msgstr "ในกรณีของการตรวจสอบคุณภาพตามปริมาณ ให้ย้ายรายการที่ใช้การตรวจสอบคุณภาพ"
 
 #. module: mrp_workorder
 #. odoo-javascript
@@ -640,7 +654,7 @@ msgstr "ระบุขั้นตอนที่คุณต้องการ
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_production_additional_workorder__blocked_by_workorder_id
 msgid "Insert after operation"
-msgstr ""
+msgstr "แทรกหลังการดำเนินการ"
 
 #. module: mrp_workorder
 #. odoo-javascript
@@ -670,12 +684,11 @@ msgstr "คำแนะนำ"
 #. odoo-javascript
 #: code:addons/mrp_workorder/static/src/mrp_display/mrp_display_record.xml:0
 msgid "Instructions ("
-msgstr ""
+msgstr "คำสั่ง ("
 
 #. module: mrp_workorder
 #: model:ir.model.fields,help:mrp_workorder.field_mrp_workorder__move_line_ids
-msgid ""
-"Inventory moves for which you must scan a lot number at this work order"
+msgid "Inventory moves for which you must scan a lot number at this work order"
 msgstr "การย้ายสินค้าคงคลังที่คุณต้องสแกนหมายเลขล็อตที่คำสั่งงานนี้"
 
 #. module: mrp_workorder
@@ -732,7 +745,7 @@ msgstr "โหลดตัวอย่าง"
 #: code:addons/mrp_workorder/static/src/mrp_display/mrp_display_record.js:0
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_production_view_form_log_note
 msgid "Log Note"
-msgstr ""
+msgstr "จดบันทึก"
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_mrp_production__log_note
@@ -851,7 +864,7 @@ msgstr "ทีมของฉัน"
 
 #. module: mrp_workorder
 #. odoo-javascript
-#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_workcenter_dialog.js:0
+#: code:addons/mrp_workorder/static/src/mrp_display/mrp_display.js:0
 msgid "My WO"
 msgstr "WO ของฉัน"
 
@@ -925,7 +938,7 @@ msgstr "การตรวจสอบครั้งต่อไป"
 #. odoo-javascript
 #: code:addons/mrp_workorder/static/src/mrp_display/mrp_display_record.xml:0
 msgid "Next Operation"
-msgstr ""
+msgstr "การดำเนินการถัดไป"
 
 #. module: mrp_workorder
 #: model_terms:ir.actions.act_window,help:mrp_workorder.action_mrp_workorder_show_steps
@@ -939,7 +952,7 @@ msgstr "ไม่มีคำสั่งงานให้ทำ!"
 
 #. module: mrp_workorder
 #. odoo-javascript
-#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_workcenter_dialog.js:0
+#: code:addons/mrp_workorder/static/src/mrp_display/mrp_display.js:0
 msgid ""
 "No workcenters are available, please create one first to add it to the shop "
 "floor view"
@@ -959,7 +972,7 @@ msgstr "จำนวนพนักงานที่ต้องใช้ใน
 #. odoo-javascript
 #: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_menu_dialog.xml:0
 msgid "Open Manufacturing Order"
-msgstr ""
+msgstr "เปิดใบสั่งผลิต"
 
 #. module: mrp_workorder
 #. odoo-javascript
@@ -1029,6 +1042,7 @@ msgstr "หยุด"
 
 #. module: mrp_workorder
 #. odoo-javascript
+#: code:addons/mrp_workorder/static/src/mrp_display/mrp_display_record.xml:0
 #: code:addons/mrp_workorder/static/src/mrp_display/search_model.js:0
 msgid "Pending"
 msgstr "รอดำเนินการ"
@@ -1305,18 +1319,6 @@ msgstr "ผลลัพธ์"
 
 #. module: mrp_workorder
 #. odoo-javascript
-#: code:addons/mrp_workorder/static/src/mrp_display/mrp_display.js:0
-msgid "STARTED work on workorder %s"
-msgstr "เริ่มงานตามคำสั่งงานแล้ว %s"
-
-#. module: mrp_workorder
-#. odoo-javascript
-#: code:addons/mrp_workorder/static/src/mrp_display/mrp_display.js:0
-msgid "STOPPED work on workorder %s"
-msgstr "หยุดงานตามคำสั่งงานแล้ว %s"
-
-#. module: mrp_workorder
-#. odoo-javascript
 #: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_menu_dialog.xml:0
 msgid "Scrap"
 msgstr "เศษสินค้า"
@@ -1362,6 +1364,8 @@ msgid "Set a New picture"
 msgstr "ตั้งค่ารูปภาพใหม่"
 
 #. module: mrp_workorder
+#. odoo-javascript
+#: code:addons/mrp_workorder/static/src/mrp_display/dialog/mrp_workcenter_dialog.js:0
 #: model:ir.actions.client,name:mrp_workorder.action_mrp_display
 #: model:ir.model.fields,field_description:mrp_workorder.field_res_config_settings__group_mrp_wo_shop_floor
 #: model:ir.ui.menu,name:mrp_workorder.menu_mrp_workorder_root
@@ -1457,6 +1461,11 @@ msgid "Stock Move Line"
 msgstr "รายการการย้ายสต็อก"
 
 #. module: mrp_workorder
+#: model:ir.model,name:mrp_workorder.model_stock_rule
+msgid "Stock Rule"
+msgstr "กฎสต๊อก"
+
+#. module: mrp_workorder
 #: model:product.template,name:mrp_workorder.product_template_stool
 msgid "Stool"
 msgstr "เก้าอี้สตูล"
@@ -1491,13 +1500,16 @@ msgstr "ประเภทการทดสอบ"
 #: model_terms:ir.actions.act_window,help:mrp_workorder.mrp_stock_picking_type_action
 msgid ""
 "The operation type system allows you to assign each stock\n"
-"            operation a specific type which will alter its views accordingly.\n"
-"            On the operation type you could e.g. specify if packing is needed by default,\n"
+"            operation a specific type which will alter its views "
+"accordingly.\n"
+"            On the operation type you could e.g. specify if packing is "
+"needed by default,\n"
 "            if it should show the customer."
 msgstr ""
 "ระบบประเภทการดำเนินการช่วยให้คุณสามารถกำหนดประเภท\n"
 "            การดำเนินงานของสต็อกแต่ละรายการได้ ซึ่งจะปรับเปลี่ยนมุมมองตามนั้น\n"
-"            เกี่ยวกับประเภทการดำเนินการคุณสามารถทำได้ เช่น ระบุว่าจำเป็นต้องมีการบรรจุโดยค่าเริ่มต้นหรือไม่\n"
+"            เกี่ยวกับประเภทการดำเนินการคุณสามารถทำได้ เช่น "
+"ระบุว่าจำเป็นต้องมีการบรรจุโดยค่าเริ่มต้นหรือไม่\n"
 "            ถ้าต้องการแสดงให้ลูกค้าสามารถมองเห็นได้"
 
 #. module: mrp_workorder
@@ -1509,7 +1521,7 @@ msgstr "ไม่มีผู้จัดการเซสชั่น กร�
 #. module: mrp_workorder
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_production_view_search_inherit_planning
 msgid "This Station"
-msgstr ""
+msgstr "สถานีนี้"
 
 #. module: mrp_workorder
 #. odoo-python
@@ -1517,9 +1529,7 @@ msgstr ""
 msgid ""
 "This workcenter isn't expected to have open workorders during this period. "
 "Work hours :"
-msgstr ""
-"ไม่มีการคาดการณ์ว่าศูนย์ปฏิบัติงานนี้จะมีใบสั่งงานที่เปิดอยู่ในช่วงเวลานี้ "
-"ชั่วโมงทำงาน:"
+msgstr "ไม่มีการคาดการณ์ว่าศูนย์ปฏิบัติงานนี้จะมีใบสั่งงานที่เปิดอยู่ในช่วงเวลานี้ ชั่วโมงทำงาน:"
 
 #. module: mrp_workorder
 #. odoo-python
@@ -1544,7 +1554,7 @@ msgstr "คำนำหน้าชื่อ"
 #. odoo-python
 #: code:addons/mrp_workorder/models/quality.py:0
 msgid "Title:"
-msgstr ""
+msgstr "ชื่อ:"
 
 #. module: mrp_workorder
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.stock_picking_type_view_kanban
@@ -1560,9 +1570,14 @@ msgstr "จำนวนรวม"
 #. odoo-javascript
 #: code:addons/mrp_workorder/static/src/mrp_display/mrp_display.xml:0
 msgid ""
-"Track work orders, show instructions and record manufacturing operations from here:\n"
-"                                    quality control, consumed quantities, lot/serial numbers, etc."
+"Track work orders, show instructions and record manufacturing operations "
+"from here:\n"
+"                                    quality control, consumed quantities, "
+"lot/serial numbers, etc."
 msgstr ""
+"ติดตามคำสั่งงาน แสดงคำสั่ง และบันทึกการดำเนินการผลิตจากที่นี่:\n"
+"                                    การควบคุมคุณภาพ ปริมาณที่ใช้ หมายเลขล็อต/ลำดับ "
+"ฯลฯ"
 
 #. module: mrp_workorder
 #: model:ir.model.fields,field_description:mrp_workorder.field_quality_check__product_tracking
@@ -1664,12 +1679,15 @@ msgstr ""
 #. module: mrp_workorder
 #: model_terms:ir.actions.act_window,help:mrp_workorder.mrp_workorder_action_tablet
 msgid ""
-"Use the table work center control panel to register operations in the shop floor directly.\n"
-"            The tablet provides worksheets for your workers and allow them to scrap products, track time,\n"
+"Use the table work center control panel to register operations in the shop "
+"floor directly.\n"
+"            The tablet provides worksheets for your workers and allow them "
+"to scrap products, track time,\n"
 "            launch a maintenance request, perform quality tests, etc."
 msgstr ""
 "ใช้โต๊ะแผงควบคุมศูนย์งานเพื่อลงทะเบียนการปฏิบัติงานในชั้นของร้านค้าโดยตรง\n"
-"            แท็บเล็ตมีแผ่นงานสำหรับพนักงานของคุณ และอนุญาตให้พวกเขาทำเศษสินค้า ติดตามเวลา\n"
+"            แท็บเล็ตมีแผ่นงานสำหรับพนักงานของคุณ และอนุญาตให้พวกเขาทำเศษสินค้า "
+"ติดตามเวลา\n"
 "           เรียกใช้คำขอบำรุงรักษา ทำการทดสอบคุณภาพ และอื่นๆ "
 
 #. module: mrp_workorder
@@ -1704,9 +1722,15 @@ msgid "Waiting"
 msgstr "รอ"
 
 #. module: mrp_workorder
+#. odoo-javascript
+#: code:addons/mrp_workorder/static/src/mrp_display/mrp_display_record.js:0
+msgid "What do you want to do?"
+msgstr "คุณอยากทำอะไร?"
+
+#. module: mrp_workorder
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.view_mrp_production_additional_workorder_wizard
 msgid "Will be placed at the beginning if emtpy"
-msgstr ""
+msgstr "จะถูกวางไว้ที่จุดเริ่มต้นของช่องว่าง"
 
 #. module: mrp_workorder
 #: model:ir.model,name:mrp_workorder.model_mrp_workcenter
@@ -1754,7 +1778,8 @@ msgstr "คำสั่งงาน"
 #: model_terms:ir.actions.act_window,help:mrp_workorder.mrp_workorder_action_tablet
 msgid ""
 "Work orders are operations to do as part of a manufacturing order.\n"
-"            Operations are defined in the bill of materials or added in the manufacturing order directly."
+"            Operations are defined in the bill of materials or added in the "
+"manufacturing order directly."
 msgstr ""
 "คำสั่งงานคือปฏิบัติการที่ต้องทำโดยเป็นส่วนหนึ่งของใบสั่งผลิต\n"
 "         การปฏิบัติการถูกกำหนดไว้ในบิลวัสดุหรือเพิ่มในใบสั่งผลิตโดยตรง"
@@ -1826,8 +1851,7 @@ msgstr "คุณไม่ได้รับอนุญาตให้ทำง
 msgid ""
 "You cannot update the quantity to do of an ongoing manufacturing order for "
 "which quality checks have been performed."
-msgstr ""
-"คุณไม่สามารถอัปเดตจำนวนที่จะทำของใบสั่งผลิตต่อเนื่องที่มีการตรวจสอบคุณภาพแล้วได้"
+msgstr "คุณไม่สามารถอัปเดตจำนวนที่จะทำของใบสั่งผลิตต่อเนื่องที่มีการตรวจสอบคุณภาพแล้วได้"
 
 #. module: mrp_workorder
 #. odoo-python
@@ -1845,10 +1869,9 @@ msgstr "คุณต้องเข้าสู่ระบบเพื่อด
 #. odoo-python
 #: code:addons/mrp_workorder/models/mrp_workorder.py:0
 msgid ""
-"You need to complete Quality Checks using the Shop Floor before marking Work"
-" Order as Done."
-msgstr ""
-"คุณต้องดำเนินการตรวจสอบคุณภาพให้เสร็จสิ้นโดยใช้พื้นที่ร้านค้าก่อนที่จะทำเครื่องหมายคำสั่งงานว่าเสร็จสิ้น"
+"You need to complete Quality Checks using the Shop Floor before marking Work "
+"Order as Done."
+msgstr "คุณต้องดำเนินการตรวจสอบคุณภาพให้เสร็จสิ้นโดยใช้พื้นที่ร้านค้าก่อนที่จะทำเครื่องหมายคำสั่งงานว่าเสร็จสิ้น"
 
 #. module: mrp_workorder
 #. odoo-python
@@ -1858,9 +1881,8 @@ msgid ""
 "'Productive'. Create one from the Manufacturing app, menu: Configuration / "
 "Productivity Losses."
 msgstr ""
-"คุณต้องกำหนดการสูญเสียความสามารถในการผลิตอย่างน้อยหนึ่งครั้งในหมวดหมู่ "
-"'ประสิทธิผล' สร้างรายการจากแอปการผลิต เมนู: การกำหนดค่า / "
-"การสูญเสียประสิทธิภาพการทำงาน"
+"คุณต้องกำหนดการสูญเสียความสามารถในการผลิตอย่างน้อยหนึ่งครั้งในหมวดหมู่ 'ประสิทธิผล' "
+"สร้างรายการจากแอปการผลิต เมนู: การกำหนดค่า / การสูญเสียประสิทธิภาพการทำงาน"
 
 #. module: mrp_workorder
 #. odoo-python
@@ -1868,8 +1890,7 @@ msgstr ""
 msgid ""
 "You need to link this user to an employee of this company to process the "
 "work order"
-msgstr ""
-"คุณต้องเชื่อมโยงผู้ใช้รายนี้กับพนักงานของบริษัทนี้เพื่อประมวลผลใบสั่งงาน"
+msgstr "คุณต้องเชื่อมโยงผู้ใช้รายนี้กับพนักงานของบริษัทนี้เพื่อประมวลผลใบสั่งงาน"
 
 #. module: mrp_workorder
 #. odoo-python
@@ -1930,6 +1951,12 @@ msgstr "เมนู"
 #: model_terms:ir.ui.view,arch_db:mrp_workorder.mrp_workcenter_form_view_inherit
 msgid "per employee"
 msgstr "ต่อพนักงาน"
+
+#. module: mrp_workorder
+#. odoo-javascript
+#: code:addons/mrp_workorder/static/src/mrp_display/mrp_display_record.xml:0
+msgid "s"
+msgstr ""
 
 #. module: mrp_workorder
 #: model:product.template,description_sale:mrp_workorder.product_template_stool_foot

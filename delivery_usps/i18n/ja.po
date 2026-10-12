@@ -1,22 +1,23 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* delivery_usps
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Junko Augias, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
+"POT-Creation-Date: 2025-12-29 18:50+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
+"Last-Translator: Junko Augias, 2025\n"
 "Language-Team: Japanese (https://app.transifex.com/odoo/teams/41243/ja/)\n"
+"Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: ja\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. module: delivery_usps
@@ -32,7 +33,8 @@ msgstr "アカウントが検証されました"
 #. module: delivery_usps
 #: model:ir.model.fields,help:delivery_usps.field_delivery_carrier__usps_account_validated
 msgid "Check this box if your account is validated by USPS"
-msgstr "アカウントがUSPSによって検証された場合はこのボックスをチェックして下さい。"
+msgstr ""
+"アカウントがUSPSによって検証された場合はこのボックスをチェックして下さい。"
 
 #. module: delivery_usps
 #. odoo-python
@@ -183,7 +185,7 @@ msgstr "PDF"
 #. module: delivery_usps
 #: model:ir.model.fields.selection,name:delivery_usps.selection__delivery_carrier__usps_mail_type__package
 msgid "Package"
-msgstr "パッケージ"
+msgstr "梱包"
 
 #. module: delivery_usps
 #: model:ir.model.fields,field_description:delivery_usps.field_delivery_carrier__usps_custom_container_girth
@@ -223,8 +225,7 @@ msgstr "荷物"
 
 #. module: delivery_usps
 #: model:ir.model.fields,help:delivery_usps.field_delivery_carrier__usps_machinable
-msgid ""
-"Please check on USPS website to ensure that your package is machinable."
+msgid "Please check on USPS website to ensure that your package is machinable."
 msgstr "USPSのウェブサイトにて、荷物が機械加工可能かどうかをご確認して下さい。"
 
 #. module: delivery_usps
@@ -375,7 +376,8 @@ msgstr ""
 #. odoo-python
 #: code:addons/delivery_usps/models/usps_request.py:0
 msgid ""
-"The estimated shipping price cannot be computed because the weight is missing for the following product(s): \n"
+"The estimated shipping price cannot be computed because the weight is "
+"missing for the following product(s): \n"
 " %s"
 msgstr ""
 "以下のプロダクトの重量がないため、見積送料を計算できません: \n"
@@ -420,8 +422,13 @@ msgstr "コンテナタイプ"
 
 #. module: delivery_usps
 #: model:ir.model.fields.selection,name:delivery_usps.selection__delivery_carrier__delivery_type__usps
-msgid "USPS"
-msgstr "USPS"
+msgid "USPS (Legacy)"
+msgstr "USPS (レガシー)"
+
+#. module: delivery_usps
+#: model:ir.model.fields,field_description:delivery_usps.field_delivery_carrier__usps_label_file_type
+msgid "USPS (Legacy) Label File Type"
+msgstr "USPS (レガシー) ラベルファイルタイプ"
 
 #. module: delivery_usps
 #: model_terms:ir.ui.view,arch_db:delivery_usps.view_delivery_carrier_form_with_provider_usps
@@ -440,7 +447,9 @@ msgstr "USPS国内定額封筒"
 msgid ""
 "USPS Domestic is used only to ship inside of the U.S.A. Please change the "
 "delivery method into USPS International."
-msgstr "USPS国内は米国内への発送にのみ使用されます。配送方法をUSPS国際に変更して下さい。"
+msgstr ""
+"USPS国内は米国内への発送にのみ使用されます。配送方法をUSPS国際に変更して下さ"
+"い。"
 
 #. module: delivery_usps
 #: model:ir.model.fields,field_description:delivery_usps.field_delivery_carrier__usps_first_class_mail_type
@@ -459,12 +468,9 @@ msgstr "USPS国際定額ボックス"
 msgid ""
 "USPS International is used only to ship outside of the U.S.A. Please change "
 "the delivery method into USPS Domestic."
-msgstr "USPS国際は米国外への発送にのみ使用されます。配送方法をUSPS国内に変更して下さい。"
-
-#. module: delivery_usps
-#: model:ir.model.fields,field_description:delivery_usps.field_delivery_carrier__usps_label_file_type
-msgid "USPS Label File Type"
-msgstr "USPSラベルファイルタイプ"
+msgstr ""
+"USPS国際は米国外への発送にのみ使用されます。配送方法をUSPS国内に変更して下さ"
+"い。"
 
 #. module: delivery_usps
 #: model:ir.model.fields,field_description:delivery_usps.field_delivery_carrier__usps_mail_type
@@ -475,12 +481,6 @@ msgstr "USPSメールタイプ"
 #: model:ir.model.fields,field_description:delivery_usps.field_delivery_carrier__usps_service
 msgid "USPS Service"
 msgstr "USPSサービス"
-
-#. module: delivery_usps
-#: model_terms:ir.ui.view,arch_db:delivery_usps.res_config_settings_view_form_sale
-#: model_terms:ir.ui.view,arch_db:delivery_usps.res_config_settings_view_form_stock
-msgid "USPS Shipping Methods"
-msgstr "USPS配送方法"
 
 #. module: delivery_usps
 #: model:ir.model.fields,field_description:delivery_usps.field_delivery_carrier__usps_username

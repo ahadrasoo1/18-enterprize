@@ -1,14 +1,15 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from freezegun import freeze_time
+from dateutil.relativedelta import relativedelta
 
 from odoo.fields import Datetime
-from odoo.tests import new_test_user
+from odoo.tests import new_test_user, tagged
 
 from odoo.addons.project.tests.test_project_base import TestProjectCommon
 from odoo.addons.project.models.project_task import CLOSED_STATES
 
-
+@tagged('-at_install', 'post_install')
 class TestTaskGanttView(TestProjectCommon):
 
     @classmethod
@@ -192,19 +193,6 @@ class TestTaskGanttView(TestProjectCommon):
         })  # capacity of 16h, should be split in two (8h for both tasks)
         self.assertEqual(self.tasks.mapped('allocated_hours'), [8.0, 8.0], 'The allocated hours should be 8.0 both')
 
-    def test_capacity_split_allocated_hours_substitute(self):
-        self.tasks |= self.env['project.task'].create({
-            'name': 'Test gantt',
-            'project_id': self.project_gantt_test_1.id,
-            'allocated_hours': 12.0,
-        })
-        self.tasks.write({
-            'user_ids': [self.project_gantt_test_1.user_id.id],
-            'planned_date_begin': '2024-03-07 00:00:00',
-            'date_deadline': '2024-03-08 23:59:59',
-        })  # capacity of 16h
-        self.assertEqual(self.tasks.mapped('allocated_hours'), [2.0, 2.0, 12.0], 'The capacity should be 4h since a task with 12h allocated hours is in the recordset')
-
     def test_no_recompute_allocated_hours_present(self):
         self.tasks.write({
             'allocated_hours': 12.0,  # set allocated hours to 12
@@ -212,3 +200,60 @@ class TestTaskGanttView(TestProjectCommon):
             'date_deadline': '2024-03-08 23:59:59',
         })
         self.assertEqual(self.tasks.mapped('allocated_hours'), [12.0, 12.0], 'The tasks\'s allocated hours shouldn\'t have been recomputed since the allocated hours are being/already set')
+
+    def test_gantt_view_with_empty_schedule(self):
+        """Ensure the Gantt view loads correctly even if a user has no working schedule"""
+
+        self.env.company.resource_calendar_id = False
+
+        project = self.env['project.project'].create({
+            'name': 'Test Project',
+        })
+        no_schedule_user = self.env['res.users'].create({
+            'name': 'Test User No Calendar',
+            'login': 'test_no_calendar',
+            'groups_id': [(6, 0, [self.env.ref('base.group_user').id])],
+            'company_id': self.env.company.id,
+        })
+        task = self.env['project.task'].new({
+            'project_id': project.id,
+            'name': 'Test Task',
+            'planned_date_begin': Datetime.now() - relativedelta(days=30),
+            'date_deadline': Datetime.now() + relativedelta(days=30),
+            'user_ids': [(6, 0, [no_schedule_user.id])],
+        })
+        task._compute_allocated_hours()
+
+    def test_gantt_view_company_calendar_flexible_hours(self):
+        """Ensure the Gantt view handles correctly company calendars with flexible hours"""
+
+        company_calendar = self.env.company.resource_calendar_id
+        company_calendar.write({'flexible_hours': True})
+
+        Task = self.env['project.task']
+        group_by = ['user_ids']
+        start_date, stop_date = Datetime.now().strftime('%Y-%m-%d 00:00:00'), (Datetime.now() + relativedelta(days=30)).strftime('%Y-%m-%d 23:59:59')
+        gantt_data = Task.get_gantt_data([], group_by, {'display_name': {}}, unavailability_fields=group_by, progress_bar_fields=group_by, start_date=start_date, stop_date=stop_date, scale='month')
+        self.assertEqual(gantt_data["unavailabilities"]['user_ids'][False], [], 'There should be no unavailability intervals when the company calendar has flexible hours.')
+
+    def test_gantt_unavailability_flexible_employee_no_leaves(self):
+        """Flex employee with no leaves should have no Gantt unavailabilities."""
+        flex_calendar = self.env['resource.calendar'].create({
+            'name': 'Flexible Test Calendar',
+            'flexible_hours': True,
+        })
+        self.env['resource.resource'].create({
+            'name': self.user_gantt_test_1.name,
+            'user_id': self.user_gantt_test_1.id,
+            'calendar_id': flex_calendar.id,
+            'company_id': self.env.company.id,
+        })
+        start = Datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        stop = start + relativedelta(days=30)
+        result = self.env['project.task']._gantt_unavailability(
+            'user_ids', [self.user_gantt_test_1.id], start, stop, 'month'
+        )
+        self.assertEqual(
+            result[self.user_gantt_test_1.id], [],
+            "Flex employee with no leaves should have no unavailabilities.",
+        )

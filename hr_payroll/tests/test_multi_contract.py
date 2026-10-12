@@ -46,3 +46,16 @@ class TestPayslipMultiContract(TestPayslipContractBase):
         out_of_contract_line = payslip.worked_days_line_ids[1]
         self.assertEqual(out_of_contract_line.number_of_hours, 70)
         self.assertEqual(out_of_contract_line.number_of_days, 10)
+
+    def test_structure_type_for_multi_contract(self):
+        expired_structure = self.env['hr.payroll.structure.type'].create({
+        'name': 'Expired Structure',
+        })
+        running_structure = self.env['hr.payroll.structure.type'].create({
+            'name': 'Running Structure',
+        })
+        self.contract_cdd.structure_type_id = expired_structure
+        self.contract_cdi.structure_type_id = running_structure
+        self.contract_cdd.state = 'close'
+        self.contract_cdi.state = 'open'
+        self.assertEqual(self.richard_emp.structure_type_id, self.contract_cdi.structure_type_id)

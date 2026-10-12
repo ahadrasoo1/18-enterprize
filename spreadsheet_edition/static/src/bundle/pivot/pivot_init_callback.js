@@ -8,7 +8,7 @@ import { deepCopy } from "@web/core/utils/objects";
 import { _t } from "@web/core/l10n/translation";
 
 const uuidGenerator = new helpers.UuidGenerator();
-const { parseDimension, isDateOrDatetimeField } = helpers;
+const { parseDimension, isDateOrDatetimeField, sanitizeSheetName } = helpers;
 
 const { SidePanelStore } = stores;
 
@@ -37,17 +37,22 @@ function addEmptyGranularity(dimensions, fields) {
 
 export function insertPivot(pivotData) {
     const fields = pivotData.metaData.fields;
-    const measures = pivotData.metaData.activeMeasures.map((measure) => ({
+    const activeMeasures = pivotData.metaData.activeMeasures;
+    const measures = activeMeasures.map((measure) => ({
         id: fields[measure]?.aggregator ? `${measure}:${fields[measure].aggregator}` : measure,
         fieldName: measure,
         aggregator: fields[measure]?.aggregator,
     }));
+    const sortedMeasure = pivotData.metaData.sortedColumn?.measure;
+    const sortedColumn = activeMeasures.includes(sortedMeasure)
+        ? pivotData.metaData.sortedColumn
+        : null;
     /** @type {import("@spreadsheet").OdooPivotCoreDefinition} */
     const pivot = deepCopy({
         type: "ODOO",
         domain: new Domain(pivotData.searchParams.domain).toJson(),
         context: pivotData.searchParams.context,
-        sortedColumn: pivotData.metaData.sortedColumn,
+        sortedColumn,
         measures,
         model: pivotData.metaData.resModel,
         columns: addEmptyGranularity(
@@ -75,10 +80,12 @@ export function insertPivot(pivotData) {
         }
         await ds.load();
 
-        let sheetName = _t("%(pivot_name)s (Pivot #%(pivot_id)s)", {
-            pivot_name: pivot.name,
-            pivot_id: model.getters.getPivotFormulaId(pivotId),
-        });
+        let sheetName = sanitizeSheetName(
+            _t("%(pivot_name)s (Pivot #%(pivot_id)s)", {
+                pivot_name: pivot.name,
+                pivot_id: model.getters.getPivotFormulaId(pivotId),
+            })
+        );
         // Add an empty sheet in the case of an existing spreadsheet.
         if (!this.isEmptySpreadsheet) {
             const sheetId = uuidGenerator.uuidv4();

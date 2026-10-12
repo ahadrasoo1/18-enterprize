@@ -56,6 +56,12 @@ class SpreadsheetMixinTest(SpreadsheetTestCase):
         copy = spreadsheet.copy({"spreadsheet_revision_ids": []})
         self.assertFalse(copy.spreadsheet_revision_ids)
 
+    def test_dont_copy_revisions_if_data_changes(self):
+        spreadsheet = self.env["spreadsheet.test"].create({})
+        spreadsheet.dispatch_spreadsheet_message(self.new_revision_data(spreadsheet))
+        copy = spreadsheet.copy({"spreadsheet_data": "{}"})
+        self.assertFalse(copy.spreadsheet_revision_ids)
+
     def test_copy_filters_out_comments(self):
         base_data = {
             "sheets": [{
@@ -198,7 +204,7 @@ class SpreadsheetMixinTest(SpreadsheetTestCase):
         action = spreadsheet.fork_history(rev1.id, {"test": "snapshot"})
         self.assertTrue(isinstance(action, dict))
 
-        self.assertEqual(action["params"]["message"], "test spreadsheet created")
+        self.assertEqual(action["params"]["message"], "New spreadsheet created")
         self.assertEqual(action["tag"], "display_notification")
         self.assertEqual(action["type"], "ir.actions.client")
 
@@ -278,6 +284,27 @@ class SpreadsheetMixinTest(SpreadsheetTestCase):
         self.assertFalse(rev1.active)
         self.assertFalse((snapshot_rev | rev3).exists())
 
+    def test_restore_version_as_base_user(self):
+        user = new_test_user(self.env, login="test", groups="base.group_user")
+        spreadsheet = self.env["spreadsheet.test"].with_user(user).create({})
+        spreadsheet.dispatch_spreadsheet_message(self.new_revision_data(spreadsheet))
+        spreadsheet.dispatch_spreadsheet_message(self.new_revision_data(spreadsheet))
+        revisions = spreadsheet.spreadsheet_revision_ids
+        rev1 = revisions[0]
+        rev2 = revisions[1]
+
+        spreadsheet.restore_spreadsheet_version(
+            rev1.id,
+            {"test": "snapshot", "revisionId": rev1.revision_uuid}
+        )
+        self.assertFalse(rev1.active)
+        self.assertFalse(rev2.exists())
+
+        self.assertEqual(
+            spreadsheet._get_spreadsheet_snapshot(),
+            {"test": "snapshot", "revisionId": spreadsheet.current_revision_uuid}
+        )
+
     def test_rename_revision(self):
         spreadsheet = self.env["spreadsheet.test"].create({})
         spreadsheet.dispatch_spreadsheet_message(self.new_revision_data(spreadsheet))
@@ -310,6 +337,19 @@ class SpreadsheetMixinTest(SpreadsheetTestCase):
         self.assertEqual(len(revisions), 1)
         self.assertEqual(revisions[0]["timestamp"], datetime(2020, 2, 2, 0, 0, 0))
         self.assertEqual(revisions[0]["user"], (user.id, user.name))
+
+    def test_currency_passed_to_spreadsheet_history(self):
+        spreadsheet = self.env["spreadsheet.test"].create({})
+        company_eur = self.env["res.company"].create({"currency_id": self.env.ref("base.EUR").id, "name": "EUR"})
+        company_gbp = self.env["res.company"].create({"currency_id": self.env.ref("base.GBP").id, "name": "GBP"})
+
+        data = spreadsheet.with_company(company_eur).get_spreadsheet_history()
+        self.assertEqual(data["default_currency"]["code"], "EUR")
+        self.assertEqual(data["default_currency"]["symbol"], "€")
+
+        data = spreadsheet.with_company(company_gbp).get_spreadsheet_history()
+        self.assertEqual(data["default_currency"]["code"], "GBP")
+        self.assertEqual(data["default_currency"]["symbol"], "£")
 
     def test_get_spreadsheet_base_user_access_right_history(self):
         user = new_test_user(self.env, login="test", groups="base.group_user")
@@ -425,12 +465,24 @@ class SpreadsheetMixinTest(SpreadsheetTestCase):
         self.assertEqual(result["records"][0]["id"], first.id)
         self.assertEqual(result["total"], 1)
 
-    def get_selector_spreadsheet_models(self):
+    def test_get_selector_spreadsheet_models(self):
         result = self.env["spreadsheet.mixin"].get_selector_spreadsheet_models()
-        self.assertEqual(len(result), 1)
-        self.assertEqual(result[0]["model"], "spreadsheet.test")
+        self.assertTrue(any(r["model"] == "spreadsheet.test" for r in result))
 
     def test_action_open_new_spreadsheet(self):
         action = self.env["spreadsheet.test"].action_open_new_spreadsheet()
         spreadsheet = self.env["spreadsheet.test"].browse(action["params"]["spreadsheet_id"])
         self.assertTrue(spreadsheet.exists())
+
+    def test_cell_thread_naming(self):
+        spreadsheet1 = self.env["spreadsheet.test"].create({})
+        spreadsheet2 = self.env["spreadsheet.test"].create({})
+        threads = self.env["spreadsheet.cell.thread"].create([
+                {"dummy_id": spreadsheet1.id},
+                {"dummy_id": spreadsheet2.id},
+        ])
+        thread1, thread2 = threads
+        self.assertEqual(
+            threads.mapped("display_name"),  # compute in batch
+            [thread1.display_name, thread2.display_name]
+        )

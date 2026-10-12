@@ -35,6 +35,11 @@ class TestInvoiceExtract(AccountTestInvoicingCommon, TestExtractMixin, MailCommo
             limit=1,
         )
 
+    @classmethod
+    def default_env_context(cls):
+        # OVERRIDE to reactivate the tracking
+        return {}
+
     def get_result_success_response(self):
         return {
             'results': [{
@@ -109,11 +114,10 @@ class TestInvoiceExtract(AccountTestInvoicingCommon, TestExtractMixin, MailCommo
 
     def get_partner_autocomplete_response(self):
         return {
-            'company_data': {
+            'data': {
                 'name': 'Partner',
                 'country_code': 'BE',
                 'vat': 'BE0477472701',
-                'partner_gid': False,
                 'city': 'Namur',
                 'bank_ids': [],
                 'zip': '2110',
@@ -841,8 +845,9 @@ class TestInvoiceExtract(AccountTestInvoicingCommon, TestExtractMixin, MailCommo
 
         self.assertEqual(invoice.partner_bank_id.acc_number, 'BE01234567890123')
 
-        # test that it uses the existing bank account if it exists
+        # test that it uses the existing bank account if it exists and if it is trusted
         created_bank_account = invoice.partner_bank_id
+        created_bank_account.allow_out_payment = True
         invoice = self.env['account.move'].create({'move_type': 'in_invoice', 'extract_state': 'waiting_extraction'})
 
         with self._mock_iap_extract(extract_response=self.get_result_success_response()):
@@ -863,11 +868,11 @@ class TestInvoiceExtract(AccountTestInvoicingCommon, TestExtractMixin, MailCommo
         invoice = self._create_invoice_with_tax()
 
         self.assertRecordValues(invoice.invoice_line_ids, [{
-                'price_unit': 112,
                 'quantity': 1,
                 'price_subtotal': 100,
                 'price_total': 112,
         }])
+        self.assertAlmostEqual(invoice.invoice_line_ids.price_unit, 112)
 
     def test_tax_price_excluded(self):
         self.env['account.tax'].create({
@@ -971,9 +976,10 @@ class TestInvoiceExtract(AccountTestInvoicingCommon, TestExtractMixin, MailCommo
         # Test that when we validate 3 bills without modification from the OCR data, we show
         # the user a wizard to automate the posting for that vendor
 
-        def create_bill_with_ocr():
+        def create_bill_with_ocr(ref):
             move = self.env['account.move'].create({
                 'move_type': 'in_invoice',
+                'ref': ref,
                 'extract_state': 'waiting_extraction',
                 'extract_document_uuid': 'some_token',
             })
@@ -986,14 +992,14 @@ class TestInvoiceExtract(AccountTestInvoicingCommon, TestExtractMixin, MailCommo
 
         # Do it two times, no wizard should be shown
         for _ in range(2):
-            bill = create_bill_with_ocr()
+            bill = create_bill_with_ocr("ref1")
             self.assertEqual(bill.state, "draft")
             autopost_bills_wizard = bill.action_post()
             self.assertFalse(autopost_bills_wizard)
             self.assertFalse(bill.is_manually_modified)
 
         # Create a third invoice, No modification for the third time, we should show the wizard
-        bill = create_bill_with_ocr()
+        bill = create_bill_with_ocr("ref2")
         self.assertEqual(bill.state, "draft")
         post_result = bill.action_post()
         self.assertEqual(post_result.get('res_model'), 'account.autopost.bills.wizard')
@@ -1002,5 +1008,27 @@ class TestInvoiceExtract(AccountTestInvoicingCommon, TestExtractMixin, MailCommo
         autopost_bills_wizard.action_automate_partner()
 
         # Now, next time the OCR is finished, we should autopost the bill
-        bill = create_bill_with_ocr()
+        bill = create_bill_with_ocr("ref3")
         self.assertEqual(bill.state, "posted")
+
+    def test_invoice_ocr_note_author(self):
+        invoice = self.env['account.move'].create({'move_type': 'in_invoice', 'extract_state': 'waiting_extraction'})
+        attachment = self.env['ir.attachment'].create({
+            'name': 'test_attachment.png',
+            'res_model': 'account.move',
+            'raw': b'My invoice',
+        })
+        with self._mock_iap_extract(extract_response=self.parse_success_response()):
+            invoice.message_post(attachment_ids=[attachment.id])
+
+        with self._mock_iap_extract(extract_response=self.get_result_success_response()):
+            invoice.check_all_status()
+
+        self.env.cr.flush()
+        message = self.env['mail.message'].search([
+            ('model', '=', 'account.move'),
+            ('res_id', '=', invoice.id),
+            ('tracking_value_ids', '!=', False),
+        ]).ensure_one()
+        author_name = message.author_id.complete_name
+        self.assertEqual(author_name, 'OdooBot')

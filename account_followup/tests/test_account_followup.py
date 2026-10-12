@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
 from unittest.mock import patch
-
 from freezegun import freeze_time
-
 from odoo import Command, fields
 from odoo.tests import tagged
-from odoo.addons.account.tests.common import AccountTestInvoicingCommon
+from odoo.addons.account_followup.tests.common import TestAccountFollowupCommon
+from odoo.addons.mail.tests.common import MailCommon
 from dateutil.relativedelta import relativedelta
 
 
 @tagged('post_install', '-at_install')
-class TestAccountFollowupReports(AccountTestInvoicingCommon):
+class TestAccountFollowupReports(TestAccountFollowupCommon, MailCommon):
 
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
         cls.env['account_followup.followup.line'].search([]).unlink()
+        cls.classPatch(cls.env.registry['ir.actions.report'], '_run_wkhtmltopdf', lambda *args, **kwargs: b"0")
 
     def create_followup(self, delay):
         return self.env['account_followup.followup.line'].create({
@@ -25,11 +25,12 @@ class TestAccountFollowupReports(AccountTestInvoicingCommon):
             'company_id': self.company_data['company'].id
         })
 
-    def create_invoice(self, date):
+    def create_invoice(self, date, partner = None):
         invoice = self.env['account.move'].create({
             'move_type': 'out_invoice',
             'invoice_date': date,
-            'partner_id': self.partner_a.id,
+            'invoice_date_due': date,
+            'partner_id': partner.id if partner else self.partner_a.id,
             'invoice_line_ids': [Command.create({
                 'quantity': 1,
                 'price_unit': 500,
@@ -38,17 +39,6 @@ class TestAccountFollowupReports(AccountTestInvoicingCommon):
         })
         invoice.action_post()
         return invoice
-
-    def assertPartnerFollowup(self, partner, status, line):
-        partner.invalidate_recordset(['followup_status', 'followup_line_id'])
-        # Since we are querying multiple times with data changes in the same transaction (for the purpose of tests),
-        # we need to invalidated the cache in database
-        self.env.cr.cache.pop('res_partner_all_followup', None)
-        res = partner._query_followup_data()
-        self.assertEqual(res.get(partner.id, {}).get('followup_status'), status)
-        self.assertEqual(res.get(partner.id, {}).get('followup_line_id'), line.id if line else None)
-        self.assertEqual(partner.followup_status, status or 'no_action_needed')
-        self.assertEqual(partner.followup_line_id.id if partner.followup_line_id else None, line.id if line else None)
 
     def test_followup_responsible(self):
         """
@@ -83,6 +73,10 @@ class TestAccountFollowupReports(AccountTestInvoicingCommon):
         (invoice1 + invoice2).action_post()
         # Should pick invoice_user_id of the most delayed move, with highest residual amount in case of tie (invoice1)
         self.assertEqual(self.partner_a._get_followup_responsible(), user1)
+        # If user1 is archived, it shouldn't be selected as responsible
+        user1.active = False
+        self.assertEqual(self.partner_a._get_followup_responsible(), self.env.user)
+        user1.active = True
 
         self.partner_a.followup_line_id = self.first_followup_line
 
@@ -131,6 +125,33 @@ class TestAccountFollowupReports(AccountTestInvoicingCommon):
         with freeze_time('2022-02-03'):
             # followup_next_action_date exceeded and invoice not reconciled yet
             self.assertPartnerFollowup(self.partner_a, 'in_need_of_action', self.second_followup_line)
+            # execute second followup
+            self.partner_a._execute_followup_partner(options={'snailmail': False})
+            self.assertPartnerFollowup(self.partner_a, 'with_overdue_invoices', self.third_followup_line)
+            self.assertEqual(self.partner_a.followup_next_action_date, fields.Date.from_string('2022-02-08'))
+
+        with freeze_time('2022-02-09'):
+            # followup_next_action_date exceeded and invoice not reconciled yet
+            self.assertPartnerFollowup(self.partner_a, 'in_need_of_action', self.third_followup_line)
+            # execute third followup
+            self.partner_a._execute_followup_partner(options={'snailmail': False})
+            self.assertPartnerFollowup(self.partner_a, 'with_overdue_invoices', self.third_followup_line)
+            self.assertEqual(self.partner_a.followup_next_action_date, fields.Date.from_string('2022-02-14'))
+
+        with freeze_time('2022-02-15'):
+            # followup_next_action_date exceeded and invoice not reconciled yet
+            self.assertPartnerFollowup(self.partner_a, 'with_overdue_invoices', self.third_followup_line)
+            # executing the third followup again should do nothing as all the aml are linked to it
+            followup_executed = self.partner_a._execute_followup_partner(options={'snailmail': False})
+            self.assertFalse(followup_executed)
+
+            # create a new overdue invoice
+            self.create_invoice('2022-01-03')
+            self.assertPartnerFollowup(self.partner_a, 'in_need_of_action', self.third_followup_line)
+            # the third followup should be executed
+            followup_executed = self.partner_a._execute_followup_partner(options={'snailmail': False})
+            self.assertTrue(followup_executed)
+            self.assertEqual(self.partner_a.followup_next_action_date, fields.Date.from_string('2022-02-20'))
 
             self.env['account.payment.register'].create({
                 'line_ids': self.partner_a.unreconciled_aml_ids,
@@ -258,6 +279,76 @@ class TestAccountFollowupReports(AccountTestInvoicingCommon):
             self.partner_a._execute_followup_partner(options={'snailmail': False})
             self.assertPartnerFollowup(self.partner_a, 'with_overdue_invoices', followup_30)
 
+    def test_followup_status_entry_lines(self):
+        """
+            Creating an entry should not affect the followups as there is no concept of due date with this flow.
+        """
+        self.followup_line = self.create_followup(delay=10)
+
+        with freeze_time('2022-01-02'):
+            invoice = self.env['account.move'].create({
+                'move_type': 'entry',
+                'date': fields.Date.from_string('2022-01-02'),
+                'partner_id': self.partner_a.id,
+                'invoice_line_ids': [
+                    Command.create({
+                        'name': 'line1',
+                        'account_id': self.company_data['default_account_revenue'].id,
+                        'debit': 500.0,
+                        'credit': 0.0,
+                    }),
+                    Command.create({
+                        'name': 'counterpart line',
+                        'account_id': self.company_data['default_account_receivable'].id,
+                        'debit': 0.0,
+                        'credit': 500.0,
+                    })
+                ]
+            })
+            invoice.action_post()
+
+        with freeze_time('2022-01-13'):
+            self.assertPartnerFollowup(self.partner_a, 'no_action_needed', self.followup_line)
+
+    def test_followup_status_residual(self):
+        """
+            Payments for partially paid invoices should contribute their residual to the due amount.
+            This is required because the paid invoice's receivable line is reconciled, and thus is
+            not considered in the query calculating followup_status.
+        """
+
+        self.followup_line = self.create_followup(delay=10)
+
+        with freeze_time('2022-01-02'):
+            invoice_1 = self.create_invoice('2022-01-02')
+            self.create_invoice('2022-01-02')
+
+            misc_payment_1 = self.env['account.move'].create({
+                'move_type': 'entry',
+                'date': fields.Date.from_string('2022-01-02'),
+                'partner_id': self.partner_a.id,
+                'invoice_line_ids': [
+                    Command.create({
+                        'name': 'line1',
+                        'account_id': self.company_data['default_account_revenue'].id,
+                        'debit': 600.0,
+                        'credit': 0.0,
+                    }),
+                    Command.create({
+                        'name': 'counterpart line',
+                        'account_id': self.company_data['default_account_receivable'].id,
+                        'debit': 0.0,
+                        'credit': 600.0,
+                    })
+                ]
+            })
+            misc_payment_1.action_post()
+
+            (invoice_1 + misc_payment_1).line_ids.filtered(lambda l: l.account_type == 'asset_receivable').reconcile()
+
+        with freeze_time('2022-01-13'):
+            self.assertPartnerFollowup(self.partner_a, 'in_need_of_action', self.followup_line)
+
     def test_followup_contacts(self):
         followup_contacts = self.partner_a._get_all_followup_contacts()
         billing_contact = self.env['res.partner'].browse(self.partner_a.address_get(['invoice'])['invoice'])
@@ -327,8 +418,23 @@ class TestAccountFollowupReports(AccountTestInvoicingCommon):
         self.create_invoice('2016-01-01')
         self.create_invoice('2017-01-01')
         self.create_invoice(fields.Date.today() + relativedelta(months=1))
-        self.assertRecordValues(self.partner_a, [{'total_due': 1500.0}])
-        self.assertRecordValues(self.partner_a, [{'total_overdue': 1000.0}])
+        self.env['account.move'].create([{
+            'move_type': 'in_invoice',
+            'invoice_date': date,
+            'partner_id': self.partner_a.id,
+            'invoice_line_ids': [Command.create({
+                'quantity': 1,
+                'price_unit': 500,
+                'tax_ids': [],
+            })]
+        } for date in ('2016-01-01', '2017-01-01', fields.Date.today() + relativedelta(months=1))]).action_post()
+
+        self.assertRecordValues(self.partner_a, [{
+            'total_due': 1500.0,
+            'total_overdue': 1000.0,
+            'total_all_due': 0.0,
+            'total_all_overdue': 0.0,
+        }])
 
     def test_send_followup_no_due_date(self):
         """
@@ -398,3 +504,84 @@ class TestAccountFollowupReports(AccountTestInvoicingCommon):
 
         self.assertTrue(mail_cc in reminder.email_recipient_ids, "John Carmac should be in the Email Recipients list.")
         self.assertTrue(mail_partner in reminder.email_recipient_ids, "Mai Lang should still be in the Email Recipients List")
+
+    def test_overdue_invoices_action_domain_includes_children_partners(self):
+        """
+        When checking overdue invoices for a company (partner), the action [action_open_overdue_entries] domain should also include
+        the overdue invoices of its children partners.
+        """
+
+        # Step 1: Create contacts
+        parent_contact = self.env['res.partner'].create({
+            'name': 'Parent Contact',
+            'is_company': True,
+        })
+        child_contact = self.env['res.partner'].create({
+            'name': 'Child Contact',
+            'parent_id': parent_contact.id,
+        })
+
+        # Step 2: Create an invoice for the child contact
+        invoice_date = fields.Date.today() - relativedelta(months=1)
+        invoice = self.create_invoice(invoice_date, child_contact)
+        invoice.invoice_date_due = invoice_date
+
+        # Step 3: Verify follow-up status and overdue invoices of the parent contact
+        action = parent_contact.action_open_overdue_entries()
+        overdue_invoices = self.env['account.move'].search(action['domain'])
+        self.assertIn(invoice.id, overdue_invoices.ids)
+        self.assertEqual(parent_contact.followup_status, 'with_overdue_invoices')
+
+    def test_followup_template_recipients_with_cron(self):
+        """
+        tests that when a mail_cc is defined on a template,
+        even if the action is ran from a cron (and de facto from `res.partner.send_followup_email`)
+        the email is correctly sent
+        Completes `test_manual_reminder_get_template_mail_addresses`
+        """
+        self.partner_a.email = "test@test.com"
+        mail_cc = self.env['res.partner'].create({
+            'name': 'John Carmac',
+            'email': 'john.carmac@example.me',
+        })
+        mail_template = self.env['mail.template'].create({
+            'name': 'reminder',
+            'model_id': self.env['ir.model']._get_id('res.partner'),
+            'email_cc': mail_cc.email,
+        })
+        followup_10 = self.create_followup(delay=10)
+        followup_10.mail_template_id = mail_template
+        self.create_invoice('2025-05-01')
+
+        with freeze_time('2025-05-12'), self.mock_mail_gateway(mail_unlink_sent=False):
+            options = {
+                'followup_line': followup_10,
+                'partner_id': self.partner_a.id,
+            }
+            self.partner_a.send_followup_email(options=options)
+        self.assertMailMail(mail_cc, 'sent', author=self.env.user.partner_id)
+
+    def test_has_moves_without_invoice(self):
+        """
+        Test that has_moves is True for a partner referenced
+        only at account.move.line level (no partner at move level)
+        """
+        partner = self.env['res.partner'].create({'name': 'Test Partner'})
+        move = self.env['account.move'].create({
+            'move_type': 'entry',
+            'line_ids': [
+                Command.create({
+                    'partner_id': partner.id,
+                    'account_id': self.company_data['default_account_receivable'].id,
+                    'debit': 100.0,
+                    'credit': 0.0,
+                }),
+                Command.create({
+                    'account_id': self.company_data['default_account_revenue'].id,
+                    'debit': 0.0,
+                    'credit': 100.0,
+                }),
+            ],
+        })
+        move.action_post()
+        self.assertTrue(partner.has_moves)

@@ -2,12 +2,16 @@
 
 import { calendarView } from "@web/views/calendar/calendar_view";
 import { registry } from "@web/core/registry";
+import { omit } from "@web/core/utils/objects";
 
 import { Component, useState } from "@odoo/owl";
 import { InteractiveEditorSidebar } from "@web_studio/client_action/view_editor/interactive_editor/interactive_editor_sidebar";
 import { Property } from "@web_studio/client_action/view_editor/property/property";
 import { SidebarViewToolbox } from "@web_studio/client_action/view_editor/interactive_editor/sidebar_view_toolbox/sidebar_view_toolbox";
-import { fieldsToChoices } from "@web_studio/client_action/view_editor/editors/utils";
+import {
+    fieldsToChoices,
+    getStudioNoFetchFields,
+} from "@web_studio/client_action/view_editor/editors/utils";
 import { SCALE_LABELS } from "@web/views/calendar/calendar_controller";
 import { useEditNodeAttributes } from "@web_studio/client_action/view_editor/view_editor_model";
 
@@ -49,7 +53,7 @@ export class CalendarEditorSidebar extends Component {
     }
 
     get colorFields() {
-        return fieldsToChoices(this.viewEditorModel.fields, ["many2one", "selection"]);
+        return fieldsToChoices(this.viewEditorModel.fields, ["many2one", "selection", "integer"]);
     }
 
     get allDayFields() {
@@ -66,7 +70,20 @@ export class CalendarEditorSidebar extends Component {
     }
 }
 
+class CalendarEditorArchParser extends calendarView.ArchParser {
+    parse(...args) {
+        const parsed = super.parse(...args);
+        const { fieldNames } = getStudioNoFetchFields(null, args[0]);
+        const toRemove = Object.fromEntries(fieldNames.map((fname) => [fname, true]));
+        parsed.fieldNames = parsed.fieldNames.filter((fname) => !(fname in toRemove));
+        parsed.filtersInfo = omit(parsed.filtersInfo, ...fieldNames);
+        parsed.popoverFieldNodes = omit(parsed.popoverFieldNodes, ...fieldNames);
+        return parsed;
+    }
+}
+
 registry.category("studio_editors").add("calendar", {
     ...calendarView,
+    ArchParser: CalendarEditorArchParser,
     Sidebar: CalendarEditorSidebar,
 });

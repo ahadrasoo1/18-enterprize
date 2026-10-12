@@ -302,7 +302,7 @@ class TestMultiCurrenciesRevaluationReport(TestAccountReportsCommon):
                 ('Accounts To Adjust',                             '',                     '',                      '',             ''),
                 ('CAD (1 USD = 4.0 CAD)',                      -100.0,                  -50.0,                   -25.0,           25.0),
                 ('121000 Account Receivable',                   100.0,                   50.0,                    25.0,          -25.0),
-                ('INV/2023/00001 INV/2023/00001',               100.0,                   50.0,                    25.0,          -25.0),
+                ('INV/2023/00001',                              100.0,                   50.0,                    25.0,          -25.0),
                 ('Total 121000 Account Receivable',             100.0,                   50.0,                    25.0,          -25.0),
                 ('211000 Account Payable',                     -200.0,                 -100.0,                   -50.0,           50.0),
                 ('BILL/2023/01/0001',                          -200.0,                 -100.0,                   -50.0,           50.0),
@@ -331,7 +331,7 @@ class TestMultiCurrenciesRevaluationReport(TestAccountReportsCommon):
                 ('Accounts To Adjust',                             '',                     '',                      '',             ''),
                 ('CAD (1 USD = 4.0 CAD)',                       100.0,                   50.0,                    25.0,          -25.0),
                 ('121000 Account Receivable',                   100.0,                   50.0,                    25.0,          -25.0),
-                ('INV/2023/00001 INV/2023/00001',               100.0,                   50.0,                    25.0,          -25.0),
+                ('INV/2023/00001',               100.0,                   50.0,                    25.0,          -25.0),
                 ('Total 121000 Account Receivable',             100.0,                   50.0,                    25.0,          -25.0),
                 ('Total CAD',                                   100.0,                   50.0,                    25.0,          -25.0),
 
@@ -894,7 +894,7 @@ class TestMultiCurrenciesRevaluationReport(TestAccountReportsCommon):
                 ('Accounts To Adjust',                             '',                     '',                      '',             ''),
                 ('CAD (1 USD = 4.0 CAD)',                       700.0,                  700.0,                   175.0,         -525.0),
                 ('121000 Account Receivable',                   700.0,                  700.0,                   175.0,         -525.0),
-                ('INV/2023/00001 INV/2023/00001',               700.0,                  700.0,                   175.0,         -525.0),
+                ('INV/2023/00001',                              700.0,                  700.0,                   175.0,         -525.0),
                 ('Total 121000 Account Receivable',             700.0,                  700.0,                   175.0,         -525.0),
                 ('Total CAD',                                   700.0,                  700.0,                   175.0,         -525.0),
             ],
@@ -924,7 +924,7 @@ class TestMultiCurrenciesRevaluationReport(TestAccountReportsCommon):
                 ('CAD (1 USD = 4.0 CAD)',                                           700.0,                  850.0,                   175.0,         -675.0),
                 ('121000 Account Receivable',                                       700.0,                  850.0,                   175.0,         -675.0),
                 ('RINV/2023/00001 (Reversal of: INV/2023/00001)',                  -300.0,                 -150.0,                   -75.0,           75.0),
-                ('INV/2023/00001 INV/2023/00001',                                  1000.0,                 1000.0,                   250.0,         -750.0),
+                ('INV/2023/00001',                                                 1000.0,                 1000.0,                   250.0,         -750.0),
                 ('Total 121000 Account Receivable',                                 700.0,                  850.0,                   175.0,         -675.0),
                 ('Total CAD',                                                       700.0,                  850.0,                   175.0,         -675.0),
             ],
@@ -1160,3 +1160,60 @@ class TestMultiCurrenciesRevaluationReport(TestAccountReportsCommon):
                 1: {'currency': self.other_currency},
             },
         )
+
+    def test_adjustment_entry_with_tax_on_expense_account(self):
+        """ Make sure the adjustment entry is correctly generated even when
+            the expense account has default taxes.
+        """
+        self.create_move_one_line(
+            partner_id=self.partner_a.id,
+            move_type='out_invoice',
+            journal_id=self.company_data['default_journal_sale'].id,
+            date='2023-01-21',
+            invoice_date='2023-01-21',
+            currency_id=self.other_currency.id,
+            account_id=self.company_data['default_account_revenue'].id,
+            quantity=1,
+            price_unit=1000.0,
+        )
+
+        options = self._generate_options(self.report, '2023-01-01', '2023-01-26')
+        options['unfold_all'] = True
+        self.assertLinesValues(
+            # pylint: disable=C0326
+            self.report._get_lines(options),
+            #   Name                       Balance in foreign currency     Balance at op. rate     Balance at curr rate     Adjustment
+            [   0,                                                  1,                      2,                       3,              4],
+            [
+                ('Accounts To Adjust',                              '',                    '',                      '',             ''),
+                ('CAD (1 USD = 2.0 CAD)',                       1000.0,                1000.0,                   500.0,         -500.0),
+                ('121000 Account Receivable',                   1000.0,                1000.0,                   500.0,         -500.0),
+                ('INV/2023/00001',                              1000.0,                1000.0,                   500.0,         -500.0),
+                ('Total 121000 Account Receivable',             1000.0,                1000.0,                   500.0,         -500.0),
+                ('Total CAD',                                   1000.0,                1000.0,                   500.0,         -500.0),
+            ],
+            options,
+            currency_map={
+                1: {'currency': self.other_currency},
+            },
+        )
+        expense_account = self.company_data['default_account_expense']
+        expense_account.tax_ids = [self.company_data['default_tax_purchase'].id]
+        self.env.context = {**self.env.context, 'multicurrency_revaluation_report_options': {**options, 'unfold_all': False}}
+        wizard = self.env['account.multicurrency.revaluation.wizard'].create({
+            'journal_id': self.company_data['default_journal_misc'].id,
+            'expense_provision_account_id': expense_account.id,
+            'income_provision_account_id': self.company_data['default_account_revenue'].id,
+        })
+        entry_data = wizard.create_entries()
+        entry = self.env['account.move'].browse(entry_data['res_id'])
+
+        self.assertRecordValues(entry.invoice_line_ids, [{
+            'name': 'Provision for CAD (1 USD = 2.0 CAD)',
+            'debit': 0.00,
+            'credit': 500.0,
+        }, {
+            'name': 'Expense Provision for CAD',
+            'debit': 500.00,
+            'credit': 0.0,
+        }])

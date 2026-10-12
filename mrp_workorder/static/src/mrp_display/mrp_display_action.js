@@ -60,7 +60,7 @@ export class MrpDisplayAction extends Component {
                 "state",
                 "workcenter_id",
                 "working_state",
-                "worksheet",
+                "has_worksheet",
                 "worksheet_google_slide",
                 "check_ids",
                 "employee_ids",

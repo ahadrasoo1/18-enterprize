@@ -1,24 +1,28 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* industry_fsm
-# 
+# * industry_fsm
+#
 # Translators:
-# Wil Odoo, 2024
-# Manon Rondou, 2024
-# 
+# Manon Rondou, 2025
+# Wil Odoo, 2025
+#
+# "Manon Rondou (ronm)" <ronm@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Manon Rondou, 2024\n"
-"Language-Team: French (https://app.transifex.com/odoo/teams/41243/fr/)\n"
+"POT-Creation-Date: 2026-04-10 18:47+0000\n"
+"PO-Revision-Date: 2026-05-08 09:18+0000\n"
+"Last-Translator: \"Manon Rondou (ronm)\" <ronm@odoo.com>\n"
+"Language-Team: French <https://translate.odoo.com/projects/odoo-18/"
+"industry_fsm/fr/>\n"
+"Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: fr\n"
-"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : ((n != 0 && n % "
+"1000000 == 0) ? 1 : 2);\n"
+"X-Generator: Weblate 5.17\n"
 
 #. module: industry_fsm
 #: model:ir.model.fields,field_description:industry_fsm.field_report_project_task_user_fsm__nbr
@@ -46,16 +50,6 @@ msgstr "10 jours"
 
 #. module: industry_fsm
 #: model_terms:ir.ui.view,arch_db:industry_fsm.worksheet_custom_page
-msgid "10:00"
-msgstr "10:00"
-
-#. module: industry_fsm
-#: model_terms:ir.ui.view,arch_db:industry_fsm.worksheet_custom_page
-msgid "2023-01-01"
-msgstr "01-01-2023"
-
-#. module: industry_fsm
-#: model_terms:ir.ui.view,arch_db:industry_fsm.worksheet_custom_page
 msgid "5 days"
 msgstr "5 jours"
 
@@ -63,43 +57,60 @@ msgstr "5 jours"
 #: model:mail.template,body_html:industry_fsm.mail_template_data_intervention_details
 msgid ""
 "<div>\n"
-"    <t t-set=\"date_begin\" t-value=\"format_datetime(object.planned_date_begin, tz=object.partner_id.tz, lang_code=object.partner_id.lang)\"></t>\n"
+"    <t t-set=\"date_begin\" t-"
+"value=\"format_datetime(object.planned_date_begin, tz=object.partner_id.tz, "
+"lang_code=object.partner_id.lang)\"/>\n"
 "\n"
-"    <t t-set=\"date_end\" t-value=\"format_datetime(object.date_deadline, tz=object.partner_id.tz, lang_code=object.partner_id.lang)\"></t>\n"
+"    <t t-set=\"date_end\" t-value=\"format_datetime(object.date_deadline, "
+"tz=object.partner_id.tz, lang_code=object.partner_id.lang)\"/>\n"
 "\n"
-"    Dear <t t-out=\"object.partner_id.name or 'customer'\">customer</t>,<br><br>\n"
+"    Dear <t t-out=\"object.partner_id.name or 'customer'\">customer</t>,<br/"
+"><br/>\n"
 "    <t t-if=\"date_begin and date_end\">\n"
-"        Your <t t-out=\"object.name or ''\">Boiler maintenance</t> intervention is scheduled from the <t t-out=\"date_begin or ''\">05/31/2021 12:30:00</t> to the <t t-out=\"date_end or ''\">05/31/2021 14:30:00</t>.\n"
+"        Your <t t-out=\"object.name or ''\">Boiler maintenance</t> "
+"intervention is scheduled from the <t t-out=\"date_begin or ''\">05/31/2021 "
+"12:30:00</t> to the <t t-out=\"date_end or ''\">05/31/2021 14:30:00</t>.\n"
 "    </t>\n"
 "    <t t-else=\"\">\n"
-"        Your <t t-out=\"object.name or ''\">Boiler maintenance</t> intervention is scheduled.\n"
+"        Your <t t-out=\"object.name or ''\">Boiler maintenance</t> "
+"intervention is scheduled.\n"
 "    </t>\n"
-"    <br><br>\n"
+"    <br/><br/>\n"
 "    Best regards,\n"
-"    <t t-if=\"user.signature\">\n"
-"        <br>\n"
-"        <t t-out=\"user.signature or ''\">--<br>Mitchell Admin</t>\n"
+"    <t t-if=\"user.signature\" data-o-mail-quote-container=\"1\">\n"
+"        <br/>\n"
+"        <t t-out=\"user.signature or ''\" data-o-mail-quote=\"1\">--<br data-"
+"o-mail-quote=\"1\"/>Mitchell Admin</t>\n"
 "    </t>\n"
 "</div>\n"
 "        "
 msgstr ""
 "<div>\n"
-"    <t t-set=\"date_begin\" t-value=\"format_datetime(object.planned_date_begin, tz=object.partner_id.tz, lang_code=object.partner_id.lang)\"></t>\n"
+"    <t t-set=\"date_begin\" t-"
+"value=\"format_datetime(object.planned_date_begin, tz=object.partner_id.tz, "
+"lang_code=object.partner_id.lang)\"/>\n"
 "\n"
-"    <t t-set=\"date_end\" t-value=\"format_datetime(object.date_deadline, tz=object.partner_id.tz, lang_code=object.partner_id.lang)\"></t>\n"
+"    <t t-set=\"date_end\" t-value=\"format_datetime(object.date_deadline, "
+"tz=object.partner_id.tz, lang_code=object.partner_id.lang)\"/>\n"
 "\n"
-"    Cher <t t-out=\"object.partner_id.name or 'customer'\">client</t>,<br><br>\n"
+"    Cher <t t-out=\"object.partner_id.name or 'customer'\">client</t>,<br/"
+"><br/>\n"
 "    <t t-if=\"date_begin and date_end\">\n"
-"        L'intervention de <t t-out=\"object.name or ''\">maintenance de votre chaudière</t> est programmée du <t t-out=\"date_begin or ''\">31/05/2021 12:30:00</t> au <t t-out=\"date_end or ''\">31/05/2021 14:30:00</t>.\n"
+"        L'intervention de <t t-out=\"object.name or ''\">maintenance de "
+"votre chaudière</t> est programmée du <t t-out=\"date_begin or "
+"''\">31/05/2021 12 h 30</t> au <t t-out=\"date_end or ''\">31/05/2021 14 h "
+"30</t>.\n"
 "    </t>\n"
 "    <t t-else=\"\">\n"
-"        L'intervention de <t t-out=\"object.name or ''\">maintenance de votre chaudière</t> est programmée.\n"
+"        L'intervention de <t t-out=\"object.name or ''\">maintenance de "
+"votre chaudière</t> est programmée.\n"
 "    </t>\n"
-"    <br><br>\n"
+"    <br/><br/>\n"
 "    Cordialement,\n"
-"    <t t-if=\"user.signature\">\n"
-"        <br>\n"
-"        <t t-out=\"user.signature or ''\">--<br>Mitchell Admin</t>\n"
+"    <t t-if=\"user.signature\" data-o-mail-quote-container=\"1\">\n"
+"        <br/>\n"
+"        <t t-out=\"user.signature or ''\" data-o-mail-quote=\"1\">--<br data-"
+"o-mail-quote=\"1\"/>Mitchell Admin</t>\n"
 "    </t>\n"
 "</div>\n"
 "        "
@@ -113,19 +124,25 @@ msgstr "<i class=\"fa fa-check me-1\"/>Signer le rapport"
 #: model:mail.template,body_html:industry_fsm.mail_template_data_task_report
 msgid ""
 "<p>\n"
-"                Dear <t t-out=\"object.partner_id.name or 'Customer'\">Customer</t>,<br><br>\n"
-"                Please find attached the field service report for our onsite operation. <br><br>\n"
-"                Feel free to contact us if you have any questions.<br><br>\n"
-"                Best regards,<br><br>\n"
+"                Dear <t t-out=\"object.partner_id.name or "
+"'Customer'\">Customer</t>,<br/><br/>\n"
+"                Please find attached the field service report for our onsite "
+"operation. <br/><br/>\n"
+"                Feel free to contact us if you have any questions.<br/><br/"
+">\n"
+"                Best regards,<br/><br/>\n"
 "            </p>\n"
 "        "
 msgstr ""
 "<p>\n"
-"                Cher <t t-out=\"object.partner_id.name or 'Customer'\">Client</t>,<br><br>\n"
-"                Veuillez trouver ci-joint le rapport de services sur site de notre intervention sur place. <br><br>\n"
-"                N'hésitez pas à nous contacter si vous avez des questions.<br><br>\n"
-"                Cordialement,<br><br>\n"
-"            </p>\n"
+"    Bonjour <t t-out=\"object.partner_id.name or 'Customer'\">client</t>,<br/"
+"><br/>\n"
+"    Veuillez trouver ci-joint le rapport d’intervention relatif à notre "
+"prestation sur site.<br/><br/>\n"
+"    N’hésitez pas à nous contacter si vous avez la moindre question.<br/><br/"
+">\n"
+"    Cordialement,<br/><br/>\n"
+"</p>\n"
 "        "
 
 #. module: industry_fsm
@@ -136,18 +153,36 @@ msgid ""
 "updated.\" invisible=\"not partner_id or not is_task_phone_update\"/>"
 msgstr ""
 "<span class=\"fa fa-exclamation-triangle text-warning oe_edit_only\" "
-"title=\"En enregistrant ce changement, le numéro de téléphone du client sera"
-" également mis à jour.\" invisible=\"not partner_id or not "
+"title=\"En enregistrant ce changement, le numéro de téléphone du client sera "
+"également mis à jour.\" invisible=\"not partner_id or not "
 "is_task_phone_update\"/>"
 
 #. module: industry_fsm
 #: model_terms:ir.ui.view,arch_db:industry_fsm.worksheet_custom_page
 msgid ""
-"<span style=\"                             font-size: 10px;                             color: #fff;                             text-transform: uppercase;                             text-align: center;                             font-weight: bold; line-height: 20px;                             transform: rotate(45deg);                             width: 100px; height: auto; display: block;                             background: green;                             position: absolute;                             top: 19px; right: -21px; left: auto;                             padding: 0;\">\n"
+"<span style=\"                             font-size: "
+"10px;                             color: #fff;                             "
+"text-transform: uppercase;                             text-align: "
+"center;                             font-weight: bold; line-height: "
+"20px;                             transform: "
+"rotate(45deg);                             width: 100px; height: auto; "
+"display: block;                             background: "
+"green;                             position: "
+"absolute;                             top: 19px; right: -21px; left: "
+"auto;                             padding: 0;\">\n"
 "                            Signed\n"
 "                        </span>"
 msgstr ""
-"<span style=\"                             font-size: 10px;                             color: #fff;                             text-transform: uppercase;                             text-align: center;                             font-weight: bold; line-height: 20px;                             transform: rotate(45deg);                             width: 100px; height: auto; display: block;                             background: green;                             position: absolute;                             top: 19px; right: -21px; left: auto;                             padding: 0;\">\n"
+"<span style=\"                             font-size: "
+"10px;                             color: #fff;                             "
+"text-transform: uppercase;                             text-align: "
+"center;                             font-weight: bold; line-height: "
+"20px;                             transform: "
+"rotate(45deg);                             width: 100px; height: auto; "
+"display: block;                             background: "
+"green;                             position: "
+"absolute;                             top: 19px; right: -21px; left: "
+"auto;                             padding: 0;\">\n"
 "                            Signé\n"
 "                        </span>"
 
@@ -214,7 +249,7 @@ msgstr "Toutes les tâches"
 #. module: industry_fsm
 #: model:ir.actions.server,name:industry_fsm.project_task_all_fsm_server_action
 msgid "All Tasks Server Action"
-msgstr ""
+msgstr "Action serveur de toutes les tâches"
 
 #. module: industry_fsm
 #: model:ir.model.fields,field_description:industry_fsm.field_report_project_task_user_fsm__allocated_hours
@@ -223,10 +258,8 @@ msgstr "Temps alloué"
 
 #. module: industry_fsm
 #: model_terms:ir.actions.act_window,help:industry_fsm.project_task_user_action_report_fsm
-msgid ""
-"Analyze the progress of your tasks and the performance of your workers."
-msgstr ""
-"Analysez l'avancement de vos tâches et la performance de vos ouvriers."
+msgid "Analyze the progress of your tasks and the performance of your workers."
+msgstr "Analysez l'avancement de vos tâches et la performance de vos ouvriers."
 
 #. module: industry_fsm
 #: model:ir.model.fields,field_description:industry_fsm.field_report_project_task_user_fsm__user_ids
@@ -433,6 +466,8 @@ msgid ""
 "Design tailored worksheet templates for various interventions, and analyze "
 "collected intervention data."
 msgstr ""
+"Concevez des modèles de feuilles de travail sur mesure pour diverses "
+"interventions, et analysez les données collectées lors des interventions."
 
 #. module: industry_fsm
 #: model_terms:ir.ui.view,arch_db:industry_fsm.project_project_view_form_simplified_footer_fsm
@@ -467,7 +502,7 @@ msgstr "Voulez-vous arrêter les minuteurs en cours ?"
 #. module: industry_fsm
 #: model:mail.template,description:industry_fsm.mail_template_data_task_report
 msgid "Email sent when clicking on \"send report\" in a task"
-msgstr "Email envoyé quand on clique sur \"envoyer rapport\" dans une tâche"
+msgstr "E-mail envoyé quand on clique sur \"envoyer rapport\" dans une tâche"
 
 #. module: industry_fsm
 #: model:ir.model.fields,field_description:industry_fsm.field_report_project_task_user_fsm__date_end
@@ -495,7 +530,7 @@ msgstr "Analyse des tâches de Services sur site"
 #: model_terms:ir.ui.view,arch_db:industry_fsm.project_view_form_inherit
 #: model_terms:ir.ui.view,arch_db:industry_fsm.res_config_settings_view_form
 msgid "Field Service"
-msgstr "Service sur site"
+msgstr "Services sur site"
 
 #. module: industry_fsm
 #: model:ir.actions.report,name:industry_fsm.task_custom_report
@@ -537,7 +572,7 @@ msgstr "Retrouvez ici vos tâches à venir pour les prochains jours."
 #. module: industry_fsm
 #: model_terms:ir.ui.view,arch_db:industry_fsm.project_task_view_search_fsm
 msgid "Future"
-msgstr "Futur(e)(s)"
+msgstr "À venir"
 
 #. module: industry_fsm
 #: model_terms:ir.ui.view,arch_db:industry_fsm.project_task_view_search_fsm
@@ -553,6 +588,11 @@ msgid ""
 msgstr ""
 "Donnez-lui un <b>titre</b> <i>(par ex. entretien de chaudière, installation "
 "de climatisation, etc.).</i>"
+
+#. module: industry_fsm
+#: model:ir.model.fields,field_description:industry_fsm.field_report_project_task_user_fsm__total_hours_spent
+msgid "Hours By Task (Including Subtasks)"
+msgstr "Heures par tâche (sous-tâches comprises)"
 
 #. module: industry_fsm
 #: model:ir.model.fields,field_description:industry_fsm.field_project_task_stop_timers_wizard__id
@@ -642,7 +682,7 @@ msgid ""
 "Let's <b>mark your task as done!</b> <i>Tip: when doing so, your stock will "
 "automatically be updated, and your task will be closed.</i>"
 msgstr ""
-"<b>Marquons votre tâche comme faite !</b> <i>Astuce : lors de cette "
+"<b>Marquons votre tâche comme terminée !</b> <i>Astuce : lors de cette "
 "opération, votre stock sera automatiquement mis à jour et votre tâche sera "
 "clôturée.</i>"
 
@@ -677,7 +717,7 @@ msgstr "Carte"
 #. module: industry_fsm
 #: model:ir.actions.server,name:industry_fsm.project_task_fsm_map_server_action
 msgid "Map Server Action"
-msgstr ""
+msgstr "Action serveur de la carte"
 
 #. module: industry_fsm
 #: model_terms:ir.ui.view,arch_db:industry_fsm.worksheet_custom_page
@@ -687,7 +727,7 @@ msgstr "Marc Demo"
 #. module: industry_fsm
 #: model_terms:ir.ui.view,arch_db:industry_fsm.view_task_form2_inherit
 msgid "Mark as done"
-msgstr "Marquer comme fait"
+msgstr "Marquer comme terminé"
 
 #. module: industry_fsm
 #: model:ir.model,name:industry_fsm.model_ir_ui_menu
@@ -708,7 +748,7 @@ msgstr "Jalons"
 #. odoo-python
 #: code:addons/industry_fsm/controllers/webmanifest.py:0
 msgid "My Calendar"
-msgstr ""
+msgstr "Mon calendrier"
 
 #. module: industry_fsm
 #. odoo-python
@@ -722,12 +762,12 @@ msgstr "Mes tâches"
 #. module: industry_fsm
 #: model:ir.actions.server,name:industry_fsm.project_task_fsm_server_action
 msgid "My Tasks Server Action"
-msgstr ""
+msgstr "Action serveur de mes tâches"
 
 #. module: industry_fsm
 #: model:ir.actions.server,name:industry_fsm.project_task_fsm_mobile_server_action
 msgid "My Tasks in mobile Server Action"
-msgstr ""
+msgstr "Action serveur de mes tâches sur mobile"
 
 #. module: industry_fsm
 #: model_terms:ir.ui.view,arch_db:industry_fsm.view_partner_address_form_industry_fsm
@@ -738,7 +778,7 @@ msgstr "Aller à"
 #. odoo-python
 #: code:addons/industry_fsm/controllers/webmanifest.py:0
 msgid "New task"
-msgstr ""
+msgstr "Nouvelle tâche"
 
 #. module: industry_fsm
 #: model_terms:ir.actions.act_window,help:industry_fsm.project_task_user_action_report_fsm
@@ -775,6 +815,11 @@ msgid "No tasks found. Let's create one!"
 msgstr "Aucune tâche trouvée. Créons-en une !"
 
 #. module: industry_fsm
+#: model:ir.model.fields,field_description:industry_fsm.field_report_project_task_user_fsm__overtime
+msgid "Overtime"
+msgstr "Heures supplémentaires"
+
+#. module: industry_fsm
 #: model:ir.model.fields,field_description:industry_fsm.field_report_project_task_user_fsm__parent_id
 msgid "Parent Task"
 msgstr "Tâche parente"
@@ -797,40 +842,40 @@ msgstr "Date prévue"
 #. module: industry_fsm
 #: model:ir.ui.menu,name:industry_fsm.fsm_menu_planning
 msgid "Planning"
-msgstr "Planning"
+msgstr "Planification"
 
 #. module: industry_fsm
 #: model:ir.actions.act_window,name:industry_fsm.project_task_action_fsm_planning_groupby_location
 #: model:ir.actions.act_window,name:industry_fsm.project_task_action_fsm_planning_groupby_location2
 msgid "Planning by Location"
-msgstr "Planning par emplacement"
+msgstr "Planificiation par emplacement"
 
 #. module: industry_fsm
 #: model:ir.actions.server,name:industry_fsm.project_task_fsm_planning_groupby_location_server_action
 msgid "Planning by Location Server Action"
-msgstr ""
+msgstr "Action serveur de planification par localisation"
 
 #. module: industry_fsm
 #: model:ir.actions.act_window,name:industry_fsm.project_task_action_fsm_planning_groupby_project
 #: model:ir.actions.act_window,name:industry_fsm.project_task_action_fsm_planning_groupby_project2
 msgid "Planning by Project"
-msgstr "Planning par projet"
+msgstr "Planificiation par projet"
 
 #. module: industry_fsm
 #: model:ir.actions.server,name:industry_fsm.project_task_fsm_planning_groupby_project_server_action
 msgid "Planning by Project Server Action"
-msgstr ""
+msgstr "Action serveur de planification par projet"
 
 #. module: industry_fsm
 #: model:ir.actions.act_window,name:industry_fsm.project_task_action_fsm_planning_groupby_user
 #: model:ir.actions.act_window,name:industry_fsm.project_task_action_fsm_planning_groupby_user2
 msgid "Planning by User"
-msgstr "Planning par utilisateur"
+msgstr "Planificiation par utilisateur"
 
 #. module: industry_fsm
 #: model:ir.actions.server,name:industry_fsm.project_task_fsm_planning_groupby_user_server_action
 msgid "Planning by User Action"
-msgstr ""
+msgstr "Action serveur de planification par utilisateur"
 
 #. module: industry_fsm
 #: model:ir.model.fields,field_description:industry_fsm.field_report_project_task_user_fsm__priority
@@ -866,13 +911,13 @@ msgid ""
 "Ready to <b>manage your onsite interventions</b>? <i>Click Field Service to "
 "start.</i>"
 msgstr ""
-"Prêt à <b>gérer vos interventions sur site</b> ? <i>Cliquez sur Services sur"
-" Site pour démarrer.</i>"
+"Prêt à <b>gérer vos services sur site</b> ? <i>Cliquez sur Services sur Site "
+"pour démarrer.</i>"
 
 #. module: industry_fsm
 #: model:ir.model,name:industry_fsm.model_ir_actions_report
 msgid "Report Action"
-msgstr "Signaler l'action"
+msgstr "Action de rapport"
 
 #. module: industry_fsm
 #: model:ir.ui.menu,name:industry_fsm.fsm_menu_reporting
@@ -919,8 +964,8 @@ msgid ""
 "Set this template on a project's stage to automate email when tasks reach "
 "stages"
 msgstr ""
-"Définir ce modèle sur une étape de projet pour automatiquement envoyer un "
-"e-mail lorsque la tâche atteint cette étape"
+"Définir ce modèle sur une étape de projet pour automatiquement envoyer un e-"
+"mail lorsque la tâche atteint cette étape"
 
 #. module: industry_fsm
 #: model:ir.actions.act_window,name:industry_fsm.res_config_settings_action_fsm
@@ -972,8 +1017,8 @@ msgstr "Compétences"
 #. module: industry_fsm
 #: model_terms:ir.ui.view,arch_db:industry_fsm.view_task_stop_timer_wizard_form
 msgid ""
-"Some employees are still running their timer for this task. Are you sure you"
-" want to continue?"
+"Some employees are still running their timer for this task. Are you sure you "
+"want to continue?"
 msgstr ""
 "Certains employés exécutent encore leur minuterie pour cette tâche. Êtes-"
 "vous sur de vouloir continuer ?"
@@ -1107,8 +1152,8 @@ msgid ""
 "not contain any timesheets, products, or worksheets."
 msgstr ""
 "Le rapport de service sur site n'est pas disponible pour les tâches "
-"sélectionnées car elles ne contiennent pas de feuilles de temps, de produits"
-" ou de feuilles de travail."
+"sélectionnées car elles ne contiennent pas de feuilles de temps, de produits "
+"ou de feuilles de travail."
 
 #. module: industry_fsm
 #. odoo-python
@@ -1160,8 +1205,7 @@ msgstr "Facturation en régie"
 #. module: industry_fsm
 #: model:ir.model.fields,help:industry_fsm.field_report_project_task_user_fsm__subtask_effective_hours
 msgid "Time spent on the sub-tasks (and their own sub-tasks) of this task."
-msgstr ""
-"Temps passé sur les sous-tâches (et leurs sous-tâches) de cette tâche."
+msgstr "Temps passé sur les sous-tâches (et leurs sous-tâches) de cette tâche."
 
 #. module: industry_fsm
 #: model:ir.model.fields,help:industry_fsm.field_report_project_task_user_fsm__total_hours_spent
@@ -1200,7 +1244,7 @@ msgstr "À planifier"
 #. module: industry_fsm
 #: model:ir.actions.server,name:industry_fsm.project_task_to_schedule_fsm_server_action
 msgid "To Schedule Server Action"
-msgstr ""
+msgstr "Action serveur pour planifier"
 
 #. module: industry_fsm
 #: model_terms:ir.ui.view,arch_db:industry_fsm.project_task_view_search_fsm
@@ -1212,9 +1256,11 @@ msgstr "À planifier/assigner"
 #: model_terms:ir.actions.act_window,help:industry_fsm.project_task_action_all_fsm2
 msgid ""
 "To get things done, plan activities and use the task status.<br>\n"
-"                Collaborate efficiently by chatting in real-time or via email."
+"                Collaborate efficiently by chatting in real-time or via "
+"email."
 msgstr ""
-"Pour faire avancer les choses, planifiez des activités et utilisez le statut de la tâche.<br>\n"
+"Pour faire avancer les choses, planifiez des activités et utilisez le statut "
+"de la tâche.<br>\n"
 "Collaborez efficacement en discutant en temps réel ou par e-mail."
 
 #. module: industry_fsm
@@ -1223,7 +1269,8 @@ msgid ""
 "To get things done, use activities and status on tasks.<br>\n"
 "                Chat in real-time or by email to collaborate efficiently."
 msgstr ""
-"Pour faire avancer les choses, utilisez les activités et le statut des tâches.<br>\n"
+"Pour faire avancer les choses, utilisez les activités et le statut des "
+"tâches.<br>\n"
 "Discutez en temps réel ou par e-mail pour collaborer efficacement."
 
 #. module: industry_fsm
@@ -1235,11 +1282,6 @@ msgstr "Aujourd'hui"
 #: model_terms:ir.ui.view,arch_db:industry_fsm.project_task_view_search_fsm
 msgid "Today Activities"
 msgstr "Activités du jour"
-
-#. module: industry_fsm
-#: model:ir.model.fields,field_description:industry_fsm.field_report_project_task_user_fsm__total_hours_spent
-msgid "Total Time Spent"
-msgstr "Total du temps passé"
 
 #. module: industry_fsm
 #: model_terms:ir.actions.act_window,help:industry_fsm.project_task_type_action_fsm
@@ -1333,3 +1375,9 @@ msgstr "est Service sur site ?"
 #: model:ir.actions.server,name:industry_fsm.fsm_customer_ratings_server_action
 msgid "project.project.fsm"
 msgstr "project.project.fsm"
+
+#~ msgid "10:00"
+#~ msgstr "10:00"
+
+#~ msgid "2023-01-01"
+#~ msgstr "01-01-2023"

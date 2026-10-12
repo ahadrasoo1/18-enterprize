@@ -1,23 +1,23 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* account_iso20022
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# Abe Manyo, 2024
-# 
+# Abe Manyo, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:26+0000\n"
+"POT-Creation-Date: 2026-01-29 18:45+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Abe Manyo, 2024\n"
+"Last-Translator: Abe Manyo, 2025\n"
 "Language-Team: Indonesian (https://app.transifex.com/odoo/teams/41243/id/)\n"
+"Language: id\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: id\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. module: account_iso20022
@@ -50,7 +50,7 @@ msgstr "Pembayaran Kelompok"
 #. module: account_iso20022
 #: model:ir.model.fields,field_description:account_iso20022.field_account_batch_payment__iso20022_charge_bearer
 msgid "Charge Bearer"
-msgstr "Charge Bearer"
+msgstr "Pembayar Ongkos"
 
 #. module: account_iso20022
 #: model:ir.model,name:account_iso20022.model_res_company
@@ -82,6 +82,12 @@ msgstr "Creditor"
 #: model:ir.model.fields.selection,name:account_iso20022.selection__account_batch_payment__iso20022_charge_bearer__debt
 msgid "Debtor"
 msgstr "Debtor"
+
+#. module: account_iso20022
+#. odoo-python
+#: code:addons/account_iso20022/models/account_journal.py:0
+msgid "Employee %s has no country in their address."
+msgstr "Karyawan %s tidak memiliki negara di alamat mereka."
 
 #. module: account_iso20022
 #: model:ir.model.fields,help:account_iso20022.field_res_company__iso20022_orgid_issr
@@ -149,16 +155,6 @@ msgstr "LEI"
 #: model:ir.model.fields,help:account_iso20022.field_res_users__iso20022_lei
 msgid "Legal Entity Identifier"
 msgstr "Pengidentifikasi Entitas Legal (LEI)"
-
-#. module: account_iso20022
-#. odoo-python
-#: code:addons/account_iso20022/models/account_batch_payment.py:0
-msgid ""
-"Maximum amount is %(maximum_euro)s for payments in Euros, %(maximum_other)s "
-"for other currencies."
-msgstr ""
-"Jumlah maksimal adalah %(maximum_euro)s untuk pembayaran dengan Euro, "
-"%(maximum_other)s untuk mata uang lainnya."
 
 #. module: account_iso20022
 #: model_terms:ir.ui.view,arch_db:account_iso20022.res_partner_sepa_inherit_form
@@ -287,16 +283,6 @@ msgstr "Beberapa pembayaran di atas jumlah maksimal yang diizinkan."
 
 #. module: account_iso20022
 #. odoo-python
-#: code:addons/account_iso20022/models/account_journal_sepa_ct.py:0
-msgid ""
-"Some payments are missing a value for 'UETR', required for the SEPA "
-"Pain.001.001.09 format."
-msgstr ""
-"Beberapa pembayaran kekurangan nilai untuk 'UETR', dibutuhkan untuk format "
-"SEPA Pain.001.001.09"
-
-#. module: account_iso20022
-#. odoo-python
 #: code:addons/account_iso20022/models/account_batch_payment.py:0
 msgid "Some payments have no recipient bank account set."
 msgstr "Beberapa pembayaran tidak memiliki akun bank penerima."
@@ -324,14 +310,18 @@ msgstr "Swiss ISO20022"
 #. odoo-python
 #: code:addons/account_iso20022/models/account_journal.py:0
 msgid ""
-"The BIC code '%(bic_code)s' associated to the bank '%(bank)s' of bank account '%(account)s' of partner '%(partner)s' does not respect the required convention.\n"
+"The BIC code '%(bic_code)s' associated to the bank '%(bank)s' of bank "
+"account '%(account)s' of partner '%(partner)s' does not respect the required "
+"convention.\n"
 "It must contain 8 or 11 characters and match the following structure:\n"
 "- 4 letters: institution code or bank code\n"
 "- 2 letters: country code\n"
 "- 2 letters or digits: location code\n"
 "- 3 letters or digits: branch code, optional\n"
 msgstr ""
-"Kode BIC '%(bic_code)s' yang terkait bank '%(bank)s' dari akun bank '%(account)s' untuk mitra '%(partner)s' tidak mematuhi peraturan yang dibutuhkan.\n"
+"Kode BIC '%(bic_code)s' yang terkait bank '%(bank)s' dari akun bank '%"
+"(account)s' untuk mitra '%(partner)s' tidak mematuhi peraturan yang "
+"dibutuhkan.\n"
 "Harus memiliki 8 atau 11 karakter dan memenuhi struktur berikut:\n"
 "- 4 huruf: kode lembaga atau bank\n"
 "- 2 huruf: kode negara\n"
@@ -342,7 +332,8 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_iso20022/models/res_partner.py:0
 msgid ""
-"The LEI number must contain 20 characters and match the following structure:\n"
+"The LEI number must contain 20 characters and match the following "
+"structure:\n"
 "- 18 alphanumeric characters with capital letters\n"
 "- 2 digits in the end\n"
 msgstr ""
@@ -364,7 +355,8 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_iso20022/models/account_batch_payment.py:0
 msgid ""
-"The bank account %(account)s, of journal '%(journal)s', is not of type IBAN.\n"
+"The bank account %(account)s, of journal '%(journal)s', is not of type "
+"IBAN.\n"
 "A valid IBAN account is required to use SEPA features."
 msgstr ""
 "Akun bank %(account)s, dari jurnal '%(journal)s', bukan tipe IBAN.\n"
@@ -374,8 +366,8 @@ msgstr ""
 #. odoo-python
 #: code:addons/account_iso20022/models/account_batch_payment.py:0
 msgid ""
-"The customer bank account set on some payments does not have an IBAN number."
-" This is required for SEPA."
+"The customer bank account set on some payments does not have an IBAN number. "
+"This is required for SEPA."
 msgstr ""
 "Akun bank pelanggan yang ditetapkan pada beberapa pembayaran tidak memiliki "
 "nomor IBAN. Ini diperlukan untuk SEPA."
@@ -457,3 +449,10 @@ msgstr "pain.001.001.03"
 #: model:ir.model.fields.selection,name:account_iso20022.selection__account_journal__sepa_pain_version__pain_001_001_09
 msgid "pain.001.001.09"
 msgstr "pain.001.001.09"
+
+#~ msgid ""
+#~ "Some payments are missing a value for 'UETR', required for the SEPA "
+#~ "Pain.001.001.09 format."
+#~ msgstr ""
+#~ "Beberapa pembayaran kekurangan nilai untuk 'UETR', dibutuhkan untuk "
+#~ "format SEPA Pain.001.001.09"

@@ -68,7 +68,10 @@ result = contract.l10n_lu_bik_vehicle
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
 result_qty = inputs['WAGE_SUPPLEMENT_70'].amount
-result = contract.l10n_lu_indexed_wage / payslip._rule_parameter('l10n_lu_hours_per_month') * 0.7
+if contract.wage_type == 'monthly':
+    result = contract.l10n_lu_indexed_wage / payslip._rule_parameter('l10n_lu_hours_per_month') * 0.7
+else:
+    result = contract.l10n_lu_indexed_wage
         </field>
         <field name="struct_id" ref="l10n_lu_hr_payroll.hr_payroll_structure_lux_employee_salary"/>
     </record>
@@ -83,7 +86,10 @@ result = contract.l10n_lu_indexed_wage / payslip._rule_parameter('l10n_lu_hours_
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
 result_qty = inputs['OVERTIME'].amount
-result = contract.l10n_lu_indexed_wage / payslip._rule_parameter('l10n_lu_hours_per_month')
+if contract.wage_type == 'monthly':
+    result = contract.l10n_lu_indexed_wage / payslip._rule_parameter('l10n_lu_hours_per_month')
+else:
+    result = contract.l10n_lu_indexed_wage
         </field>
         <field name="struct_id" ref="l10n_lu_hr_payroll.hr_payroll_structure_lux_employee_salary"/>
     </record>
@@ -98,7 +104,10 @@ result = contract.l10n_lu_indexed_wage / payslip._rule_parameter('l10n_lu_hours_
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
 result_qty = inputs['OVERTIME_SUPPLEMENT_40'].amount
-result = contract.l10n_lu_indexed_wage / payslip._rule_parameter('l10n_lu_hours_per_month') * 0.4
+if contract.wage_type == 'monthly':
+    result = contract.l10n_lu_indexed_wage / payslip._rule_parameter('l10n_lu_hours_per_month') * 0.4
+else:
+    result = contract.l10n_lu_indexed_wage
         </field>
         <field name="struct_id" ref="l10n_lu_hr_payroll.hr_payroll_structure_lux_employee_salary"/>
     </record>
@@ -113,7 +122,10 @@ result = contract.l10n_lu_indexed_wage / payslip._rule_parameter('l10n_lu_hours_
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
 result_qty = inputs['OVERTIME_SUPPLEMENT_150'].amount
-result = contract.l10n_lu_indexed_wage / payslip._rule_parameter('l10n_lu_hours_per_month') * 1.5
+if contract.wage_type == 'monthly':
+    result = contract.l10n_lu_indexed_wage / payslip._rule_parameter('l10n_lu_hours_per_month') * 1.5
+else:
+    result = contract.l10n_lu_indexed_wage
         </field>
         <field name="struct_id" ref="l10n_lu_hr_payroll.hr_payroll_structure_lux_employee_salary"/>
     </record>
@@ -128,7 +140,10 @@ result = contract.l10n_lu_indexed_wage / payslip._rule_parameter('l10n_lu_hours_
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
 result_qty = inputs['OVERTIME_SUPPLEMENT_150'].amount
-result = contract.l10n_lu_indexed_wage / payslip._rule_parameter('l10n_lu_hours_per_month') * 2
+if contract.wage_type == 'monthly':
+    result = contract.l10n_lu_indexed_wage / payslip._rule_parameter('l10n_lu_hours_per_month') * 2
+else:
+    result = contract.l10n_lu_indexed_wage
         </field>
         <field name="struct_id" ref="l10n_lu_hr_payroll.hr_payroll_structure_lux_employee_salary"/>
     </record>
@@ -510,6 +525,29 @@ result = - ci_co2 / 12 * ceil(payslip.l10n_lu_effective_taxable_days) / payslip.
         <field name="struct_id" ref="l10n_lu_hr_payroll.hr_payroll_structure_lux_employee_salary"/>
     </record>
 
+    <record id="l10n_lu_employees_cim" model="hr.salary.rule">
+        <field name="category_id" ref="l10n_lu_hr_payroll.hr_salary_rule_category_tax_credit"/>
+        <field name="name">CIM</field>
+        <field name="code">CIM</field>
+        <field name="sequence">145</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = employee.l10n_lu_tax_id_number and employee.l10n_lu_tax_credit_cim</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+yearly_gross = int(payslip._get_yearly_simulated_gross(categories['GROSS']))
+gross_lower, gross_upper, amount_lower, base_amount_mid, rate_mid, amount_upper = payslip._rule_parameter('l10n_lu_cim')
+cim = 0
+if yearly_gross &lt; gross_lower:
+    cim = amount_lower
+elif gross_lower &lt;= yearly_gross &lt;= gross_upper:
+    cim = base_amount_mid - (yearly_gross - gross_lower) * rate_mid
+else:
+    cim = amount_upper
+result = - cim / 12 * ceil(payslip.l10n_lu_effective_taxable_days) / payslip._rule_parameter('l10n_lu_days_per_month')
+        </field>
+        <field name="struct_id" ref="l10n_lu_hr_payroll.hr_payroll_structure_lux_employee_salary"/>
+    </record>
+
     <record id="l10n_lu_employees_cip" model="hr.salary.rule">
         <field name="category_id" ref="l10n_lu_hr_payroll.hr_salary_rule_category_tax_credit"/>
         <field name="name">CIP</field>
@@ -561,7 +599,11 @@ lower_bound = payslip._rule_parameter('l10n_lu_cissm_lower_bound')
 middle_bound = payslip._rule_parameter('l10n_lu_cissm_middle_bound')
 upper_bound = payslip._rule_parameter('l10n_lu_cissm_upper_bound')
 
-fte_monthly_wage = int(contract.l10n_lu_indexed_wage / contract.work_time_rate) if contract.work_time_rate else 0
+if contract.wage_type == 'monthly':
+    fte_monthly_wage = int(contract.l10n_lu_indexed_wage / contract.work_time_rate) if contract.work_time_rate else 0
+else:
+    worked_hours = payslip._get_paid_worked_days_line_number_of_hours()
+    fte_monthly_wage = int(contract.l10n_lu_indexed_wage * worked_hours / contract.work_time_rate) if contract.work_time_rate else 0
 
 if lower_bound &lt;= fte_monthly_wage &lt;= middle_bound:
     cissm = max_amount

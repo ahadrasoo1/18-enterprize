@@ -1,22 +1,23 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* data_cleaning
-# 
+#
 # Translators:
-# Wil Odoo, 2024
-# 
+# Daye Jeong, 2024
+# Wil Odoo, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:29+0000\n"
+"POT-Creation-Date: 2026-04-03 18:59+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
+"Last-Translator: Wil Odoo, 2025\n"
 "Language-Team: Korean (https://app.transifex.com/odoo/teams/41243/ko/)\n"
+"Language: ko\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: ko\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. module: data_cleaning
@@ -56,6 +57,7 @@ msgstr ""
 "변경사항을 승인할 수 있습니다"
 
 #. module: data_cleaning
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_model_form
 #: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_model_form
 msgid "<span class=\"me-1\">Every</span>"
 msgstr "<span class=\"me-1\">매</span>"
@@ -77,6 +79,7 @@ msgstr "필드는 한 번만 표시할 수 있습니다!"
 
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_cleaning_rule__action
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_model_form
 #: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_record_list
 msgid "Action"
 msgstr "추가 작업"
@@ -135,8 +138,8 @@ msgstr "보관 처리됨"
 #. odoo-javascript
 #: code:addons/data_cleaning/static/src/views/data_merge_list_view.js:0
 msgid ""
-"Are you sure that you want to merge the selected records in their respective"
-" group?"
+"Are you sure that you want to merge the selected records in their respective "
+"group?"
 msgstr "선택한 레코드를 해당 그룹에서 병합하시겠습니까?"
 
 #. module: data_cleaning
@@ -167,6 +170,16 @@ msgstr "사례"
 #: code:addons/data_cleaning/models/data_merge_rule.py:0
 msgid "Case/Accent Insensitive Match"
 msgstr "대소문자/악센트 매치 구분 없음"
+
+#. module: data_cleaning
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_model_form
+msgid "Clean"
+msgstr "정리"
+
+#. module: data_cleaning
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_model_form
+msgid "Cleaning Actions"
+msgstr "작업 정리중"
 
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_cleaning_model__cleaning_mode
@@ -433,8 +446,7 @@ msgstr "병합할 중복 항목"
 
 #. module: data_cleaning
 #: model:ir.model.fields,help:data_cleaning.field_data_merge_model__create_threshold
-msgid ""
-"Duplicates with a similarity below this threshold will not be suggested"
+msgid "Duplicates with a similarity below this threshold will not be suggested"
 msgstr "이 임계값 미만의 유사도를 가진 중복 항목은 권장되지 않습니다"
 
 #. module: data_cleaning
@@ -511,11 +523,11 @@ msgstr "병합 작업 숨기기 버튼"
 #: model:ir.model.fields,help:data_cleaning.field_data_cleaning_rule__action_case
 msgid ""
 "How the type case is set by the rule. 'First Letters to Uppercase' sets "
-"every letter to lowercase except the first letter of each word, which is set"
-" to uppercase."
+"every letter to lowercase except the first letter of each word, which is set "
+"to uppercase."
 msgstr ""
-"규칙에 따라 대소문자가 설정되는 방식입니다. '첫 글자는 대문자로' 는 첫 글자만 대문자로 표시되며 나머지 글자는 모두 소문자로 "
-"설정됩니다."
+"규칙에 따라 대소문자가 설정되는 방식입니다. '첫 글자는 대문자로' 는 첫 글자"
+"만 대문자로 표시되며 나머지 글자는 모두 소문자로 설정됩니다."
 
 #. module: data_cleaning
 #: model_terms:ir.ui.view,arch_db:data_cleaning.data_merge_duplicate
@@ -541,23 +553,31 @@ msgstr "ID"
 msgid ""
 "If True, the generic data merge tool is available in the contextual menu of "
 "this model."
-msgstr "True면 해당 모델의 컨텍스트 메뉴에서 일반 데이터 병합 도구를 사용할 수 있습니다."
+msgstr ""
+"True면 해당 모델의 컨텍스트 메뉴에서 일반 데이터 병합 도구를 사용할 수 있습니"
+"다."
 
 #. module: data_cleaning
 #: model:ir.model.fields,help:data_cleaning.field_data_merge_model__is_contextual_merge_action
 msgid ""
 "If True, this record is used for contextual menu action \"Merge\" on the "
 "target model."
-msgstr "True이면 해당 레코드는 대상 모델에서 상황에 맞는 메뉴 작업 “병합”에 사용됩니다."
+msgstr ""
+"True이면 해당 레코드는 대상 모델에서 상황에 맞는 메뉴 작업 “병합”에 사용됩니"
+"다."
 
 #. module: data_cleaning
 #: model:ir.model.fields,help:data_cleaning.field_ir_model__hide_merge_action
 msgid ""
-"If the model already has a custom merge method, the class attribute `_merge_disabled` is set to true on\n"
-"             that model and the generic data merge action should not be available on that model."
+"If the model already has a custom merge method, the class attribute "
+"`_merge_disabled` is set to true on\n"
+"             that model and the generic data merge action should not be "
+"available on that model."
 msgstr ""
-"모델에 이미 사용자 지정 병합 메서드가 있는 경우 해당 모델에서 클래스 속성 `_merge_disabled`은\n"
-"             True로 설정되어야 하며, 해당 모델에서는 일반 데이터 병합 작업을 할 수 없습니다."
+"모델에 이미 사용자 지정 병합 메서드가 있는 경우 해당 모델에서 클래스 속성 "
+"`_merge_disabled`은\n"
+"             True로 설정되어야 하며, 해당 모델에서는 일반 데이터 병합 작업을 "
+"할 수 없습니다."
 
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_record__is_deleted
@@ -780,6 +800,7 @@ msgstr "레코드 이름"
 
 #. module: data_cleaning
 #: model_terms:ir.ui.view,arch_db:data_cleaning.data_merge_record_view_search_merge_action
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_model_form
 #: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_record_search
 #: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_record_search
 msgid "Records"
@@ -835,6 +856,11 @@ msgid "Scrap HTML"
 msgstr "HTML 가져오기"
 
 #. module: data_cleaning
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_model_form
+msgid "Select a model to configure cleaning actions"
+msgstr "정리를 설정할 모델을 선택합니다"
+
+#. module: data_cleaning
 #: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_model_form
 msgid "Select a model to configure deduplication rules"
 msgstr "중복 제거 규칙을 구성할 모델 선택"
@@ -877,7 +903,7 @@ msgstr "저장 공간"
 #. odoo-python
 #: code:addons/data_cleaning/report/data_storage.py:0
 msgid "Storage Detail: %(name)s"
-msgstr ""
+msgstr "저장소 세부 정보: %(name)s"
 
 #. module: data_cleaning
 #: model:ir.model.fields,help:data_cleaning.field_data_merge_model__rule_ids
@@ -910,7 +936,15 @@ msgstr "불필요한 빈칸"
 msgid ""
 "The Python module `phonenumbers` is not installed. Format phone will not "
 "work."
-msgstr "'phonenumbers'라는 Python 모듈이 설치되어 있지 않습니다. 전화번호형식이 동작하지 않습니다."
+msgstr ""
+"'phonenumbers'라는 Python 모듈이 설치되어 있지 않습니다. 전화번호형식이 동작"
+"하지 않습니다."
+
+#. module: data_cleaning
+#. odoo-javascript
+#: code:addons/data_cleaning/static/src/views/data_merge_list_view.js:0
+msgid "The connection timed out. Please try merging fewer records at once."
+msgstr ""
 
 #. module: data_cleaning
 #: model:ir.model.constraint,message:data_cleaning.constraint_data_cleaning_model_check_notif_freq
@@ -950,7 +984,7 @@ msgstr "이미 사용 중인 이름입니다"
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_ir_attachment_report__size
 msgid "Total Size"
-msgstr ""
+msgstr "총 크기"
 
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_cleaning_rule__action_trim
@@ -1013,7 +1047,8 @@ msgid ""
 "Which spaces are trimmed by the rule. Leading, trailing, and successive "
 "spaces are considered superfluous."
 msgstr ""
-"규칙에 따라 빈칸을 조정하는 방식입니다. 앞이나 뒤 혹은 연속해서 빈칸이 있는 경우 공백이 불필요하게 있는 것으로 간주합니다."
+"규칙에 따라 빈칸을 조정하는 방식입니다. 앞이나 뒤 혹은 연속해서 빈칸이 있는 "
+"경우 공백이 불필요하게 있는 것으로 간주합니다."
 
 #. module: data_cleaning
 #. odoo-python

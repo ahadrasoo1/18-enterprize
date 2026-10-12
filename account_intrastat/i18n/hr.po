@@ -1,61 +1,94 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* account_intrastat
+# * account_intrastat
 #
 # Translators:
-# Tina Milas, 2022
-# Karolina Tonković <karolina.tonkovic@storm.hr>, 2022
-# Vladimir Olujić <olujic.vladimir@storm.hr>, 2022
-# Martin Trigaux, 2023
-# Bole <bole@dajmi5.com>, 2023
-#
+# Tina Milas, 2024
+# Martin Trigaux, 2024
+# Karolina Tonković <karolina.tonkovic@storm.hr>, 2024
+# Vladimir Olujić <olujic.vladimir@storm.hr>, 2024
+# Bole <bole@dajmi5.com>, 2024
+# Karlo Mikešić <karlo@uvid.hr>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2026.
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 16.0+e\n"
+"Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-16 16:02+0000\n"
-"PO-Revision-Date: 2022-09-22 05:45+0000\n"
-"Last-Translator: Bole <bole@dajmi5.com>, 2023\n"
-"Language-Team: Croatian (https://app.transifex.com/odoo/teams/41243/hr/)\n"
+"POT-Creation-Date: 2026-05-29 17:48+0000\n"
+"PO-Revision-Date: 2026-04-11 18:35+0000\n"
+"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"Language-Team: Croatian <https://translate.odoo.com/projects/odoo-18/"
+"account_intrastat/hr/>\n"
 "Language: hr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"X-Generator: Weblate 5.16.2\n"
+
+#. module: account_intrastat
+#. odoo-javascript
+#: code:addons/account_intrastat/static/src/components/intrastat_report/warnings.xml:0
+msgid ", which cannot be reported."
+msgstr ", koje se ne mogu prijaviti."
 
 #. module: account_intrastat
 #: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__1_000_kwh
+#: model:ir.model.fields.selection,name:account_intrastat.selection__product_template__intrastat_supplementary_unit__1_000_kwh
 msgid "1 000 kWh"
-msgstr ""
+msgstr "1 000 kWh"
 
 #. module: account_intrastat
 #: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__1_000_m3
+#: model:ir.model.fields.selection,name:account_intrastat.selection__product_template__intrastat_supplementary_unit__1_000_m3
 msgid "1 000 m3"
-msgstr ""
+msgstr "1 000 m3"
 
 #. module: account_intrastat
 #: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__1_000_p/st
+#: model:ir.model.fields.selection,name:account_intrastat.selection__product_template__intrastat_supplementary_unit__1_000_p/st
 msgid "1 000 p/st"
-msgstr ""
+msgstr "1 000 p/st"
 
 #. module: account_intrastat
 #: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__100_p/st
+#: model:ir.model.fields.selection,name:account_intrastat.selection__product_template__intrastat_supplementary_unit__100_p/st
 msgid "100 p/st"
+msgstr "100 p/st"
+
+#. module: account_intrastat
+#: model_terms:ir.ui.view,arch_db:account_intrastat.res_config_settings_view_form
+msgid ""
+"<span class=\"fa fa-lg fa-building-o ms-2\" title=\"Values set here are "
+"company-specific.\"/>"
 msgstr ""
+"<span class=\"fa fa-lg fa-building-o ms-2\" title=\"Ovdje postavljene "
+"vrijednosti specifične su za tvrtku.\"/>"
 
 #. module: account_intrastat
 #: model_terms:ir.ui.view,arch_db:account_intrastat.account_move_line_tree_view_account_intrastat_transaction_codes
 msgid "Account move line"
-msgstr ""
+msgstr "Stavka knjigovodstvenog dokumenta"
 
 #. module: account_intrastat
 #: model_terms:ir.ui.view,arch_db:account_intrastat.view_intrastat_code_search
 msgid "Active"
-msgstr "Aktivan"
+msgstr "Aktivno"
 
 #. module: account_intrastat
+#. odoo-javascript
+#: code:addons/account_intrastat/static/src/components/intrastat_report/filters/filters.js:0
+msgid "All partners"
+msgstr ""
+"\n"
+"Svi partneri"
+
+#. module: account_intrastat
+#. odoo-javascript
 #. odoo-python
 #: code:addons/account_intrastat/models/account_intrastat_report.py:0
+#: code:addons/account_intrastat/static/src/components/intrastat_report/filters/filters.js:0
 msgid "Arrival"
 msgstr "Dolazak"
 
@@ -76,34 +109,29 @@ msgstr "Po tipu"
 
 #. module: account_intrastat
 #. odoo-javascript
-#: code:addons/account_intrastat/static/src/components/account_report.xml:0
+#: code:addons/account_intrastat/static/src/components/intrastat_report/warnings.xml:0
 msgid "Check the expired"
-msgstr ""
+msgstr "Provjerite istekle"
 
 #. module: account_intrastat
 #. odoo-javascript
-#: code:addons/account_intrastat/static/src/components/account_report.xml:0
+#: code:addons/account_intrastat/static/src/components/intrastat_report/warnings.xml:0
 msgid "Check the premature"
-msgstr ""
+msgstr "Provjerite preuranjene"
 
 #. module: account_intrastat
+#: model:account.report.column,name:account_intrastat.intrastat_report_column_commodity_code
 #: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__type__commodity
 #: model_terms:ir.ui.view,arch_db:account_intrastat.view_intrastat_code_search
 msgid "Commodity"
 msgstr "Usklađenost"
 
 #. module: account_intrastat
-#: model:account.report.column,name:account_intrastat.intrastat_report_column_commodity_code
 #: model:ir.model.fields,field_description:account_intrastat.field_product_template__intrastat_code_id
 #: model_terms:ir.ui.view,arch_db:account_intrastat.product_product_tree_view_account_intrastat_supplementary_unit
 #: model_terms:ir.ui.view,arch_db:account_intrastat.product_product_tree_view_account_intrastat_weight
 msgid "Commodity Code"
 msgstr "Šifra usklađenosti"
-
-#. module: account_intrastat
-#: model:ir.model.fields,field_description:account_intrastat.field_product_product__intrastat_code_id
-msgid "Commodity code"
-msgstr ""
 
 #. module: account_intrastat
 #: model:ir.model,name:account_intrastat.model_res_company
@@ -113,12 +141,12 @@ msgstr "Tvrtke"
 #. module: account_intrastat
 #: model:ir.model.fields,field_description:account_intrastat.field_res_config_settings__company_country_id
 msgid "Company country"
-msgstr "Država poduzeća"
+msgstr "Država tvrtke"
 
 #. module: account_intrastat
 #: model:ir.model,name:account_intrastat.model_res_config_settings
 msgid "Config Settings"
-msgstr "Postavke"
+msgstr "Konfiguracijske postavke"
 
 #. module: account_intrastat
 #: model:account.report.column,name:account_intrastat.intrastat_report_column_country_code
@@ -136,37 +164,51 @@ msgstr "Država porijekla"
 #: model:ir.model.fields,field_description:account_intrastat.field_res_company__intrastat_default_invoice_transaction_code_id
 #: model:ir.model.fields,field_description:account_intrastat.field_res_config_settings__intrastat_default_invoice_transaction_code_id
 msgid "Default invoice transaction code"
-msgstr ""
+msgstr "Zadana šifra transakcije računa"
 
 #. module: account_intrastat
 #: model:ir.model.fields,field_description:account_intrastat.field_res_company__intrastat_default_refund_transaction_code_id
 #: model:ir.model.fields,field_description:account_intrastat.field_res_config_settings__intrastat_default_refund_transaction_code_id
 msgid "Default refund transaction code"
-msgstr ""
+msgstr "Zadana šifra transakcije povrata"
 
 #. module: account_intrastat
 #: model:ir.model.fields,field_description:account_intrastat.field_res_company__intrastat_transport_mode_id
 msgid "Default transport mode"
-msgstr ""
-
-#. module: account_intrastat
-#. odoo-python
-#: code:addons/account_intrastat/models/account_intrastat_report.py:0
-msgid "Dispatch"
-msgstr ""
+msgstr "Zadani način prijevoza"
 
 #. module: account_intrastat
 #. odoo-javascript
-#: code:addons/account_intrastat/static/src/components/filters/filter_intrastat_options.xml:0
+#. odoo-python
+#: code:addons/account_intrastat/models/account_intrastat_report.py:0
+#: code:addons/account_intrastat/static/src/components/intrastat_report/filters/filters.js:0
+msgid "Dispatch"
+msgstr "Otprema"
+
+#. module: account_intrastat
+#. odoo-javascript
+#: code:addons/account_intrastat/static/src/components/intrastat_report/filters/filter_intrastat_report.xml:0
 msgid "Extended Mode"
-msgstr ""
+msgstr "Prošireni način"
+
+#. module: account_intrastat
+#. odoo-javascript
+#: code:addons/account_intrastat/static/src/components/intrastat_report/filters/filters.js:0
+msgid "Extended mode"
+msgstr "Prošireni način"
+
+#. module: account_intrastat
+#: model:ir.model.fields,field_description:account_intrastat.field_res_config_settings__has_country_regions
+msgid "Has Country Regions"
+msgstr "Ima regije države"
 
 #. module: account_intrastat
 #: model:account.report.column,name:account_intrastat.intrastat_report_column_incoterm_code
-msgid "Incoterm Code"
-msgstr "Inkoterm šifra"
+msgid "Incoterm"
+msgstr "Incoterm"
 
 #. module: account_intrastat
+#: model:account.report.line,name:account_intrastat.intrastat_line
 #: model:ir.model.fields,field_description:account_intrastat.field_account_move_line__intrastat_transaction_id
 #: model_terms:ir.ui.view,arch_db:account_intrastat.invoice_form_inherit_account_intrastat
 #: model_terms:ir.ui.view,arch_db:account_intrastat.product_product_form_view_inherit_account_intrastat
@@ -175,22 +217,38 @@ msgid "Intrastat"
 msgstr "Intrastat"
 
 #. module: account_intrastat
+#: model:account.report,name:account_intrastat.intrastat_report
+msgid "Intrastat (Goods)"
+msgstr "Intrastat (Roba)"
+
+#. module: account_intrastat
 #: model:ir.actions.act_window,name:account_intrastat.action_report_intrastat_code_tree
 #: model:ir.model,name:account_intrastat.model_account_intrastat_code
+#: model:ir.model.fields,field_description:account_intrastat.field_product_product__intrastat_code_id
 #: model:ir.ui.menu,name:account_intrastat.menu_report_intrastat_code
 #: model_terms:ir.ui.view,arch_db:account_intrastat.view_report_intrastat_code_form
 msgid "Intrastat Code"
 msgstr "Intrastat Kod"
 
 #. module: account_intrastat
+#: model:ir.model.fields,field_description:account_intrastat.field_product_product__intrastat_code_domain
+#: model:ir.model.fields,field_description:account_intrastat.field_product_template__intrastat_code_domain
+msgid "Intrastat Code Domain"
+msgstr "Domena šifre Intrastat"
+
+#. module: account_intrastat
+#: model:ir.model.fields,field_description:account_intrastat.field_product_product__valid_intrastat_code_ids
+#: model:ir.model.fields,field_description:account_intrastat.field_product_template__valid_intrastat_code_ids
+msgid "Intrastat Code IDs"
+msgstr "ID-evi šifri Intrastat"
+
+#. module: account_intrastat
 #: model:ir.model.fields,field_description:account_intrastat.field_account_bank_statement_line__intrastat_country_id
 #: model:ir.model.fields,field_description:account_intrastat.field_account_move__intrastat_country_id
-#: model:ir.model.fields,field_description:account_intrastat.field_account_payment__intrastat_country_id
 msgid "Intrastat Country"
 msgstr "Intrastat država"
 
 #. module: account_intrastat
-#: model:account.report,name:account_intrastat.intrastat_report
 #: model:ir.actions.client,name:account_intrastat.action_account_report_intrastat
 #: model:ir.ui.menu,name:account_intrastat.menu_action_account_report_intrastat
 msgid "Intrastat Report"
@@ -199,12 +257,21 @@ msgstr "Intrastat Izvještaj"
 #. module: account_intrastat
 #: model:ir.model,name:account_intrastat.model_account_intrastat_report_handler
 msgid "Intrastat Report Custom Handler"
-msgstr ""
+msgstr "Prilagođeni handler Intrastat izvještaja"
+
+#. module: account_intrastat
+#: model:ir.model.fields,field_description:account_intrastat.field_product_template__intrastat_supplementary_unit
+msgid "Intrastat Supplementary Unit"
+msgstr "Intrastat dopunska jedinica"
+
+#. module: account_intrastat
+#: model:ir.model.fields,field_description:account_intrastat.field_product_template__intrastat_supplementary_unit_amount
+msgid "Intrastat Supplementary Unit Amount"
+msgstr "Količina Intrastat dopunske jedinice"
 
 #. module: account_intrastat
 #: model:ir.model.fields,field_description:account_intrastat.field_account_bank_statement_line__intrastat_transport_mode_id
 #: model:ir.model.fields,field_description:account_intrastat.field_account_move__intrastat_transport_mode_id
-#: model:ir.model.fields,field_description:account_intrastat.field_account_payment__intrastat_transport_mode_id
 msgid "Intrastat Transport Mode"
 msgstr "Zadani način transporta"
 
@@ -216,9 +283,8 @@ msgstr "Intrastat kod"
 #. module: account_intrastat
 #: model:ir.model.fields,help:account_intrastat.field_account_bank_statement_line__intrastat_country_id
 #: model:ir.model.fields,help:account_intrastat.field_account_move__intrastat_country_id
-#: model:ir.model.fields,help:account_intrastat.field_account_payment__intrastat_country_id
 msgid "Intrastat country, arrival for sales, dispatch for purchases"
-msgstr ""
+msgstr "Intrastat država, dolazak za prodaje, otprema za nabave"
 
 #. module: account_intrastat
 #: model:ir.model.fields,field_description:account_intrastat.field_res_country__intrastat
@@ -227,25 +293,48 @@ msgstr "Intarstat Član"
 
 #. module: account_intrastat
 #: model:ir.model.fields,field_description:account_intrastat.field_res_company__intrastat_region_id
+#: model:ir.model.fields,field_description:account_intrastat.field_res_config_settings__intrastat_region_id
 msgid "Intrastat region"
 msgstr "Intrastat regija"
 
 #. module: account_intrastat
 #: model_terms:ir.ui.view,arch_db:account_intrastat.account_move_line_tree_view_account_intrastat_transaction_codes
 msgid "Intrastat transaction code"
+msgstr "Intrastat šifra transakcije"
+
+#. module: account_intrastat
+#. odoo-python
+#: code:addons/account_intrastat/models/product.py:0
+msgid "Invalid Intrastat Code"
 msgstr ""
 
 #. module: account_intrastat
 #. odoo-python
 #: code:addons/account_intrastat/models/account_intrastat_report.py:0
 msgid "Invalid commodity intrastat code products."
-msgstr ""
+msgstr "Proizvodi s nevažećom Intrastat šifrom robe."
 
 #. module: account_intrastat
 #. odoo-python
 #: code:addons/account_intrastat/models/account_intrastat_report.py:0
 msgid "Invalid transaction intrastat code entries."
-msgstr ""
+msgstr "Unosi s nevažećom Intrastat šifrom transakcije."
+
+#. module: account_intrastat
+#. odoo-python
+#: code:addons/account_intrastat/models/account_intrastat_report.py:0
+msgid "Invalid transport mode code entries."
+msgstr "Unosi s nevažećom šifrom načina prijevoza."
+
+#. module: account_intrastat
+#: model_terms:ir.ui.view,arch_db:account_intrastat.account_move_line_tree_view_account_intrastat_product_origin_country_id
+msgid "Invoice Lines"
+msgstr "Stavke računa"
+
+#. module: account_intrastat
+#: model_terms:ir.ui.view,arch_db:account_intrastat.account_move_tree_view_account_intrastat_transport_codes
+msgid "Journal Entries"
+msgstr "Temeljnice"
 
 #. module: account_intrastat
 #: model:ir.model,name:account_intrastat.model_account_move
@@ -258,22 +347,45 @@ msgid "Journal Item"
 msgstr "Stavka dnevnika"
 
 #. module: account_intrastat
+#. odoo-python
+#: code:addons/account_intrastat/models/account_intrastat_report.py:0
+msgid "Missing country of origin"
+msgstr "Nedostaje država podrijetla"
+
+#. module: account_intrastat
+#. odoo-python
+#: code:addons/account_intrastat/models/account_intrastat_report.py:0
+msgid "Missing product"
+msgstr "Nedostaje proizvod"
+
+#. module: account_intrastat
+#: model:res.country,name:account_intrastat.xi
+msgid "Northern Ireland"
+msgstr ""
+
+#. module: account_intrastat
+#. odoo-python
+#: code:addons/account_intrastat/models/product.py:0
+msgid ""
+"Note that the selected commodity code is invalid based on its start or "
+"expiry date. You can still select it."
+msgstr ""
+
+#. module: account_intrastat
 #. odoo-javascript
-#: code:addons/account_intrastat/static/src/components/filters/filter_intrastat_partner.xml:0
+#: code:addons/account_intrastat/static/src/components/intrastat_report/filters/filter_intrastat_report.xml:0
 msgid "Only with VAT numbers"
-msgstr ""
+msgstr "Samo s PDV brojevima"
 
 #. module: account_intrastat
-#. odoo-javascript
-#: code:addons/account_intrastat/static/src/components/filters/filter_intrastat_options.xml:0
-msgid "Options:"
-msgstr ""
-
-#. module: account_intrastat
-#: model:account.report.column,name:account_intrastat.intrastat_report_column_product_origin_country
 #: model_terms:ir.ui.view,arch_db:account_intrastat.report_invoice_document_intrastat_2019
 msgid "Origin"
 msgstr "Izvor"
+
+#. module: account_intrastat
+#: model:account.report.column,name:account_intrastat.intrastat_report_column_product_origin_country
+msgid "Origin Country"
+msgstr "Država porijekla"
 
 #. module: account_intrastat
 #: model:account.report.column,name:account_intrastat.intrastat_report_column_partner_vat
@@ -282,9 +394,9 @@ msgstr "Porezni broj"
 
 #. module: account_intrastat
 #. odoo-javascript
-#: code:addons/account_intrastat/static/src/components/filters/filter_intrastat_partner.xml:0
-msgid "Partners:"
-msgstr ""
+#: code:addons/account_intrastat/static/src/components/intrastat_report/filters/filters.js:0
+msgid "Partners with VAT numbers"
+msgstr "Partneri s PDV brojevima"
 
 #. module: account_intrastat
 #: model:ir.model,name:account_intrastat.model_product_template
@@ -304,124 +416,135 @@ msgid "Product Variant"
 msgstr "Varijanta proizvoda"
 
 #. module: account_intrastat
+#: model:account.report.column,name:account_intrastat.intrastat_report_column_region_code
 #: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__type__region
 #: model_terms:ir.ui.view,arch_db:account_intrastat.view_intrastat_code_search
 msgid "Region"
 msgstr "Regija"
 
 #. module: account_intrastat
-#: model:account.report.column,name:account_intrastat.intrastat_report_column_region_code
-msgid "Region Code"
-msgstr "Šifra regije"
-
-#. module: account_intrastat
 #. odoo-javascript
-#: code:addons/account_intrastat/static/src/components/account_report.xml:0
+#: code:addons/account_intrastat/static/src/components/intrastat_report/warnings.xml:0
 msgid "Some lines have expired intrastat"
-msgstr ""
+msgstr "Neke stavke imaju istekli Intrastat"
 
 #. module: account_intrastat
 #. odoo-javascript
-#: code:addons/account_intrastat/static/src/components/account_report.xml:0
+#: code:addons/account_intrastat/static/src/components/intrastat_report/warnings.xml:0
 msgid "Some lines have premature intrastat"
-msgstr ""
+msgstr "Neke stavke imaju preuranjeni Intrastat"
 
 #. module: account_intrastat
 #. odoo-javascript
-#: code:addons/account_intrastat/static/src/components/account_report.xml:0
+#: code:addons/account_intrastat/static/src/components/intrastat_report/warnings.xml:0
 msgid "Some lines have undefined"
-msgstr ""
+msgstr "Neke stavke imaju nedefiniran"
 
 #. module: account_intrastat
 #. odoo-javascript
-#: code:addons/account_intrastat/static/src/components/account_report.xml:0
+#: code:addons/account_intrastat/static/src/components/intrastat_report/warnings.xml:0
 msgid "Some products have undefined"
-msgstr ""
+msgstr "Neki proizvodi imaju nedefiniran"
+
+#. module: account_intrastat
+#. odoo-javascript
+#: code:addons/account_intrastat/static/src/components/intrastat_report/filters/filters.js:0
+msgid "Standard mode"
+msgstr "Standardni način"
 
 #. module: account_intrastat
 #: model:ir.model.fields,field_description:account_intrastat.field_product_product__intrastat_supplementary_unit
-#: model:ir.model.fields,field_description:account_intrastat.field_product_template__intrastat_supplementary_unit
 #: model_terms:ir.ui.view,arch_db:account_intrastat.view_intrastat_code_search
 msgid "Supplementary Unit"
-msgstr ""
+msgstr "Dopunska jedinica"
 
 #. module: account_intrastat
 #: model:account.report.column,name:account_intrastat.intrastat_report_column_supplementary_units
 #: model:ir.model.fields,field_description:account_intrastat.field_product_product__intrastat_supplementary_unit_amount
-#: model:ir.model.fields,field_description:account_intrastat.field_product_template__intrastat_supplementary_unit_amount
 msgid "Supplementary Units"
-msgstr ""
+msgstr "Dopunske jedinice"
 
 #. module: account_intrastat
 #: model_terms:ir.ui.view,arch_db:account_intrastat.product_product_tree_view_account_intrastat_supplementary_unit
 msgid "Supplementary Units per Product"
-msgstr ""
+msgstr "Dopunske jedinice po proizvodu"
 
 #. module: account_intrastat
 #: model:account.report.column,name:account_intrastat.intrastat_report_column_system
 msgid "System"
-msgstr ""
+msgstr "Sustav"
+
+#. module: account_intrastat
+#: model:ir.model.fields.selection,name:account_intrastat.selection__product_template__intrastat_supplementary_unit__tj
+msgid "TJ"
+msgstr "TJ"
 
 #. module: account_intrastat
 #: model:ir.model.fields,help:account_intrastat.field_res_config_settings__company_country_id
 msgid "The country to use the tax reports from for this company"
-msgstr ""
+msgstr "Država čiji se porezni izvještaji koriste za ovu tvrtku"
+
+#. module: account_intrastat
+#. odoo-python
+#: code:addons/account_intrastat/models/account_intrastat_report.py:0
+msgid "The date range must be a full month"
+msgstr "Raspon datuma mora biti puni mjesec"
+
+#. module: account_intrastat
+#. odoo-python
+#: code:addons/account_intrastat/models/account_intrastat_report.py:0
+msgid "The date range must be a full month or a full quarter."
+msgstr "Raspon datuma mora biti puni mjesec ili puni kvartal."
 
 #. module: account_intrastat
 #: model:ir.model.fields,help:account_intrastat.field_product_product__intrastat_supplementary_unit_amount
 #: model:ir.model.fields,help:account_intrastat.field_product_template__intrastat_supplementary_unit_amount
 msgid "The number of supplementary units per product quantity."
-msgstr ""
+msgstr "Broj dopunskih jedinica po količini proizvoda."
 
 #. module: account_intrastat
 #. odoo-python
-#: code:addons/account_intrastat/models/account_intrastat_report.py:0
-msgid "Total"
-msgstr "Ukupno"
+#: code:addons/account_intrastat/models/product.py:0
+msgid ""
+"The product template has no products/variants. At least one variant is "
+"required to set the Intrastat values."
+msgstr ""
 
 #. module: account_intrastat
+#. odoo-javascript
+#: code:addons/account_intrastat/static/src/components/intrastat_report/warnings.xml:0
+msgid "There are some"
+msgstr "Postoji nekoliko"
+
+#. module: account_intrastat
+#: model:account.report.column,name:account_intrastat.intrastat_report_column_transaction_code
 #: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__type__transaction
 #: model_terms:ir.ui.view,arch_db:account_intrastat.view_intrastat_code_search
 msgid "Transaction"
 msgstr "Transakcija"
 
 #. module: account_intrastat
-#: model:account.report.column,name:account_intrastat.intrastat_report_column_transaction_code
-msgid "Transaction Code"
-msgstr ""
-
-#. module: account_intrastat
+#: model:account.report.column,name:account_intrastat.intrastat_report_column_transport_code
 #: model_terms:ir.ui.view,arch_db:account_intrastat.view_intrastat_code_search
 msgid "Transport"
 msgstr "Transport"
 
 #. module: account_intrastat
-#: model:account.report.column,name:account_intrastat.intrastat_report_column_transport_code
-msgid "Transport Code"
-msgstr "Šifra transporta"
-
-#. module: account_intrastat
 #: model:ir.model.constraint,message:account_intrastat.constraint_account_intrastat_code_intrastat_region_code_unique
 msgid "Triplet code/type/country_id must be unique."
-msgstr ""
-
-#. module: account_intrastat
-#. odoo-javascript
-#: code:addons/account_intrastat/static/src/components/filters/filter_intrastat_type.xml:0
-msgid "Types:"
-msgstr ""
+msgstr "Trojka šifra/vrsta/country_id mora biti jedinstvena."
 
 #. module: account_intrastat
 #. odoo-python
 #: code:addons/account_intrastat/models/account_intrastat_report.py:0
 msgid "Undefined supplementary unit products."
-msgstr ""
+msgstr "Proizvodi s nedefiniranom dopunskom jedinicom."
 
 #. module: account_intrastat
 #. odoo-python
 #: code:addons/account_intrastat/models/account_intrastat_report.py:0
 msgid "Undefined weight products."
-msgstr ""
+msgstr "Proizvodi s nedefiniranom težinom."
 
 #. module: account_intrastat
 #: model:account.report.column,name:account_intrastat.intrastat_report_column_value
@@ -429,116 +552,158 @@ msgid "Value"
 msgstr "Vrijednost"
 
 #. module: account_intrastat
-#. odoo-python
-#: code:addons/account_intrastat/models/account_intrastat_report.py:0
-msgid "View Journal Entry"
-msgstr "Vidi stavku dnevnika"
+#: model:account.report.column,name:account_intrastat.intrastat_report_column_value_currency
+msgid "Value Currency"
+msgstr "Valuta vrijednosti"
 
 #. module: account_intrastat
 #: model:account.report.column,name:account_intrastat.intrastat_report_column_weight
-msgid "Weight"
-msgstr "Težina"
+msgid "Weight (kg)"
+msgstr "Težina (kg)"
 
 #. module: account_intrastat
 #: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__c/k
+#: model:ir.model.fields.selection,name:account_intrastat.selection__product_template__intrastat_supplementary_unit__c/k
 msgid "c/k"
-msgstr ""
+msgstr "c/k"
 
 #. module: account_intrastat
 #: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__ce/el
+#: model:ir.model.fields.selection,name:account_intrastat.selection__product_template__intrastat_supplementary_unit__ce/el
 msgid "ce/el"
-msgstr ""
+msgstr "ce/el"
 
 #. module: account_intrastat
 #. odoo-javascript
-#: code:addons/account_intrastat/static/src/components/account_report.xml:0
+#: code:addons/account_intrastat/static/src/components/intrastat_report/warnings.xml:0
 msgid "commodity codes"
-msgstr ""
+msgstr "šifre robe"
 
 #. module: account_intrastat
 #: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__ct/l
+#: model:ir.model.fields.selection,name:account_intrastat.selection__product_template__intrastat_supplementary_unit__ct/l
 msgid "ct/l"
+msgstr "ct/l"
+
+#. module: account_intrastat
+#: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__g
+#: model:ir.model.fields.selection,name:account_intrastat.selection__product_template__intrastat_supplementary_unit__g
+msgid "g"
 msgstr ""
 
 #. module: account_intrastat
 #: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__gi_f_/_s
+#: model:ir.model.fields.selection,name:account_intrastat.selection__product_template__intrastat_supplementary_unit__gi_f_/_s
 msgid "gi F / S"
-msgstr ""
+msgstr "gi F / S"
+
+#. module: account_intrastat
+#. odoo-javascript
+#: code:addons/account_intrastat/static/src/components/intrastat_report/warnings.xml:0
+msgid "journals items with no product"
+msgstr "stavke dnevnika bez proizvoda"
 
 #. module: account_intrastat
 #: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__kg_90_%_sdt
+#: model:ir.model.fields.selection,name:account_intrastat.selection__product_template__intrastat_supplementary_unit__kg_90_%_sdt
 msgid "kg 90 % sdt"
-msgstr ""
+msgstr "kg 90 % sdt"
 
 #. module: account_intrastat
 #: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__kg_h2o2
+#: model:ir.model.fields.selection,name:account_intrastat.selection__product_template__intrastat_supplementary_unit__kg_h2o2
 msgid "kg H2O2"
-msgstr ""
+msgstr "kg H2O2"
 
 #. module: account_intrastat
 #: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__kg_k2o
+#: model:ir.model.fields.selection,name:account_intrastat.selection__product_template__intrastat_supplementary_unit__kg_k2o
 msgid "kg K2O"
-msgstr ""
+msgstr "kg K2O"
 
 #. module: account_intrastat
 #: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__kg_koh
+#: model:ir.model.fields.selection,name:account_intrastat.selection__product_template__intrastat_supplementary_unit__kg_koh
 msgid "kg KOH"
-msgstr ""
+msgstr "kg KOH"
 
 #. module: account_intrastat
 #: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__kg_n
+#: model:ir.model.fields.selection,name:account_intrastat.selection__product_template__intrastat_supplementary_unit__kg_n
 msgid "kg N"
-msgstr ""
+msgstr "kg N"
 
 #. module: account_intrastat
 #: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__kg_naoh
+#: model:ir.model.fields.selection,name:account_intrastat.selection__product_template__intrastat_supplementary_unit__kg_naoh
 msgid "kg NaOH"
-msgstr ""
+msgstr "kg NaOH"
 
 #. module: account_intrastat
 #: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__kg_p2o5
+#: model:ir.model.fields.selection,name:account_intrastat.selection__product_template__intrastat_supplementary_unit__kg_p2o5
 msgid "kg P2O5"
-msgstr ""
+msgstr "kg P2O5"
 
 #. module: account_intrastat
 #: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__kg_u
+#: model:ir.model.fields.selection,name:account_intrastat.selection__product_template__intrastat_supplementary_unit__kg_u
 msgid "kg U"
-msgstr ""
+msgstr "kg U"
 
 #. module: account_intrastat
 #: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__kg_met_am_
+#: model:ir.model.fields.selection,name:account_intrastat.selection__product_template__intrastat_supplementary_unit__kg_met_am_
 msgid "kg met.am."
-msgstr ""
+msgstr "kg met.am."
 
 #. module: account_intrastat
 #: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__kg/net_eda
+#: model:ir.model.fields.selection,name:account_intrastat.selection__product_template__intrastat_supplementary_unit__kg/net_eda
 msgid "kg/net eda"
+msgstr "kg/net eda"
+
+#. module: account_intrastat
+#: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__l
+#: model:ir.model.fields.selection,name:account_intrastat.selection__product_template__intrastat_supplementary_unit__l
+msgid "l"
 msgstr ""
 
 #. module: account_intrastat
 #: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__l_alc__100_%
+#: model:ir.model.fields.selection,name:account_intrastat.selection__product_template__intrastat_supplementary_unit__l_alc__100_%
 msgid "l alc. 100 %"
+msgstr "l alk. 100 %"
+
+#. module: account_intrastat
+#: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__m
+#: model:ir.model.fields.selection,name:account_intrastat.selection__product_template__intrastat_supplementary_unit__m
+msgid "m"
 msgstr ""
 
 #. module: account_intrastat
 #: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__m2
+#: model:ir.model.fields.selection,name:account_intrastat.selection__product_template__intrastat_supplementary_unit__m2
 msgid "m2"
-msgstr ""
+msgstr "m2"
 
 #. module: account_intrastat
 #: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__m3
+#: model:ir.model.fields.selection,name:account_intrastat.selection__product_template__intrastat_supplementary_unit__m3
 msgid "m3"
-msgstr ""
+msgstr "m3"
 
 #. module: account_intrastat
 #: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__p/st
+#: model:ir.model.fields.selection,name:account_intrastat.selection__product_template__intrastat_supplementary_unit__p/st
 msgid "p/st"
-msgstr ""
+msgstr "p/st"
 
 #. module: account_intrastat
 #: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__pa
+#: model:ir.model.fields.selection,name:account_intrastat.selection__product_template__intrastat_supplementary_unit__pa
 msgid "pa"
-msgstr ""
+msgstr "pa"
 
 #. module: account_intrastat
 #: model_terms:ir.ui.view,arch_db:account_intrastat.product_product_tree_view_account_intrastat_supplementary_unit
@@ -547,35 +712,42 @@ msgstr "proizvod"
 
 #. module: account_intrastat
 #. odoo-javascript
-#: code:addons/account_intrastat/static/src/components/account_report.xml:0
-msgid "product's commodity codes"
-msgstr ""
+#: code:addons/account_intrastat/static/src/components/intrastat_report/warnings.xml:0
+msgid "product commodity codes"
+msgstr "šifre robe proizvoda"
 
 #. module: account_intrastat
 #. odoo-javascript
-#: code:addons/account_intrastat/static/src/components/account_report.xml:0
+#: code:addons/account_intrastat/static/src/components/intrastat_report/warnings.xml:0
+msgid "product's commodity codes"
+msgstr "šifre robe proizvoda"
+
+#. module: account_intrastat
+#. odoo-javascript
+#: code:addons/account_intrastat/static/src/components/intrastat_report/warnings.xml:0
 msgid "supplementary units"
-msgstr ""
+msgstr "dopunske jedinice"
 
 #. module: account_intrastat
 #: model:ir.model.fields.selection,name:account_intrastat.selection__account_intrastat_code__supplementary_unit__t__co2
+#: model:ir.model.fields.selection,name:account_intrastat.selection__product_template__intrastat_supplementary_unit__t__co2
 msgid "t. CO2"
-msgstr ""
+msgstr "t. CO2"
 
 #. module: account_intrastat
 #. odoo-javascript
-#: code:addons/account_intrastat/static/src/components/account_report.xml:0
+#: code:addons/account_intrastat/static/src/components/intrastat_report/warnings.xml:0
 msgid "transaction codes"
-msgstr ""
+msgstr "šifre transakcija"
 
 #. module: account_intrastat
 #. odoo-javascript
-#: code:addons/account_intrastat/static/src/components/account_report.xml:0
+#: code:addons/account_intrastat/static/src/components/intrastat_report/warnings.xml:0
 msgid "weights"
-msgstr ""
+msgstr "težine"
 
 #. module: account_intrastat
 #. odoo-javascript
-#: code:addons/account_intrastat/static/src/components/account_report.xml:0
+#: code:addons/account_intrastat/static/src/components/intrastat_report/warnings.xml:0
 msgid "when they are required."
-msgstr ""
+msgstr "kada su obavezne."

@@ -57,7 +57,7 @@ class SocialLivePostTwitter(models.Model):
                 timeout=5
             )
             if not result.ok:
-                _logger.error('Failed to fetch the account (%i) metrics: %r.', account.id, result.text)
+                _logger.warning('Failed to fetch the account (%i) metrics: %r.', account.id, result.text)
 
             result_tweets = result.json().get('data', [])
             if isinstance(result_tweets, dict) and result_tweets.get('errors'):
@@ -73,8 +73,9 @@ class SocialLivePostTwitter(models.Model):
                 if existing_live_post:
                     public_metrics = tweet.get('public_metrics', {})
                     likes_count = public_metrics.get('like_count', 0)
+                    comments_count = public_metrics.get('reply_count', 0)
                     retweets_count = public_metrics.get('retweet_count', 0)
-                    existing_live_post.engagement = likes_count + retweets_count
+                    existing_live_post.engagement = likes_count + comments_count + retweets_count
 
     def _post(self):
         twitter_live_posts = self._filter_by_media_types(['twitter'])

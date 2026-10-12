@@ -18,11 +18,14 @@
     ],
     'assets': {
         'point_of_sale._assets_pos': [
+            'account/static/src/components/document_state/*',
             'l10n_mx_edi_pos/static/src/**/*',
         ],
         'web.assets_tests': [
             'l10n_mx_edi_pos/static/tests/tours/invoice_order_tour.js',
             'l10n_mx_edi_pos/static/tests/tours/invoice_previous_order_tour.js',
+            'l10n_mx_edi_pos/static/tests/tours/l10n_mx_pos_tour.js',
+            'l10n_mx_edi_pos/static/tests/tours/refund_order_tour.js',
         ],
     },
     'installable': True,

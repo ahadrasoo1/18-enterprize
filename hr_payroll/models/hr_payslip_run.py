@@ -29,7 +29,7 @@ class HrPayslipRun(models.Model):
         default=lambda self: self.env.company)
     country_id = fields.Many2one(
         'res.country', string='Country',
-        related='company_id.country_id', readonly=True
+        related='company_id.country_id', readonly=True, search='_search_country_id'
     )
     country_code = fields.Char(related='country_id.code', depends=['country_id'], readonly=True)
     currency_id = fields.Many2one(related="company_id.currency_id")
@@ -50,6 +50,9 @@ class HrPayslipRun(models.Model):
             if payslip_run.state == 'draft' and payslip_run.slip_ids:
                 payslip_run.update({'state': 'verify'})
 
+    def _search_country_id(self, operator, value):
+        return [('company_id.partner_id.country_id', operator, value)]
+
     def action_draft(self):
         if self.slip_ids.filtered(lambda s: s.state == 'paid'):
             raise ValidationError(_('You cannot reset a batch to draft if some of the payslips have already been paid.'))
@@ -65,15 +68,27 @@ class HrPayslipRun(models.Model):
 
     def action_payment_report(self, export_format='csv'):
         self.ensure_one()
-        self.env['hr.payroll.payment.report.wizard'].create({
-            'payslip_ids': self.slip_ids.ids,
-            'payslip_run_id': self.id,
-            'export_format': export_format
-        }).generate_payment_report()
+        return {
+            'name': self.env._('Generate a Payment Report'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'hr.payroll.payment.report.wizard',
+            'view_mode': 'form',
+            'views': [(False, 'form')],
+            'target': 'new',
+            'context': {
+                'default_payslip_ids': self.slip_ids.ids,
+                'default_payslip_run_id': self.id,
+                'default_export_format': export_format,
+            },
+        }
 
     def action_paid(self):
         self.mapped('slip_ids').action_payslip_paid()
         self.write({'state': 'paid'})
+
+    def action_unpaid(self):
+        self.slip_ids.action_payslip_unpaid()
+        self.write({'state': 'close'})
 
     def action_validate(self):
         payslip_done_result = self.mapped('slip_ids').filtered(lambda slip: slip.state not in ['draft', 'cancel']).action_payslip_done()

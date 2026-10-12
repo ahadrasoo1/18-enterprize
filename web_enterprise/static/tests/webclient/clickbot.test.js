@@ -59,7 +59,6 @@ beforeEach(() => {
             id: 1001,
             name: "App1",
             res_model: "foo",
-            type: "ir.actions.act_window",
             views: [
                 [false, "list"],
                 [false, "kanban"],
@@ -70,7 +69,6 @@ beforeEach(() => {
             id: 1002,
             name: "App2 Menu 1",
             res_model: "foo",
-            type: "ir.actions.act_window",
             views: [[false, "kanban"]],
             xml_id: "app2_menu1",
         },
@@ -78,44 +76,34 @@ beforeEach(() => {
             id: 1022,
             name: "App2 Menu 2",
             res_model: "foo",
-            type: "ir.actions.act_window",
             views: [[false, "list"]],
             xml_id: "app2_menu2",
         },
     ]);
     defineMenus([
+        { id: 1, name: "App1", appID: 1, actionID: 1001, xmlid: "app1" },
         {
-            id: "root",
+            id: 2,
             children: [
-                { id: 1, children: [], name: "App1", appID: 1, actionID: 1001, xmlid: "app1" },
                 {
-                    id: 2,
-                    children: [
-                        {
-                            id: 3,
-                            children: [],
-                            name: "menu 1",
-                            appID: 2,
-                            actionID: 1002,
-                            xmlid: "app2_menu1",
-                        },
-                        {
-                            id: 4,
-                            children: [],
-                            name: "menu 2",
-                            appID: 2,
-                            actionID: 1022,
-                            xmlid: "app2_menu2",
-                        },
-                    ],
-                    name: "App2",
+                    id: 3,
+                    name: "menu 1",
                     appID: 2,
                     actionID: 1002,
-                    xmlid: "app2",
+                    xmlid: "app2_menu1",
+                },
+                {
+                    id: 4,
+                    name: "menu 2",
+                    appID: 2,
+                    actionID: 1022,
+                    xmlid: "app2_menu2",
                 },
             ],
-            name: "root",
-            appID: "root",
+            name: "App2",
+            appID: 2,
+            actionID: 1002,
+            xmlid: "app2",
         },
     ]);
 });

@@ -102,6 +102,7 @@ class TestDocumentsProjectRoutes(HttpCase, TestProjectCommon):
         self.assertEqual(res.status_code, 303, "must not access an unshared project")
 
         # Access project, but not documents
+        self.project_pigs.privacy_visibility = "portal"
         self.project_pigs._portal_ensure_token()
         self.project_pigs._add_collaborators(self.user_portal.partner_id)
         res = project_url_open('/documents')
@@ -175,3 +176,33 @@ class TestDocumentsProjectRoutes(HttpCase, TestProjectCommon):
         self.assertEqual(new_doc.access_internal, folder.access_internal)
         self.assertEqual(new_doc.res_model, 'project.project')
         self.assertEqual(new_doc.res_id, self.project_pigs.id)
+
+    def test_upload_to_project_folder_without_sharing_project(self):
+        """Test sharing the project's folder without sharing the project itself.
+        Ensure that the user can upload documents to the folder without having access to the project.
+
+        Test Case:
+        ==========
+        1. Create a project
+        2. Get shareable link for the project's folder with permission to upload
+        3. as portal user, upload a document to the folder using the shareable link
+        4. Verify that the document is created and linked to the folder
+        """
+        self.authenticate(self.user_portal.login, self.user_portal.login)
+
+        folder = self.project_pigs.documents_folder_id
+        folder.action_update_access_rights(
+            partners={self.user_portal.partner_id: ('edit', False)},
+            access_via_link='none'
+        )
+
+        with RecordCapturer(self.env['documents.document'], []) as capture:
+            res = self.url_open(f'/documents/upload/{folder.access_token}',
+                data={'csrf_token': http.Request.csrf_token(self)},
+                files={'ufile': ('hello.txt', io.BytesIO(b"Hello"), 'text/plain')},
+                allow_redirects=False)
+            res.raise_for_status()
+        document = capture.records.ensure_one()
+        self.assertEqual(document.name, 'hello.txt')
+        self.assertEqual(document.mimetype, 'text/plain')
+        self.assertEqual(document.folder_id, folder)

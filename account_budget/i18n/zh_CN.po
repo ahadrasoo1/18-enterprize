@@ -1,34 +1,43 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* account_budget
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# 何彬 <vnsoft.he@gmail.com>, 2024
+# Chloe Wang, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:26+0000\n"
+"POT-Creation-Date: 2025-12-29 18:46+0000\n"
 "PO-Revision-Date: 2024-09-25 09:43+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Chinese (China) (https://app.transifex.com/odoo/teams/41243/zh_CN/)\n"
+"Last-Translator: Chloe Wang, 2025\n"
+"Language-Team: Chinese (China) (https://app.transifex.com/odoo/teams/41243/"
+"zh_CN/)\n"
+"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: zh_CN\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. module: account_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_kanban
-msgid "<i class=\"fa fa-clock-o me-1\" role=\"img\" aria-label=\"Period\" title=\"Period\"/>"
+msgid ""
+"<i class=\"fa fa-clock-o me-1\" role=\"img\" aria-label=\"Period\" "
+"title=\"Period\"/>"
 msgstr ""
+"<i class=\"fa fa-clock-o me-1\" role=\"img\" aria-label=\"Period\" "
+"title=\"Period\"/>"
 
 #. module: account_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.budget_split_wizard_form_view
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_form
-msgid "<i class=\"fa fa-long-arrow-right mx-2\" aria-label=\"to\" title=\"to\"/>"
-msgstr "<i class=\"fa fa-long-arrow-right mx-2\" aria-label=\"to\" title=\"to\"/>"
+msgid ""
+"<i class=\"fa fa-long-arrow-right mx-2\" aria-label=\"to\" title=\"to\"/>"
+msgstr ""
+"<i class=\"fa fa-long-arrow-right mx-2\" aria-label=\"to\" title=\"to\"/>"
 
 #. module: account_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.budget_report_view_search
@@ -48,7 +57,7 @@ msgstr "已达成"
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_line__achieved_percentage
 msgid "Achieved (%)"
-msgstr ""
+msgstr "达标 (%)"
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__message_needaction
@@ -78,19 +87,19 @@ msgstr "活动类型图标"
 #. module: account_budget
 #: model:ir.model.fields,help:account_budget.field_budget_line__committed_amount
 msgid "Already Billed amount + Confirmed purchase orders."
-msgstr ""
+msgstr "已开票金额 + 已确认的采购订单。"
 
 #. module: account_budget
 #: model:ir.model.fields,help:account_budget.field_budget_line__achieved_amount
 msgid "Amount Billed/Invoiced."
-msgstr ""
+msgstr "账单/发票金额。"
 
 #. module: account_budget
 #: model:ir.model.fields,help:account_budget.field_budget_line__theoritical_amount
 msgid ""
 "Amount supposed to be Billed/Invoiced, formula = (Budget Amount / Budget "
 "Days) x Budget Days Completed"
-msgstr ""
+msgstr "应开具账单/发票的金额，公式=（预算金额/预算天数）×已完成预算天数"
 
 #. module: account_budget
 #: model:ir.model,name:account_budget.model_account_analytic_account
@@ -102,7 +111,7 @@ msgstr "分析账户"
 #. module: account_budget
 #: model:ir.ui.menu,name:account_budget.menu_act_budget_analytic_view
 msgid "Analytic Budget"
-msgstr ""
+msgstr "分析预算"
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_purchase_order_line__analytic_json
@@ -117,7 +126,7 @@ msgstr "分析方案"
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__message_attachment_count
 msgid "Attachment Count"
-msgstr "附件计数"
+msgstr "附件数量"
 
 #. module: account_budget
 #: model:ir.model.fields.selection,name:account_budget.selection__budget_analytic__budget_type__both
@@ -153,6 +162,7 @@ msgstr "预算分析"
 #. module: account_budget
 #: model:ir.model,name:account_budget.model_budget_line
 #: model:ir.model.fields,field_description:account_budget.field_account_analytic_account__budget_line_ids
+#: model:ir.model.fields,field_description:account_budget.field_budget_report__budget_line_id
 msgid "Budget Line"
 msgstr "预算明细"
 
@@ -186,7 +196,7 @@ msgstr "预算名称"
 #: model_terms:ir.ui.view,arch_db:account_budget.budget_report_view_search
 #: model_terms:ir.ui.view,arch_db:account_budget.budget_report_view_tree
 msgid "Budget Report"
-msgstr "预算报告"
+msgstr "预算报表"
 
 #. module: account_budget
 #: model:ir.model,name:account_budget.model_budget_split_wizard
@@ -206,7 +216,7 @@ msgstr "预算类型"
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_line__budget_amount
 msgid "Budgeted"
-msgstr ""
+msgstr "已编入预算"
 
 #. module: account_budget
 #. odoo-python
@@ -254,7 +264,7 @@ msgstr "已投放"
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_line__committed_percentage
 msgid "Committed (%)"
-msgstr ""
+msgstr "已投放（%）"
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_analytic__company_id
@@ -280,7 +290,7 @@ msgstr "创建日期"
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_line__currency_id
 msgid "Currency"
-msgstr "币种"
+msgstr "币别"
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_report__date
@@ -576,7 +586,7 @@ msgstr "采购订单"
 #. module: account_budget
 #: model:ir.model,name:account_budget.model_purchase_order_line
 msgid "Purchase Order Line"
-msgstr "采购订单行"
+msgstr "采购订单明细"
 
 #. module: account_budget
 #: model:ir.model.fields.selection,name:account_budget.selection__budget_split_wizard__period__quarter
@@ -680,15 +690,21 @@ msgstr ""
 "计划：未来活动。"
 
 #. module: account_budget
+#. odoo-python
+#: code:addons/account_budget/models/budget_line.py:0
+msgid "The 'End Date' must be greater than or equal to 'Start Date'."
+msgstr "“结束日期” 必须大于或等于 “开始日期”。"
+
+#. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_line__theoritical_amount
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_form
 msgid "Theoretical"
-msgstr ""
+msgstr "理论"
 
 #. module: account_budget
 #: model:ir.model.fields,field_description:account_budget.field_budget_line__theoritical_percentage
 msgid "Theoretical (%)"
-msgstr ""
+msgstr "理论 (%)"
 
 #. module: account_budget
 #: model_terms:ir.ui.view,arch_db:account_budget.view_budget_analytic_search

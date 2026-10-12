@@ -10,7 +10,7 @@ class SlsCustomHandler(models.AbstractModel):
     def _custom_options_initializer(self, report, options, previous_options):
         super()._custom_options_initializer(report, options, previous_options=previous_options)
         options.update({
-            'move_type': 'out_invoice',
+            'journal_type': 'sale',
             # This mapping will be used to build the amount for each expression_label based on the grid names.
             'report_grids_map': {
                 'gross_amount': ['31A', '32A', '33A', '34A'],

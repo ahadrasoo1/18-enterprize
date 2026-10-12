@@ -1,13 +1,13 @@
 /** @odoo-module **/
 
 import { registry } from "@web/core/registry";
+import { browser } from "@web/core/browser/browser";
 import { stepUtils } from "@web_tour/tour_service/tour_utils";
 
-const oldWriteText = navigator.clipboard.writeText;
+const oldWriteText = browser.navigator.clipboard.writeText;
 
 registry.category("web_tour.tours").add('appointment_hr_recruitment_tour', {
     url: '/odoo',
-    test: true,
     steps: () => [stepUtils.showAppsMenuItem(), {
         trigger: '.o_app[data-menu-xmlid="hr_recruitment.menu_hr_recruitment_root"]',
         run: 'click',
@@ -27,15 +27,16 @@ registry.category("web_tour.tours").add('appointment_hr_recruitment_tour', {
         trigger: '.o_appointment_button_link:contains("Test AppointmentHrRecruitment")',
         async run(helpers) {
             // Patch and ignore write on clipboard in tour as we don't have permissions
-            navigator.clipboard.writeText = () => { console.info('Copy in clipboard ignored!') };
+            browser.navigator.clipboard.writeText = () => { console.info('Copy in clipboard ignored!') };
             await helpers.click();
         },
     }, {
         trigger: '.o_appointment_discard_slots',
         async run(helpers) {
+            // Cleanup the patched clipboard method
+            browser.navigator.clipboard.writeText = oldWriteText;
+
             await helpers.click();
-            // Re-patch the function with the previous writeText
-            navigator.clipboard.writeText = oldWriteText;
         },
     }],
 });

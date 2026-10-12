@@ -39,8 +39,8 @@
                     <TaxSalary>
                         <DocID><t t-esc="employee['DocID']"/></DocID>
                         <Period>
-                            <from>2022-01-01</from>
-                            <until>2022-12-31</until>
+                            <from><t t-out="employee['Period']['from']" /></from>
+                            <until><t t-out="employee['Period']['until']" /></until>
                         </Period>
                         <Income><t t-esc="employee['salaries']['Income'][0]"/></Income>
                         <FringeBenefits>

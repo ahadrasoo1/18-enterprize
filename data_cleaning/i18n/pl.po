@@ -1,29 +1,34 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* data_cleaning
-# 
+# * data_cleaning
+#
 # Translators:
-# Wil Odoo, 2024
-# 
+# Wil Odoo, 2025
+#
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:29+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Polish (https://app.transifex.com/odoo/teams/41243/pl/)\n"
+"POT-Creation-Date: 2026-04-03 18:59+0000\n"
+"PO-Revision-Date: 2026-04-30 11:27+0000\n"
+"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"Language-Team: Polish <https://translate.odoo.com/projects/odoo-18/"
+"data_cleaning/pl/>\n"
+"Language: pl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: pl\n"
-"Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
+"Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && "
+"(n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && "
+"n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
+"X-Generator: Weblate 5.17\n"
 
 #. module: data_cleaning
 #. odoo-python
 #: code:addons/data_cleaning/models/data_merge_group.py:0
 msgid "%(model)s - Similarity: %(similarity)s%%"
-msgstr ""
+msgstr "%(model)s - Podobieństwo: %(similarity)s%%"
 
 #. module: data_cleaning
 #. odoo-python
@@ -56,6 +61,7 @@ msgstr ""
 "Możesz zweryfikować zmiany."
 
 #. module: data_cleaning
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_model_form
 #: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_model_form
 msgid "<span class=\"me-1\">Every</span>"
 msgstr "<span class=\"me-1\">Każdy</span>"
@@ -69,6 +75,7 @@ msgstr "<span class=\"oe_inline\">%</span>"
 #: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_model_form
 msgid "<span invisible=\"not custom_merge_method\">Model specific</span>"
 msgstr ""
+"<span invisible=\"not custom_merge_method\">Specyficzny dla modelu</span>"
 
 #. module: data_cleaning
 #: model:ir.model.constraint,message:data_cleaning.constraint_data_merge_rule_uniq_model_id_field_id
@@ -77,6 +84,7 @@ msgstr "Pole może pojawić się tylko raz!"
 
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_cleaning_rule__action
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_model_form
 #: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_record_list
 msgid "Action"
 msgstr "Akcja"
@@ -135,8 +143,8 @@ msgstr "Zarchiwizowane"
 #. odoo-javascript
 #: code:addons/data_cleaning/static/src/views/data_merge_list_view.js:0
 msgid ""
-"Are you sure that you want to merge the selected records in their respective"
-" group?"
+"Are you sure that you want to merge the selected records in their respective "
+"group?"
 msgstr "Czy na pewno chcesz scalić wybrane rekordy w odpowiedniej grupie?"
 
 #. module: data_cleaning
@@ -167,6 +175,16 @@ msgstr "Przypadek"
 #: code:addons/data_cleaning/models/data_merge_rule.py:0
 msgid "Case/Accent Insensitive Match"
 msgstr "Dopasowanie niewrażliwe na wielkość liter/akcenty"
+
+#. module: data_cleaning
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_model_form
+msgid "Clean"
+msgstr "Wyczyść"
+
+#. module: data_cleaning
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_model_form
+msgid "Cleaning Actions"
+msgstr "Akcja Czyszczenia"
 
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_cleaning_model__cleaning_mode
@@ -298,7 +316,7 @@ msgstr "Scalanie danych: Znajdź zduplikowane rekordy"
 #. odoo-python
 #: code:addons/data_cleaning/models/data_cleaning_model.py:0
 msgid "Data to Clean"
-msgstr ""
+msgstr "Dane do wyczyszczenia"
 
 #. module: data_cleaning
 #: model:ir.model.fields.selection,name:data_cleaning.selection__data_cleaning_model__notify_frequency_period__days
@@ -431,12 +449,11 @@ msgstr "Duplikaty"
 #. odoo-python
 #: code:addons/data_cleaning/models/data_merge_model.py:0
 msgid "Duplicates to Merge"
-msgstr ""
+msgstr "Duplikaty do scalenia"
 
 #. module: data_cleaning
 #: model:ir.model.fields,help:data_cleaning.field_data_merge_model__create_threshold
-msgid ""
-"Duplicates with a similarity below this threshold will not be suggested"
+msgid "Duplicates with a similarity below this threshold will not be suggested"
 msgstr "Duplikaty o podobieństwie poniżej tego progu nie będą sugerowane."
 
 #. module: data_cleaning
@@ -513,11 +530,11 @@ msgstr "Ukryj przycisk akcji scalania"
 #: model:ir.model.fields,help:data_cleaning.field_data_cleaning_rule__action_case
 msgid ""
 "How the type case is set by the rule. 'First Letters to Uppercase' sets "
-"every letter to lowercase except the first letter of each word, which is set"
-" to uppercase."
+"every letter to lowercase except the first letter of each word, which is set "
+"to uppercase."
 msgstr ""
-"Jak wielkość liter jest ustawiana przez regułę. 'Pierwsze litery na wielkie'"
-" ustawia każdą literę na małe litery z wyjątkiem pierwszej litery każdego "
+"Jak wielkość liter jest ustawiana przez regułę. 'Pierwsze litery na wielkie' "
+"ustawia każdą literę na małe litery z wyjątkiem pierwszej litery każdego "
 "słowa, która jest ustawiona na wielkie litery."
 
 #. module: data_cleaning
@@ -560,10 +577,13 @@ msgstr ""
 #. module: data_cleaning
 #: model:ir.model.fields,help:data_cleaning.field_ir_model__hide_merge_action
 msgid ""
-"If the model already has a custom merge method, the class attribute `_merge_disabled` is set to true on\n"
-"             that model and the generic data merge action should not be available on that model."
+"If the model already has a custom merge method, the class attribute "
+"`_merge_disabled` is set to true on\n"
+"             that model and the generic data merge action should not be "
+"available on that model."
 msgstr ""
-"Jeśli model ma już niestandardową metodę scalania, atrybut klasy `_merge_disabled` jest ustawiony na true dla tego modelu\n"
+"Jeśli model ma już niestandardową metodę scalania, atrybut klasy "
+"`_merge_disabled` jest ustawiony na true dla tego modelu\n"
 "a generyczna akcja scalania danych nie powinna być dostępna w tym modelu."
 
 #. module: data_cleaning
@@ -638,7 +658,7 @@ msgstr "Manualna"
 #: model:ir.actions.act_window,name:data_cleaning.ir_model_action_merge
 #: model:ir.ui.menu,name:data_cleaning.ir_model_menu_merge_action_manager
 msgid "Manual Merge"
-msgstr ""
+msgstr "Ręczne scalenie"
 
 #. module: data_cleaning
 #. odoo-python
@@ -791,6 +811,7 @@ msgstr "Nazwa rekordu"
 
 #. module: data_cleaning
 #: model_terms:ir.ui.view,arch_db:data_cleaning.data_merge_record_view_search_merge_action
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_model_form
 #: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_record_search
 #: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_record_search
 msgid "Records"
@@ -848,6 +869,11 @@ msgid "Scrap HTML"
 msgstr "Pobierz HTML"
 
 #. module: data_cleaning
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_model_form
+msgid "Select a model to configure cleaning actions"
+msgstr "Wybierz model aby konfigurować akcje czyszczenia"
+
+#. module: data_cleaning
 #: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_model_form
 msgid "Select a model to configure deduplication rules"
 msgstr "Wybierz model, aby skonfigurować reguły deduplikacji"
@@ -892,7 +918,7 @@ msgstr "Magazynowanie"
 #. odoo-python
 #: code:addons/data_cleaning/report/data_storage.py:0
 msgid "Storage Detail: %(name)s"
-msgstr ""
+msgstr "Szczegóły przechowywania: %(name)s"
 
 #. module: data_cleaning
 #: model:ir.model.fields,help:data_cleaning.field_data_merge_model__rule_ids
@@ -927,8 +953,16 @@ msgid ""
 "The Python module `phonenumbers` is not installed. Format phone will not "
 "work."
 msgstr ""
-"Moduł python 'phonenumbers' jest niezainstalowany. Czyszczenie telefonów nie"
-" będzie działać"
+"Moduł python 'phonenumbers' jest niezainstalowany. Czyszczenie telefonów nie "
+"będzie działać"
+
+#. module: data_cleaning
+#. odoo-javascript
+#: code:addons/data_cleaning/static/src/views/data_merge_list_view.js:0
+msgid "The connection timed out. Please try merging fewer records at once."
+msgstr ""
+"Połączenie osiągnęło limit czasu. Spróbuj scalić mniej rekordów za jednym "
+"razem."
 
 #. module: data_cleaning
 #: model:ir.model.constraint,message:data_cleaning.constraint_data_cleaning_model_check_notif_freq
@@ -968,7 +1002,7 @@ msgstr "Ta nazwa jest już zajęta"
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_ir_attachment_report__size
 msgid "Total Size"
-msgstr ""
+msgstr "Całkowity rozmiar"
 
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_cleaning_rule__action_trim

@@ -9,7 +9,7 @@ from werkzeug.urls import url_join
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 
-TWITTER_IMAGES_UPLOAD_ENDPOINT = "https://upload.twitter.com/1.1/media/upload.json"
+TWITTER_IMAGES_UPLOAD_ENDPOINT = "https://api.x.com/2/media/upload"
 
 
 class SocialAccountTwitter(models.Model):
@@ -161,7 +161,7 @@ class SocialAccountTwitter(models.Model):
         }
         for tweet in result.json().get('data', []):
             public_metrics = tweet.get('public_metrics', {})
-            last_tweets_stats['engagement'] += public_metrics.get('like_count', 0)
+            last_tweets_stats['engagement'] += public_metrics.get('like_count', 0) + public_metrics.get('reply_count', 0)
             last_tweets_stats['stories'] += public_metrics.get('retweet_count', 0)
         return last_tweets_stats
 
@@ -205,62 +205,29 @@ class SocialAccountTwitter(models.Model):
 
     def _init_twitter_upload(self, image):
         data = {
-            'command': 'INIT',
             'total_bytes': image['file_size'],
             'media_category': 'tweet_gif' if image['mimetype'] == 'image/gif' else 'tweet_image',
             'media_type': image['mimetype'],
         }
-        headers = self._get_twitter_oauth_header(
-            TWITTER_IMAGES_UPLOAD_ENDPOINT,
-            params=data
-        )
-        result = requests.post(
-            TWITTER_IMAGES_UPLOAD_ENDPOINT,
-            data=data,
-            headers=headers,
-            timeout=5
-        )
+        url_endpoint = f"{TWITTER_IMAGES_UPLOAD_ENDPOINT}/initialize"
+        headers = self._get_twitter_oauth_header(url_endpoint)
+        result = requests.post(url_endpoint, json=data, headers=headers, timeout=5)
         if not result.ok:
             # unfortunately Twitter does not return a proper error code so we have to rely on the error message
             # last known max file size for the API is 20MB
             generic_api_error = result.json().get('error', '')
             raise UserError(_("We could not upload your image, it may be corrupted, it may exceed size limit or API may have send improper response (error: %s).", generic_api_error))
 
-        return result.json().get('media_id_string')
+        return result.json().get('data').get('id')
 
     def _process_twitter_upload(self, image, media_id):
-        params = {
-            'command': 'APPEND',
-            'media_id': media_id,
-            'segment_index': 0,
-        }
-        files = {
-            'media': image['bytes']
-        }
-        headers = self._get_twitter_oauth_header(
-            TWITTER_IMAGES_UPLOAD_ENDPOINT,
-            params=params
-        )
-        requests.post(
-            TWITTER_IMAGES_UPLOAD_ENDPOINT,
-            params=params,
-            files=files,
-            headers=headers,
-            timeout=15
-        )
+        files = {'media': image['bytes']}
+        data = {"segment_index": 0}
+        url_endpoint = f"{TWITTER_IMAGES_UPLOAD_ENDPOINT}/{media_id}/append"
+        headers = self._get_twitter_oauth_header(url_endpoint)
+        requests.post(url_endpoint, files=files, data=data, headers=headers, timeout=15)
 
     def _finish_twitter_upload(self, media_id):
-        data = {
-            'command': 'FINALIZE',
-            'media_id': media_id,
-        }
-        headers = self._get_twitter_oauth_header(
-            TWITTER_IMAGES_UPLOAD_ENDPOINT,
-            params=data
-        )
-        requests.post(
-            TWITTER_IMAGES_UPLOAD_ENDPOINT,
-            data=data,
-            headers=headers,
-            timeout=5
-        )
+        url_endpoint = f"{TWITTER_IMAGES_UPLOAD_ENDPOINT}/{media_id}/finalize"
+        headers = self._get_twitter_oauth_header(url_endpoint)
+        requests.post(url_endpoint, headers=headers, timeout=5)

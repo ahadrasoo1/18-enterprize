@@ -9,6 +9,7 @@ import { standardActionServiceProps } from "@web/webclient/actions/action_servic
 export class HrReferralWelcome extends Component {
     static template = "hr_referral.Welcome";
     static props = { ...standardActionServiceProps };
+    static path = "referrals";
 
     setup() {
         super.setup();
@@ -77,7 +78,7 @@ export class HrReferralWelcome extends Component {
             tag: 'hr_referral_welcome',
             name: _t('Dashboard'),
             target: 'main'
-        });
+        }, {noEmptyTransition: true});
     }
 
     /**
@@ -93,7 +94,7 @@ export class HrReferralWelcome extends Component {
             tag: 'hr_referral_welcome',
             name: _t('Dashboard'),
             target: 'main'
-        });
+        }, {noEmptyTransition: true});
     }
 
     /**
@@ -109,7 +110,7 @@ export class HrReferralWelcome extends Component {
             tag: 'hr_referral_welcome',
             name: _t('Dashboard'),
             target: 'main'
-        });
+        }, {noEmptyTransition: true});
     }
 
 }

@@ -71,6 +71,18 @@ class L10nLuGenerateTaxReport(models.TransientModel):
 
         form['field_values']['204'] = {'value': on_payment and '0' or '1', 'field_type': 'boolean'}
         form['field_values']['205'] = {'value': on_payment and '1' or '0', 'field_type': 'boolean'}
+
+        if fields.Date.from_string(options['date'].get('date_to')).year >= 2025:
+            # The simple fact that "l10n_eu_oss_eu_country" is in the settings means that the
+            # user is using OSS while ioss on a company has to be set to mean IOSS is used.
+            oss = hasattr(self.env['res.config.settings'], "l10n_eu_oss_eu_country")
+            ioss = hasattr(report.env.company, "ioss") and self.env['res.company'].browse(options['companies'][0]['id']).ioss
+            form['field_values']['491'] = {'value': oss and '1' or '0', 'field_type': 'boolean'}
+            form['field_values']['492'] = {'value': ioss and '1' or '0', 'field_type': 'boolean'}
+            # 481 and 482 are the SME scheme fields
+            sme = any(float(str(form['field_values'].get(index, {'value': 0})['value']).replace(',', '.')) for index in ['481', '482'])
+            form['field_values']['493'] = {'value': sme and '1' or '0', 'field_type': 'boolean'}
+
         for code, field_type in (
                 ('403', 'number'), ('418', 'number'), ('453', 'number'), ('042', 'float'), ('416', 'float'), ('417', 'float'), ('451', 'float'), ('452', 'float')
             ):
@@ -115,22 +127,20 @@ class L10nLuGenerateTaxReport(models.TransientModel):
             if form.get(field) and not child_exists:
                 form.pop(field, None)
 
+        val_163, val_164, val_165 = [form.get(index, {}).get('value', 0) for index in ('163', '164', '165')]
         if form.get('163') and form.get('165') and not form.get('164'):
-            form['164'] = {'value': form.get('163') - form.get('165'), 'field_type': 'float'}
+            form['164'] = {'value': val_163 - val_165, 'field_type': 'float'}
         elif form.get('163') and form.get('164') and not form.get('165'):
-            form['165'] = {'value': form.get('163') - form.get('164'), 'field_type': 'float'}
+            form['165'] = {'value': val_163 - val_164, 'field_type': 'float'}
 
         if not form['361']['value']:
             form['361'] = form['414']
         if not form['362']['value']:
             form['362'] = form['415']
-        if float_compare(form['361']['value'], 0.0, 2) != 0 and '192' not in form:
+        if float_compare(form['361']['value'], 0.0, 2) != 0 and '192' not in form or float_compare(form['192']['value'], 0.0, 2) == 0:
             form['192'] = form['361']
-        if float_compare(form['362']['value'], 0.0, 2) != 0 and '193' not in form:
+        if float_compare(form['362']['value'], 0.0, 2) != 0 and '193' not in form or float_compare(form['193']['value'], 0.0, 2) == 0:
             form['193'] = form['362']
-        if ('192' in form) ^ ('193' in form):
-            form['192'] = form.get('192', {'value': 0.0, 'field_type': 'float'})
-            form['193'] = form.get('193', {'value': 0.0, 'field_type': 'float'})
 
         # Add appendix to operational expenditures
         expenditures_table = []

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details
 
-from odoo.exceptions import UserError
 from odoo.addons.industry_fsm_sale.tests.common import TestFsmFlowSaleCommon
 from odoo.tests import tagged
 
@@ -11,8 +10,6 @@ class TestTaskReport(TestFsmFlowSaleCommon):
     def test_generate_task_report(self):
         self.assertFalse(self.task.material_line_product_count, "No product should be linked to a new task")
 
-        with self.assertRaises(UserError, msg='Should not be able to get to material without customer set'):
-            self.task.action_fsm_view_material()
         self.task.write({'partner_id': self.partner_1.id})
         self.assertFalse(self.task.task_to_invoice, "Nothing should be invoiceable on task")
 

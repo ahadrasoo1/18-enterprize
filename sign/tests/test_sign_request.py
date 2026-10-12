@@ -3,7 +3,7 @@
 
 from odoo.tests import Form
 from .sign_request_common import SignRequestCommon
-from odoo import Command
+from odoo import Command, fields
 from odoo.exceptions import UserError, ValidationError
 
 from datetime import datetime, timedelta
@@ -101,10 +101,6 @@ class TestSignRequest(SignRequestCommon):
         sign_request_no_item_token = sign_request_no_item.access_token
         sign_request_no_item.cancel()
         self.assertEqual(sign_request_item.state, 'completed', 'The sign.request.item should be completed')
-        self.assertEqual(sign_request_no_item.state, 'canceled', 'The sign request should be canceled')
-        self.assertNotEqual(sign_request_item.access_token, sign_request_item_token, 'The access token should be changed')
-        self.assertNotEqual(sign_request_no_item.access_token, sign_request_no_item_token, 'The access token should be changed')
-        self.assertEqual(len(sign_request_no_item.sign_log_ids.filtered(lambda log: log.action == 'cancel')), 1, 'A log with action="cancel" should be created')
 
         # copy
         new_sign_request_no_item = sign_request_no_item.copy()
@@ -225,6 +221,14 @@ class TestSignRequest(SignRequestCommon):
         # change the email address of the signer (laurie.poiret.b)
         with self.assertRaises(ValidationError, msg='All signers must have valid email addresses'):
             self.partner_1.write({'email': 'laurie.poiret.b'})
+
+        # change the email address to upper case (LAURIE.POIRET.A@example.com)
+        self.partner_1.write({'email': 'LAURIE.POIRET.A@example.com'})
+        self.assertEqual(request_item.signer_email, "laurie.poiret.a@example.com", 'email address should not be changed as is the same email')
+        self.assertFalse(
+            sign_request.sign_log_ids.filtered(lambda log: log.action == 'update_mail' and log.sign_request_item_id == request_item),
+            'No log with action="update_mail" should be created after changing the email to upper case'
+        )
 
         # change the email address of the signer (laurie.poiret.b@example.com)
         self.partner_1.write({'email': 'laurie.poiret.b@example.com'})
@@ -382,13 +386,8 @@ class TestSignRequest(SignRequestCommon):
             1, 'A log with action="sign" should be created')
 
         # unlink
-        sign_request_items = sign_request_3_roles.request_item_ids
-        sign_item_values = sign_request_items.sign_item_value_ids
-        sign_logs = sign_request_3_roles.sign_log_ids
-        sign_request_3_roles.unlink()
-        self.assertFalse(sign_request_items.exists(), 'All sign request items should be unlinked')
-        self.assertFalse(sign_item_values.exists(), 'All sign item values should be unlinked')
-        self.assertFalse(sign_logs.exists(), 'All sign logs should be unlinked')
+        with self.assertRaises(UserError, msg='A signed sign request cannot be unlinked'):
+            sign_request_3_roles.unlink()
 
     def test_sign_request_mail_sent_order(self):
         sign_request_3_roles = self.env['sign.request'].create({
@@ -408,6 +407,8 @@ class TestSignRequest(SignRequestCommon):
                 'mail_sent_order': 2,
             })],
         })
+        self.partner_4.user_ids.notification_type = 'inbox'
+        sign_request_3_roles.message_subscribe(partner_ids=[self.partner_4.id])
         role2sign_request_item = dict([(sign_request_item.role_id, sign_request_item) for sign_request_item in sign_request_3_roles.request_item_ids])
         sign_request_item_customer = role2sign_request_item[self.role_customer]
         sign_request_item_employee = role2sign_request_item[self.role_employee]
@@ -430,6 +431,8 @@ class TestSignRequest(SignRequestCommon):
         sign_request_item_employee._edit_and_sign(self.employee_sign_values)
         sign_request_item_company._edit_and_sign(self.company_sign_values)
         self.assertEqual(sign_request_3_roles.state, 'signed', 'The sign request should be signed')
+        notification = self.env['mail.message'].search([('partner_ids', '=', self.partner_4.id)])
+        self.assertEqual(notification.subject, 'template_3_roles has been signed')
 
     def test_sign_request_mail_reply_to_exists(self):
         sign_request = self.create_sign_request_1_role(self.partner_1, self.env['res.partner'])
@@ -459,11 +462,23 @@ class TestSignRequest(SignRequestCommon):
         self.assertEqual([record['mail_sent_order'] for record in wizard.signer_ids._records], [1, 2, 3])
 
     def test_archived_requests_dont_send_reminders(self):
-        """ Create a request with old validity and archived, trigger cron reminder and ensure no reminder was created. """
-        archived_request = self.create_sign_request_no_item(signer=self.partner_1, cc_partners=self.partner_4)
-        archived_request.write({'active': False, 'validity': datetime.now() - timedelta(days=2)})
-        self.env['sign.request']._cron_reminder()
-        self.assertTrue(archived_request.state != 'expired')
+        """ Create a request with a validity period and archive it, jump to the future
+        where it's not valid anymore, trigger cron reminder and ensure no reminder was created. """
+
+        with self.mock_datetime_and_now("2024-05-01"):
+            validity_date = fields.Date.from_string('2024-05-05')
+            archived_request = self.create_sign_request_no_item(
+                signer=self.partner_1,
+                cc_partners=self.partner_4,
+                validity=validity_date
+            )
+            # This action should set the state to canceled.
+            archived_request.action_archive()
+
+            # Jump to the future and run the cron
+            with self.mock_datetime_and_now("2024-05-6"):
+                self.env['sign.request']._cron_reminder()
+                self.assertEqual(archived_request.state, 'canceled')
 
     def test_send_request_with_default_sign_template(self):
         sign_request_record = self.create_sign_request_no_item(signer=self.partner_1, cc_partners=self.partner_4)
@@ -493,3 +508,30 @@ class TestSignRequest(SignRequestCommon):
         self.template_1_role.write({'user_id': self.user_1.id})
         wizard = Form(self.env['sign.send.request'].with_context(default_activity_id=activity.id))
         self.assertEqual(self.template_1_role, wizard.template_id)
+
+    def test_remove_validity_date_of_sign_request(self):
+        validity_date = fields.Date.to_date(fields.Date.today()) + timedelta(days=1)
+        sign_request = self.create_sign_request_no_item(signer=self.partner_1, cc_partners=self.partner_4, validity=validity_date)
+        sign_request.validity = False
+        self.assertEqual(sign_request.state, 'sent')
+
+    def test_send_reminder_without_set_validity(self):
+        with self.mock_datetime_and_now("2025-07-06"):
+            sign_request = self.create_sign_request_3_roles(customer=self.partner_1, employee=self.partner_2, company=self.partner_3, cc_partners=self.partner_4)
+            sign_request.write({'validity': None, 'reminder_enabled': True, 'reminder': 1})
+
+        with self.mock_datetime_and_now("2025-07-07"):
+            self.env['sign.request']._cron_reminder()
+
+    def test_sign_request_cancel_signed_document(self):
+        """ Ensure that a fully signed document cannot be canceled. """
+        sign_request = self.create_sign_request_no_item(signer=self.partner_1, cc_partners=self.partner_4)
+        sign_request_item = sign_request.request_item_ids[0]
+
+        # Sign the document.
+        sign_request_item._edit_and_sign(self.signature_fake)
+        self.assertEqual(sign_request.state, 'signed', 'The sign request should be signed.')
+
+        # Attempt to cancel, document should remain signed.
+        sign_request.cancel()
+        self.assertEqual(sign_request.state, 'signed', 'A fully signed document should not be canceled.')

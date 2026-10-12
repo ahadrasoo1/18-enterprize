@@ -4,24 +4,9 @@ import { registry } from "@web/core/registry";
 import * as tourUtils from '@website_sale/js/tours/tour_utils';
 
 registry.category("web_tour.tours").add('shop_buy_rental_stock_product', {
-    test: true,
     url: '/shop',
     steps: () => [
-        {
-            content: "Search computer write text",
-            trigger: 'form input[name="search"]',
-            run: "edit computer",
-        },
-        {
-            content: "Search computer click",
-            trigger: 'form:has(input[name="search"]) .oe_search_button',
-            run: "click",
-        },
-        {
-            content: "Select computer",
-            trigger: '.oe_product_cart:first a:contains("Computer")',
-            run: "click",
-        },
+        ...tourUtils.searchProduct("computer", { select: true }),
         {
             content: "Check if the default data is in the date picker input",
             trigger: '.o_daterange_picker[data-has-default-dates=true]',
@@ -31,9 +16,9 @@ registry.category("web_tour.tours").add('shop_buy_rental_stock_product', {
             trigger: 'input[name=renting_start_date]',
             run: "click",
         },
-        { // ensures only one day is selected
+        { // Select the first day of the next month, this ensures that the daterange is always valid.
             content:  "Select Date field",
-            trigger:  ".o_date_picker .o_highlight_end",
+            trigger:  ".o_date_picker:nth-child(2) > .o_date_item_cell:not(.o_out_of_range)",
             run: "click",
         },
         {
@@ -74,6 +59,7 @@ registry.category("web_tour.tours").add('shop_buy_rental_stock_product', {
             content: "Go back on the Computer",
             trigger: '#cart_products div>a>h6:contains("Computer")',
             run: "click",
+            expectUnloadPage: true,
         },
         {
             content: "Verify there is a warning message",
@@ -89,6 +75,58 @@ registry.category("web_tour.tours").add('shop_buy_rental_stock_product', {
             trigger: '#cart_products .oe_currency_value:contains(28.00)',
         },
         tourUtils.goToCheckout(),
-        ...tourUtils.payWithTransfer(true),
+        tourUtils.confirmOrder(),
+        ...tourUtils.payWithTransfer({ redirect: true }),
     ]
+});
+
+
+registry.category("web_tour.tours").add("website_availability_update", {
+    url: "/shop",
+    steps: () => [
+        ...tourUtils.searchProduct("Test Product with Variants", { select: true }),
+        {
+            trigger:
+                '#threshold_message_renting:contains("Only 1 Units still available during the selected period.")',
+        },
+        {
+            trigger: '.o_wsale_product_attribute li:eq(1) input[type="radio"]',
+            run: "click",
+        },
+        {
+            trigger: 'span[name="renting_warning_message"]',
+        },
+    ],
+});
+
+registry.category("web_tour.tours").add("test_website_availability_while_continuing_selling", {
+    url: "/shop",
+    steps: () => [
+        ...tourUtils.searchProduct("Computer", { select: true }),
+        {
+            trigger:
+                "#threshold_message_renting:contains('Only 2 Units still available during the selected period.')",
+        },
+        {
+            trigger: ".o_website_sale_daterange_picker_input",
+            run: "click",
+        },
+        {
+            trigger: ".o_date_item_cell:contains(22)",
+            run: "click",
+        },
+        {
+            trigger: ".o_date_item_cell:contains(24)",
+            run: "click",
+        },
+        {
+            trigger: ".o_apply:contains(Apply)",
+            run: "click",
+        },
+        {
+            trigger:
+                "#threshold_message_renting:contains('Only 5 Units still available during the selected period.')",
+            run: () => {},
+        },
+    ],
 });

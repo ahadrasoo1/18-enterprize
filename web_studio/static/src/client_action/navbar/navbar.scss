@@ -1,7 +1,7 @@
 .o_studio_navbar {
   --NavBar-brand-color: #{rgba($o-web-studio-text-light, .9)};
   --NavBar-entry-color: #{rgba($o-web-studio-text-light, .9)};
-  --NavBar-entry-backgroundColor: $o-web-studio-bg-dark;
+  --NavBar-entry-backgroundColor: #{$o-web-studio-bg-dark};
   --NavBar-entry-backgroundColor--hover: #{$o-web-studio-bg-medium};
   --NavBar-entry-backgroundColor--focus: #{$o-web-studio-bg-medium};
   --NavBar-menuToggle-color: #{rgba($o-web-studio-text-light, .9)};
@@ -14,6 +14,11 @@
   border-color: $o-web-studio-bg-dark;
 
   &.o_main_navbar {
+    .o_menu_toggle {
+      &.o_menu_toggle_studio_app_creator_back{
+          transform: scaleX(1);
+      }
+    }
     grid-template-areas: "apps brand sections studiomenu systray";
     grid-template-columns:
       minmax($o-navbar-height, max-content)

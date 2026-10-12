@@ -16,8 +16,15 @@ class HrPayslipEmployees(models.TransientModel):
     _name = 'hr.payslip.employees'
     _description = 'Generate payslips for all selected employees'
 
+    def _get_available_contracts_extra_domain(self, extra_domain):
+        payslip_run = self.env['hr.payslip.run'].browse(self.env.context.get('active_id'))
+        if payslip_run:
+            date_domain = [('date_start', '<=', payslip_run.date_end), '|', ('date_end', '=', False), ('date_end', '>=', payslip_run.date_start)]
+            extra_domain = expression.AND([date_domain, extra_domain])
+        return [('contract_ids', 'any', expression.AND([[('state', 'in', ('open', 'close'))], extra_domain])), ('company_id', '=', self.env.company.id)]
+
     def _get_available_contracts_domain(self):
-        return [('contract_ids.state', 'in', ('open', 'close')), ('company_id', '=', self.env.company.id)]
+        return self._get_available_contracts_extra_domain([])
 
     def _get_employees(self):
         active_employee_ids = self.env.context.get('active_employee_ids', False)
@@ -51,26 +58,29 @@ class HrPayslipEmployees(models.TransientModel):
             wizard.structure_id = wizard.structure_type_id.default_struct_id if wizard.structure_type_id else False
 
     def get_employees_domain(self):
-        domain = self._get_available_contracts_domain()
+        contracts_domain = []
+        if self.structure_type_id:
+            contracts_domain = expression.AND([
+                contracts_domain,
+                [('structure_type_id', '=', self.structure_type_id.id)]
+            ])
+        if self.structure_id:
+            contracts_domain = expression.AND([
+                contracts_domain,
+                [('structure_type_id', '=', self.structure_id.type_id.id)]
+            ])
+
+        domain = self._get_available_contracts_extra_domain(contracts_domain)
+
         if self.department_id:
             domain = expression.AND([
                 domain,
                 [('department_id', 'child_of', self.department_id.id)]
             ])
-        if self.structure_type_id:
-            domain = expression.AND([
-                domain,
-                [('structure_type_id', '=', self.structure_type_id.id)]
-            ])
         if self.job_id:
             domain = expression.AND([
                 domain,
                 [('job_id', '=', self.job_id.id)]
-            ])
-        if self.structure_id:
-            domain = expression.AND([
-                domain,
-                [('structure_type_id', '=', self.structure_id.type_id.id)]
             ])
         return domain
 
@@ -128,7 +138,7 @@ class HrPayslipEmployees(models.TransientModel):
             ('employee_id', 'in', employees.ids),
         ])
         for slip in payslip_run.slip_ids:
-            slip_tz = pytz.timezone(slip.contract_id.resource_calendar_id.tz)
+            slip_tz = pytz.timezone(slip.contract_id.resource_calendar_id.tz or slip.employee_id.tz or slip.company_id.resource_calendar_id.tz or 'UTC')
             utc = pytz.timezone('UTC')
             date_from = slip_tz.localize(datetime.combine(slip.date_from, time.min)).astimezone(utc).replace(tzinfo=None)
             date_to = slip_tz.localize(datetime.combine(slip.date_to, time.max)).astimezone(utc).replace(tzinfo=None)

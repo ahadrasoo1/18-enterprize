@@ -8,7 +8,7 @@ VAT_MANDATORY_FIELDS = {
     '104', '105', '152', '233', '234', '235', '236',
     '361', '362', '407', '409', '410', '419', '423',
     '436', '462', '463', '464', '765', '766', '767',
-    '768',
+    '768', '192', '193',
     # Simplified-only
     '450', '801', '802',
     # Monthly-only
@@ -16,6 +16,9 @@ VAT_MANDATORY_FIELDS = {
     # 033 and 042 are mandatory when 403 is specified (always true for us, with 0% tax)
     '033', '042', '403', '414', '415', '418', '416',
     '417', '453', '452', '451',
+    # custom rate (%) fields are mandatory when their related custom rate (value) are specified
+    '394', '128', '153', '136', '149', '144', '396', '162',
+    '129', '137', '145', '165', '164', '163', '175',
 }
 
 # Mapping dictionary: monthly fields as keys, list of corresponding annual fields as values
@@ -28,7 +31,7 @@ YEARLY_MONTHLY_FIELDS_TO_DELETE = [
 # PLUS the date fields
 YEARLY_SIMPLIFIED_FIELDS = [
     '233', '234', '235', '236',
-    '012', '471', '481', '450', '423', '424', '801', '802', '805', '806',
+    '012', '482', '481', '450', '423', '424', '801', '802', '805', '806',
     '807', '808', '819', '820', '817', '818', '051', '056', '711', '712',
     '713', '714', '715', '716', '049', '054', '194', '065', '407', '721',
     '722', '723', '724', '725', '726', '059', '068', '195', '731', '732',

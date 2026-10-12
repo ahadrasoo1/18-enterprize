@@ -9,6 +9,11 @@ import {
 import { click, getFixture, patchWithCleanup } from "@web/../tests/helpers/utils";
 import { makeFakeHTTPService } from "@web/../tests/helpers/mock_services";
 import { registry } from "@web/core/registry";
+import { enterpriseSubscriptionService } from "@web_enterprise/webclient/home_menu/enterprise_subscription_service";
+import { createEnterpriseWebClient } from "@web_enterprise/../tests/helpers";
+import { doAction } from "@web/../tests/legacy/webclient/helpers";
+import { contains } from "@web/../tests/legacy/utils";
+import { openStudio } from "../../helpers";
 
 /** @type {Node} */
 let target;
@@ -273,6 +278,52 @@ QUnit.module(
             await click(target.querySelectorAll(".dropdown-toggle.o_select_menu_toggler")[1]);
             const sortByDropdownMenu = target.querySelectorAll(".o_select_menu_item");
             assert.strictEqual(sortByDropdownMenu.length, 1, "There should be 1 items in the SortBy dropdown");
+        });
+
+        QUnit.test("map leaflet is rendered", async (assert) => {
+            const serviceRegistry = registry.category("services");
+            serviceRegistry.add("enterprise_subscription", enterpriseSubscriptionService);
+            serverData.actions = {
+                2: {
+                    id: 2,
+                    xml_id: "action_2",
+                    name: "Partners Action 2",
+                    res_model: "partner",
+                    type: "ir.actions.act_window",
+                    views: [[1, "map"]],
+                },
+            };
+            serverData.models.partner = {
+                partner: {
+                    fields: {},
+                    records: {},
+                },
+            };
+            serverData.views = {
+                "partner,1,map": "<map />",
+                "partner,false,search": "<search />",
+            };
+
+            const webClient = await createEnterpriseWebClient({
+                serverData,
+            });
+            await doAction(webClient.env, 2);
+            await contains(".o-map-renderer--container.leaflet-container");
+            let mapContainer = target.querySelector(".o-map-renderer--container.leaflet-container");
+            let mapRect = mapContainer.getBoundingClientRect();
+            assert.ok(mapRect.width  > 0);
+            assert.ok(mapRect.height > 0);
+
+            await openStudio(target);
+            await contains(
+                ".o_web_studio_view_renderer .o-map-renderer--container.leaflet-container"
+            );
+            mapContainer = target.querySelector(
+                ".o_web_studio_view_renderer .o-map-renderer--container.leaflet-container"
+            );
+            mapRect = mapContainer.getBoundingClientRect();
+            assert.ok(mapRect.width  > 0);
+            assert.ok(mapRect.height > 0);
         });
     }
 );

@@ -277,11 +277,13 @@ class TestTimesheet(TestHelpdeskTimesheetCommon):
     def test_default_company_id_for_timesheet(self):
         """ This test ensures that the default company_id used when a timesheet is created from the ticket form view is the company_id of its project. """
         new_company = self.env['res.company'].create({'name': "Do the extra miles"})
+        company_second = self.env['res.company'].create({'name': "Second company"})
+        self.env['hr.employee'].create({'user_id': self.env.uid, 'company_id': new_company.id})
+        self.env['hr.employee'].create({'user_id': self.env.uid, 'company_id': company_second.id})
         project = self.env['project.project'].create({
             'name': 'Project',
             'allow_timesheets': True,
             'partner_id': self.partner.id,
-            'company_id': new_company.id,
         })
         helpdesk_team = self.env['helpdesk.team'].create({
             'name': 'Test Team new company',
@@ -297,6 +299,12 @@ class TestTimesheet(TestHelpdeskTimesheetCommon):
         # Use the default values sent by the form view
         vals = {'date': '2023-11-03', 'user_id': False, 'employee_id': self.env['hr.employee'].create({'user_id': self.env.uid}).id, 'name': False,
                 'unit_amount': 0, 'project_id': self.project.id, 'task_id': False, 'helpdesk_ticket_id': helpdesk_ticket.id}
+        timesheet = self.env['account.analytic.line'].create([vals])
+        self.assertEqual(timesheet.company_id, new_company, 'The expected company of the timesheet is the company from the project of its ticket')
+
+        # Test to ensure provided company_id is not overridden
+        vals.update({'company_id': new_company.id, 'date': '2023-11-04', 'user_id': self.env.uid})
+        vals.pop('employee_id')
         timesheet = self.env['account.analytic.line'].create([vals])
         self.assertEqual(timesheet.company_id, new_company, 'The expected company of the timesheet is the company from the project of its ticket')
 
@@ -322,3 +330,56 @@ class TestTimesheet(TestHelpdeskTimesheetCommon):
             ('helpdesk_ticket_id', '=', self.helpdesk_ticket.id)
         ], limit=1)
         self.assertEqual(timesheet_count, 1, "The new timesheet entry's ticket_id should be set correctly.")
+
+    def test_create_separate_timesheet_entries_depending_on_ticket_id(self):
+        ticket_copy = self.helpdesk_ticket.copy()
+        timesheet_1, timesheet_2, timesheet_3 = self.env['account.analytic.line'].with_user(self.user_employee).create([{
+            'name': '/',
+            'project_id': self.project.id,
+            'date': date.today(),
+            'helpdesk_ticket_id': self.helpdesk_ticket.id,
+        }, {
+            'name': '/',
+            'project_id': self.project.id,
+            'date': date.today(),
+            'helpdesk_ticket_id': ticket_copy.id,
+        }, {
+            'name': '/',
+            'project_id': self.project.id,
+            'date': date.today(),
+            'helpdesk_ticket_id': ticket_copy.id,
+        }])
+
+        timesheet_1.sudo()._add_timesheet_time(15, True)
+        timesheet_2.sudo()._add_timesheet_time(15, True)
+        timesheet_3.sudo()._add_timesheet_time(15, True)
+
+        # timesheets 2 and 3 should be merged since they belong to the same ticket, timesheet 1 must be kept separate
+        self.assertTrue(timesheet_1.exists(), 'Timesheet 1 should not have been merged')
+        self.assertFalse(timesheet_2.exists(), 'Timesheet 2 should have been merged into 3')
+        self.assertTrue(timesheet_3.exists(), 'Timesheet 2 should have been merged into 3')
+        self.assertAlmostEqual(timesheet_1.unit_amount, 0.25, 2)
+        self.assertAlmostEqual(timesheet_3.unit_amount, 0.5, 2)
+
+    def test_total_hours_spent(self):
+        """ Test the total_hours_spent field is correctly computed """
+        # create 5 tickets with a timesheet each of 10 minutes
+        tickets = self.env['helpdesk.ticket'].create([{
+            'name': f'Ticket {i}',
+            'team_id': self.helpdesk_team.id,
+            'partner_id': self.partner.id,
+        } for i in range(5)])
+
+        for ticket in tickets:
+            self.env['account.analytic.line'].create({
+                'name': 'Test Timesheet',
+                'unit_amount': 1 / 6,  # 10 minutes in hours
+                'project_id': self.project.id,
+                'helpdesk_ticket_id': ticket.id,
+                'employee_id': self.empl_employee.id,
+            })
+
+        # check sum of total_hours_spent is 5/6 hours
+        total_hours_spent = sum(ticket.total_hours_spent for ticket in tickets)
+        self.assertAlmostEqual(total_hours_spent, 5 / 6, places=2,
+                               msg="The total hours spent across all tickets should be 5/6 hours (50 minutes).")

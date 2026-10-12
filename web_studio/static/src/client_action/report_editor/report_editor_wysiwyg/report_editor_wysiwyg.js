@@ -7,6 +7,7 @@ import {
     onWillUnmount,
     reactive,
     useState,
+    useSubEnv,
 } from "@odoo/owl";
 import { loadBundle } from "@web/core/assets";
 import { ensureJQuery } from "@web/core/ensure_jquery";
@@ -16,7 +17,7 @@ import { omit } from "@web/core/utils/objects";
 import { usePopover } from "@web/core/popover/popover_hook";
 import { useHotkey } from "@web/core/hotkeys/hotkey_hook";
 import { sortBy } from "@web/core/utils/arrays";
-import { useOwnedDialogs, useService } from "@web/core/utils/hooks";
+import { useChildRef, useOwnedDialogs, useService } from "@web/core/utils/hooks";
 import { SelectMenu } from "@web/core/select_menu/select_menu";
 
 import { StudioDynamicPlaceholderPopover } from "./studio_dynamic_placeholder_popover";
@@ -38,7 +39,22 @@ import { nodeSize } from "@html_editor/utils/position";
 import { closestElement } from "@html_editor/utils/dom_traversal";
 import { QWebTablePlugin } from "./qweb_table_plugin";
 import { visitNode } from "../utils";
+import { ColorPlugin as _ColorPlugin } from "@html_editor/main/font/color_plugin";
 import { TablePlugin } from "@html_editor/main/table/table_plugin";
+import { withSequence } from "@html_editor/utils/resource";
+import { uniqueId } from "@web/core/utils/functions";
+import { LocalOverlayContainer } from "@html_editor/local_overlay_container";
+
+/**
+ * @typedef {Object} QwebVariableInfo
+ * @property {string} model - The technical model name (e.g. "res.partner").
+ * @property {string} name - The human-readable model name.
+ * @property {boolean} in_foreach - Whether the variable appears inside a `t-foreach`.
+ */
+
+/**
+ * @typedef {Record<string, QwebVariableInfo>} AvailableQwebVariables
+ */
 
 class __Record extends _Record.components._Record {
     setup() {
@@ -83,17 +99,22 @@ class FieldDynamicPlaceholder extends Component {
         availableQwebVariables: Object,
         close: Function,
         validate: Function,
-        isEditingFooterHeader: Boolean,
-        initialQwebVar: { optional: true, type: String },
+        initialQwebVar: String,
         showOnlyX2ManyFields: Boolean,
-    };
-
-    static defaultProps = {
-        initialQwebVar: "",
+        sortedVariables: {
+            type: Array,
+            element: {
+                type: Object,
+                shape: {
+                    label: { type: String },
+                    value: { type: String },
+                },
+            },
+        },
     };
 
     setup() {
-        this.state = useState({ currentVar: this.getDefaultVariable() });
+        this.state = useState({ currentVar: this.props.initialQwebVar });
         useHotkey("escape", () => this.props.close());
     }
 
@@ -103,62 +124,8 @@ class FieldDynamicPlaceholder extends Component {
         return resModel || this.props.resModel;
     }
 
-    get sortedVariables() {
-        const entries = Object.entries(this.props.availableQwebVariables).filter(
-            ([k, v]) => v.in_foreach && !this.props.isEditingFooterHeader
-        );
-        const resModel = this.props.resModel;
-        const sortFn = ([k, v]) => {
-            let score = 0;
-            if (k === "doc") {
-                score += 2;
-            }
-            if (k === "docs") {
-                score -= 2;
-            }
-            if (k === "o") {
-                score++;
-            }
-            if (v.model === resModel) {
-                score++;
-            }
-            return score;
-        };
-
-        const mapFn = ([k, v]) => {
-            return {
-                value: k,
-                label: `${k} (${v.name})`,
-            };
-        };
-        return sortBy(entries, sortFn, "desc").map((e) => mapFn(e));
-    }
-
     validate(...args) {
         this.props.validate(this.state.currentVar, ...args);
-    }
-
-    getDefaultVariable() {
-        const initialQwebVar = this.props.initialQwebVar;
-        if (initialQwebVar && initialQwebVar in this.props.availableQwebVariables) {
-            return initialQwebVar;
-        }
-        if (this.props.isEditingFooterHeader) {
-            const companyVar = Object.entries(this.props.availableQwebVariables).find(
-                ([k, v]) => v.model === "res.company"
-            );
-            return companyVar && companyVar[0];
-        }
-
-        let defaultVar = this.sortedVariables.find((v) => {
-            return ["doc", "o"].includes(v.value);
-        });
-        defaultVar =
-            defaultVar ||
-            this.sortedVariables.find(
-                (v) => this.props.availableQwebVariables[v.value].model === this.props.resModel
-            );
-        return defaultVar && defaultVar.value;
     }
 }
 
@@ -186,7 +153,7 @@ const CUSTOM_BRANDING_ATTR = [
 ];
 
 class _TablePlugin extends TablePlugin {
-    static name = TablePlugin.name;
+    static id = TablePlugin.id;
     _insertTable() {
         const table = super._insertTable(...arguments);
         if (closestElement(table, "[t-call='web.external_layout']")) {
@@ -197,12 +164,28 @@ class _TablePlugin extends TablePlugin {
     }
 }
 
-const REPORT_EDITOR_PLUGINS_MAP = Object.fromEntries(MAIN_PLUGINS.map((cls) => [cls.name, cls]));
+class ColorPlugin extends _ColorPlugin {
+    getPropsForColorSelector(...args) {
+        const props = super.getPropsForColorSelector(...args);
+        props.useDefaultThemeColors = false;
+        return props;
+    }
+}
+
+const EXCLUDED_PLUGIN_IDS = new Set(["powerButtons"]);
+const REPORT_EDITOR_PLUGINS_MAP = Object.fromEntries(
+    MAIN_PLUGINS.filter((cls) => !EXCLUDED_PLUGIN_IDS.has(cls.id)).map((cls) => [cls.id, cls])
+);
 Object.assign(REPORT_EDITOR_PLUGINS_MAP, {
-    [QWebPlugin.name]: QWebPlugin,
-    [QWebTablePlugin.name]: QWebTablePlugin,
-    [TablePlugin.name]: _TablePlugin,
+    [QWebPlugin.id]: QWebPlugin,
+    [QWebTablePlugin.id]: QWebTablePlugin,
+    [TablePlugin.id]: _TablePlugin,
+    [_ColorPlugin.id]: ColorPlugin,
 });
+
+export function getReportEditorPlugins() {
+    return Object.values(REPORT_EDITOR_PLUGINS_MAP);
+}
 
 export class ReportEditorWysiwyg extends Component {
     static components = {
@@ -213,6 +196,7 @@ export class ReportEditorWysiwyg extends Component {
         BooleanField,
         UndoRedo,
         ReportEditorIframe,
+        LocalOverlayContainer,
     };
     static props = {
         paperFormatStyle: String,
@@ -220,6 +204,10 @@ export class ReportEditorWysiwyg extends Component {
     static template = "web_studio.ReportEditorWysiwyg";
 
     setup() {
+        this.overlayRef = useChildRef();
+        useSubEnv({
+            localOverlayContainerKey: uniqueId("report_editor"),
+        });
         this.action = useService("action");
         this.addDialog = useOwnedDialogs();
         this.notification = useService("notification");
@@ -229,7 +217,9 @@ export class ReportEditorWysiwyg extends Component {
                 this.reportEditorModel.reportQweb,
                 "text/html"
             );
-            return tree.firstElementChild;
+            const htmlNode = tree.firstElementChild;
+            htmlNode.translate = false;
+            return htmlNode;
         });
 
         const reportEditorModel = (this.reportEditorModel = useState(this.env.reportEditorModel));
@@ -250,8 +240,8 @@ export class ReportEditorWysiwyg extends Component {
         this.undoRedoState = reactive({
             canUndo: false,
             canRedo: false,
-            undo: () => this.editor?.dispatch("HISTORY_UNDO"),
-            redo: () => this.editor?.dispatch("HISTORY_REDO"),
+            undo: () => this.editor?.shared.history.undo(),
+            redo: () => this.editor?.shared.history.redo(),
         });
 
         onWillStart(async () => {
@@ -275,11 +265,11 @@ export class ReportEditorWysiwyg extends Component {
         this.undoRedoState.canUndo = false;
         this.undoRedoState.canRedo = false;
         const onEditorChange = () => {
-            const canUndo = this.editor.shared.canUndo();
+            const canUndo = this.editor.shared.history.canUndo();
             this.reportEditorModel.isDirty = canUndo;
             Object.assign(this.undoRedoState, {
                 canUndo: canUndo,
-                canRedo: this.editor.shared.canRedo(),
+                canRedo: this.editor.shared.history.canRedo(),
             });
         };
 
@@ -292,11 +282,14 @@ export class ReportEditorWysiwyg extends Component {
                 Plugins: Object.values(REPORT_EDITOR_PLUGINS_MAP),
                 onChange: onEditorChange,
                 getRecordInfo: () => {
-                    const { anchorNode } = this.editor.shared.getEditableSelection();
+                    const { anchorNode } = this.editor.shared.selection.getEditableSelection();
                     if (!anchorNode) {
                         return {};
                     }
                     const lastViewParent = closestElement(anchorNode, "[ws-view-id]");
+                    if (!lastViewParent) {
+                        return {};
+                    }
                     return {
                         resModel: "ir.ui.view",
                         resId: parseInt(lastViewParent.getAttribute("ws-view-id")),
@@ -305,12 +298,25 @@ export class ReportEditorWysiwyg extends Component {
                 },
                 resources: {
                     handleNewRecords: this.handleMutations.bind(this),
-                    powerboxCategory: {
+                    powerbox_categories: withSequence(5, {
                         id: "report_tools",
                         name: _t("Report Tools"),
-                        sequence: 10,
+                    }),
+                    user_commands: this.getUserCommands(),
+                    powerbox_items: this.getPowerboxCommands(),
+                    unsplittable_node_predicates: (node) => {
+                        return (
+                            node.nodeType === Node.ELEMENT_NODE &&
+                            node.matches(".page, .header, .footer")
+                        );
                     },
-                    powerboxItems: this.getPowerboxCommands(),
+                },
+                disableVideo: true,
+                allowImageTransform: false,
+                allowImageResize: false,
+                localOverlayContainers: {
+                    key: this.env.localOverlayContainerKey,
+                    ref: this.overlayRef,
                 },
             },
             this.env.services
@@ -483,53 +489,180 @@ export class ReportEditorWysiwyg extends Component {
         });
     }
 
-    getPowerboxCommands() {
+    getUserCommands() {
+        const isAvailable = (selection) => {
+            const { availableQwebVariables, initialQwebVar, isEditingFooterHeader } =
+                this.getQwebVariables(this.getPopoverAnchor(selection));
+
+            return !!this.getDefaultVariable(
+                initialQwebVar,
+                availableQwebVariables,
+                isEditingFooterHeader
+            );
+        };
         return [
             {
-                category: "report_tools",
-                name: _t("Field"),
-                priority: 150,
+                id: "insertField",
+                title: _t("Field"),
                 description: _t("Insert a field"),
-                fontawesome: "fa-magic",
-                action: () => this.insertField(),
+                icon: "fa-magic",
+                run: this.insertField.bind(this),
+                isAvailable,
             },
             {
-                category: "report_tools",
-                name: _t("Dynamic Table"),
-                priority: 140,
+                id: "insertDynamicTable",
+                title: _t("Dynamic Table"),
                 description: _t("Insert a table based on a relational field."),
-                fontawesome: "fa-magic",
-                action: () => this.insertTableX2Many(),
+                icon: "fa-magic",
+                run: this.insertTableX2Many.bind(this),
+                isAvailable,
             },
         ];
     }
 
-    getFieldPopoverParams() {
-        const odooEditor = this.editor;
-        const doc = odooEditor.document;
+    getPowerboxCommands() {
+        return [
+            withSequence(20, {
+                categoryId: "report_tools",
+                commandId: "insertField",
+            }),
+            withSequence(25, {
+                categoryId: "report_tools",
+                commandId: "insertDynamicTable",
+            }),
+        ];
+    }
 
+    /**
+     * @param {HTMLElement} element
+     * @return {{isEditingFooterHeader: boolean, availableQwebVariables: AvailableQwebVariables, initialQwebVar: string} | {}}
+     */
+    getQwebVariables(element) {
+        if (!element) {
+            return {};
+        }
+        const nodeOeContext = element.closest("[oe-context]");
+
+        /** @type {AvailableQwebVariables} */
+        let availableQwebVariables =
+            (nodeOeContext && JSON.parse(nodeOeContext.getAttribute("oe-context"))) || {};
+
+        const isEditingFooterHeader = !!closestElement(element, ".header,.footer");
+        let initialQwebVar;
+        if (isEditingFooterHeader) {
+            const companyVars = Object.entries(availableQwebVariables).filter(
+                ([k, v]) => v.model === "res.company"
+            );
+            initialQwebVar = companyVars[0]?.[0];
+            availableQwebVariables = Object.fromEntries(companyVars);
+        } else {
+            initialQwebVar = getOrderedTAs(element)[0] || "";
+        }
+        return {
+            isEditingFooterHeader,
+            availableQwebVariables,
+            initialQwebVar,
+        };
+    }
+
+    /**
+     * @param {AvailableQwebVariables} availableQwebVariables
+     * @param {boolean} isEditingFooterHeader
+     * @param {string} resModel
+     * @return {{label: string, value: string}[]}
+     */
+    sortedVariables(availableQwebVariables, isEditingFooterHeader, resModel) {
+        const entries = Object.entries(availableQwebVariables).filter(
+            ([k, v]) => v.in_foreach && !isEditingFooterHeader
+        );
+        const sortFn = ([k, v]) => {
+            let score = 0;
+            if (k === "doc") {
+                score += 2;
+            }
+            if (k === "docs") {
+                score -= 2;
+            }
+            if (k === "o") {
+                score++;
+            }
+            if (v.model === resModel) {
+                score++;
+            }
+            return score;
+        };
+
+        const mapFn = ([k, v]) => {
+            return {
+                value: k,
+                label: `${k} (${v.name})`,
+            };
+        };
+        return sortBy(entries, sortFn, "desc").map((e) => mapFn(e));
+    }
+
+    /**
+     * @param {string} [initialQwebVar]
+     * @param {AvailableQwebVariables} availableQwebVariables
+     * @param {boolean} isEditingFooterHeader
+     * @return {string|undefined}
+     */
+    getDefaultVariable(initialQwebVar, availableQwebVariables, isEditingFooterHeader) {
+        if (initialQwebVar && initialQwebVar in availableQwebVariables) {
+            return initialQwebVar;
+        }
+        if (isEditingFooterHeader) {
+            const companyVar = Object.entries(availableQwebVariables).find(
+                ([k, v]) => v.model === "res.company"
+            );
+            return companyVar && companyVar[0];
+        }
         const resModel = this.reportEditorModel.reportResModel;
-        const docSelection = odooEditor.shared.getEditableSelection();
-        const { anchorNode } = docSelection;
-        const isEditingFooterHeader =
-            !!(doc.querySelector(".header") && doc.querySelector(".header").contains(anchorNode)) ||
-            !!(doc.querySelector(".footer") && doc.querySelector(".footer").contains(anchorNode));
+        const sortedVariables = this.sortedVariables(
+            availableQwebVariables,
+            isEditingFooterHeader,
+            resModel
+        );
 
-        const popoverAnchor = anchorNode.nodeType === 1 ? anchorNode : anchorNode.parentElement;
+        let defaultVar = sortedVariables.find((v) => {
+            return ["doc", "o"].includes(v.value);
+        });
+        defaultVar ??= sortedVariables.find(
+            (v) => availableQwebVariables[v.value].model === resModel
+        );
+        return defaultVar && defaultVar.value;
+    }
 
-        const nodeOeContext = popoverAnchor.closest("[oe-context]");
-        const availableQwebVariables =
-            nodeOeContext && JSON.parse(nodeOeContext.getAttribute("oe-context"));
-
+    getFieldPopoverParams() {
+        const resModel = this.reportEditorModel.reportResModel;
+        const popoverAnchor = this.getPopoverAnchor();
+        const { availableQwebVariables, initialQwebVar, isEditingFooterHeader } =
+            this.getQwebVariables(popoverAnchor);
+        const sortedVariables = this.sortedVariables(
+            availableQwebVariables,
+            isEditingFooterHeader,
+            resModel
+        );
+        const defaultVariable = this.getDefaultVariable(
+            initialQwebVar,
+            availableQwebVariables,
+            isEditingFooterHeader
+        );
         return {
             popoverAnchor,
             props: {
                 availableQwebVariables,
-                initialQwebVar: getOrderedTAs(popoverAnchor)[0] || "",
-                isEditingFooterHeader,
+                initialQwebVar: defaultVariable,
                 resModel,
+                sortedVariables,
             },
         };
+    }
+
+    getPopoverAnchor(selection) {
+        selection ||= this.editor.shared.selection.getEditableSelection();
+        const { anchorNode } = selection;
+        return anchorNode.nodeType === 1 ? anchorNode : anchorNode.parentElement;
     }
 
     async insertTableX2Many() {
@@ -546,7 +679,7 @@ export class ReportEditorWysiwyg extends Component {
                 relationName
             ) => {
                 const doc = this.editor.document;
-                this.editor.editable.focus();
+                doc.defaultView.focus();
 
                 const table = doc.createElement("table");
                 table.classList.add("table", "table-sm");
@@ -587,9 +720,12 @@ export class ReportEditorWysiwyg extends Component {
                 td.textContent = _t("Insert a field...");
                 tr.appendChild(td);
 
-                this.editor.shared.domInsert(table);
-                this.editor.shared.setSelection({ anchorNode: td, focusOffset: nodeSize(td) });
-                this.editor.dispatch("ADD_STEP");
+                this.editor.shared.dom.insert(table);
+                this.editor.shared.selection.setSelection({
+                    anchorNode: td,
+                    focusOffset: nodeSize(td),
+                });
+                this.editor.shared.history.addStep();
             },
         });
     }
@@ -608,6 +744,7 @@ export class ReportEditorWysiwyg extends Component {
                 fieldString
             ) => {
                 const doc = this.editor.document;
+                doc.defaultView.focus();
 
                 const span = doc.createElement("span");
                 span.setAttribute(
@@ -625,9 +762,8 @@ export class ReportEditorWysiwyg extends Component {
                     span.setAttribute("t-options-widget", "'image'");
                     span.setAttribute("t-options-qweb_img_raw_data", 1);
                 }
-                this.editor.shared.domInsert(span);
-                this.editor.editable.focus();
-                this.editor.dispatch("ADD_STEP");
+                this.editor.shared.dom.insert(span);
+                this.editor.shared.history.addStep();
             },
         });
     }

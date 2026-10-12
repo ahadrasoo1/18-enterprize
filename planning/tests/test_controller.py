@@ -82,3 +82,23 @@ class TestControllersRoute(HttpCase, TestCommonPlanning):
         self.assertEqual(req.status_code, 200, "Response should = OK")
         decoded_content = req.content.decode('utf-8')
         self.assertEqual(decoded_content.count('BEGIN:VEVENT'), 3, "There should be 3 Calendar events present in the ics file")
+
+    def test_planning_ics_file_without_assigned_employee(self):
+        """
+        Test that the planning ICS file can be generated when no employee is assigned.
+        This ensures that a fallback timezone (current user's or UTC) is used
+        when `resource_id` is not set on the slot.
+        """
+        self.slots[0].write({'resource_id': False})
+        url_res = self.slots[0]._get_slot_resource_urls()
+        self.authenticate(None, None)
+
+        # open the ICS file
+        ics_request = self.url_open(url_res['iCal'])
+        self.assertEqual(ics_request.status_code, 200, "ICS export should return HTTP 200 OK")
+        decoded_content = ics_request.content.decode('utf-8')
+
+        self.assertIn("DTSTART:20230602T080000Z", decoded_content, "The starting date of the shift should be in the ics file")
+        self.assertIn("DTEND:20230602T170000Z", decoded_content, "The ending date of the shift should be in the ics file")
+        self.assertIn("SUMMARY:role", decoded_content, "The summary of the ics file should contain the name of the employee and it's default role")
+        self.assertIn("Role: role a", decoded_content, "The description of the ics file should contain the role of the employee")

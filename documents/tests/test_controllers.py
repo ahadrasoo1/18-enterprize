@@ -1,3 +1,5 @@
+import base64
+import json
 import zipfile
 from base64 import b64decode, b64encode
 from datetime import timedelta
@@ -7,11 +9,12 @@ from urllib.parse import urlencode
 
 from PIL import Image
 from freezegun import freeze_time
+from reportlab.pdfgen import canvas
 from urllib3.util import parse_url
 
 from odoo import Command, fields, http
-from odoo.tests.common import RecordCapturer
-from odoo.tools import file_open
+from odoo.tests.common import RecordCapturer, tagged
+from odoo.tools import file_open, mute_logger
 from odoo.tools.image import image_process
 
 from odoo.addons.base.tests.common import HttpCaseWithUserDemo
@@ -20,6 +23,7 @@ from odoo.addons.mail.tests.common import mail_new_test_user
 from odoo.addons.documents.controllers.documents import ShareRoute
 
 
+@tagged('post_install', '-at_install')
 class TestDocumentsControllers(HttpCaseWithUserDemo):
     def _assertPathEqual(self, first, second):
         self.assertEqual(parse_url(first).path, parse_url(second).path)
@@ -347,7 +351,7 @@ class TestDocumentsControllers(HttpCaseWithUserDemo):
         self.public_file.action_create_shortcut(self.internal_folder.id)
         self.public_folder.action_create_shortcut(self.internal_folder.id)
         self.env['documents.document'].create([{
-            'name': 'test.tar.gz',
+            'name': 'te/st.tar.gz',  # the `/` in the name should be replaced with `_`
             'folder_id': self.internal_folder.id,
             'access_internal': 'view',
             'datas': 'test',
@@ -365,6 +369,15 @@ class TestDocumentsControllers(HttpCaseWithUserDemo):
             'type': 'folder',
         } for _ in range(2)])
 
+        # add nested folders with `/` in their names
+        parent_id = self.public_folder.id
+        for i in range(4):
+            parent_id = self.env["documents.document"].create({
+                'name': f'folder/test/{i}',
+                'folder_id': parent_id,
+                'type': 'folder',
+            }).id
+
         self.authenticate('demo', 'demo')
         res = self.url_open(f'/documents/content/{self.internal_folder.access_token}')
         res.raise_for_status()
@@ -380,11 +393,16 @@ class TestDocumentsControllers(HttpCaseWithUserDemo):
             'public folder-3/',
             'public folder-4/',
             'public folder-5/',
-            'test.tar.gz',
-            'test-2.tar.gz',
-            'test-3.tar.gz',
+            'te_st.tar.gz',
+            'te_st-2.tar.gz',
+            'te_st-3.tar.gz',
             '.hidden/',
             '.hidden-2/',
+            # the path should be correct, even if the folders have `/` in their names
+            'public folder/folder_test_0/',
+            'public folder/folder_test_0/folder_test_1/',
+            'public folder/folder_test_0/folder_test_1/folder_test_2/',
+            'public folder/folder_test_0/folder_test_1/folder_test_2/folder_test_3/',
         }
         with zipfile.ZipFile(BytesIO(res.content)) as reszip:
             self.assertEqual(set(reszip.namelist()), expected)
@@ -405,9 +423,10 @@ class TestDocumentsControllers(HttpCaseWithUserDemo):
         self.assertEqual(res.status_code, HTTPStatus.TEMPORARY_REDIRECT)  # 307
         self.assertEqual(res.headers.get('Location'), self.internal_url.url)
 
+    @mute_logger('odoo.http')
     def test_doc_ctrl_cross_redirection(self):
-        docs_url = f'/documents/{self.public_file.access_token}'
-        odoo_url = '/odoo' + docs_url
+        docs_url = f'/documents/{self.public_file.access_token}?a=1'
+        odoo_url = f'/odoo{docs_url}'
         portal = self.user_portal.login
         demo = self.user_demo.login
         for login, url, code, location in [
@@ -425,6 +444,36 @@ class TestDocumentsControllers(HttpCaseWithUserDemo):
                 self.assertEqual(res.status_code, code)
                 if code == 307:
                     self.assertURLEqual(res.headers.get('Location'), location)
+
+    @mute_logger('odoo.http')
+    def test_doc_redirection_partner(self):
+        """Test that the partner is redirected to the signup page."""
+        self.public_file.access_via_link = 'none'
+        access = self.env["documents.access"].create({
+            'document_id': self.public_file.id,
+            'role': 'view',
+            'partner_id': self.env["res.partner"].create({'name': 'Test'}).id,
+        })
+        member_signup_token = access._get_member_signup_token()
+        docs_url = f'/documents/{self.public_file.access_token}?member_signup_token={member_signup_token}&member_id={access.id}'
+        res = self.url_open(docs_url, allow_redirects=False)
+        res.raise_for_status()
+        redirect_url = res.headers.get('Location') or ''
+        self.assertIn('/web/signup', redirect_url, f"Invalid redirect URL: {redirect_url}")
+        self.assertIn(self.public_file.access_token, redirect_url)
+
+        docs_url = f'/documents/{self.public_file.access_token}?member_signup_token=bad_token_{member_signup_token}&member_id={access.id}'
+        res = self.url_open(docs_url, allow_redirects=False)
+        self.assertFalse(res.ok)
+        redirect_url = res.headers.get('Location') or ''
+        self.assertFalse(redirect_url)
+
+        # remove the role, should invalidate the invitation link
+        access.last_access_date = fields.Datetime.now()
+        access.role = False
+        docs_url = f'/documents/{self.public_file.access_token}?member_signup_token={member_signup_token}&member_id={access.id}'
+        res = self.url_open(docs_url, allow_redirects=False)
+        self.assertFalse(res.ok)
 
     def test_doc_render_public_templates(self):
         self.authenticate(None, None)
@@ -569,6 +618,10 @@ class TestDocumentsControllers(HttpCaseWithUserDemo):
 
     def test_doc_ctrl_upload_request_public(self):
         self.authenticate(None, None)
+        # Check that uploading a document to a request is independent from user's access to related record
+        self.public_request.res_id = self.user_demo.id
+        self.public_request.res_model = self.user_demo._name
+        self.assertFalse(self.user_demo.check_access('read'))
 
         # Upload a text file
         res = self.url_open(f'/documents/upload/{self.public_request.access_token}',
@@ -596,6 +649,10 @@ class TestDocumentsControllers(HttpCaseWithUserDemo):
             is_access_via_link_hidden=False,
         )
 
+        shortcut = self.public_request.action_create_shortcut()
+        self.assertFalse(shortcut.thumbnail)
+        self.assertFalse(self.public_request.thumbnail)
+
         # Upload an image but forge the filename/mimetype to pretend it is text
         with self.assertLogs('odoo.tools.mimetypes', 'WARNING') as log_capture:
             res = self.url_open(f'/documents/upload/{self.public_request.access_token}',
@@ -609,6 +666,10 @@ class TestDocumentsControllers(HttpCaseWithUserDemo):
         self.assertEqual(self.public_request.mimetype, 'image/png',
                          "the mimetype must have been neutralized")
         self.assertEqual(self.public_request.raw, self.doc_icon)
+
+        self.assertTrue(shortcut.thumbnail)
+        self.assertTrue(self.public_request.thumbnail)
+
         self.assertEqual(log_capture.output, [
             ("WARNING:odoo.tools.mimetypes:File 'hello.txt' has an "
              "invalid extension for mimetype 'image/png', adding '.png'")
@@ -654,12 +715,7 @@ class TestDocumentsControllers(HttpCaseWithUserDemo):
             "<p>Document uploaded by Marc Demo</p>",
             "<p>Document created</p>",
         ])
-        activity = capture_activity.records.ensure_one()
-        self.assertEqual(activity.activity_type_id, self.test_activity_type)
-        self.assertEqual(activity.summary, 'test summary')
-        self.assertEqual(activity.note, '<p>test note</p>')
-        self.assertEqual(activity.user_id, self.user_admin)
-        self.assertIn(activity.date_deadline, {fields.Date.today() + timedelta(days=5)})
+        self.assertFalse(capture_activity.records, 'Activities should only be created when using the mail gateway')
 
         # Upload a fake text file that actually is an image on the demo user
         self.internal_folder.create_activity_option = False
@@ -717,6 +773,24 @@ class TestDocumentsControllers(HttpCaseWithUserDemo):
             files={'ufile': ('hello.txt', BytesIO(b"Hello"), 'text/plain')},
         )
         self.assertEqual(res.status_code, 404)
+
+        # Check that the images are not compressed
+        img_byte = BytesIO()
+        Image.new(mode='RGB', size=(10_000, 2_000)).save(img_byte, format='PNG')
+        img_byte = img_byte.getvalue()
+
+        res = self.url_open(f'/documents/upload/{self.internal_request.access_token}',
+            data={
+                'res_id': self.user_demo.id,
+                'res_model': 'res.users',
+                'csrf_token': http.Request.csrf_token(self),
+            },
+            files={'ufile': ('test.bmp', img_byte, 'image/bmp')},
+            allow_redirects=False,
+        )
+        res.raise_for_status()
+        self.assertEqual(self.internal_request.name, 'test.bmp')
+        self.assertEqual(base64.b64decode(self.internal_request.datas), img_byte)
 
     def test_doc_ctrl_upload_shortcut(self):
         self.authenticate(None, None)
@@ -839,8 +913,8 @@ class TestDocumentsControllers(HttpCaseWithUserDemo):
             self.assertEqual(res.status_code, 200)
             self.assertEqual(res.content, self.doc_icon)
 
-    def test_documents_get_init_data_folder_id(self):
-        """Test computed side panel root depending on access rights."""
+    def test_documents_get_init_data(self):
+        """Test computed init data depending on access rights."""
         shared_portal_values = {'access_ids': [
             Command.create({'partner_id': self.user_portal.partner_id.id, 'role': 'view'})
         ]}
@@ -857,34 +931,210 @@ class TestDocumentsControllers(HttpCaseWithUserDemo):
             'name': 'Restricted Folder',
             'access_internal': 'none',
         })
-        demo_personal, demo_company, company_portal, restricted_portal, restricted_manager, shared_via_link = (
+        demo_personal, company_portal, company_child_portal, restricted_portal, restricted_manager, shared_via_link = (
             doc_as_demo.create([
                 shared_portal_values | {'name': 'demo_personal_share_portal'},
-                shared_portal_values | {'name': 'demo_company_share_portal', 'access_internal': 'view'},
-                shared_portal_values | {'name': 'company_share_portal', 'folder_id': internal_folder.id},
+                shared_portal_values | {'name': 'company_share_portal'},
+                shared_portal_values | {'name': 'company_child_share_portal', 'folder_id': internal_folder.id},
                 shared_portal_values | {'name': 'restricted_share_portal', 'folder_id': restricted_folder.id},
                 shared_manager_values | {'name': 'restricted_manager', 'folder_id': restricted_folder.id},
                 {'name': 'restricted_shared_link', 'folder_id': restricted_folder.id, 'access_via_link': 'view'},
             ])
         )
+        (internal_folder | company_portal).sudo().action_set_as_company_root()
+        archived_doc, archived_folder = archived = doc_as_demo.create([
+            {'type': doc_type, 'name': f'Archived {doc_type}'} for doc_type in ('binary', 'folder')
+        ])
+        archived_doc_shortcut, archived_folder_shortcut = archived.action_create_shortcut()
+        archived.action_archive()
 
-        for document, user, expected_folder_id in [
-            (demo_personal, self.user_demo, 'MY'),
-            (demo_personal, self.user_portal, False),
-            (demo_company, self.user_demo, 'MY'),
-            (demo_company, self.user_portal, False),
-            (demo_company, self.user_manager, 'COMPANY'),  # as would any other internal user
-            (company_portal, self.user_demo, internal_folder.id),
-            (company_portal, self.user_portal, False),
-            (company_portal, self.user_manager, internal_folder.id),
-            (restricted_portal, self.user_demo, restricted_folder.id),
-            (restricted_portal, self.user_portal, False),
-            (restricted_manager, self.user_demo, restricted_folder.id),
-            (restricted_manager, self.user_manager, 'SHARED'),
-            (shared_via_link, self.user_portal, False),
-            (shared_via_link, self.user_manager, 'SHARED'),
+        for document, user, expected_folder_id, expected_document_id in [
+            (demo_personal, self.user_demo, 'MY', demo_personal.id),
+            (demo_personal, self.user_portal, False, demo_personal.id),
+            (demo_personal, self.user_manager, 'SHARED', demo_personal.id),  # as would any other internal user
+            (company_portal, self.user_demo, 'COMPANY', company_portal.id),
+            (company_portal, self.user_portal, False, company_portal.id),
+            (company_child_portal, self.user_demo, internal_folder.id, company_child_portal.id),
+            (company_child_portal, self.user_portal, False, company_child_portal.id),
+            (company_child_portal, self.user_manager, internal_folder.id, company_child_portal.id),  # same comment
+            (restricted_portal, self.user_demo, restricted_folder.id, restricted_portal.id),
+            (restricted_portal, self.user_portal, False, restricted_portal.id),
+            (restricted_manager, self.user_demo, restricted_folder.id, restricted_manager.id),
+            (restricted_manager, self.user_manager, 'SHARED', restricted_manager.id),
+            (shared_via_link, self.user_portal, False, shared_via_link.id),
+            (shared_via_link, self.user_manager, 'SHARED', shared_via_link.id),
+            (archived_doc, self.user_demo, 'TRASH', archived_doc.id),
+            (archived_folder, self.user_demo, 'TRASH', archived_folder.id),
+            (archived_doc_shortcut, self.user_demo, 'MY', archived_doc_shortcut.id),
+            (archived_folder_shortcut, self.user_demo, 'MY', archived_folder_shortcut.id),
+            (internal_folder, self.user_demo, internal_folder.id, None),
         ]:
             document.invalidate_recordset()
             with self.subTest(document_name=document.name, username=user.name):
                 data = ShareRoute._documents_get_init_data(document.with_user(user), user)
                 self.assertEqual(data['folder_id'], expected_folder_id)
+                self.assertEqual(data.get('document_id'), expected_document_id)
+
+    def test_from_access_token(self):
+        """Check that _from_access_token doesn't raise on a non-existent record"""
+        url = self.env['documents.document'].create({'name': 'url', 'type': 'url', 'url': 'https://www.odoo.com/'})
+        access_token = url.access_token
+        url.unlink()
+        self.authenticate('admin', 'admin')
+        res = self.url_open(
+            f'/documents/touch/{access_token}', 
+            data=json.dumps({}),
+            headers={"Content-Type": "application/json"}
+        )
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.text, '{"jsonrpc": "2.0", "id": null, "result": {}}')
+
+    def test_upload_internal_multi_company_defaults(self):
+        main_company = self.env.ref('base.main_company')
+        comp = self.env['res.company'].create({'name': 'Company 2'})
+        company_field = self.env['ir.model.fields'].search([('model', '=', 'documents.document'), ('name', '=', 'company_id')], limit=1)
+        self.env['ir.default'].create([
+            {
+                'field_id': company_field.id,
+                'company_id': comp.id,
+                'json_value': comp.id,
+            },
+            {
+                'field_id': company_field.id,
+                'company_id': main_company.id,
+                'json_value': main_company.id,
+            }
+        ])
+        
+        self.user_admin.write({'company_ids': [Command.link(comp.id)]})
+        # assert admin has access to both companies
+        self.assertGreaterEqual(self.user_admin.company_ids, main_company | comp)
+
+        self.authenticate('admin', 'admin')
+        with RecordCapturer(self.env['documents.document'], []) as record_capture:
+            res = self.url_open(f'/documents/upload',
+                data={
+                    'csrf_token': http.Request.csrf_token(self),
+                    'allowed_company_ids': f'[{comp.id}]',
+                },
+                files={'ufile': ('testingfile.txt', BytesIO(b"Hello"), 'text/plain')},
+                allow_redirects=False,
+            )
+            res.raise_for_status()
+        document1 = record_capture.records.ensure_one()
+        self.assertEqual(document1.company_id, comp)
+        
+        with RecordCapturer(self.env['documents.document'], []) as record_capture:
+            res = self.url_open(f'/documents/upload',
+                data={
+                    'csrf_token': http.Request.csrf_token(self),
+                    'allowed_company_ids': f'[{main_company.id}]',
+                },
+                files={'ufile': ('testingfile2.txt', BytesIO(b"Hello2"), 'text/plain')},
+                allow_redirects=False,
+            )
+            res.raise_for_status()
+        document2 = record_capture.records.ensure_one()
+        self.assertEqual(document2.company_id, main_company)
+
+
+@tagged('post_install', '-at_install')
+class TestCaseSecurityRoutes(HttpCaseWithUserDemo):
+
+    def setUp(self):
+        super(TestCaseSecurityRoutes, self).setUp()
+
+        self.raw_gif = b"R0lGODdhAQABAIAAAP///////ywAAAAAAQABAAACAkQBADs="
+        pdf_buffer = BytesIO()
+        canva = canvas.Canvas(pdf_buffer, pagesize=(600, 800))
+        canva.drawString(100, 750, "Minimal PDF")
+        canva.save()
+        self.raw_pdf = b64encode(pdf_buffer.getvalue())
+
+        self.user_attachment_gif, self.admin_attachment_gif, \
+        self.user_attachment_pdf, self.admin_attachment_pdf = self.env['ir.attachment'].create([
+            {
+                'datas': self.raw_gif,
+                'name': 'attachmentGif_A.gif',
+                'res_model': 'documents.document',
+                'res_id': 0,
+            },
+            {
+                'datas': self.raw_gif,
+                'name': 'attachmentGif_B.gif',
+                'res_model': 'documents.document',
+                'res_id': 0,
+            },
+            {
+                'datas': self.raw_pdf,
+                'name': 'attachmentPdf_A.pdf',
+                'mimetype': 'application/pdf',
+                'res_model': 'documents.document',
+                'res_id': 0,
+            },
+            {
+                'datas': self.raw_pdf,
+                'name': 'attachmentPdf_B.pdf',
+                'mimetype': 'application/pdf',
+                'res_model': 'documents.document',
+                'res_id': 0,
+            }
+        ])
+        self.user_document_gif, self.admin_document_gif, \
+        self.user_document_pdf, self.admin_document_pdf = self.env['documents.document'].create([
+            {
+                'name': 'GIF A',
+                'attachment_id': self.user_attachment_gif.id,
+            },
+            {
+                'name': 'GIF B',
+                'attachment_id': self.admin_attachment_gif.id,
+            },
+            {
+                'name': 'PDF A',
+                'attachment_id': self.user_attachment_pdf.id,
+            },
+            {
+                'name': 'PDF B',
+                'attachment_id': self.admin_attachment_pdf.id,
+            }
+        ])
+        self.document_user = self.env['res.users'].create({
+            'name': "user",
+            'login': "user",
+            'password': "useruser",
+            'email': "user@yourcompany.com",
+            'groups_id': [(6, 0, [self.ref('documents.group_documents_user')])]
+        })
+
+    @mute_logger('odoo.http')
+    def test_documents_zip_access(self):
+        self.authenticate("user", "useruser")
+        response = self.url_open('/document/zip', data={
+            'file_ids': ','.join(map(str, [self.user_document_gif.id, self.admin_document_gif.id])),
+            'zip_name': 'testZip.zip',
+            'csrf_token': http.Request.csrf_token(self),
+        })
+        self.assertNotEqual(response.status_code, 200)
+
+    @mute_logger('odoo.http')
+    def test_documents_split_access(self):
+        self.authenticate("user", "useruser")
+        response = self.url_open('/documents/pdf_split', data={
+            'vals': json.dumps({
+                "tag_ids": [],
+                "owner_id": self.document_user.id,
+                "active": True
+            }),
+            'new_files': json.dumps([{
+                "name": "Test",
+                "new_pages": [{
+                    "old_file_type": "document",
+                    "old_file_index": self.admin_document_pdf.id,
+                    "old_page_number": 1
+                }]
+            }]),
+            'archive': False,
+            'csrf_token': http.Request.csrf_token(self),
+        })
+        self.assertNotEqual(response.status_code, 200)

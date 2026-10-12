@@ -1,22 +1,24 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* room
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Tony Ng, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:24+0000\n"
+"POT-Creation-Date: 2025-12-29 18:45+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Chinese (Taiwan) (https://app.transifex.com/odoo/teams/41243/zh_TW/)\n"
+"Last-Translator: Tony Ng, 2025\n"
+"Language-Team: Chinese (Taiwan) (https://app.transifex.com/odoo/teams/41243/"
+"zh_TW/)\n"
+"Language: zh_TW\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: zh_TW\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. module: room
@@ -75,7 +77,7 @@ msgstr "<strong>房間：</strong>"
 #. module: room
 #: model:ir.model.fields,field_description:room.field_room_room__access_token
 msgid "Access Token"
-msgstr "存取代碼(token)"
+msgstr "存取權杖(token)"
 
 #. module: room
 #: model:ir.model.fields,field_description:room.field_room_booking__message_needaction
@@ -102,8 +104,14 @@ msgstr "新增預訂"
 
 #. module: room
 #: model:ir.model.fields,field_description:room.field_room_room__description
+#: model_terms:ir.ui.view,arch_db:room.room_room_view_form
 msgid "Amenities"
 msgstr "設施"
+
+#. module: room
+#: model_terms:ir.ui.view,arch_db:room.room_room_view_form
+msgid "Appearance"
+msgstr "外觀"
 
 #. module: room
 #: model_terms:ir.ui.view,arch_db:room.room_room_view_form
@@ -145,7 +153,7 @@ msgstr "可用的背景顏色"
 #. module: room
 #: model:ir.model.fields,field_description:room.field_room_room__room_background_image
 msgid "Background Image"
-msgstr "背景圖像"
+msgstr "背景圖片"
 
 #. module: room
 #. odoo-javascript
@@ -280,6 +288,11 @@ msgid "Followers (Partners)"
 msgstr "關注人（業務夥伴）"
 
 #. module: room
+#: model:ir.model,name:room.model_ir_http
+msgid "HTTP Routing"
+msgstr "http路由"
+
+#. module: room
 #: model:ir.model.fields,field_description:room.field_room_booking__has_message
 #: model:ir.model.fields,field_description:room.field_room_room__has_message
 msgid "Has Message"
@@ -352,8 +365,7 @@ msgstr "主要辦事處"
 
 #. module: room
 #: model_terms:ir.actions.act_window,help:room.room_booking_action
-msgid ""
-"Make meeting room sharing easy by centralizing all meetings in this App"
+msgid "Make meeting room sharing easy by centralizing all meetings in this App"
 msgstr "將所有會議集中在此應用程式處理，輕鬆共享會議室"
 
 #. module: room

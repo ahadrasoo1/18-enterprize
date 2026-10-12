@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from freezegun import freeze_time
 
 from odoo import Command
-from odoo.tests import Form
+from odoo.tests import Form, new_test_user
 from odoo.addons.project_mrp_account.tests.test_analytic_account import TestMrpAnalyticAccount
 
 
@@ -77,6 +77,35 @@ class TestMrpAnalyticAccountHr(TestMrpAnalyticAccount):
         employee2_aa_line = mo.workorder_ids.employee_analytic_account_line_ids.filtered(lambda l: l.employee_id == self.employee2)
         self.assertEqual(employee2_aa_line[self.analytic_plan._column_name()], new_account)
         self.assertEqual(employee1_aa_line[self.analytic_plan._column_name()], new_account)
+        # Test the same thing but when the wo is marked as done from the widget
+        mo_2 = self.env['mrp.production'].create({
+            'product_id': self.product.id,
+            'bom_id': self.bom.id,
+            'product_qty': 1,
+            'project_id': self.project.id,
+        })
+        self.env.user.employee_id = self.employee1
+        mo_2.action_confirm()
+        mo_2.workorder_ids.action_mark_as_done()
+        mo_2.workorder_ids.invalidate_recordset(['duration'])
+        employee_aa_line = mo_2.workorder_ids.employee_analytic_account_line_ids.filtered(lambda l: l.employee_id == self.env.user.employee_id)
+        self.assertEqual(employee_aa_line.amount, -100.0)
+        self.assertEqual(mo_2.workorder_ids.mo_analytic_account_line_ids.amount, -10.0)
+
+    def test_mrp_private_project_linked_mo(self):
+        """Test when a MO is linked to a private project, an employee without project right
+        is able to work on the MO
+        """
+        production_worker = new_test_user(self.env, 'Bob', 'mrp.group_mrp_user')
+        self.project.privacy_visibility = 'followers'
+        mo = self.env['mrp.production'].create({
+            'product_id': self.product.id,
+            'bom_id': self.bom.id,
+            'product_qty': 1.0,
+            'project_id': self.project.id,
+        })
+        self.project.invalidate_recordset()
+        mo.with_user(production_worker).action_confirm()
 
     def test_mrp_analytic_account_without_workorder(self):
         """
@@ -203,6 +232,105 @@ class TestMrpAnalyticAccountHr(TestMrpAnalyticAccount):
         self.assertEqual(len(self.analytic_account.with_context(analytic_plan_id=self.analytic_account.plan_id.id).line_ids), 4, '2 lines for workcenters costs 2 for employee cost')
 
         # delete a time from a workorder
+        previous_balance = self.analytic_account.balance
         time.unlink()
-        self.assertEqual(self.analytic_account.balance, -32.5, '-40 + 7.5 (30 mins worker time)')
+        self.assertEqual(self.analytic_account.balance, previous_balance + 7.5, '-40 + 7.5 (30 mins worker time)')
         self.assertEqual(mo.workorder_ids[1].duration, 0, 'no time left on workorder')
+
+    def test_mrp_analytic_account_employee_from_widget(self):
+        """
+            Test adding a user time to a work order from the widget
+        """
+        user = self.env['res.users'].create({
+            'name': 'Marc Demo',
+            'email': 'mark.brown23@example.com',
+            'login': 'demo_1',
+            'password': 'demo_123'
+        })
+        self.employee1.write({
+            'user_id': user.id,
+            'hourly_cost': 100,
+        })
+        mo = self.env['mrp.production'].create({
+            'product_id': self.product.id,
+            'product_qty': 1,
+            'bom_id': self.bom.id,
+            'project_id': self.project.id
+        })
+        mo.action_confirm()
+        with Form(mo.workorder_ids) as form:
+            with form.time_ids.new() as line:
+                line.date_end = "2025-05-15 12:46:46"
+                line.date_start = "2025-05-15 12:16:46"
+                line.duration = 30
+                line.employee_id = self.employee1
+                line.loss_id = self.env.ref('mrp.block_reason7')
+                line.workcenter_id = self.workcenter
+
+        mo.button_mark_done()
+        # check that the aal is created with the right values
+        first_amount = mo.workorder_ids.employee_analytic_account_line_ids.filtered(lambda l: l.employee_id == self.employee1).amount
+        self.assertEqual(first_amount, -50, "the workcenter productivity has a duration of 30 min so the aal should be half of the employee's hourly cost")
+        # check that changing the date of a line without saving it does not create a new aal or modify the value of an existing one
+        with Form(mo.workorder_ids) as form:
+            with form.time_ids.edit(0) as line:
+                line.date_end = "2025-05-15 14:16:46"
+                self.assertEqual(mo.workorder_ids.employee_analytic_account_line_ids.filtered(lambda l: l.employee_id == self.employee1).amount, first_amount,
+                "changing the date_end and triggering the compute_duration method should not modify the aal amount")
+
+    def test_mrp_aa_employee_without_account_rights(self):
+        """
+            Test adding a user time to a work order with
+            a user admin on mrp but no rights on accounting.
+        """
+        user = new_test_user(self.env, 'temp_stock_manager', 'hr.group_hr_user,mrp.group_mrp_manager,project.group_project_user')
+        self.env['hr.employee'].create({
+            'user_id': user.id,
+            'image_1920': False,
+            'hourly_cost': 15,
+        })
+
+        mo_form = Form(self.env['mrp.production'])
+        mo_form.product_id = self.product
+        mo_form.bom_id = self.bom
+        mo_form.product_qty = 1.0
+        mo_form.project_id = self.project
+        mo_form.workorder_ids.duration_expected = 60
+        mo = mo_form.save()
+        mo.action_confirm()
+        with freeze_time('2027-10-01 10:00:00'):
+            mo.workorder_ids.with_user(user).start_employee(self.employee1.id)
+        with freeze_time('2027-10-01 12:00:00'):
+            self.env.invalidate_all()
+            mo.workorder_ids.with_user(user).stop_employee([self.employee1.id])
+        employee1_aa_line = mo.workorder_ids.employee_analytic_account_line_ids.filtered(lambda l: l.employee_id == self.employee1)
+        self.assertEqual(employee1_aa_line.amount, -200.0)
+        self.assertEqual(employee1_aa_line[self.analytic_plan._column_name()], self.analytic_account)
+
+    def test_change_employee_update_hourly_cost(self):
+        mo = self.env['mrp.production'].create({
+            'product_id': self.product.id,
+            'product_qty': 1,
+            'bom_id': self.bom.id,
+            'project_id': self.project.id,
+        })
+        mo.action_confirm()
+        with Form(mo.workorder_ids) as form:
+            with form.time_ids.new() as line:
+                line.duration = 60
+                line.employee_id = self.employee1
+                line.loss_id = self.env.ref('mrp.block_reason7')
+                line.workcenter_id = self.workcenter
+
+        aal = mo.workorder_ids.employee_analytic_account_line_ids.filtered(
+            lambda l: l.employee_id == self.employee1)
+        self.assertEqual(aal.amount, -100,
+                         "the workcenter productivity has a duration of 60 min so the AAL amount should be equal to employee1 hourly cost")
+        # check that changing the employee of a line should update the AAL amount and employee
+        with Form(mo.workorder_ids) as form:
+            with form.time_ids.edit(0) as line:
+                line.employee_id = self.employee2
+
+        self.assertEqual(aal.amount, -200,
+                         "the workcenter productivity has a duration of 60 min so the AAL should be equal to employee2 hourly cost")
+        self.assertEqual(aal.employee_id, self.employee2, "The employee on the AAL should change")

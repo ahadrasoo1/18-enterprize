@@ -1,23 +1,28 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* quality
-# 
+# * quality
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Patricia Gutiérrez Capetillo <pagc@odoo.com>, 2025
+# Fernanda Alvarez, 2025
+# "Fernanda Alvarez (mfar)" <mfar@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Spanish (Latin America) (https://app.transifex.com/odoo/teams/41243/es_419/)\n"
+"POT-Creation-Date: 2026-05-22 17:54+0000\n"
+"PO-Revision-Date: 2026-06-20 09:22+0000\n"
+"Last-Translator: \"Fernanda Alvarez (mfar)\" <mfar@odoo.com>\n"
+"Language-Team: Spanish (Latin America) <https://translate.odoo.com/projects/"
+"odoo-18/quality/es_419/>\n"
+"Language: es_419\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: es_419\n"
-"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=(n == 1) ? 0 : ((n != 0 && n % 1000000 == "
+"0) ? 1 : 2);\n"
+"X-Generator: Weblate 2026.6.1\n"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert_team__alert_count
@@ -36,8 +41,14 @@ msgid ""
 "A Python dictionary that will be evaluated to provide default values when "
 "creating new records for this alias."
 msgstr ""
-"Un diccionario de Python que se evaluará con el fin de proporcionar valores "
-"predeterminados cuando se creen nuevos registros para este seudónimo."
+"Un diccionario de Python que se evaluará con el fin de proporcionar los "
+"valores predeterminados al crear nuevos registros para este alias."
+
+#. module: quality
+#. odoo-python
+#: code:addons/quality/models/quality.py:0
+msgid "A quality team must have a company assigned."
+msgstr "Un equipo de calidad debe tener una empresa asignada."
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert__message_needaction
@@ -114,47 +125,47 @@ msgstr "Alertas"
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert_team__alias_id
 msgid "Alias"
-msgstr "Seudónimo"
+msgstr "Alias"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert_team__alias_contact
 msgid "Alias Contact Security"
-msgstr "Seudónimo del contacto de seguridad"
+msgstr "Seguridad del contacto del alias"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert_team__alias_domain_id
 msgid "Alias Domain"
-msgstr "Dominio del seudónimo"
+msgstr "Dominio del alias"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert_team__alias_domain
 msgid "Alias Domain Name"
-msgstr "Nombre del dominio del seudónimo"
+msgstr "Nombre del dominio del alias"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert_team__alias_full_name
 msgid "Alias Email"
-msgstr "Correo electrónico del seudónimo"
+msgstr "Correo electrónico del alias"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert_team__alias_name
 msgid "Alias Name"
-msgstr "Nombre del seudónimo"
+msgstr "Nombre del alias"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert_team__alias_status
 msgid "Alias Status"
-msgstr "Estado del seudónimo"
+msgstr "Estado del alias"
 
 #. module: quality
 #: model:ir.model.fields,help:quality.field_quality_alert_team__alias_status
 msgid "Alias status assessed on the last message received."
-msgstr "Estado del seudónimo evaluado en el último mensaje recibido."
+msgstr "Estado del alias evaluado en el último mensaje recibido."
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert_team__alias_model_id
 msgid "Aliased Model"
-msgstr "Modelo con seudónimo"
+msgstr "Modelo con alias"
 
 #. module: quality
 #: model_terms:ir.ui.view,arch_db:quality.quality_point_view_form
@@ -318,7 +329,7 @@ msgstr "Listo"
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert_team__alias_email
 msgid "Email Alias"
-msgstr "Seudónimo de correo electrónico"
+msgstr "Alias de correo"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert__email_cc
@@ -402,11 +413,11 @@ msgstr "ID"
 #. module: quality
 #: model:ir.model.fields,help:quality.field_quality_alert_team__alias_parent_thread_id
 msgid ""
-"ID of the parent record holding the alias (example: project holding the task"
-" creation alias)"
+"ID of the parent record holding the alias (example: project holding the task "
+"creation alias)"
 msgstr ""
-"ID del registro principal que tiene el seudónimo (ejemplo: el proyecto que "
-"contiene el seudónimo para la creación de tareas)"
+"ID del registro principal que tiene el alias (por ejemplo, el proyecto que "
+"contiene el alias para la creación de tareas)"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert__activity_exception_icon
@@ -426,8 +437,7 @@ msgstr "Icono que indica una actividad de excepción."
 #: model:ir.model.fields,help:quality.field_quality_check__message_needaction
 #: model:ir.model.fields,help:quality.field_quality_point__message_needaction
 msgid "If checked, new messages require your attention."
-msgstr ""
-"Si se encuentra seleccionado, hay nuevos mensajes que requieren su atención."
+msgstr "Si está seleccionado, hay nuevos mensajes que requieren tu atención."
 
 #. module: quality
 #: model:ir.model.fields,help:quality.field_quality_alert__message_has_error
@@ -439,7 +449,7 @@ msgstr ""
 #: model:ir.model.fields,help:quality.field_quality_point__message_has_error
 #: model:ir.model.fields,help:quality.field_quality_point__message_has_sms_error
 msgid "If checked, some messages have a delivery error."
-msgstr "Si se encuentra seleccionado, algunos mensajes tienen error de envío."
+msgstr "Si está seleccionado, algunos mensajes tienen error de envío."
 
 #. module: quality
 #: model:ir.model.fields,help:quality.field_quality_alert_team__alias_bounced_content
@@ -501,7 +511,7 @@ msgstr "Actividades atrasadas"
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert_team__alias_incoming_local
 msgid "Local-part based incoming detection"
-msgstr "Detección de entradas según las partes locales"
+msgstr "Detección entrante basada en la parte local"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert__lot_id
@@ -511,7 +521,7 @@ msgstr "Lote"
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_check__lot_id
 msgid "Lot/Serial"
-msgstr "Número de lote/serie "
+msgstr "Número de serie/lote"
 
 #. module: quality
 #: model:ir.model.fields.selection,name:quality.selection__quality_alert__priority__1
@@ -684,8 +694,8 @@ msgstr "ID del hilo del registro principal"
 #. module: quality
 #: model:ir.model.fields,help:quality.field_quality_alert_team__alias_parent_model_id
 msgid ""
-"Parent model holding the alias. The model holding the alias reference is not"
-" necessarily the model given by alias_model_id (example: project "
+"Parent model holding the alias. The model holding the alias reference is not "
+"necessarily the model given by alias_model_id (example: project "
 "(parent_model) and task (model))"
 msgstr ""
 "Modelo principal que posee el seudónimo. El modelo que contiene la "
@@ -724,12 +734,15 @@ msgid ""
 "Policy to post a message on the document using the mailgateway.\n"
 "- everyone: everyone can post\n"
 "- partners: only authenticated partners\n"
-"- followers: only followers of the related document or members of following channels\n"
+"- followers: only followers of the related document or members of following "
+"channels\n"
 msgstr ""
-"La política sobre cómo publicar un mensaje en el documento con el servidor de correo.\n"
+"La política sobre cómo publicar un mensaje en el documento con el servidor "
+"de correo.\n"
 "- Todos: todos pueden publicar\n"
 "- Contactos: solo los contactos verificados\n"
-"- Seguidores: solo los seguidores del documento relacionado o los miembros de los canales\n"
+"- Seguidores: solo los seguidores del documento relacionado o los miembros "
+"de los canales\n"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert__action_preventive
@@ -861,12 +874,12 @@ msgstr "Usuario responsable"
 #: model:ir.model.fields,field_description:quality.field_quality_alert__reason_id
 #: model_terms:ir.ui.view,arch_db:quality.quality_alert_view_search
 msgid "Root Cause"
-msgstr "Causa principal"
+msgstr "Causa raíz"
 
 #. module: quality
 #: model:ir.model,name:quality.model_quality_reason
 msgid "Root Cause for Quality Failure"
-msgstr "Causa principal por la que no pasó el control de calidad"
+msgstr "Causa raíz por la que no pasó el control de calidad"
 
 #. module: quality
 #: model:ir.model.fields,field_description:quality.field_quality_alert__message_has_sms_error
@@ -965,13 +978,13 @@ msgstr "Tipo de prueba"
 #. module: quality
 #: model:ir.model.fields,help:quality.field_quality_alert_team__alias_model_id
 msgid ""
-"The model (Odoo Document Kind) to which this alias corresponds. Any incoming"
-" email that does not reply to an existing record will cause the creation of "
-"a new record of this model (e.g. a Project Task)"
+"The model (Odoo Document Kind) to which this alias corresponds. Any incoming "
+"email that does not reply to an existing record will cause the creation of a "
+"new record of this model (e.g. a Project Task)"
 msgstr ""
-"El modelo (tipo de documento de Odoo) al que corresponde este seudónimo. "
+"El modelo (tipo de documento de Odoo) al que corresponde este alias. "
 "Cualquier correo entrante que no sea respuesta a un registro existente "
-"creará un nuevo registro de este modelo (por ejemplo, una tarea de "
+"creará un nuevo registro de este modelo (por ejemplo, una tarea en el "
 "proyecto)."
 
 #. module: quality
@@ -980,8 +993,8 @@ msgid ""
 "The name of the email alias, e.g. 'jobs' if you want to catch emails for "
 "<jobs@example.odoo.com>"
 msgstr ""
-"El nombre del seudónimo de correo electrónico. Por ejemplo, \"trabajos\" si "
-"desea recibir correos electrónicos en <trabajos@ejemplo.odoo.com>."
+"El nombre del alias del correo, por ejemplo, \"vacantes\" para recibir los "
+"mensajes de <vacantes@ejemplo.odoo.com>."
 
 #. module: quality
 #: model:res.groups,comment:quality.group_quality_manager

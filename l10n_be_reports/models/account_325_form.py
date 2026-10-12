@@ -352,9 +352,19 @@ class Form325(models.Model):
                 'fees': fees_per_partner.get(partner_id.id, 0.0),
                 'atn': atn_per_partner.get(partner_id.id, 0.0),
                 'exposed_expenses': exposed_expenses_per_partner.get(partner_id.id, 0.0),
-                'paid_amount': paid_amount_per_partner.get(partner_id.id, 0.0),
+                # don't report negative numbers
+                'paid_amount': max(paid_amount_per_partner.get(partner_id.id, 0.0), 0.0),
             }
             for partner_id in partner_ids.sorted(lambda p: (p.zip, p.name))
+            if (
+                self.currency_id.compare_amounts(paid_amount_per_partner.get(partner_id.id, 0.0), 250.0) >= 0
+                or self.currency_id.compare_amounts(sum([
+                    commissions_per_partner.get(partner_id.id, 0.0),
+                    fees_per_partner.get(partner_id.id, 0.0),
+                    atn_per_partner.get(partner_id.id, 0.0),
+                    exposed_expenses_per_partner.get(partner_id.id, 0.0),
+                ]), 250.0) >= 0
+            )
         ]
 
         return amount_per_partner
@@ -385,7 +395,10 @@ class Form325(models.Model):
                AND line.date BETWEEN %(move_date_from)s AND %(move_date_to)s
                AND line.parent_state = 'posted'
                AND line.company_id = %(company)s
+               AND line.balance != 0
           GROUP BY COALESCE(move.commercial_partner_id, line.partner_id)
+            -- negative number can't be reported and will result in a crash when generating the BOW file
+            HAVING ROUND(SUM(line.balance), %(decimal_places)s) > 0
         """, {
             'partners': partners.ids,
             'accounts': accounts.ids,
@@ -438,6 +451,7 @@ class Form325(models.Model):
                AND aml_payable.date BETWEEN %(invoice_date_from)s AND %(invoice_date_to)s
                AND aml_expense.date BETWEEN %(invoice_date_from)s AND %(invoice_date_to)s
                AND COALESCE(move_payable.commercial_partner_id, aml_payable.partner_id) = ANY(%(partner_ids)s)
+               AND aml_payable.balance != 0
         ),
         amount_paid_per_partner_based_on_bill_reconciled AS (
             SELECT paid_expense_line.partner_id AS partner_id,
@@ -463,6 +477,7 @@ class Form325(models.Model):
                AND account_tag_rel.account_account_tag_id = ANY(%(tag_ids)s)
                AND line.date BETWEEN %(payment_date_from)s AND %(payment_date_to)s
                AND line.partner_id = ANY(%(partner_ids)s)
+               AND line.balance != 0
         ),
         amount_paid AS (
             SELECT * FROM amount_paid_per_partner_based_on_bill_reconciled
@@ -494,7 +509,9 @@ class Form325(models.Model):
             for form_281_50 in self.form_281_50_ids:
                 attachments.append((form_281_50._get_pdf_file_name(), form_281_50._generate_281_50_form_pdf()))
 
-        if len(attachments) > 1:  # If there are more than one file, we zip all these files.
+        if not attachments:
+            raise UserError(_("No 281.50 lines found to generate a PDF. Please record a transaction with a 281.50 tag first."))
+        elif len(attachments) > 1:  # If there are more than one file, we zip all these files.
             downloaded_filename = f"281_50_forms_{self.reference_year}.zip"
             with tempfile.SpooledTemporaryFile() as tmp_file:  # We store the zip into a temporary file.
                 with zipfile.ZipFile(tmp_file, 'w', zipfile.ZIP_DEFLATED) as archive:  # We create the zip archive.

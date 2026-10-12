@@ -5,13 +5,14 @@ from collections import defaultdict
 from odoo import api, fields, models
 from odoo.exceptions import AccessError, UserError
 from odoo.tools import _, frozendict
+from odoo.models import PREFETCH_MAX
 
 
 class ProjectProject(models.Model):
     _name = 'project.project'
     _inherit = ['project.project', 'documents.mixin']
 
-    use_documents = fields.Boolean("Use Documents", default=True)
+    use_documents = fields.Boolean("Documents", default=True)
     documents_folder_id = fields.Many2one(
         'documents.document', string="Folder", copy=False,
         domain="[('type', '=', 'folder'), ('shortcut_document_id', '=', False), "
@@ -23,6 +24,14 @@ class ProjectProject(models.Model):
     document_count = fields.Integer(
         compute='_compute_documents', export_string_translation=False)
     document_ids = fields.One2many('documents.document', compute='_compute_documents', export_string_translation=False)
+
+    @api.ondelete(at_uninstall=False)
+    def _archive_folder_on_projects_unlinked(self):
+        """ Archives the project folder if all its related projects are unlinked. """
+        self.env['documents.document'].sudo().search([
+            ('project_ids', '!=', False),
+            ('project_ids', 'not any', [('id', 'not in', self.ids)]
+        )]).sudo(False)._filtered_access('unlink').action_archive()
 
     @api.constrains('documents_folder_id')
     def _check_company_is_folders_company(self):
@@ -49,6 +58,11 @@ class ProjectProject(models.Model):
             task_ids += ids
             for task_id in ids:
                 project_id_per_task_id[task_id] = project.id
+
+        # perf optimization:
+        # prefer a subquery when searching documents on too many tasks
+        if len(task_ids) > PREFETCH_MAX:
+            task_ids = self.env['project.task']._search([('project_id', 'in', self.ids)])
 
         documents_read_group = self.env['documents.document']._read_group(
             [
@@ -132,7 +146,8 @@ class ProjectProject(models.Model):
             self.documents_folder_id.sudo().name = vals['name']
 
         if new_visibility := vals.get('privacy_visibility'):
-            self.documents_folder_id.action_update_access_rights(
+            document_to_update = (self.documents_folder_id | self.document_ids).filtered(lambda doc: not doc.shortcut_document_id)
+            document_to_update.action_update_access_rights(
                 access_internal='none' if new_visibility == 'followers' else 'edit')
 
         res = super().write(vals)
@@ -147,7 +162,7 @@ class ProjectProject(models.Model):
     def copy(self, default=None):
         # We have to add no_create_folder=True to the context, otherwise a folder
         # will be automatically created during the call to create.
-        # However, we cannot use with_context, as it intanciates a new recordset,
+        # However, we cannot use with_context, as it instantiates a new recordset,
         # and this copy would call itself infinitely.
         previous_context = self.env.context
         self.env.context = frozendict(self.env.context, no_create_folder=True)
@@ -157,7 +172,7 @@ class ProjectProject(models.Model):
         for old_project, new_project in zip(self, copied_projects):
             if not self.env.context.get('no_create_folder') and new_project.use_documents and old_project.documents_folder_id:
                 new_project.documents_folder_id = old_project.documents_folder_id.with_context(
-                    documents_copy_folders_only=True).copy(
+                    documents_copy_folders_only=True).sudo().copy(
                         {'name': new_project.name, 'owner_id': self.env.ref('base.user_root').id}
                     )
         return copied_projects
@@ -181,18 +196,14 @@ class ProjectProject(models.Model):
 
     def action_view_documents_project(self):
         self.ensure_one()
-        action = self.env["ir.actions.actions"]._for_xml_id("documents.document_action")
-        return action | {
-            'view_mode': 'kanban,list',
-            'context': {
-                'active_id': self.id,
-                'active_model':  'project.project',
-                'default_res_id': self.id,
-                'default_res_model': 'project.project',
-                'no_documents_unique_folder_id': True,
-                'searchpanel_default_folder_id': self._get_document_folder().id,
-            }
+        action = self.documents_folder_id.get_formview_action()
+        action['context'] |= {
+            'active_id': self.id,
+            'active_model':  'project.project',
+            'default_res_id': self.id,
+            'default_res_model': 'project.project',
         }
+        return action
 
     def _get_document_access_ids(self):
         return False
@@ -201,7 +212,14 @@ class ProjectProject(models.Model):
         return self.documents_tag_ids
 
     def _get_document_folder(self):
-        return self.documents_folder_id
+        if self.use_documents:
+            if not self.documents_folder_id:
+                self._create_missing_folders()
+            return self.documents_folder_id
+        return super()._get_document_folder()
+
+    def _get_document_partner(self):
+        return self.partner_id
 
     def _get_document_vals_access_rights(self):
         return {

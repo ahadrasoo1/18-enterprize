@@ -1,5 +1,6 @@
 import { Component, onWillStart, onWillUpdateProps, useState } from "@odoo/owl";
 import { CheckBox } from "@web/core/checkbox/checkbox";
+import { Domain } from "@web/core/domain";
 import { DomainSelectorDialog } from "@web/core/domain_selector_dialog/domain_selector_dialog";
 import { rpc } from "@web/core/network/rpc";
 import { SelectMenu } from "@web/core/select_menu/select_menu";
@@ -164,7 +165,7 @@ export class ButtonProperties extends Component {
         const domain = rule.domain;
         this.dialog.add(DomainSelectorDialog, {
             resModel: this.env.viewEditorModel.resModel,
-            domain: JSON.stringify(domain || []),
+            domain: domain ? new Domain(domain).toString() : "[]",
             isDebugMode: !!this.env.debug,
             onConfirm: async (domain) => {
                 await this.decoratedOrmWrite("studio.approval.rule", [id], {

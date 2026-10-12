@@ -7,9 +7,11 @@ import { useService } from "@web/core/utils/hooks";
 import { MultiRecordSelector } from "@web/core/record_selectors/multi_record_selector";
 import { Domain } from "@web/core/domain";
 import { user } from "@web/core/user";
-
+import { components } from "@odoo/o-spreadsheet";
 import { useState } from "@odoo/owl";
 import { SidePanelDomain } from "../../../components/side_panel_domain/side_panel_domain";
+
+const { ValidationMessages } = components;
 
 /**
  * @typedef {import("@spreadsheet").OdooField} OdooField
@@ -34,6 +36,7 @@ export class RelationFilterEditorSidePanel extends AbstractFilterEditorSidePanel
         MultiRecordSelector,
         FilterEditorFieldMatching,
         SidePanelDomain,
+        ValidationMessages,
     };
     setup() {
         super.setup();
@@ -82,22 +85,6 @@ export class RelationFilterEditorSidePanel extends AbstractFilterEditorSidePanel
     }
 
     /**
-     * List of model names of all related models of all pivots
-     * @returns {Array<string>}
-     */
-    get relatedModels() {
-        const all = this.fieldMatchings.map((object) => Object.values(object.fields()));
-        return [
-            ...new Set(
-                all
-                    .flat()
-                    .filter((field) => field.relation)
-                    .map((field) => field.relation)
-            ),
-        ];
-    }
-
-    /**
      * @override
      * @param {GlobalFilter} globalFilter
      */
@@ -111,6 +98,9 @@ export class RelationFilterEditorSidePanel extends AbstractFilterEditorSidePanel
 
     async onWillStart() {
         await super.onWillStart();
+        if (!this.isValid) {
+            return;
+        }
         const promises = [this.fetchModelFromName()];
         if (this.relationState.includeChildren) {
             this.relationState.relatedModel.hasParentRelation = true;
@@ -124,10 +114,14 @@ export class RelationFilterEditorSidePanel extends AbstractFilterEditorSidePanel
      * Get the first field which could be a relation of the current related
      * model
      *
+     * @param {string} model
      * @param {Object.<string, OdooField>} fields Fields to look in
      * @returns {field|undefined}
      */
-    _findRelation(fields) {
+    _findRelation(model, fields) {
+        if (this.relationState.relatedModel.technical === model) {
+            return Object.values(fields).find((field) => field.name === "id");
+        }
         const field = Object.values(fields).find(
             (field) =>
                 field.searchable && field.relation === this.relationState.relatedModel.technical
@@ -147,7 +141,7 @@ export class RelationFilterEditorSidePanel extends AbstractFilterEditorSidePanel
         this.relationState.domainOfAllowedValues = [];
 
         this.fieldMatchings.forEach((object, index) => {
-            const field = this._findRelation(object.fields());
+            const field = this._findRelation(object.model(), object.fields());
             this.onSelectedField(index, field ? field.name : undefined, field);
         });
         await this.fetchModelRelation();

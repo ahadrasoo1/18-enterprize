@@ -1,7 +1,7 @@
 import datetime
 from dateutil.relativedelta import relativedelta
 from markupsafe import Markup
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 from odoo.addons.account_accountant.tests.test_signature import TestInvoiceSignature
 from odoo.addons.mail.tests.common import MockEmail
@@ -15,6 +15,11 @@ from odoo.exceptions import AccessError, ValidationError, UserError
 
 @tagged('post_install', '-at_install')
 class TestSubscription(TestSubscriptionCommon, MockEmail):
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.product_a.recurring_invoice = False
 
     def flush_tracking(self):
         """ Force the creation of tracking values. """
@@ -89,7 +94,7 @@ class TestSubscription(TestSubscriptionCommon, MockEmail):
             self.assertEqual(datetime.date(2021, 2, 3), sub.next_invoice_date, 'next invoice date should be updated')
             inv = sub.invoice_ids.sorted('date')[-1]
             inv_line = inv.invoice_line_ids[0].sorted('id')[0]
-            invoice_periods = inv_line.name.split('\n')[1]
+            invoice_periods = inv_line.name.split('\n')[2]
             self.assertEqual(invoice_periods, "1 Months 01/03/2021 to 02/02/2021")
             self.assertEqual(inv_line.date, datetime.date(2021, 1, 3))
 
@@ -100,7 +105,7 @@ class TestSubscription(TestSubscriptionCommon, MockEmail):
             self.assertEqual(datetime.date(2021, 1, 3), sub.start_date, 'start date should not changed')
             self.assertEqual(datetime.date(2021, 3, 3), sub.next_invoice_date, 'next invoice date should be in 1 month')
             inv = sub.invoice_ids.sorted('date')[-1]
-            invoice_periods = inv.invoice_line_ids[1].name.split('\n')[1]
+            invoice_periods = inv.invoice_line_ids[1].name.split('\n')[2]
             self.assertEqual(invoice_periods, "1 Months 02/03/2021 to 03/02/2021")
             self.assertEqual(inv.invoice_line_ids[1].date, datetime.date(2021, 2, 3))
 
@@ -108,7 +113,7 @@ class TestSubscription(TestSubscriptionCommon, MockEmail):
             self.env['sale.order']._cron_recurring_create_invoice()
             self.assertEqual(datetime.date(2021, 4, 3), sub.next_invoice_date, 'next invoice date should be in 1 month')
             inv = sub.invoice_ids.sorted('date')[-1]
-            invoice_periods = inv.invoice_line_ids[0].name.split('\n')[1]
+            invoice_periods = inv.invoice_line_ids[0].name.split('\n')[2]
             self.assertEqual(invoice_periods, "1 Months 03/03/2021 to 04/02/2021")
             self.assertEqual(inv.invoice_line_ids[0].date, datetime.date(2021, 3, 3))
 
@@ -294,6 +299,39 @@ class TestSubscription(TestSubscriptionCommon, MockEmail):
         invoice._post()  # should not throw an error
         self.assertEqual(invoice.line_ids.product_id, sub_product1 | sub_product2)
 
+    def test_invoicing_access_rights(self):
+        """Ensure a salesman can get amount invoiced for subscriptions with others' invoices."""
+        sales_user = self.company_data['default_user_salesman']
+        self.subscription.write({
+            'user_id': sales_user.id,
+            'order_line': [Command.create({
+                'name': "Non-recurring product",
+                'product_id': self.product_a.id,
+                'tax_id': False,
+            })],
+        })
+        self.subscription.action_confirm()
+        self.assertAlmostEqual(
+            self.subscription.with_user(sales_user).amount_to_invoice,
+            sum(self.subscription.order_line.mapped('price_total')),
+            msg="All lines should still need to be invoiced",
+        )
+
+        # assign a different user to the invoice
+        invoice = self.subscription._create_recurring_invoice()
+        invoice.user_id = self.env.ref('base.user_admin')
+
+        # ensure salesman doesn't have access to just any invoice
+        invoice.invalidate_recordset(['name'])
+        with self.assertRaises(AccessError):
+            invoice.with_user(sales_user).user_id = sales_user
+
+        self.assertAlmostEqual(
+            self.subscription.with_user(sales_user).amount_invoiced,
+            self.product_a.list_price,
+            msg="We should get the amount invoiced for non-recurring products",
+        )
+
     @mute_logger('odoo.addons.base.models.ir_model', 'odoo.models')
     def test_unlimited_sale_order(self):
         """ Test behaviour of on_change_template """
@@ -323,7 +361,7 @@ class TestSubscription(TestSubscriptionCommon, MockEmail):
             # Next invoice date should not be bumped up because it is the first period
             self.assertEqual("2021-02-03", sub.next_invoice_date.strftime("%Y-%m-%d"))
 
-            invoice_periods = sub.invoice_ids.invoice_line_ids.name.split('\n')[1]
+            invoice_periods = sub.invoice_ids.invoice_line_ids.name.split('\n')[2]
             self.assertEqual(invoice_periods, "1 Months 01/03/2021 to 02/02/2021")
             self.assertEqual(sub.invoice_ids.invoice_line_ids.date, datetime.date(2021, 1, 3))
         with freeze_time("2021-02-03"):
@@ -332,7 +370,7 @@ class TestSubscription(TestSubscriptionCommon, MockEmail):
             self.assertEqual("2021-02-03", sub.last_invoice_date.strftime("%Y-%m-%d"))
             self.assertEqual("2021-03-03", sub.next_invoice_date.strftime("%Y-%m-%d"))
             inv = sub.invoice_ids.sorted('date')[-1]
-            invoice_periods = inv.invoice_line_ids.name.split('\n')[1]
+            invoice_periods = inv.invoice_line_ids.name.split('\n')[2]
             self.assertEqual(invoice_periods, "1 Months 02/03/2021 to 03/02/2021")
             self.assertEqual(inv.invoice_line_ids.date, datetime.date(2021, 2, 3))
         with freeze_time("2021-03-03"):
@@ -341,7 +379,7 @@ class TestSubscription(TestSubscriptionCommon, MockEmail):
             self.assertEqual("2021-03-03", sub.last_invoice_date.strftime("%Y-%m-%d"))
             self.assertEqual("2021-04-03", sub.next_invoice_date.strftime("%Y-%m-%d"))
             inv = sub.invoice_ids.sorted('date')[-1]
-            invoice_periods = inv.invoice_line_ids.name.split('\n')[1]
+            invoice_periods = inv.invoice_line_ids.name.split('\n')[2]
             self.assertEqual(invoice_periods, "1 Months 03/03/2021 to 04/02/2021")
             self.assertEqual(inv.invoice_line_ids.date, datetime.date(2021, 3, 3))
 
@@ -377,7 +415,7 @@ class TestSubscription(TestSubscriptionCommon, MockEmail):
         with freeze_time("2021-03-03"):
             # March
             inv = sub._create_recurring_invoice()
-            self.assertAlmostEqual(inv.amount_untaxed, 84 * 16 / 31, 1)   # 03 to 18 = 16 days (03 and 18 are inclusive)
+            self.assertAlmostEqual(inv.amount_untaxed, 84, 1,  msg="Last period is full too 01 to 01 even if the end_date occurs in the middle of the period")
 
     @mute_logger('odoo.addons.base.models.ir_model', 'odoo.models')
     def test_invoice_on_period_start_service_sale_order(self):
@@ -402,7 +440,7 @@ class TestSubscription(TestSubscriptionCommon, MockEmail):
             sub.plan_id.billing_first_day = True
             sub.action_confirm()
             inv = sub._create_recurring_invoice()
-            self.assertAlmostEqual(inv.amount_untaxed, 84 * 17 / 31, 1)   # 15 to 31 is 17 days (15 and 31 included)
+            self.assertAlmostEqual(inv.amount_untaxed, 84 * 17 / 31, 1, msg="15 to 31 is 17 days (15 and 31 included)")
 
         with freeze_time("2021-02-01"):
             # February
@@ -412,7 +450,7 @@ class TestSubscription(TestSubscriptionCommon, MockEmail):
         with freeze_time("2021-03-01"):
             # March
             inv = sub._create_recurring_invoice()
-            self.assertAlmostEqual(inv.amount_untaxed, 84 * 18 / 31, 1)  # 01 to 18 is 18 is 18 days (1 and 18 and inc.)
+            self.assertAlmostEqual(inv.amount_untaxed, 84, 1, msg="Last period is full too 01 to 01 even if the end_date occurs in the middle of the period")
 
     @mute_logger('odoo.models.unlink')
     def test_renewal(self):
@@ -425,6 +463,7 @@ class TestSubscription(TestSubscriptionCommon, MockEmail):
                 'partner_invoice_id': self.partner_a_invoice.id,
                 'partner_shipping_id': self.partner_a_shipping.id,
                 'internal_note': 'internal note',
+                'tag_ids': [Command.create({'name': 'Subscription Tag'})]
             })            # add an so line with a different uom
             uom_dozen = self.env.ref('uom.product_uom_dozen').id
             self.subscription_tmpl.duration_value = 2 # end after 2 months to adapt to the following line
@@ -436,6 +475,7 @@ class TestSubscription(TestSubscriptionCommon, MockEmail):
                                                 'product_uom': uom_dozen,
                                                 'price_unit': 42})
 
+            self.subscription.message_subscribe([self.env.user.partner_id.id, self.partner_a.id])
             self.subscription.action_confirm()
             self.subscription._create_recurring_invoice()
             self.assertEqual(self.subscription.end_date, datetime.date(2022, 1, 17), 'The end date of the subscription should be updated according to the template')
@@ -473,6 +513,8 @@ class TestSubscription(TestSubscriptionCommon, MockEmail):
             self.assertEqual(self.subscription.subscription_state, '5_renewed')
             self.assertEqual(renewal_so.date_order.date(), self.subscription.end_date, 'renewal start date should depends on the parent end date')
             self.assertEqual(renewal_so.start_date, self.subscription.end_date, 'The renewal subscription start date and the renewed end_date should be aligned')
+            self.assertEqual(renewal_so.message_follower_ids.mapped('partner_id'), self.subscription.message_follower_ids.mapped('partner_id'), 'The followers from the subscription should also follow the renewal')
+            self.assertEqual(renewal_so.tag_ids, self.subscription.tag_ids, 'The tags from the subscription should have been copied to the renewal')
 
             self.assertEqual(renewal_so.plan_id, self.plan_month, 'the plan should be propagated')
             self.assertEqual(renewal_so.next_invoice_date, datetime.date(2021, 12, 18))
@@ -527,7 +569,7 @@ class TestSubscription(TestSubscriptionCommon, MockEmail):
         upsell_so.start_date = False
         upsell_so.action_confirm()
         upsell_so._create_invoices()
-        self.assertEqual(self.subscription.order_line.sorted('id').mapped('product_uom_qty'), [1.0, 1.0, 14.0, 15.0], "Quantities should be equal to 1.0, 1.0, 14.0, 15.0")
+        self.assertEqual(self.subscription.order_line.sorted('id').mapped('product_uom_qty'), [7.0, 7.0, 8.0, 9.0])
 
     def test_upsell_via_so(self):
         # Test the upsell flow using an intermediary upsell quote.
@@ -594,7 +636,9 @@ class TestSubscription(TestSubscriptionCommon, MockEmail):
                 'product_uom': self.product3.uom_id.id,
                 'price_unit': self.product3.list_price,
             })]
+            self.assertEqual(upsell_so.type_name, "Quotation")
             upsell_so.action_confirm()
+            self.assertEqual(upsell_so.type_name, "Sales Order")
             self.subscription._create_recurring_invoice()
             self.subscription.invoice_ids.filtered(lambda am: am.state == 'draft')._post()
             discounts = [round(v, 2) for v in upsell_so.order_line.sorted('discount').mapped('discount')]
@@ -630,12 +674,30 @@ class TestSubscription(TestSubscriptionCommon, MockEmail):
             self.subscription.invoice_ids.filtered(lambda am: am.state == 'draft')._post()
             inv = self.subscription.invoice_ids.sorted('date')[-1]
             invoice_periods = inv.invoice_line_ids.sorted('id').mapped('name')
-            first_period = invoice_periods[0].split('\n')[1]
+            first_period = invoice_periods[0].split('\n')[2]
             self.assertEqual(first_period, "1 Months 08/01/2021 to 08/31/2021")
-            second_period = invoice_periods[1].split('\n')[1]
+            second_period = invoice_periods[1].split('\n')[2]
             self.assertEqual(second_period, "1 Months 08/01/2021 to 08/31/2021")
 
         self.assertEqual(len(self.subscription.order_line), 4)
+
+    def test_sale_subscription_set_date(self):
+        """ Test case to verify that updating the `start_date` on a copied upsell sale order
+            correctly sets the new date in the subscription. """
+        with freeze_time("2024-11-01"):
+            self.subscription.action_confirm()
+            self.env['sale.order']._cron_recurring_create_invoice()
+
+        with freeze_time("2024-11-11"):
+            # Prepare the upsell order from the subscription
+            action = self.subscription.prepare_upsell_order()
+            upsell_so = self.env['sale.order'].browse(action['res_id'])
+            # Copy the upsell order
+            upsell_so_new = upsell_so.copy()
+            # Set a new start date on the copied upsell order
+            new_start_date = fields.Date.from_string("2024-11-12")
+            upsell_so_new.write({'start_date': new_start_date})
+            self.assertEqual(upsell_so_new.start_date, new_start_date, "The start date of the copied upsell order should be updated.")
 
     def test_subscription_order_line_description(self):
         with freeze_time("2024-04-01"):
@@ -737,6 +799,46 @@ class TestSubscription(TestSubscriptionCommon, MockEmail):
         self.assertAlmostEqual(self.subscription.amount_untaxed, 70, msg='Recompute price_unit : 50 (product) + 20 (product2)')
         # 1200 over 4 year = 25/year + 100 per month
         self.assertAlmostEqual(self.subscription.recurring_monthly, 5.84, msg='70 / 12')
+
+    def test_recurring_total(self):
+        """Test rounding of (non-) recurring total"""
+        self.company.write({
+            'currency_id': self.env.ref('base.BGN').id,
+            'account_price_include': 'tax_included',
+            'tax_calculation_rounding_method': 'round_globally',
+        })
+        sub_tax = self.env['account.tax'].create({
+            'name': '20% BG',
+            'amount': 20,
+            'company_id': self.company.id,
+        })
+        subscription = self.env['sale.order'].create({
+            'name': 'TestSubscription',
+            'is_subscription': True,
+            'company_id': self.company.id,
+            'plan_id': self.plan_month.id,
+            'partner_id': self.user_portal.partner_id.id,
+            'order_line': [
+                Command.create({'product_id': self.product.id,
+                                'price_unit': 140,
+                                'tax_id': [Command.set(sub_tax.ids)]
+                                }),
+                Command.create({'product_id': self.product.id,
+                                'price_unit': 36.97,
+                                'tax_id': [Command.set(sub_tax.ids)]
+                                }),
+                Command.create({'product_id': self.product.id,
+                                'price_unit': 36.97,
+                                'tax_id': [Command.set(sub_tax.ids)]
+                                }),
+                Command.create({'product_id': self.product.id,
+                                'price_unit': 21,
+                                'tax_id': [Command.set(sub_tax.ids)]
+                                }),
+                ]
+        })
+        self.assertEqual(subscription.non_recurring_total, 0)
+        self.assertEqual(subscription.recurring_total, 195.78)
 
     def test_compute_kpi(self):
         self.env['sale.order.alert'].create([
@@ -1557,8 +1659,8 @@ class TestSubscription(TestSubscriptionCommon, MockEmail):
         """ Update the taxes of confirmed lines when the subscription company is updated """
         tax_group_1 = self.env['account.tax.group'].create({
             'name': 'Test tax group',
-            'tax_receivable_account_id': self.company_data['default_account_receivable'].copy().id,
-            'tax_payable_account_id': self.company_data['default_account_payable'].copy().id,
+            'tax_receivable_account_id': self.company_data['default_tax_account_receivable'].copy().id,
+            'tax_payable_account_id': self.company_data['default_tax_account_payable'].copy().id,
         })
         sale_tax_percentage_incl_1 = self.env['account.tax'].create({
             'name': 'sale_tax_percentage_incl_1',
@@ -1572,8 +1674,8 @@ class TestSubscription(TestSubscriptionCommon, MockEmail):
         tax_group_2 = self.env['account.tax.group'].create({
             'name': 'Test tax group',
             'company_id': other_company_data['company'].id,
-            'tax_receivable_account_id': other_company_data['default_account_receivable'].copy().id,
-            'tax_payable_account_id': other_company_data['default_account_payable'].copy().id,
+            'tax_receivable_account_id': other_company_data['default_tax_account_receivable'].copy().id,
+            'tax_payable_account_id': other_company_data['default_tax_account_payable'].copy().id,
         })
         sale_tax_percentage_incl_2 = self.env['account.tax'].create({
             'name': 'sale_tax_percentage_incl_2',
@@ -1892,6 +1994,11 @@ class TestSubscription(TestSubscriptionCommon, MockEmail):
 
             subscriptions = subscription_future + subscription_now + subscription_past
             subscriptions.action_confirm()
+
+            self.assertEqual(subscription_now.next_invoice_date, datetime.date(2022, 6, 15), "Postpaid subscription first invoice should be end of period")
+            self.assertEqual(subscription_past.next_invoice_date, datetime.date(2022, 5, 15), "Postpaid subscription first invoice should be end of period")
+            self.assertEqual(subscription_future.next_invoice_date, datetime.date(2022, 7, 1), "Postpaid subscription first invoice should be end of period")
+
             # Nothing delivered, nothing invoiced
             self.assertEqual(subscription_future.order_line.invoice_status, 'no', "The line qty should be black.")
             self.assertEqual(subscription_now.order_line.invoice_status, 'no', "The line qty should be black.")
@@ -1911,7 +2018,13 @@ class TestSubscription(TestSubscriptionCommon, MockEmail):
             )
             subscriptions._create_recurring_invoice()
             self.assertEqual(subscription_past.order_line.invoice_status, 'invoiced', "The line qty should be invoiced.")
-            self.assertEqual(subscription_now.order_line.invoice_status, 'invoiced', "The line qty should be invoiced.")
+            self.assertEqual(subscription_now.order_line.invoice_status, 'to invoice', "The line qty should not be invoiced yet.")
+            self.assertEqual(subscription_future.order_line.invoice_status, 'no', "The line qty should be black.")
+
+        with freeze_time('2022-06-15'):
+            subscriptions._create_recurring_invoice()
+            self.assertEqual(subscription_past.order_line.invoice_status, 'invoiced', "The line qty should be invoiced.")
+            self.assertEqual(subscription_now.order_line.invoice_status, 'invoiced', "The line qty should not be invoiced yet.")
             self.assertEqual(subscription_future.order_line.invoice_status, 'no', "The line qty should be black.")
 
     def test_product_pricing_respects_variants(self):
@@ -2206,6 +2319,30 @@ class TestSubscription(TestSubscriptionCommon, MockEmail):
                     'qty_delivered': 3,
                     'product_uom': delivered_product_tmpl.product_variant_id.uom_id.id
         })],})
+
+        # Test constraint works when product is added through catalog.
+        # the base _update_order_line_info calls request.update_context() which
+        # requires an active HTTP request. We mock it so the validation logic can be tested.
+        sub3 = self.subscription.copy()
+        sub3.order_line.unlink()
+        sub3.order_line = [Command.create({
+            'name': self.product_tmpl_5.name,
+            'product_id': self.product_tmpl_5.product_variant_id.id,
+            'product_uom_qty': 1,
+            'product_uom': self.product_tmpl_5.product_variant_id.uom_id.id,
+        })]
+        sub3.plan_id = False
+        sub3.action_confirm()
+        with patch('odoo.addons.sale.models.sale_order.request', new=MagicMock()):
+            with self.assertRaisesRegex(UserError, 'Please add a recurring plan on the subscription or remove the recurring product.'):
+                sub3._update_order_line_info(self.product.id, 1)
+
+        # Test adding recurring product in draft SO through catalog should NOT raise.
+        sub4 = self.subscription.copy()
+        sub4.order_line.unlink()
+        sub4.plan_id = False
+        with patch('odoo.addons.sale.models.sale_order.request', new=MagicMock()):
+            sub4._update_order_line_info(self.product.id, 1)
 
     def test_multiple_renew(self):
         """ Prevent to confirm several renewal quotation for the same subscription """
@@ -2701,17 +2838,17 @@ class TestSubscription(TestSubscriptionCommon, MockEmail):
 
             self.assertEqual(self.subscription.invoice_count, 1)
             invoice = self.subscription.invoice_ids.sorted('id')[-1]
-            self.assertAlmostEqual(invoice.amount_total, 10, 4, 'Downpayment price should be 10')
+            self.assertAlmostEqual(invoice.amount_total, 10, 4, msg='Downpayment price should be 10')
             invoice._post()
             self.assertEqual(self.subscription.next_invoice_date, datetime.date(2021, 1, 3))
             invoice = self.subscription._create_invoices(final=True)  # manual
-            self.assertAlmostEqual(invoice.amount_total, total - 10, 4, 'Downpayment should be deducted from the price')
+            self.assertAlmostEqual(invoice.amount_total, total - 10, 4, msg='Downpayment should be deducted from the price')
             invoice._post()
             self.assertEqual(self.subscription.next_invoice_date, datetime.date(2021, 2, 3))
 
         with freeze_time('2021-02-03'):
             inv = self.subscription._create_recurring_invoice()
-            self.assertAlmostEqual(inv.amount_total, total, 4, 'Downpayment should not be deducted from the price anymore')
+            self.assertAlmostEqual(inv.amount_total, total, 4, msg='Downpayment should not be deducted from the price anymore')
 
     def test_downpayment_manual_invoice(self):
         """ Test invoice with a way of downpayment and check downpayment's SO line is created
@@ -2739,18 +2876,18 @@ class TestSubscription(TestSubscriptionCommon, MockEmail):
 
             self.assertEqual(self.subscription.invoice_count, 1)
             invoice = self.subscription.invoice_ids.sorted('id')[-1]
-            self.assertAlmostEqual(invoice.amount_total, 10, 4, 'Downpayment price should be 10')
+            self.assertAlmostEqual(invoice.amount_total, 10, 4, msg='Downpayment price should be 10')
             invoice._post()
 
             invoice = self.subscription._create_invoices(final=True)
             invoice._post()
 
-            self.assertAlmostEqual(invoice.amount_total, total - 10, 4, 'Downpayment should be deducted from the price')
+            self.assertAlmostEqual(invoice.amount_total, total - 10, 4, msg='Downpayment should be deducted from the price')
 
         with freeze_time('2021-02-03'):
             invoice = self.subscription._create_invoices(final=True)
             self.assertAlmostEqual(invoice.amount_total, total, 4,
-                                   'Downpayment should not be deducted from the price anymore')
+                                   msg='Downpayment should not be deducted from the price anymore')
 
     def test_upsell_with_different_currency_throws_error(self):
         pricelist_eur = self.env['product.pricelist'].create({
@@ -2890,8 +3027,14 @@ class TestSubscription(TestSubscriptionCommon, MockEmail):
             # You cannot cancel a subscription that has been invoiced
             sub_paused._action_cancel()
         sub_paused.subscription_state = '6_churn'
+        with self.assertRaises(ValidationError):
+            sub_paused._action_cancel()
+        sub_paused.invoice_ids.button_cancel()
         self.assertEqual(sub_paused.state, 'sale')
         sub_progress.subscription_state = '6_churn'
+        with self.assertRaises(ValidationError):
+            sub_progress._action_cancel()
+        sub_progress.invoice_ids.button_cancel()
         sub_progress._action_cancel()
         sub_progress.set_open()
         action = sub_progress.prepare_renewal_order()
@@ -3754,12 +3897,18 @@ class TestSubscription(TestSubscriptionCommon, MockEmail):
     def test_upsell_total_qty(self):
         self.subscription.action_confirm()
         self.subscription._create_recurring_invoice()
+        next_invoice_date = self.subscription.next_invoice_date
         action = self.subscription.prepare_upsell_order()
         upsell_so = self.env['sale.order'].browse(action['res_id'])
         upsell_so.order_line.filtered(lambda l: not l.display_type).product_uom_qty = 2
         upsell_so.action_confirm()
         for line in upsell_so.order_line.filtered(lambda l: not l.display_type):
             self.assertEqual(line.upsell_total, 3)
+        invoice = upsell_so._create_invoices()
+        # simulate wrong historical data
+        invoice.invoice_line_ids.filtered('deferred_end_date').deferred_end_date = next_invoice_date + relativedelta(days=5)
+        invoice._post()
+        self.assertEqual(self.subscription.next_invoice_date, next_invoice_date, "The next Invoice date should not be updated by an upsell")
 
     def test_sale_subscription_upsell_does_not_copy_non_recurring_products(self):
         nr_product = self.env['product.template'].create({
@@ -3892,6 +4041,83 @@ class TestSubscription(TestSubscriptionCommon, MockEmail):
         new_invoice = inv.copy()
         self.assertEqual(sub.invoice_ids, inv | new_invoice)
 
+    def test_recurring_invoice_cron_trigger(self):
+        """
+        Test that the cron job to create recurring invoices is triggered only
+        when count of subscriptions to invoice is greater than batch size.
+        """
+        SaleOrder = self.env['sale.order']
+        with freeze_time("2024-05-01"):
+            subscriptions = []
+            for i in range (4):
+                subscriptions.append(SaleOrder.create({
+                    'name': 'require payment %s' % str(i),
+                    'is_subscription': True,
+                    'partner_id': self.user_portal.partner_id.id,
+                    'pricelist_id': self.company_data['default_pricelist'].id,
+                    'plan_id': self.plan_month.id,
+                    'order_line': [
+                        Command.create({
+                            'product_id': self.product.id,
+                            'product_uom_qty': 1
+                        }),
+                    ],
+                    'require_payment': True,
+                }))
+                subscriptions[-1].action_confirm()
+
+            # no subscription should be invoiced which means we should not trigger cron job
+            all_subscriptions, need_cron_trigger = SaleOrder._recurring_invoice_get_subscriptions(batch_size=3)
+            self.assertFalse(need_cron_trigger)
+            self.assertFalse(all_subscriptions)
+
+    def test_recurring_invoice_cron_batch(self):
+        """
+        Check all subscriptions are processed by the cron when there are more than batch_size of them and
+        some of them are filtered by _get_subscriptions_to_invoice.
+        """
+        SaleOrder = self.env['sale.order']
+        subscriptions_to_invoice = self.env['sale.order']
+
+        for i in range(5):
+            sub_to_invoice = SaleOrder.create({
+                'name': 'Payment not required',
+                'is_subscription': True,
+                'partner_id': self.user_portal.partner_id.id,
+                'pricelist_id': self.company_data['default_pricelist'].id,
+                'plan_id': self.plan_month.id,
+                'order_line': [
+                    Command.create({
+                        'product_id': self.product.id,
+                        'product_uom_qty': 1
+                    }),
+                ],
+                'require_payment': False,
+            })
+            sub_to_invoice.action_confirm()
+            subscriptions_to_invoice += sub_to_invoice
+
+        for i in range(2):
+            sub = SaleOrder.create({
+                'name': 'require payment %s' % str(i),
+                'is_subscription': True,
+                'partner_id': self.user_portal.partner_id.id,
+                'pricelist_id': self.company_data['default_pricelist'].id,
+                'plan_id': self.plan_month.id,
+                'order_line': [
+                    Command.create({
+                        'product_id': self.product.id,
+                        'product_uom_qty': 1
+                    }),
+                ],
+                'require_payment': True,
+            })
+            sub.action_confirm()
+
+        SaleOrder._create_recurring_invoice(batch_size=3)
+
+        self.assertTrue(all(sub.invoice_ids))
+
     def test_amount_to_invoice_with_subscription(self):
         one_shot_product_tmpl = self.env['product.template'].create({
             'name': 'One shot product',
@@ -4007,6 +4233,27 @@ class TestSubscription(TestSubscriptionCommon, MockEmail):
                 self.env['sale.order']._cron_recurring_send_payment_reminder()
                 # it should close the subscription
                 self.assertEqual(self.subscription.subscription_state, '6_churn')
+
+    def test_cron_recurring_send_payment_reminder_duplicate(self):
+        """
+        The copy of a subscription should not have its last_reminder_date set in order to permit the
+        delivery of payment reminder for the duplicate subscription.
+        """
+        with freeze_time("2026-04-21"):
+            self.subscription.require_payment = True
+            self.subscription.action_confirm()
+
+        with self.mock_mail_gateway():
+            with freeze_time("2026-04-28"):
+                self.env['sale.order']._cron_recurring_send_payment_reminder()
+                self.assertEqual(len(self._new_mails), 1)
+                self.assertEqual(self.subscription.last_reminder_date, fields.Date.today())
+                subscription_copy = self.subscription.copy()
+                self.assertFalse(subscription_copy.last_reminder_date)
+                subscription_copy.action_confirm()
+                self.env['sale.order']._cron_recurring_send_payment_reminder()
+                self.assertEqual(len(self._new_mails), 2)
+                self.assertEqual(subscription_copy.last_reminder_date, fields.Date.today())
 
     def test_cron_recurring_send_payment_reminder_failure(self):
         with freeze_time("2024-05-01"):
@@ -4213,6 +4460,402 @@ class TestSubscription(TestSubscriptionCommon, MockEmail):
 
             SaleOrder._cron_recurring_send_payment_reminder()
 
+    def test_compute_last_invoiced_date(self):
+        with freeze_time("2024-09-01"):
+            subscription = self.env['sale.order'].create({
+                'partner_id': self.partner.id,
+                'plan_id': self.plan_month.id,
+                'order_line': [
+                    (0, 0, {
+                        'name': self.product.name,
+                        'product_id': self.product.id,
+                        'product_uom_qty': 3.0,
+                        'product_uom': self.product.uom_id.id,
+                        'price_unit': 12,
+                    })],
+            })
+            subscription.action_confirm()
+            inv = subscription._create_recurring_invoice()
+            self.assertEqual(subscription.order_line.last_invoiced_date, datetime.date(2024, 9, 30), "Last invoiced date is updated")
+            self.assertEqual(subscription.next_invoice_date, datetime.date(2024, 10, 1), "Next invoice date is updated")
+
+        with freeze_time("2024-10-01"):
+            inv = subscription._create_recurring_invoice()
+            self.assertEqual(subscription.next_invoice_date, datetime.date(2024, 11, 1), "Next invoice date is updated")
+            self.assertEqual(subscription.order_line.last_invoiced_date, datetime.date(2024, 10, 31), "Last invoiced date is updated")
+
+        with freeze_time("2024-10-05"):
+            inv.button_draft()
+            self.assertEqual(subscription.order_line.last_invoiced_date, datetime.date(2024, 9, 30), "Last invoiced date is reset to previous value")
+            inv.button_cancel()
+            # user update the next invoice date to recreate it
+            subscription.next_invoice_date = datetime.date(2024, 10, 1)
+
+        # with freeze_time("2024-11-01"):
+            self.assertEqual(subscription.order_line.last_invoiced_date, datetime.date(2024, 9, 30), "Last invoiced date is unchanged")
+            inv = subscription._create_recurring_invoice()
+            self.assertEqual(subscription.order_line.last_invoiced_date, datetime.date(2024, 10, 31), "Last invoiced date is updated")
+
+        with freeze_time("2024-12-01"):
+            inv = subscription._create_recurring_invoice()
+            self.assertEqual(subscription.order_line.last_invoiced_date, datetime.date(2024, 11, 30), "Last invoiced date is updated")
+            inv.payment_state = 'paid'
+            # We refund the invoice
+            refund_wizard = self.env['account.move.reversal'].with_context(
+                active_model="account.move",
+                active_ids=inv.ids).create({
+                'reason': 'Test refund tax repartition',
+                'journal_id': inv.journal_id.id,
+            })
+            res = refund_wizard.refund_moves()
+            refund_move = self.env['account.move'].browse(res['res_id'])
+            self.assertEqual(inv.reversal_move_ids, refund_move, "The initial move should be reversed")
+            refund_move._post()
+            # user update the next invoice date to recreate it
+            subscription.next_invoice_date = datetime.date(2024, 11, 1)
+            self.assertEqual(subscription.order_line.last_invoiced_date, datetime.date(2024, 10, 31), "Last invoiced date is reverted")
+            inv = subscription._create_recurring_invoice()
+            self.assertEqual(subscription.order_line.last_invoiced_date, datetime.date(2024, 11, 30), "Last invoiced date is updated")
+
+    def test_invoice_credit_email_template(self):
+        invoice = self.env['account.move'].create({
+            'move_type': 'out_invoice',
+            'invoice_line_ids': [(0, 0, {
+                'name': 'Test',
+                'quantity': 1,
+                'price_unit': 100,
+                'subscription_id': self.subscription.id,
+            })],
+        })
+        template_invoice_id = self.env['account.move.send']._get_default_mail_template_id(invoice).id
+        self.assertEqual(template_invoice_id, self.env.ref('account.email_template_edi_invoice').id, 'The email template id for an Invoice is not what it should be.')
+        credit_note = self.env['account.move'].create({
+            'move_type': 'out_refund',
+            'invoice_line_ids': [(0, 0, {
+                'name': 'Test',
+                'quantity': 1,
+                'price_unit': 100,
+                'subscription_id': self.subscription.id,
+            })],
+        })
+        template_credit_id = self.env['account.move.send']._get_default_mail_template_id(credit_note).id
+        self.assertEqual(template_credit_id, self.env.ref('account.email_template_edi_credit_note').id, 'The email template id for a Credit Note is not what it should be.')
+
+
+    def test_next_billing_details(self):
+        with freeze_time("2024-11-20"):
+            """Test the value displayed on the portal"""
+            context_no_mail = {'no_reset_password': True, 'mail_create_nosubscribe': True, 'mail_create_nolog': True, }
+            self.env.ref('base.MXN').active = True
+            mxn_pricelist = self.env['product.pricelist'].create({
+                'name': 'MXN pricelist',
+                'currency_id': self.env.ref('base.MXN').id,
+            })
+            SubPricing = self.env['sale.subscription.pricing'].with_context(context_no_mail)
+            SubPricing.create({
+                'plan_id': self.plan_month.id,
+                'price': 6,
+                'pricelist_id': mxn_pricelist.id,
+                'product_template_id': self.product.product_tmpl_id.id
+            })
+            SubPricing.create({
+                'plan_id': self.plan_month.id,
+                'price': 600,
+                'pricelist_id': mxn_pricelist.id,
+                'product_template_id': self.product2.product_tmpl_id.id
+            })
+            self.subscription.order_line[0].name = "First recurring product"
+            self.subscription.order_line[1].name = "Second recurring product"
+            self.product5.recurring_invoice = False
+            self.subscription.order_line = [Command.create({
+                'name': "Non recurring line",
+                'product_id': self.product5.id, # non recurring product
+                'product_uom_qty': 1
+            })]
+            self.subscription.action_confirm()
+            details = self.subscription._next_billing_details()
+            self.assertEqual(details["sale_order"], self.subscription, "self is the subscription")
+            self.assertAlmostEqual(details["next_invoice_amount"], 69.3, 2, "The next invoice amount the total amount")
+            self.subscription._create_recurring_invoice()
+            details = self.subscription._next_billing_details()
+            self.assertAlmostEqual(details["next_invoice_amount"], 23.1, 2, "Only the recurring product is invoiced")
+        with freeze_time("2024-12-20"):
+            action = self.subscription.prepare_renewal_order()
+            renewal_so = self.env['sale.order'].browse(action['res_id'])
+            renewal_so.pricelist_id = mxn_pricelist
+            renewal_so.order_line = [Command.create({
+                'name': "Non recurring line",
+                'product_id': self.product5.id, # non recurring product
+                'product_uom_qty': 2
+            })]
+            renewal_so.action_update_prices()
+            renewal_so.action_confirm()
+            details = renewal_so._next_billing_details()
+            self.assertAlmostEqual(details["next_invoice_amount"], 759.0, 2, "Only the recurring product is invoiced")
+            inv = renewal_so._create_recurring_invoice()
+            details = renewal_so._next_billing_details()
+            self.assertAlmostEqual(details["next_invoice_amount"], 666.6, 2, "Only the recurring product is invoiced")
+
+    def test_postpaid_next_invoice_date(self):
+        """" Ensure the next invoice date is correctly updated for postpaid orders
+        This test fix a bug where a new invoice was created every day if postpaid line were mixed with non recurring lines
+        """
+        if self.env.ref('base.module_sale_subscription_stock').state == 'installed':
+            self.skipTest("`stock` module is installed. The invoice amount depends on the stock.move validation")
+        with freeze_time("2025-01-01"):
+            sub_product_delivery = self.env['product.product'].create({
+                'name': "Subscription consumable invoiced on delivery",
+                'list_price': 42,
+                'type': 'consu',
+                'uom_id': self.uom_unit.id,
+                'invoice_policy': 'delivery',
+                'recurring_invoice': True,
+            })
+            product_non_recurring = self.env['product.product'].create({
+                'name': "Consumable invoiced on order",
+                'list_price': 30.0,
+                'type': 'consu',
+                'uom_id': self.uom_unit.id,
+                'invoice_policy': 'order',
+            })
+            sub = self.env['sale.order'].create({
+                'name': 'Delivery',
+                'is_subscription': True,
+                'partner_id': self.user_portal.partner_id.id,
+                'plan_id': self.plan_month.id,
+                'pricelist_id': self.company_data['default_pricelist'].id,
+                'order_line': [Command.create({
+                    'product_id': sub_product_delivery.id,
+                    'product_uom_qty': 1,
+                    'tax_id': [Command.clear()],
+                }), Command.create({
+                    'display_type': 'line_section',
+                    'name': 'Test section',
+                }), Command.create({
+                    'product_id': product_non_recurring.id,
+                    'product_uom_qty': 1,
+                    'tax_id': [Command.clear()],
+                })],
+            })
+            sub.action_confirm()
+            inv = sub._create_recurring_invoice()
+            self.assertEqual(sub.next_invoice_date, datetime.date(2025, 2, 1))
+            self.assertAlmostEqual(inv.amount_untaxed, 30, msg="We invoice only the non recurring product")
+            recurring_line = sub.order_line.filtered(lambda l: l.product_id.id == sub_product_delivery.id)
+            recurring_line.qty_delivered = 1
+
+        with freeze_time("2025-02-01"):
+            inv = self.env['sale.order']._create_recurring_invoice()
+            self.assertAlmostEqual(inv.amount_untaxed, 42, msg="We invoice recurring products")
+            self.assertEqual(sub.next_invoice_date, datetime.date(2025, 3, 1))
+
+        with freeze_time("2025-03-01"):
+            inv = sub._create_recurring_invoice()
+            self.assertAlmostEqual(inv.amount_untaxed, 42, msg="We invoice recurring products")
+            self.assertEqual(sub.next_invoice_date, datetime.date(2025, 4, 1))
+
+    def test_confirm_upsell_cancels_pending_upsells(self):
+        delivered_product_tmpl = self.env['product.template'].create({
+            'name': 'Delivery product',
+            'type': 'consu',
+            'recurring_invoice': True,
+            'uom_id': self.env.ref('uom.product_uom_unit').id,
+            'invoice_policy': 'order',
+            'list_price': 50.0,
+        })
+        product = delivered_product_tmpl.product_variant_id
+        # create a subscription with a custom price_unit
+        subscription = self.env['sale.order'].create({
+            'name': 'Original subscription',
+            'is_subscription': True,
+            'partner_id': self.partner.id,
+            'plan_id': self.plan_month.id,
+            'order_line': [
+                Command.create({
+                    'name': product.name,
+                    'product_id': product.id,
+                    'product_uom_qty': 1,
+                    'product_uom': self.env.ref('uom.product_uom_unit').id,
+                    'price_unit': 10,
+                }),
+            ]
+        })
+
+        subscription.action_confirm()
+        move = subscription._create_invoices()
+        move.action_post()
+        # Create two upsells and confirm them later.
+        action = subscription.prepare_upsell_order()
+        upsell = self.env['sale.order'].browse(action['res_id'])
+        upsell.name = "UPSELL 1"
+        action2 = subscription.prepare_upsell_order()
+        upsell2 = self.env['sale.order'].browse(action2['res_id'])
+        upsell2.name = "UPSELL 2"
+        self.assertEqual(upsell.order_line.parent_line_id, subscription.order_line, "The parent_line_id should be correctly set")
+        self.assertEqual(upsell2.order_line.parent_line_id, subscription.order_line, "The parent_line_id should be correctly set")
+        # upsell confirmation
+        upsell.action_confirm()
+        self.assertEqual(upsell.order_line.price_unit, 10, "The unit price should be the same as the original subscription")
+        self.assertEqual(upsell.order_line.parent_line_id, subscription.order_line, "The parent_line_id should be correctly set")
+        self.assertEqual(upsell2.order_line.price_unit, 10, "The unit price should be the same as the original subscription")
+        self.assertEqual(upsell2.order_line.parent_line_id, subscription.order_line, "The unit price should be the same as the original subscription")
+        upsell2.action_confirm()
+        self.assertEqual(upsell2.order_line.price_unit, 10, "The unit price should be the same as the original subscription")
+        self.assertEqual(upsell.order_line.parent_line_id, subscription.order_line, "The parent_line_id of first upsell should not be reset")
+        self.assertEqual(upsell.order_line.price_unit, 10, "The unit price shouldn't get updated")
+
+    def test_not_override_end_date_in_expiration_cron(self):
+        """Ensure the expiration cron does not override an existing past end_date."""
+        with freeze_time("2025-05-05"):
+            self.subscription.write({'end_date': datetime.date(2025, 6, 4)})
+            self.subscription.action_confirm()
+            self.subscription._create_recurring_invoice()
+            today = fields.Date.today()
+            self.assertEqual(self.subscription.start_date, today, "start date set to today")
+            self.assertEqual(self.subscription.next_invoice_date, datetime.date(2025, 6, 5))
+            self.assertEqual(self.subscription.end_date, datetime.date(2025, 6, 4))
+
+        with freeze_time("2025-06-10"):
+            self.env["sale.order"].sudo()._cron_subscription_expiration()
+            self.assertEqual(self.subscription.end_date, datetime.date(2025, 6, 4), "after expiration cron run, end_date should remain unchanged if already set and in the past")
+
+    def test_null_ordered_quantity(self):
+        """ Null recurring line should not appear in the invoice """
+        with freeze_time("2025-06-03"):
+            self.assertEqual(self.product3.invoice_policy, 'order', "We need invoice policy order for this test")
+            self.subscription.order_line = [Command.create({
+                    'name': self.product3.name,
+                    'product_id': self.product3.id,
+                    'product_uom_qty': 0,
+                    'product_uom': self.env.ref('uom.product_uom_unit').id,
+                    'price_unit': 10,
+
+            })]
+            self.subscription.action_confirm()
+            inv = self.subscription._cron_recurring_create_invoice()
+            self.assertEqual(len(inv.invoice_line_ids), 2)
+            product_ids = inv.invoice_line_ids.product_id
+            self.assertEqual(len(product_ids), 2)
+            self.assertTrue(self.product.id in product_ids.ids)
+            self.assertTrue(self.product2.id in product_ids.ids)
+
+    def test_upsell_invoice_line_description(self):
+        self.plan_year.billing_first_day = True
+        with freeze_time("06/30/2025"):
+            subscription = self.env['sale.order'].create({
+                'partner_id': self.partner.id,
+                'plan_id': self.plan_year.id,
+                'order_line': [
+                    Command.create({
+                        'name': self.product.name,
+                        'product_id': self.product.id,
+                        'product_uom_qty': 2.0,
+                        'product_uom': self.product.uom_id.id,
+                        'price_unit': 12,
+                        })],
+            })
+            subscription.plan_id = self.plan_year
+            subscription.action_confirm()
+            subscription._cron_recurring_create_invoice()
+            invoice = subscription._create_invoices()
+            invoice.action_post()
+            action = subscription.prepare_upsell_order()
+            upsell = self.env['sale.order'].browse(action['res_id'])
+            upsell.action_confirm()
+            line = upsell.order_line[0]._prepare_invoice_line()
+
+            self.assertIn("550 days 06/30/2025 to 12/31/2026", line['name'])
+
+    def test_invoice_status_on_manual_invoices(self):
+        postpaid_product = self.product.copy({
+            'invoice_policy': 'delivery',
+        })
+        with freeze_time("2025-02-15"):
+            # Subscription for a product invoiced based on delivered quantities
+            subscription = self.env['sale.order'].create({
+                'name': 'Subscription',
+                'partner_id': self.partner.id,
+                'plan_id': self.plan_month.id,
+                'order_line': [
+                    Command.create({
+                        'name': postpaid_product.name,
+                        'product_id': postpaid_product.id,
+                        'product_uom_qty': 1.0,
+                        'product_uom': postpaid_product.uom_id.id,
+                        'price_unit': 10,
+                    }),
+                ]
+            })
+            subscription.action_confirm()
+            self.assertEqual(subscription.order_line.invoice_status, 'no')
+            subscription.order_line.qty_delivered = 1
+            self.assertEqual(subscription.order_line.invoice_status, 'to invoice')
+            subscription._create_invoices().action_post()
+            self.assertEqual(subscription.order_line.invoice_status, 'invoiced')
+
+            # Upsell
+            action = subscription.prepare_upsell_order()
+            upsell_subscription = self.env['sale.order'].browse(action['res_id'])
+            upsell_subscription.order_line = [Command.create({
+                'product_id': postpaid_product.id,
+                'product_uom_qty': 1.0,
+                'product_uom': postpaid_product.uom_id.id,
+                'price_unit': 10,
+            })]
+            upsell_subscription_line = upsell_subscription.order_line.filtered(lambda l: not l.display_type)
+            self.assertEqual(upsell_subscription_line.invoice_status, 'no')
+            upsell_subscription_line.qty_delivered = 1
+            upsell_subscription.action_confirm()
+            self.assertEqual(upsell_subscription_line.invoice_status, 'to invoice')
+            upsell_subscription._create_invoices().action_post()
+            self.assertEqual(upsell_subscription_line.invoice_status, 'invoiced')
+
+            # Subscription for a product invoiced based on ordered quantities
+            subscription = self.env['sale.order'].create({
+                'name': 'Subscription',
+                'partner_id': self.partner.id,
+                'plan_id': self.plan_month.id,
+                'order_line': [
+                    Command.create({
+                        'name': self.product.name,
+                        'product_id': self.product.id,
+                        'product_uom_qty': 1.0,
+                        'product_uom': self.product.uom_id.id,
+                        'price_unit': 10,
+                    }),
+                ]
+            })
+            subscription.action_confirm()
+            self.assertEqual(subscription.order_line.invoice_status, 'to invoice')
+            subscription._create_invoices().action_post()
+            self.assertEqual(subscription.order_line.invoice_status, 'invoiced')
+
+            # Upsell
+            action = subscription.prepare_upsell_order()
+            upsell_subscription = self.env['sale.order'].browse(action['res_id'])
+            upsell_subscription_line = upsell_subscription.order_line.filtered(lambda l: not l.display_type)
+            upsell_subscription_line.product_uom_qty = 1.0
+            self.assertEqual(upsell_subscription_line.invoice_status, 'no')
+            upsell_subscription.action_confirm()
+            self.assertEqual(upsell_subscription_line.invoice_status, 'to invoice')
+            upsell_subscription._create_invoices().action_post()
+            self.assertEqual(upsell_subscription_line.invoice_status, 'invoiced')
+
+
+    def test_subscription_upsell_alternative_invoice(self):
+        self.subscription.action_confirm()
+        self.env['sale.order']._cron_recurring_create_invoice()
+        action = self.subscription.prepare_upsell_order()
+        upsell_so = self.env['sale.order'].browse(action['res_id'])
+        action = upsell_so.create_alternative()
+        alternative_upsell_so = self.env['sale.order'].browse(action['res_id'])
+        alternative_upsell_order_line = alternative_upsell_so.order_line.filtered(lambda line: not line.display_type)
+        for sol in alternative_upsell_order_line:
+            sol.product_uom_qty = 1.0
+        alternative_upsell_so.action_confirm()
+        alternative_upsell_so._create_invoices()
+        self.assertTrue(len(alternative_upsell_so.invoice_ids), "An invoice should have been created for the alternative upsell sale order.")
+
 
 @tagged('post_install', '-at_install')
 @freeze_time("2021-01-03")
@@ -4220,6 +4863,7 @@ class TestSubscriptionInvoiceSignature(TestInvoiceSignature, TestSubscription):
     def setUp(self):
         super().setUp()
         self.sale_subscription_cron = self.env.ref("sale_subscription.account_analytic_cron_for_invoice")
+        self.another_user.groups_id += self.env.ref("sales_team.group_sale_salesman")
         self.subscription = self.env['sale.order'].with_user(self.another_user).create({
                 'partner_id': self.partner_a.id,
                 'company_id': self.company_data['company'].id,
@@ -4301,6 +4945,17 @@ class TestSubscriptionInvoiceSignature(TestInvoiceSignature, TestSubscription):
             self.assertEqual(pricing_2.price, pricing_1.price)
             self.assertEqual(pricing_2.plan_id, pricing_1.plan_id)
             self.assertEqual(pricing_2.pricelist_id, pricing_1.pricelist_id)
+        mitchell_user = self.env['res.users'].create({
+            'name': 'Mitchell not Admin',
+            'login': 'm_user',
+            'email': 'm@user.com',
+            'groups_id': [(6, 0, self.env.ref('base.group_system').ids)],
+        })
+        product.invalidate_recordset(['product_subscription_pricing_ids'])
+        with self.assertRaises(AccessError):
+            product.with_user(mitchell_user).product_subscription_pricing_ids
+        with self.assertRaises(UserError):
+            product.with_user(mitchell_user).copy()
 
     def test_renewed_churned_canceled(self):
         context_no_mail = {'no_reset_password': True, 'mail_create_nosubscribe': True, 'mail_create_nolog': True}
@@ -4475,3 +5130,373 @@ class TestSubscriptionInvoiceSignature(TestInvoiceSignature, TestSubscription):
         purchase_order_invoice.action_post()
 
         self.assertEqual(purchase_order_invoice.state, 'posted')
+
+    def test_uspell_same_product_different_discount(self):
+        subscription = self.env['sale.order'].create({
+            'name': 'Original subscription',
+            'is_subscription': True,
+            'partner_id': self.user_portal.partner_id.id,
+            'plan_id': self.plan_month.id,
+            'order_line': [
+                Command.create({
+                    'name': self.product2.name,
+                    'product_id': self.product2.id,
+                    'product_uom_qty': 1,
+                    'product_uom': self.env.ref('uom.product_uom_unit').id,
+                    'discount': 0,
+                }),
+                Command.create({
+                    'name': self.product2.name,
+                    'product_id': self.product2.id,
+                    'product_uom_qty': 1,
+                    'product_uom': self.env.ref('uom.product_uom_unit').id,
+                    'discount': 50,
+                })
+            ]
+        })
+
+        subscription.action_confirm()
+        self.env['sale.order']._cron_recurring_create_invoice()
+        action = subscription.prepare_upsell_order()
+        upsell = self.env['sale.order'].browse(action['res_id'])
+        self.assertEqual(set(upsell.order_line.mapped('discount')), {0, 50}, 'Upsell discounts should match subscription discounts')
+
+    def test_churn_discount_removal(self):
+        """ Test the following flow:
+                Sub with first year discount -> Renew -> Discount is removed on original sub -> Cancel the renewal -> Churn the original sub
+            This flow was causing an issue where the churn log amount was set as the full amount instead of the discounted amount which resulted negative MRR.
+        """
+        # create new subscription with discount
+        self.product2.list_price = -1
+        sub = self.env['sale.order'].create({
+            'partner_id': self.partner.id,
+            'plan_id': self.plan_year.id,
+            'order_line': [
+                    (0, 0, {
+                        'name': self.product.name,
+                        'product_id': self.product.id,
+                        'product_uom_qty': 10.0,
+                    }),
+                    (0, 0, {
+                        'name': self.product2.name,
+                        'product_id': self.product2.id,
+                        'product_uom_qty': 1.0,
+                    }),
+                ],
+        })
+        self.flush_tracking()
+        sub.action_confirm()
+        self.flush_tracking()
+        new_log = sub.order_log_ids
+        self.assertEqual([new_log.event_type, new_log.amount_signed], ['0_creation', 83.25])
+        sub._create_recurring_invoice()
+
+        # renew the subscription without discount
+        action = sub.prepare_renewal_order()
+        renewal_so = self.env['sale.order'].browse(action['res_id'])
+        renewal_so.order_line.filtered(lambda l: l.product_id == self.product2).unlink()
+        self.flush_tracking()
+        renewal_so.action_confirm()
+        self.flush_tracking()
+
+        # remove first year discount on original subscription
+        # shoudln't be doable normally but this simulate first year discount removal via cron
+        sub.order_line.filtered(lambda l: l.product_id == self.product2).unlink()
+
+        # cancel renewal
+        self.flush_tracking()
+        renewal_so._action_cancel()
+        self.flush_tracking()
+
+        # churn
+        sub.set_close()
+        self.flush_tracking()
+        self.assertEqual(sum(sub.order_log_ids.mapped('amount_signed')), 0)
+
+    def test_subscription_discount_on_non_sub_lines(self):
+        """
+        Check that discounts manually set on non-subscription order lines are preserved after creating
+        the subscription and when closing it.
+        """
+        DISCOUNT_10 = 10
+        self.product2.recurring_invoice = False
+
+        subscription = self.env['sale.order'].create({
+            'name': 'Test subscription',
+            'is_subscription': True,
+            'partner_id': self.partner.id,
+            'plan_id': self.plan_month.id,
+            'order_line': [
+                Command.create({
+                    'name': 'Subscription product',
+                    'product_id': self.product.id,
+                    'product_uom_qty': 1,
+                    'discount': DISCOUNT_10,
+                }),
+                Command.create({
+                    'name': 'Non-subscription product',
+                    'product_id': self.product2.id,
+                    'product_uom_qty': 1,
+                    'discount': DISCOUNT_10,
+                })
+            ]
+        })
+
+        self.assertEqual(subscription.order_line.mapped("discount"), [DISCOUNT_10, DISCOUNT_10])
+
+        subscription.action_confirm()
+        subscription._cron_recurring_create_invoice()
+        subscription.set_close()
+
+        self.assertEqual(subscription.order_line.mapped("discount"), [DISCOUNT_10, DISCOUNT_10])
+
+    def test_partial_refund_reduces_invoiced_quantity_on_subscription(self):
+        """
+        Verify that a partial refund on a subscription invoice
+        correctly updates the invoiced quantity on the order line.
+        """
+        with freeze_time("2024-09-01"):
+            subscription = self.env['sale.order'].create({
+                'partner_id': self.partner.id,
+                'plan_id': self.plan_month.id,
+                'order_line': [
+                    (0, 0, {
+                        'name': self.product.name,
+                        'product_id': self.product.id,
+                        'product_uom_qty': 3.0,
+                        'product_uom': self.product.uom_id.id,
+                        'price_unit': 12,
+                    })],
+            })
+            subscription.action_confirm()
+            subscription._create_recurring_invoice()
+            self.assertEqual(subscription.order_line.qty_invoiced, 3, "The 3 products should be invoiced")
+            subscription._get_invoiced()
+            inv = subscription.invoice_ids
+            inv.payment_state = 'paid'
+            refund_wizard = self.env['account.move.reversal'].with_context(
+                active_model="account.move",
+                active_ids=inv.ids).create({
+                'reason': 'Partial refund for Product A',
+                'journal_id': inv.journal_id.id,
+            })
+            refund_wizard.reverse_moves()
+
+            credit_note = self.env['account.move'].search([
+                ('reversed_entry_id', '=', inv.id),
+                ('move_type', '=', 'out_refund'),
+            ], limit=1)
+
+            for line in credit_note.invoice_line_ids:
+                if line.product_id.id == self.product.id:
+                    line.quantity = 2
+
+            credit_note._compute_amount()
+            credit_note._compute_tax_totals()
+
+            credit_note.action_post()
+
+        self.assertEqual(subscription.order_line.qty_invoiced, 1, "The invoiced quantity should be reduced by the refund")
+
+    def test_sale_subscription_optional_product_discount(self):
+        """
+        Check that the discount on an optional product is correctly applied when the option is added to a SO.
+        """
+        subscription = self.env['sale.order'].create({
+            'name': "Test subscription",
+            'is_subscription': True,
+            'partner_id': self.partner.id,
+            'plan_id': self.plan_month.id,
+            'order_line': [
+                Command.create({
+                    'name': "Subscription product",
+                    'product_id': self.product.id,
+                    'product_uom_qty': 1,
+                }),
+            ],
+            'sale_order_option_ids': [
+                Command.create({
+                    'product_id': self.product2.id,
+                    'discount': 20,  # 20% discount
+                })
+            ],
+        })
+        subscription.sale_order_option_ids[0].button_add_to_order()
+
+        self.assertEqual(subscription.order_line.mapped("discount"), [0, 20])
+
+    def test_subscription_product_update_on_parent_line_in_upsell(self):
+        """
+        Check recurring product quantity on subscription after updating product
+        on parent line in upsell and confirm.
+        """
+        # Non-recurring product
+        nr_product = self.env['product.product'].create({
+            'name': 'Non recurring product',
+            'type': 'service',
+            'uom_id': self.product.uom_id.id,
+            'list_price': 25,
+        })
+        # Subscription
+        subscription = self.env['sale.order'].create({
+            'partner_id': self.partner_a.id,
+            'company_id': self.company_data['company'].id,
+            'plan_id': self.plan_month.id,
+            'order_line': [
+                Command.create({
+                    'product_id': self.product.id,
+                    'product_uom_qty': 2.0,
+                    'product_uom': self.product.uom_id.id,
+                    'price_unit': 12,
+                })
+            ],
+        })
+        subscription.action_confirm()
+        sub_line = subscription.order_line
+        self.assertEqual(len(sub_line), 1)
+        self.assertEqual(sub_line.product_uom_qty, 2.0)
+        self.env['sale.order']._cron_recurring_create_invoice()
+
+        # Upsell
+        action = subscription.prepare_upsell_order()
+        upsell_so = self.env['sale.order'].browse(action['res_id'])
+        self.assertEqual(subscription.order_line, upsell_so.order_line.parent_line_id,
+                         "The parent line is the one from the subscription")
+        upsell_order_line = upsell_so.order_line.filtered(lambda line: not line.display_type)
+        self.assertEqual(upsell_order_line.product_uom_qty, 0.0, 'The upsell order has 0 quantity')
+
+        # Update the existing line with non-recurring product and quantity
+        upsell_order_line.product_id = nr_product
+        upsell_order_line.product_uom_qty = 11.0
+
+        # Confirm upsell
+        upsell_so._confirm_upsell()
+        upsell_line = upsell_so.order_line.filtered(lambda line: not line.display_type)
+        self.assertEqual(len(upsell_line), 1)
+        self.assertFalse(upsell_line.parent_line_id)
+        self.assertEqual(upsell_line.product_uom_qty, 11.0)
+        # Check recurring product quantity after upsell
+        self.assertEqual(len(subscription.order_line), 1)
+        self.assertEqual(subscription.order_line.product_uom_qty, 2.0,
+                         "The recurring product's quantity should not be changed in subscription")
+
+    def test_invoice_after_deleting_invoiced_line(self):
+        """ Test that invoicing works correctly after deleting an already invoiced subscription line.
+        This test covers the fix for _get_max_invoiced_date when sale_line_ids is empty
+        """
+        product_a = self.env['product.product'].create({
+            'name': 'Car Leasing (SUB)',
+            'type': 'service',
+            'recurring_invoice': True,
+            'uom_id': self.env.ref('uom.product_uom_unit').id,
+            'list_price': 20,
+        })
+        product_b = self.env['product.product'].create({
+            'name': 'Office Cleaning Service (SUB)',
+            'type': 'service',
+            'recurring_invoice': True,
+            'uom_id': self.env.ref('uom.product_uom_unit').id,
+            'list_price': 10,
+        })
+
+        with freeze_time('2025-11-11'):
+            subscription = self.env['sale.order'].create({
+                'name': 'Test Subscription',
+                'is_subscription': True,
+                'plan_id': self.plan_month.id,
+                'partner_id': self.partner.id,
+                'order_line': [Command.create({
+                    'product_id': product_a.id,
+                    'product_uom_qty': 1.0,
+                    'price_unit': 20,
+                })],
+            })
+            subscription.action_confirm()
+
+            invoice_1 = subscription._create_invoices()
+            invoice_1._post()
+
+            self.assertEqual(len(subscription.invoice_ids), 1, 'First invoice should be created')
+            self.assertEqual(subscription.order_line.qty_invoiced, 1.0, 'Product A should be invoiced')
+
+            subscription.write({
+                'order_line': [Command.create({
+                    'product_id': product_b.id,
+                    'product_uom_qty': 1.0,
+                    'price_unit': 10,
+                })],
+            })
+
+            line_to_delete = subscription.order_line.filtered(lambda l: l.product_id == product_a)
+            line_to_delete.unlink()
+
+            self.assertEqual(len(subscription.order_line), 1, 'Only product B line should remain')
+            self.assertEqual(subscription.order_line.product_id, product_b, 'Remaining line should be product B')
+            self.assertEqual(len(subscription.invoice_ids), 1, 'Invoice for product A should still exist')
+
+            invoice_2 = subscription._create_invoices()
+
+            self.assertTrue(invoice_2, 'Second invoice should be created successfully')
+            self.assertEqual(len(subscription.invoice_ids), 2, 'Should have two invoices total')
+
+            invoice_2_lines = invoice_2.invoice_line_ids.filtered(lambda l: l.display_type == 'product')
+            self.assertEqual(len(invoice_2_lines), 1, 'Second invoice should have one product line')
+            self.assertEqual(invoice_2_lines.product_id, product_b, 'Second invoice should be for product B')
+
+            invoice_2._post()
+            self.assertEqual(invoice_2.state, 'posted', 'Second invoice should be posted successfully')
+
+    def test_next_invoice_date_with_invoice_quantities_summing_to_zero(self):
+        """
+        Verify that the next invoice date is correctly updated when having a
+        subscription with several lines whose quantities add up to zero.
+        """
+        with freeze_time("2024-09-01"):
+            subscription = self.env['sale.order'].create({
+                'partner_id': self.partner.id,
+                'plan_id': self.plan_month.id,
+                'order_line': [
+                    (0, 0, {
+                        'name': self.product.name,
+                        'product_id': self.product.id,
+                        'product_uom_qty': 1.0,
+                        'product_uom': self.product.uom_id.id,
+                        'price_unit': 50,
+                    }),
+                    (0, 0, {
+                        'name': self.product.name,
+                        'product_id': self.product.id,
+                        'product_uom_qty': -1.0,
+                        'product_uom': self.product.uom_id.id,
+                        'price_unit': 20,
+                    })],
+            })
+            subscription.action_confirm()
+            self.assertEqual(subscription.next_invoice_date, datetime.date(2024, 9, 1))
+
+            subscription._create_recurring_invoice()
+            self.assertEqual(subscription.next_invoice_date, datetime.date(2024, 10, 1))
+
+    def test_subscription_salesperson_propagates_to_company_child_contacts(self):
+        """ Changing salesperson on a subscription linked to a company should propagate to all child contacts. """
+        company_partner = self.env['res.partner'].create({'name': 'Test Company', 'is_company': True})
+        contact_1 = self.env['res.partner'].create({'name': 'Contact 1', 'parent_id': company_partner.id})
+        contact_2 = self.env['res.partner'].create({'name': 'Contact 2', 'parent_id': company_partner.id})
+        subscription = self.env['sale.order'].create({
+            'partner_id': company_partner.id,
+            'plan_id': self.plan_month.id,
+            'order_line': [Command.create({'product_id': self.product.id, 'product_uom_qty': 1})]
+        })
+        subscription.action_confirm()
+
+        new_user = self.env['res.users'].create({'name': 'new user', 'login': 'new', 'email': 'new@test.com'})
+        subscription.write({'user_id': new_user.id})
+        self.assertEqual(new_user, company_partner.user_id, "Salesperson should be updated on the company partner.")
+        self.assertEqual(new_user, contact_1.user_id, "Salesperson should be propagated to child contact 1.")
+        self.assertEqual(new_user, contact_2.user_id, "Salesperson should be propagated to child contact 2.")
+
+        new_user_2 = self.env['res.users'].create({'name': 'new user 2', 'login': 'new2', 'email': 'new2@test.com'})
+        subscription.write({'user_id': new_user_2.id})
+        self.assertEqual(new_user_2, company_partner.user_id, "Salesperson should be updated on the company partner after second change")
+        self.assertEqual(new_user_2, contact_1.user_id, "Salesperson should be propagated to child contact 1 after second change")
+        self.assertEqual(new_user_2, contact_2.user_id, "Salesperson should be propagated to child contact 2 after second change")

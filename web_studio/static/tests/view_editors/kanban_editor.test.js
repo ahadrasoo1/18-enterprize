@@ -1,5 +1,5 @@
 import { expect, test } from "@odoo/hoot";
-import { animationFrame, Deferred } from "@odoo/hoot-mock";
+import { animationFrame, Deferred } from "@odoo/hoot-dom";
 import { onMounted } from "@odoo/owl";
 import {
     contains,
@@ -13,8 +13,8 @@ import {
 import { CodeEditor } from "@web/core/code_editor/code_editor";
 
 import {
-    createMockViewResult,
     disableHookAnimation,
+    editView,
     mountViewEditor,
 } from "@web_studio/../tests/view_editor_tests_utils";
 
@@ -59,7 +59,7 @@ test("template without t-name='card' load the legacy kanban editor", async () =>
     const originalConsoleWarn = console.warn;
     patchWithCleanup(console, {
         warn: (msg) => {
-            if (msg !== "'kanban-box' is deprecated, use 'kanban-card' API instead") {
+            if (msg !== "'kanban-box' is deprecated, define a 'card' template instead") {
                 originalConsoleWarn(msg);
             }
         },
@@ -125,7 +125,7 @@ test("templates without a main node are wrapped in a main node by the editor", a
 });
 
 test("kanban structures display depends if element is present in the view", async () => {
-    onRpc("/web_studio/edit_view", () => {
+    onRpc("/web_studio/edit_view", (request) => {
         // in this test, we result with a completely different template
         const newArch = `
                 <kanban>
@@ -141,7 +141,7 @@ test("kanban structures display depends if element is present in the view", asyn
                     </templates>
                 </kanban>
             `;
-        return createMockViewResult("kanban", newArch, Coucou);
+        return editView(request, "kanban", newArch);
     });
     await mountViewEditor({
         type: "kanban",
@@ -247,7 +247,7 @@ test("adding an aside element calls the right operation", async () => {
                     </templates>
                 </kanban>
             `;
-        return createMockViewResult("kanban", newArch, Coucou);
+        return editView(params, "kanban", newArch);
     });
     await mountViewEditor({
         type: "kanban",
@@ -285,7 +285,7 @@ test("adding a footer element calls the right operation", async () => {
                     </templates>
                 </kanban>
             `;
-        return createMockViewResult("kanban", newArch, Coucou);
+        return editView(params, "kanban", newArch);
     });
     await mountViewEditor({
         type: "kanban",
@@ -354,7 +354,7 @@ test("adding a colorpicker inside the menu", async () => {
                         </templates>
                     </kanban>
                 `;
-        return createMockViewResult("kanban", newArch, Coucou);
+        return editView(params, "kanban", newArch);
     });
     await mountViewEditor({
         type: "kanban",
@@ -409,7 +409,7 @@ test("adding a colorpicker when menu is not present", async () => {
                         </templates>
                     </kanban>
                 `;
-        return createMockViewResult("kanban", newArch, Coucou);
+        return editView(params, "kanban", newArch);
     });
     await mountViewEditor({
         type: "kanban",
@@ -454,7 +454,7 @@ test("can_open attribute can be edited from the sidebar", async () => {
                 </templates>
             </kanban>
         `;
-        return createMockViewResult("kanban", newArch, Coucou);
+        return editView(params, "kanban", newArch);
     });
     await mountViewEditor({
         type: "kanban",
@@ -510,7 +510,7 @@ test("buttons can be edited when being selected", async () => {
 });
 
 test("grouped kanban editor", async () => {
-    onRpc("web_read_group", async ({ kwargs }) => {
+    onRpc("web_read_group", ({ kwargs }) => {
         expect.step("web_read_group");
         expect(kwargs.limit).toBe(1);
     });
@@ -582,7 +582,7 @@ test("kanban editor, grouped on date field, no record", async () => {
 
 test("kanban editor, grouped on date field granular, no record, progressbar", async () => {
     Coucou._fields.date = fields.Date({ string: "Date" });
-    serverState.debug = true;
+    serverState.debug = "1";
     const def = new Deferred();
     patchWithCleanup(CodeEditor.prototype, {
         setup() {
@@ -599,21 +599,19 @@ test("kanban editor, grouped on date field granular, no record, progressbar", as
                     </t>
                 </templates>
             </kanban>`;
-    onRpc("/web_studio/get_xml_editor_resources", () => {
-        return {
-            main_view_key: "",
-            views: [
-                {
-                    active: true,
-                    arch,
-                    id: 99999999,
-                    inherit_id: false,
-                    name: "default view",
-                    xml_id: "default",
-                },
-            ],
-        };
-    });
+    onRpc("/web_studio/get_xml_editor_resources", () => ({
+        main_view_key: "",
+        views: [
+            {
+                active: true,
+                arch,
+                id: 99999999,
+                inherit_id: false,
+                name: "default view",
+                xml_id: "default",
+            },
+        ],
+    }));
     await mountViewEditor({
         type: "kanban",
         resModel: "coucou",
@@ -648,4 +646,48 @@ test("grouped kanban editor cannot add columns or load more", async () => {
     });
     expect(".o_kanban_load_more").toHaveCount(0);
     expect(".o_kanban_add_column").toHaveCount(0);
+});
+
+test("sortby and orderby field in kanban sidebar", async () => {
+    onRpc("/web_studio/edit_view", async (request) => {
+        const { params } = await request.json();
+        const operation = params.operations[0];
+        expect(operation.new_attrs.default_order).toBe("char_field asc");
+        expect(operation.position).toBe("attributes");
+        expect(operation.target.xpath_info).toEqual([{ tag: "kanban", indice: 1 }]);
+        expect.step("edit_view");
+        const newArch = `
+            <kanban default_order="char_field asc">
+                <templates>
+                    <t t-name="card">
+                        <h3>Card</h3>
+                    </t>
+                </templates>
+            </kanban>
+        `;
+        return editView(params, "kanban", newArch);
+    });
+    await mountViewEditor({
+        type: "kanban",
+        resModel: "coucou",
+        arch: `<kanban>
+        <templates>
+            <t t-name="card">
+                <h3>Card</h3>
+            </t>
+        </templates>
+    </kanban>
+    `,
+    });
+    await contains(".o_web_studio_view").click();
+    await contains(".o_web_studio_property_sort_by .o_select_menu .o_select_menu_toggler").click();
+    await contains(".o-overlay-item:nth-child(1) .o-dropdown--menu .dropdown-item:eq(0)").click();
+    expect(".o_web_studio_property_sort_by .o_select_menu .text-start").toHaveText("Char field");
+
+    await contains(
+        ".o_web_studio_property_sort_order .o_select_menu .o_select_menu_toggler"
+    ).click();
+    await contains(".o-overlay-item:nth-child(1) .o-dropdown--menu .dropdown-item:eq(0)").click();
+    expect(".o_web_studio_property_sort_order .o_select_menu .text-start").toHaveText("Ascending");
+    expect.verifySteps(["edit_view"]);
 });

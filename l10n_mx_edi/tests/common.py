@@ -41,7 +41,10 @@ class TestMxEdiCommon(AccountTestInvoicingCommon):
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.frozen_today = fields.datetime.now()
+        if EXTERNAL_MODE:
+            cls.frozen_today = fields.datetime.now()
+        else:
+            cls.frozen_today = fields.datetime(2025, 6, 15, 0, 0, 0)
 
         # Allow to see the full result of AssertionError.
         cls.maxDiff = None
@@ -66,7 +69,7 @@ class TestMxEdiCommon(AccountTestInvoicingCommon):
 
         # do not use demo data and avoid having duplicated companies
         cls.env['res.company'].search([('vat', '=', "EKU9003173C9")]).write({'vat': False})
-        cls.env['res.company'].search([('name', '=', "ESCUELA KEMPER URGATE")]).write({'name': "ESCUELA KEMPER URGATE (2)"})
+        cls.env['res.company'].search([('name', '=', "ESCUELA KEMPER URGATE")]).name = "ESCUELA KEMPER URGATE (2)"
 
         cls.company_data['company'].write({
             'name': "ESCUELA KEMPER URGATE",
@@ -113,30 +116,31 @@ class TestMxEdiCommon(AccountTestInvoicingCommon):
         cls.tax_6_ieps = cls.tax_8_ieps.copy(default={'amount': 6.0})
         cls.tax_7_ieps = cls.tax_8_ieps.copy(default={'amount': 7.0})
         cls.tax_26_5_ieps = cls.env["account.chart.template"].ref('ieps_26_5_sale')
+        cls.tax_30_ieps = cls.env["account.chart.template"].ref('ieps_30_sale')
         cls.tax_53_ieps = cls.env["account.chart.template"].ref('ieps_53_sale')
         cls.tax_10_ret_isr = cls.env["account.chart.template"].ref('tax3')
         cls.tax_10_ret_isr.type_tax_use = 'sale'
         cls.tax_10_67_ret = cls.env["account.chart.template"].ref('tax8')
         cls.tax_10_67_ret.type_tax_use = 'sale'
-        cls.local_tax_16_transferred = cls.tax_16.copy(default={'name': 'local 16%'})
-        cls.local_tax_8_withholding = cls.tax_8.copy(default={'name': 'local -8%', 'amount': -8})
-        cls.local_tax_16_transferred.l10n_mx_tax_type = cls.local_tax_8_withholding.l10n_mx_tax_type = 'local'
-        cls.existing_taxes_combinations_to_test = [
-            # pylint: disable=bad-whitespace
-            # Line 1                                                Line 2                  Line 3
-            (cls.env['account.tax'],),
-            (cls.tax_0_exento,                                      cls.tax_0),
-            (cls.tax_0_exento,                                      cls.tax_16),
-            (cls.tax_0,                                             cls.tax_16),
-            (cls.tax_0_exento,                                      cls.tax_0,              cls.tax_16),
-            (cls.tax_0_exento,),
-            (cls.tax_0,),
-            (cls.tax_16 + cls.tax_10_ret_isr + cls.tax_10_67_ret,),
-            (cls.tax_8_ieps + cls.tax_0,),
-            (cls.tax_53_ieps + cls.tax_16,),
-            (cls.local_tax_16_transferred,                  cls.local_tax_8_withholding,    cls.tax_16),
-        ]
-
+        cls.tax_1_25_sale_withholding = cls.env["account.chart.template"].ref('mx_wh_1_25_sale')
+        cls.local_tax_group = cls.env['account.tax.group'].create({'name': "Local VAT"})
+        cls.local_tax_16_transferred = cls.tax_16.copy(default={
+            'name': 'local 16%',
+            'tax_group_id': cls.local_tax_group.id,
+        })
+        cls.local_tax_16_transferred.l10n_mx_tax_type = 'local'
+        cls.local_tax_8_withholding = cls.tax_8.copy(default={
+            'name': 'local -8%',
+            'amount': -8.0,
+            'tax_group_id': cls.local_tax_group.id,
+        })
+        cls.local_tax_8_withholding.l10n_mx_tax_type = 'local'
+        cls.local_tax_3_5_withholding = cls.tax_8.copy(default={
+            'name': 'local -3.5%',
+            'amount': -3.5,
+            'tax_group_id': cls.local_tax_group.id,
+        })
+        cls.local_tax_3_5_withholding.l10n_mx_tax_type = 'local'
         (cls.product_a + cls.product_b).unlink()
         cls.product = cls._create_product()
 
@@ -331,14 +335,8 @@ class TestMxEdiCommon(AccountTestInvoicingCommon):
     @contextmanager
     def with_mocked_global_invoice_sequence(self, number):
         sequence = self.env['l10n_mx_edi.document']._get_global_invoice_cfdi_sequence(self.env.company)
-        sequence.number_next = number
+        sequence.sudo().number_next = number
         yield
-
-    def _test_cfdi_rounding(self, run_function):
-        for tax_calculation_rounding_method in ('round_per_line', 'round_globally'):
-            with self.subTest(tax_calculation_rounding_method=tax_calculation_rounding_method):
-                self.env.company.tax_calculation_rounding_method = tax_calculation_rounding_method
-                run_function(tax_calculation_rounding_method)
 
     @classmethod
     def _create_product(cls, **kwargs):

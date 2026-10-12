@@ -3,47 +3,61 @@
 # 	* mrp_mps
 #
 # Translators:
-# hed shefer <hed@laylinetech.com>, 2022
-# Lilach Gilliam <lilach.gilliam@gmail.com>, 2022
-# דודי מלכה <Dudimalka6@gmail.com>, 2022
-# Yihya Hugirat <hugirat@gmail.com>, 2022
-# Amit Spilman <amit@laylinetech.com>, 2022
-# ZVI BLONDER <ZVIBLONDER@gmail.com>, 2022
-# ExcaliberX <excaliberx@gmail.com>, 2022
-# Martin Trigaux, 2022
-# Roy Sayag, 2023
+# MichaelHadar, 2024
+# NoaFarkash, 2024
+# שהאב חוסיין <shhab89@gmail.com>, 2024
+# Hed Shefer <hed@laylinetech.com>, 2024
+# Orel Nahmany, 2024
+# דודי מלכה <Dudimalka6@gmail.com>, 2024
+# ExcaliberX <excaliberx@gmail.com>, 2024
+# Martin Trigaux, 2024
+# Yihya Hugirat <hugirat@gmail.com>, 2024
+# Lilach Gilliam <lilach.gilliam@gmail.com>, 2024
+# ZVI BLONDER <ZVIBLONDER@gmail.com>, 2025
+# or balmas, 2025
+# Yoram Lavi, 2025
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 16.0+e\n"
+"Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-16 16:01+0000\n"
-"PO-Revision-Date: 2022-09-22 05:47+0000\n"
-"Last-Translator: Roy Sayag, 2023\n"
+"POT-Creation-Date: 2025-12-29 18:46+0000\n"
+"PO-Revision-Date: 2024-09-25 09:44+0000\n"
+"Last-Translator: Yoram Lavi, 2025\n"
 "Language-Team: Hebrew (https://app.transifex.com/odoo/teams/41243/he/)\n"
 "Language: he\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % 1 == 0) ? 1: (n % 10 == 0 && n % 1 == 0 && n > 10) ? 2 : 3;\n"
+"Plural-Forms: nplurals=3; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % "
+"1 == 0) ? 1: 2;\n"
 
 #. module: mrp_mps
-#. odoo-javascript
-#: code:addons/mrp_mps/static/src/components/line.xml:0
-msgid "- Indirect Demand Forecast"
-msgstr "- דרישה חזויה עקיפה"
+#: model_terms:ir.ui.view,arch_db:mrp_mps.mrp_mps_production_schedule_form_view
+msgid "<span invisible=\"enable_batch_size\">No Batch Size</span>"
+msgstr "<span invisible=\"enable_batch_size\"> ללא גודל אצווה</span>"
+
+#. module: mrp_mps
+#: model_terms:ir.ui.view,arch_db:mrp_mps.mrp_mps_production_schedule_form_view
+msgid "<span invisible=\"enable_max_replenish\">No Maximum</span>"
+msgstr "<span invisible=\"enable_max_replenish\">ללא מקסימום</span>"
+
+#. module: mrp_mps
+#: model_terms:ir.ui.view,arch_db:mrp_mps.mrp_bom_form_view_inherit_mps
+msgid "<span>Schedules</span>"
+msgstr "<span> לוח זמנים</span>"
 
 #. module: mrp_mps
 #. odoo-javascript
 #: code:addons/mrp_mps/static/src/components/line.xml:0
 msgid "ATP"
-msgstr ""
+msgstr "כמות זמינה להתחייבות"
 
 #. module: mrp_mps
 #. odoo-javascript
 #: code:addons/mrp_mps/static/src/components/line.xml:0
 msgid "Actual"
-msgstr ""
+msgstr " בפועל"
 
 #. module: mrp_mps
 #. odoo-javascript
@@ -54,22 +68,22 @@ msgstr "דרישה בפועל"
 #. module: mrp_mps
 #. odoo-python
 #: code:addons/mrp_mps/models/mrp_mps.py:0
-msgid "Actual Demand %s %s (%s - %s)"
-msgstr "דרישה בפועל %s %s (%s - %s)"
+msgid "Actual Demand %(product)s %(date)s (%(date_start)s - %(date_end)s)"
+msgstr "דרישה בפועל %(product)s %(date)s (%(date_start)s - %(date_end)s)"
 
 #. module: mrp_mps
 #. odoo-javascript
 #: code:addons/mrp_mps/static/src/components/line.xml:0
 #: code:addons/mrp_mps/static/src/search/group_menu.xml:0
 msgid "Actual Demand Y-1"
-msgstr ""
+msgstr "ביקוש בפועל שנה קודמת"
 
 #. module: mrp_mps
 #. odoo-javascript
 #: code:addons/mrp_mps/static/src/components/line.xml:0
 #: code:addons/mrp_mps/static/src/search/group_menu.xml:0
 msgid "Actual Demand Y-2"
-msgstr ""
+msgstr "ביקוש בפועל Y-2"
 
 #. module: mrp_mps
 #. odoo-javascript
@@ -81,8 +95,9 @@ msgstr "חידוש מלאי בפועל"
 #. module: mrp_mps
 #. odoo-python
 #: code:addons/mrp_mps/models/mrp_mps.py:0
-msgid "Actual Replenishment %s %s (%s - %s)"
-msgstr "חידוש מלאי בפועל %s %s (%s - %s)"
+msgid ""
+"Actual Replenishment %(product)s %(date)s (%(date_start)s - %(date_end)s)"
+msgstr "חידוש מלאי בפועל %(product)s %(date)s (%(date_start)s - %(date_end)s)"
 
 #. module: mrp_mps
 #. odoo-javascript
@@ -90,6 +105,11 @@ msgstr "חידוש מלאי בפועל %s %s (%s - %s)"
 #: model:ir.actions.act_window,name:mrp_mps.action_mrp_mps_form_view
 msgid "Add a Product"
 msgstr "הוסף מוצר"
+
+#. module: mrp_mps
+#: model:ir.model.fields,field_description:mrp_mps.field_mrp_production_schedule__allowed_route_ids
+msgid "Allowed Route"
+msgstr "מסלול מותר"
 
 #. module: mrp_mps
 #. odoo-javascript
@@ -104,10 +124,25 @@ msgid "Are you sure you want to delete this record?"
 msgstr "האם אתה בטוח שברצונך למחוק רשומה זו?"
 
 #. module: mrp_mps
+#: model:ir.model.fields.selection,name:mrp_mps.selection__mrp_production_schedule__replenish_trigger__automated
+msgid "Automatic"
+msgstr "אוטומטי"
+
+#. module: mrp_mps
+#: model_terms:ir.ui.view,arch_db:mrp_mps.mrp_mps_search_view
+msgid "Automatically Replenished"
+msgstr "חידוש אוטומטי"
+
+#. module: mrp_mps
 #. odoo-javascript
 #: code:addons/mrp_mps/static/src/search/group_menu.xml:0
 msgid "Available to Promise"
 msgstr "זמין להבטיח"
+
+#. module: mrp_mps
+#: model:ir.model.fields,field_description:mrp_mps.field_mrp_production_schedule__batch_size
+msgid "Batch Size"
+msgstr "גודל אצווה"
 
 #. module: mrp_mps
 #: model:ir.model,name:mrp_mps.model_mrp_bom
@@ -142,7 +177,7 @@ msgstr "חברה"
 #. module: mrp_mps
 #: model:ir.model,name:mrp_mps.model_res_config_settings
 msgid "Config Settings"
-msgstr "הגדר הגדרות"
+msgstr "הגדרות תצורה"
 
 #. module: mrp_mps
 #. odoo-javascript
@@ -175,6 +210,17 @@ msgid "Date"
 msgstr "תאריך"
 
 #. module: mrp_mps
+#. odoo-javascript
+#: code:addons/mrp_mps/static/src/components/main.js:0
+msgid "Day"
+msgstr "יום"
+
+#. module: mrp_mps
+#: model_terms:ir.ui.view,arch_db:mrp_mps.res_config_settings_view_form
+msgid "Default Time Range"
+msgstr "טווח זמן ברירת מחדל"
+
+#. module: mrp_mps
 #: model:ir.model.fields,help:mrp_mps.field_mrp_production_schedule__product_uom_id
 msgid "Default unit of measure used for all stock operations."
 msgstr "יחידת מידה ברירת מחדל המשמשת לביצוע כל פעולות המלאי."
@@ -189,7 +235,7 @@ msgstr "ערך ברירת מחדל לטווחי הזמן בדוח תוכנית �
 #. odoo-javascript
 #: code:addons/mrp_mps/static/src/components/main.js:0
 msgid "Delete"
-msgstr "מחק"
+msgstr "מחיקה"
 
 #. module: mrp_mps
 #. odoo-javascript
@@ -206,12 +252,12 @@ msgstr "הצג דרישה בפועל"
 #. module: mrp_mps
 #: model:ir.model.fields,field_description:mrp_mps.field_res_company__mrp_mps_show_actual_demand_year_minus_2
 msgid "Display Actual Demand Before Year"
-msgstr ""
+msgstr "הצג ביקוש בפועל לפני שנה"
 
 #. module: mrp_mps
 #: model:ir.model.fields,field_description:mrp_mps.field_res_company__mrp_mps_show_actual_demand_year_minus_1
 msgid "Display Actual Demand Last Year"
-msgstr ""
+msgstr "הצג את הביקוש בפועל בשנה שעברה"
 
 #. module: mrp_mps
 #: model:ir.model.fields,field_description:mrp_mps.field_res_company__mrp_mps_show_actual_replenishment
@@ -256,9 +302,19 @@ msgid "Display To Replenish"
 msgstr "הצג מלאי לחידוש"
 
 #. module: mrp_mps
+#: model:ir.model.fields,field_description:mrp_mps.field_mrp_production_schedule__enable_batch_size
+msgid "Enable Batch Size"
+msgstr "אפשר גודל אצווה"
+
+#. module: mrp_mps
+#: model:ir.model.fields,field_description:mrp_mps.field_mrp_production_schedule__enable_max_replenish
+msgid "Enable Max Replenish"
+msgstr "אפשר חידוש המקסימלי"
+
+#. module: mrp_mps
 #: model:ir.model.fields.selection,name:mrp_mps.selection__mrp_production_schedule__replenish_state__excessive_replenishment
 msgid "Excessive Replenishment"
-msgstr ""
+msgstr "חידוש מלאי עודף"
 
 #. module: mrp_mps
 #. odoo-javascript
@@ -276,12 +332,6 @@ msgstr "מזהה חיצוני"
 #: model:ir.model,name:mrp_mps.model_mrp_mps_forecast_details
 msgid "Forecast Demand Details"
 msgstr "פרטי תחזית דרישה"
-
-#. module: mrp_mps
-#. odoo-javascript
-#: code:addons/mrp_mps/static/src/components/line.xml:0
-msgid "Forecast Report"
-msgstr ""
 
 #. module: mrp_mps
 #. odoo-javascript
@@ -308,11 +358,6 @@ msgid "Forecasted quantity at date"
 msgstr "כמות חזויה בתאריך"
 
 #. module: mrp_mps
-#: model:ir.model.fields,help:mrp_mps.field_mrp_production_schedule__sequence
-msgid "Gives the sequence order when displaying a product list"
-msgstr "נותן את סדר הרצף בעת הצגת רשימת מוצרים"
-
-#. module: mrp_mps
 #: model:ir.model.fields,field_description:mrp_mps.field_mrp_mps_forecast_details__id
 #: model:ir.model.fields,field_description:mrp_mps.field_mrp_product_forecast__id
 #: model:ir.model.fields,field_description:mrp_mps.field_mrp_production_schedule__id
@@ -320,10 +365,45 @@ msgid "ID"
 msgstr "מזהה"
 
 #. module: mrp_mps
+#: model:ir.model.fields,help:mrp_mps.field_mrp_production_schedule__bom_id
+msgid "If set, the bill of materials components will also be imported."
+msgstr "אם מוגדר, גם רכיבי עצי המוצר ייובאו."
+
+#. module: mrp_mps
+#: model:ir.model.fields,help:mrp_mps.field_mrp_production_schedule__batch_size
+msgid ""
+"If set, the generated manufacturing orders will be split in quantities of "
+"this value at maximum."
+msgstr "אם נקבע, הוראות הייצור שנוצרו יחולקו בכמויות של ערך זה לכל היותר"
+
+#. module: mrp_mps
+#. odoo-python
+#: code:addons/mrp_mps/models/mrp_mps.py:0
+msgid "Import Template for Master Production Schedule"
+msgstr "תבנית ייבוא לתוכנית ייצור ראשית"
+
+#. module: mrp_mps
+#: model_terms:ir.ui.view,arch_db:mrp_mps.mrp_mps_production_schedule_form_view
+#: model_terms:ir.ui.view,arch_db:mrp_mps.mrp_mps_search_view
+msgid "Indirect Demand"
+msgstr "ביקוש לא ישיר"
+
+#. module: mrp_mps
 #. odoo-javascript
+#: code:addons/mrp_mps/static/src/components/line.xml:0
 #: code:addons/mrp_mps/static/src/search/group_menu.xml:0
 msgid "Indirect Demand Forecast"
 msgstr "דרישה עקיפה חזויה"
+
+#. module: mrp_mps
+#: model:ir.model.fields,field_description:mrp_mps.field_mrp_production_schedule__is_indirect
+msgid "Indirect demand product"
+msgstr "מוצר עם ביקוש עקיף"
+
+#. module: mrp_mps
+#: model:ir.model.fields,field_description:mrp_mps.field_mrp_production_schedule__is_manufacture_route
+msgid "Is Manufacture Route"
+msgstr ""
 
 #. module: mrp_mps
 #: model:ir.model.fields,field_description:mrp_mps.field_mrp_mps_forecast_details__write_uid
@@ -345,6 +425,42 @@ msgid "MPS"
 msgstr "MPS"
 
 #. module: mrp_mps
+#: model:ir.actions.server,name:mrp_mps.ir_cron_replenish_automated_mps_ir_actions_server
+msgid "MPS: replenish automated schedules"
+msgstr ""
+
+#. module: mrp_mps
+#: model:ir.model.fields.selection,name:mrp_mps.selection__mrp_production_schedule__replenish_trigger__manual
+msgid "Manual"
+msgstr "ידני"
+
+#. module: mrp_mps
+#: model:ir.model.fields,help:mrp_mps.field_mrp_production_schedule__replenish_trigger
+msgid ""
+"Manual: Product to be replenished manually from MPS.\n"
+"Automatic: Product replenished automatically via scheduled action.\n"
+"Never: Product is not replenished from MPS."
+msgstr ""
+
+#. module: mrp_mps
+#: model_terms:ir.ui.view,arch_db:mrp_mps.mrp_mps_search_view
+msgid "Manually Replenished"
+msgstr "חודש ידנית "
+
+#. module: mrp_mps
+#: model:ir.model.fields,field_description:mrp_mps.field_mrp_mps_forecast_details__manufacture_string
+msgid "Manufacture String"
+msgstr ""
+
+#. module: mrp_mps
+#. odoo-python
+#: code:addons/mrp_mps/wizard/mrp_mps_forecast_details.py:0
+msgid "Manufacturing Order"
+msgstr "הוראת ייצור"
+
+#. module: mrp_mps
+#. odoo-python
+#: code:addons/mrp_mps/wizard/mrp_mps_forecast_details.py:0
 #: model_terms:ir.ui.view,arch_db:mrp_mps.mrp_mps_forecast_details_form_view
 msgid "Manufacturing Orders"
 msgstr "הוראות ייצור"
@@ -354,6 +470,14 @@ msgstr "הוראות ייצור"
 #: model:ir.model.fields,field_description:mrp_mps.field_res_config_settings__manufacturing_period
 msgid "Manufacturing Period"
 msgstr "תקופת ייצור"
+
+#. module: mrp_mps
+#. odoo-python
+#: code:addons/mrp_mps/models/res_company.py:0
+msgid ""
+"Manufacturing Settings: Your Master Production Schedule must always display "
+"at least 1 period."
+msgstr "הגדרות ייצור: תוכנית ייצור ראשית חייבת להציג תמיד לפחות תקופה אחת."
 
 #. module: mrp_mps
 #. odoo-javascript
@@ -375,6 +499,12 @@ msgid "Minimum to Replenish"
 msgstr "מינימום לחידוש מלאי"
 
 #. module: mrp_mps
+#. odoo-javascript
+#: code:addons/mrp_mps/static/src/components/main.js:0
+msgid "Month"
+msgstr "חודש"
+
+#. module: mrp_mps
 #: model:ir.model.fields.selection,name:mrp_mps.selection__res_company__manufacturing_period__month
 msgid "Monthly"
 msgstr "חודשי"
@@ -385,25 +515,91 @@ msgid "Move"
 msgstr "תנועה"
 
 #. module: mrp_mps
-#. odoo-javascript
-#: code:addons/mrp_mps/static/src/components/main.xml:0
-msgid "No product yet. Add one to start scheduling."
+#: model:ir.model.fields,field_description:mrp_mps.field_mrp_mps_forecast_details__moves_string
+msgid "Moves String"
 msgstr ""
 
 #. module: mrp_mps
+#: model:ir.model.fields.selection,name:mrp_mps.selection__mrp_production_schedule__replenish_trigger__never
+msgid "Never"
+msgstr "אף פעם"
+
+#. module: mrp_mps
+#. odoo-javascript
+#: code:addons/mrp_mps/static/src/components/main.xml:0
+msgid "No product yet. Add one to start scheduling."
+msgstr "אין עדיין מוצרים. הוסף מוצר כדי להתחיל בתכנון."
+
+#. module: mrp_mps
+#: model_terms:ir.ui.view,arch_db:mrp_mps.mrp_mps_search_view
+msgid "Not Replenished from MPS"
+msgstr ""
+
+#. module: mrp_mps
+#: model:ir.model.fields,field_description:mrp_mps.field_res_config_settings__manufacturing_period_to_display_day
+msgid "Number of Daily Manufacturing Period Columns"
+msgstr "מספר העמודות עבור תקופת הייצור ליום"
+
+#. module: mrp_mps
+#: model:ir.model.fields,field_description:mrp_mps.field_res_config_settings__manufacturing_period_to_display_month
+msgid "Number of Monthly Manufacturing Period Columns"
+msgstr "מספר העמודות עבור תקופת הייצור לחודש"
+
+#. module: mrp_mps
 #: model_terms:ir.ui.view,arch_db:mrp_mps.res_config_settings_view_form
-msgid "Number of Columns"
-msgstr "מספר עמודות"
+msgid "Number of Periods"
+msgstr "כמות מחזורים"
 
 #. module: mrp_mps
-#: model:ir.model.fields,field_description:mrp_mps.field_res_config_settings__manufacturing_period_to_display
-msgid "Number of Manufacturing Period Columns"
-msgstr "מספר עמודות עבור תקופות ייצור"
+#: model:ir.model.fields,field_description:mrp_mps.field_res_config_settings__manufacturing_period_to_display_week
+msgid "Number of Weekly Manufacturing Period Columns"
+msgstr "מספר העמודות עבור תקופת הייצור לשבוע"
 
 #. module: mrp_mps
-#: model:ir.model.fields,field_description:mrp_mps.field_res_company__manufacturing_period_to_display
-msgid "Number of columns for the        given period to display in Master Production Schedule"
-msgstr "מספר העמודות לתקופה הנתונה שיוצגו בתוכנית האב לייצור "
+#: model:ir.model.fields,field_description:mrp_mps.field_res_config_settings__manufacturing_period_to_display_year
+msgid "Number of Yearly Manufacturing Period Columns"
+msgstr "כמות העמודות עבור תקופת הייצור לשנה"
+
+#. module: mrp_mps
+#: model:ir.model.fields,field_description:mrp_mps.field_res_company__manufacturing_period_to_display_day
+msgid ""
+"Number of columns for the daily period to display in Master Production "
+"Schedule"
+msgstr "מספר העמודות המוצגות עבור התקופה היומית בתוכנית הייצור הראשית"
+
+#. module: mrp_mps
+#: model:ir.model.fields,field_description:mrp_mps.field_res_company__manufacturing_period_to_display_month
+msgid ""
+"Number of columns for the monthly period to display in Master Production "
+"Schedule"
+msgstr "מספר העמודות המוצגות עבור התקופה החודשית בתוכנית הייצור הראשית"
+
+#. module: mrp_mps
+#: model:ir.model.fields,field_description:mrp_mps.field_res_company__manufacturing_period_to_display_week
+msgid ""
+"Number of columns for the weekly period to display in Master Production "
+"Schedule"
+msgstr ""
+
+#. module: mrp_mps
+#: model:ir.model.fields,field_description:mrp_mps.field_res_company__manufacturing_period_to_display_year
+msgid ""
+"Number of columns for the yearly period to display in Master Production "
+"Schedule"
+msgstr "מספר העמודות המוצגות עבור התקופה השנתית בתוכנית הייצור הראשית"
+
+#. module: mrp_mps
+#. odoo-javascript
+#: code:addons/mrp_mps/static/src/components/line.xml:0
+#: code:addons/mrp_mps/static/src/components/main.js:0
+#: code:addons/mrp_mps/static/src/components/main.xml:0
+msgid "Order"
+msgstr "הזמנה"
+
+#. module: mrp_mps
+#: model:ir.model.fields,field_description:mrp_mps.field_mrp_production_schedule__route_id
+msgid "Preferred Route"
+msgstr "מסלול מועדף"
 
 #. module: mrp_mps
 #: model:ir.model.fields,field_description:mrp_mps.field_mrp_product_forecast__procurement_launched
@@ -479,10 +675,20 @@ msgstr "כמות מבקשה להצעת מחיר"
 #. module: mrp_mps
 #. odoo-javascript
 #: code:addons/mrp_mps/static/src/components/line.xml:0
-msgid "Quantity predicted to be available for sale at the end of the period (= to replenish - actual demand)."
+msgid ""
+"Quantity predicted to be available for sale at the end of the period (= to "
+"replenish - actual demand)."
 msgstr "כמות שצפויה להיות זמינה למכירה בסוף התקופה (= לחדש - ביקוש בפועל)."
 
 #. module: mrp_mps
+#. odoo-python
+#: code:addons/mrp_mps/wizard/mrp_mps_forecast_details.py:0
+msgid "Receipt"
+msgstr "קבלה"
+
+#. module: mrp_mps
+#. odoo-python
+#: code:addons/mrp_mps/wizard/mrp_mps_forecast_details.py:0
 #: model_terms:ir.ui.view,arch_db:mrp_mps.mrp_mps_forecast_details_form_view
 msgid "Receipts"
 msgstr "קבלות"
@@ -490,15 +696,13 @@ msgstr "קבלות"
 #. module: mrp_mps
 #. odoo-javascript
 #: code:addons/mrp_mps/static/src/components/line.xml:0
-#: code:addons/mrp_mps/static/src/components/main.js:0
-#: code:addons/mrp_mps/static/src/components/main.xml:0
 msgid "Replenish"
 msgstr "חדש מלאי"
 
 #. module: mrp_mps
 #: model:ir.model.fields,field_description:mrp_mps.field_mrp_production_schedule__replenish_state
 msgid "Replenish State"
-msgstr ""
+msgstr "מצב חידוש מלאי"
 
 #. module: mrp_mps
 #: model:ir.model.fields,field_description:mrp_mps.field_mrp_product_forecast__replenish_qty_updated
@@ -508,17 +712,51 @@ msgstr "Replenish_qty עודכן ידנית"
 #. module: mrp_mps
 #: model_terms:ir.ui.view,arch_db:mrp_mps.mrp_mps_search_view
 msgid "Replenishment Too High"
-msgstr ""
+msgstr "החידוש מלאי גבוה מידי"
 
 #. module: mrp_mps
 #: model_terms:ir.ui.view,arch_db:mrp_mps.mrp_mps_search_view
 msgid "Replenishment Too Low"
+msgstr "החידוש מלאי נמוך מידי"
+
+#. module: mrp_mps
+#: model:ir.model.fields,field_description:mrp_mps.field_mrp_production_schedule__replenish_trigger
+msgid "Replenishment Trigger"
 msgstr ""
 
 #. module: mrp_mps
+#. odoo-javascript
+#: code:addons/mrp_mps/static/src/components/line.xml:0
+msgid "Replenishment:"
+msgstr "חידוש מלאי:"
+
+#. module: mrp_mps
+#. odoo-python
+#: code:addons/mrp_mps/wizard/mrp_mps_forecast_details.py:0
+msgid "Request for quotation"
+msgstr "בקשה להצעת מחיר"
+
+#. module: mrp_mps
+#. odoo-python
+#: code:addons/mrp_mps/wizard/mrp_mps_forecast_details.py:0
 #: model_terms:ir.ui.view,arch_db:mrp_mps.mrp_mps_forecast_details_form_view
 msgid "Requests for quotation"
 msgstr "בקשה להצעת מחיר"
+
+#. module: mrp_mps
+#: model:ir.model.fields,field_description:mrp_mps.field_mrp_mps_forecast_details__rfq_string
+msgid "Rfq String"
+msgstr ""
+
+#. module: mrp_mps
+#: model_terms:ir.ui.view,arch_db:mrp_mps.mrp_mps_production_schedule_form_view
+msgid "Route"
+msgstr "מסלול"
+
+#. module: mrp_mps
+#: model:ir.model.fields,help:mrp_mps.field_mrp_production_schedule__route_id
+msgid "Route to replenish your product."
+msgstr "מסלול כדי לחדש מלאי של המוצר שלך. "
 
 #. module: mrp_mps
 #. odoo-javascript
@@ -547,19 +785,27 @@ msgid "Scheduled Date"
 msgstr "תאריך מתוזמן"
 
 #. module: mrp_mps
-#: model:ir.model.fields,field_description:mrp_mps.field_mrp_bom__schedule_count
 #: model:ir.model.fields,field_description:mrp_mps.field_product_product__schedule_count
 #: model:ir.model.fields,field_description:mrp_mps.field_product_template__schedule_count
-#: model_terms:ir.ui.view,arch_db:mrp_mps.mrp_bom_form_view_inherit_mps
 #: model_terms:ir.ui.view,arch_db:mrp_mps.product_normal_form_view_mps
 #: model_terms:ir.ui.view,arch_db:mrp_mps.product_template_only_form_view_mps
 msgid "Schedules"
-msgstr ""
+msgstr "לוחות זמנים"
 
 #. module: mrp_mps
-#: model:ir.model.fields,field_description:mrp_mps.field_mrp_production_schedule__sequence
+#: model:ir.model.fields,field_description:mrp_mps.field_mrp_production_schedule__mps_sequence
 msgid "Sequence"
 msgstr "רצף"
+
+#. module: mrp_mps
+#: model:ir.model.fields,field_description:mrp_mps.field_mrp_production_schedule__show_bom
+msgid "Show Bom"
+msgstr "הצג עץ מוצר"
+
+#. module: mrp_mps
+#: model:ir.model.fields,field_description:mrp_mps.field_mrp_production_schedule__show_vendor
+msgid "Show Vendor"
+msgstr "הצג ספק"
 
 #. module: mrp_mps
 #. odoo-javascript
@@ -571,12 +817,6 @@ msgstr "מלאי פתיחה"
 #: model:ir.model,name:mrp_mps.model_stock_rule
 msgid "Stock Rule"
 msgstr "כלל מלאי "
-
-#. module: mrp_mps
-#. odoo-javascript
-#: code:addons/mrp_mps/static/src/components/line.xml:0
-msgid "Suggested Replenishment"
-msgstr "חידוש מלאי מומלץ"
 
 #. module: mrp_mps
 #: model:ir.model.fields,help:mrp_mps.field_mrp_production_schedule__replenish_state
@@ -597,7 +837,9 @@ msgstr "הביקוש שאושר, מבוסס על הזמנות הלקוח שאו�
 #. module: mrp_mps
 #. odoo-javascript
 #: code:addons/mrp_mps/static/src/components/line.xml:0
-msgid "The forecasted demand to fulfill the needs in components of the Manufacturing Orders."
+msgid ""
+"The forecasted demand to fulfill the needs in components of the "
+"Manufacturing Orders."
 msgstr "הדרישה החזויה למלא את הצרכים במרכיבי הזמנות הייצור."
 
 #. module: mrp_mps
@@ -622,37 +864,48 @@ msgstr "הכמות החזויה במלאי בסוף התקופה."
 #. odoo-javascript
 #: code:addons/mrp_mps/static/src/components/main.xml:0
 msgid ""
-"The master schedule translates your sales and demand forecasts into a production and purchase planning for each component.\n"
-"                    It ensures everything gets scheduled on time, based on constraints such as: safety stock, production capacity, lead times.\n"
+"The master schedule translates your sales and demand forecasts into a "
+"production and purchase planning for each component.\n"
+"                    It ensures everything gets scheduled on time, based on "
+"constraints such as: safety stock, production capacity, lead times.\n"
 "                    It's the perfect tool to support your S&OP meetings."
 msgstr ""
 
 #. module: mrp_mps
 #: model:ir.model.fields,help:mrp_mps.field_mrp_production_schedule__max_to_replenish_qty
-msgid "The maximum replenishment you would like to launch for each period in the MPS. Note that if the demand is higher than that amount, the remaining quantity will be transferred to the next period automatically."
+msgid ""
+"The maximum replenishment you would like to launch for each period in the "
+"MPS. This is only applied for the period defined in the settings. Note that "
+"if the demand is higher than that amount, the remaining quantity will be "
+"transferred to the next period automatically."
 msgstr ""
 
 #. module: mrp_mps
 #. odoo-javascript
 #: code:addons/mrp_mps/static/src/components/line.xml:0
-msgid "The quantity being replenished, based on the Requests for Quotation and the Manufacturing Orders."
+msgid ""
+"The quantity being replenished, based on the Requests for Quotation and the "
+"Manufacturing Orders."
 msgstr "הכמות שמתחדשת, על בסיס בקשות להצעת מחיר והוראות ייצור."
 
 #. module: mrp_mps
 #. odoo-javascript
 #: code:addons/mrp_mps/static/src/components/line.xml:0
-msgid "The quantity to replenish through Purchase Orders or Manufacturing Orders."
+msgid ""
+"The quantity to replenish through Purchase Orders or Manufacturing Orders."
 msgstr "הכמות שיש לחדש באמצעות הזמנות רכש או הוראות ייצור."
 
 #. module: mrp_mps
 #: model:ir.model.fields,help:mrp_mps.field_mrp_production_schedule__forecast_target_qty
-msgid "This is the minimum free stock you want to keep for that product at all times."
-msgstr ""
+msgid ""
+"This is the minimum free stock you want to keep for that product at all "
+"times."
+msgstr "זו הכמות המינימלית של מלאי זמין שברצונך לשמור עבור המוצר הזה בכל זמן."
 
 #. module: mrp_mps
-#: model_terms:ir.ui.view,arch_db:mrp_mps.res_config_settings_view_form
-msgid "Time Range"
-msgstr "טווח זמן"
+#: model_terms:ir.ui.view,arch_db:mrp_mps.mrp_mps_search_view
+msgid "To Forecast"
+msgstr ""
 
 #. module: mrp_mps
 #. odoo-javascript
@@ -664,25 +917,59 @@ msgid "To Replenish"
 msgstr "לחדש מלאי"
 
 #. module: mrp_mps
+#. odoo-javascript
+#: code:addons/mrp_mps/static/src/components/main.js:0
+msgid "Toggle Indirect Demand"
+msgstr ""
+
+#. module: mrp_mps
 #: model:ir.model.fields.selection,name:mrp_mps.selection__mrp_production_schedule__replenish_state__under_replenishment
 msgid "Under Replenishment"
 msgstr ""
 
 #. module: mrp_mps
 #: model:ir.model.fields,help:mrp_mps.field_mrp_production_schedule__min_to_replenish_qty
-msgid "Unless the demand is 0, Odoo will always at least replenish this quantity."
-msgstr ""
+msgid ""
+"Unless the demand is 0, Odoo will always at least replenish this quantity."
+msgstr "אלא אם כן הביקוש הוא 0, אודו תמיד יחדש לפחות את הכמות הזו."
+
+#. module: mrp_mps
+#: model:ir.model.fields,field_description:mrp_mps.field_mrp_production_schedule__supplier_id
+msgid "Vendor"
+msgstr "ספק"
+
+#. module: mrp_mps
+#. odoo-javascript
+#: code:addons/mrp_mps/static/src/components/main.js:0
+msgid "Week"
+msgstr "שבוע"
 
 #. module: mrp_mps
 #. odoo-python
 #: code:addons/mrp_mps/models/res_company.py:0
-msgid "Week {week_num} ({start_date}-{end_date}/{month})"
-msgstr ""
+msgid "Week %(week_num)s (%(start_date)s-%(end_date)s/%(month)s)"
+msgstr "שבוע %(week_num)s (%(start_date)s-%(end_date)s/%(month)s)"
 
 #. module: mrp_mps
 #: model:ir.model.fields.selection,name:mrp_mps.selection__res_company__manufacturing_period__week
 msgid "Weekly"
 msgstr "שבועי"
+
+#. module: mrp_mps
+#: model:ir.model.fields,help:mrp_mps.field_mrp_production_schedule__is_indirect
+msgid "When checked, this product will not appear in the 'To Forecast' filter."
+msgstr ""
+
+#. module: mrp_mps
+#. odoo-javascript
+#: code:addons/mrp_mps/static/src/components/main.js:0
+msgid "Year"
+msgstr "שנה"
+
+#. module: mrp_mps
+#: model:ir.model.fields.selection,name:mrp_mps.selection__res_company__manufacturing_period__year
+msgid "Yearly"
+msgstr "שנתי"
 
 #. module: mrp_mps
 #. odoo-javascript

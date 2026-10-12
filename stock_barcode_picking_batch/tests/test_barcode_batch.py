@@ -345,6 +345,7 @@ class TestBarcodeBatchClientAction(TestBarcodeClientAction):
         completed before changing the line, even if the scanned lot is planned for another picking
         or another picking has an empty line for this product.
         """
+        self.env.ref('base.group_user').implied_ids += self.env.ref('stock.group_production_lot')
         self.clean_access_rights()
         grp_pack = self.env.ref('stock.group_tracking_lot')
         self.env.user.write({'groups_id': [(4, grp_pack.id, 0)]})
@@ -423,14 +424,17 @@ class TestBarcodeBatchClientAction(TestBarcodeClientAction):
         """ Checks that scanning a lot won't erase the reserved one if the
         scanned one is reserved too."""
         self.clean_access_rights()
-        grp_pack = self.env.ref('stock.group_tracking_lot')
-        self.env.user.write({'groups_id': [Command.link(grp_pack.id)]})
+        grp_pack = self.ref('stock.group_tracking_lot')
+        grp_lot = self.ref('stock.group_production_lot')
+        self.env.user.write({'groups_id': [Command.link(grp_pack), Command.link(grp_lot)]})
         self.picking_type_out.show_reserved_sns = True
         # Create some lots and add quantity in stock for them.
         common_vals = {'product_id': self.productlot1.id, 'company_id': self.env.company.id}
         lots = self.env['stock.lot'].create([{**common_vals, 'name': f'lot{i}'} for i in range(1, 4)])
         for lot in lots:
             self.env['stock.quant']._update_available_quantity(self.productlot1, self.stock_location, 3, lot_id=lot)
+        # Add 1 unit without lot
+        self.env['stock.quant']._update_available_quantity(self.productlot1, self.stock_location, 1, lot_id=False)
         # Create a delivery and batch it alone (a batch with a single picking is enough for this test's purpose.)
         delivery = self.env['stock.picking'].create({
             'name': "delivery with lots",
@@ -443,7 +447,7 @@ class TestBarcodeBatchClientAction(TestBarcodeClientAction):
                 'location_dest_id': self.customer_location.id,
                 'product_id': self.productlot1.id,
                 'product_uom': self.uom_unit.id,
-                'product_uom_qty': 9,
+                'product_uom_qty': 10,
             })],
         })
         batch = self.env['stock.picking.batch'].create({
@@ -771,6 +775,13 @@ class TestBarcodeBatchClientAction(TestBarcodeClientAction):
                 'product_id': self.productlot1.id,
                 'product_uom_qty': 4,
                 'picking_id': receipt1.id,
+            }, {
+                'name': 'receipt1 product3 move',
+                'location_id': self.supplier_location.id,
+                'location_dest_id': self.stock_location.id,
+                'product_id': self.product3.id,
+                'product_uom_qty': 4.4,
+                'picking_id': receipt1.id,
             }, {  # receipt2 moves.
                 'name': 'receipt2 productlot1 move',
                 'location_id': self.supplier_location.id,
@@ -786,6 +797,13 @@ class TestBarcodeBatchClientAction(TestBarcodeClientAction):
                 'product_id': self.product1.id,
                 'product_uom_qty': 2,
                 'product_uom': self.product1.uom_id.id,
+                'picking_id': receipt2.id,
+            }, {
+                'name': 'receipt2 product3 move',
+                'location_id': self.supplier_location.id,
+                'location_dest_id': self.stock_location.id,
+                'product_id': self.product3.id,
+                'product_uom_qty': 48.8,
                 'picking_id': receipt2.id,
             }, {
                 'name': 'receipt2 product2 move',
@@ -825,6 +843,38 @@ class TestBarcodeBatchClientAction(TestBarcodeClientAction):
 
         url = self._get_batch_client_action_url(batch_receipts.id)
         self.start_tour(url, 'test_setting_group_lines_by_product', login='admin', timeout=180)
+
+    def test_setting_group_lines_by_product_when_tracking_is_off(self):
+        """ This test ensures lines are grouped by product in batch if the option is enabled even if
+        tracking setting is off (used to define if lines should be grouped or not.)"""
+        self.clean_access_rights()
+        self.picking_type_in.group_lines_by_product = True
+        # Explicitly remove the tracking group access right.
+        group_lot = self.env.ref('stock.group_production_lot')
+        group_user = self.env.ref('base.group_user')
+        group_user.write({'implied_ids': [Command.unlink(group_lot.id)]})
+        self.env.user.write({'groups_id': [Command.unlink(group_lot.id)]})
+
+        receipt_1 = self.env['stock.picking'].create({
+            'picking_type_id': self.picking_type_in.id,
+            'move_ids': [Command.create({
+                'name': "Billy Joel",
+                'product_id': self.product1.id,
+                'product_uom_qty': 3,
+                'location_id': self.picking_type_in.default_location_src_id.id,
+                'location_dest_id': self.picking_type_in.default_location_dest_id.id,
+            })],
+        })
+        receipt_2 = receipt_1.copy()
+        (receipt_1 | receipt_2).action_confirm()
+
+        batch_receipt = self.env['stock.picking.batch'].create({
+            'picking_ids': [Command.link(receipt_1.id), Command.link(receipt_2.id)],
+        })
+        batch_receipt.action_confirm()
+
+        url = self._get_batch_client_action_url(batch_receipt.id)
+        self.start_tour(url, 'test_setting_group_lines_by_product_when_tracking_is_off', login='admin')
 
     def test_split_line_on_exit_for_batch(self):
         """ Ensures that exit an unfinished batch will split the uncompleted move lines to have one
@@ -874,12 +924,18 @@ class TestBarcodeBatchClientAction(TestBarcodeClientAction):
         self.start_tour("odoo/barcode/", 'test_split_line_on_exit_for_batch', login='admin')
         # Checks the receipts moves values.
         self.assertRecordValues(receipt1.move_ids, [
-            {'product_id': self.product1.id, 'quantity': 2, 'picked': True},
-            {'product_id': self.product1.id, 'quantity': 2, 'picked': False},
+            {'product_id': self.product1.id, 'quantity': 4, 'picked': True},
+        ])
+        self.assertRecordValues(receipt1.move_line_ids, [
+            {'quantity': 2, 'picked': True},
+            {'quantity': 2, 'picked': False},
         ])
         self.assertRecordValues(receipt2.move_ids, [
-            {'product_id': self.product2.id, 'quantity': 1, 'picked': True},
-            {'product_id': self.product2.id, 'quantity': 3, 'picked': False},
+            {'product_id': self.product2.id, 'quantity': 4, 'picked': True},
+        ])
+        self.assertRecordValues(receipt2.move_line_ids, [
+            {'quantity': 1, 'picked': True},
+            {'quantity': 3, 'picked': False},
         ])
 
     def test_scan_can_change_destination_location(self):
@@ -924,3 +980,132 @@ class TestBarcodeBatchClientAction(TestBarcodeClientAction):
         # validate that SML destination locations changed
         move_lines = internal_picking_1.move_line_ids + internal_picking_2.move_line_ids
         self.assertEqual(move_lines.mapped('location_dest_id'), self.shelf3)
+
+    def test_pack_batch_in_multiple_packages(self):
+        """
+        Batch deliveries and put in packs lines from different pickings.
+        Check that the lines still refer to their respective picking.
+        """
+        self.clean_access_rights()
+        grp_pack = self.env.ref('stock.group_tracking_lot')
+        self.env.user.write({'groups_id': [Command.link(grp_pack.id)]})
+        # Creates a new batch.
+        batch_receipts = self.env['stock.picking.batch'].create({
+            'name': 'test_pack_batch_in_multiple_packages',
+            'picking_type_id': self.picking_type_in.id,
+        })
+        # Creates two receipts (each containing product1 and product2) and add them to the batch.
+        products = self.product1 | self.product2
+        receipts = self.env['stock.picking'].create([
+            {
+                'batch_id': batch_receipts.id,
+                'name': f"Lovely receipt {i + 1}",
+                'location_id': self.supplier_location.id,
+                'location_dest_id': self.stock_location.id,
+                'picking_type_id': self.picking_type_in.id,
+                'move_ids': [
+                    Command.create({
+                        'location_id': self.supplier_location.id,
+                        'location_dest_id': self.stock_location.id,
+                        'name': f"{product.name} x{2 + i}",
+                        'product_id': product.id,
+                        'product_uom_qty': 2 + i,
+                    }) for product in products
+                ]
+            } for i in range(2)
+        ])
+        batch_receipts.action_confirm()
+        url = self._get_batch_client_action_url(batch_receipts.id)
+        self.start_tour(url, 'test_pack_batch_in_multiple_packages', login='admin')
+        # Checks the receipts moves values.
+        self.assertFalse(receipts.backorder_ids)
+        packages = receipts[1].move_line_ids.sorted(lambda ml: ml.product_id.id).result_package_id
+        self.assertRecordValues(receipts.move_line_ids.sorted(lambda ml: (ml.picking_id.id, ml.product_id.id, ml.quantity)), [
+            {'picking_id': receipts.ids[0], 'result_package_id': packages.ids[1], 'product_id': products.ids[0], 'quantity': 1.0},
+            {'picking_id': receipts.ids[0], 'result_package_id': packages.ids[0], 'product_id': products.ids[0], 'quantity': 1.0},
+            {'picking_id': receipts.ids[0], 'result_package_id': packages.ids[1], 'product_id': products.ids[1], 'quantity': 2.0},
+            {'picking_id': receipts.ids[1], 'result_package_id': packages.ids[0], 'product_id': products.ids[0], 'quantity': 3.0},
+            {'picking_id': receipts.ids[1], 'result_package_id': packages.ids[1], 'product_id': products.ids[1], 'quantity': 3.0},
+        ])
+
+    def test_barcode_batch_partial_receipt_leave_reopen(self):
+        """
+        Create a batch picking with 2 receipts, open the batch and process
+        part of both pickings.
+        """
+        self.picking_receipt_1.move_ids.filtered(lambda m: m.product_id == self.product1).product_uom_qty = 5
+        batch = self.env['stock.picking.batch'].create({
+            'picking_ids': [
+                Command.link(self.picking_receipt_1.id),
+                Command.link(self.picking_receipt_2.id)
+            ],
+        })
+        batch.action_confirm()
+        self.assertEqual(len(batch.move_ids), 4)
+        self.assertEqual(len(batch.move_line_ids), 5)
+
+        url = self._get_batch_client_action_url(batch.id)
+        self.start_tour(url, 'test_barcode_batch_partial_receipt_leave_reopen', login='admin', timeout=180)
+        self.assertEqual(len(batch.move_ids), 4)
+        self.assertEqual(len(batch.move_line_ids), 7)
+
+    def test_barcode_batch_GS1_scan_barcode_with_new_serial(self):
+        """
+        Ensure scanning a GS1 barcode with a wrong serial updates the serial of the existing line.
+        """
+        self.clean_access_rights()
+        self.env.user.write({'groups_id': [
+            Command.link(self.env.ref('stock.group_tracking_lot').id),
+            Command.link(self.env.ref('stock.group_production_lot').id)
+        ]})
+        self.env.company.nomenclature_id = self.env.ref('barcodes_gs1_nomenclature.default_gs1_nomenclature')
+        self.picking_type_out.use_create_lots = True
+
+        self.productserial1.barcode = '23456789012344'
+        sn1 = self.env['stock.lot'].create({
+            'name': 'sn1',
+            'product_id': self.productserial1.id,
+            'company_id': self.env.company.id,
+        })
+        self.env['stock.quant']._update_available_quantity(self.productserial1, self.stock_location, 1, lot_id=sn1)
+        self.env['stock.quant']._update_available_quantity(self.product2, self.stock_location, 10)
+        picking_delivery_serial_1, picking_delivery_product_2 = self.env['stock.picking'].create([
+            {
+                'name': 'Delivery for product serial 1',
+                'location_id': self.stock_location.id,
+                'location_dest_id': self.customer_location.id,
+                'picking_type_id': self.picking_type_out.id,
+                'move_ids': [Command.create({
+                    'name': 'product serial 1',
+                    'location_id': self.stock_location.id,
+                    'location_dest_id': self.customer_location.id,
+                    'product_id': self.productserial1.id,
+                    'product_uom': self.uom_unit.id,
+                    'product_uom_qty': 1,
+                })],
+            }, {
+                'name': 'Delivery for product 2',
+                'location_id': self.stock_location.id,
+                'location_dest_id': self.customer_location.id,
+                'picking_type_id': self.picking_type_out.id,
+                'move_ids': [Command.create({
+                    'name': 'product 2',
+                    'location_id': self.stock_location.id,
+                    'location_dest_id': self.customer_location.id,
+                    'product_id': self.product2.id,
+                    'product_uom': self.uom_unit.id,
+                    'product_uom_qty': 1,
+                })],
+            },
+        ])
+        batch = self.env['stock.picking.batch'].create({
+            'picking_ids': [
+                Command.link(picking_delivery_serial_1.id),
+                Command.link(picking_delivery_product_2.id)
+            ],
+        })
+        batch.action_confirm()
+        self.assertEqual(picking_delivery_serial_1.lot_id.id, sn1.id)
+        url = self._get_batch_client_action_url(batch.id)
+        self.start_tour(url, 'test_barcode_batch_GS1_scan_barcode_with_new_serial', login='admin', timeout=180)
+        self.assertEqual(picking_delivery_serial_1.lot_id.name, 'BATCHSN1')

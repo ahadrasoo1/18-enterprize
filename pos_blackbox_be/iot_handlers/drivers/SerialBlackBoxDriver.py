@@ -3,6 +3,7 @@
 
 import logging
 import serial
+import time
 
 from odoo.addons.hw_drivers.tools import helpers
 from odoo.addons.hw_drivers.event_manager import event_manager
@@ -16,7 +17,7 @@ BlackboxProtocol = SerialProtocol(
     bytesize=serial.EIGHTBITS,
     stopbits=serial.STOPBITS_ONE,
     parity=serial.PARITY_NONE,
-    timeout=3,
+    timeout=1.4,
     writeTimeout=0.2,
     measureRegexp=None,
     statusRegexp=None,
@@ -69,28 +70,37 @@ class BlackBoxDriver(SerialDriver):
         """Initializes `self._actions`, a map of action keys sent by the frontend to backend action methods."""
 
         self._actions.update({
-            'registerReceipt': self._request_registerReceipt, # 'H'
-            'registerPIN': self._request_registerReceipt, # 'P'
+            'registerReceipt': self._request_registerReceipt,  # 'H'
+            'registerPIN': self._request_registerPIN,  # 'P'
         })
 
     @classmethod
     def supported(cls, device):
         """Checks whether the device at path `device` is supported by the driver.
-        :param device: path to the device
-        :type device: str
+
+        :param dict device: path to the device
         :return: whether the device is supported by the driver
         :rtype: bool
         """
-
-        try:
-            protocol = cls._protocol
-            probe_message = cls._wrap_low_level_message_around("S000")
-            with serial_connection(device['identifier'], protocol) as connection:
-                return cls._send_and_wait_for_ack(probe_message, connection)
-        except serial.serialutil.SerialTimeoutException:
-            pass
-        except Exception:
-            _logger.exception('Error while probing %s with protocol %s' % (device, protocol.name))
+        for i in range(3):
+            try:
+                protocol = cls._protocol
+                probe_message = cls._wrap_low_level_message_around("S00" + str(i))
+                with serial_connection(device['identifier'], protocol) as connection:
+                    connection.reset_output_buffer()
+                    connection.reset_input_buffer()
+                    # ask for status then acknowledge the response
+                    connection.write(probe_message)
+                    buffer = connection.read_until(ETX)
+                    _logger.info('Probing %s as a blackbox. Expecting "%s" in response. Device response: "%s"', device, ACK, buffer)
+                    connection.write(ACK)
+                    connection.reset_input_buffer()  # flush in case bb sends status again (ACK too late)
+                    if len(buffer) > 0 and buffer[0:1] == ACK:
+                        return True
+            except serial.SerialException:
+                _logger.exception('Error while probing %s with protocol %s', device, protocol.name)
+            time.sleep(3)
+        return False
 
     @classmethod
     def _wrap_low_level_message_around(cls, high_level_message):
@@ -114,36 +124,19 @@ class BlackBoxDriver(SerialDriver):
 
     @staticmethod
     def _lrc(msg):
-        """"Compute a message's longitudinal redundancy check value.
-        :param msg: the message the LRC is computed for
-        :type msg: byte
+        """Compute a message's longitudinal redundancy check value.
+
+        :param byte msg: the message the LRC is computed for
         :return: the message LRC
         :rtype: int
         """
         lrc = 0
-
         for character in msg:
             byte = ord(character)
             lrc = (lrc + byte) & 0xFF
 
         lrc = ((lrc ^ 0xFF) + 1) & 0xFF
-
         return lrc
-
-    @staticmethod
-    def _send_and_wait_for_ack(packet, connection):
-        """Sends a message to and wait for acknoledgement from the blackbox.
-        :param packet: the message sent to the blackbox
-        :type packet: bytearray
-        :param connection: serial connection to the blackbox
-        :type connection: serial.Serial
-        :return: wether the blackbox acknowledged the message it received
-        :rtype: bool
-        """
-
-        connection.write(packet)
-        ack = connection.read(1)
-        return ack == ACK
 
     def _box_id(self):
         return 'BODO001' + helpers.get_mac_address().upper().replace(':', '')[-7:]
@@ -172,58 +165,100 @@ class BlackBoxDriver(SerialDriver):
 
     def _request_registerReceipt(self, data):
         if data['high_level_message'].get('clock'):
-            packet = self._wrap_low_level_message_around(self._wrap_high_level_message_around('I', data['high_level_message']))
-            blackbox_response = self._send_to_blackbox(packet, 59, self._connection)
+            blackbox_response = self._send_to_blackbox('I', data['high_level_message'], self._connection)
 
-        packet = self._wrap_low_level_message_around(self._wrap_high_level_message_around('H', data['high_level_message']))
-        blackbox_response = self._send_to_blackbox(packet, 109, self._connection)
+        blackbox_response = self._send_to_blackbox('H', data['high_level_message'], self._connection)
         if blackbox_response:
             self.data['value'] = self._parse_blackbox_response(blackbox_response)
         event_manager.device_changed(self)
 
-    def _send_to_blackbox(self, packet, response_size, connection):
+    def _request_registerPIN(self, data):
+        blackbox_response = self._send_to_blackbox("P", data['high_level_message'], self._connection)
+        if blackbox_response:
+            self.data['value'] = self._parse_blackbox_response(blackbox_response)
+        event_manager.device_changed(self)
+
+    def _send_to_blackbox(self, request_type: str, data: dict, connection: serial.Serial) -> str | None:
         """Sends a message to and wait for a response from the blackbox.
-        :param packet: the message to be sent to the blackbox
-        :type packet: bytearray
-        :param response_size: number of bytes of the expected response
-        :type response_size: int
+
+        :param request_type: "I", "H" or "P"
+        :param data: data to be sent to the blackbox
         :param connection: serial connection to the blackbox
-        :type connection: serial.Serial
-        :return: the response to the sent message
-        :rtype: bytearray
+        :return: the response to the message, or None if no valid response was received
         """
+        error_code = ''
+        error_message = ''
+        for retry in range(3):
+            if retry > 0:
+                _logger.warning("Retrying (count=%s)...", retry)
 
-        got_response = False
-        connection.reset_output_buffer()
-        connection.reset_input_buffer()
+            packet = self._wrap_low_level_message_around(self._wrap_high_level_message_around(request_type, data, retry))
+            connection.reset_output_buffer()
+            connection.reset_input_buffer()
+            try:
+                connection.write(packet)
+                buffer = connection.read_until(ETX)
 
-        if self._send_and_wait_for_ack(packet, connection):
-            stx = connection.read(1)
-            response = connection.read(response_size).decode()
-            etx = connection.read(1)
-            bcc = connection.read(1)
+                if not len(buffer) or buffer[0:1] not in (ACK, NACK):
+                    # When the blackbox is off or poorly connected its adaptor is still detected but always replies with empty bytestrings b''
+                    _logger.error("Blackbox did not respond, check the cable connection and the power supply.")
+                    error_code = 'BLACKBOX_CONNECTION_ERROR'
+                    error_message = (
+                        'Fiscal Data Module did not respond to your request. This usually means it has disconnected. '
+                        'Please check its cable connection and its power supply. Make sure it has a steady '
+                        'green light on.'
+                    )
+                    continue
 
-            if stx == STX and etx == ETX and bcc and self._lrc(response) == ord(bcc):
-                got_response = True
-                connection.write(ACK)
-            else:
-                _logger.warning("received ACK but not a valid response, sending NACK...")
-                connection.write(NACK)
+                error_code = 'BLACKBOX_INVALID_RESPONSE'
+                if buffer[0:1] == NACK:
+                    _logger.error("received NACK from blackbox.")
+                    error_message = 'Fiscal Data Module refused message due to invalid control sum.'
+                    continue
+                elif buffer[0:1] == ACK:
+                    buffer = buffer[1:]  # remove ACK
+                    for _ in range(3):
+                        response_data = buffer[1:-1]  # remove STX and ETX
+                        if (
+                            len(buffer)
+                            and buffer[0:1] == STX
+                            and buffer[-1:] == ETX
+                            and self._lrc(response_data.decode()) == ord(connection.read(1))
+                        ):
+                            connection.write(ACK)
+                            return response_data.decode()
 
-        if not got_response:
-            _logger.error("sent 1 NACKS without receiving response, giving up.")
-            self.data['value'] = {'error': {
-                    'errorCode': '208000',
-                    'errorMessage': errors.get('208000'),
-                }
-            },
-        else:
-            _logger.error(type(response))
-            return response
+                        _logger.error("received ACK but not a valid response, sending NACK... (response: %s)", buffer)
+                        error_message = (
+                            'Fiscal Data Module responded with invalid response. '
+                            f'Buffer: {buffer}. Please check the cable connection and the power supply, then retry.'
+                        )
+                        connection.reset_input_buffer()
+                        connection.write(NACK)
+                        buffer = connection.read_until(ETX)
+                    break
+            except serial.SerialException:
+                _logger.warning("Error while sending to blackbox with protocol %s", self._protocol.name)
+                error_code = 'BLACKBOX_CONNECTION_ERROR'
+                error_message = (
+                    'Fiscal Data Module did not respond to your request. This usually means it has disconnected. '
+                    'Please check its cable connection and its power supply. Make sure it has steady '
+                    'green light on.'
+                )
+        self.data['value'] = {
+            'error': {
+                'errorCode': error_code,
+                'errorMessage': error_message,
+            }
+        }
+        return None
 
-    def _wrap_high_level_message_around(self, request_type, data):
+    def _wrap_high_level_message_around(self, request_type, data, retry=0):
         self.sequence_number += 1
-        wrap = request_type + str(self.sequence_number % 100).zfill(2) + '0'
+        wrap = request_type + str(self.sequence_number % 100).zfill(2) + str(retry)
+
+        if request_type == "P":
+            return wrap + data
 
         if request_type == 'I':
             return wrap
@@ -251,3 +286,12 @@ class BlackBoxDriver(SerialDriver):
         except Exception:
             name = 'Unknown Serial Device'
         self.device_name = name
+
+    def run(self):
+        with serial_connection(self.device_identifier, self._protocol) as connection:
+            self._connection = connection
+            self.data['status'] = self.STATUS_CONNECTED
+            while not self._stopped.is_set():
+                time.sleep(self._protocol.newMeasureDelay)
+
+            self.data['status'] = self.STATUS_DISCONNECTED

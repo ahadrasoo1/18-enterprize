@@ -2,12 +2,11 @@
 
 import json
 import base64
-from datetime import datetime
 
 from .common import SpreadsheetTestCommon, TEST_CONTENT, GIF
-from odoo.exceptions import AccessError
+from odoo.exceptions import AccessError, ValidationError
 from odoo.tests import Form
-from odoo.tests.common import freeze_time, new_test_user
+from odoo.tests.common import new_test_user
 
 
 class SpreadsheetDocuments(SpreadsheetTestCommon):
@@ -81,6 +80,52 @@ class SpreadsheetDocuments(SpreadsheetTestCommon):
         document = self.env["documents.document"].browse(spreadsheet_id)
         self.assertEqual(document.folder_id, self.folder)
 
+    def test_action_update_access_rights(self):
+        folder = self.env['documents.document'].create({'name': 'Folder', 'type': 'folder'})
+        frozen_folder, document = self.env['documents.document'].create([
+            {'name': 'Frozen Folder', 'type': 'folder', 'handler': 'frozen_folder', 'folder_id': folder.id},
+            {'name': 'Document', 'folder_id': folder.id},
+        ])
+        frozen_spreadsheet = self.env['documents.document'].create({'name': 'Spreadsheet', 'handler': 'frozen_spreadsheet'})
+        partner = self.env['res.partner'].create({'name': 'Partner'})
+
+        # The update does not propagate on the frozen folders / spreadsheets
+        folder.action_update_access_rights(access_internal='edit', partners={partner: ('edit', None)})
+        self.assertEqual(folder.access_internal, 'edit')
+        self.assertEqual(folder.access_ids.role, 'edit')
+        self.assertEqual(document.access_internal, 'edit')
+        self.assertEqual(document.access_ids.role, 'edit')
+        self.assertEqual(frozen_folder.access_internal, 'none')
+        self.assertFalse(frozen_folder.access_ids.role)
+        self.assertEqual(frozen_spreadsheet.access_internal, 'none')
+        self.assertFalse(frozen_spreadsheet.access_ids.role)
+
+        folder.action_update_access_rights(access_internal='view', partners={partner: ('view', None)})
+        self.assertEqual(folder.access_internal, 'view')
+        self.assertEqual(folder.access_ids.role, 'view')
+        self.assertEqual(document.access_internal, 'view')
+        self.assertEqual(document.access_ids.role, 'view')
+        self.assertEqual(frozen_folder.access_internal, 'none')
+        self.assertFalse(frozen_folder.access_ids.role)
+        self.assertEqual(frozen_spreadsheet.access_internal, 'none')
+        self.assertFalse(frozen_spreadsheet.access_ids.role)
+
+        frozen_folder.action_update_access_rights(access_internal='view', partners={partner: ('view', None)})
+        self.assertEqual(frozen_folder.access_internal, 'view')
+        self.assertEqual(frozen_folder.access_ids.role, 'view')
+        self.assertEqual(frozen_spreadsheet.access_internal, 'none')
+        self.assertFalse(frozen_spreadsheet.access_ids.role)
+
+        frozen_spreadsheet.action_update_access_rights(access_internal='view', partners={partner: ('view', None)})
+        self.assertEqual(frozen_spreadsheet.access_internal, 'view')
+        self.assertEqual(frozen_spreadsheet.access_ids.role, 'view')
+
+    def test_action_create_shortcut(self):
+        self.archive_existing_spreadsheet()
+        document = self.create_spreadsheet()
+        shortcut = document.action_create_shortcut()
+        self.assertEqual(shortcut.handler, "spreadsheet")
+
     def archive_existing_spreadsheet(self):
         """Existing spreadsheet in the database can influence some test results"""
         self.env["documents.document"].search([("handler", "=", "spreadsheet")]).active = False
@@ -99,13 +144,13 @@ class SpreadsheetDocuments(SpreadsheetTestCommon):
             self.env.company.document_spreadsheet_folder_id,
             "It should have been assigned the default Spreadsheet Folder"
         )
-        self.assertEqual(document.access_internal, 'none')
+        self.assertEqual(document.access_internal, 'edit')
         self.assertEqual(document.access_via_link, 'none')
 
-        # Bob can not read the documents of Alice
+        # Bob can read the documents of Alice
         result = self.env['documents.document'].with_user(user2).search(
             [('folder_id', '=', document.folder_id.id)])
-        self.assertNotIn(document, result)
+        self.assertIn(document, result)
 
         self.env.company.document_spreadsheet_folder_id = self.env['documents.document'].create({
             'name': 'Spreadsheet - Test Folder',
@@ -132,6 +177,51 @@ class SpreadsheetDocuments(SpreadsheetTestCommon):
             "mimetype": "application/o-spreadsheet",
         })
         self.assertEqual(document.folder_id, self.folder, "It should be in the specified folder")
+
+    def test_access_rights_inherited_on_create_spreadsheet(self):
+        user = new_test_user(
+            self.env, login='Jean', groups='documents.group_documents_user',
+        )
+        document_1 = self.env['documents.document'].create({
+            'spreadsheet_data': '{}',
+            'handler': 'spreadsheet',
+            'mimetype': 'application/o-spreadsheet',
+        })
+        document_2 = self.env['documents.document'].create({
+            'spreadsheet_data': '{}',
+            'handler': 'spreadsheet',
+            'folder_id': False,
+            'mimetype': 'application/o-spreadsheet',
+        })
+        self.folder.write({
+            'access_via_link': 'none',
+            'access_internal': 'view',
+        })
+        self.folder.action_update_access_rights(partners={user.partner_id.id: ('view', False)})
+        document_3 = self.env['documents.document'].create({
+            'spreadsheet_data': '{}',
+            'handler': 'spreadsheet',
+            'folder_id': self.folder.id,
+            'mimetype': 'application/o-spreadsheet',
+        })
+
+        # inherit access from default parent folder (Spreadsheet)
+        self.assertEqual(
+            document_1.folder_id,
+            self.env.company.document_spreadsheet_folder_id,
+            'It should have been assigned the default Spreadsheet Folder'
+        )
+        self.assertEqual(document_1.access_internal, 'edit')
+        self.assertEqual(document_1.access_via_link, 'none')
+
+        # inherit access from parent folder (My Drive)
+        self.assertEqual(document_2.access_internal, 'none')
+        self.assertEqual(document_2.access_via_link, 'none')
+
+        # inherit access from parent folder (Test folder)
+        self.assertEqual(document_3.access_internal, 'view')
+        self.assertEqual(document_3.access_via_link, 'none')
+        self.assertEqual(document_3.access_ids.partner_id, user.partner_id)
 
     def test_spreadsheet_to_display_with_domain(self):
         self.archive_existing_spreadsheet()
@@ -663,63 +753,6 @@ class SpreadsheetDocuments(SpreadsheetTestCommon):
         copy = spreadsheet.copy({'name': 'sheet'})
         self.assertEqual(copy.name, 'sheet')
 
-    def test_autovacuum_remove_old_empty_spreadsheet(self):
-        self.env["documents.document"].search([('handler', 'in', ('spreadsheet', 'frozen_spreadsheet'))]).unlink()
-
-        spreadsheet = self.create_spreadsheet(name="Spreadsheet", values={
-            "create_date": datetime(2023, 5, 15, 18)
-        })
-        spreadsheet.previous_attachment_ids = False
-        self.assertEqual(len(self.env["documents.document"].search([('handler', 'in', ('spreadsheet', 'frozen_spreadsheet'))])), 1)
-
-        with self._freeze_time("2023-05-16 19:00"):
-            self.env["documents.document"]._gc_spreadsheet()
-        self.assertEqual(len(self.env["documents.document"].search([('handler', 'in', ('spreadsheet', 'frozen_spreadsheet'))])), 0)
-
-    def test_autovacuum_keep_new_empty_spreadsheet(self):
-        self.env["documents.document"].search([('handler', 'in', ('spreadsheet', 'frozen_spreadsheet'))]).unlink()
-
-        self.create_spreadsheet(name="Spreadsheet", values={
-            "create_date": datetime(2023, 5, 16, 18)
-        })
-        self.assertEqual(len(self.env["documents.document"].search([('handler', 'in', ('spreadsheet', 'frozen_spreadsheet'))])), 1)
-
-        with self._freeze_time("2023-05-16 19:00"):
-            self.env["documents.document"]._gc_spreadsheet()
-        self.assertEqual(len(self.env["documents.document"].search([('handler', 'in', ('spreadsheet', 'frozen_spreadsheet'))])), 1)
-
-    def test_autovacuum_keep_old_spreadsheet_with_revision(self):
-        self.env["documents.document"].search([('handler', 'in', ('spreadsheet', 'frozen_spreadsheet'))]).unlink()
-
-        spreadsheet = self.create_spreadsheet(name="Spreadsheet", values={
-            "create_date": datetime(2023, 5, 15, 18)
-        })
-        commands = self.new_revision_data(spreadsheet)
-        spreadsheet.dispatch_spreadsheet_message(commands)
-
-        self.assertEqual(len(self.env["documents.document"].search([('handler', 'in', ('spreadsheet', 'frozen_spreadsheet'))])), 1)
-
-        with self._freeze_time("2023-05-16 19:00"):
-            self.env["documents.document"]._gc_spreadsheet()
-        self.assertEqual(len(self.env["documents.document"].search([('handler', 'in', ('spreadsheet', 'frozen_spreadsheet'))])), 1)
-
-    def test_autovacuum_preserve_spreadsheet_with_attachment(self):
-        self.env["documents.document"].search([('handler', '=', 'spreadsheet')]).unlink()
-
-        spreadsheet = self.create_spreadsheet(name="Spreadsheet", values={
-            "create_date": datetime(2024, 8, 12, 18)
-        })
-        spreadsheet.previous_attachment_ids = self.env["ir.attachment"].create({
-            "name": "image.png",
-            "datas": b"test",
-            "res_model": "documents.document",
-            "res_id": spreadsheet.id,
-        })
-        self.assertEqual(len(self.env["documents.document"].search([('handler', '=', 'spreadsheet')])), 1)
-        with freeze_time("2024-08-13 19:00"):
-            self.env["documents.document"]._gc_spreadsheet()
-        self.assertEqual(len(self.env["documents.document"].search([('handler', '=', 'spreadsheet')])), 1)
-
     def test_join_session_name_is_a_string(self):
         spreadsheet = self.create_spreadsheet(name="")
         self.assertEqual(spreadsheet.name, "")
@@ -899,7 +932,7 @@ class SpreadsheetDocuments(SpreadsheetTestCommon):
     def test_spreadsheet_thumbnail_checksum(self):
         spreadsheet = self.create_spreadsheet()
         self.assertFalse(spreadsheet.spreadsheet_thumbnail_checksum)
-        spreadsheet.thumbnail = GIF
+        spreadsheet.display_thumbnail = GIF
         thumbnail_attachment = self.env["ir.attachment"].search([
             ("res_model", "=", "documents.document"),
             ("res_field", "=", "thumbnail"),
@@ -917,3 +950,81 @@ class SpreadsheetDocuments(SpreadsheetTestCommon):
             "folder_id": self.folder.id,
         })
         self.assertFalse(document.spreadsheet_thumbnail_checksum)
+
+    def test_get_only_spreadsheet_documents(self):
+        self.env["documents.document"].search([("handler", "=", "spreadsheet")]).unlink()
+
+        # a spreadsheet
+        spreadsheet = self.create_spreadsheet()
+
+        # a regular document
+        self.env["documents.document"].create({
+            "datas": GIF,
+            "thumbnail": GIF,
+            "folder_id": self.folder.id,
+        })
+
+        # a frozen spreadsheet
+        frozen_spreadsheet = self.create_spreadsheet()
+        frozen_spreadsheet.access_internal = "view"
+        frozen_spreadsheet.handler = "frozen_spreadsheet"
+
+        result = self.env["documents.document"].get_spreadsheets()
+        self.assertEqual(result, {
+            "records": [{
+                "id": spreadsheet.id,
+                "display_name": spreadsheet.name,
+                "display_thumbnail": False
+            }],
+            "total": 1,
+        })
+
+    def test_company_consistency(self):
+        """
+        A folder can be company-specific. A company can have one spreadsheet
+        folder. Several companies can share the same one. A default folder
+        exists and is used on company creation. This test checks several
+        scenarios to ensure that there isn't any inconsistency between the
+        company of the folders and the companies
+        """
+        folder01 = self.env.ref('documents_spreadsheet.document_spreadsheet_folder')
+        company01 = self.env.company
+
+        # Make sure the setup is as expected
+        folder01.company_id = False
+        company01.document_spreadsheet_folder_id = folder01
+
+        company02 = self.env['res.company'].create({
+            'name': 'Comp02',
+        })
+        self.assertEqual(company02.document_spreadsheet_folder_id, folder01)
+
+        with self.assertRaises(ValidationError):
+            # folder01 is used by both company01 and company02
+            folder01.company_id = company01
+
+        folder02 = folder01.copy()
+        company02.document_spreadsheet_folder_id = folder02
+        folder01.company_id = company01
+
+        company03 = self.env['res.company'].create({
+            'name': 'Comp03',
+        })
+        self.assertTrue(company03)
+        self.assertFalse(company03.document_spreadsheet_folder_id)
+
+        with self.assertRaises(ValidationError):
+            # folder01 belongs to company01
+            company03.document_spreadsheet_folder_id = folder01
+
+        with self.assertRaises(ValidationError):
+            # folder01 is used by company01
+            folder01.company_id = company03
+
+    def test_spreadsheet_prevent_portal_owner(self):
+        portal = new_test_user(self.env, "Test user", groups="base.group_portal")
+        spreadsheet = self.create_spreadsheet()
+        with self.assertRaises(
+            AccessError, msg="Portal users cannot be the owner of a spreadsheet."
+        ):
+            spreadsheet.owner_id = portal

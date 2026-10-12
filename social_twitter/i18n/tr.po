@@ -1,50 +1,61 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* social_twitter
-# 
+# * social_twitter
+#
 # Translators:
 # emre oktem, 2024
+# Gökhan Erdoğdu <gokhan.erdogdu@mechsoft.com.tr>, 2024
+# Umur Akın <umura@projetgrup.com>, 2024
+# Nadir Gazioglu <nadirgazioglu@gmail.com>, 2024
 # Ediz Duman <neps1192@gmail.com>, 2024
-# 
+# Levent Karakaş <levent@mektup.at>, 2024
+# Martin Trigaux, 2024
+# Tunç Sabah, 2024
+# Tugay Hatıl <tugayh@projetgrup.com>, 2024
+# Murat Kaplan <muratk@projetgrup.com>, 2024
+# Deniz Guvener_Odoo <degu@odoo.com>, 2025
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:28+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Ediz Duman <neps1192@gmail.com>, 2024\n"
-"Language-Team: Turkish (https://app.transifex.com/odoo/teams/41243/tr/)\n"
+"POT-Creation-Date: 2026-04-10 18:52+0000\n"
+"PO-Revision-Date: 2026-07-13 16:48+0000\n"
+"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-18/"
+"social_twitter/tr/>\n"
+"Language: tr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: tr\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Generator: Weblate 2026.6.1\n"
 
 #. module: social_twitter
 #. odoo-python
 #: code:addons/social_twitter/models/social_post_template.py:0
 msgid "%(current_length)s / %(max_length)s characters to fit in a Post"
-msgstr ""
+msgstr "Bir Gönderiye sığması için%(current_length)s / %(max_length)s karakter"
 
 #. module: social_twitter
 #: model_terms:ir.ui.view,arch_db:social_twitter.twitter_preview
 msgid "11m"
-msgstr ""
+msgstr "11m"
 
 #. module: social_twitter
 #: model_terms:ir.ui.view,arch_db:social_twitter.twitter_preview
 msgid "<b class=\"text-900\">X Account</b>"
-msgstr ""
+msgstr "<b class=\"text-900\">X Hesap</b>"
 
 #. module: social_twitter
 #: model_terms:ir.ui.view,arch_db:social_twitter.social_stream_post_view_kanban
 msgid "<i class=\"fa fa-comments me-1\" title=\"Comments\"/>"
-msgstr ""
+msgstr "<i class=\"fa fa-comments me-1\" title=\"Comments\"/>"
 
 #. module: social_twitter
 #: model_terms:ir.ui.view,arch_db:social_twitter.social_stream_post_view_kanban
 msgid "<i class=\"fa fa-heart me-1\" title=\"Likes\"/>"
-msgstr ""
+msgstr "<i class=\"fa fa-heart me-1\" title=\"Likes\"/>"
 
 #. module: social_twitter
 #: model_terms:ir.ui.view,arch_db:social_twitter.social_stream_post_view_kanban
@@ -52,30 +63,39 @@ msgid ""
 "<i class=\"fa fa-pencil me-1\" title=\"Quote a post\"/>\n"
 "                                    <span>Quote</span>"
 msgstr ""
+"<i class=\"fa fa-pencil me-1\" title=\"Quote a post\"/>\n"
+"                                    <span>Teklif</span>"
 
 #. module: social_twitter
 #: model_terms:ir.ui.view,arch_db:social_twitter.social_stream_post_view_kanban
 msgid "<i class=\"fa fa-retweet me-1\" title=\"Repost a post\"/>"
+msgstr ""
+"<i class=\"fa fa-retweet me-1\" title=\"Bir gönderiyi yeniden paylaşın\"/>"
+
+#. module: social_twitter
+#: model_terms:ir.ui.view,arch_db:social_twitter.twitter_preview
+msgid "@x ·"
 msgstr ""
 
 #. module: social_twitter
 #. odoo-python
 #: code:addons/social_twitter/models/social_stream_post.py:0
 msgid "A repost already exists"
-msgstr ""
+msgstr "Bu gönderi zaten tekrar paylaşıldı"
 
 #. module: social_twitter
 #. odoo-python
 #: code:addons/social_twitter/controllers/main.py:0
 msgid "Authentication failed. Please enter valid credentials."
 msgstr ""
+"Kimlik doğrulama başarısız oldu. Lütfen geçerli kimlik bilgilerini girin."
 
 #. module: social_twitter
 #. odoo-javascript
 #: code:addons/social_twitter/static/src/xml/social_twitter_templates.xml:0
 #: model_terms:ir.ui.view,arch_db:social_twitter.social_stream_post_view_kanban
 msgid "Author Image"
-msgstr ""
+msgstr "Üretici Resmi"
 
 #. module: social_twitter
 #. odoo-python
@@ -84,6 +104,8 @@ msgid ""
 "Can not like / unlike the tweet\n"
 "%s."
 msgstr ""
+"Tweet beğenilemez veya beğenmekten vazgeçilemez\n"
+"%s."
 
 #. module: social_twitter
 #. odoo-javascript
@@ -97,6 +119,8 @@ msgid ""
 "Check this if you want to use your personal X Developer Account instead of "
 "the provided one."
 msgstr ""
+"Sağlanan hesap yerine kişisel X Geliştirici Hesabınızı kullanmak "
+"istiyorsanız bunu işaretleyin."
 
 #. module: social_twitter
 #: model:ir.model,name:social_twitter.model_res_config_settings
@@ -106,12 +130,12 @@ msgstr "Yapılandırma Ayarları"
 #. module: social_twitter
 #: model_terms:ir.ui.view,arch_db:social_twitter.res_config_settings_view_form
 msgid "Consumer Key"
-msgstr ""
+msgstr "Tüketici anahtarı"
 
 #. module: social_twitter
 #: model_terms:ir.ui.view,arch_db:social_twitter.res_config_settings_view_form
 msgid "Consumer Secret Key"
-msgstr ""
+msgstr "Tüketici Gizli Şifre"
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_twitter_account__create_uid
@@ -126,7 +150,7 @@ msgstr "Oluşturuldu"
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_twitter_account__description
 msgid "Description"
-msgstr ""
+msgstr "Açıklama"
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_twitter_account__display_name
@@ -137,32 +161,32 @@ msgstr "İsim Göster"
 #: model:ir.model.fields,field_description:social_twitter.field_social_post__display_twitter_preview
 #: model:ir.model.fields,field_description:social_twitter.field_social_post_template__display_twitter_preview
 msgid "Display X Preview"
-msgstr ""
+msgstr "X Önizlemesini Gösterin"
 
 #. module: social_twitter
 #. odoo-javascript
 #: code:addons/social_twitter/static/src/js/stream_post_comments.js:0
 msgid ""
 "Easy, tiger! No spamming allowed. Let's stick to three replies per Tweet."
-msgstr ""
+msgstr "Sakin ol, şampiyon! Spamlamak yok. Tweet başına üç yanıtla yetinelim."
 
 #. module: social_twitter
 #. odoo-javascript
 #: code:addons/social_twitter/static/src/xml/social_twitter_templates.xml:0
 msgid "Empty post"
-msgstr ""
+msgstr "Boş gönderi"
 
 #. module: social_twitter
 #. odoo-javascript
 #: code:addons/social_twitter/static/src/js/stream_post_kanban_record.js:0
 msgid "Error"
-msgstr ""
+msgstr "Hata"
 
 #. module: social_twitter
 #. odoo-javascript
 #: code:addons/social_twitter/static/src/js/stream_post_twitter_quote.js:0
 msgid "Error while sending the data to the server."
-msgstr ""
+msgstr "Veriler sunucuya gönderilirken hata oluştu."
 
 #. module: social_twitter
 #. odoo-python
@@ -171,31 +195,35 @@ msgid ""
 "Failed to delete the post\n"
 "%s."
 msgstr ""
+"Gönderi silinemedi\n"
+"%s."
 
 #. module: social_twitter
 #. odoo-python
 #: code:addons/social_twitter/models/social_stream_post.py:0
 msgid ""
-"Failed to fetch the posts in the same thread: '%(text)s' using the account "
-"%(account)s."
+"Failed to fetch the posts in the same thread: '%(text)s' using the account %"
+"(account)s."
 msgstr ""
+"%(text)s' başlıklı dizideki gönderiler %(account)s hesabı kullanılarak "
+"alınamadı."
 
 #. module: social_twitter
 #. odoo-python
 #: code:addons/social_twitter/models/social_stream_post.py:0
 msgid "Failed to post comment: %(error)s with the account %(account)s."
-msgstr ""
+msgstr "Yorum gönderilemedi: %(error)s, kullanılan hesap: %(account)s."
 
 #. module: social_twitter
 #: model:social.stream.type,name:social_twitter.stream_type_twitter_likes
 msgid "Favorites of"
-msgstr ""
+msgstr "Favoriler"
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_post__has_twitter_account
 #: model:ir.model.fields,field_description:social_twitter.field_social_post_template__has_twitter_account
 msgid "Has X Account"
-msgstr ""
+msgstr "X Hesabı Var"
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_twitter_account__id
@@ -205,17 +233,17 @@ msgstr "ID"
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_twitter_account__image
 msgid "Image"
-msgstr ""
+msgstr "Görsel"
 
 #. module: social_twitter
 #: model_terms:ir.ui.view,arch_db:social_twitter.social_post_template_view_form
 msgid "Images"
-msgstr ""
+msgstr "Görseller"
 
 #. module: social_twitter
 #: model:social.stream.type,name:social_twitter.stream_type_twitter_keyword
 msgid "Keyword"
-msgstr ""
+msgstr "Anahtar Kelime"
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_twitter_account__write_uid
@@ -231,7 +259,7 @@ msgstr "Son Güncelleme"
 #. odoo-javascript
 #: code:addons/social_twitter/static/src/xml/social_twitter_templates.xml:0
 msgid "Likes"
-msgstr ""
+msgstr "Beğeniler"
 
 #. module: social_twitter
 #. odoo-python
@@ -240,21 +268,23 @@ msgid ""
 "Looks like you've made too many requests. Please wait a few minutes before "
 "giving it another try."
 msgstr ""
+"Görünüşe göre çok fazla istekte bulunmuşsun. Tekrar denemeden önce lütfen "
+"birkaç dakika bekleyin."
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_media__media_type
 msgid "Media Type"
-msgstr ""
+msgstr "Medya Türü"
 
 #. module: social_twitter
 #: model:social.stream.type,name:social_twitter.stream_type_twitter_user_mentions
 msgid "Mentions"
-msgstr ""
+msgstr "Bahsedilenler"
 
 #. module: social_twitter
 #: model_terms:ir.ui.view,arch_db:social_twitter.social_post_template_view_form
 msgid "Message"
-msgstr ""
+msgstr "Mesaj"
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_twitter_account__name
@@ -265,77 +295,78 @@ msgstr "Adı"
 #. odoo-python
 #: code:addons/social_twitter/models/social_stream.py:0
 msgid "Please select a X account for this stream type."
-msgstr ""
+msgstr "Lütfen bu akış türü için bir X hesabı seçin."
 
 #. module: social_twitter
 #. odoo-python
 #: code:addons/social_twitter/models/social_post_template.py:0
 msgid "Please specify either an X Message or upload some X Images."
-msgstr ""
+msgstr "Lütfen bir X mesajı belirtin veya bazı X görselleri yükleyin."
 
 #. module: social_twitter
 #. odoo-javascript
 #: code:addons/social_twitter/static/src/xml/social_twitter_templates.xml:0
 msgid "Post"
-msgstr ""
+msgstr "Onayla"
 
 #. module: social_twitter
 #: model_terms:ir.ui.view,arch_db:social_twitter.twitter_preview
 msgid "Post Image"
-msgstr ""
+msgstr "Gönderi Resmi"
 
 #. module: social_twitter
 #: model:social.stream.type,name:social_twitter.stream_type_twitter_follow
 msgid "Posts of"
-msgstr ""
+msgstr "Gönderileri"
 
 #. module: social_twitter
 #. odoo-javascript
 #: code:addons/social_twitter/static/src/js/stream_post_kanban_record.js:0
 msgid "Quote a Tweet"
-msgstr ""
+msgstr "Tweet Alıntıla"
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_stream_post__twitter_quoted_tweet_author_link
 msgid "Quoted post author Link"
-msgstr ""
+msgstr "Alıntılanan gönderi yazar bağlantısı"
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_stream_post__twitter_quoted_tweet_author_name
 msgid "Quoted post author Name"
-msgstr ""
+msgstr "Alıntılanan gönderi yazar adı"
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_stream_post__twitter_quoted_tweet_message
 msgid "Quoted post message"
-msgstr ""
+msgstr "Alıntılanan gönderi mesajı"
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_stream_post__twitter_quoted_tweet_profile_image_url
 msgid "Quoted post profile image URL"
-msgstr ""
+msgstr "Alıntılanan gönderi profil resminin URL’si"
 
 #. module: social_twitter
 #. odoo-python
 #: code:addons/social_twitter/controllers/main.py:0
 msgid "Read More about X Accounts"
-msgstr ""
+msgstr "X Hesapları hakkında daha fazla bilgi edinin"
 
 #. module: social_twitter
 #. odoo-python
 #: code:addons/social_twitter/models/social_stream_post.py:0
 msgid "Replies from posts older than 7 days must be accessed on Twitter.com"
 msgstr ""
+"Yedi günden eski gönderilerin yanıtlarına Twitter.com üzerinden erişilmelidir"
 
 #. module: social_twitter
 #: model_terms:ir.ui.view,arch_db:social_twitter.social_stream_post_view_kanban
 msgid "Repost"
-msgstr ""
+msgstr "Yeniden paylaşmak"
 
 #. module: social_twitter
 #: model_terms:ir.ui.view,arch_db:social_twitter.social_stream_post_view_kanban
 msgid "Repost or Quote"
-msgstr ""
+msgstr "Yeniden Paylaşın veya Alıntılayın"
 
 #. module: social_twitter
 #. odoo-javascript
@@ -343,70 +374,71 @@ msgstr ""
 #: model:ir.model.fields,field_description:social_twitter.field_social_stream_post__twitter_retweet_count
 #: model_terms:ir.ui.view,arch_db:social_twitter.social_stream_post_view_kanban
 msgid "Reposts"
-msgstr ""
+msgstr "Yeniden paylaşımlar"
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_stream__twitter_searched_keyword
 msgid "Search Keyword"
-msgstr ""
+msgstr "Anahtarkelime Ara"
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_stream__twitter_followed_account_search
 msgid "Search User"
-msgstr ""
+msgstr "Kullanıcı Ara"
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_twitter_account__twitter_searched_by_id
 msgid "Searched by"
-msgstr ""
+msgstr "Tarafından arandı"
 
 #. module: social_twitter
 #: model:ir.model,name:social_twitter.model_social_account
 msgid "Social Account"
-msgstr ""
+msgstr "Sosyal Hesap"
 
 #. module: social_twitter
 #: model:ir.model,name:social_twitter.model_social_live_post
 msgid "Social Live Post"
-msgstr ""
+msgstr "Sosyal Canlı Gönderi"
 
 #. module: social_twitter
 #: model:ir.model,name:social_twitter.model_social_media
 msgid "Social Media"
-msgstr ""
+msgstr "Sosyal Medya"
 
 #. module: social_twitter
 #: model:ir.model,name:social_twitter.model_social_post
 msgid "Social Post"
-msgstr ""
+msgstr "Sosyal Gönderi"
 
 #. module: social_twitter
 #: model:ir.model,name:social_twitter.model_social_post_template
 msgid "Social Post Template"
-msgstr ""
+msgstr "Sosyal Gönderi Şablonu"
 
 #. module: social_twitter
 #: model:ir.model,name:social_twitter.model_social_stream
 msgid "Social Stream"
-msgstr ""
+msgstr "Sosyal Medya Akışı"
 
 #. module: social_twitter
 #: model:ir.model,name:social_twitter.model_social_stream_post
 msgid "Social Stream Post"
-msgstr ""
+msgstr "Sosyal Medya Yayını"
 
 #. module: social_twitter
 #: model:ir.model,name:social_twitter.model_social_twitter_account
 msgid "Social X Account"
-msgstr ""
+msgstr "Sosyal X Hesabı"
 
 #. module: social_twitter
 #. odoo-python
 #: code:addons/social_twitter/models/social_stream.py:0
 msgid ""
-"The keyword you've typed in does not look valid. Please try again with other"
-" words."
+"The keyword you've typed in does not look valid. Please try again with other "
+"words."
 msgstr ""
+"Yazdığın kelime uygun gözükmüyor. Lütfen başka kelimelerle tekrar dene."
 
 #. module: social_twitter
 #. odoo-python
@@ -415,51 +447,52 @@ msgid ""
 "The url that this service requested returned an error. Please contact the "
 "author of the app."
 msgstr ""
+"Bu hizmetin istediği url hata verdi. Lütfen uygulamanın üreticisine başvurun."
 
 #. module: social_twitter
 #. odoo-python
 #: code:addons/social_twitter/controllers/main.py:0
 msgid "This Post has been deleted."
-msgstr ""
+msgstr "Bu Gönderi silinmiştir."
 
 #. module: social_twitter
 #. odoo-python
 #: code:addons/social_twitter/models/social_stream_post.py:0
 msgid "This post is outdated, please refresh the stream and try again."
-msgstr ""
+msgstr "Bu gönderi güncel değil, lütfen akışı yenileyip tekrar deneyin."
 
 #. module: social_twitter
 #. odoo-javascript
 #: code:addons/social_twitter/static/src/js/stream_post_comment.js:0
 msgid "Tweet"
-msgstr ""
+msgstr "Tweet"
 
 #. module: social_twitter
 #: model_terms:ir.ui.view,arch_db:social_twitter.social_post_template_view_form
 msgid "Twitter"
-msgstr ""
+msgstr "Twitter"
 
 #. module: social_twitter
 #. odoo-javascript
 #: code:addons/social_twitter/static/src/js/stream_post_kanban_record.js:0
 msgid "Twitter Comments"
-msgstr ""
+msgstr "Twitter Yorumları"
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_stream__twitter_followed_account_id
 msgid "Twitter Followed Account"
-msgstr ""
+msgstr "Twitter Takip Edilen Hesap"
 
 #. module: social_twitter
 #. odoo-python
 #: code:addons/social_twitter/controllers/main.py:0
 msgid "Unauthorized. Please contact your administrator."
-msgstr ""
+msgstr "Yetkisiz. Lütfen yöneticinizle iletişime geçin."
 
 #. module: social_twitter
 #: model_terms:ir.ui.view,arch_db:social_twitter.social_stream_post_view_kanban
 msgid "Undo Repost"
-msgstr ""
+msgstr "Yeniden Paylaşımı Geri Alın"
 
 #. module: social_twitter
 #. odoo-javascript
@@ -467,18 +500,18 @@ msgstr ""
 #: code:addons/social_twitter/models/social_stream.py:0
 #: code:addons/social_twitter/static/src/xml/social_twitter_templates.xml:0
 msgid "Unknown"
-msgstr ""
+msgstr "Bilinmeyen"
 
 #. module: social_twitter
 #. odoo-python
 #: code:addons/social_twitter/models/social_stream_post.py:0
 msgid "Unknown error"
-msgstr ""
+msgstr "Bilinmeyen hata"
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_res_config_settings__twitter_use_own_account
 msgid "Use your own X Account"
-msgstr ""
+msgstr "Kendi X Hesabınızı kullanın"
 
 #. module: social_twitter
 #: model:ir.model.fields,help:social_twitter.field_social_media__media_type
@@ -486,6 +519,8 @@ msgid ""
 "Used to make comparisons when we need to restrict some features to a "
 "specific media ('facebook', 'x', ...)."
 msgstr ""
+"Bazı özellikleri belirli bir mecra ile sınırlamamız gerektiğinde "
+"karşılaştırma yapmak için kullanılır ('facebook', 'x', ...)."
 
 #. module: social_twitter
 #. odoo-python
@@ -494,190 +529,204 @@ msgid ""
 "We could not upload your image, it may be corrupted, it may exceed size "
 "limit or API may have send improper response (error: %s)."
 msgstr ""
+"Resminizi yükleyemedik, bozuk olabilir, boyut sınırını aşmış olabilir veya "
+"API yanlış yanıt göndermiş olabilir (hata: %s)."
 
 #. module: social_twitter
 #: model:ir.model.fields,help:social_twitter.field_social_post__twitter_image_ids
 #: model:ir.model.fields,help:social_twitter.field_social_post_template__twitter_image_ids
 msgid "Will attach images to your posts."
-msgstr ""
+msgstr "Gönderilerinize görseller eklenecek."
+
+#. module: social_twitter
+#: model:ir.model.fields.selection,name:social_twitter.selection__social_media__media_type__twitter
+#: model:social.media,name:social_twitter.social_media_twitter
+msgid "X"
+msgstr "X"
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_stream_post__twitter_author_id
 msgid "X Author ID"
-msgstr ""
+msgstr "X Yazar Kimliği"
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_res_config_settings__twitter_consumer_key
 msgid "X Consumer Key"
-msgstr ""
+msgstr "X Tüketici Anahtarı"
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_res_config_settings__twitter_consumer_secret_key
 msgid "X Consumer Secret Key"
-msgstr ""
+msgstr "X Tüketici Gizli Anahtarı"
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_stream_post__twitter_conversation_id
 msgid "X Conversation ID"
-msgstr ""
+msgstr "X Sohbeti Kimlik Numarası"
 
 #. module: social_twitter
 #: model_terms:ir.ui.view,arch_db:social_twitter.res_config_settings_view_form
 msgid "X Developer Account"
-msgstr ""
+msgstr "X Geliştirici Hesabı"
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_twitter_account__twitter_id
 msgid "X ID"
-msgstr ""
+msgstr "X ID"
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_post__twitter_image_ids
 #: model:ir.model.fields,field_description:social_twitter.field_social_post_template__twitter_image_ids
 msgid "X Images"
-msgstr ""
+msgstr "X Görselleri"
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_stream_post__twitter_likes_count
 msgid "X Likes"
-msgstr ""
+msgstr "X Beğenileri"
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_post__twitter_message
 #: model:ir.model.fields,field_description:social_twitter.field_social_post_template__twitter_message
 msgid "X Message"
-msgstr ""
+msgstr "X MEsajı"
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_account__twitter_oauth_token
 msgid "X OAuth Token"
-msgstr ""
+msgstr "X OAuth Belirteci"
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_account__twitter_oauth_token_secret
 msgid "X OAuth Token Secret"
-msgstr ""
+msgstr "X OAuth Token Sırrı"
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_stream_post__twitter_tweet_id
 msgid "X Post ID"
-msgstr ""
+msgstr "X Gönderisi Kimlik Numarası"
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_post__is_twitter_post_limit_exceed
 #: model:ir.model.fields,field_description:social_twitter.field_social_post_template__is_twitter_post_limit_exceed
 msgid "X Post Limit Exceeded"
-msgstr ""
+msgstr "X gönderisi sınırı aşıldı"
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_post__twitter_post_limit_message
 #: model:ir.model.fields,field_description:social_twitter.field_social_post_template__twitter_post_limit_message
 msgid "X Post Limit Message"
-msgstr ""
+msgstr "X gönderisi sınırı mesajı"
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_post__twitter_preview
 #: model:ir.model.fields,field_description:social_twitter.field_social_post_template__twitter_preview
 msgid "X Preview"
-msgstr ""
+msgstr "X Ön izleme"
 
 #. module: social_twitter
 #. odoo-javascript
 #: code:addons/social_twitter/static/src/xml/social_twitter_templates.xml:0
 msgid "X Profile Image"
-msgstr ""
+msgstr "X Profil Görüntüsü"
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_stream_post__twitter_profile_image_url
 msgid "X Profile Image URL"
-msgstr ""
+msgstr "X profil resmi URL’si"
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_stream_post__twitter_quoted_tweet_id_str
 msgid "X Quoted post ID"
-msgstr ""
+msgstr "X alıntılanan gönderi kimliği"
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_stream_post__twitter_comments_count
 msgid "X Replies"
-msgstr ""
+msgstr "X Yanıtları"
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_stream_post__twitter_retweeted_tweet_id_str
 msgid "X Repost ID"
-msgstr ""
+msgstr "X Yeniden Gönderim Kimlik Numarası"
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_stream_post__twitter_can_retweet
 msgid "X Repost Permission"
-msgstr ""
+msgstr "X Yeniden Gönderim İzni"
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_stream_post__twitter_screen_name
 msgid "X Screen Name"
-msgstr ""
+msgstr "X Ekran Adı"
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_account__twitter_user_id
 msgid "X User ID"
-msgstr ""
+msgstr "X Kullanıcı Kimliği"
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_stream_post__twitter_user_likes
 msgid "X User Likes"
-msgstr ""
+msgstr "X Kullanıcı Beğenileri"
 
 #. module: social_twitter
 #. odoo-python
 #: code:addons/social_twitter/controllers/main.py:0
 msgid "X did not provide a valid access token or it may have expired."
-msgstr ""
+msgstr "X geçerli bir erişim belirteci sağlamadı veya süresi dolmuş olabilir."
 
 #. module: social_twitter
 #. odoo-python
 #: code:addons/social_twitter/controllers/main.py:0
 msgid "X did not provide a valid access token."
-msgstr ""
+msgstr "X geçerli bir erişim belirteci sağlamadı."
 
 #. module: social_twitter
 #: model:ir.model.fields,field_description:social_twitter.field_social_live_post__twitter_tweet_id
 msgid "X post id"
-msgstr ""
+msgstr "X gönderi kimlik numarası"
 
 #. module: social_twitter
 #. odoo-python
 #: code:addons/social_twitter/models/social_stream_post.py:0
 msgid "You are not authenticated"
-msgstr ""
+msgstr "kimliğiniz doğrulanmadı"
 
 #. module: social_twitter
 #: model:ir.model.constraint,message:social_twitter.constraint_social_stream_post_tweet_uniq
 msgid "You can not store two times the same post on the same stream!"
-msgstr ""
+msgstr "Aynı gönderiyi aynı akışta iki kez depolayamazsınız!"
 
 #. module: social_twitter
 #. odoo-python
 #: code:addons/social_twitter/models/social_stream.py:0
 msgid ""
 "You cannot create a Stream from this X account.\n"
-"It may be because it's protected. To solve this, please make sure you follow it before trying again."
+"It may be because it's protected. To solve this, please make sure you follow "
+"it before trying again."
 msgstr ""
+"Bu X hesabından bir Akış oluşturamazsınız.\n"
+"Korumalı olduğu için olabilir. Bunu çözmek için, lütfen tekrar denemeden "
+"önce takip ettiğinizden emin olun."
 
 #. module: social_twitter
 #. odoo-python
 #: code:addons/social_twitter/models/social_media.py:0
 msgid "You don't have an active subscription. Please buy one here: %s"
 msgstr ""
+"Hesap bağlantısı kurulamıyor, lütfen sistem yöneticinize başvurun. Daha "
+"Fazla Bilgi İçin : %s"
 
 #. module: social_twitter
 #. odoo-python
 #: code:addons/social_twitter/models/social_media.py:0
 msgid ""
-"You need to add the following callback URL to your X application settings: "
-"%s"
+"You need to add the following callback URL to your X application settings: %s"
 msgstr ""
+"X uygulama ayarlarınıza aşağıdaki geri arama URL'sini eklemeniz gerekir: %s"
 
 #. module: social_twitter
 #: model_terms:ir.ui.view,arch_db:social_twitter.social_stream_view_form
 msgid "e.g. #odoo"
-msgstr ""
+msgstr "#odoo v.b. "

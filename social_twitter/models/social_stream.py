@@ -88,7 +88,7 @@ class SocialStreamTwitter(models.Model):
         result = response.json()
 
         if not response.ok:
-            _logger.error('Failed to fetch social stream posts: %r for account %i.', response.text, self.account_id.id)
+            _logger.warning('Failed to fetch social stream posts: %r for account %i.', response.text, self.account_id.id)
             # an error occurred
             if 'Not authorized' in result.get('title', ''):
                 # no error code is returned by the Twitter API in that case
@@ -158,6 +158,7 @@ class SocialStreamTwitter(models.Model):
                 'author_name': user_info.get('name'),
                 'published_date': created_date,
                 'twitter_likes_count': public_metrics.get('like_count'),
+                'twitter_comments_count': public_metrics.get('reply_count'),
                 'twitter_retweet_count': public_metrics.get('retweet_count'),
                 'twitter_tweet_id': twitter_tweet_id,
                 'twitter_conversation_id': tweet.get('conversation_id'),

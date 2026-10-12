@@ -11,13 +11,13 @@ import PackageLineComponent from '@stock_barcode/components/package_line';
 import { rpc } from "@web/core/network/rpc";
 import { registry } from "@web/core/registry";
 import { useService, useBus } from "@web/core/utils/hooks";
+import { Mutex } from "@web/core/utils/concurrency";
 import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 import { View } from "@web/views/view";
 import { BarcodeVideoScanner, isBarcodeScannerSupported } from '@web/core/barcode/barcode_video_scanner';
 import { url } from '@web/core/utils/urls';
 import { utils as uiUtils } from "@web/core/ui/ui_service";
 import { Component, EventBus, onPatched, onWillStart, onWillUnmount, useState, useSubEnv } from "@odoo/owl";
-import { ImportBlockUI } from "@base_import/import_block_ui";
 import { standardWidgetProps } from "@web/views/widgets/standard_widget_props";
 import { standardActionServiceProps } from "@web/webclient/actions/action_service";
 import { BarcodeInput } from "./manual_barcode";
@@ -44,6 +44,18 @@ class StockBarcodeUnlinkButton extends Component {
 registry.category("view_widgets").add("stock_barcode_unlink_button", {
     component: StockBarcodeUnlinkButton,
 });
+
+
+/**
+ * TODO: stock_barcode should not depend on base_import.
+ */
+export class ImportBlockUI extends Component {
+	static props = {
+		message: { type: String, optional: true },
+		blockComponent: { type: Object, optional: true },
+	};
+	static template = "stock_barcode.BlockUI";
+}
 
 /**
  * Main Component
@@ -75,6 +87,7 @@ class MainComponent extends Component {
         this.notification = useService('notification');
         this.dialog = useService('dialog');
         this.action = useService('action');
+        this.actionMutex = new Mutex();
         this.resModel = this.props.action.res_model;
         this.resId = this.props.action.context.active_id || false;
         const model = this._getModel();
@@ -117,37 +130,7 @@ class MainComponent extends Component {
         useBus(this.env.model, "clearBarcodesCountProcessed", this.clearBarcodesCountProcessed.bind(this));
         useBus(bus, "refresh", (ev) => this._onRefreshState(ev.detail));
 
-        onWillStart(async () => {
-            const barcodeData = await rpc(
-                '/stock_barcode/get_barcode_data',
-                { model: this.resModel, res_id: this.resId }
-            );
-            barcodeData.actionId = this.props.actionId;
-            this.config = { play_sound: true, ...barcodeData.data.config };
-            if (this.config.play_sound) {
-                const fileExtension = new Audio().canPlayType("audio/ogg") ? "ogg" : "mp3";
-                this.sounds = {
-                    error: new Audio(url(`/barcodes/static/src/audio/error.${fileExtension}`)),
-                    notify: new Audio(url(`/mail/static/src/audio/ting.${fileExtension}`)),
-                    success: new Audio(url(`/stock_barcode/static/src/audio/success.${fileExtension}`)),
-                };
-                this.sounds.error.load();
-                this.sounds.notify.load();
-                this.sounds.success.load();
-            }
-            this.setupCameraScanner();
-            this.groups = barcodeData.groups;
-            this.env.model.setData(barcodeData);
-            this.state.displayNote = Boolean(this.env.model.record.note);
-            this.env.model.addEventListener('process-action', this._onDoAction.bind(this));
-            this.env.model.addEventListener('refresh', (ev) => this._onRefreshState(ev.detail));
-            this.env.model.addEventListener('update', () => {
-                if (!this.state.uiBlocked) {
-                    this.render(true);
-                }
-            });
-            this.env.model.addEventListener('history-back', () => this._exit());
-        });
+        onWillStart(() => this.onWillStart());
 
         onWillUnmount(() => {
             clearTimeout(this.bufferingTimeout);
@@ -155,6 +138,10 @@ class MainComponent extends Component {
 
         onPatched(() => {
             this._scrollToSelectedLine();
+        });
+
+        onWillUnmount(() => {
+            this.env.model._onExit();
         });
     }
 
@@ -206,7 +193,8 @@ class MainComponent extends Component {
         this.sounds[type].play().catch((error) => {
             // `play` returns a promise. In case this promise is rejected (permission
             // issue for example), catch it to avoid Odoo's `UncaughtPromiseError`.
-            console.log(error);
+            this.config.play_sound  = false;
+            console.warn(error);
         });
     }
 
@@ -216,6 +204,38 @@ class MainComponent extends Component {
 
     get highlightValidateButton() {
         return this.env.model.highlightValidateButton;
+    }
+
+    async onWillStart() {
+        const barcodeData = await rpc("/stock_barcode/get_barcode_data", {
+            model: this.resModel,
+            res_id: this.resId,
+        });
+        barcodeData.actionId = this.props.actionId;
+        this.config = { play_sound: true, ...barcodeData.data.config };
+        if (this.config.play_sound) {
+            const fileExtension = new Audio().canPlayType("audio/ogg; codecs=vorbis") ? "ogg" : "mp3";
+            this.sounds = {
+                error: new Audio(url(`/barcodes/static/src/audio/error.${fileExtension}`)),
+                notify: new Audio(url(`/mail/static/src/audio/ting.${fileExtension}`)),
+                success: new Audio(url(`/stock_barcode/static/src/audio/success.${fileExtension}`)),
+            };
+            this.sounds.error.load();
+            this.sounds.notify.load();
+            this.sounds.success.load();
+        }
+        this.setupCameraScanner();
+        this.groups = barcodeData.groups;
+        this.env.model.setData(barcodeData);
+        this.state.displayNote = Boolean(this.env.model.record.note);
+        this.env.model.addEventListener("process-action", this._onDoAction.bind(this));
+        this.env.model.addEventListener("refresh", (ev) => this._onRefreshState(ev.detail));
+        this.env.model.addEventListener("update", () => {
+            if (!this.state.uiBlocked) {
+                this.render(true);
+            }
+        });
+        this.env.model.addEventListener("history-back", () => this._exit());
     }
 
     get isTransfer() {
@@ -329,8 +349,13 @@ class MainComponent extends Component {
     }
 
     onBarcodeScanned(barcode) {
+        if (this.state.view !== "barcodeLines") {
+            return;
+        }
         if (barcode) {
-            this.env.model.processBarcode(barcode);
+            this.actionMutex.exec(async () => {
+                return this.env.model.processBarcode(barcode);
+            });
             if ('vibrate' in window.navigator) {
                 window.navigator.vibrate(100);
             }
@@ -381,7 +406,9 @@ class MainComponent extends Component {
     async exit(ev) {
         this.state.cameraScannedEnabled = false;
         if (this.state.view === "barcodeLines") {
-            await this.env.model.beforeQuit();
+            await this.actionMutex.exec(async () => {
+                await this.env.model.beforeQuit();
+            });
             this._exit();
         } else {
             this.toggleBarcodeLines();
@@ -540,7 +567,7 @@ class MainComponent extends Component {
 
     get displayOperationButtons() {
         const { model } = this.env;
-        return model.canScrap || model.displayCancelButton || model.displaySignatureButton;
+        return model.canScrap || model.displayCancelButton || model.displaySignatureButton || model.displayReturnButton;
     }
 
     get scrapViewProps() {

@@ -36,7 +36,7 @@
         </xpath>
         <xpath expr="//td[@field='name']" position="replace">
             <t t-if="line.data.flag === 'new_batch'">
-                <td field="name">
+                <td field="name" t-att-colspan="line_ids_columns.length - (display_currency_columns ? 5 : 3) + (hasGroupReadOnly ? 0 : 1)">
                     <span class="o_form_uri fst-italic"
                           t-out="line.data.name"
                           t-on-click="() => this.actionRedirectToSourceMove(line)"/>

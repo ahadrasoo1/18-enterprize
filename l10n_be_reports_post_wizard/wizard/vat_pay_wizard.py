@@ -1,6 +1,8 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import api, models, fields
+from markupsafe import Markup
+
+from odoo import api, models, fields, _
 
 
 class VATPayWizard(models.TransientModel):
@@ -31,8 +33,28 @@ class VATPayWizard(models.TransientModel):
 
     @api.depends('move_id')
     def _compute_partner_bank_id(self):
-        fps_account = self.env.ref('l10n_be_reports_post_wizard.fps_vat_current_account', raise_if_not_found=False)
-        self.partner_bank_id = fps_account or False
+        pivot_date = fields.Date.from_string('2026-04-01')
+        old_bank_account = 'BE22679200300047'  # 'VAT Current Account': Bank account BEFORE April 2026
+        new_bank_account = 'BE41679200364210'  # 'VAT Provision Account': Bank account AFTER April 2026
+        bank_accounts = self.env['res.partner.bank'].search([
+            ('active', '=', True),
+            ('sanitized_acc_number', 'in', [old_bank_account, new_bank_account]),
+        ])
+        for wizard in self:
+            account_number = old_bank_account if wizard.move_id.date < pivot_date else new_bank_account
+            fps_account = bank_accounts.filtered(lambda bank: bank.sanitized_acc_number == account_number)
+            if not fps_account:
+                fps_partner = (
+                    bank_accounts.partner_id
+                    or self.env.ref('l10n_be_reports_post_wizard.partner_fps_belgium', raise_if_not_found=False)
+                    or self.env['res.partner'].create({'name': 'FPS Finance - VAT Revenue Service Brussels'})
+                )
+                fps_account = self.env['res.partner.bank'].create({
+                    'partner_id': fps_partner.id,
+                    'acc_number': account_number,
+                    'allow_out_payment': True,
+                })
+            wizard.partner_bank_id = fps_account
 
     @api.depends('move_id', 'communication', 'amount')
     def _compute_qr_code(self):
@@ -47,9 +69,13 @@ class VATPayWizard(models.TransientModel):
                     debtor_partner=wizard.partner_id,
                 )
                 if b64_qr:
-                    qr_html = f'''
-                        <img class="float-end" src="{b64_qr}"/>
-                    '''
+                    txt = _('Scan me with your banking app.')
+                    qr_html = Markup("""
+                        <div class="text-center">
+                            <img src="{b64_qr}"/>
+                            <p><strong>{txt}</strong></p>
+                        </div>
+                    """).format(b64_qr=b64_qr, txt=txt)
             wizard.qr_code = qr_html
 
     def mark_paid(self):

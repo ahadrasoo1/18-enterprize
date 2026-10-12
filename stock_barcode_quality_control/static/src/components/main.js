@@ -15,11 +15,23 @@ patch(MainComponent.prototype, {
         const res = await this.orm.call(
             this.resModel,
             this.env.model.openQualityChecksMethod,
-            [[this.resId]]
+            [[this.resId || this.env.model.record.id]],
+            { context: { barcode_trigger: true } }
         );
         if (typeof res === 'object' && res !== null) {
             return this.action.doAction(res, {
-                onClose: this._onRefreshState.bind(this, { recordId: this.resId }),
+                onClose: async () => {
+                    await this._onRefreshState({ recordId: this.resId });
+                    // update lines demand just split to their quantity done to mark them
+                    // validated
+                    for (const line of this.env.model.pageLines) {
+                        if (['pass', 'fail'].includes(line.check_state)) {
+                            line.reserved_uom_qty = line.quantity;
+                        }
+                    }
+                    this.env.model.groupLines();
+                    this.env.model.trigger("update");
+                },
             });
         } else {
             this.notification.add(_t("All the quality checks have been done"));

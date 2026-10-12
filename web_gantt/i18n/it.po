@@ -1,23 +1,26 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* web_gantt
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Marianna Ciofani, 2025
+# Sergio Zanchetta <primes2h@gmail.com>, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:29+0000\n"
+"POT-Creation-Date: 2026-05-22 17:59+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
+"Last-Translator: Sergio Zanchetta <primes2h@gmail.com>, 2025\n"
 "Language-Team: Italian (https://app.transifex.com/odoo/teams/41243/it/)\n"
+"Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: it\n"
-"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? "
+"1 : 2;\n"
 
 #. module: web_gantt
 #. odoo-javascript
@@ -44,12 +47,14 @@ msgstr "Azione visualizzazione finestra"
 
 #. module: web_gantt
 #. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer_controls.js:0
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "Activate dense mode"
 msgstr "Attiva modalità dense"
 
 #. module: web_gantt
 #. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer_controls.js:0
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "Activate sparse mode"
 msgstr "Attiva modalità sparse"
@@ -69,7 +74,7 @@ msgstr "Eliminare veramente questo record?"
 #. module: web_gantt
 #: model:ir.model,name:web_gantt.model_base
 msgid "Base"
-msgstr "Imponibile"
+msgstr "Base"
 
 #. module: web_gantt
 #. odoo-javascript
@@ -91,6 +96,12 @@ msgstr "Modifica"
 
 #. module: web_gantt
 #. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+msgid "Ending date cannot be before the starting date"
+msgstr "La data di fine non può precedere la data di inizio"
+
+#. module: web_gantt
+#. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "Expand rows"
 msgstr "Espandi righe"
@@ -106,6 +117,12 @@ msgstr "Focus oggi"
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "From"
 msgstr "Da"
+
+#. module: web_gantt
+#. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer_controls.js:0
+msgid "From: %(from_date)s to: %(to_date)s"
+msgstr "Dal: %(from_date)s al: %(to_date)s"
 
 #. module: web_gantt
 #: model:ir.model.fields.selection,name:web_gantt.selection__ir_actions_act_window_view__view_mode__gantt
@@ -124,7 +141,7 @@ msgstr "Vista Gantt"
 #: code:addons/web_gantt/models/ir_ui_view.py:0
 msgid "Gantt child can only be field or template, got %s"
 msgstr ""
-"Una riga figlia Gantt può essere solo un campo o un modello, tu hai %s"
+"Un elemento figlio di Gantt può essere solo un campo o un modello, trovato %s"
 
 #. module: web_gantt
 #. odoo-python
@@ -145,8 +162,8 @@ msgid ""
 "Gantt must have a 'dependency_inverted_field' attribute once the "
 "'dependency_field' is specified"
 msgstr ""
-"La vista Gantt deve avere un attributo 'dependency_inverted_field' una volta"
-" che il 'dependency_field' viene specificato"
+"La vista Gantt deve avere un attributo 'dependency_inverted_field' una volta "
+"che il 'dependency_field' viene specificato"
 
 #. module: web_gantt
 #. odoo-javascript
@@ -198,7 +215,7 @@ msgstr "default_range non valido '%s' in gantt"
 #. odoo-python
 #: code:addons/web_gantt/models/ir_ui_view.py:0
 msgid "Invalid default_scale '%s' in gantt"
-msgstr "default_scale \"%s\" non valido in gantt"
+msgstr "default_scale \"%s\" non valido nel Gantt"
 
 #. module: web_gantt
 #. odoo-python
@@ -228,19 +245,25 @@ msgstr "Apri"
 #. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_renderer.js:0
 msgid "Plan"
-msgstr "Pianificazione"
+msgstr "Pianifica"
 
 #. module: web_gantt
 #. odoo-python
 #: code:addons/web_gantt/models/models.py:0
 msgid "Reschedule done successfully."
-msgstr ""
+msgstr "Riprogrammazione avvenuta con successo."
 
 #. module: web_gantt
 #. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_popover.xml:0
 msgid "Start"
 msgstr "Avvia"
+
+#. module: web_gantt
+#. odoo-javascript
+#: code:addons/web_gantt/static/src/gantt_renderer.js:0
+msgid "Starting date cannot be after the ending date"
+msgstr "La data di inizio non può precedere la data di fine"
 
 #. module: web_gantt
 #. odoo-javascript
@@ -306,7 +329,7 @@ msgstr "Totale"
 #. odoo-javascript
 #: code:addons/web_gantt/static/src/gantt_model.js:0
 msgid "Undefined %s"
-msgstr "%s non definiti"
+msgstr "%s non definito"
 
 #. module: web_gantt
 #. odoo-javascript
@@ -356,9 +379,3 @@ msgstr "mesi"
 #: code:addons/web_gantt/static/src/gantt_renderer_controls.xml:0
 msgid "to"
 msgstr "a"
-
-#. module: web_gantt
-#. odoo-javascript
-#: code:addons/web_gantt/static/src/gantt_row_progress_bar.xml:0
-msgid "{{ props.progressBar.warning }}"
-msgstr "{{ props.progressBar.warning }}"

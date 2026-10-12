@@ -1,3 +1,4 @@
 # -*- coding: utf-8 -*-
-from . import iot_handlers
+# Part of Odoo. See LICENSE file for full copyright and licensing details.
+
 from . import models

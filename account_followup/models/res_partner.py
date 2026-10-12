@@ -1,14 +1,13 @@
-# -*- coding: utf-8 -*-
-# Part of Odoo. See LICENSE file for full copyright and licensing details.
 import ast
-from collections import defaultdict
 import logging
 
-from odoo import api, fields, models, _
-from odoo.tools.misc import format_date
-from datetime import datetime, timedelta
-from odoo.tools import DEFAULT_SERVER_DATE_FORMAT
+from collections import defaultdict
+from datetime import datetime
+
+from odoo import _, api, fields, models
 from odoo.exceptions import UserError
+from odoo.tools import DEFAULT_SERVER_DATE_FORMAT, SQL
+from odoo.tools.misc import format_date, get_lang
 
 _logger = logging.getLogger(__name__)
 
@@ -20,13 +19,8 @@ class ResPartner(models.Model):
         string='Next reminder',
         copy=False,
         company_dependent=True,
-        help="""The date before which no follow-up action should be taken.
-                You can set it manually if desired but it is automatically set when follow-ups are processed.
-                The date is computed according to the following rules (depending on the follow-up levels):
-                - default -> next date set in {next level delay - current level delay} days
-                - if no next level -> next date set in {current level delay - previous level delay} days
-                - if no next level AND no previous level -> next date set in {current level delay} days
-                - if no level defined at all -> next date never automatically set""",
+        help='''No follow-up action will be taken before this date.
+                Sending a reminder will set this date depending on the levels configuration, and you can change it manually.''',
     )
 
     # readonly=False in order to be able to edit it directly in the view form, without having to click on 'Edit'
@@ -35,6 +29,15 @@ class ResPartner(models.Model):
 
     unpaid_invoice_ids = fields.One2many('account.move', compute='_compute_unpaid_invoices')
     unpaid_invoices_count = fields.Integer(compute='_compute_unpaid_invoices')
+    # These two fields are meant to receive the due and overdue amounts, including asset_receivable AND liability_payable accounts
+    # In opposition to the total_due and total_overdue fields which only take into account asset_receivable accounts
+    # To be renamed in master
+    total_all_due = fields.Monetary(
+        compute='_compute_total_due',
+        groups='account.group_account_readonly,account.group_account_invoice')
+    total_all_overdue = fields.Monetary(
+        compute='_compute_total_due',
+        groups='account.group_account_readonly,account.group_account_invoice')
     total_due = fields.Monetary(
         compute='_compute_total_due',
         groups='account.group_account_readonly,account.group_account_invoice')
@@ -67,6 +70,7 @@ class ResPartner(models.Model):
         company_dependent=True,
         groups='account.group_account_readonly,account.group_account_invoice',
     )
+    has_moves = fields.Boolean(compute='_compute_has_moves')
 
     @property
     def _complete_name_displayed_types(self):
@@ -117,15 +121,16 @@ class ResPartner(models.Model):
             partner.followup_line_id = partner_data['followup_line_id']
 
     def _compute_unpaid_invoices(self):
+        partners_unpaid_receivable_lines = self.env['account.move.line'].search([
+            ('company_id', 'child_of', self.env.company.id),
+            ('move_id.commercial_partner_id', 'in', self.ids),
+            ('parent_state', '=', 'posted'),
+            ('move_id.payment_state', 'in', ('not_paid', 'partial')),
+            ('move_id.move_type', 'in', self.env['account.move'].get_sale_types()),
+            ('account_id.account_type', '=', 'asset_receivable'),
+        ]).grouped(lambda line: line.move_id.commercial_partner_id.id)
         for partner in self:
-            unpaid_receivable_lines = self.env['account.move.line'].search([
-                ('company_id', 'child_of', self.env.company.id),
-                ('move_id.commercial_partner_id', '=', partner.id),
-                ('parent_state', '=', 'posted'),
-                ('move_id.payment_state', 'in', ('not_paid', 'partial')),
-                ('move_id.move_type', 'in', self.env['account.move'].get_sale_types()),
-                ('account_id.account_type', '=', 'asset_receivable'),
-            ])
+            unpaid_receivable_lines = partners_unpaid_receivable_lines.get(partner.id, self.env['account.move.line'])
             unpaid_invoices = unpaid_receivable_lines.move_id
             partner.unpaid_invoice_ids = unpaid_invoices
             partner.unpaid_invoices_count = len(unpaid_invoices)
@@ -142,6 +147,17 @@ class ResPartner(models.Model):
         }
         return action
 
+    def action_open_overdue_entries(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _("Overdue Invoices"),
+            'res_model': 'account.move',
+            'domain': [('commercial_partner_id', '=', self.id), ('move_type', 'in', ('out_invoice', 'out_refund'))],
+            'view_mode': 'list,form',
+            'context': {'search_default_late': True},
+        }
+
     def action_open_unreconciled_partner(self):
         action_values = self.env["ir.actions.actions"]._for_xml_id("account_accountant.action_move_line_posted_unreconciled")
         domain = ast.literal_eval(action_values['domain'])
@@ -154,20 +170,28 @@ class ResPartner(models.Model):
     def _compute_total_due(self):
         due_data = defaultdict(float)
         overdue_data = defaultdict(float)
+        receivable_due_data = defaultdict(float)
+        receivable_overdue_data = defaultdict(float)
         unreconciled_aml_ids = defaultdict(list)
-        for overdue, partner, amount_residual_sum, aml_ids in self.env['account.move.line']._read_group(
+        for account_type, overdue, partner, amount_residual_sum, aml_ids in self.env['account.move.line']._read_group(
             domain=self._get_unreconciled_aml_domain(),
-            groupby=['followup_overdue', 'partner_id'],
+            groupby=['account_type', 'followup_overdue', 'partner_id'],
             aggregates=['amount_residual:sum', 'id:array_agg'],
         ):
-            unreconciled_aml_ids[partner] += aml_ids
+            if account_type == 'asset_receivable':
+                unreconciled_aml_ids[partner] += aml_ids
+                receivable_due_data[partner] += amount_residual_sum
+                if overdue:
+                    receivable_overdue_data[partner] += amount_residual_sum
             due_data[partner] += amount_residual_sum
             if overdue:
                 overdue_data[partner] += amount_residual_sum
 
         for partner in self:
-            partner.total_due = due_data.get(partner, 0.0)
-            partner.total_overdue = overdue_data.get(partner, 0.0)
+            partner.total_all_due = due_data.get(partner, 0.0)
+            partner.total_all_overdue = overdue_data.get(partner, 0.0)
+            partner.total_due = receivable_due_data.get(partner, 0.0)
+            partner.total_overdue = receivable_overdue_data.get(partner, 0.0)
             partner.unreconciled_aml_ids = self.env['account.move.line'].browse(unreconciled_aml_ids.get(partner, []))
 
     def _set_followup_line_on_unreconciled_amls(self):
@@ -181,8 +205,7 @@ class ResPartner(models.Model):
     def _get_unreconciled_aml_domain(self):
         return [
             ('reconciled', '=', False),
-            ('account_id.deprecated', '=', False),
-            ('account_id.account_type', '=', 'asset_receivable'),
+            ('account_id.account_type', 'in', ('asset_receivable', 'liability_payable')),
             ('parent_state', '=', 'posted'),
             ('partner_id', 'in', self.ids),
             ('company_id', 'child_of', self.env.company.id),
@@ -196,19 +219,14 @@ class ResPartner(models.Model):
             return self.user_id
 
         most_delayed_aml = self._included_unreconciled_aml_max_followup().get('most_delayed_aml')
-        if responsible_type == 'salesperson' and most_delayed_aml and most_delayed_aml.move_id.invoice_user_id:
-            return most_delayed_aml.move_id.invoice_user_id
 
-        if self.followup_responsible_id:
-            return self.followup_responsible_id
-
-        if self.user_id:
-            return self.user_id
-
-        if most_delayed_aml and most_delayed_aml.move_id.invoice_user_id:
-            return most_delayed_aml.move_id.invoice_user_id
-
-        return self.env.user
+        candidates = [
+            (responsible_type == 'salesperson' and most_delayed_aml and most_delayed_aml.move_id.invoice_user_id),
+            self.followup_responsible_id,
+            self.user_id,
+            (most_delayed_aml and most_delayed_aml.move_id.invoice_user_id),
+        ]
+        return next((u for u in candidates if u and u.active), super()._get_followup_responsible())
 
     def _get_all_followup_contacts(self):
         """ Returns every contact of type 'followup' in the children of self.
@@ -234,8 +252,8 @@ class ResPartner(models.Model):
         # Minimum value for delay, will always be smaller than any other delay
         max_delay = first_followup_line.delay - 1
         has_overdue_invoices = False
-        for aml in self.unreconciled_aml_ids:
-            aml_delay = (today - (aml.date_maturity or aml.date)).days
+        for aml in self.unreconciled_aml_ids.filtered('date_maturity'):
+            aml_delay = (today - aml.date_maturity).days
 
             is_overdue = aml_delay > 0
             if is_overdue:
@@ -265,11 +283,13 @@ class ResPartner(models.Model):
         self.ensure_one()
         if not options:
             options = {}
-        invoices_to_print = self.unreconciled_aml_ids.move_id.filtered(lambda l: l.is_invoice(include_receipts=True))
+        if not options.get('join_invoices', options.get('followup_line', self.followup_line_id).join_invoices):
+            return self.env['account.move']
+        invoices_to_print = self._get_unreconciled_aml_ids().move_id
         if options.get('manual_followup'):
             # For manual reminders, only print invoices with the selected attachments
-            return invoices_to_print.filtered(lambda inv: inv.message_main_attachment_id.id in options.get('attachment_ids'))
-        return invoices_to_print.filtered(lambda inv: inv.message_main_attachment_id)
+            return invoices_to_print.filtered(lambda inv: inv.invoice_pdf_report_id.id in options.get('attachment_ids', []))
+        return invoices_to_print.filtered(lambda inv: inv.invoice_pdf_report_id)
 
     @api.model
     def _get_first_followup_level(self):
@@ -291,28 +311,6 @@ class ResPartner(models.Model):
             eligible_levels = previous_levels.filtered(lambda level: (today - aml.date_maturity).days >= level.delay)
             if eligible_levels:
                 aml.followup_line_id = max(eligible_levels, key=lambda level: level.delay)
-
-    def _get_partner_account_report_attachment(self, report, options=None):
-        self.ensure_one()
-        if not options:
-            options = report.get_options({
-                'partner_ids': self.ids,
-                'unfold_all': True,
-                'unreconciled': True,
-                'hide_account': True,
-                'all_entries': False,
-            })
-        attachment_file = report.export_to_pdf(options)
-        return self.env['ir.attachment'].create([
-            {
-                'name': f"{self.name} - {attachment_file['file_name']}",
-                'res_model': self._name,
-                'res_id': self.id,
-                'type': 'binary',
-                'raw': attachment_file['file_content'],
-                'mimetype': 'application/pdf',
-            },
-        ])
 
     def send_followup_email(self, options):
         """
@@ -398,11 +396,12 @@ class ResPartner(models.Model):
         self.env['account.move.line'].flush_model()
         self.env['res.partner'].flush_model()
         self.env['account_followup.followup.line'].flush_model()
-        ResPartner = self.env['res.partner'].with_company(self.env.company.root_id.id)
+        ResPartner = self.env['res.partner']
+        extra_join_conditions = self._get_followup_data_query_extra_join_conditions()
         return f"""
             SELECT partner.id as partner_id,
                    ful.id as followup_line_id,
-                   CASE WHEN partner.balance <= 0 THEN 'no_action_needed'
+                   CASE WHEN partner.amount_residual <= 0 THEN 'no_action_needed'
                         WHEN in_need_of_action_aml.id IS NOT NULL AND (followup_next_action_date IS NULL OR followup_next_action_date <= %(current_date)s) THEN 'in_need_of_action'
                         WHEN exceeded_unreconciled_aml.id IS NOT NULL THEN 'with_overdue_invoices'
                         ELSE 'no_action_needed' END as followup_status
@@ -410,7 +409,7 @@ class ResPartner(models.Model):
           SELECT partner.id,
                  {self.env.cr.mogrify(ResPartner._field_to_sql('partner', 'followup_next_action_date')).decode(self.env.cr.connection.encoding)} AS followup_next_action_date,
                  MAX(COALESCE(next_ful.delay, ful.delay)) as followup_delay,
-                 SUM(aml.balance) as balance
+                 SUM(aml.amount_residual) as amount_residual
             FROM res_partner partner
             JOIN account_move_line aml ON aml.partner_id = partner.id
             JOIN account_account account ON account.id = aml.account_id
@@ -419,7 +418,7 @@ class ResPartner(models.Model):
                     SELECT next_ful.id
                       FROM account_followup_followup_line next_ful
                      WHERE next_ful.delay > COALESCE(ful.delay, %(min_delay)s - 1)
-                       AND next_ful.company_id = %(root_company_id)s
+                       AND next_ful.company_id = %(company_id)s
                   ORDER BY next_ful.delay ASC
                      LIMIT 1
                  )
@@ -431,7 +430,7 @@ class ResPartner(models.Model):
              {"" if partner_ids is None else "AND aml.partner_id IN %(partner_ids)s"}
         GROUP BY partner.id
             ) partner
-            LEFT JOIN account_followup_followup_line ful ON ful.delay = partner.followup_delay AND ful.company_id = %(root_company_id)s
+            LEFT JOIN account_followup_followup_line ful ON ful.delay = partner.followup_delay AND ful.company_id = %(company_id)s
             -- Get the followup status data
             LEFT OUTER JOIN LATERAL (
                 SELECT line.id
@@ -445,8 +444,10 @@ class ResPartner(models.Model):
                    AND line.reconciled IS NOT TRUE
                    AND line.balance > 0
                    AND line.company_id = ANY(%(company_ids)s)
-                   AND COALESCE(ful.delay, %(min_delay)s - 1) <= partner.followup_delay
-                   AND COALESCE(line.date_maturity, line.date) + COALESCE(ful.delay, %(min_delay)s - 1) < %(current_date)s
+                   AND COALESCE(ful.delay, %(min_delay)s - 1) < partner.followup_delay
+                   AND line.date_maturity IS NOT NULL
+                   AND line.date_maturity + COALESCE(ful.delay, %(min_delay)s - 1) < %(current_date)s
+                   {extra_join_conditions}
                  LIMIT 1
             ) in_need_of_action_aml ON true
             LEFT OUTER JOIN LATERAL (
@@ -460,16 +461,22 @@ class ResPartner(models.Model):
                    AND line.reconciled IS NOT TRUE
                    AND line.balance > 0
                    AND line.company_id = ANY(%(company_ids)s)
-                   AND COALESCE(line.date_maturity, line.date) < %(current_date)s
+                   AND line.date_maturity IS NOT NULL
+                   AND line.date_maturity < %(current_date)s
+                   {extra_join_conditions}
                  LIMIT 1
             ) exceeded_unreconciled_aml ON true
         """, {
             'company_ids': self.env.company.search([('id', 'child_of', self.env.company.id)]).ids,
-            'root_company_id': self.env.company.root_id.id,
+            'company_id': self.env.company.id,
             'partner_ids': tuple(partner_ids or []),
             'current_date': fields.Date.context_today(self),  # Allow mocking the current day for testing purpose.
             'min_delay': self._get_first_followup_level().delay or 0,
         }
+
+    def _get_followup_data_query_extra_join_conditions(self):
+        """ Hook method to add extra join conditions. """
+        return ''
 
     def _send_followup(self, options):
         """ Send the follow-up to the partner, depending on selected options.
@@ -481,6 +488,58 @@ class ResPartner(models.Model):
             self.send_followup_email(options)
         if options.get('sms', followup_line.send_sms):
             self.send_followup_sms(options)
+
+    def _get_followup_report(self, options):
+        followup_report = (
+                self.env.ref('account_reports.followup_report', raise_if_not_found=False)
+                or self.env.ref('account_reports.customer_statement_report', raise_if_not_found=False)
+                or self.env.ref('account_reports.partner_ledger_report')
+        )
+        options = followup_report.get_options({
+            'forced_companies': self.env.company.search([('id', 'child_of', self.env.context.get('allowed_company_ids', self.env.company.id))]).ids,
+            'partner_ids': self.ids,
+            'unfold_all': True,
+            'unreconciled': True,
+            'all_entries': False,
+            'export_mode': 'print',
+        })
+        return self._get_partner_account_report_attachment(followup_report, options=options).id
+
+    def _get_followup_attachments(self, options):
+        res_attachment_ids = options.get('attachment_ids', [])
+        followup_line = options.get('followup_line')
+
+        invoice_attachment_ids = self._get_invoices_to_print(options).invoice_pdf_report_id.ids
+        if not options.get('join_invoices', followup_line.join_invoices):
+            res_attachment_ids = []
+        if options.get('manual_followup'):
+            res_attachment_ids = [attachment for attachment in res_attachment_ids if attachment not in invoice_attachment_ids]
+
+        # Add the Follow-up report
+        options['report_attachment_id'] = self._get_followup_report(options)
+        res_attachment_ids.append(options['report_attachment_id'])
+
+        # Add the attachments from the template
+        if template_id := options.get('template_id', followup_line.mail_template_id):
+            template_attachments = template_id._generate_template_attachments(self.ids, {'attachment_ids', 'report_template_ids'})[self.id]
+            res_attachment_ids += template_attachments['attachment_ids']
+
+            attachments_to_create = []
+            for dynamic_report in template_attachments['attachments']:
+                attachments_to_create.append({
+                    'name': dynamic_report[0],
+                    'datas': dynamic_report[1],
+                    'res_model': self._name,
+                    'res_id': self.id,
+                })
+            dynamic_attachments = self.env['ir.attachment'].create(attachments_to_create)
+            res_attachment_ids += dynamic_attachments.ids
+
+        if options.get('join_invoices', followup_line.join_invoices):
+            # Add the PDFs from overdue invoices
+            res_attachment_ids += invoice_attachment_ids
+
+        options['attachment_ids'] = res_attachment_ids
 
     def _execute_followup_partner(self, options=None):
         """ Execute the actions to do with follow-ups for this partner (apart from printing).
@@ -504,13 +563,12 @@ class ResPartner(models.Model):
                     summary=followup_line.activity_summary,
                     user_id=(self._get_followup_responsible()).id
                 )
-
+            options['followup_line'] = followup_line
             self._update_next_followup_action_date(followup_line)
 
-            if not options.get('join_invoices', followup_line.join_invoices):
-                options['attachment_ids'] = []
+            self._get_followup_attachments(options)
 
-            self._send_followup(options={'followup_line': followup_line, **options})
+            self._send_followup(options)
 
             return True
         return False
@@ -602,5 +660,66 @@ class ResPartner(models.Model):
 
     def _show_pay_now_button(self):
         invoice_online_payment = bool(self.env['ir.config_parameter'].sudo().get_param('account_payment.enable_portal_payment'))
-        payment_method_available = bool(self.env['payment.method'].sudo().search_count([('active', '=', 'True')]))
+        payment_method_available = bool('payment.method' in self.env and self.env['payment.method'].sudo().search_count([('active', '=', 'True')]))
         return invoice_online_payment and payment_method_available
+
+    def _compute_has_moves(self):
+        field_names = ['partner_id', 'partner_shipping_id', 'commercial_partner_id']
+        partner_ids = {row[0] for row in self.env.execute_query(SQL("\nUNION ").join(
+            [self.env['account.move']._search(
+                [('company_id', 'in', self.env.companies.ids), (name, 'in', self.ids)]
+            ).subselect('account_move.' + name) for name in field_names] +
+            [self.env['account.move.line']._search(
+                [('company_id', 'in', self.env.companies.ids), ('partner_id', 'in', self.ids)]
+            ).subselect('account_move_line.partner_id')]
+        ))}
+
+        for partner in self:
+            partner.has_moves = partner.id in partner_ids
+
+    def _get_followup_report_pdf(self, options):
+        """
+        Generate the follow-up report and return a tuple (filename, pdf_bin).
+        """
+        tz_date_str = format_date(self.env, fields.Date.today(), lang_code=self.env.user.lang or get_lang(self.env).code)
+        # To avoid having dots in the name of the file.
+        tz_date_str = tz_date_str.replace('.', '-')
+        followup_letter_name = _("Follow-up %(partner)s - %(date)s.pdf", partner=self.display_name, date=tz_date_str)
+
+        action = self.env.ref('account_followup.action_report_followup')
+        followup_letter = action.with_context(lang=self.lang or self.env.user.lang)._render_qweb_pdf('account_followup.report_followup_print_all', self.id, data={'options': options or {}})[0]
+
+        return followup_letter_name, followup_letter
+
+    def _get_followup_report_attachment(self, options):
+        """
+        Generate the follow-up report and returns it as an attachment.
+        """
+
+        followup_letter_name, followup_letter = self._get_followup_report_pdf(options)
+        return self.env['ir.attachment'].create({
+            'name': followup_letter_name,
+            'raw': followup_letter,
+            'res_id': self.id,
+            'res_model': 'res.partner',
+            'type': 'binary',
+            'mimetype': 'application/pdf',
+        })
+
+    def _get_attachments_ids(self):
+        self.ensure_one()
+        # `account_no_followup` was added in stable so not all users have it installed even if it's auto_install
+        if 'no_followup' in self.env['account.move.line']:
+            return self.unreconciled_aml_ids.filtered(lambda l: not l.no_followup).move_id.invoice_pdf_report_id
+        return self.unreconciled_aml_ids.move_id.invoice_pdf_report_id
+
+    def _get_unreconciled_aml_ids(self):
+        self.ensure_one()
+        # `account_no_followup` was added in stable so not all users have it installed even if it's auto_install
+        if 'no_followup' in self.env['account.move.line']:
+            return self.unreconciled_aml_ids.filtered(
+                lambda l: not l.no_followup and l.move_id.is_invoice(include_receipts=True)
+            )
+        return self.unreconciled_aml_ids.filtered(
+            lambda l: l.move_id.is_invoice(include_receipts=True)
+        )

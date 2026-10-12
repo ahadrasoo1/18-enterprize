@@ -14,11 +14,18 @@ class StockMove(models.Model):
         moves._create_quality_checks()
         return moves
 
+    def _post_process_created_moves(self):
+        # Quality checks per product and operations are expected to be created during
+        # the action confirm of the related stock move. However, a move can be created
+        # in a non draft state and might never be confirmed in before being done
+        super()._post_process_created_moves()
+        self.filtered(lambda m: m.state not in ('draft', 'cancel', 'done'))._create_quality_checks()
+
     def _create_quality_checks(self):
         # Groupby move by picking. Use it in order to generate missing quality checks.
         pick_moves = defaultdict(lambda: self.env['stock.move'])
         for move in self:
-            if move.picking_id:
+            if move.picking_id and not move.scrapped:
                 pick_moves[move.picking_id] |= move
         check_vals_list = self._create_operation_quality_checks(pick_moves)
         for picking, moves in pick_moves.items():
@@ -40,6 +47,9 @@ class StockMove(models.Model):
         check_vals_list = []
         for picking, moves in pick_moves.items():
             quality_points_domain = self.env['quality.point']._get_domain(moves.product_id, picking.picking_type_id, measure_on='operation')
+            existing_point_ids = picking.check_ids.filtered(lambda c: c.measure_on == 'operation').point_id.ids
+            if existing_point_ids:
+                quality_points_domain += [('id', 'not in', existing_point_ids)]
             quality_points = self.env['quality.point'].sudo().search(quality_points_domain)
             for point in quality_points:
                 if point.check_execute_now():

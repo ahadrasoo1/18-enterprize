@@ -19,8 +19,6 @@ import { browser } from "@web/core/browser/browser";
 
 import { Component, useState, onWillUnmount, useRef } from "@odoo/owl";
 
-const { DateTime } = luxon;
-
 export class GridController extends Component {
     static components = {
         Layout,
@@ -68,7 +66,9 @@ export class GridController extends Component {
             ranges: this.props.archInfo.ranges,
             defaultAnchor,
         });
+        const rootRef = useRef("root");
         useSetupAction({
+            rootRef: rootRef,
             getLocalState: () => {
                 const { anchor, range } = this.model.navigationInfo;
                 return {
@@ -84,7 +84,6 @@ export class GridController extends Component {
                 ? JSON.parse(isWeekendVisible)
                 : true,
         });
-        const rootRef = useRef("root");
         useViewButtons(rootRef, {
             beforeExecuteAction: this.beforeExecuteActionButton.bind(this),
             afterExecuteAction: this.afterExecuteActionButton.bind(this),
@@ -174,9 +173,11 @@ export class GridController extends Component {
     }
 
     get columns() {
-        return this.state.isWeekendVisible || this.state.activeRangeName === "day" ? this.model.columnsArray : this.model.columnsArray.filter(column => {
-            return DateTime.fromISO(column.value).weekday < 6;
-        });
+        return this.state.isWeekendVisible || ["day", "year"].includes(this.state.activeRangeName)
+            ? this.model.columnsArray
+            : this.model.columnsArray.filter((column) => {
+                  return column.isWeekDay;
+             });
     }
 
     toggleWeekendVisibility() {

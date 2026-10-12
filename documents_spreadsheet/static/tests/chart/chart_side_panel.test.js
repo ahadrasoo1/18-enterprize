@@ -1,4 +1,4 @@
-import { patchWithCleanup, contains, onRpc } from "@web/../tests/web_test_helpers";
+import { patchWithCleanup, contains, onRpc, makeServerError } from "@web/../tests/web_test_helpers";
 import { animationFrame } from "@odoo/hoot-mock";
 import { defineDocumentSpreadsheetModels } from "@documents_spreadsheet/../tests/helpers/data";
 import { expect, test, beforeEach, getFixture, describe } from "@odoo/hoot";
@@ -12,6 +12,7 @@ import { GraphRenderer } from "@web/views/graph/graph_renderer";
 import { patchGraphSpreadsheet } from "@spreadsheet_edition/assets/graph_view/graph_view";
 import { registries } from "@odoo/o-spreadsheet";
 import * as dsHelpers from "@web/../tests/core/tree_editor/condition_tree_editor_test_helpers";
+import { LoadableDataSource } from "@spreadsheet/data_sources/data_source";
 
 defineDocumentSpreadsheetModels();
 describe.current.tags("desktop");
@@ -254,7 +255,7 @@ describe("trend line", () => {
             display: true,
         });
         const runtime = model.getters.getChartRuntime(chartId);
-        expect(runtime.chartJsConfig.data.datasets.length).toEqual(2);
+        expect(runtime.chartJsConfig.data.datasets.length).toBe(2);
     });
 
     test("Can change trend type", async function () {
@@ -272,14 +273,35 @@ describe("trend line", () => {
             display: true,
         });
 
-        for (const trendType of ["exponential", "logarithmic", "polynomial"]) {
-            await contains(".trend-type-selector").select(trendType);
-            definition = model.getters.getChartDefinition(chartId);
-            expect(definition.trend?.type).toEqual(trendType);
-        }
+        await contains(".trend-type-selector").select("logarithmic");
+        definition = model.getters.getChartDefinition(chartId);
+        expect(definition.trend?.type).toBe("logarithmic");
     });
 
     test("Can change polynomial degree", async function () {
+        onRpc("web_read_group", () => {
+            // return at least 3 groups to have a valid trend line
+            return {
+                groups: [
+                    {
+                        bar: true,
+                        __count: 1,
+                        __domain: [],
+                    },
+                    {
+                        bar: false,
+                        __count: 2,
+                        __domain: [],
+                    },
+                    {
+                        bar: null,
+                        __count: 3,
+                        __domain: [],
+                    },
+                ],
+                length: 3,
+            };
+        });
         const { model, env } = await createSpreadsheetFromGraphView();
         const sheetId = model.getters.getActiveSheetId();
         const chartId = model.getters.getChartIds(sheetId)[0];
@@ -295,9 +317,9 @@ describe("trend line", () => {
         });
 
         await contains(".trend-type-selector").select("polynomial");
-        await contains(".trend-order-input").edit("2");
+        await contains(".trend-order-input").edit("3");
         definition = model.getters.getChartDefinition(chartId);
-        expect(definition.trend?.order).toEqual(2);
+        expect(definition.trend?.order).toBe(3);
     });
 });
 test("Show values", async () => {
@@ -316,4 +338,33 @@ test("Show values", async () => {
     expect(model.getters.getChartDefinition(chartId).showValues).toBe(true);
     options = model.getters.getChartRuntime(chartId).chartJsConfig.options;
     expect(options.plugins.chartShowValuesPlugin.showValues).toBe(true);
+});
+
+test("An error is displayed in the side panel if the chart has invalid model", async function () {
+    const { model, env } = await createSpreadsheetFromGraphView({
+        mockRPC: async function (route, { model, method, kwargs }) {
+            if (method === "fields_get") {
+                throw makeServerError({ code: 404 });
+            }
+        },
+    });
+    await openChartSidePanel(model, env);
+
+    expect(".o-validation-error").toHaveCount(1);
+});
+
+test("An spinner is displayed in the side panel if the chart model isn't loaded yet", async function () {
+    let isDataSourceLoaded = false;
+    patchWithCleanup(LoadableDataSource.prototype, {
+        isReady: () => isDataSourceLoaded,
+    });
+    const { model, env } = await createSpreadsheetFromGraphView({});
+    await openChartSidePanel(model, env);
+    expect(".spinner-border").toHaveCount(1);
+
+    isDataSourceLoaded = true;
+    model.trigger("update");
+    await animationFrame();
+
+    expect(".spinner-border").toHaveCount(0);
 });

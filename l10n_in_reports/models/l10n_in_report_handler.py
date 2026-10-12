@@ -133,17 +133,11 @@ class IndianTaxReportCustomHandler(models.AbstractModel):
 
     @api.model
     def _get_out_of_fiscal_year_reversed_moves(self, options):
-        out_of_fiscal_year_reversed_moves = self.env['account.move'].search(
-            [
-                ('date', '>=', options['date']['date_from']),
-                ('date', '<=', options['date']['date_to']),
-                ('move_type', '=', 'out_refund'),
-                ('state', '=', 'posted'),
-                ('reversed_entry_id', '!=', False),
-                ('line_ids.tax_tag_ids', '!=', False),
-            ]
-        ).filtered(lambda move: move.reversed_entry_id.invoice_date < move.get_fiscal_year_start_date(move.company_id, move.invoice_date)).ids
-        return 'l10n_in_reports.out_of_fiscal_year_reversed_moves_warning', out_of_fiscal_year_reversed_moves
+        """This method is deprecated and will be removed in the next version (master).
+        The warning is now displayed directly on each individual move until it is checked,
+        instead of being shown at the report level.
+        """
+        return 'l10n_in_reports.out_of_fiscal_year_reversed_moves_warning', self.env['account.move']
 
     def _dynamic_lines_generator(self, report, options, all_column_groups_expression_totals, warnings=None):
         if warnings is not None:

@@ -90,7 +90,7 @@ result = rules['NET']['total'] > categories['NET'] * 0.10''',
 # result_rate: float, rate between -100.0 and 100.0, which defaults to 100.0 (%).
 # result_qty: float, quantity, which defaults to 1.
 # result_name: string, name of the line, which defaults to the name field of the salary rule.
-               This is useful if the name depends should depend on something computed in the rule.
+#              This is useful if the name depends should depend on something computed in the rule.
 # The total returned by the salary rule is calculated as:
 # total = result * result_rate * result_qty
 
@@ -178,11 +178,11 @@ result = contract.wage * 0.10''')
         fields_vals_list = []
         for rule in self:
             field_name = rule._get_report_field_name()
-            model = self.env.ref('hr_payroll.model_hr_payroll_report').sudo().read(['id', 'name'])[0]
+            model = self.env.ref('hr_payroll.model_hr_payroll_report').sudo().read(['id', 'model'])[0]
             if rule.appears_on_payroll_report and field_name not in self.env['hr.payroll.report']:
                 fields_vals_list.append({
                     'name': field_name,
-                    'model': model['name'],
+                    'model': model['model'],
                     'model_id': model['id'],
                     'field_description': '%s: %s' % (rule.struct_id.country_id.code or 'XX', rule.name),
                     'ttype': 'float',

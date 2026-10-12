@@ -6,7 +6,7 @@ import { patch } from "@web/core/utils/patch";
 import { _t } from "@web/core/l10n/translation";
 
 patch(BarcodePickingModel.prototype, {
-    async validate() {
+    async _validate() {
         if (this.currentState.lines.some(line => line.product_id.is_kits)) {
             await this.save();
             const move_ids = this.currentState.lines.reduce((mvIds, line) => line.product_id.is_kits ? [...mvIds, line.move_id] : mvIds, []);
@@ -18,7 +18,10 @@ patch(BarcodePickingModel.prototype, {
             this.trigger('refresh');
             return this.notification(_t("The lines with a kit have been replaced with their components. Please check the picking before the final validation."), {type: 'danger'});
         } else {
-            return await super.validate();
+            return await super._validate();
         }
+    },
+    groupKey(line) {
+        return super.groupKey(...arguments) + (line.description_bom_line && `_${line.description_bom_line}` || '');
     },
 });

@@ -41,7 +41,7 @@ class SaleOrderLine(models.Model):
             ('start_datetime', '!=', False),
             '|',
                 ('resource_id', '=', False),
-                ('resource_type', '!=', 'material'),
+                ('resource_type', 'in', ['user', 'material']),
         ], ['sale_line_id'], ['allocated_hours:sum'])
         mapped_data = {sale_line.id: allocated_hours_sum for sale_line, allocated_hours_sum in group_data}
         for line in self:
@@ -124,17 +124,23 @@ class SaleOrderLine(models.Model):
         """
             For SO service lines with slot generation, create the planning slot.
         """
-        vals_list = []
-        for so_line in self:
-            if (so_line.product_id.type == 'service'
-               and so_line.product_id.planning_enabled
-               and not so_line.planning_slot_ids.filtered(lambda shift: not shift.start_datetime)
-               and float_compare(
-                    so_line.planning_hours_to_plan,
-                    so_line.planning_hours_planned,
-                    precision_digits=2) == 1):
-                vals_list.append(so_line._planning_slot_values())
+        vals_list = self.filtered(lambda sol: sol._should_generate_planning_slot())._planning_slot_vals_list()
         self.env['planning.slot'].create(vals_list)
+
+    def _should_generate_planning_slot(self):
+        return (
+            self.product_id.type == 'service'
+            and self.product_id.planning_enabled
+            and not self.planning_slot_ids.filtered(lambda shift: not shift.start_datetime)
+            and float_compare(
+                self.planning_hours_to_plan,
+                self.planning_hours_planned,
+                precision_digits=2
+            ) == 1
+        )
+
+    def _planning_slot_vals_list(self):
+        return [sol._planning_slot_values() for sol in self]
 
     def _planning_slot_values(self):
         return {

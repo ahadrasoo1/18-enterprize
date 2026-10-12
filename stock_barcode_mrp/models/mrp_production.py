@@ -62,6 +62,7 @@ class ManufacturingOrder(models.Model):
             'user_id',
             'procurement_group_id',
             'backorder_ids',
+            'use_create_components_lots',
         ]
 
     def _get_stock_barcode_data(self):
@@ -75,7 +76,7 @@ class ManufacturingOrder(models.Model):
         moves = self.move_raw_ids | self.move_byproduct_ids
         packagings = products.packaging_ids
 
-        uoms = products.uom_id | move_lines.product_uom_id
+        uoms = products.uom_id | move_lines.product_uom_id | self.bom_id.product_uom_id | moves.bom_line_id.product_uom_id
         # If UoM setting is active, fetch all UoM's data.
         if self.env.user.has_group('uom.group_uom'):
             uoms |= self.env['uom.uom'].search([])
@@ -132,8 +133,8 @@ class ManufacturingOrder(models.Model):
             if parsed_results:
                 # filter with the last feasible rule
                 for result in parsed_results[::-1]:
-                    if result['rule'].type in ('product', 'package'):
-                        barcode_type = result['rule'].type
+                    if result['type'] in ('product', 'package'):
+                        barcode_type = result['type']
                         break
 
         base_domain = [

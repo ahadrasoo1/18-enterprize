@@ -4,7 +4,6 @@
 from dateutil.relativedelta import relativedelta
 
 from odoo import api, fields, models, _
-from odoo.fields import Datetime
 from odoo.osv.expression import NEGATIVE_TERM_OPERATORS
 
 
@@ -85,7 +84,7 @@ class MarketingParticipant(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         participants = super().create(vals_list)
-        now = Datetime.now()
+        now = self.env.cr.now()
         cron_trigger_dates = set()
         for res in participants:
             # prepare first traces related to begin activities
@@ -114,16 +113,21 @@ class MarketingParticipant(models.Model):
 
     def action_set_completed(self):
         ''' Manually mark as a completed and cancel every scheduled trace '''
+        self._action_set_completed(trace_message=_('Marked as completed'))
+
+    def _action_set_completed(self, trace_message=False):
         # TDE TODO: delegate set Canceled to trace record
         self.write({'state': 'completed'})
+        trace_vals = {
+            'state': 'canceled',
+            'schedule_date': self.env.cr.now(),
+        }
+        if trace_message:
+            trace_vals['state_msg'] = trace_message
         self.env['marketing.trace'].search([
             ('participant_id', 'in', self.ids),
             ('state', '=', 'scheduled')
-        ]).write({
-            'state': 'canceled',
-            'schedule_date': Datetime.now(),
-            'state_msg': _('Marked as completed')
-        })
+        ]).write(trace_vals)
 
     def action_set_running(self):
         self.write({'state': 'running'})

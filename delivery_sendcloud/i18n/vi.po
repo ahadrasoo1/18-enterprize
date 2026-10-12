@@ -1,22 +1,23 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* delivery_sendcloud
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Thi Huong Nguyen, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
+"POT-Creation-Date: 2026-04-10 18:47+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
+"Last-Translator: Thi Huong Nguyen, 2025\n"
 "Language-Team: Vietnamese (https://app.transifex.com/odoo/teams/41243/vi/)\n"
+"Language: vi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: vi\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. module: delivery_sendcloud
@@ -24,15 +25,19 @@ msgstr ""
 #: code:addons/delivery_sendcloud/models/sendcloud_service.py:0
 msgid ""
 "\n"
-"Additionally, some individual product(s) are too heavy for the heaviest available shipping method.\n"
+"Additionally, some individual product(s) are too heavy for the heaviest "
+"available shipping method.\n"
 "                             \n"
-"Divide the quantity of the following product(s) across your packages if possible or choose another carrier:\n"
+"Divide the quantity of the following product(s) across your packages if "
+"possible or choose another carrier:\n"
 "\t%s"
 msgstr ""
 "\n"
-"Hơn nữa, một số sản phẩm quá nặng so với khối lượng vận chuyển nặng nhất của phương thức vận chuyển có sẵn.\n"
+"Hơn nữa, một số sản phẩm quá nặng so với khối lượng vận chuyển nặng nhất của "
+"phương thức vận chuyển có sẵn.\n"
 "\n"
-"Nếu có thể hãy chia nhỏ các sản phẩm sau đây thành các kiện hàng hoặc chọn một đơn vị vận chuyển khác:\n"
+"Nếu có thể hãy chia nhỏ các sản phẩm sau đây thành các kiện hàng hoặc chọn "
+"một đơn vị vận chuyển khác:\n"
 "\t%s"
 
 #. module: delivery_sendcloud
@@ -40,10 +45,20 @@ msgstr ""
 #: code:addons/delivery_sendcloud/models/sendcloud_service.py:0
 msgid ""
 "\n"
-"Try to distribute your products across your packages so that they weigh less than %(max_weight)s %(unit)s or choose another carrier."
+"Try to distribute your products across your packages so that they weigh less "
+"than %(max_weight)s %(unit)s or choose another carrier."
 msgstr ""
 "\n"
-"Cố gắng chia nhỏ các sản phẩm của bạn thành nhiều kiện hàng để chúng nhẹ hơn %(max_weight)s %(unit)s hoặc chọn một đơn vị vận chuyển khác."
+"Cố gắng chia nhỏ các sản phẩm của bạn thành nhiều kiện hàng để chúng nhẹ hơn "
+"%(max_weight)s %(unit)s hoặc chọn một đơn vị vận chuyển khác."
+
+#. module: delivery_sendcloud
+#. odoo-python
+#: code:addons/delivery_sendcloud/models/sendcloud_service.py:0
+msgid ""
+" Please make sure there is an address with the same name under \"Address "
+"Name (optional)\" in your Sendcloud Address configuration."
+msgstr ""
 
 #. module: delivery_sendcloud
 #. odoo-python
@@ -73,9 +88,9 @@ msgid ""
 "charges, your shippings are automatically <b>cancelled</b> after the label "
 "creation."
 msgstr ""
-"<i class=\"fa fa-exclamation-triangle\"/>Để tránh bị tính phí, thì trong môi"
-" trường kiểm thử, các đơn vận chuyển của bạn sẽ tự động <b>bị hủy</b> sau "
-"khi tạo nhãn."
+"<i class=\"fa fa-exclamation-triangle\"/>Để tránh bị tính phí, thì trong môi "
+"trường kiểm thử, các đơn vận chuyển của bạn sẽ tự động <b>bị hủy</b> sau khi "
+"tạo nhãn."
 
 #. module: delivery_sendcloud
 #: model_terms:ir.ui.view,arch_db:delivery_sendcloud.view_delivery_carrier_form
@@ -92,8 +107,8 @@ msgid ""
 "<i class=\"fa fa-info-circle\"/> Available shipping products depend on "
 "enabled carriers in your Sendcloud account."
 msgstr ""
-"<i class=\"fa fa-info-circle\"/>Các sản phẩm vận chuyển có sẵn phụ thuộc vào"
-" đơn vị vận chuyển đã được kích hoạt trong tài khoản Sendcloud của bạn."
+"<i class=\"fa fa-info-circle\"/>Các sản phẩm vận chuyển có sẵn phụ thuộc vào "
+"đơn vị vận chuyển đã được kích hoạt trong tài khoản Sendcloud của bạn."
 
 #. module: delivery_sendcloud
 #: model:ir.model.fields,field_description:delivery_sendcloud.field_sendcloud_shipping_wizard__sendcloud_products_code
@@ -171,12 +186,12 @@ msgstr "Được tạo vào"
 #. module: delivery_sendcloud
 #: model_terms:ir.ui.view,arch_db:delivery_sendcloud.view_delivery_carrier_form
 msgid "Default Package Type"
-msgstr "Kiểu đóng gói mặc định"
+msgstr "Loại kiện hàng mặc định"
 
 #. module: delivery_sendcloud
 #: model:ir.model.fields,field_description:delivery_sendcloud.field_delivery_carrier__sendcloud_default_package_type_id
 msgid "Default Package Type for Sendcloud"
-msgstr "Kiểu đóng gói mặc định cho Sendcloud"
+msgstr "Loại kiện hàng mặc định cho Sendcloud"
 
 #. module: delivery_sendcloud
 #: model:ir.model.fields,field_description:delivery_sendcloud.field_sendcloud_shipping_wizard__carrier_id
@@ -191,10 +206,14 @@ msgstr "Sản phẩm phí giao hàng"
 #. module: delivery_sendcloud
 #: model:ir.model.fields,help:delivery_sendcloud.field_delivery_carrier__sendcloud_shipping_rules
 msgid ""
-"Depending your Sendcloud account type, through rules you can define the shipping method to use depending on different conditions like destination, weight, value, etc.\n"
+"Depending your Sendcloud account type, through rules you can define the "
+"shipping method to use depending on different conditions like destination, "
+"weight, value, etc.\n"
 "Rules can override shipping product selected in Odoo"
 msgstr ""
-"Tùy vào loại tài khoản Sendcloud của bạn và thông qua các quy tắc, bạn có thể xác định phương thức vận chuyển muốn sử dụng dựa trên các điều kiện khác nhau như đích đến, khối lượng, giá trị,...\n"
+"Tùy vào loại tài khoản Sendcloud của bạn và thông qua các quy tắc, bạn có "
+"thể xác định phương thức vận chuyển muốn sử dụng dựa trên các điều kiện khác "
+"nhau như đích đến, khối lượng, giá trị,...\n"
 "Quy tắc có thể ghi đè sản phẩm vận chuyển được chọn trong Odoo"
 
 #. module: delivery_sendcloud
@@ -207,8 +226,8 @@ msgstr "Tên hiển thị"
 #. odoo-python
 #: code:addons/delivery_sendcloud/models/sendcloud_service.py:0
 msgid ""
-"Each address line can only contain a maximum of 75 characters. You can split"
-" the address into multiple lines to try to avoid this limitation."
+"Each address line can only contain a maximum of 75 characters. You can split "
+"the address into multiple lines to try to avoid this limitation."
 msgstr ""
 "Mỗi dòng địa chỉ chỉ có thể chứa tối đa 75 ký tự. Bạn có thể tách địa chỉ "
 "thành nhiều dòng để không vượt quá giới hạn này."
@@ -340,7 +359,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/delivery_sendcloud/models/sendcloud_service.py:0
 msgid "No picking or order provided"
-msgstr "Không có phiếu lấy hàng hoặc đơn hàng nào"
+msgstr "Không có phiếu xuất kho hoặc đơn hàng nào"
 
 #. module: delivery_sendcloud
 #. odoo-python
@@ -371,8 +390,7 @@ msgstr "Tùy chọn"
 #. odoo-python
 #: code:addons/delivery_sendcloud/models/sendcloud_service.py:0
 msgid "Order below minimum weight of carrier"
-msgstr ""
-"Khối lượng đơn hàng nhẹ hơn khối lượng tối thiểu của đơn vị vận chuyển"
+msgstr "Khối lượng đơn hàng nhẹ hơn khối lượng tối thiểu của đơn vị vận chuyển"
 
 #. module: delivery_sendcloud
 #. odoo-javascript
@@ -385,8 +403,8 @@ msgstr "Chức năng khác"
 #: code:addons/delivery_sendcloud/static/src/views/sendcloud_product_selection_widget.xml:0
 msgid ""
 "Please check SendCloud return product documentation before selecting return "
-"product. For some products, you can be charged for return labels printed but"
-" not used."
+"product. For some products, you can be charged for return labels printed but "
+"not used."
 msgstr ""
 "Vui lòng tham khảo tài liệu về sản phẩm trả hàng của SendCloud trước khi "
 "chọn sản phẩm trả hàng. Đối với một số sản phẩm, bạn có thể bị tính phí cho "
@@ -406,6 +424,11 @@ msgstr "Trả hàng"
 #: model:ir.model.fields,field_description:delivery_sendcloud.field_sendcloud_shipping_wizard__return_products
 msgid "Return Products"
 msgstr "Trả lại hàng"
+
+#. module: delivery_sendcloud
+#: model:ir.model.fields,help:delivery_sendcloud.field_delivery_carrier__country_id
+msgid "Select the country to be used by this delivery method"
+msgstr "Chọn quốc gia sẽ được sử dụng theo phương thức giao hàng này"
 
 #. module: delivery_sendcloud
 #: model_terms:ir.ui.view,arch_db:delivery_sendcloud.view_delivery_carrier_form
@@ -486,9 +509,10 @@ msgstr "Sản phẩm vận chuyển Sendcloud"
 #. module: delivery_sendcloud
 #. odoo-python
 #: code:addons/delivery_sendcloud/models/sendcloud_service.py:0
-msgid ""
-"Sendcloud is not responding. Check your credentials and/or retry later."
+msgid "Sendcloud is not responding. Check your credentials and/or retry later."
 msgstr ""
+"Sendcloud không phản hồi. Hãy kiểm tra thông tin đăng nhập của bạn và/hoặc "
+"thử lại sau."
 
 #. module: delivery_sendcloud
 #: model:ir.model.fields,field_description:delivery_sendcloud.field_delivery_carrier__country_id
@@ -529,7 +553,7 @@ msgid ""
 "type that you set as default"
 msgstr ""
 "Một số đơn vị vận chuyển quy định kích thước kiện hàng, bạn có thể xác định "
-"chúng trong kiểu đóng gói được đặt làm mặc định."
+"chúng trong loại kiện hàng được đặt làm mặc định."
 
 #. module: delivery_sendcloud
 #. odoo-python
@@ -554,7 +578,7 @@ msgstr ""
 #. module: delivery_sendcloud
 #: model:ir.model,name:delivery_sendcloud.model_stock_package_type
 msgid "Stock package type"
-msgstr "Kiểu đóng gói tồn kho"
+msgstr "Loại kiện hàng tồn kho"
 
 #. module: delivery_sendcloud
 #. odoo-python
@@ -571,15 +595,21 @@ msgid ""
 "delivery partner via the delivery order and make sure the parent of the "
 "delivery partner is the partner you want to ship to."
 msgstr ""
+"Địa chỉ giao hàng của khách hàng đã bị xóa khỏi vị trí nhận hàng. Sendcloud "
+"yêu cầu thông tin này. Vui lòng đi đến đối tác giao hàng qua lệnh giao hàng "
+"và đảm bảo rằng đối tác chính của đối tác giao hàng là đối tác mà bạn muốn "
+"giao hàng."
 
 #. module: delivery_sendcloud
 #. odoo-python
 #: code:addons/delivery_sendcloud/models/sendcloud_service.py:0
 msgid ""
-"The estimated shipping price cannot be computed because the weight is missing for the following product(s): \n"
+"The estimated shipping price cannot be computed because the weight is "
+"missing for the following product(s): \n"
 " %s"
 msgstr ""
-"Không thể tính giá vận chuyển ước tính vì thiếu khối lượng của (các) sản phẩm sau: \n"
+"Không thể tính giá vận chuyển ước tính vì thiếu khối lượng của (các) sản "
+"phẩm sau: \n"
 " %s"
 
 #. module: delivery_sendcloud
@@ -587,8 +617,7 @@ msgstr ""
 #: code:addons/delivery_sendcloud/models/delivery_carrier.py:0
 msgid "The shipping product actually configured can't handle this delivery"
 msgstr ""
-"Sản phẩm vận chuyển được cấu hình trong thực tế không thể xử lý giao hàng "
-"này"
+"Sản phẩm vận chuyển được cấu hình trong thực tế không thể xử lý giao hàng này"
 
 #. module: delivery_sendcloud
 #. odoo-python
@@ -615,9 +644,10 @@ msgstr ""
 #. odoo-python
 #: code:addons/delivery_sendcloud/models/delivery_carrier.py:0
 msgid ""
-"There is no rate available for this order with the selected shipping "
-"product."
+"There is no rate available for this order with the selected shipping product."
 msgstr ""
+"Không có cước phí nào khả dụng cho đơn hàng này với sản phẩm vận chuyển đã "
+"chọn."
 
 #. module: delivery_sendcloud
 #. odoo-python
@@ -626,8 +656,8 @@ msgid ""
 "There is no shipping method available for this order with the selected "
 "carrier"
 msgstr ""
-"Không có phương thức vận chuyển nào khả dụng cho đơn hàng này với đơn vị vận"
-" chuyển đã chọn"
+"Không có phương thức vận chuyển nào khả dụng cho đơn hàng này với đơn vị vận "
+"chuyển đã chọn"
 
 #. module: delivery_sendcloud
 #. odoo-python
@@ -636,7 +666,7 @@ msgid ""
 "There is no shipping method available for this picking with the selected "
 "carrier"
 msgstr ""
-"Không có phương thức vận chuyển nào khả dụng cho phiếu lấy hàng này với đơn "
+"Không có phương thức vận chuyển nào khả dụng cho phiếu xuất kho này với đơn "
 "vị vận chuyển đã chọn"
 
 #. module: delivery_sendcloud
@@ -645,11 +675,13 @@ msgstr ""
 msgid ""
 "There's no method with matching weight range for packages :\n"
 "%s\n"
-"You can either choose another carrier, change your filters or redefine the content of your package(s)."
+"You can either choose another carrier, change your filters or redefine the "
+"content of your package(s)."
 msgstr ""
 "Không có phương thức nào có phạm vi khối lượng phù hợp với các kiện hàng:\n"
 "%s\n"
-"Bạn có thể chọn một đơn vị vận chuyển khác, thay đổi bộ lọc hoặc bố trí lại thành phần kiện hàng của bạn."
+"Bạn có thể chọn một đơn vị vận chuyển khác, thay đổi bộ lọc hoặc bố trí lại "
+"thành phần kiện hàng của bạn."
 
 #. module: delivery_sendcloud
 #. odoo-python
@@ -659,7 +691,7 @@ msgid ""
 "picking/order."
 msgstr ""
 "Không có phương thức vận chuyển phù hợp với tất cả các bộ lọc bạn đã chọn "
-"cho phiếu lấy hàng/đơn hàng này."
+"cho phiếu xuất kho/đơn hàng này."
 
 #. module: delivery_sendcloud
 #. odoo-python
@@ -675,7 +707,7 @@ msgstr "Lệnh chuyển hàng"
 #. module: delivery_sendcloud
 #: model:ir.model.fields,field_description:delivery_sendcloud.field_delivery_carrier__sendcloud_use_batch_shipping
 msgid "Use Batch Shipping"
-msgstr "Sử dụng vận chuyển hàng loạt"
+msgstr "Sử dụng vận chuyển theo lô"
 
 #. module: delivery_sendcloud
 #: model:ir.model.fields,field_description:delivery_sendcloud.field_delivery_carrier__sendcloud_shipping_rules
@@ -711,8 +743,7 @@ msgid ""
 "You must assign the required 'Shipping From' field in order to search for "
 "available products"
 msgstr ""
-"Bạn bắt buộc phải gán trường 'Vận chuyển từ' để tìm kiếm các sản phẩm có "
-"sẵn."
+"Bạn bắt buộc phải gán trường 'Vận chuyển từ' để tìm kiếm các sản phẩm có sẵn."
 
 #. module: delivery_sendcloud
 #. odoo-python
@@ -734,3 +765,9 @@ msgid ""
 msgstr ""
 "được tạo trong Sendcloud. <br/>\n"
 "            <b>Mã số theo dõi:</b>"
+
+#. module: delivery_sendcloud
+#. odoo-javascript
+#: code:addons/delivery_sendcloud/static/src/views/sendcloud_product_selection_widget.xml:0
+msgid "g"
+msgstr ""

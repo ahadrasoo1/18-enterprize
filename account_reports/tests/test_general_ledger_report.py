@@ -513,6 +513,46 @@ class TestGeneralLedgerReport(TestAccountReportsCommon, odoo.tests.HttpCase):
             options,
         )
 
+        asset_account = self.env['account.chart.template'].ref('current_assets')  # Account Code: 101000
+        capital_account = self.env['account.chart.template'].ref('capital')  # Account Code: 301000
+        move = self.env['account.move'].create({
+            'move_type': 'entry',
+            'date': fields.Date.from_string('2017-02-01'),
+            'journal_id': self.company_data['default_journal_sale'].id,
+            'line_ids': [
+                Command.create({'debit': 1000.0, 'credit': 0.0, 'account_id': capital_account.id}),
+                Command.create({'debit': 0.0, 'credit': 1000.0, 'account_id': asset_account.id}),
+            ],
+        })
+        move.action_post()
+        options['filter_search_bar'] = '10'
+        self.assertLinesValues(
+            self.report._get_lines(options),
+            #   Name                                     Debit          Credit          Balance
+            [   0,                                       4,             5,              6],
+            [
+                ('101000 Current Assets',                   0.0,       1000.0,          -1000.0),
+                ('INV/2017/00002',                          0.0,       1000.0,          -1000.0),
+                ('Total 101000 Current Assets',             0.0,       1000.0,          -1000.0),
+                ('121000 Account Receivable',            1000.0,          0.0,           1000.0),
+                ('INV/2017/00001',                       1000.0,          0.0,           1000.0),
+                ('Total 121000 Account Receivable',      1000.0,          0.0,           1000.0),
+                ('211000 Account Payable',                100.0,          0.0,            100.0),
+                ('211010 Account Payable',                 50.0,          0.0,             50.0),
+                ('301000 Capital',                       1000.0,          0.0,           1000.0),
+                ('INV/2017/00002',                       1000.0,          0.0,           1000.0),
+                ('Total 301000 Capital',                 1000.0,          0.0,           1000.0),
+                ('400010 Product Sales',                    0.0,        200.0,           -200.0),
+                ('BNK1/2017/00001',                         0.0,        200.0,           -200.0),
+                ('Total 400010 Product Sales',              0.0,        200.0,           -200.0),
+                ('600010 Expenses',                       200.0,          0.0,            200.0),
+                ('BNK1/2017/00001',                       200.0,          0.0,            200.0),
+                ('Total 600010 Expenses',                 200.0,          0.0,            200.0),
+                ('Total',                                2350.0,       1200.0,           1150.0),
+            ],
+            options,
+        )
+
         options['filter_search_bar'] = '999'
 
         self.assertLinesValues(
@@ -652,6 +692,135 @@ class TestGeneralLedgerReport(TestAccountReportsCommon, odoo.tests.HttpCase):
             options,
         )
 
+    def test_general_ledger_hierarchy_numerical_value(self):
+        account_a, account_b = self.env['account.account'].create([{
+            'code': '222222',
+            'name': 'Account A',
+        }, {
+            'code': '333333',
+            'name': 'Account B',
+        }])
+
+        self.env['account.move'].create({
+            'move_type': 'entry',
+            'journal_id': self.company_data['default_journal_misc'].id,
+            'date': '2010-01-15',
+            'line_ids': [
+                Command.create({
+                    'debit': 50.0,
+                    'credit': 0.0,
+                    'account_id': account_a.id,
+                }),
+                Command.create({
+                    'debit': 0.0,
+                    'credit': 50.0,
+                    'account_id': account_b.id,
+                }),
+            ],
+        }).action_post()
+
+        report = self.env.ref('account_reports.general_ledger_report')
+        options = self._generate_options(report, '2010-01-01', '2010-01-31')
+        options['hierarchy'] = True
+
+        self.assertLinesValues(
+            self.report._get_lines(options),
+            #   Name                                Debit        Credit       Balance
+            [   0,                                     4,            5,            6],
+            [
+                ('(No Group)',                      50.0,         50.0,          0.0),
+                ('Total',                           50.0,         50.0,          0.0),
+            ],
+            options,
+        )
+
+        currency_2 = self.env['res.currency'].create({
+            'name': "Test Currency",
+            'symbol': 'T',
+        })
+
+        account_a_cur_2, account_b_cur_2 = self.env['account.account'].create([{
+            'code': '444444',
+            'name': 'Account A Currency 2',
+            'currency_id': currency_2.id,
+        }, {
+            'code': '555555',
+            'name': 'Account B Currency 2',
+            'currency_id': currency_2.id,
+        }])
+
+        account_group = self.env['account.group'].create({
+            'name': 'Group',
+            'code_prefix_start': '4',
+            'code_prefix_end': '4',
+        })
+        accounts = (account_a + account_b + account_a_cur_2 + account_b_cur_2)
+        accounts.invalidate_recordset(['group_id'])
+
+        self.env['account.move'].create({
+            'move_type': 'entry',
+            'journal_id': self.company_data['default_journal_misc'].id,
+            'date': '2010-01-15',
+            'line_ids': [
+                Command.create({
+                    'amount_currency': 75.0,
+                    'currency_id': currency_2.id,
+                    'account_id': account_a_cur_2.id,
+                }),
+                Command.create({
+                    'amount_currency': -75.0,
+                    'currency_id': currency_2.id,
+                    'account_id': account_b_cur_2.id,
+                }),
+            ]
+        }).action_post()
+
+        options = self._generate_options(report, '2010-01-01', '2010-01-31')
+        options['hierarchy'] = True
+        self.assertLinesValues(
+            self.report._get_lines(options),
+            #   Name                               Currency        Debit        Credit       Balance
+            [   0,                                      4,            5,            6,            7],
+            [
+                ('4 Group',                          75.0,         75.0,          0.0,          75.0),
+                ('(No Group)',                         '',         50.0,        125.0,         -75.0),
+                ('Total',                              '',        125.0,        125.0,           0.0),
+            ],
+            options,
+            currency_map={4: {'currency': currency_2}},
+        )
+
+        account_group.code_prefix_end = '5'
+        accounts.invalidate_recordset(['group_id'])
+
+        self.assertLinesValues(
+            self.report._get_lines(options),
+            #   Name                               Currency        Debit        Credit       Balance
+            [   0,                                      4,            5,            6,            7],
+            [
+                ('4-5 Group',                         0.0,         75.0,         75.0,           0.0),
+                ('(No Group)',                         '',         50.0,         50.0,           0.0),
+                ('Total',                              '',        125.0,        125.0,           0.0),
+            ],
+            options,
+            currency_map={4: {'currency': currency_2}},
+        )
+
+        account_group.code_prefix_start = '3'
+        accounts.invalidate_recordset(['group_id'])
+
+        self.assertLinesValues(
+            self.report._get_lines(options),
+            #   Name                               Currency        Debit        Credit       Balance
+            [   0,                                      4,            5,            6,            7],
+            [
+                ('3-5 Group',                          '',         75.0,        125.0,        -50.0),
+                ('(No Group)',                         '',         50.0,          0.0,         50.0),
+                ('Total',                              '',        125.0,        125.0,          0.0),
+            ],
+            options,
+        )
+
     def test_general_ledger_same_date_ordering(self):
         self.env.company.account_sale_tax_id = None
         self.env.company.totals_below_sections = False
@@ -684,3 +853,151 @@ class TestGeneralLedgerReport(TestAccountReportsCommon, odoo.tests.HttpCase):
             ],
             options
         )
+
+    def assertCSVExportLinesValues(self, options, expected_vals_list):
+        report = self.env['account.report'].browse(options['report_id'])
+        lines_gen = report.dispatch_report_action(options, 'generate_csv_export')['file_content']
+        lines_list = list(lines_gen)
+        self.assertEqual(len(lines_list), len(expected_vals_list))
+
+        for (line, expected_vals) in zip(lines_list, expected_vals_list):
+            self.assertEqual(line.decode('utf-8'), ','.join(expected_vals) + '\n')
+
+    def test_general_ledger_export_csv(self):
+        move_1 = self.init_invoice('out_invoice', invoice_date='2010-01-01', amounts=[100])
+        move_2 = self.init_invoice('out_invoice', invoice_date='2010-01-15', amounts=[150])
+        move_3 = self.init_invoice('in_invoice', invoice_date='2008-06-06', amounts=[50])
+        move_3 = self.env['account.move'].create({
+            'move_type': 'entry',
+            'date': '2009-12-30',
+            'line_ids': [
+                Command.create({
+                    'account_id': self.company_data['default_account_receivable'].id,
+                    'debit': 0.0,
+                    'credit': 50.0,
+                }),
+                Command.create({
+                    'account_id': self.company_data['default_account_assets'].id,
+                    'debit': 50.0,
+                    'credit': 0.0,
+                }),
+            ],
+        })
+        (move_1 + move_2 + move_3).action_post()
+
+        report = self.env.ref('account_reports.general_ledger_report')
+        options = self._generate_options(report, '2010-01-01', '2010-01-31')
+        self.assertCSVExportLinesValues(options, [
+            [  'Code',               'Name',       'Date', 'Communication',   'Partner',  'Debit', 'Credit', 'Balance'],
+            ['121000', 'Account Receivable',           '',              '',          '', '250.00',  '50.00',  '200.00'],
+            [      '',    'Initial Balance',           '',              '',          '',   '0.00',  '50.00',  '-50.00'],
+            [      '',          move_1.name, '2010-01-01',     move_1.name, 'partner_a', '100.00',   '0.00',   '50.00'],
+            [      '',          move_2.name, '2010-01-15',     move_2.name, 'partner_a', '150.00',   '0.00',  '200.00'],
+            ['151000',        'Fixed Asset',           '',              '',          '',  '50.00',   '0.00',   '50.00'],
+            ['400000',      'Product Sales',           '',              '',          '',   '0.00', '250.00', '-250.00'],
+            [      '',          move_1.name, '2010-01-01',     'test line', 'partner_a',   '0.00', '100.00', '-100.00'],
+            [      '',          move_2.name, '2010-01-15',     'test line', 'partner_a',   '0.00', '150.00', '-250.00'],
+            [      '',              'Total',           '',              '',          '', '300.00', '300.00',    '0.00'],
+        ])
+
+    def test_general_ledger_export_csv_multi_comp(self):
+        company_1 = self.env.company
+        company_2 = self.company_data_2['company']
+        company_2.currency_id.active = True
+        company_2.currency_id.decimal_places = 3
+        company_ids = (company_1 + company_2).ids
+
+        move_1 = self.init_invoice('out_invoice', invoice_date='2010-01-01', amounts=[100])
+        move_2 = self.init_invoice('out_invoice', invoice_date='2010-01-15', amounts=[50], company=company_2)
+        (move_1 + move_2).with_context(allowed_company_ids=company_ids).action_post()
+
+        report = self.env.ref('account_reports.general_ledger_report')
+        options = self._generate_options(report, '2010-01-01', '2010-01-31')
+        self.assertCSVExportLinesValues(options, [
+            [  'Code',               'Name',       'Date', 'Communication',   'Partner', 'Currency', 'Debit', 'Credit',  'Balance'],
+            ['121000', 'Account Receivable',           '',              '',          '',         '', '100.00',   '0.00',  '100.00'],
+            [      '',          move_1.name, '2010-01-01',     move_1.name, 'partner_a',         '', '100.00',   '0.00',  '100.00'],
+            ['400000',      'Product Sales',           '',              '',          '',         '',   '0.00', '100.00', '-100.00'],
+            [      '',          move_1.name, '2010-01-01',     'test line', 'partner_a',         '',   '0.00', '100.00', '-100.00'],
+            ['400010',      'Product Sales',           '',              '',          '',         '',   '0.00',  '50.00',  '-50.00'],
+            [      '',          move_2.name, '2010-01-15',     'test line', 'partner_a',  '-50.000',   '0.00',  '50.00',  '-50.00'],
+            [      '', 'Account Receivable',           '',              '',          '',         '',  '50.00',   '0.00',   '50.00'],
+            [      '',          move_2.name, '2010-01-15',     move_2.name, 'partner_a',   '50.000',  '50.00',   '0.00',   '50.00'],
+            [      '',              'Total',           '',              '',          '',         '', '150.00', '150.00',    '0.00'],
+        ])
+
+        self.company_data_2['default_account_revenue'].with_company(company_1).code = '400000'
+        self.company_data_2['default_account_receivable'].with_company(company_1).code = '121000'
+
+        self.assertCSVExportLinesValues(options, [
+            [  'Code',               'Name',       'Date', 'Communication',   'Partner', 'Currency', 'Debit', 'Credit',  'Balance'],
+            ['121000', 'Account Receivable',           '',              '',          '',         '', '100.00',   '0.00',  '100.00'],
+            [      '',          move_1.name, '2010-01-01',     move_1.name, 'partner_a',         '', '100.00',   '0.00',  '100.00'],
+            ['121000', 'Account Receivable',           '',              '',          '',         '',  '50.00',   '0.00',   '50.00'],
+            [      '',          move_2.name, '2010-01-15',     move_2.name, 'partner_a',   '50.000',  '50.00',   '0.00',   '50.00'],
+            ['400000',      'Product Sales',           '',              '',          '',         '',   '0.00', '100.00', '-100.00'],
+            [      '',          move_1.name, '2010-01-01',     'test line', 'partner_a',         '',   '0.00', '100.00', '-100.00'],
+            ['400000',      'Product Sales',           '',              '',          '',         '',   '0.00',  '50.00',  '-50.00'],
+            [      '',          move_2.name, '2010-01-15',     'test line', 'partner_a',  '-50.000',   '0.00',  '50.00',  '-50.00'],
+            [      '',              'Total',           '',              '',          '',         '', '150.00', '150.00',    '0.00'],
+        ])
+
+    def test_general_ledger_export_csv_currency_integer(self):
+        self.env.user.groups_id |= self.env.ref('base.group_multi_currency')
+        foreign_currency = self.env['res.currency'].create({
+            'name': 'Gold Coin',
+            'symbol': '☺',
+            'rounding': 0.001,
+        })
+        foreign_curr_account = self.env['account.account'].create({
+            'name': 'Foreign Currency Account',
+            'code': '181000',
+            'account_type': 'asset_current',
+            'currency_id': foreign_currency.id,
+        })
+        move = self.env['account.move'].create({
+            'move_type': 'entry',
+            'date': '2010-01-01',
+            'line_ids': [
+                Command.create({'account_id': foreign_curr_account.id, 'debit': 100.0, 'credit': 0.0, 'amount_currency': 200.0, 'currency_id': foreign_currency.id}),
+                Command.create({'account_id': self.company_data['default_account_expense'].id, 'debit': 0.0, 'credit': 100.0}),
+            ],
+        })
+        move.action_post()
+
+        options = self._generate_options(self.report, '2010-01-01', '2010-01-31')
+        self.assertCSVExportLinesValues(options, [
+            [  'Code',                     'Name',       'Date', 'Communication', 'Partner', 'Currency',  'Debit', 'Credit', 'Balance'],
+            ['181000', 'Foreign Currency Account',           '',              '',        '',  '200.000', '100.00',   '0.00',  '100.00'],
+            [      '',                  move.name, '2010-01-01',              '',        '',  '200.000', '100.00',   '0.00',  '100.00'],
+            ['600000',                 'Expenses',           '',              '',        '',         '',   '0.00', '100.00', '-100.00'],
+            [      '',                  move.name, '2010-01-01',              '',        '',         '',   '0.00', '100.00', '-100.00'],
+            [      '',                    'Total',           '',              '',        '',         '', '100.00', '100.00',    '0.00'],
+        ])
+
+    def test_open_gl_from_bs_then_change_date_filter(self):
+        """
+        Test that the 'filter_search_bar' option key is not filtered out when updating the date filter after opening
+        the General Ledger from a balance sheet line
+        """
+
+        # Open Balance Sheet
+        balance_sheet = self.env.ref('account_reports.balance_sheet')
+        bs_options = self._generate_options(balance_sheet, '2017-06-01', '2017-06-01', default_options={'unfold_all': True})
+        lines = balance_sheet._get_lines(bs_options)
+        line = [l for l in lines if l.get('caret_options')][:1]
+        self.assertLinesValues(line, [0, 1], [('121000 Account Receivable', 1000.0)], bs_options)
+
+        # Open General Ledger
+        general_ledger = self.env.ref('account_reports.general_ledger_report')
+        params = {'line_id': line[0]['id']}
+        res = balance_sheet.caret_option_open_general_ledger(bs_options, params)
+        gl_options = res['params']['options']
+
+        # options are updated afterward by the search() in account_reports/static/src/components/account_report/search_bar/search_bar.js
+        gl_options['filter_search_bar'] = '121000'
+
+        # Update the date filter
+        gl_options['date'] = {**gl_options['date'], 'filter': 'this_month'}
+        new_gl_options = general_ledger.with_context(res['context']).get_options(gl_options)
+        self.assertEqual(new_gl_options['filter_search_bar'], '121000', 'the filter_search_bar key should still be present and set in the options')

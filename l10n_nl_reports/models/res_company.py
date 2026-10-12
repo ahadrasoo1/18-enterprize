@@ -11,3 +11,6 @@ class ResCompany(models.Model):
         rslt = super()._get_countries_allowing_tax_representative()
         rslt.add('NL')
         return rslt
+
+    def _get_nl_vat(self):
+        return self.vat

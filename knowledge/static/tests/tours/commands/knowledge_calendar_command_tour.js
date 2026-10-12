@@ -1,20 +1,28 @@
 /** @odoo-module */
 
-import { HtmlField } from "@html_editor/fields/html_field";
-import { nodeSize } from "@html_editor/utils/position";
 import { registry } from "@web/core/registry";
-import { patch } from "@web/core/utils/patch";
 import {
     embeddedViewPatchFunctions,
     endKnowledgeTour,
     openCommandBar,
 } from "../knowledge_tour_utils.js";
 import { stepUtils } from "@web_tour/tour_service/tour_utils";
+import { patch } from "@web/core/utils/patch";
+import { animationFrame, hover, queryFirst } from "@odoo/hoot-dom";
 
 const embeddedViewPatchUtil = embeddedViewPatchFunctions();
 
-let htmlField;
-let unpatchHtmlField;
+function mockDate() {
+    const now = "2025-02-15T08:00:00";
+    class MockDate extends Date {
+        static now() {
+            return new Date(now);
+        }
+    }
+    return patch(window, { Date: MockDate });
+}
+
+let unpatchDate;
 
 function clickDate(el) {
     const rect = el.getBoundingClientRect();
@@ -50,7 +58,6 @@ function dragDate(el, target) {
 
 registry.category("web_tour.tours").add('knowledge_calendar_command_tour', {
     url: '/odoo',
-    test: true,
     steps: () => [stepUtils.showAppsMenuItem(), { // open the Knowledge App
     trigger: '.o_app[data-menu-xmlid="knowledge.knowledge_menu_root"]',
     run: "click",
@@ -58,12 +65,7 @@ registry.category("web_tour.tours").add('knowledge_calendar_command_tour', {
     trigger: "body",
     run: () => {
         embeddedViewPatchUtil.before();
-        unpatchHtmlField = patch(HtmlField.prototype, {
-            setup() {
-                super.setup();
-                htmlField = this;
-            },
-        });
+        unpatchDate = mockDate();
     },
 }, {
     //-----------------------------------------------
@@ -86,7 +88,7 @@ registry.category("web_tour.tours").add('knowledge_calendar_command_tour', {
     run: function() {
         this.anchor.scrollIntoView(true);
     }
-}, 
+},
 {
     trigger:
         "[data-embedded='view']",
@@ -128,18 +130,9 @@ registry.category("web_tour.tours").add('knowledge_calendar_command_tour', {
     // and create new start and stop properties to use by the view
     //--------------------------------------------------------------
 
-    // Remove previous item calendar view
+    content: "Remove previous item calendar view",
     trigger: '.odoo-editor-editable',
-    run: function () {
-        htmlField.editor.dispatch("HISTORY_STAGE_SELECTION");
-        htmlField.editor.shared.setSelection({
-            anchorNode: htmlField.editor.editable,
-            anchorOffset: 0,
-            focusOffset: nodeSize(htmlField.editor.editable),
-        });
-        htmlField.editor.dispatch("DELETE_SELECTION");
-        htmlField.editor.dispatch("ADD_STEP");
-    },
+    run: "editor ",
 },
 {
     trigger: ".odoo-editor-editable:not(:has( [data-embedded='view']))",
@@ -189,15 +182,15 @@ registry.category("web_tour.tours").add('knowledge_calendar_command_tour', {
     trigger:
         "[data-embedded='view'] .o_knowledge_article_view_calendar_embedded_view",
 }, { // Check that the display options are applied
-    trigger: ".fc-timegrid-slot:not(.fc-timegrid-slot-lane[data-time='07:00:00'])",
+    trigger: ".fc-timegrid-slots:not(:has(.fc-timegrid-slot-lane[data-time='07:00:00']))",
 }, {
     trigger: ".fc-timegrid-slot.fc-timegrid-slot-lane[data-time='08:00:00']",
 }, {
-    trigger: ".fc-timegrid-slot:not(.fc-timegrid-slot-lane[data-time='16:30:00'])",
+    trigger: ".fc-timegrid-slots:not(:has(.fc-timegrid-slot-lane[data-time='16:30:00']))",
 }, {
     trigger: ".fc-timegrid-slot.fc-timegrid-slot-lane[data-time='16:00:00']",
 }, {
-    trigger: ":not(.fc-day-sat), :not(.fc-day-sun)",
+    trigger: ".o_calendar_widget:not(:has(.fc-day-sat, .fc-day-sun))",
 },
 {
     //---------------------------------------------------
@@ -398,20 +391,20 @@ registry.category("web_tour.tours").add('knowledge_calendar_command_tour', {
         const target = document.querySelector('.fc-timegrid-slot.fc-timegrid-slot-lane[data-time="09:00:00"]');
         dragDate(this.anchor, target);
     },
-}, { // Make resizer visible
-    trigger: '.fc-timegrid-event',
-    run: function () {
-        const resizer = this.anchor.querySelector(".fc-event-resizer-end");
-        resizer.style.display = "block";
-        resizer.style.width = "100%";
-        resizer.style.height = "3px";
-        resizer.style.bottom = "0";
-        },
-}, {
-    trigger: '.fc-timegrid-event:contains("Item Article") .fc-event-resizer-end',
-    run: function () {
-        const target = document.querySelector('.fc-timegrid-slot.fc-timegrid-slot-lane[data-time="11:00:00"]');
-        dragDate(this.anchor, target);
+}, { // Resize the item
+    trigger: '.fc-timegrid-event:contains("Item Article")',
+    run: async () => {
+        // Make resizer visible
+        await hover(`.fc-event-main:first`, { root: this.anchor });
+        await animationFrame();
+        const resizer = queryFirst(`.fc-event-resizer-end`, { root: this.anchor });
+        Object.assign(resizer.style, {
+            display: "block",
+            height: "1px",
+            bottom: "0",
+        });
+        const target = queryFirst('.fc-timegrid-slot.fc-timegrid-slot-lane[data-time="11:00:00"]');
+        dragDate(resizer, target);
     },
 }, {
     //----------------------------------------------------------------------
@@ -460,8 +453,8 @@ registry.category("web_tour.tours").add('knowledge_calendar_command_tour', {
     //---------------------------------------------------------------------
 
     // Click on edit property button
-    trigger: '.o_knowledge_properties_field .o_property_field:contains("Start Property") .o_field_property_open_popover',
-    run: 'click',
+    trigger: ".o_knowledge_properties_field .o_property_field:contains(Start Property)",
+    run: "hover && click .o_knowledge_properties_field .o_property_field:contains(Start Property) .o_field_property_open_popover",
 }, { // Delete start date property
     trigger: '.o_field_property_definition .o_field_property_definition_delete',
     run: 'click',
@@ -476,8 +469,8 @@ registry.category("web_tour.tours").add('knowledge_calendar_command_tour', {
 }, {
     trigger: 'body',
     run: () => {
+        unpatchDate();
         embeddedViewPatchUtil.after();
-        unpatchHtmlField();
     },
 }, ...endKnowledgeTour()
 ]});

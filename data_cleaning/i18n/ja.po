@@ -1,23 +1,28 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* data_cleaning
-# 
+# * data_cleaning
+#
 # Translators:
-# Wil Odoo, 2024
-# 
+# Wil Odoo, 2025
+# Junko Augias, 2025
+#
+# "Junko Augias (juau)" <juau@odoo.com>, 2026.
+# Weblate <noreply-mt-weblate@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:29+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Japanese (https://app.transifex.com/odoo/teams/41243/ja/)\n"
+"POT-Creation-Date: 2026-04-03 18:59+0000\n"
+"PO-Revision-Date: 2026-05-06 21:39+0000\n"
+"Last-Translator: \"Junko Augias (juau)\" <juau@odoo.com>\n"
+"Language-Team: Japanese <https://translate.odoo.com/projects/odoo-18/"
+"data_cleaning/ja/>\n"
+"Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: ja\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 5.17\n"
 
 #. module: data_cleaning
 #. odoo-python
@@ -56,6 +61,7 @@ msgstr ""
 "変更を検証できます。"
 
 #. module: data_cleaning
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_model_form
 #: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_model_form
 msgid "<span class=\"me-1\">Every</span>"
 msgstr "<span class=\"me-1\">毎</span>"
@@ -77,6 +83,7 @@ msgstr "フィールドは1度しか表示されません！"
 
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_cleaning_rule__action
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_model_form
 #: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_record_list
 msgid "Action"
 msgstr "アクション"
@@ -103,7 +110,7 @@ msgstr "アクション"
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_model__active
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_record__active
 msgid "Active"
-msgstr "有効化"
+msgstr "有効"
 
 #. module: data_cleaning
 #: model:ir.model.fields.selection,name:data_cleaning.selection__data_cleaning_rule__action_case__lower
@@ -135,9 +142,10 @@ msgstr "アーカイブ済"
 #. odoo-javascript
 #: code:addons/data_cleaning/static/src/views/data_merge_list_view.js:0
 msgid ""
-"Are you sure that you want to merge the selected records in their respective"
-" group?"
-msgstr "選択したレコードをそれぞれのグループでマージしますが、間違いありませんか？"
+"Are you sure that you want to merge the selected records in their respective "
+"group?"
+msgstr ""
+"選択したレコードをそれぞれのグループでマージしますが、間違いありませんか？"
 
 #. module: data_cleaning
 #. odoo-javascript
@@ -167,6 +175,16 @@ msgstr "ケース"
 #: code:addons/data_cleaning/models/data_merge_rule.py:0
 msgid "Case/Accent Insensitive Match"
 msgstr "大文字/小文字を区別しない一致"
+
+#. module: data_cleaning
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_model_form
+msgid "Clean"
+msgstr "クリーン"
+
+#. module: data_cleaning
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_model_form
+msgid "Cleaning Actions"
+msgstr "クリーニングアクション"
 
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_cleaning_model__cleaning_mode
@@ -223,7 +241,8 @@ msgstr "連絡先"
 #: model:ir.model.fields,help:data_cleaning.field_ir_model__ref_merge_ir_act_server_id
 msgid ""
 "Contextual menu action that redirects to the deduplicate view of data_merge."
-msgstr "data_merge の重複排除ビューにリダイレクトするコンテキストメニューアクション。"
+msgstr ""
+"data_merge の重複排除ビューにリダイレクトするコンテキストメニューアクション。"
 
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_cleaning_record__country_id
@@ -433,8 +452,7 @@ msgstr "マージする重複"
 
 #. module: data_cleaning
 #: model:ir.model.fields,help:data_cleaning.field_data_merge_model__create_threshold
-msgid ""
-"Duplicates with a similarity below this threshold will not be suggested"
+msgid "Duplicates with a similarity below this threshold will not be suggested"
 msgstr "このしきい値を下回る類似度の重複は提案されません。"
 
 #. module: data_cleaning
@@ -511,9 +529,11 @@ msgstr "マージアクションボタンを隠す"
 #: model:ir.model.fields,help:data_cleaning.field_data_cleaning_rule__action_case
 msgid ""
 "How the type case is set by the rule. 'First Letters to Uppercase' sets "
-"every letter to lowercase except the first letter of each word, which is set"
-" to uppercase."
-msgstr "大文字小文字の設定規則。'最初の文字のみ大文字'は、各単語の最初の文字のみ大文字とし、それ以外は小文字とする。"
+"every letter to lowercase except the first letter of each word, which is set "
+"to uppercase."
+msgstr ""
+"大文字小文字の設定規則。'最初の文字のみ大文字'は、各単語の最初の文字のみ大文"
+"字とし、それ以外は小文字とする。"
 
 #. module: data_cleaning
 #: model_terms:ir.ui.view,arch_db:data_cleaning.data_merge_duplicate
@@ -539,23 +559,31 @@ msgstr "ID"
 msgid ""
 "If True, the generic data merge tool is available in the contextual menu of "
 "this model."
-msgstr "TRUEの場合、このモデルのコンテクストメニューで汎用データマージツールが利用できます。"
+msgstr ""
+"TRUEの場合、このモデルのコンテクストメニューで汎用データマージツールが利用で"
+"きます。"
 
 #. module: data_cleaning
 #: model:ir.model.fields,help:data_cleaning.field_data_merge_model__is_contextual_merge_action
 msgid ""
 "If True, this record is used for contextual menu action \"Merge\" on the "
 "target model."
-msgstr "TRUEの場合、このレコードはターゲットモデルのコンテキストメニューのアクション\"マージ\"に使用されます。"
+msgstr ""
+"TRUEの場合、このレコードはターゲットモデルのコンテキストメニューのアクション"
+"\"マージ\"に使用されます。"
 
 #. module: data_cleaning
 #: model:ir.model.fields,help:data_cleaning.field_ir_model__hide_merge_action
 msgid ""
-"If the model already has a custom merge method, the class attribute `_merge_disabled` is set to true on\n"
-"             that model and the generic data merge action should not be available on that model."
+"If the model already has a custom merge method, the class attribute "
+"`_merge_disabled` is set to true on\n"
+"             that model and the generic data merge action should not be "
+"available on that model."
 msgstr ""
-"もしモデルが既にカスタムマージ方法を持っている場合、クラス属性 `_merge_disabled` はそのモデルで\n"
-"　　　TRUEに設定され、汎用データマージアクションはそのモデルでは利用できません。"
+"もしモデルが既にカスタムマージ方法を持っている場合、クラス属性 "
+"`_merge_disabled` はそのモデルで\n"
+"　　　TRUEに設定され、汎用データマージアクションはそのモデルでは利用できませ"
+"ん。"
 
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_record__is_deleted
@@ -778,6 +806,7 @@ msgstr "レコード名"
 
 #. module: data_cleaning
 #: model_terms:ir.ui.view,arch_db:data_cleaning.data_merge_record_view_search_merge_action
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_model_form
 #: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_record_search
 #: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_record_search
 msgid "Records"
@@ -833,6 +862,11 @@ msgid "Scrap HTML"
 msgstr "HTMLを廃棄"
 
 #. module: data_cleaning
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_model_form
+msgid "Select a model to configure cleaning actions"
+msgstr "クリーニングアクションを設定するモデルを選択します。"
+
+#. module: data_cleaning
 #: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_model_form
 msgid "Select a model to configure deduplication rules"
 msgstr "モデルを選択して重複規則を設定します。"
@@ -875,12 +909,13 @@ msgstr "ストレージ"
 #. odoo-python
 #: code:addons/data_cleaning/report/data_storage.py:0
 msgid "Storage Detail: %(name)s"
-msgstr ""
+msgstr "ストレージ詳細: %(name)s"
 
 #. module: data_cleaning
 #: model:ir.model.fields,help:data_cleaning.field_data_merge_model__rule_ids
 msgid "Suggest to merge records matching at least one of these rules"
-msgstr "これらの規則の少なくとも1つに一致するレコードをマージするよう提案します。"
+msgstr ""
+"これらの規則の少なくとも1つに一致するレコードをマージするよう提案します。"
 
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_cleaning_record__suggested_value_display
@@ -908,7 +943,17 @@ msgstr "余分な空白"
 msgid ""
 "The Python module `phonenumbers` is not installed. Format phone will not "
 "work."
-msgstr "Pythonモジュール `phonenumbers` がインストールされていません。フォーマットフォンは動作しません。"
+msgstr ""
+"Pythonモジュール `phonenumbers` がインストールされていません。フォーマット"
+"フォンは動作しません。"
+
+#. module: data_cleaning
+#. odoo-javascript
+#: code:addons/data_cleaning/static/src/views/data_merge_list_view.js:0
+msgid "The connection timed out. Please try merging fewer records at once."
+msgstr ""
+"接続がタイムアウトしました。一度にマージするレコードの数を減らして再試行して"
+"ください。"
 
 #. module: data_cleaning
 #: model:ir.model.constraint,message:data_cleaning.constraint_data_cleaning_model_check_notif_freq
@@ -948,7 +993,7 @@ msgstr "この名前は既に使用されています。"
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_ir_attachment_report__size
 msgid "Total Size"
-msgstr ""
+msgstr "合計サイズ"
 
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_cleaning_rule__action_trim
@@ -1010,7 +1055,8 @@ msgstr "有効にすると、異なる会社間での重複が提案されます
 msgid ""
 "Which spaces are trimmed by the rule. Leading, trailing, and successive "
 "spaces are considered superfluous."
-msgstr "トリムされる空白の規則。前、後、連続する空白は余分な空白と見なされます。"
+msgstr ""
+"トリムされる空白の規則。前、後、連続する空白は余分な空白と見なされます。"
 
 #. module: data_cleaning
 #. odoo-python

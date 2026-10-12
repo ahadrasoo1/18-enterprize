@@ -1,6 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import Command, fields
+from odoo.tests.common import new_test_user
 
 from odoo.addons.account_payment.tests.common import AccountPaymentCommon
 from odoo.addons.payment_custom.tests.common import PaymentCustomCommon
@@ -29,8 +30,10 @@ class SepaDirectDebitCommon(AccountPaymentCommon, PaymentCustomCommon):
         cls.sepa_journal.bank_account_id = cls.sepa_bank_account
 
         # create the partner bank account
+        cls.partner_bank_number = 'BE17412614919710'
+        # IBAN detection will rewrite the number as 'BE17 4126 1491 9710'
         cls.partner_bank = cls.env['res.partner.bank'].create({
-            'acc_number': 'BE17412614919710',
+            'acc_number': cls.partner_bank_number,
             'partner_id': cls.partner.id,
             'company_id': cls.company.id,
         })
@@ -45,3 +48,7 @@ class SepaDirectDebitCommon(AccountPaymentCommon, PaymentCustomCommon):
 
         cls.provider = cls.sepa
         cls.currency = cls.currency_euro
+
+        cls.invoicing_banks_user = new_test_user(
+            cls.env, 'invoicing_banks_user', groups='account.group_account_basic'
+        )

@@ -1,22 +1,26 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* data_cleaning
-# 
+#
 # Translators:
-# Wil Odoo, 2024
-# 
+# 何彬 <vnsoft.he@gmail.com>, 2024
+# Chloe Wang, 2024
+# Raymond Yu <cl_yu@hotmail.com>, 2024
+# Wil Odoo, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:29+0000\n"
+"POT-Creation-Date: 2026-04-03 18:59+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Chinese (China) (https://app.transifex.com/odoo/teams/41243/zh_CN/)\n"
+"Last-Translator: Wil Odoo, 2025\n"
+"Language-Team: Chinese (China) (https://app.transifex.com/odoo/teams/41243/"
+"zh_CN/)\n"
+"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: zh_CN\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. module: data_cleaning
@@ -56,6 +60,7 @@ msgstr ""
 "您可以验证更改"
 
 #. module: data_cleaning
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_model_form
 #: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_model_form
 msgid "<span class=\"me-1\">Every</span>"
 msgstr "<span class=\"me-1\">每</span>"
@@ -77,6 +82,7 @@ msgstr "字段只能出现一次！"
 
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_cleaning_rule__action
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_model_form
 #: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_record_list
 msgid "Action"
 msgstr "操作"
@@ -103,7 +109,7 @@ msgstr "操作"
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_model__active
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_record__active
 msgid "Active"
-msgstr "已启用"
+msgstr "有效"
 
 #. module: data_cleaning
 #: model:ir.model.fields.selection,name:data_cleaning.selection__data_cleaning_rule__action_case__lower
@@ -129,14 +135,14 @@ msgstr "存档"
 #: model_terms:ir.ui.view,arch_db:data_cleaning.data_merge_model_view_search
 #: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_record_search
 msgid "Archived"
-msgstr "已存档"
+msgstr "已归档"
 
 #. module: data_cleaning
 #. odoo-javascript
 #: code:addons/data_cleaning/static/src/views/data_merge_list_view.js:0
 msgid ""
-"Are you sure that you want to merge the selected records in their respective"
-" group?"
+"Are you sure that you want to merge the selected records in their respective "
+"group?"
 msgstr "是否确实要合并其各自组中的选定记录？"
 
 #. module: data_cleaning
@@ -167,6 +173,16 @@ msgstr "实例"
 #: code:addons/data_cleaning/models/data_merge_rule.py:0
 msgid "Case/Accent Insensitive Match"
 msgstr "大小写/重音不敏感匹配"
+
+#. module: data_cleaning
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_model_form
+msgid "Clean"
+msgstr "干净"
+
+#. module: data_cleaning
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_model_form
+msgid "Cleaning Actions"
+msgstr "清理动作"
 
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_cleaning_model__cleaning_mode
@@ -361,7 +377,7 @@ msgstr "删除"
 #. module: data_cleaning
 #: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_storage_tree
 msgid "Details"
-msgstr "细节"
+msgstr "详情"
 
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_merge_record__differences
@@ -433,8 +449,7 @@ msgstr "待合并的副本"
 
 #. module: data_cleaning
 #: model:ir.model.fields,help:data_cleaning.field_data_merge_model__create_threshold
-msgid ""
-"Duplicates with a similarity below this threshold will not be suggested"
+msgid "Duplicates with a similarity below this threshold will not be suggested"
 msgstr "不会建议具有低于此阈值的相似性的重复项"
 
 #. module: data_cleaning
@@ -511,9 +526,11 @@ msgstr "隐藏合并动作按钮"
 #: model:ir.model.fields,help:data_cleaning.field_data_cleaning_rule__action_case
 msgid ""
 "How the type case is set by the rule. 'First Letters to Uppercase' sets "
-"every letter to lowercase except the first letter of each word, which is set"
-" to uppercase."
-msgstr "如何由规则设置类型大小写。\"第一个字母到大写字母\"将每个字母设置为小写，每个单词的第一个字母除外，该字母设置为大写。"
+"every letter to lowercase except the first letter of each word, which is set "
+"to uppercase."
+msgstr ""
+"如何由规则设置类型大小写。\"第一个字母到大写字母\"将每个字母设置为小写，每个"
+"单词的第一个字母除外，该字母设置为大写。"
 
 #. module: data_cleaning
 #: model_terms:ir.ui.view,arch_db:data_cleaning.data_merge_duplicate
@@ -551,10 +568,13 @@ msgstr "如果是 \"真\"，这个记录将用于目标模型上的上下文菜�
 #. module: data_cleaning
 #: model:ir.model.fields,help:data_cleaning.field_ir_model__hide_merge_action
 msgid ""
-"If the model already has a custom merge method, the class attribute `_merge_disabled` is set to true on\n"
-"             that model and the generic data merge action should not be available on that model."
+"If the model already has a custom merge method, the class attribute "
+"`_merge_disabled` is set to true on\n"
+"             that model and the generic data merge action should not be "
+"available on that model."
 msgstr ""
-"如果模型已经有一个自定义的合并方法，类属性`_merge_disabled`在该模型上被设置为 \"true\"，通用数据合并动作在该模型上不可用。\n"
+"如果模型已经有一个自定义的合并方法，类属性`_merge_disabled`在该模型上被设置"
+"为 \"true\"，通用数据合并动作在该模型上不可用。\n"
 "             该模型上，通用数据合并动作不应该在该模型上可用。"
 
 #. module: data_cleaning
@@ -778,6 +798,7 @@ msgstr "记录名称"
 
 #. module: data_cleaning
 #: model_terms:ir.ui.view,arch_db:data_cleaning.data_merge_record_view_search_merge_action
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_model_form
 #: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_record_search
 #: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_record_search
 msgid "Records"
@@ -833,6 +854,11 @@ msgid "Scrap HTML"
 msgstr "清除 HTML"
 
 #. module: data_cleaning
+#: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_cleaning_model_form
+msgid "Select a model to configure cleaning actions"
+msgstr "选择要配置清洁动作的模型"
+
+#. module: data_cleaning
 #: model_terms:ir.ui.view,arch_db:data_cleaning.view_data_merge_model_form
 msgid "Select a model to configure deduplication rules"
 msgstr "选择模型以配置重复数据消除规则"
@@ -875,7 +901,7 @@ msgstr "存储"
 #. odoo-python
 #: code:addons/data_cleaning/report/data_storage.py:0
 msgid "Storage Detail: %(name)s"
-msgstr ""
+msgstr "储存详情：%(name)s"
 
 #. module: data_cleaning
 #: model:ir.model.fields,help:data_cleaning.field_data_merge_model__rule_ids
@@ -909,6 +935,12 @@ msgid ""
 "The Python module `phonenumbers` is not installed. Format phone will not "
 "work."
 msgstr "未安装 Python 模块`phonenumbers`。格式化电话将不起作用。"
+
+#. module: data_cleaning
+#. odoo-javascript
+#: code:addons/data_cleaning/static/src/views/data_merge_list_view.js:0
+msgid "The connection timed out. Please try merging fewer records at once."
+msgstr ""
 
 #. module: data_cleaning
 #: model:ir.model.constraint,message:data_cleaning.constraint_data_cleaning_model_check_notif_freq
@@ -948,7 +980,7 @@ msgstr "此名称已取"
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_ir_attachment_report__size
 msgid "Total Size"
-msgstr ""
+msgstr "总大小"
 
 #. module: data_cleaning
 #: model:ir.model.fields,field_description:data_cleaning.field_data_cleaning_rule__action_trim

@@ -192,7 +192,7 @@ class HrContract(models.Model):
             types += ('text',)
         nonstored_whitelist = self._benefit_white_list()
         benefit_fields = set(
-            field.name for field in self._fields.values() if field.type in types and (field.store or not field.store and field.name in nonstored_whitelist))
+            field.name for field in self._fields.values() if field.type in types and (field.store or not field.store and field.name in nonstored_whitelist) and not field.name.startswith("x_studio_"))
         if not triggers:
             benefit_fields |= {'wage_with_holidays'}
         return tuple(benefit_fields - self._benefit_black_list())
@@ -377,6 +377,11 @@ class HrContract(models.Model):
             'department_id': self.department_id.id,
         }
 
+    def _get_wage_to_apply(self):
+        # To be overriden in localizations if a new wage applies depending on selected benefits
+        self.ensure_one()
+        return self.wage_with_holidays
+
     def action_show_offers(self):
         self.ensure_one()
         action = self.env['ir.actions.act_window']._for_xml_id('hr_contract_salary.hr_contract_salary_offer_action')
@@ -402,7 +407,7 @@ class HrContract(models.Model):
             'default_res_ids': self.ids,
             'default_template_id': template_id,
             'default_composition_mode': 'comment',
-            'salary_package_url': self.get_base_url() + path,
+            'salary_package_url': self.env['hr.contract'].get_base_url() + path,
         }
         return {
             'type': 'ir.actions.act_window',

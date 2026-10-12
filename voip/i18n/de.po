@@ -1,22 +1,23 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* voip
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Larissa Manderfeld, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
+"POT-Creation-Date: 2025-12-29 18:45+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
+"Last-Translator: Larissa Manderfeld, 2025\n"
 "Language-Team: German (https://app.transifex.com/odoo/teams/41243/de/)\n"
+"Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: de\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #. module: voip
@@ -86,8 +87,8 @@ msgid ""
 "A hardware error has occurred while trying to access the audio recording "
 "device. Please ensure that your drivers are up to date and try again."
 msgstr ""
-"Beim Versuch, auf das Audioaufnahmegerät zuzugreifen, ist ein Hardwarefehler"
-" aufgetreten. Bitte stellen Sie sicher, dass Ihre Treiber auf dem neuesten "
+"Beim Versuch, auf das Audioaufnahmegerät zuzugreifen, ist ein Hardwarefehler "
+"aufgetreten. Bitte stellen Sie sicher, dass Ihre Treiber auf dem neuesten "
 "Stand sind und versuchen Sie es erneut."
 
 #. module: voip
@@ -131,7 +132,8 @@ msgid ""
 "An error occured involving the audio recording device (%(errorName)s):\n"
 "%(errorMessage)s"
 msgstr ""
-"Es ist ein Fehler im Zusammenhang mit dem Audioaufnahmegerät aufgetreten (%(errorName)s):\n"
+"Es ist ein Fehler im Zusammenhang mit dem Audioaufnahmegerät aufgetreten (%"
+"(errorName)s):\n"
 "%(errorMessage)s"
 
 #. module: voip
@@ -154,7 +156,8 @@ msgid ""
 "\n"
 "Error: %(error)s"
 msgstr ""
-"Beim Versuch, die folgende Nummer einzuladen, ist ein Fehler aufgetreten:%(phoneNumber)s\n"
+"Beim Versuch, die folgende Nummer einzuladen, ist ein Fehler aufgetreten:%"
+"(phoneNumber)s\n"
 "\n"
 "Fehler:%(error)s"
 
@@ -284,16 +287,20 @@ msgstr "Ein Gerät auswählen:"
 #. module: voip
 #: model:ir.model.fields,help:voip.field_res_users_settings__how_to_call_on_mobile
 msgid ""
-"Choose the method to be used to place a call when using the mobile application:\n"
+"Choose the method to be used to place a call when using the mobile "
+"application:\n"
 "            • VoIP: Always use the Odoo softphone\n"
 "            • Device's phone: Always use the device's phone\n"
-"            • Ask: Always ask whether the softphone or the device's phone must be used\n"
+"            • Ask: Always ask whether the softphone or the device's phone "
+"must be used\n"
 "        "
 msgstr ""
-"Wählen Sie die Methode, mit der Sie einen Anruf über die mobile Anwendung tätigen möchten:\n"
+"Wählen Sie die Methode, mit der Sie einen Anruf über die mobile Anwendung "
+"tätigen möchten:\n"
 "            • VoIP: Immer das Odoo-Softphone verwenden\n"
 "            • Telefon des Geräts: Immer das Telefon des Geräts verwenden\n"
-"            • Fragen: Immer fragen, ob das Softphone oder das Telefon des Geräts verwendet werden soll.\n"
+"            • Fragen: Immer fragen, ob das Softphone oder das Telefon des "
+"Geräts verwendet werden soll.\n"
 "        "
 
 #. module: voip
@@ -517,8 +524,8 @@ msgid ""
 msgstr ""
 "Wenn diese Option aktiviert ist, wird bei einem Anruf in Odoo der Anruf an "
 "die „Externe Gerätenummer“ weitergeleitet. Verwenden Sie diese Option, um "
-"den Anruf in Odoo zu tätigen, ihn aber von einem anderen Gerät auszuführen -"
-" z. B. von Ihrem Tischtelefon aus."
+"den Anruf in Odoo zu tätigen, ihn aber von einem anderen Gerät auszuführen - "
+"z. B. von Ihrem Tischtelefon aus."
 
 #. module: voip
 #: model:ir.model.fields,help:voip.field_res_users_settings__external_device_number
@@ -778,7 +785,7 @@ msgstr "Abgelehnter Anruf an %(phone_number)s"
 #. odoo-javascript
 #: code:addons/voip/static/src/mobile/call_method_selection_dialog.xml:0
 msgid "Remember?"
-msgstr "Erinnern Sie sich?"
+msgstr "Merken?"
 
 #. module: voip
 #. odoo-javascript
@@ -806,7 +813,7 @@ msgstr "Es klingelt ..."
 #. module: voip
 #: model_terms:ir.ui.view,arch_db:voip.res_config_settings_view_form
 msgid "Schedule & make calls from your database"
-msgstr "Anrufe aus Ihrer Datenbank planen & tätigen"
+msgstr "Planen und tätigen Sie Anrufe aus Ihrer Datenbank heraus."
 
 #. module: voip
 #. odoo-javascript
@@ -846,8 +853,8 @@ msgstr "Sollte von einem anderen Gerät anrufen"
 #. odoo-python
 #: code:addons/voip/models/voip_queue_mixin.py:0
 msgid ""
-"Some documents cannot be added to the call queue as they do not have a phone"
-" number set: %(record_names)s"
+"Some documents cannot be added to the call queue as they do not have a phone "
+"number set: %(record_names)s"
 msgstr ""
 "Einige Dokumente können nicht in die Warteschlange aufgenommen werden, da "
 "für sie keine Telefonnummer festgelegt ist: %(record_names)s"
@@ -900,8 +907,8 @@ msgid ""
 "persists, this is probably an issue with the server."
 msgstr ""
 "Der Fehler kann von der Transportschicht herrühren. Bitte lassen Sie einen "
-"Administrator die URL des Websocket-Servers in den Allgemeinen Einstellungen"
-" überprüfen. Wenn das Problem weiterhin besteht, handelt es sich "
+"Administrator die URL des Websocket-Servers in den Allgemeinen Einstellungen "
+"überprüfen. Wenn das Problem weiterhin besteht, handelt es sich "
 "wahrscheinlich um ein Problem mit dem Server."
 
 #. module: voip
@@ -914,10 +921,13 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/voip/static/src/core/user_agent_service.js:0
 msgid ""
-"The number is incorrect, the user credentials could be wrong or the connection cannot be made. Please check your configuration.\n"
+"The number is incorrect, the user credentials could be wrong or the "
+"connection cannot be made. Please check your configuration.\n"
 "(Reason received: %(reasonPhrase)s)"
 msgstr ""
-"Die Nummer ist falsch, die Benutzeranmeldeinformationen könnten falsch sein oder die Verbindung kann nicht hergestellt werden. Bitte überprüfen Sie Ihre Konfiguration.\n"
+"Die Nummer ist falsch, die Benutzeranmeldeinformationen könnten falsch sein "
+"oder die Verbindung kann nicht hergestellt werden. Bitte überprüfen Sie Ihre "
+"Konfiguration.\n"
 "(ermittelter Grund: %(reasonPhrase)s)"
 
 #. module: voip
@@ -1119,8 +1129,8 @@ msgid ""
 "Your browser does not support some of the features required for VoIP to "
 "work. Please try updating your browser or using a different one."
 msgstr ""
-"Ihr Browser unterstützt einige der für VoIP erforderlichen Funktionen nicht."
-" Bitte versuchen Sie, Ihren Browser zu aktualisieren oder einen anderen "
+"Ihr Browser unterstützt einige der für VoIP erforderlichen Funktionen nicht. "
+"Bitte versuchen Sie, Ihren Browser zu aktualisieren oder einen anderen "
 "Browser zu verwenden."
 
 #. module: voip
@@ -1145,15 +1155,3 @@ msgstr ""
 #: code:addons/voip/static/src/core/call_model.js:0
 msgid "less than a second"
 msgstr "weniger als einer Sekunde"
-
-#. module: voip
-#. odoo-javascript
-#: code:addons/voip/static/src/mobile/call_method_selection_dialog.xml:0
-msgid "phone"
-msgstr "Telefon"
-
-#. module: voip
-#. odoo-javascript
-#: code:addons/voip/static/src/mobile/call_method_selection_dialog.xml:0
-msgid "voip"
-msgstr "VoIP"

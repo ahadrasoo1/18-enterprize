@@ -33,11 +33,7 @@ class AccountLoan(models.Model):
 
     name = fields.Char("Name", required=True, index="trigram", tracking=True)
     company_id = fields.Many2one('res.company', string='Company', required=True, default=lambda self: self.env.company)
-    currency_id = fields.Many2one(
-        related='company_id.currency_id',
-        default=lambda self: self.env.company.currency_id,  # to show the currency symbol when creating a new record (before saving it)
-        readonly=False,  # to avoid a warning because the field is readonly=True (related) and has a default value (not displayed in the view)
-    )
+    currency_id = fields.Many2one(related='company_id.currency_id')
     active = fields.Boolean(default=True)
     state = fields.Selection(
         string="Status",
@@ -162,11 +158,12 @@ class AccountLoan(models.Model):
     @api.depends('amount_borrowed', 'line_ids.principal', 'state', 'line_ids.is_payment_move_posted')
     def _compute_outstanding_balance(self):
         for loan in self:
-            loan.outstanding_balance = (
-                loan.amount_borrowed
-                -
-                sum(loan.line_ids.filtered('is_payment_move_posted').mapped('principal'))
-            ) if loan.state == "running" else loan.amount_borrowed
+            outstanding_balance = loan.amount_borrowed
+            if loan.state == 'running':
+                for line in loan.line_ids:
+                    if line.is_payment_move_posted or (loan.skip_until_date and line.date < loan.skip_until_date):
+                        outstanding_balance -= line.principal
+            loan.outstanding_balance = outstanding_balance
 
     @api.depends('asset_group_id')
     def _compute_linked_assets(self):
@@ -200,8 +197,9 @@ class AccountLoan(models.Model):
 
             payment_moves_values = []
             reclassification_moves_values = []
+            reclassification_reversed_moves_values = []
             for i, line in enumerate(loan.line_ids):
-                if loan.skip_until_date and line.date > loan.skip_until_date:
+                if loan.skip_until_date and line.date < loan.skip_until_date:
                     continue
 
                 # Principal and interest (to match with the bank statement)
@@ -239,13 +237,16 @@ class AccountLoan(models.Model):
                 next_lines = loan.line_ids[i + 1: i + 13]  # 13 = 1 (start offset) + 12 months
                 from_date = format_date(self.env, next_lines[0].date, date_format='MM/y')
                 to_date = format_date(self.env, next_lines[-1].date, date_format='MM/y')
-                reclassification_moves_values.append({
+                common_reclassification_values = {
                     'company_id': loan.company_id.id,
                     'auto_post': 'at_date',
                     'generating_loan_line_id': line.id,
                     'is_loan_payment_move': False,
-                    'date': line.date + relativedelta(day=31),
                     'journal_id': loan.journal_id.id,
+                }
+                reclassification_moves_values.append({
+                    **common_reclassification_values,
+                    'date': line.date + relativedelta(day=31),
                     'ref': f"{loan.name} - {_('Reclassification LT - ST')} {from_date} to {to_date}",
                     'line_ids': [
                         Command.create({
@@ -260,27 +261,41 @@ class AccountLoan(models.Model):
                         }),
                     ],
                 })
+                # Manually create the reverse (instead of using _reverse_moves()) for optimization reasons
+                reclassification_reversed_moves_values.append({
+                    **common_reclassification_values,
+                    'date': line.date + relativedelta(day=31) + relativedelta(days=1),  # first day of next month
+                    'ref': f"{loan.name} - {_('Reversal reclassification LT - ST')} {from_date} to {to_date}",
+                    'line_ids': [
+                        Command.create({
+                            'account_id': loan.long_term_account_id.id,
+                            'credit': sum(next_lines.mapped('principal')),
+                            'name': f"{loan.name} - {_('Reversal reclassification LT - ST')} {from_date} to {to_date} (To {loan.short_term_account_id.code})",
+                        }),
+                        Command.create({
+                            'account_id': loan.short_term_account_id.id,
+                            'debit': sum(next_lines.mapped('principal')),
+                            'name': f"{loan.name} - {_('Reversal reclassification LT - ST')} {from_date} to {to_date} (From {loan.long_term_account_id.code})",
+                        }),
+                    ],
+                })
 
             def post_moves(moves):
                 moves.filtered(lambda m: m.date <= fields.Date.context_today(self)).action_post()
 
             payment_moves = self.env['account.move'].create(payment_moves_values)
             reclassification_moves = self.env['account.move'].create(reclassification_moves_values)
-            post_moves(payment_moves | reclassification_moves)
+            reclassification_reversed_moves = self.env['account.move'].create(reclassification_reversed_moves_values)
+            post_moves(payment_moves | reclassification_moves | reclassification_reversed_moves)
 
-            reclassification_reversed_moves = reclassification_moves._reverse_moves()
-            for reclassification_reversed_move in reclassification_reversed_moves:
-                reclassification_reversed_move.write({
-                    'date': reclassification_reversed_move.reversed_entry_id.date + relativedelta(days=1),
-                    'ref': _("Reversal of %s", reclassification_reversed_move.reversed_entry_id.ref),
-                    'generating_loan_line_id': reclassification_reversed_move.reversed_entry_id.generating_loan_line_id.id,
-                    'is_loan_payment_move': False,
-                })
-            post_moves(reclassification_reversed_moves)
+            for (reclassification_move, reclassification_reversed_move) in zip(reclassification_moves, reclassification_reversed_moves):
+                reclassification_reversed_move.reversed_entry_id = reclassification_move
+                reclassification_reversed_move.message_post(body=_('This entry has been reversed from %s', reclassification_move._get_html_link()))
 
-            reclassification_moves._message_log_batch(
-                bodies={move.id: _('This entry has been %s', reverse._get_html_link(title=_("reversed"))) for move, reverse in zip(reclassification_moves, reclassification_reversed_moves)}
-            )
+            bodies = {}
+            for move, reverse in zip(reclassification_moves, reclassification_reversed_moves):
+                bodies[move.id] = _('This entry has been %s', reverse._get_html_link(title=_("reversed")))
+            reclassification_moves._message_log_batch(bodies=bodies)
 
             if any(m.state != 'posted' for m in payment_moves | reclassification_moves | reclassification_reversed_moves):
                 loan.state = 'running'
@@ -375,11 +390,11 @@ class AccountLoan(models.Model):
         }
 
     def action_cancel(self):
-        self.line_ids.generated_move_ids._unlink_or_reverse()
+        self.line_ids.generated_move_ids.filtered(lambda m: m.state != 'cancel')._unlink_or_reverse()
         self.state = 'cancelled'
 
     def action_set_to_draft(self):
-        self.line_ids.generated_move_ids._unlink_or_reverse()
+        self.line_ids.generated_move_ids.filtered(lambda m: m.state != 'cancel')._unlink_or_reverse()
         self.state = 'draft'
 
     def action_open_loan_entries(self):

@@ -74,17 +74,17 @@ class CalendarEvent(models.Model):
     appointment_invite_id = fields.Many2one('appointment.invite', 'Appointment Invitation', readonly=True, ondelete='set null')
     appointment_resource_ids = fields.Many2many('appointment.resource', 'appointment_booking_line', 'calendar_event_id', 'appointment_resource_id',
                                                 string="Appointment Resources", group_expand="_read_group_appointment_resource_ids",
-                                                depends=['booking_line_ids'], readonly=True)
+                                                depends=['booking_line_ids'], readonly=True, copy=False)
     # This field is used in the form view to create/manage the booking lines based on the resource_total_capacity_reserved
     # selected. This allows to have the appointment_resource_ids field linked to the appointment_booking_line model and
     # thus avoid the duplication of information.
     resource_ids = fields.Many2many('appointment.resource', string="Resources",
                                     compute="_compute_resource_ids", inverse="_inverse_resource_ids_or_capacity",
                                     search="_search_resource_ids",
-                                    group_expand="_read_group_appointment_resource_ids")
-    booking_line_ids = fields.One2many('appointment.booking.line', 'calendar_event_id', string="Booking Lines")
+                                    group_expand="_read_group_appointment_resource_ids", copy=False)
+    booking_line_ids = fields.One2many('appointment.booking.line', 'calendar_event_id', string="Booking Lines", copy=True)
     partner_ids = fields.Many2many('res.partner', group_expand="_read_group_partner_ids")
-    resource_total_capacity_reserved = fields.Integer('Total Capacity Reserved', compute="_compute_resource_total_capacity", inverse="_inverse_resource_ids_or_capacity")
+    resource_total_capacity_reserved = fields.Integer('Total Capacity Reserved', compute="_compute_resource_total_capacity", inverse="_inverse_resource_ids_or_capacity", copy=True)
     resource_total_capacity_used = fields.Integer('Total Capacity Used', compute="_compute_resource_total_capacity")
     user_id = fields.Many2one('res.users', group_expand="_read_group_user_id")
     videocall_redirection = fields.Char('Meeting redirection URL', compute='_compute_videocall_redirection')
@@ -103,6 +103,18 @@ class CalendarEvent(models.Model):
         for event in self:
             if event.appointment_status and not event.appointment_type_id:
                 raise ValidationError(_("The event %s cannot have an appointment status without being linked to an appointment type.", event.name))
+
+    def _check_organizer_validation_conditions(self, vals_list):
+        res = super()._check_organizer_validation_conditions(vals_list)
+        appointment_type_ids = list({vals["appointment_type_id"] for vals in vals_list if vals.get("appointment_type_id")})
+
+        if appointment_type_ids:
+            appointment_type_ids = self.env['appointment.type'].browse(appointment_type_ids)
+            resource_appointment_type_ids = set(appointment_type_ids.filtered(lambda apt: apt.schedule_based_on == 'resources').ids)
+
+            return [vals.get("appointment_type_id") not in resource_appointment_type_ids for vals in vals_list]
+
+        return res
 
     @api.depends('appointment_type_id')
     def _compute_alarm_ids(self):
@@ -181,7 +193,7 @@ class CalendarEvent(models.Model):
                 continue
             if not event.access_token:
                 event.access_token = uuid.uuid4().hex
-            event.videocall_redirection = f"{self.get_base_url()}/calendar/videocall/{self.access_token}"
+            event.videocall_redirection = f"{event.get_base_url()}/calendar/videocall/{event.access_token}"
 
     @api.depends('appointment_type_id.event_videocall_source')
     def _compute_videocall_source(self):
@@ -190,7 +202,7 @@ class CalendarEvent(models.Model):
             if not event.appointment_type_id or event.videocall_location and not self.DISCUSS_ROUTE in event.videocall_location:
                 events_no_appointment |= event
                 continue
-            event.videocall_source = event.appointment_type_id.event_videocall_source
+            event.videocall_source = event.sudo().appointment_type_id.event_videocall_source
         super(CalendarEvent, events_no_appointment)._compute_videocall_source()
 
     def _compute_is_highlighted(self):
@@ -200,6 +212,11 @@ class CalendarEvent(models.Model):
             for event in self:
                 if event.appointment_type_id.id == appointment_type_id:
                     event.is_highlighted = True
+
+    def get_base_url(self):
+        if self.appointment_type_id:
+            return self.appointment_type_id.sudo().get_base_url()
+        return super().get_base_url()
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -244,14 +261,18 @@ class CalendarEvent(models.Model):
         field to ensure there is no ordering conflict.
         """
         booking_lines = []
+        booking_lines_to_delete = self.env['appointment.booking.line']
         for event in self:
             resources = event.resource_ids
             if resources:
-                if event.appointment_type_manage_capacity and self.resource_total_capacity_reserved:
-                    capacity_to_reserve = self.resource_total_capacity_reserved
+                # Ignore the inverse and keep the previous booking lines when we duplicate an event
+                if self.env.context.get('is_appointment_copied'):
+                    continue
+                if event.appointment_type_manage_capacity and event.resource_total_capacity_reserved:
+                    capacity_to_reserve = event.resource_total_capacity_reserved
                 else:
                     capacity_to_reserve = sum(event.booking_line_ids.mapped('capacity_reserved')) or sum(resources.mapped('capacity'))
-                event.booking_line_ids.sudo().unlink()
+                booking_lines_to_delete |= event.booking_line_ids
                 for resource in resources.sorted("shareable"):
                     if event.appointment_type_manage_capacity and capacity_to_reserve <= 0:
                         break
@@ -263,8 +284,12 @@ class CalendarEvent(models.Model):
                     capacity_to_reserve -= min(resource.capacity, capacity_to_reserve)
                     capacity_to_reserve = max(0, capacity_to_reserve)
             else:
-                event.booking_line_ids.sudo().unlink()
+                booking_lines_to_delete |= event.booking_line_ids
+        booking_lines_to_delete.unlink()
         self.env['appointment.booking.line'].sudo().create(booking_lines)
+
+    def copy(self, default=None):
+        return super(CalendarEvent, self.with_context(is_appointment_copied=True)).copy()
 
     def _search_resource_ids(self, operator, value):
         return [('appointment_resource_ids', operator, value)]
@@ -329,6 +354,7 @@ class CalendarEvent(models.Model):
             event.access_token = self._default_access_token()
 
     def action_calendar_more_options(self):
+        # this method is deprecated and will be removed in the master
         self.ensure_one()
         action = self.env["ir.actions.actions"]._for_xml_id("calendar.action_calendar_event")
         action["views"] = [(False, 'form')]
@@ -398,14 +424,14 @@ class CalendarEvent(models.Model):
 
     def _track_template(self, changes):
         res = super(CalendarEvent, self)._track_template(changes)
-        if not self.appointment_type_id or self._skip_send_mail_status_update():
+        if not self.appointment_type_id:
             return res
 
         appointment_type_sudo = self.appointment_type_id.sudo()
         # set 'author_id' and 'email_from' based on the organizer
         vals = {'author_id': self.user_id.partner_id.id, 'email_from': self.user_id.email_formatted} if self.user_id else {}
 
-        if 'appointment_type_id' in changes and self.appointment_status == 'booked':
+        if 'appointment_type_id' in changes and (self.appointment_status == 'booked' or self.appointment_status == 'request'):
             try:
                 booked_template = self.env.ref('appointment.appointment_booked_mail_template')
             except ValueError as e:
@@ -434,8 +460,8 @@ class CalendarEvent(models.Model):
         if not self.appointment_type_id:
             return super()._get_customer_description()
 
-        confirmation_html = html_sanitize(self.appointment_type_id.message_confirmation or '')
-        base_url = self.appointment_type_id.get_base_url()
+        confirmation_html = html_sanitize(self.appointment_type_id.sudo().message_confirmation or '')
+        base_url = self.appointment_type_id.sudo().get_base_url()
         url = f"{base_url}/calendar/view/{self.access_token}"
         link_html = Markup("<span>%s <a href=%s>%s</a></span>") % (_("Need to reschedule?"), url, _("Click here"))
 
@@ -445,6 +471,10 @@ class CalendarEvent(models.Model):
             confirmation_html,
             link_html,
         ])
+
+    @api.model
+    def _get_activity_excluded_models(self):
+        return super()._get_activity_excluded_models() + ['appointment.type']
 
     def _get_attendee_description(self):
         """:return (html): Sanitized HTML description of attendees and their responses to the questions"""
@@ -471,9 +501,9 @@ class CalendarEvent(models.Model):
             return ''
 
         if attendee_descriptions:
-            attendee_descriptions.insert(0, Markup('<span>Contact Details</span>'))
+            attendee_descriptions.insert(0, Markup('<span>{}</span>').format(_("Contact Details")))
         if question_descriptions:
-            question_descriptions.insert(0, Markup('<span>Questions</span>'))
+            question_descriptions.insert(0, Markup('<span>{}</span>').format(_("Questions")))
         complete_description = (
             Markup('<br/>').join([
                 Markup('<div>%s</div>') % Markup('<br/>').join(paragraph)

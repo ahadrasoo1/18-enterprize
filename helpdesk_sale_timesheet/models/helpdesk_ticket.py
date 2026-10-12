@@ -21,7 +21,7 @@ class HelpdeskTicket(models.Model):
                 ('order_partner_id', 'child_of', unquote('commercial_partner_id')),
             ],
         ])
-        return str(domain)
+        return domain
 
     use_helpdesk_sale_timesheet = fields.Boolean('Reinvoicing Timesheet activated on Team', related='team_id.use_helpdesk_sale_timesheet', readonly=True)
     sale_order_id = fields.Many2one('sale.order', compute="_compute_helpdesk_sale_order", compute_sudo=True, store=True, readonly=False)
@@ -30,7 +30,7 @@ class HelpdeskTicket(models.Model):
     sale_line_id = fields.Many2one(
         'sale.order.line', string="Sales Order Item", tracking=True,
         compute="_compute_sale_line_id", store=True, readonly=False,
-        domain=_domain_sale_line_id,
+        domain=lambda self: str(self._domain_sale_line_id()),
         help="Sales Order Item to which the time spent on this ticket will be added in order to be invoiced to your customer.\n"
              "By default the last prepaid sales order item that has time remaining will be selected.\n"
              "Remove the sales order item in order to make this ticket non-billable.\n"
@@ -111,6 +111,26 @@ class HelpdeskTicket(models.Model):
             domain = expression.AND([domain, [('order_id', '=?', order_id.id)]])
         return SaleOrderLine.search(domain, limit=1)
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        tickets = super().create(vals_list)
+        sol_ids = {
+            vals['sale_line_id']
+            for vals in vals_list
+            if vals.get('sale_line_id')
+        }
+        if sol_ids:
+            tickets._ensure_sale_order_linked(list(sol_ids))
+        return tickets
+
+    def _ensure_sale_order_linked(self, sol_ids):
+        quotations = self.env['sale.order.line'].sudo()._read_group(
+            domain=[('state', '=', 'draft'), ('id', 'in', sol_ids)],
+            aggregates=['order_id:recordset'],
+        )[0][0]
+        if quotations:
+            quotations.action_confirm()
+
     def write(self, values):
         recompute_so_lines = None
         other_timesheets = None
@@ -123,6 +143,8 @@ class HelpdeskTicket(models.Model):
                 other_timesheets = self.env['account.analytic.line'].sudo().search([('id', 'not in', timesheet_ids), ('helpdesk_ticket_id', '=', self.id)])
 
         res = super(HelpdeskTicket, self).write(values)
+        if sol_id := values.get('sale_line_id'):
+            self._ensure_sale_order_linked([sol_id])
         if other_timesheets:
             # Then we update the so_line if needed
             compute_timesheets = defaultdict(list, [(timesheet, timesheet.so_line) for timesheet in other_timesheets])  # key = timesheet and value = so_line of the timesheet before the _compute_so_line

@@ -35,6 +35,7 @@ API_OPERATIONS_MAPPING = {
     'createRestrictedDataToken': {
         'url_path': '/tokens/2021-03-01/restrictedDataToken',
         'restricted_resource_path': None,
+        'log_response': False,
     },
     'getFeed': {
         'url_path': '/feeds/2021-06-30/feeds/{param}',
@@ -64,6 +65,10 @@ API_OPERATIONS_MAPPING = {
         # Amazon requires the path to include the placeholder "{orderID}" to grant the RDT.
         'restricted_resource_path': '/orders/v0/orders/{orderId}/orderItems',
         'restricted_resource_data_elements': ['buyerInfo']
+    },
+    'searchListingsItems': {
+        'url_path': '/listings/2021-08-01/items/{param}',
+        'restricted_resource_path': None,
     },
 }
 
@@ -170,11 +175,13 @@ AMAZON_CARRIER_NAMES_MAPPING = {
     'dhlkargo': 'DHL Kargo',
     'dhlpaket': 'DHL-Paket',
     'dhlpl': 'DHLPL',
+    'dhlrest': 'DHL',
     'digitaldelivery': 'Digital Delivery',
     'directlog': 'DirectLog',
     'dotzot': 'Dotzot',
     'dpb': 'DPB',
     'dpd': 'DPD',
+    'dpdgb': 'DPD',  # Sendcloud separates it, but Amazon doesn't make the difference
     'dpdlocal': 'DPD Local',
     'dsv': 'DSV',
     'dtdc': 'DTDC',
@@ -204,6 +211,7 @@ AMAZON_CARRIER_NAMES_MAPPING = {
     'fedex': 'FedEx',
     'fedexfreight': 'Fedex Freight',
     'fedexjp': 'FEDEX_JP',
+    'fedexrest': 'FedEx',
     'fedexsmartpost': 'FedEx SmartPost',
     'fercam': 'FERCAM',
     'fillokargo': 'Fillo Kargo',
@@ -229,6 +237,7 @@ AMAZON_CARRIER_NAMES_MAPPING = {
     'hermeseinrichtungsservice': 'Hermes Einrichtungsservice',
     'hermeslogistikgruppe': 'Hermes Logistik Gruppe',
     'hermesuk': 'Hermes UK',
+    'hermesgb': 'Hermes UK',  # Sendcloud separates it, but Amazon doesn't make the difference
     'hlog': 'Hlog',
     'homelogistics': 'Home Logistics',
     'honesteye': 'honesteye',
@@ -332,7 +341,7 @@ AMAZON_CARRIER_NAMES_MAPPING = {
     'rl': 'R+L',
     'rmlgb': 'RMLGB',
     'roadrunner': 'Roadrunner',
-    'royalmail': 'ROYAL_MAIL',
+    'royalmail': 'Royal Mail',
     'rrdonnelley': 'RR Donnelley',
     'safexpress': 'Safexpress',
     'sagawa': 'SAGAWA',
@@ -412,8 +421,10 @@ AMAZON_CARRIER_NAMES_MAPPING = {
     'upsilon': 'Upsilon',
     'upsmailinnovations': 'UPS Mail Innovations',
     'upsmi': 'UPSMI',
+    'upsrest': 'UPS',
     'urbanexpress': 'Urban Express',
     'usps': 'USPS',
+    'uspsrest': 'USPS',
     'verageshipping': 'Verage Shipping',
     'viaxpress': 'Via Xpress',
     'vir': 'VIR',

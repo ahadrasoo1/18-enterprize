@@ -1,7 +1,6 @@
 /** @odoo-module **/
 
 import { useService } from "@web/core/utils/hooks";
-import { Domain } from "@web/core/domain";
 import { Component, markup, onWillStart, onWillUpdateProps, useState } from "@odoo/owl";
 import { escape } from "@web/core/utils/strings";
 import { _t } from "@web/core/l10n/translation";
@@ -14,7 +13,6 @@ export class DocumentsActionHelper extends Component {
 
     setup() {
         this.orm = useService("orm");
-        this.hasShareReadAccessRights = undefined;
         this.state = useState({
             mailTo: undefined,
         });
@@ -35,48 +33,48 @@ export class DocumentsActionHelper extends Component {
      * otherwise a message depending on it being the "All" folder or the "Trash" folder
      */
     get noContentHelp() {
-        if (!this.selectedFolderId || ["RECENT", "SHARED", "TRASH", "MY"].includes(this.selectedFolderId)) {
-            return markup(
-                `<p class='o_view_nocontent_smiling_face'>
-                    ${escape(
-                        this.selectedFolderId === "TRASH"
-                            ? _t("Documents moved to trash will show up here")
-                            : this.selectedFolderId === "RECENT" 
-                                ? _t("Recently accessed Documents will show up here")
-                                : this.selectedFolderId === "SHARED"
-                                ? _t("Documents shared with you will appear here")
-                                : this.selectedFolderId === "MY"
-                                    ? _t("Your personal space")
-                                    : _t("Select a folder to upload a document")
-                    )}
-                </p>`
-            );
+        if (
+            !this.selectedFolderId ||
+            ["RECENT", "SHARED", "TRASH", "MY", "COMPANY"].includes(this.selectedFolderId)
+        ) {
+            const helpMessage = (() => {
+                switch (this.selectedFolderId) {
+                    case "TRASH":
+                        return _t("Documents moved to trash will show up here");
+                    case "RECENT":
+                        return _t("Recently accessed Documents will show up here");
+                    case "SHARED":
+                        return _t("Documents shared with you will appear here");
+                    case "MY":
+                        return _t("Your personal space");
+                    default:
+                        return _t("Select a folder to upload a document");
+                }
+            })();
+            return markup(`<p class="o_view_nocontent_smiling_face">${escape(helpMessage)}</p>`);
         }
         return this.props.noContentHelp;
     }
 
     async updateShareInformation() {
         this.state.mailTo = undefined;
-        // Only load data if we are in a single folder.
-        let domain = this.env.searchModel.domain.filter(
+        // Only load data if we are in a single folder and selected folder has a real id
+        const filteredDomain = this.env.searchModel.domain.filter(
             (leaf) => Array.isArray(leaf) && leaf.includes("folder_id")
         );
-        if (domain.length !== 1) {
+        if (filteredDomain.length !== 1 || typeof this.selectedFolderId !== "number") {
             return;
         }
         // make sure we have a mail.alias configured
-        domain = Domain.and([domain, [["type", "=", "folder"]], [["alias_name", "!=", false]]]).toList();
-        if (this.hasShareReadAccessRights === undefined) {
-            this.hasShareReadAccessRights = false;
-        }
-        if (!this.hasShareReadAccessRights) {
+        const selectedFolder = this.env.searchModel.getFolderById(this.selectedFolderId);
+        if (
+            !selectedFolder ||
+            selectedFolder.user_permission === "none" ||
+            !selectedFolder.alias_name ||
+            !selectedFolder.alias_domain_id
+        ) {
             return;
         }
-        const folders = await this.orm.searchRead("documents.document", domain, ["id", "alias_id"], {
-            limit: 1,
-        });
-        if (folders.length) {
-            this.state.mailTo = folders[0].alias_id[1];
-        }
+        this.state.mailTo = `${selectedFolder.alias_name}@${selectedFolder.alias_domain_id[1]}`;
     }
 }

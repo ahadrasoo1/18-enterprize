@@ -361,6 +361,26 @@ invoice_1_request = {
                     "taxType": "icms",
                 },
                 {
+                    "citation": "Valor do ICMS desonerado: 11,11",
+                    "citationId": "b4655cef-0f17-4c21-a94c-760d8e965b72",
+                    "cst": "20",
+                    "exemptionCode": "",
+                    "isCustomCitation": False,
+                    "jurisdictionName": "Paraná",
+                    "jurisdictionType": "State",
+                    "modBC": "3",
+                    "rate": 19,
+                    "source": "0",
+                    "subtotalTaxable": 151.11,
+                    "tax": 11.11,
+                    "taxImpact": {
+                        "accounting": "none",
+                        "impactOnFinalPrice": "Included",
+                        "impactOnNetAmount": "Included",
+                    },
+                    "taxType": "icmsDeson",
+                },
+                {
                     "calcMode": "rate",
                     "citation": 'IPI não tributado conforme: "Decreto '
                     "nº 11.158/22, Artigo 1º, Anexos I, "
@@ -508,6 +528,11 @@ invoice_1_request = {
                 "subtotalTaxable": 435,
                 "tax": 52.2,
             },
+            "icmsDeson": {
+                "jurisdictions": [{"jurisdictionName": "Paraná", "jurisdictionType": "State", "tax": 11.11}],
+                "subtotalTaxable": 446.11,
+                "tax": 11.11,
+            },
             "ipi": {
                 "jurisdictions": [{"jurisdictionName": "Brazil", "jurisdictionType": "Country", "tax": 0}],
                 "subtotalTaxable": 435,
@@ -521,6 +546,7 @@ invoice_1_request = {
             "included": [
                 {"subtotalTaxable": 435, "tax": 0, "taxType": "cofins"},
                 {"subtotalTaxable": 435, "tax": 52.2, "taxType": "icms"},
+                {"subtotalTaxable": 446.11, "tax": 11.11, "taxType": "icmsDeson"},
                 {"subtotalTaxable": 435, "tax": 0, "taxType": "pis"},
             ],
             "informative": [
@@ -581,6 +607,24 @@ invoice_1_cancel_success_response = {
   "xml": {
     "base64": "eW9sbwo=",
     "link": "https://homolog.invoicy.com.br///HNUC002.aspx?ParmCript=XXX&DocDetArqCodigo=0&DocEveTipo=0&DocEvenSeq=0"
+  },
+  "pdf": {
+    "base64": None,
+    "link": None
+  }
+}
+
+invoice_1_cancel_fail_response = {
+  "eventType": "cancel",
+  "status": {
+    "code": "493",
+    "desc": "Rejei\u00e7\u00e3o: Evento n\u00e3o atende o Schema XML espec\u00edfico",
+    "protocol": None,
+    "authorizationDateTime": {}
+  },
+  "xml": {
+    "base64": None,
+    "link": None
   },
   "pdf": {
     "base64": None,

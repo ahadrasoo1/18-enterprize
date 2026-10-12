@@ -1,24 +1,27 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* hr_appraisal
-# 
+# * hr_appraisal
+#
 # Translators:
 # JH CHOI <hwangtog@gmail.com>, 2024
 # Wil Odoo, 2024
-# 
+# Daye Jeong, 2024
+# "Kwanghee Park (kwpa)" <kwpa@odoo.com>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
-"Language-Team: Korean (https://app.transifex.com/odoo/teams/41243/ko/)\n"
+"POT-Creation-Date: 2026-04-10 18:47+0000\n"
+"PO-Revision-Date: 2025-10-23 22:30+0000\n"
+"Last-Translator: \"Kwanghee Park (kwpa)\" <kwpa@odoo.com>\n"
+"Language-Team: Korean <https://translate.odoo.com/projects/odoo-18/"
+"hr_appraisal/ko/>\n"
+"Language: ko\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: ko\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 5.12.2\n"
 
 #. module: hr_appraisal
 #. odoo-python
@@ -45,43 +48,29 @@ msgid "1 Meeting"
 msgstr "1 회의"
 
 #. module: hr_appraisal
-#: model:ir.model.fields.selection,name:hr_appraisal.selection__hr_appraisal_goal__progression__100
-msgid "100%"
-msgstr "100%"
-
-#. module: hr_appraisal
-#: model:ir.model.fields.selection,name:hr_appraisal.selection__hr_appraisal_goal__progression__025
-msgid "25%"
-msgstr "25%"
-
-#. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_res_config_settings__module_hr_appraisal_survey
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.res_config_settings_view_employee_form
 msgid "360 Feedback"
 msgstr "360도 피드백"
 
 #. module: hr_appraisal
-#: model:ir.model.fields.selection,name:hr_appraisal.selection__hr_appraisal_goal__progression__050
-msgid "50%"
-msgstr "50%"
-
-#. module: hr_appraisal
-#: model:ir.model.fields.selection,name:hr_appraisal.selection__hr_appraisal_goal__progression__075
-msgid "75%"
-msgstr "75%"
-
-#. module: hr_appraisal
 #: model:mail.template,body_html:hr_appraisal.mail_template_appraisal_confirm
 msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
-"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
-"                        An appraisal of <t t-out=\"ctx.get('employee_to_name', 'employee')\">employee</t> has been confirmed.\n"
-"                        <br><br>\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
+"\">\n"
+"                        An appraisal of <t t-"
+"out=\"ctx.get('employee_to_name', 'employee')\">employee</t> has been "
+"confirmed.\n"
+"                        <br/><br/>\n"
 "                        Please schedule an appraisal date together.\n"
-"                        <br><br>\n"
+"                        <br/><br/>\n"
 "                        <t t-if=\"ctx.get('recipient_users')\">\n"
-"                            <p style=\"margin: 16px 0px 16px 0px; text-align: center;\">\n"
-"                                <a t-att-href=\"ctx.get('url')\" style=\"background-color:#875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px;\">\n"
+"                            <p style=\"margin: 16px 0px 16px 0px; text-"
+"align: center;\">\n"
+"                                <a t-att-href=\"ctx.get('url')\" "
+"style=\"background-color:#875A7B; padding: 8px 16px 8px 16px; text-"
+"decoration: none; color: #fff; border-radius: 5px;\">\n"
 "                                    View Appraisal\n"
 "                                </a>\n"
 "                            </p>\n"
@@ -91,14 +80,19 @@ msgid ""
 "            "
 msgstr ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
-"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
-"                        <t t-out=\"ctx.get('employee_to_name', 'employee')\">employee</t>님의 업무 평가가 확정되었습니다. \n"
-"                        <br><br>\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
+"\">\n"
+"                        <t t-out=\"ctx.get('employee_to_name', 'employee')"
+"\">employee</t>의 업무 평가가 확정되었습니다.\n"
+"                        <br/><br/>\n"
 "                        평가를 시행할 날짜를 정해주세요.\n"
-"                        <br><br>\n"
+"                        <br/><br/>\n"
 "                        <t t-if=\"ctx.get('recipient_users')\">\n"
-"                            <p style=\"margin: 16px 0px 16px 0px; text-align: center;\">\n"
-"                                <a t-att-href=\"ctx.get('url')\" style=\"background-color:#875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px;\">\n"
+"                            <p style=\"margin: 16px 0px 16px 0px; text-"
+"align: center;\">\n"
+"                                <a t-att-href=\"ctx.get('url')\" "
+"style=\"background-color:#875A7B; padding: 8px 16px 8px 16px; text-"
+"decoration: none; color: #fff; border-radius: 5px;\">\n"
 "                                    업무 평가 보기\n"
 "                                </a>\n"
 "                            </p>\n"
@@ -111,18 +105,27 @@ msgstr ""
 #: model:mail.template,body_html:hr_appraisal.mail_template_appraisal_request_from_employee
 msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
-"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
-"                        Dear <t t-out=\"ctx.get('employee_to_name', 'employee')\">employee</t>,\n"
-"                        <br>\n"
-"                        <t t-out=\"ctx.get('author_name', '')\">Addison Olson</t> (<t t-out=\"ctx.get('author_mail', '')\">addison.olson28@example.com</t>) wishes an appraisal.\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
+"\">\n"
+"                        Dear <t t-out=\"ctx.get('employee_to_name', "
+"'employee')\">employee</t>,\n"
+"                        <br/>\n"
+"                        <t t-out=\"ctx.get('author_name', '')\">Addison "
+"Olson</t> (<t t-out=\"ctx.get('author_mail', '')"
+"\">addison.olson28@example.com</t>) wishes an appraisal.\n"
 "                        <t t-if=\"ctx.get('user_body')\">\n"
-"                            <div style=\"margin: 16px 0px 16px 0px; padding: 8px 16px 8px 16px; background-color: #F1F1F1;\">\n"
-"                                <t t-out=\"ctx.get('user_body')\">Annual appraisal.</t>\n"
+"                            <div style=\"margin: 16px 0px 16px 0px; padding: "
+"8px 16px 8px 16px; background-color: #F1F1F1;\">\n"
+"                                <t t-out=\"ctx.get('user_body')\">Annual "
+"appraisal.</t>\n"
 "                            </div>\n"
 "                        </t>\n"
 "                        <t t-if=\"ctx.get('recipient_users')\">\n"
-"                            <p style=\"margin: 16px 0px 16px 0px; padding: 8px 16px 8px 16px; text-align: center;\">\n"
-"                                <a t-att-href=\"ctx.get('url')\" style=\" margin: auto; background-color:#875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px;\">\n"
+"                            <p style=\"margin: 16px 0px 16px 0px; padding: "
+"8px 16px 8px 16px; text-align: center;\">\n"
+"                                <a t-att-href=\"ctx.get('url')\" style=\" "
+"margin: auto; background-color:#875A7B; padding: 8px 16px 8px 16px; text-"
+"decoration: none; color: #fff; border-radius: 5px;\">\n"
 "                                    View Appraisal\n"
 "                                </a>\n"
 "                            </p>\n"
@@ -132,18 +135,28 @@ msgid ""
 "            "
 msgstr ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
-"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
-"                        안녕하세요, <t t-out=\"ctx.get('employee_to_name', 'employee')\">employee</t>님.\n"
-"                        <br>\n"
-"                        <t t-out=\"ctx.get('author_name', '')\">Addison Olson</t> (<t t-out=\"ctx.get('author_mail', '')\">addison.olson28@example.com</t>)님이 귀하의 업무 평가를 시행하고자 합니다.\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
+"\">\n"
+"                        안녕하세요, <t t-out=\"ctx.get('employee_to_name', "
+"'employee')\">employee</t>님,\n"
+"                        <br/>\n"
+"                        <t t-out=\"ctx.get('author_name', '')\">Addison "
+"Olson</t> (<t t-out=\"ctx.get('author_mail', '')"
+"\">addison.olson28@example.com</t>)님이 귀하의 업무 평가를 시행하고자 합니"
+"다.\n"
 "                        <t t-if=\"ctx.get('user_body')\">\n"
-"                            <div style=\"margin: 16px 0px 16px 0px; padding: 8px 16px 8px 16px; background-color: #F1F1F1;\">\n"
-"                                <t t-out=\"ctx.get('user_body')\">연말 평가</t>\n"
+"                            <div style=\"margin: 16px 0px 16px 0px; padding: "
+"8px 16px 8px 16px; background-color: #F1F1F1;\">\n"
+"                                <t t-out=\"ctx.get('user_body')\">연말 평가</"
+"t>\n"
 "                            </div>\n"
 "                        </t>\n"
 "                        <t t-if=\"ctx.get('recipient_users')\">\n"
-"                            <p style=\"margin: 16px 0px 16px 0px; padding: 8px 16px 8px 16px; text-align: center;\">\n"
-"                                <a t-att-href=\"ctx.get('url')\" style=\" margin: auto; background-color:#875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px;\">\n"
+"                            <p style=\"margin: 16px 0px 16px 0px; padding: "
+"8px 16px 8px 16px; text-align: center;\">\n"
+"                                <a t-att-href=\"ctx.get('url')\" style=\" "
+"margin: auto; background-color:#875A7B; padding: 8px 16px 8px 16px; text-"
+"decoration: none; color: #fff; border-radius: 5px;\">\n"
 "                                    업무 평가 보기\n"
 "                                </a>\n"
 "                            </p>\n"
@@ -156,49 +169,67 @@ msgstr ""
 #: model:mail.template,body_html:hr_appraisal.mail_template_appraisal_request
 msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
-"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
-"                        Dear <t t-out=\"ctx.get('employee_to_name', 'employee')\">employee</t>,\n"
-"                        <br>\n"
-"                        An appraisal has been requested by <t t-out=\"ctx.get('author_name', '')\">Addison Olson</t>\n"
-"                        <br>\n"
-"                        (<t t-out=\"ctx.get('author_mail', '')\">addison.olson28@example.com</t>).\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
+"\">\n"
+"                        Dear <t t-out=\"ctx.get('employee_to_name', "
+"'employee')\">employee</t>,\n"
+"                        <br/>\n"
+"                        An appraisal has been requested by <t t-"
+"out=\"ctx.get('author_name', '')\">Addison Olson</t>\n"
+"                        <br/>\n"
+"                        (<t t-out=\"ctx.get('author_mail', '')"
+"\">addison.olson28@example.com</t>).\n"
 "                        <t t-if=\"ctx.get('user_body')\">\n"
-"                            <div style=\"margin: 16px 0px 16px 0px; padding: 8px 16px 8px 16px; background-color: #F1F1F1;\">\n"
-"                                <t t-out=\"ctx.get('user_body')\">Annual appraisal.</t>\n"
+"                            <div style=\"margin: 16px 0px 16px 0px; padding: "
+"8px 16px 8px 16px; background-color: #F1F1F1;\">\n"
+"                                <t t-out=\"ctx.get('user_body')\">Annual "
+"appraisal.</t>\n"
 "                            </div>\n"
 "                        </t>\n"
 "                        <t t-if=\"ctx.get('recipient_users')\">\n"
-"                            <p style=\"margin: 16px 0px 16px 0px; padding: 8px 16px 8px 16px; text-align: center;\">\n"
-"                                <a t-att-href=\"ctx.get('url')\" style=\" margin: auto; background-color:#875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px;\">\n"
+"                            <p style=\"margin: 16px 0px 16px 0px; padding: "
+"8px 16px 8px 16px; text-align: center;\">\n"
+"                                <a t-att-href=\"ctx.get('url')\" style=\" "
+"margin: auto; background-color:#875A7B; padding: 8px 16px 8px 16px; text-"
+"decoration: none; color: #fff; border-radius: 5px;\">\n"
 "                                    View Appraisal\n"
 "                                </a>\n"
 "                            </p>\n"
 "                        </t>\n"
-"                        <br>\n"
+"                        <br/>\n"
 "                    </p>\n"
 "                </div>\n"
 "            "
 msgstr ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
-"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
-"                        안녕하세요, <t t-out=\"ctx.get('employee_to_name', 'employee')\">employee</t>님.\n"
-"                        <br>\n"
-"                        <t t-out=\"ctx.get('author_name', '')\">Addison Olson</t>님께서 귀하의 업무 평가를 요청하셨습니다.\n"
-"                        <br>\n"
-"                        (<t t-out=\"ctx.get('author_mail', '')\">addison.olson28@example.com</t>).\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
+"\">\n"
+"                        안녕하세요, <t t-out=\"ctx.get('employee_to_name', "
+"'employee')\">employee</t>님.\n"
+"                        <br/>\n"
+"                        <t t-out=\"ctx.get('author_name', '')\">Addison "
+"Olson</t>님께서 귀하의 업무 평가를 요청하셨습니다.\n"
+"                        <br/>\n"
+"                        (<t t-out=\"ctx.get('author_mail', '')"
+"\">addison.olson28@example.com</t>).\n"
 "                        <t t-if=\"ctx.get('user_body')\">\n"
-"                            <div style=\"margin: 16px 0px 16px 0px; padding: 8px 16px 8px 16px; background-color: #F1F1F1;\">\n"
-"                                <t t-out=\"ctx.get('user_body')\">연말 평가</t>\n"
+"                            <div style=\"margin: 16px 0px 16px 0px; padding: "
+"8px 16px 8px 16px; background-color: #F1F1F1;\">\n"
+"                                <t t-out=\"ctx.get('user_body')\">연말 평가</"
+"t>\n"
 "                            </div>\n"
 "                        </t>\n"
 "                        <t t-if=\"ctx.get('recipient_users')\">\n"
-"                            <p style=\"margin: 16px 0px 16px 0px; padding: 8px 16px 8px 16px; text-align: center;\">\n"
-"                                <a t-att-href=\"ctx.get('url')\" style=\" margin: auto; background-color:#875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px;\">\n"
+"                            <p style=\"margin: 16px 0px 16px 0px; padding: "
+"8px 16px 8px 16px; text-align: center;\">\n"
+"                                <a t-att-href=\"ctx.get('url')\" style=\" "
+"margin: auto; background-color:#875A7B; padding: 8px 16px 8px 16px; text-"
+"decoration: none; color: #fff; border-radius: 5px;\">\n"
 "                                    업무 평가 보기\n"
 "                                </a>\n"
 "                            </p>\n"
 "                        </t>\n"
-"                        <br>\n"
+"                        <br/>\n"
 "                    </p>\n"
 "                </div>\n"
 "            "
@@ -207,64 +238,104 @@ msgstr ""
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_default_template
 msgid ""
 "<em>\n"
-"                        Describe something that made you proud, a piece of work positive for\n"
+"                        Describe something that made you proud, a piece of "
+"work positive for\n"
 "                        the company.\n"
 "                    </em>"
 msgstr ""
+"<em>\n"
+"                        지난 기간 동안 이뤄낸 성과, 회사에 긍정적인 영향을 주"
+"었던 업무에 대해\n"
+"                        작성해 주세요.\n"
+"                    </em>"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_default_template
 msgid ""
 "<em>\n"
-"                        Did you face new difficulties? Did you confront yourself to new\n"
+"                        Did you face new difficulties? Did you confront "
+"yourself to new\n"
 "                        obstacles?\n"
 "                    </em>"
 msgstr ""
+"<em>\n"
+"                        직무 수행 중 어려웠던 점, 불편했던 사항에 대해\n"
+"                        기술해 주세요.\n"
+"                    </em>"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_default_template
 msgid ""
 "<em>\n"
-"                        Every job has strong points, what are, in your opinion, the tasks that\n"
+"                        Every job has strong points, what are, in your "
+"opinion, the tasks that\n"
 "                        you enjoy the most/the least?\n"
 "                    </em>"
 msgstr ""
+"<em>\n"
+"                        모든 업무에는 장단점이 있습니다. 본인이 생각하기에 가"
+"장 즐거웠던 업무와\n"
+"                        가장 힘들었던 업무에 대해 작성해 주세요.\n"
+"                    </em>"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_default_template
 msgid ""
 "<em>\n"
-"                        From a manager point of view, how could you help the employee to\n"
+"                        From a manager point of view, how could you help the "
+"employee to\n"
 "                        overcome their weaknesses?\n"
 "                    </em>"
 msgstr ""
+"<em>\n"
+"                        관리자의 관점에서, 직원이 가진 약점을 극복하기 위해\n"
+"                        도울 수 있는 방안은 무엇입니까?\n"
+"                    </em>"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_default_template
 msgid ""
 "<em>\n"
-"                        How can the company help you with your need and objectives in order\n"
-"                        for you to reach your goals and look for the best collaboration.\n"
+"                        How can the company help you with your need and "
+"objectives in order\n"
+"                        for you to reach your goals and look for the best "
+"collaboration.\n"
 "                    </em>"
 msgstr ""
+"<em>\n"
+"                        본인의 업무 목표를 달성하고 협업을 성공적으로 해내기 "
+"위해\n"
+"                        회사가 도울 수 있는 방안은 무엇입니까?\n"
+"                    </em>"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_default_template
 msgid ""
 "<em>\n"
-"                        How do you see the employee in the future, do your vision follow the\n"
+"                        How do you see the employee in the future, do your "
+"vision follow the\n"
 "                        employee's desire?\n"
 "                    </em>"
 msgstr ""
+"<em>\n"
+"                        해당 직원의 발전 가능성에 대해 어떻게 생각하십니까?\n"
+"                        회사의 비전과 직원의 업무 욕구가 동일합니까?\n"
+"                    </em>"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_default_template
 msgid ""
 "<em>\n"
-"                        Some achievements comforting you in their strengths to face job's\n"
+"                        Some achievements comforting you in their strengths "
+"to face job's\n"
 "                        issues.\n"
 "                    </em>"
 msgstr ""
+"<em>\n"
+"                        직무 중 발생할 수 있는 문제에 직면했을 때 이를 극복했"
+"던 성공 사례에 관해\n"
+"                        기술해 주세요.\n"
+"                    </em>"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_default_template
@@ -275,10 +346,20 @@ msgstr "<em>자기 주도성</em>"
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_default_template
 msgid ""
 "<em>Culture/Behavior:</em>\n"
-"                        <span class=\"o_stars o_five_stars\" id=\"checkId-1\">\n"
-"                            <i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i>\n"
+"                        <span class=\"o_stars o_five_stars\" "
+"id=\"checkId-1\">\n"
+"                            <i class=\"fa fa-star-o\"></i><i class=\"fa fa-"
+"star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i "
+"class=\"fa fa-star-o\"></i>\n"
 "                        </span>"
 msgstr ""
+"<em>기업 문화/행동 방식:</em>\n"
+"                        <span class=\"o_stars o_five_stars\" "
+"id=\"checkId-1\">\n"
+"                            <i class=\"fa fa-star-o\"></i><i class=\"fa fa-"
+"star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i "
+"class=\"fa fa-star-o\"></i>\n"
+"                        </span>"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_default_template
@@ -299,19 +380,39 @@ msgstr "<em>단기 목표에 대한 구체적인 예시를 기술하세요. (6�
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_default_template
 msgid ""
 "<em>Internal Communication:</em>\n"
-"                        <span class=\"o_stars o_five_stars\" id=\"checkId-2\">\n"
-"                            <i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i>\n"
+"                        <span class=\"o_stars o_five_stars\" "
+"id=\"checkId-2\">\n"
+"                            <i class=\"fa fa-star-o\"></i><i class=\"fa fa-"
+"star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i "
+"class=\"fa fa-star-o\"></i>\n"
 "                        </span>"
 msgstr ""
+"<em>내부 커뮤니케이션:</em>\n"
+"                        <span class=\"o_stars o_five_stars\" "
+"id=\"checkId-2\">\n"
+"                            <i class=\"fa fa-star-o\"></i><i class=\"fa fa-"
+"star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i "
+"class=\"fa fa-star-o\"></i>\n"
+"                        </span>"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_default_template
 msgid ""
 "<em>Job's content:</em>\n"
-"                        <span class=\"o_stars o_five_stars\" id=\"checkId-3\">\n"
-"                            <i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i>\n"
+"                        <span class=\"o_stars o_five_stars\" "
+"id=\"checkId-3\">\n"
+"                            <i class=\"fa fa-star-o\"></i><i class=\"fa fa-"
+"star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i "
+"class=\"fa fa-star-o\"></i>\n"
 "                        </span>"
 msgstr ""
+"<em>업무 내용:</em>\n"
+"                        <span class=\"o_stars o_five_stars\" "
+"id=\"checkId-3\">\n"
+"                            <i class=\"fa fa-star-o\"></i><i class=\"fa fa-"
+"star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i "
+"class=\"fa fa-star-o\"></i>\n"
+"                        </span>"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_default_template
@@ -322,10 +423,20 @@ msgstr "<em>진취성</em>"
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_default_template
 msgid ""
 "<em>Remuneration:</em>\n"
-"                        <span class=\"o_stars o_five_stars\" id=\"checkId-5\">\n"
-"                            <i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i>\n"
+"                        <span class=\"o_stars o_five_stars\" "
+"id=\"checkId-5\">\n"
+"                            <i class=\"fa fa-star-o\"></i><i class=\"fa fa-"
+"star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i "
+"class=\"fa fa-star-o\"></i>\n"
 "                        </span>"
 msgstr ""
+"<em>급여:</em>\n"
+"                        <span class=\"o_stars o_five_stars\" "
+"id=\"checkId-5\">\n"
+"                            <i class=\"fa fa-star-o\"></i><i class=\"fa fa-"
+"star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i "
+"class=\"fa fa-star-o\"></i>\n"
+"                        </span>"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_default_template
@@ -346,10 +457,20 @@ msgstr "<em>시간 관리 능력</em>"
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_default_template
 msgid ""
 "<em>Work organization:</em>\n"
-"                        <span class=\"o_stars o_five_stars\" id=\"checkId-4\">\n"
-"                            <i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i>\n"
+"                        <span class=\"o_stars o_five_stars\" "
+"id=\"checkId-4\">\n"
+"                            <i class=\"fa fa-star-o\"></i><i class=\"fa fa-"
+"star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i "
+"class=\"fa fa-star-o\"></i>\n"
 "                        </span>"
 msgstr ""
+"<em>업무 조직:</em>\n"
+"                        <span class=\"o_stars o_five_stars\" "
+"id=\"checkId-4\">\n"
+"                            <i class=\"fa fa-star-o\"></i><i class=\"fa fa-"
+"star-o\"></i><i class=\"fa fa-star-o\"></i><i class=\"fa fa-star-o\"></i><i "
+"class=\"fa fa-star-o\"></i>\n"
+"                        </span>"
 
 #. module: hr_appraisal
 #. odoo-python
@@ -358,27 +479,31 @@ msgid ""
 "<p class=\"o_view_nocontent_smiling_face\">\n"
 "                            Schedule an appraisal\n"
 "                        </p><p>\n"
-"                            Plan appraisals with your colleagues, collect and discuss feedback.\n"
+"                            Plan appraisals with your colleagues, collect "
+"and discuss feedback.\n"
 "                        </p>"
 msgstr ""
 "<p class=\"o_view_nocontent_smiling_face\">\n"
 "                            업무 평가 일정 예약\n"
 "                        </p><p>\n"
-"                            동료들로부터 직무 능력과 관련된 피드백을 수집하고 토론하세요.\n"
+"                            동료들로부터 직무 능력과 관련된 피드백을 수집하"
+"고 토론하세요.\n"
 "                        </p>"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_kanban
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid ""
-"<small role=\"img\" class=\"fa fa-circle text-success\" invisible=\"state !="
-" 'pending' or waiting_feedback\" aria-label=\"Ready\" title=\"Ready\"/>"
+"<small role=\"img\" class=\"fa fa-circle text-success\" invisible=\"state != "
+"'pending' or waiting_feedback\" aria-label=\"Ready\" title=\"Ready\"/>"
 msgstr ""
+"<small role=\"img\" class=\"fa fa-circle text-success\" invisible=\"state != "
+"'pending' or waiting_feedback\" aria-label=\"준비\" title=\"준비\"/>"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_kanban
 msgid "<span class=\"fw-bold\">Meeting: </span>"
-msgstr ""
+msgstr "<span class=\"fw-bold\">회의: </span>"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_employee_view_form
@@ -386,7 +511,8 @@ msgid ""
 "<span class=\"o_stat_text\" invisible=\"last_appraisal_state == 'done'\">\n"
 "                            Ongoing\n"
 "                        </span>\n"
-"                        <span class=\"o_stat_text\" invisible=\"last_appraisal_state != 'done'\">\n"
+"                        <span class=\"o_stat_text\" "
+"invisible=\"last_appraisal_state != 'done'\">\n"
 "                            Latest\n"
 "                        </span>\n"
 "                        <span class=\"o_stat_text\">\n"
@@ -396,7 +522,8 @@ msgstr ""
 "<span class=\"o_stat_text\" invisible=\"last_appraisal_state == 'done'\">\n"
 "                            진행 중\n"
 "                        </span>\n"
-"                        <span class=\"o_stat_text\" invisible=\"last_appraisal_state != 'done'\">\n"
+"                        <span class=\"o_stat_text\" "
+"invisible=\"last_appraisal_state != 'done'\">\n"
 "                            최근\n"
 "                        </span>\n"
 "                        <span class=\"o_stat_text\">\n"
@@ -428,31 +555,49 @@ msgstr "<span class=\"o_stat_text\">목표 설정</span>"
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid ""
-"<span class=\"text-end\" invisible=\"employee_feedback_published\">Not Visible to Manager</span>\n"
-"                                            <span class=\"text-end\" invisible=\"not employee_feedback_published or state == 'new'\">Visible to Manager</span>\n"
-"                                            <span class=\"text-end\" invisible=\"not employee_feedback_published or state != 'new'\">Visible &amp; Editable by Manager</span>"
+"<span class=\"text-end\" invisible=\"employee_feedback_published\">Not "
+"Visible to Manager</span>\n"
+"                                            <span class=\"text-end\" "
+"invisible=\"not employee_feedback_published or state == 'new'\">Visible to "
+"Manager</span>\n"
+"                                            <span class=\"text-end\" "
+"invisible=\"not employee_feedback_published or state != 'new'\">Visible "
+"&amp; Editable by Manager</span>"
 msgstr ""
-"<span class=\"text-end\" invisible=\"employee_feedback_published\">관리자에게 표시되지 않음</span>\n"
-"                                            <span class=\"text-end\" invisible=\"not employee_feedback_published or state == 'new'\">관리자에게 표시</span>\n"
-"                                            <span class=\"text-end\" invisible=\"not employee_feedback_published or state != 'new'\">관리자가 확인 및 편집 가능</span>"
+"<span class=\"text-end\" invisible=\"employee_feedback_published\">관리자에"
+"게 표시되지 않음</span>\n"
+"                                            <span class=\"text-end\" "
+"invisible=\"not employee_feedback_published or state == 'new'\">관리자에게 표"
+"시</span>\n"
+"                                            <span class=\"text-end\" "
+"invisible=\"not employee_feedback_published or state != 'new'\">관리자가 확"
+"인 및 편집 가능</span>"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
 msgid ""
-"<span class=\"text-end\" invisible=\"manager_feedback_published or not can_see_manager_publish\">Not Visible to Employee</span>\n"
-"                                            <span class=\"text-end\" invisible=\"not manager_feedback_published or not can_see_manager_publish\">Visible to Employee</span>"
+"<span class=\"text-end\" invisible=\"manager_feedback_published or not "
+"can_see_manager_publish\">Not Visible to Employee</span>\n"
+"                                            <span class=\"text-end\" "
+"invisible=\"not manager_feedback_published or not "
+"can_see_manager_publish\">Visible to Employee</span>"
 msgstr ""
-"<span class=\"text-end\" invisible=\"manager_feedback_published or not can_see_manager_publish\">직원에게 표시하지 않음</span>\n"
-"                                            <span class=\"text-end\" invisible=\"not manager_feedback_published or not can_see_manager_publish\">직원에게 표시함</span>"
+"<span class=\"text-end\" invisible=\"manager_feedback_published or not "
+"can_see_manager_publish\">직원에게 표시하지 않음</span>\n"
+"                                            <span class=\"text-end\" "
+"invisible=\"not manager_feedback_published or not can_see_manager_publish\">"
+"직원에게 표시함</span>"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_employee_public_view_form
 msgid ""
-"<span invisible=\"not is_manager or (next_appraisal_date or not ongoing_appraisal_count)\">\n"
+"<span invisible=\"not is_manager or (next_appraisal_date or not "
+"ongoing_appraisal_count)\">\n"
 "                    Ongoing\n"
 "                </span>"
 msgstr ""
-"<span invisible=\"not is_manager or (next_appraisal_date or not ongoing_appraisal_count)\">\n"
+"<span invisible=\"not is_manager or (next_appraisal_date or not "
+"ongoing_appraisal_count)\">\n"
 "                    진행 중\n"
 "                </span>"
 
@@ -463,6 +608,9 @@ msgid ""
 "                        Evaluation\n"
 "                    </span>"
 msgstr ""
+"<span style=\"font-weight: bolder;\">\n"
+"                        평가\n"
+"                    </span>"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_default_template
@@ -471,6 +619,8 @@ msgid ""
 "                        Feedback\n"
 "                    </span>"
 msgstr ""
+"<span style=\"font-weight: bolder;\">\n"
+"                        피드백"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_default_template
@@ -479,6 +629,9 @@ msgid ""
 "                        Improvements\n"
 "                    </span>"
 msgstr ""
+"<span style=\"font-weight: bolder;\">\n"
+"                        개선사항\n"
+"                    </span>"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_default_template
@@ -487,6 +640,9 @@ msgid ""
 "                        My feelings\n"
 "                    </span>"
 msgstr ""
+"<span style=\"font-weight: bolder;\">\n"
+"                        나의 생각\n"
+"                    </span>"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_default_template
@@ -495,6 +651,9 @@ msgid ""
 "                        My future\n"
 "                    </span>"
 msgstr ""
+"<span style=\"font-weight: bolder;\">\n"
+"                        나의 계획\n"
+"                    </span>"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_default_template
@@ -503,12 +662,412 @@ msgid ""
 "                        My work\n"
 "                    </span>"
 msgstr ""
+"<span style=\"font-weight: bolder;\">\n"
+"                        나의 업무\n"
+"                    </span>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_probationary_period_template
+msgid ""
+"<strong class=\"text-o-color-4\">\n"
+"                                    LEAST\n"
+"                                    <br>\n"
+"                                </strong>"
+msgstr ""
+"<strong class=\"text-o-color-4\">\n"
+"                                    최소\n"
+"                                    <br>\n"
+"                                </strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_probationary_period_template
+msgid ""
+"<strong class=\"text-o-color-4\">\n"
+"                                    MOST\n"
+"                                    <br>\n"
+"                                </strong>"
+msgstr ""
+"<strong class=\"text-o-color-4\">\n"
+"                                    최고\n"
+"                                    <br>\n"
+"                                </strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_yearly_template
+msgid "<strong>360 feedback :</strong>"
+msgstr "<strong>360도 피드백:</strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_post_training_template
+msgid "<strong>Any particular remark on the training ?</strong>"
+msgstr "<strong>연수에 대해 특별히 언급할 내용이 있습니까?</strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_yearly_template
+msgid "<strong>Are you happy with your current role ?</strong>"
+msgstr "<strong>현재 맡고 있는 역할에 만족하십니까?</strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_post_training_template
+msgid ""
+"<strong>Can the employee accurately recall and explain the key concepts from "
+"the training ?</strong>"
+msgstr ""
+"<strong>직원이 교육의 핵심 개념을 정확하게 암기하고 설명할 수 있습니까?</"
+"strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_yearly_template
+msgid "<strong>Career objective</strong>"
+msgstr "<strong>커리어 관련 목표</strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_probationary_period_template
+msgid "<strong>Career opportunities</strong>"
+msgstr "<strong>커리어 관련 기회</strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_probationary_period_template
+msgid "<strong>Company Feedback</strong>"
+msgstr "<strong>회사 피드백</strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_exit_interview_template
+msgid "<strong>Could you provide examples ?</strong>"
+msgstr "<strong>예를 들어서 설명해주세요.</strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_yearly_template
+msgid "<strong>Create your SWOT</strong>"
+msgstr "<strong>SWOT 작성</strong>"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_report_view_gantt
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_view_gantt
 msgid "<strong>Date — </strong>"
 msgstr "<strong>날짜 — </strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_yearly_template
+msgid "<strong>Do you seek any particular career path ?</strong>"
+msgstr "<strong>어떤 특정 경력을 추구하십니까?</strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_exit_interview_template
+msgid "<strong>Feedback on management</strong>"
+msgstr "<strong>경영진에 대한 피드백</strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_yearly_template
+msgid "<strong>GOALS :</strong>"
+msgstr "<strong>목표 :</strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_exit_interview_template
+msgid "<strong>Handover to manage inside the team</strong>"
+msgstr "<strong>팀 내부에서 관리할 인수인계 책임.</strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_post_training_template
+msgid ""
+"<strong>Has the employee effectively integrated the new skills or knowledge "
+"into their daily work tasks ?</strong>"
+msgstr ""
+"<strong>직원이 새로운 기술이나 지식을 일상 업무에 효과적으로 활용했습니까? </"
+"strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_post_training_template
+msgid ""
+"<strong>How actively did the employee participate during the training "
+"sessions (e.g., asking questions, contributing to discussions) ?</strong>"
+msgstr ""
+"<strong>교육 세션 동안 직원이 얼마나 적극적으로 참여했습니까(예: 질문하기, 토"
+"론에 참여하기)? </strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_post_training_template
+msgid ""
+"<strong>How confident do you feel in using the skills and knowledge gained "
+"from the training in your work ?</strong>"
+msgstr ""
+"<strong>교육에서 습득한 기술과 지식을 업무에 적용하는 데 얼마나 자신을 가지"
+"고 있습니까?</strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_probationary_period_template
+msgid ""
+"<strong>How do you feel about the support and resources provided to you "
+"during this period ?</strong>"
+msgstr ""
+"<strong>이 기간 동안 제공된 지원과 리소스에 대해 어떻게 생각하십니까?</"
+"strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_post_training_template
+msgid "<strong>How helpful were the provided materials ?</strong>"
+msgstr ""
+"<strong>제공된 자료가 업무를 지원하는 데 얼마나 효과적이었습니까?</strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_post_training_template
+msgid "<strong>How would you asses your level before the training ?</strong>"
+msgstr "<strong>교육 전 자신의 기술 수준을 어떻게 평가하시겠습니까?</strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_post_training_template
+msgid "<strong>How would you assess your level post training ?</strong>"
+msgstr ""
+"<strong>교육을 마친 후 자신의 기술 수준을 어떻게 평가하시겠습니까?</strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_post_training_template
+msgid ""
+"<strong>How would you rate the employee's proficiency in the skill on a "
+"scale from 1 to 10 ?</strong>"
+msgstr ""
+"<strong>직원의 기술 숙련도를 평가한다면, 10점 만점에 몇 점입니까?</strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_post_training_template
+#: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_yearly_template
+msgid "<strong>Management feedback and assessment</strong>"
+msgstr "<strong>경영진에 대한 피드백과 평가를 제공해주세요.</strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_probationary_period_template
+msgid "<strong>Motivations</strong>"
+msgstr "<strong>동기</strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_post_training_template
+msgid ""
+"<strong>On a scale of 1 to 10, how would you rate the employee’s overall "
+"improvement since the training ?</strong>"
+msgstr ""
+"<strong>1부터 10까지의 범위를 기준으로, 교육을 마친 후 직원의 전반적인 개선 "
+"정도를 어떻게 평가하시겠습니까?</strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_probationary_period_template
+msgid "<strong>Opportunity</strong>"
+msgstr "<strong>기회</strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_probationary_period_template
+msgid "<strong>Overall experience feedback</strong>"
+msgstr "<strong>전체적인 경험 피드백</strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_exit_interview_template
+#: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_post_training_template
+#: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_probationary_period_template
+#: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_yearly_template
+msgid "<strong>Overall personal experience</strong>"
+msgstr "<strong>전반적인 개인 경험</strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_exit_interview_template
+msgid "<strong>Position succession and candidate suggestion</strong>"
+msgstr "<strong>직책 후임자 및 후보자 제안</strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_yearly_template
+msgid "<strong>SWOT results</strong>"
+msgstr "<strong>SWOT 결과</strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_probationary_period_template
+msgid "<strong>SWOT</strong>"
+msgstr "<strong>SWOT</strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_post_training_template
+msgid "<strong>Skills at stakes :</strong>"
+msgstr "<strong>중요한 기술:</strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_probationary_period_template
+msgid "<strong>Strength</strong>"
+msgstr "<strong>강점</strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_yearly_template
+msgid "<strong>Things to keep doing ?</strong>"
+msgstr "<strong>성공을 유지하기 위해 계속해야 할 일은 무엇입니까?</strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_yearly_template
+msgid "<strong>Things to start doing ?</strong>"
+msgstr "<strong>어떤 새로운 계획을 실행하는 것을 고려해야 할까요?</strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_yearly_template
+msgid "<strong>Things to stop doing ?</strong>"
+msgstr "<strong>중단해야 할 관행은 무엇입니까?</strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_probationary_period_template
+msgid "<strong>Threats</strong>"
+msgstr "<strong>위협</strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_yearly_template
+msgid "<strong>Time to assess the leadership team:</strong>"
+msgstr "<strong>리더십 팀을 평가할 시간입니다:</strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_post_training_template
+msgid "<strong>Training assessment</strong>"
+msgstr "<strong>교육 평가</strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_exit_interview_template
+msgid ""
+"<strong>We wish you the best of success and sincerely thank you for your "
+"invaluable contribution to the company's achievements.</strong>"
+msgstr ""
+"<strong>귀하의 지속적인 성공을 기원하며, 귀하의 귀중한 노력에 진심으로 감사드"
+"립니다. </strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_probationary_period_template
+msgid "<strong>Weakness</strong>"
+msgstr "<strong>약점</strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_exit_interview_template
+msgid ""
+"<strong>What advice do you have for improving management's leadership and "
+"support for future employees ?</strong>"
+msgstr ""
+"<strong>경영진의 리더십과 미래의 직원에 대한 지원을 개선하기 위한 제안이 있다"
+"면 무엇입니까?</strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_exit_interview_template
+msgid "<strong>What advice would you give to the successor ?</strong>"
+msgstr "<strong>후임자에게 어떤 조언을 하시겠습니까?</strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_probationary_period_template
+msgid ""
+"<strong>What are your thoughts on the company culture and work environment ?"
+"</strong>"
+msgstr "<strong>회사의 문화와 업무 환경에 대해 어떻게 생각하십니까?</strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_yearly_template
+msgid ""
+"<strong>What are your thoughts on the recent changes in the company ? Were "
+"you able to adapt ?</strong>"
+msgstr ""
+"<strong>최근 회사에서 일어난 변화에 대해 어떻게 생각하십니까? 그 변화에 효과"
+"적으로 적응할 수 있었습니까?</strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_yearly_template
+msgid "<strong>What are your thoughts on working with your team ?</strong>"
+msgstr "<strong>팀과 함께 일하는 것에 대해 어떻게 생각하십니까?</strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_probationary_period_template
+msgid ""
+"<strong>What are your thoughts on your overall experience during the "
+"probationary period ?</strong>"
+msgstr "<strong>수습 기간 동안의 전반적인 경험을 어떻게 평가하십니까?</strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_exit_interview_template
+msgid ""
+"<strong>What aspects of management and leadership at the company were most "
+"effective in helping you succeed ?</strong>"
+msgstr ""
+"<strong>회사의 관리 및 리더십 중 어떤 측면이 여러분의 성공을 가장 효과적으로 "
+"지원했습니까?</strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_probationary_period_template
+msgid ""
+"<strong>What aspects of your role have you enjoyed the most/least ?</strong>"
+msgstr "<strong>여러분의 역할 중 어떤 측면을 가장 즐기십니까?</strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_probationary_period_template
+msgid "<strong>What change would you see in the company ?</strong>"
+msgstr "<strong>회사에 어떤 변화가 있었으면 좋겠습니까?</strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_post_training_template
+msgid ""
+"<strong>What further actions (e.g., additional training, mentoring) do you "
+"recommend to support the employee’s continued development ?</strong>"
+msgstr ""
+"<strong>직원의 지속적인 개발을 지원하기 위해 어떤 추가적인 조치(예: 추가 교"
+"육, 멘토링)를 권장하십니까?</strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_yearly_template
+msgid "<strong>What is your overall feeling about the previous year ?</strong>"
+msgstr ""
+"<strong>지난 1년 동안의 전반적인 소감을 어떻게 표현하시겠습니까?</strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_exit_interview_template
+msgid ""
+"<strong>What key skills should the management team focus on for a smooth "
+"transition ?</strong>"
+msgstr ""
+"<strong>경영진이 원활한 전환을 위해 우선순위를 두어야 할 핵심 기술은 무엇입니"
+"까?</strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_probationary_period_template
+msgid ""
+"<strong>What motivates you to continue working with us, and what are your "
+"career aspirations here ?</strong>"
+msgstr ""
+"<strong>당사와 계속 일하고 싶은 동기는 무엇이며, 회사에서 이루고자 하는 커리"
+"어 목표는 무엇입니까? </strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_exit_interview_template
+msgid "<strong>What were the key challenges in your position ?</strong>"
+msgstr "<strong>해당 직책에서 가장 큰 어려움은 무엇이었습니까? </strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_yearly_template
+msgid "<strong>Which emotions were prevalent ?</strong>"
+msgstr "<strong>여러분의 경험에서 가장 많이 나타난 감정은 무엇입니까?</strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_yearly_template
+msgid ""
+"<strong>Which skills do you possess that you feel the company is not "
+"utilizing ?</strong>"
+msgstr ""
+"<strong>회사에서 제대로 활용하지 않는다고 생각하는 자신만의 기술이 있습니까?"
+"</strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_yearly_template
+msgid ""
+"<strong>Which skills would you like to prioritize for training, and why ?</"
+"strong>"
+msgstr ""
+"<strong>어떤 기술을 훈련에 집중하고 싶으십니까? 그 선택의 이유는 무엇입니까?"
+"</strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_exit_interview_template
+msgid "<strong>Who would you see as your successor ?</strong>"
+msgstr ""
+"<strong>귀하의 직책에 가장 적합한 후임자는 누구라고 생각하십니까?</strong>"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_post_training_template
+msgid "<strong>Would you need extra help from the management team ?</strong>"
+msgstr "<strong>경영진으로부터 추가적인 지원이 필요하다고 느끼십니까?</strong>"
 
 #. module: hr_appraisal
 #: model:ir.model.constraint,message:hr_appraisal.constraint_hr_appraisal_goal_tag_name_uniq
@@ -694,7 +1253,7 @@ msgstr "업무 평가 통계"
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.res_config_settings_view_employee_form
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_template_form
 msgid "Appraisal Template"
-msgstr ""
+msgstr "업무 평가 양식"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_department__custom_appraisal_template_id
@@ -702,6 +1261,16 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.res_config_settings_view_employee_form
 msgid "Appraisal Templates"
 msgstr "업무 평가 양식"
+
+#. module: hr_appraisal
+#. odoo-python
+#: code:addons/hr_appraisal/wizard/request_appraisal.py:0
+msgid ""
+"Appraisal for %(appraisal_title)s should be using template \"%"
+"(template_name)s\" instead of \"%(wrong_template_name)s\""
+msgstr ""
+"%(appraisal_title)s에 대한 평가는 \"%(template_name)s\" 템플릿을 사용해야 합"
+"니다. \"%(wrong_template_name)s\"는 사용할 수 없습니다."
 
 #. module: hr_appraisal
 #. odoo-python
@@ -751,7 +1320,7 @@ msgstr "업무 평가"
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.res_config_settings_view_employee_form
 msgid "Appraisals Automation"
-msgstr ""
+msgstr "업무 평가 자동화"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.res_config_settings_view_employee_form
@@ -784,7 +1353,9 @@ msgstr "평가 관련 참고 사항"
 msgid ""
 "Assign Goals to motivate your Employees and keep track of their objectives "
 "between Appraisals."
-msgstr "목표를 설정하여 직원에게 동기를 부여하고 이를 추적하여 업무 평가에 반영합니다."
+msgstr ""
+"목표를 설정하여 직원에게 동기를 부여하고 이를 추적하여 업무 평가에 반영합니"
+"다."
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__message_attachment_count
@@ -882,12 +1453,12 @@ msgstr "취소됨"
 #. module: hr_appraisal
 #: model:ir.model.fields,help:hr_appraisal.field_hr_appraisal__date_close
 msgid "Closing date of the current appraisal"
-msgstr ""
+msgstr "현재 평가의 마감일"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,help:hr_appraisal.field_hr_appraisal__previous_appraisal_date
 msgid "Closing date of the previous appraisal"
-msgstr ""
+msgstr "이전 평가의 마감일"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal_tag__color
@@ -980,7 +1551,7 @@ msgstr "새로운 목표 설정"
 #. module: hr_appraisal
 #: model_terms:ir.actions.act_window,help:hr_appraisal.hr_appraisal_goal_tag_action
 msgid "Create new tags to use on Employee's goals"
-msgstr ""
+msgstr "직원의 목표에 사용할 새 태그를 생성합니다."
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_view_search
@@ -1021,7 +1592,7 @@ msgstr "작성일자"
 #. module: hr_appraisal
 #: model:ir.model.fields,help:hr_appraisal.field_hr_appraisal__next_appraisal_date
 msgid "Date where the new appraisal will be automatically created"
-msgstr ""
+msgstr "새 평가가 자동으로 생성되는 날짜입니다."
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__deadline
@@ -1114,6 +1685,11 @@ msgid "Done"
 msgstr "완료"
 
 #. module: hr_appraisal
+#: model:ir.model,name:hr_appraisal.model_mail_template
+msgid "Email Templates"
+msgstr "이메일 양식"
+
+#. module: hr_appraisal
 #: model:ir.model,name:hr_appraisal.model_hr_employee
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__employee_id
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_goal__employee_id
@@ -1132,7 +1708,7 @@ msgstr "직원 업무 평가"
 #. module: hr_appraisal
 #: model:ir.model,name:hr_appraisal.model_hr_appraisal_template
 msgid "Employee Appraisal Template"
-msgstr ""
+msgstr "직원 업무 평가 양식"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__employee_autocomplete_ids
@@ -1251,6 +1827,8 @@ msgid ""
 "Give one positive achievement that convinced you of the employee's\n"
 "                    value."
 msgstr ""
+"해당 직원의 업무 능력을 인정하게 된 바람직한 성과 한 가지를 제시해\n"
+"                    주세요."
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_view_form
@@ -1308,7 +1886,7 @@ msgstr "하드 스킬"
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal_report__has_department_manager_access
 msgid "Has Department Manager Access"
-msgstr ""
+msgstr "부서장 권한"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__has_message
@@ -1495,6 +2073,8 @@ msgid ""
 "Long term (&gt; 6 months) career discussion, where does the employee\n"
 "                    wants to go, how to help them reach this path?"
 msgstr ""
+"장기적인 (6개월 이상) 커리어 발달 기회에 대하여, 직원이 이루고자 하는\n"
+"                    목표는 무엇이며, 어떻게 도와줄 수 있습니까?"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_request_appraisal__template_id
@@ -1725,15 +2305,27 @@ msgid "Operation not supported"
 msgstr "지원되지 않는 작업"
 
 #. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_yearly_template
+#: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_yearly_template
+msgid "Opportunities"
+msgstr "영업기회"
+
+#. module: hr_appraisal
 #: model:ir.model.fields,help:hr_appraisal.field_request_appraisal__lang
 msgid ""
 "Optional translation language (ISO code) to select when sending out an "
 "email. If not set, the english version will be used. This should usually be "
-"a placeholder expression that provides the appropriate language, e.g. {{ "
-"object.partner_id.lang }}."
+"a placeholder expression that provides the appropriate language, e.g. "
+"{{ object.partner_id.lang }}."
 msgstr ""
-"이메일 전송 시 번역할 언어 (ISO code)를 선택할 수 있습니다. 설정하지 않을 경우, 영어가 기본 언어로 사용됩니다. 적절한 "
-"언어를 선택할 수 있도록 다음과 같은 예시용 메시지를 사용합니다. {{ object.partner_id.lang }}."
+"이메일 전송 시 번역할 언어 (ISO code)를 선택할 수 있습니다. 설정하지 않을 경"
+"우, 영어가 기본 언어로 사용됩니다. 적절한 언어를 선택할 수 있도록 다음과 같"
+"은 예시용 메시지를 사용합니다. {{ object.partner_id.lang }}."
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_exit_interview_template
+msgid "Overall experience feedback"
+msgstr "전체적인 경험 피드백"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_employee__parent_user_id
@@ -1751,7 +2343,7 @@ msgstr "관리하는 직원"
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__previous_appraisal_date
 msgid "Previous Appraisal Date"
-msgstr ""
+msgstr "이전 업무 평가 날짜"
 
 #. module: hr_appraisal
 #. odoo-python
@@ -1907,7 +2499,7 @@ msgstr "순서"
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.res_config_settings_view_employee_form
 msgid "Set default appraisal template"
-msgstr ""
+msgstr "기본 평가 템플릿 설정"
 
 #. module: hr_appraisal
 #: model:ir.actions.act_window,name:hr_appraisal.hr_appraisal_config_settings_action
@@ -1965,6 +2557,12 @@ msgstr ""
 "예정: 향후 계획된 활동입니다."
 
 #. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_yearly_template
+#: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_yearly_template
+msgid "Strengths"
+msgstr "강점"
+
+#. module: hr_appraisal
 #. odoo-python
 #: code:addons/hr_appraisal/models/res_company.py:0
 msgid "Strongly Exceed Expectations"
@@ -1989,11 +2587,22 @@ msgstr "태그"
 
 #. module: hr_appraisal
 #. odoo-python
+#: code:addons/hr_appraisal/models/mail_template.py:0
+msgid ""
+"Template %(template_name)s is necessary for appraisal requests and may not "
+"be removed."
+msgstr ""
+"템플릿 %(template_name)s는 업무 평가 요청에 필요하며 제거할 수 없습니다."
+
+#. module: hr_appraisal
+#. odoo-python
 #: code:addons/hr_appraisal/models/hr_appraisal.py:0
 msgid ""
 "Thanks to your Appraisal Plan, without any new manual Appraisal, the new "
 "Appraisal will be automatically created on %s."
-msgstr "업무 평가 계획을 사용하면, 매번 수동으로 업무 평가를 작성하지 않아도 %s에 새 업무 평가가 자동으로 생성됩니다."
+msgstr ""
+"업무 평가 계획을 사용하면, 매번 수동으로 업무 평가를 작성하지 않아도 %s에 새 "
+"업무 평가가 자동으로 생성됩니다."
 
 #. module: hr_appraisal
 #. odoo-python
@@ -2034,7 +2643,8 @@ msgid ""
 "The employee %(employee)s arrived %(months)s months ago. The appraisal is "
 "created and you can fill it here."
 msgstr ""
-"직원 %(employee)s이 %(months)s개월 전에 입사했습니다. 업무 평가가 생성되었으며 여기에서 내용을 입력하실 수 있습니다."
+"직원 %(employee)s이 %(months)s개월 전에 입사했습니다. 업무 평가가 생성되었으"
+"며 여기에서 내용을 입력하실 수 있습니다."
 
 #. module: hr_appraisal
 #. odoo-python
@@ -2048,7 +2658,9 @@ msgstr "관리자는 직원 피드백을 수정할 수 없습니다."
 msgid ""
 "The employee's feedback will be published without their consent. Do you "
 "really want to publish it? This action will be logged in the chatter."
-msgstr "직원의 피드백이 직원의 동의 없이 게시됩니다. 정말로 게시하시겠습니까? 이 작업은 대화창에 기록됩니다."
+msgstr ""
+"직원의 피드백이 직원의 동의 없이 게시됩니다. 정말로 게시하시겠습니까? 이 작업"
+"은 대화창에 기록됩니다."
 
 #. module: hr_appraisal
 #. odoo-python
@@ -2057,8 +2669,8 @@ msgid ""
 "The last appraisal of %(employee)s was %(months)s months ago. The appraisal "
 "is created and you can fill it here."
 msgstr ""
-"%(employee)s에 대한 마지막 업무 평가는 %(months)s개월 전이었습니다. 새로운 업무 평가서가 생성되었으며, 여기에서 "
-"내용을 입력하실 수 있습니다."
+"%(employee)s에 대한 마지막 업무 평가는 %(months)s개월 전이었습니다. 새로운 업"
+"무 평가서가 생성되었으며, 여기에서 내용을 입력하실 수 있습니다."
 
 #. module: hr_appraisal
 #. odoo-python
@@ -2070,6 +2682,12 @@ msgstr "직원은 관리자 피드백을 수정할 수 없습니다."
 #: model:ir.model.fields,help:hr_appraisal.field_hr_appraisal__assessment_note
 msgid "This field is not visible to the Employee."
 msgstr "이 필드는 직원에게는 표시되지 않습니다."
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_yearly_template
+#: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_yearly_template
+msgid "Threats"
+msgstr "위협"
 
 #. module: hr_appraisal
 #: model:ir.model.fields.selection,name:hr_appraisal.selection__hr_appraisal__state__new
@@ -2135,18 +2753,22 @@ msgstr "예정된 업무 평가"
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_template_form
 msgid ""
-"Use this area to write the content that will be displayed for the Employee."
-"                                         You can use a lot of options with "
-"the html editor, accessible by pressing / on the keyboard."
+"Use this area to write the content that will be displayed for the "
+"Employee.                                         You can use a lot of "
+"options with the html editor, accessible by pressing / on the keyboard."
 msgstr ""
+"이 영역을 사용하여 직원에게 표시될 콘텐츠를 작성합니다. 키보드에서 /를 눌러 "
+"액세스할 수 있는 HTML 편집기로 다양한 옵션을 활용할 수 있습니다."
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_template_form
 msgid ""
-"Use this area to write the content that will be displayed for the Manager."
-"                                         You can use a lot of options with "
-"the html editor, accessible by pressing / on the keyboard."
+"Use this area to write the content that will be displayed for the "
+"Manager.                                         You can use a lot of "
+"options with the html editor, accessible by pressing / on the keyboard."
 msgstr ""
+"이 영역에서는 관리자에게 표시될 콘텐츠를 작성할 수 있습니다. 키보드에서 /를 "
+"눌러 액세스할 수 있는 HTML 편집기로 다양한 옵션을 활용할 수 있습니다."
 
 #. module: hr_appraisal
 #: model:ir.model,name:hr_appraisal.model_res_users
@@ -2163,6 +2785,12 @@ msgstr "사용자 콘텐츠"
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__waiting_feedback
 msgid "Waiting Feedback from Employee/Managers"
 msgstr "직원/관리자의 피드백을 기다리는 중"
+
+#. module: hr_appraisal
+#: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_yearly_template
+#: model_terms:hr.appraisal.template,appraisal_manager_feedback_template:hr_appraisal.hr_appraisal_yearly_template
+msgid "Weaknesses"
+msgstr "약점"
 
 #. module: hr_appraisal
 #: model:ir.model.fields,field_description:hr_appraisal.field_hr_appraisal__website_message_ids
@@ -2187,6 +2815,8 @@ msgid ""
 "What are my short and long-term goals with the company, and for my\n"
 "                    career?"
 msgstr ""
+"회사의 발전과 본인 스스로의 개발을 위해 설정한 장단기 목표에 대해\n"
+"                    기술해 주세요."
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_default_template
@@ -2194,6 +2824,8 @@ msgid ""
 "What has been the most challenging aspect of my work this past year and\n"
 "                    why?"
 msgstr ""
+"지난 한 해 동안의 업무 중 가장 어려웠던 부분과 그 이유는\n"
+"                    무엇입니까?"
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_default_template
@@ -2205,12 +2837,15 @@ msgstr "본인의 업무와 관련하여 개선이 필요한 부분은 무엇입
 msgid ""
 "When the Appraisals plan is saved, it will overwrite all Next Appraisal "
 "Dates for employees without ongoing appraisals."
-msgstr "업무 평가 계획이 저장되면 진행 중인 평가가 없는 직원에 대한 다음 업무 평가 날짜는 덮어쓰기됩니다."
+msgstr ""
+"업무 평가 계획이 저장되면 진행 중인 평가가 없는 직원에 대한 다음 업무 평가 날"
+"짜는 덮어쓰기됩니다."
 
 #. module: hr_appraisal
 #: model_terms:hr.appraisal.template,appraisal_employee_feedback_template:hr_appraisal.hr_appraisal_default_template
 msgid "Which parts of my job do I most / least enjoy?"
-msgstr "본인이 맡은 업무 중 가장 좋아하는 부분과 좋아하지 않는 부분은 무엇입니까?"
+msgstr ""
+"본인이 맡은 업무 중 가장 좋아하는 부분과 좋아하지 않는 부분은 무엇입니까?"
 
 #. module: hr_appraisal
 #. odoo-python
@@ -2218,14 +2853,18 @@ msgstr "본인이 맡은 업무 중 가장 좋아하는 부분과 좋아하지 �
 msgid ""
 "You arrived %s months ago. Your appraisal is created and you can fill it "
 "here."
-msgstr "처음 입사한지 %s개월이 지났습니다. 귀하에 대한 업무 평가가 생성되었으며 여기에서 내용을 입력하실 수 있습니다."
+msgstr ""
+"처음 입사한지 %s개월이 지났습니다. 귀하에 대한 업무 평가가 생성되었으며 여기"
+"에서 내용을 입력하실 수 있습니다."
 
 #. module: hr_appraisal
 #. odoo-python
 #: code:addons/hr_appraisal/models/hr_employee.py:0
 msgid ""
 "You cannot delete an employee who is a goal's manager, archive it instead."
-msgstr "목표 관리자인 직원은 삭제할 수 없습니다. 대신 해당 직원을 보관 처리할 수 있습니다."
+msgstr ""
+"목표 관리자인 직원은 삭제할 수 없습니다. 대신 해당 직원을 보관 처리할 수 있습"
+"니다."
 
 #. module: hr_appraisal
 #. odoo-python
@@ -2249,9 +2888,11 @@ msgstr "업무 평가가 완료되었습니다."
 #. odoo-python
 #: code:addons/hr_appraisal/models/hr_appraisal.py:0
 msgid ""
-"Your last appraisal was %s months ago. Your appraisal is created and you can"
-" fill it here."
-msgstr "마지막 업무 평가가 %s개월 전에 작성되었습니다. 새로운 업무 평가서가 생성되었으며, 여기에서 내용을 입력하실 수 있습니다."
+"Your last appraisal was %s months ago. Your appraisal is created and you can "
+"fill it here."
+msgstr ""
+"마지막 업무 평가가 %s개월 전에 작성되었습니다. 새로운 업무 평가서가 생성되었"
+"으며, 여기에서 내용을 입력하실 수 있습니다."
 
 #. module: hr_appraisal
 #. odoo-javascript
@@ -2262,12 +2903,12 @@ msgstr "새로 만들기"
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_template_form
 msgid "e.g. Annual Appraisal"
-msgstr ""
+msgstr "예: 연간 업무 평가"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_view_form
 msgid "e.g. Improve your English level"
-msgstr ""
+msgstr "예: 영어 실력 향상"
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.view_hr_appraisal_form
@@ -2277,7 +2918,7 @@ msgstr "예: 홍길동"
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.hr_appraisal_goal_tag_view_tree
 msgid "e.g. Remediation, Team, Improvement plan, Career change, ..."
-msgstr ""
+msgstr "예: 개선, 팀, 개선 계획, 경력 변경 등..."
 
 #. module: hr_appraisal
 #: model_terms:ir.ui.view,arch_db:hr_appraisal.res_config_settings_view_employee_form
@@ -2315,3 +2956,15 @@ msgstr "{{ hasattr(object, 'name') and object.name or '' }} 업무평가 요청�
 #: model:mail.template,subject:hr_appraisal.mail_template_appraisal_confirm
 msgid "{{ object.employee_id.name }}: Appraisal Confirmed"
 msgstr "{{ object.employee_id.name }}: 업무평가 확인"
+
+#~ msgid "100%"
+#~ msgstr "100%"
+
+#~ msgid "25%"
+#~ msgstr "25%"
+
+#~ msgid "50%"
+#~ msgstr "50%"
+
+#~ msgid "75%"
+#~ msgstr "75%"

@@ -5,6 +5,8 @@ import { Transition } from "@web/core/transition";
 import { _t } from "@web/core/l10n/translation";
 import { Component, useState, useRef } from "@odoo/owl";
 
+const { DateTime } = luxon;
+
 /**
  * Expiration panel
  *
@@ -54,7 +56,26 @@ export class ExpirationPanel extends Component {
         if (this.subscription.expirationReason === "demo") {
             return _t("This demo database will expire in %s. ", delay);
         }
-        return _t("This database will expire in %s. ", delay);
+
+        const expirationDate = this.subscription.expirationDate;
+        const today = DateTime.now();
+        const diff = expirationDate.diff(today);
+
+        if (this.subscription.expirationReason !== 'renewal') {
+            return _t("This database will expire in %s. ", delay);
+        } else {
+            if (daysLeft > 15) {
+                return _t(
+                    "Your subscription expires in %s days. ",
+                    daysLeft - 15
+                );
+            } else {
+                return _t(
+                    "Your subscription expired %s days ago. This database will be blocked soon. ",
+                    (diff.as("days") | 0)
+                );
+            }
+        }
     }
 
     showRegistrationForm() {

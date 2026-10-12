@@ -19,7 +19,7 @@ class Task(models.Model):
         fsm_project = False
         if is_fsm_mode and 'project_id' in fields_list and not self._context.get('default_parent_id'):
             company_id = self.env.context.get('default_company_id') or self.env.company.id
-            fsm_project = self.env['project.project'].search([('is_fsm', '=', True), ('company_id', '=', company_id)], order='sequence', limit=1)
+            fsm_project = self.env['project.project'].search([('is_fsm', '=', True), ('company_id', '=', company_id)], order='sequence, name, id', limit=1)
             if fsm_project:
                 context['default_project_id'] = self.env.context.get('default_project_id', fsm_project.id)
         result = super(Task, self.with_context(context)).default_get(fields_list)
@@ -133,10 +133,11 @@ class Task(models.Model):
     def _inverse_partner_phone(self):
         for task in self:
             if task.partner_id:
-                if task.partner_id.mobile or not task.partner_id.phone:
-                    task.partner_id.mobile = task.partner_phone
+                partner = task.partner_id.sudo()
+                if partner.mobile or not partner.phone:
+                    partner.mobile = task.partner_phone
                 else:
-                    task.partner_id.phone = task.partner_phone
+                    partner.phone = task.partner_phone
 
     @api.depends('partner_phone', 'partner_id.phone')
     def _compute_is_task_phone_update(self):
@@ -195,6 +196,14 @@ class Task(models.Model):
             vals.update({"date_deadline": False, "planned_date_begin": False})
 
         return super(Task, self_fsm).write(vals)
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        tasks = super().create(vals_list)
+        for task in tasks:
+            if task.is_fsm and not task.partner_id and self.env.user.has_group('base.group_portal'):
+                task.partner_id = self.env.user.partner_id
+        return tasks
 
     @api.model
     def _group_expand_project_ids(self, projects, domain):
@@ -422,11 +431,7 @@ class Task(models.Model):
         }
 
     def action_send_report(self):
-        tasks_with_report = self.filtered(
-            lambda task:
-                (task.display_send_report_primary or task.display_send_report_secondary)
-                and task._is_fsm_report_available()
-        )
+        tasks_with_report = self.filtered(lambda task: task._is_fsm_report_available())
         if not tasks_with_report:
             return {
                 'type': 'ir.actions.client',
@@ -500,3 +505,7 @@ class Task(models.Model):
                 [('is_fsm', '=', True)],
             ])
         return action
+
+    def _get_report_base_filename(self):
+        self.ensure_one()
+        return 'Field Service Report %s - %s' % (self.name, self.partner_id.name)

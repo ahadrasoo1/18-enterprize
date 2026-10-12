@@ -2,7 +2,6 @@
 
 {
     'name': 'Bangladesh - Payroll with Accounting',
-    'author': 'Odoo',
     'version': '1.0',
     'category': 'Human Resources',
     'description': """

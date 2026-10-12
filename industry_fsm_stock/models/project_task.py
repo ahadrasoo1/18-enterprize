@@ -21,7 +21,8 @@ class Task(models.Model):
             for order_line in sale_line:
                 to_log = {}
                 total_qty = sum(order_line.move_ids.filtered(lambda m: m.state != 'cancel' and not m.move_dest_ids).mapped('product_uom_qty'))
-                if float_compare(order_line.product_uom_qty, total_qty, precision_rounding=order_line.product_uom.rounding) < 0:
+                if (float_compare(order_line.product_uom_qty, total_qty, precision_rounding=order_line.product_uom.rounding) < 0
+                    and order_line.product_id in order_line.move_ids.product_id):
                     to_log[order_line] = (order_line.product_uom_qty, total_qty)
 
                 if to_log:
@@ -150,8 +151,6 @@ class Task(models.Model):
            to do so as there would be a risk that all the existing SOL (possibly added in a (pre)sale phase)
            would get that user's default warehouse when the SO gets confirmed and the picking generated."""
         sale_order = super()._fsm_ensure_sale_order()
-        if self.env.user.has_group('project.group_project_user'):
-            sale_order = self.sale_order_id.sudo()
         if sale_order.state == 'draft':
             sale_order.action_confirm()
         return sale_order
@@ -166,9 +165,19 @@ class Task(models.Model):
         sale_order = self.sale_order_id
         if self.env.user.has_group('project.group_project_user'):
             sale_order = self.sale_order_id.sudo()
-        sale_order.action_confirm()
+        sale_order.with_context(fsm_create_sale_order=True).action_confirm()
 
     def action_fsm_view_material(self):
         action = super(Task, self).action_fsm_view_material()
         action['context'].update({"warehouse_id": self.env.user._get_default_warehouse_id().id})
         return action
+
+    def action_fsm_validate(self, stop_running_timers=False):
+        """Since SOs for FSM tasks are confirmed right after creation
+           and this blocks the creation of pickings,
+           we do not lock sales orders for FSM tasks after confirmation.
+           Instead, we lock the SOs when we mark the FSM task as done."""
+        res = super().action_fsm_validate(stop_running_timers)
+        if res is True:
+            self.sudo().sale_order_id.filtered(lambda so: so._should_be_locked()).action_lock()
+        return res

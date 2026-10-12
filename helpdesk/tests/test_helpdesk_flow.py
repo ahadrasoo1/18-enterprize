@@ -145,6 +145,26 @@ Content-Transfer-Encoding: quoted-printable
             ticket1.write({'stage_id': self.stage_done.id})
             self.assertEqual(ticket1.close_hours, 19, "Close time for ticket not correct")
 
+    def test_ticket_ref_ordering(self):
+        ticket_sequence = self.env['ir.sequence'].search([('code', '=', 'helpdesk.ticket')])
+        ticket_sequence.padding = 2
+        ticket_sequence.number_next_actual = 99
+        tickets = self.env['helpdesk.ticket'].create([
+            {
+                'name': 'test ticket_ref ordering',
+                'team_id': self.test_team.id,
+            },
+            {
+                'name': 'test ticket_ref ordering',
+                'team_id': self.test_team.id,
+            },
+        ])
+        self.assertTrue(tickets[0].ticket_ref > tickets[1].ticket_ref)  # '99' > '100'
+
+        ticket_search = tickets.search([('name', '=', 'test ticket_ref ordering')], order='ticket_ref ASC')
+        self.assertEqual(ticket_search[0], tickets[0], "Ticket created first appears first in order")
+        self.assertEqual(ticket_search[1], tickets[1])
+
     def test_ticket_partners(self):
         # we create a partner
         partner = self.env['res.partner'].create({
@@ -327,6 +347,39 @@ Content-Transfer-Encoding: quoted-printable
 
         self.assertTrue(partner0 in helpdesk_ticket0.message_follower_ids.mapped('partner_id'))
         self.assertTrue(partner1 in helpdesk_ticket1.message_follower_ids.mapped('partner_id'))
+
+        # Test case: partner already existing in company A sends email to team alias in company B.
+        new_message_2 = f"""MIME-Version: 1.0
+Date: Thu, 27 Dec 2018 16:27:45 +0100
+Message-ID: blablabla2
+Subject: Cross-company ticket
+From:  A client <client_a@someprovider.com>
+To: {mail_alias1.display_name}
+Content-Type: multipart/alternative; boundary="000000000000a47519057e029630"
+
+--000000000000a47519057e029630
+Content-Type: text/plain; charset="UTF-8"
+
+
+--000000000000a47519057e029630
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div>Cross-company message</div>
+
+--000000000000a47519057e029630--
+"""
+        partner_client_a = Partner.search([('email', 'in', ['client_a@someprovider.com'])])
+        self.assertEqual(partner_client_a.company_id, company0)
+
+        helpdesk_ticket_cross_id = self.env['mail.thread'].message_process(False, new_message_2)
+        self.env.cr.flush()  # trigger pre-commit
+        helpdesk_ticket_cross = self.env['helpdesk.ticket'].browse(helpdesk_ticket_cross_id)
+
+        self.assertEqual(helpdesk_ticket_cross.team_id, helpdesk_team1)
+        self.assertEqual(helpdesk_ticket_cross.company_id, company1)
+        self.assertEqual(helpdesk_ticket_cross.partner_id.company_id, company1, "A new partner should have been created in company of helpdesk team.")
+        self.assertTrue(helpdesk_ticket_cross.partner_id in helpdesk_ticket_cross.message_follower_ids.mapped('partner_id'))
 
     def test_ticket_sequence_created_from_multi_company(self):
         """
@@ -784,6 +837,33 @@ should be in the ticket's description
         })
         self.assertEqual(self.helpdesk_user.partner_id.phone, '123')
 
+    def test_partner_multi_email_not_overwritten(self):
+        """Test that a partner with multiple comma-separated emails does not
+        get their email overwritten when a ticket is created with one of those
+        emails as the partner_email (e.g. from an incoming mail).
+        """
+        multi_email = 'primary@example.com, secondary@example.com'
+        partner = self.env['res.partner'].create({
+            'name': 'Multi Email Partner',
+            'email': multi_email,
+        })
+        ticket = self.env['helpdesk.ticket'].create({
+            'name': 'Ticket from primary email',
+            'partner_id': partner.id,
+            'partner_email': '"Multi Email Partner" <primary@example.com>',
+        })
+        self.assertEqual(partner.email, multi_email)
+        self.assertFalse(ticket.is_partner_email_update)
+
+        # Same test with the secondary email
+        ticket2 = self.env['helpdesk.ticket'].create({
+            'name': 'Ticket from secondary email',
+            'partner_id': partner.id,
+            'partner_email': 'secondary@example.com',
+        })
+        self.assertEqual(partner.email, multi_email)
+        self.assertFalse(ticket2.is_partner_email_update)
+
     def test_ticket_display_name(self):
         """
         Test to verify that the display_name should not display the ID of its record when
@@ -852,3 +932,92 @@ should be in the ticket's description
 
         self.assertFalse(ticket1.user_id)
         self.assertFalse(ticket2.user_id)
+
+    def test_copy_first_and_avg_response_time(self):
+        helpdesk_ticket = self.env['helpdesk.ticket'].create({
+            'name': 'Test ticket',
+            'first_response_hours': '1.5',
+            'avg_response_hours': '2.33',
+            'total_response_hours': '4.5',
+        })
+
+        ticket_copy = helpdesk_ticket.copy()
+        self.assertEqual(ticket_copy.first_response_hours, 0.0)
+        self.assertEqual(ticket_copy.avg_response_hours, 0.0)
+        self.assertEqual(ticket_copy.total_response_hours, 0.0)
+
+    def test_assigned_customer_multicompany(self):
+        """
+        Test in multicompany that the assigned customer is in the same company as the ticket
+
+        Test Case:
+        ==========
+        1. Create 2 companies
+        2. Create `res.partner` `test_partner` in company1
+        3. Create ticket for helpdesk_team2 from company2
+           with email of `test_partner`
+        4. Check that the partner on the ticket is a newly
+           created partner in company2 and different from `test_partner`
+        """
+
+        company1 = self.main_company_id
+        company2, company3 = self.env['res.company'].create([
+            {'name': 'company2'},
+            {'name': 'company3'},
+        ])
+
+        # Create a partner in company1
+        test_partner, test_partner2 = self.env['res.partner'].create([
+            {
+                'name': 'test partner',
+                'email': 'testmail@test.com',
+                'company_id': company1,
+            }, {
+                'name': 'test partner without company',
+                'email': 'testcompany@test.com',
+                'company_type': 'company',
+                'company_id': False,
+            },
+        ])
+
+        # Create a helpdesk team in company2
+        helpdesk_team, helpdesk_team_company3 = self.env['helpdesk.team'].create([
+            {'name': 'test team', 'company_id': company2.id},
+            {'name': 'test team2', 'company_id': company3.id},
+        ])
+
+        # Create a ticket in company2 with email of test_partner
+        ticket = self.env['helpdesk.ticket'].create({
+            'partner_name': 'Test Name',
+            'partner_email': 'testmail@test.com',
+            'name': 'Ticket Name',
+            'team_id': helpdesk_team.id,
+        })
+
+        self.assertTrue(ticket.partner_id)
+        self.assertNotEqual(ticket.partner_id, test_partner)
+        self.assertEqual(ticket.partner_id.company_id, ticket.company_id)
+
+        ticket2 = self.env['helpdesk.ticket'].create({
+            'partner_name': 'Test Name',
+            'partner_email': 'testcompany@test.com',
+            'name': 'Ticket Name',
+            'team_id': helpdesk_team_company3.id,
+        })
+
+        self.assertEqual(ticket2.partner_id, test_partner2)
+        self.assertFalse(ticket2.partner_id.company_id)
+
+    def test_ticket_created_in_closed_stage_sets_close_date(self):
+        """Test that a ticket created directly in a folded (closed) stage sets close_date."""
+        with self._ticket_patch_now("2024-06-01 10:00:00"):
+            ticket = self.env['helpdesk.ticket'].create({
+                'name': 'Closed from start',
+                'team_id': self.test_team.id,
+                'stage_id': self.stage_done.id,
+            })
+        self.assertEqual(
+            ticket.close_date,
+            datetime(2024, 6, 1, 10, 0, 0),
+            "Ticket created in a closed stage should have close_date set to the current datetime"
+        )

@@ -27,10 +27,13 @@
             <attribute name="t-if">not combination_info.get('is_rental')</attribute>
         </xpath>
         <xpath expr="//h3[hasclass('css_non_editable_mode_hidden')]" position="attributes">
-            <attribute name="t-if">not combination_info.get('is_rental')</attribute>
+            <attribute name="t-if" add="not combination_info.get('is_rental')" separator=" and "/>
         </xpath>
         <xpath expr="//div[@itemprop='offers']" position="after">
-            <div t-if="combination_info.get('is_rental')" class="d-inline-block mt-2 mb-3">
+            <div
+                t-if="combination_info.get('is_rental') and not combination_info['prevent_zero_price_sale']"
+                class="d-inline-block mt-2 mb-3"
+            >
                 <h3>
                     <span
                         class="oe_price o_renting_total_price text-nowrap"
@@ -101,8 +104,8 @@
                         t-set="current_image_cols"
                         t-value="website._get_product_page_proportions()[0]"
                     />
-                    <input type="hidden" name="default_start_date" t-att-value="wso.rental_start_date or combination_info['default_start_date']"/>
-                    <input type="hidden" name="default_end_date" t-att-value="wso.rental_return_date or combination_info['default_end_date']"/>
+                    <input type="hidden" name="default_start_date" t-att-value="combination_info['default_start_date']"/>
+                    <input type="hidden" name="default_end_date" t-att-value="combination_info['default_end_date']"/>
                     <input type="hidden" name="rental_duration_unit" t-att-value="combination_info['rental_duration_unit']"/>
                     <strong class="attribute_name">
                         <span>Rental Period</span>
@@ -119,14 +122,14 @@
                         <div class="s_website_form_datetime date o_daterange_picker">
                             <div t-attf-class="d-flex gap-2 align-items-center flex-column flex-md-row #{current_image_cols == 8 and 'flex-lg-column'} #{(current_image_cols == 0 or current_image_cols == 12) and 'd-lg-inline-flex'}">
                                 <div class="input-group">
-                                    <input id="rental_product_start_date" type="text" name="renting_start_date" placeholder="Start date" t-att-value="wso.rental_start_date or combination_info['default_start_date']" class="o_website_sale_daterange_picker_input form-control" t-att-disabled="periodIsSet"/>
+                                    <input id="rental_product_start_date" type="text" name="renting_start_date" placeholder="Start date" t-att-value="wso.rental_start_date and wso.convert_to_website_tz(wso.rental_start_date) or combination_info['default_start_date']" class="o_website_sale_daterange_picker_input form-control" t-att-disabled="periodIsSet"/>
                                     <label for="rental_product_start_date" class="input-group-text input-group-text-subtle d-flex align-items-center">
                                         <i class="fa fa-calendar" role="img"/>
                                     </label>
                                 </div>
                                 <i t-attf-class="oi oi-arrow-right d-none d-md-block #{current_image_cols == 8 and 'd-lg-none'}" role="img"/>
                                 <div class="input-group">
-                                    <input id="rental_product_end_date" type="text" name="renting_end_date" placeholder="End date" t-att-value="wso.rental_return_date or combination_info['default_end_date']" class="o_website_sale_daterange_picker_input form-control" t-att-disabled="periodIsSet"/>
+                                    <input id="rental_product_end_date" type="text" name="renting_end_date" placeholder="End date" t-att-value="wso.rental_return_date and wso.convert_to_website_tz(wso.rental_return_date) or combination_info['default_end_date']" class="o_website_sale_daterange_picker_input form-control" t-att-disabled="periodIsSet"/>
                                     <label for="rental_product_end_date" class="input-group-text input-group-text-subtle d-flex align-items-center">
                                         <i class="fa fa-calendar" role="img"/>
                                     </label>
@@ -241,7 +244,10 @@
                  class="d-md-block small text-muted"/>
         </td>
         <xpath expr="//div[@id='o_wsale_total_accordion_item']/t[@t-call='website_sale.total']" position="before">
-            <div t-if="website_sale_order and website_sale_order.has_rented_products" class="pt-3 border-top mb-3">
+            <div
+                t-if="website_sale_order and website_sale_order.has_rented_products and website_sale_order._is_valid_renting_dates()"
+                class="pt-3 border-top mb-3"
+            >
                 <h6 class="attribute_name">Rental Period</h6>
                 <div class="oe_unremovable d-flex gap-1 align-items-center w-100 text-muted">
                     <span t-out="website_sale_order.convert_to_website_tz(website_sale_order.rental_start_date)"
@@ -301,18 +307,21 @@
     </template>
 
     <template id="suggested_products_list" inherit_id="website_sale.suggested_products_list">
-        <xpath expr="//div[@name='website_sale_suggested_product_price']/t[@t-set='combination_info']" position="after">
-            <span t-if="combination_info.get('is_rental') and combination_info['rental_duration']" class="h6">from</span>
-        </xpath>
         <xpath expr="//div[@name='website_sale_suggested_product_price']/del" position="attributes">
             <attribute name="t-if">not product.rent_ok</attribute>
         </xpath>
         <xpath expr="//div[@name='website_sale_suggested_product_price']//span" position="after">
             <span t-if="combination_info.get('is_rental') and combination_info['rental_duration']" class="h6">
-                <span>per</span>
+                <span class="ps-1">per</span>
                 <span t-if="combination_info['rental_duration'] > 1" t-esc="combination_info['rental_duration']"/>
                 <span t-esc="combination_info['rental_unit']"/>
             </span>
+        </xpath>
+        <xpath
+            expr="//div[@name='website_sale_suggested_product_price']/t[@t-set='combination_info']"
+            position="after">
+            <span t-if="combination_info.get('is_rental') and combination_info['rental_duration']"
+                class="h6 pe-1">from</span>
         </xpath>
     </template>
 
@@ -325,8 +334,8 @@
         >
             <input type="hidden" name="rental_duration_unit" value="hour"/>
             <t t-set="wso" t-value="website.sale_get_order()"/>
-            <input type="hidden" name="default_start_date" t-if="wso and wso.has_rented_products" t-att-value="wso.rental_start_date"/>
-            <input type="hidden" name="default_end_date" t-if="wso and wso.has_rented_products" t-att-value="wso.rental_return_date"/>
+            <input type="hidden" name="default_start_date" t-if="wso and wso.has_rented_products" t-att-value="wso.rental_start_date and wso.convert_to_website_tz(wso.rental_start_date)"/>
+            <input type="hidden" name="default_end_date" t-if="wso and wso.has_rented_products" t-att-value="wso.rental_return_date and wso.convert_to_website_tz(wso.rental_return_date)"/>
             <div class="s_website_form_datetime date o_daterange_picker">
                 <div class="d-flex gap-2 flex-column">
                     <div class="input-group">

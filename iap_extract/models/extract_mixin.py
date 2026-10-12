@@ -107,7 +107,7 @@ class ExtractMixin(models.AbstractModel):
 
         for record in records_to_validate:
             try:
-                self._contact_iap_extract(
+                record._contact_iap_extract(
                     'validate',
                     params={
                         'document_token': record.extract_document_uuid,
@@ -267,6 +267,11 @@ class ExtractMixin(models.AbstractModel):
                     self.env['iap.account']._send_success_notification(
                         message=self._get_iap_bus_notification_success(),
                     )
+                    self.env.user._bus_send("extract_mixin_new_document", {
+                        'status': self.extract_state,
+                        'error_message': self.extract_error_message,
+                        'extract_document_uuid': self.extract_document_uuid,
+                    })
                     self._upload_to_extract_success_callback()
                 elif result['status'] == 'error_no_credit':
                     self._send_no_credit_notification()
@@ -332,10 +337,10 @@ class ExtractMixin(models.AbstractModel):
         self.extract_status = result['status']
         if result['status'] == 'success':
             self.extract_state = 'waiting_validation'
-            # Set OdooBot as the author of the tracking message
-            self._track_set_author(self.env.ref('base.partner_root'))
             ocr_results = result['results'][0]
             self.with_company(self.company_id)._fill_document_with_results(ocr_results)
+            # Set OdooBot as the author of the tracking message
+            self._track_set_author(self.env.ref('base.partner_root'))
             if 'full_text_annotation' in ocr_results:
                 self.message_main_attachment_id.index_content = ocr_results['full_text_annotation']
 
@@ -408,4 +413,4 @@ class ExtractMixin(models.AbstractModel):
                 self._check_ocr_status()
             self.env.cr.commit()
         except Exception as e:
-            _logger.error("Couldn't check OCR status of %s with id %d: %s", self._name, self.id, str(e))
+            _logger.warning("Couldn't check OCR status of %s with id %d: %s", self._name, self.id, str(e))

@@ -1,7 +1,6 @@
 import { CogMenu } from "@web/search/cog_menu/cog_menu";
 import { documentsCogMenuItemArchive } from "./documents_cog_menu_item_archive";
 import { documentCogMenuPinAction } from "./documents_cog_menu_pin_actions";
-import { documentsCogMenuItemConfigure } from "./documents_cog_menu_item_configure";
 import { documentsCogMenuItemDetails } from "./documents_cog_menu_item_details";
 import { documentsCogMenuItemDownload } from "./documents_cog_menu_item_download";
 import { documentsCogMenuItemShare } from "./documents_cog_menu_item_share";
@@ -11,6 +10,7 @@ import {
     documentsCogMenuItemStarAdd,
     documentsCogMenuItemStarRemove,
 } from "./documents_cog_menu_item_star";
+import { documentsCogMenuItemAutomations } from "./documents_cog_menu_item_automations";
 
 const documentMenuItems = [
     documentsCogMenuItemDownload,
@@ -20,9 +20,9 @@ const documentMenuItems = [
     documentsCogMenuItemStarAdd,
     documentsCogMenuItemStarRemove,
     documentsCogMenuItemDetails,
-    documentsCogMenuItemConfigure,
     documentsCogMenuItemArchive,
     documentCogMenuPinAction,
+    documentsCogMenuItemAutomations,
 ];
 
 /**

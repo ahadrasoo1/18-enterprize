@@ -24,7 +24,7 @@ class IoTDeviceController extends formView.Controller {
         return this._iotDevice;
     }
 
-    async onWillSaveRecord(record) {
+    async onRecordSaved(record) {
         if (["keyboard", "scanner"].includes(record.data.type)) {
             const data = await this.updateKeyboardLayout(record.data);
             if (data.result !== true) {

@@ -1,5 +1,4 @@
 import { _t } from "@web/core/l10n/translation";
-import { RPCError } from "@web/core/network/rpc";
 import { PaymentInterface } from "@point_of_sale/app/payment/payment_interface";
 import { AlertDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 
@@ -65,9 +64,6 @@ export class PaymentIngenico extends PaymentInterface {
             .then(self._onActionResult.bind(self))
             .catch((e) => {
                 self._onActionFail();
-                if (!(e instanceof RPCError)) {
-                    return Promise.reject(e);
-                }
             });
     }
     _onActionResult(data) {
@@ -125,27 +121,25 @@ export class PaymentIngenico extends PaymentInterface {
      *
      * @param {Object} data.Response
      * @param {Object} data.Stage
-     * @param {Object} data.Ticket
+     * @param {string} data.Ticket
      * @param {Object} data.device_id
-     * @param {Object} data.owner
-     * @param {Object} data.session_id
+     * @param {string} data.owner
+     * @param {string} data.session_id
      * @param {Object} data.value
-     * @param {Object} data.Card
+     * @param {string} data.Card
+     * @param {string} data.cid
+     * @param {Object} [data.result]
      */
     _onValueChange(resolve, order, data) {
-        const line = order.get_paymentline_by_uuid(data.cid);
-        const terminal_proxy = line.payment_method_id.terminal_proxy;
-        if (
-            line &&
-            terminal_proxy &&
-            (!data.owner || data.owner === this.env.services.iot_longpolling._session_id)
-        ) {
-            this._waitingResponse(resolve, data, line);
-            if (data.Ticket) {
-                line.set_receipt_info(data.Ticket);
+        const result = data.result ? data.result : data; // compatibility v19.1+ iot box
+        const line = order.get_paymentline_by_uuid(result.cid);
+        if (line && line.payment_method_id.terminal_proxy) {
+            this._waitingResponse(resolve, result, line);
+            if (result.Ticket) {
+                line.set_receipt_info(result.Ticket);
             }
-            if (data.Card) {
-                line.card_type = data.Card;
+            if (result.Card) {
+                line.card_type = result.Card;
             }
         }
     }
@@ -179,7 +173,7 @@ export class PaymentWorldline extends PaymentIngenico {
             // Result of a cancel request
             if (data.Error) {
                 // Cancel failed, wait for transaction response
-                this.cancel_resolve(false);
+                this.cancel_resolve?.(false);
                 line.set_payment_status("waitingCard");
                 this.env.services.dialog.add(AlertDialog, {
                     title: _t("Transaction could not be cancelled"),
@@ -187,7 +181,7 @@ export class PaymentWorldline extends PaymentIngenico {
                 });
             } else {
                 this.get_terminal().removeListener();
-                this.cancel_resolve(true);
+                this.cancel_resolve?.(true);
                 resolve(false);
             }
         } else if (data.Disconnected) {

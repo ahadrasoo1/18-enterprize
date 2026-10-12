@@ -59,7 +59,7 @@ class Employee(models.Model):
     def _planning_get_url(self, planning):
         result = {}
         for employee in self:
-            if employee.user_id:
+            if employee.user_id and not employee.user_id._is_portal():
                 result[employee.id] = f"/odoo/action-planning.planning_action_open_shift?date_start={planning.date_start}&date_end={planning.date_end}"
             else:
                 result[employee.id] = '/planning/%s/%s' % (planning.access_token, employee.employee_token)

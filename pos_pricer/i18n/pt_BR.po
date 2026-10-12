@@ -1,24 +1,28 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* pos_pricer
-# 
+# * pos_pricer
+#
 # Translators:
 # Wil Odoo, 2024
 # Maitê Dietze, 2024
-# 
+#
+# Weblate <noreply-mt-weblate@weblate.org>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:25+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Maitê Dietze, 2024\n"
-"Language-Team: Portuguese (Brazil) (https://app.transifex.com/odoo/teams/41243/pt_BR/)\n"
+"POT-Creation-Date: 2025-12-29 18:45+0000\n"
+"PO-Revision-Date: 2025-11-17 14:19+0000\n"
+"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"Language-Team: Portuguese (Brazil) <https://translate.odoo.com/projects/"
+"odoo-18/pos_pricer/pt_BR/>\n"
+"Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: pt_BR\n"
-"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : ((n != 0 && n % "
+"1000000 == 0) ? 1 : 2);\n"
+"X-Generator: Weblate 5.12.2\n"
 
 #. module: pos_pricer
 #: model:ir.model.constraint,message:pos_pricer.constraint_pricer_tag_name_unique
@@ -44,6 +48,11 @@ msgstr "URL autorizada"
 #: model:product.pricelist,name:pos_pricer.pricer_demo_pricelist
 msgid "Christmas"
 msgstr "Natal"
+
+#. module: pos_pricer
+#: model:ir.model,name:pos_pricer.model_res_partner
+msgid "Contact"
+msgstr "Contato"
 
 #. module: pos_pricer
 #: model:ir.model.fields,field_description:pos_pricer.field_pricer_store__create_or_update_products_url
@@ -90,8 +99,8 @@ msgstr "Erro: verificar as credenciais do Pricer"
 #: code:addons/pos_pricer/models/pricer_store.py:0
 msgid "Failed to unlink Pricer tag %(pricer_tag)s at API url %(api_url)s"
 msgstr ""
-"Falha ao desvincular a etiqueta Pricer %(pricer_tag)s na url da API "
-"%(api_url)s"
+"Falha ao desvincular a etiqueta Pricer %(pricer_tag)s na url da API %"
+"(api_url)s"
 
 #. module: pos_pricer
 #: model:ir.model.fields,field_description:pos_pricer.field_pricer_store__id
@@ -347,7 +356,12 @@ msgstr "Movimentação de estoque"
 #. module: pos_pricer
 #: model:ir.model.fields,field_description:pos_pricer.field_pricer_store__name
 msgid "Store Name"
-msgstr "Nome da loka"
+msgstr "Nome da loja"
+
+#. module: pos_pricer
+#: model:ir.model,name:pos_pricer.model_product_supplierinfo
+msgid "Supplier Pricelist"
+msgstr "Lista de preços do fornecedor"
 
 #. module: pos_pricer
 #. odoo-javascript
@@ -378,6 +392,11 @@ msgstr ""
 "seguida de 16 dígitos"
 
 #. module: pos_pricer
+#: model:ir.model,name:pos_pricer.model_account_tax
+msgid "Tax"
+msgstr "Imposto"
+
+#. module: pos_pricer
 #: model:ir.model.fields,help:pos_pricer.field_product_product__pricer_sale_pricelist_id
 msgid ""
 "This pricelist will be used to set sales on Pricer tags for this product"
@@ -389,8 +408,8 @@ msgstr ""
 #: model:ir.model.fields,help:pos_pricer.field_pricer_tag__pricer_store_id
 #: model:ir.model.fields,help:pos_pricer.field_product_product__pricer_store_id
 msgid ""
-"This product will be linked to and displayed on the Pricer tags of the store"
-" selected here"
+"This product will be linked to and displayed on the Pricer tags of the store "
+"selected here"
 msgstr ""
 "Este produto será vinculado e exibido nas etiquetas Pricer da loja "
 "selecionada aqui"

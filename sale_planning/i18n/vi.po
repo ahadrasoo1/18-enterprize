@@ -1,22 +1,23 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* sale_planning
-# 
+#
 # Translators:
 # Wil Odoo, 2024
-# 
+# Thi Huong Nguyen, 2025
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-25 09:28+0000\n"
+"POT-Creation-Date: 2025-12-29 18:48+0000\n"
 "PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
+"Last-Translator: Thi Huong Nguyen, 2025\n"
 "Language-Team: Vietnamese (https://app.transifex.com/odoo/teams/41243/vi/)\n"
+"Language: vi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: vi\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. module: sale_planning
@@ -39,10 +40,10 @@ msgid ""
 "cancellation of the sales order.\" invisible=\"sale_order_state != "
 "'cancel'\"/>"
 msgstr ""
-"<span class=\"fa fa-exclamation-triangle text-warning\" title=\"Đơn bán hàng"
-" liên kết với ca làm này đã bị hủy. Chúng tôi khuyên bạn nên cập nhật mục "
-"đơn bán hàng hoặc lên lịch lại ca làm này cho phù hợp với việc hủy đơn bán "
-"hàng.\" invisible=\"sale_order_state != 'cancel'\"/>"
+"<span class=\"fa fa-exclamation-triangle text-warning\" title=\"Đơn bán hàng "
+"liên kết với ca làm này đã bị hủy. Chúng tôi khuyên bạn nên cập nhật mục đơn "
+"bán hàng hoặc lên lịch lại ca làm này cho phù hợp với việc hủy đơn bán hàng."
+"\" invisible=\"sale_order_state != 'cancel'\"/>"
 
 #. module: sale_planning
 #: model_terms:ir.ui.view,arch_db:sale_planning.view_order_form_inherit_sale_planning
@@ -79,8 +80,8 @@ msgstr "<strong>Hạng mục đơn bán hàng  — </strong>"
 #. odoo-javascript
 #: code:addons/sale_planning/static/src/views/planning_hooks.js:0
 msgid ""
-"All open shifts and sales orders have already been assigned, or there are no"
-" resources available to take them at this time."
+"All open shifts and sales orders have already been assigned, or there are no "
+"resources available to take them at this time."
 msgstr ""
 "Tất cả đơn bán hàng và ca làm việc mở đã được phân công hoặc không có nhân "
 "viên rảnh để thực hiện chúng vào lúc này."
@@ -128,7 +129,7 @@ msgstr "Giờ"
 #. module: sale_planning
 #: model:product.template,name:sale_planning.technical_maintainance_product_product_template
 msgid "IT Technical Maintenance (Plan services)"
-msgstr "Bảo trì kỹ thuật CNTT (Dịch vụ kế hoạch)"
+msgstr "Bảo dưỡng kỹ thuật CNTT (Dịch vụ kế hoạch)"
 
 #. module: sale_planning
 #: model:planning.role,name:sale_planning.planning_role_technician
@@ -142,12 +143,18 @@ msgstr "Kỹ thuật viên CNTT"
 msgid ""
 "If enabled, a shift will automatically be generated for the selected role "
 "when confirming the Sales Order.                 With the 'auto plan' "
-"feature, only employees with this role will be automatically assigned shifts"
-" for Sales Orders containing this service.                 The system will "
-"consider employee availability and the remaining time to be planned."
-"                 You can also manually schedule open shifts for your Sales "
-"Order or assign them to any employee you prefer."
+"feature, only employees with this role will be automatically assigned shifts "
+"for Sales Orders containing this service.                 The system will "
+"consider employee availability and the remaining time to be "
+"planned.                 You can also manually schedule open shifts for your "
+"Sales Order or assign them to any employee you prefer."
 msgstr ""
+"Nếu bật, hệ thống sẽ tự động tạo một ca làm cho vai trò đã chọn khi xác nhận "
+"Đơn bán hàng. Với tính năng 'tự động lập kế hoạch', chỉ những nhân viên có "
+"vai trò này mới được tự động phân công ca làm cho Đơn bán hàng có chứa dịch "
+"vụ này. Hệ thống sẽ xem xét thời gian trống của nhân viên và thời gian còn "
+"lại cần lập kế hoạch. Bạn cũng có thể lên lịch thủ công các ca làm mở cho "
+"Đơn bán hàng của mình hoặc phân công chúng cho bất kỳ nhân viên nào bạn muốn."
 
 #. module: sale_planning
 #: model_terms:ir.ui.view,arch_db:sale_planning.planning_slot_view_search_inherit_sale_planning
@@ -177,13 +184,13 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/sale_planning/static/src/views/planning_hooks.js:0
 msgid "Open shifts and sales orders assigned"
-msgstr ""
+msgstr "Ca làm mở và đơn bán hàng đã được phân công"
 
 #. module: sale_planning
 #. odoo-javascript
 #: code:addons/sale_planning/static/src/views/planning_hooks.js:0
 msgid "Open shifts and sales orders unscheduled"
-msgstr ""
+msgstr "Ca làm mở và đơn bán hàng chưa được lên lịch"
 
 #. module: sale_planning
 #: model_terms:product.template,description:sale_planning.developer_product_product_template
@@ -201,8 +208,7 @@ msgstr "Lập kế hoạch dịch vụ "
 #: model_terms:ir.ui.view,arch_db:sale_planning.product_template_form_view_invoice_policy_inherit_sale_planning
 msgid "Plan shifts for your orders for employees who have this role."
 msgstr ""
-"Lập kế hoạch ca làm việc cho đơn hàng đối với những nhân viên có vai trò "
-"này."
+"Lập kế hoạch ca làm việc cho đơn hàng đối với những nhân viên có vai trò này."
 
 #. module: sale_planning
 #. odoo-python
@@ -287,9 +293,9 @@ msgid ""
 "are automatically planned, the remaining hours of the sales order item, as "
 "well as the role defined on the service, are taken into account."
 msgstr ""
-"Hạng mục đơn bán hàng mà ca làm này sẽ được thực hiện. Khi đơn bán hàng được"
-" lên kế hoạch tự động, số giờ còn lại của hạng mục đơn bán hàng cũng như vai"
-" trò đã xác định đối với dịch vụ sẽ được tính đến."
+"Hạng mục đơn bán hàng mà ca làm này sẽ được thực hiện. Khi đơn bán hàng được "
+"lên kế hoạch tự động, số giờ còn lại của hạng mục đơn bán hàng cũng như vai "
+"trò đã xác định đối với dịch vụ sẽ được tính đến."
 
 #. module: sale_planning
 #: model:ir.actions.act_window,name:sale_planning.sale_planning_action_schedule_by_sale_order
@@ -341,17 +347,18 @@ msgstr "Không có mục đơn bán hàng nào để lập kế hoạch."
 #: code:addons/sale_planning/models/planning_slot.py:0
 msgid "This Sale Order Item doesn't have a target value of planned hours."
 msgstr ""
-"Hạng mục đơn bán hàng này không có giá trị mục tiêu của số giờ đã lập kế "
-"hoạch."
+"Hạng mục đơn bán hàng này không có giá trị mục tiêu của số giờ theo kế hoạch."
 
 #. module: sale_planning
 #. odoo-javascript
 #: code:addons/sale_planning/static/src/views/sale_planning_gantt/sale_planning_gantt_renderer.js:0
 msgid ""
 "This resource is not available for this shift during the selected period."
-msgstr "Nguồn lực không có sẵn cho ca làm này vào khoảng thời gian đã chọn. "
+msgstr "Tài nguyên không có sẵn cho ca làm này vào khoảng thời gian đã chọn. "
 
 #. module: sale_planning
+#. odoo-javascript
+#: code:addons/sale_planning/static/src/views/sale_planning_gantt/sale_planning_gantt_renderer.js:0
 #: model_terms:ir.ui.view,arch_db:sale_planning.planning_slot_view_gantt_inherit_sale_planning
 #: model_terms:ir.ui.view,arch_db:sale_planning.planning_view_form_in_gantt_inherit_sale_planning
 msgid "Unschedule"
@@ -378,9 +385,13 @@ msgstr "Bạn đang cố gắng tạo một khung giờ cho đơn bán hàng đ�
 #. odoo-python
 #: code:addons/sale_planning/models/sale_order.py:0
 msgid ""
-"You cannot update the company for sales order %(order_name)s as it's linked to shifts in another company.\n"
+"You cannot update the company for sales order %(order_name)s as it's linked "
+"to shifts in another company.\n"
 "Please transfer shifts %(slots_names)s to the destination company first."
 msgstr ""
+"Bạn không thể cập nhật công ty cho đơn bán hàng %(order_name)s vì nó được "
+"liên kết với các ca làm ở công ty khác.\n"
+"Vui lòng chuyển ca làm %(slots_names)s sang công ty đích trước."
 
 #. module: sale_planning
 #: model_terms:ir.ui.view,arch_db:sale_planning.planning_role_view_tree_inherit_sale_planning

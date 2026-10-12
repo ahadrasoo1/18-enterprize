@@ -1,30 +1,40 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* documents_spreadsheet
-# 
+# * documents_spreadsheet
+#
 # Translators:
-# Wil Odoo, 2024
-# Maitê Dietze, 2024
-# 
+# Wil Odoo, 2025
+# Maitê Dietze, 2025
+#
+# Weblate <noreply-mt-weblate@weblate.org>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-26 09:15+0000\n"
-"PO-Revision-Date: 2024-09-25 09:44+0000\n"
-"Last-Translator: Maitê Dietze, 2024\n"
-"Language-Team: Portuguese (Brazil) (https://app.transifex.com/odoo/teams/41243/pt_BR/)\n"
+"POT-Creation-Date: 2025-12-29 18:47+0000\n"
+"PO-Revision-Date: 2025-12-13 18:24+0000\n"
+"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"Language-Team: Portuguese (Brazil) <https://translate.odoo.com/projects/"
+"odoo-18/documents_spreadsheet/pt_BR/>\n"
+"Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: pt_BR\n"
-"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : ((n != 0 && n % "
+"1000000 == 0) ? 1 : 2);\n"
+"X-Generator: Weblate 5.14.3\n"
 
 #. module: documents_spreadsheet
 #. odoo-python
 #: code:addons/documents_spreadsheet/wizard/save_spreadsheet_template.py:0
 msgid "\"%s\" saved as template"
 msgstr "“%s” salvo como modelo"
+
+#. module: documents_spreadsheet
+#. odoo-python
+#: code:addons/documents_spreadsheet/models/documents_document.py:0
+msgid "%(folder)s is used by %(company)s"
+msgstr "%(folder)s é usada por %(company)s"
 
 #. module: documents_spreadsheet
 #. odoo-python
@@ -46,14 +56,25 @@ msgstr "Já existe uma combinação da planilha e do usuário"
 #. module: documents_spreadsheet
 #: model:ir.model.constraint,message:documents_spreadsheet.constraint_documents_document_frozen_spreadsheet_access_via_link_access_internal
 msgid "A frozen spreadsheet can not be editable"
-msgstr ""
+msgstr "Uma planilha congelada não pode ser editada"
+
+#. module: documents_spreadsheet
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/demo/files/pipeline_dashboard.json:0
+msgid "Actuals vs Target"
+msgstr "Atuais x Objetivo"
+
+#. module: documents_spreadsheet
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/demo/files/pipeline_dashboard.json:0
+msgid "Actuals vs Target status"
+msgstr "Actuals vs Target status"
 
 #. module: documents_spreadsheet
 #: model_terms:ir.ui.view,arch_db:documents_spreadsheet.save_spreadsheet_template_view_form
 msgid ""
 "Any user will be able to create a new spreadsheet based on this template."
-msgstr ""
-"Qualquer usuário poderá criar uma nova planilha com base nesse modelo."
+msgstr "Qualquer usuário poderá criar uma nova planilha com base nesse modelo."
 
 #. module: documents_spreadsheet
 #: model_terms:ir.ui.view,arch_db:documents_spreadsheet.save_spreadsheet_template_view_form
@@ -134,6 +155,13 @@ msgid "Display Name"
 msgstr "Nome exibido"
 
 #. module: documents_spreadsheet
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_document__display_thumbnail
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_save_spreadsheet_template__display_thumbnail
+#: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__display_thumbnail
+msgid "Display Thumbnail"
+msgstr "Display Thumbnail"
+
+#. module: documents_spreadsheet
 #: model:ir.model,name:documents_spreadsheet.model_documents_document
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_cell_thread__document_id
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_contributor__document_id
@@ -143,13 +171,13 @@ msgstr "Documento"
 #. module: documents_spreadsheet
 #: model:ir.model,name:documents_spreadsheet.model_documents_access
 msgid "Document / Partner"
-msgstr ""
+msgstr "Documento / Parceiro"
 
 #. module: documents_spreadsheet
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_res_company__document_spreadsheet_folder_id
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_res_config_settings__document_spreadsheet_folder_id
 msgid "Document Spreadsheet Folder"
-msgstr ""
+msgstr "Pasta de planilhas de documentos"
 
 #. module: documents_spreadsheet
 #: model_terms:ir.ui.view,arch_db:documents_spreadsheet.spreadsheet_template_view_tree
@@ -178,6 +206,12 @@ msgstr ""
 "Odoo. Abrir seu arquivo com o Odoo Planilhas possibilitará isso."
 
 #. module: documents_spreadsheet
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/demo/files/pipeline_dashboard.json:0
+msgid "Expected Revenue by Stage"
+msgstr "Receita esperada por estágio"
+
+#. module: documents_spreadsheet
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__file_name
 msgid "File Name"
 msgstr "Nome do arquivo"
@@ -187,35 +221,40 @@ msgstr "Nome do arquivo"
 #: code:addons/documents_spreadsheet/static/src/bundle/actions/spreadsheet_freeze_and_share/spreadsheet_freeze_and_share.xml:0
 #: code:addons/documents_spreadsheet/static/src/documents_control_panel/documents_control_panel.xml:0
 msgid "Freeze and share"
-msgstr ""
+msgstr "Congelar e compartilhar"
 
 #. module: documents_spreadsheet
 #: model:ir.model.fields.selection,name:documents_spreadsheet.selection__documents_document__handler__frozen_folder
 msgid "Frozen Folder"
-msgstr ""
+msgstr "Pasta congelada"
 
 #. module: documents_spreadsheet
 #: model:ir.model.fields.selection,name:documents_spreadsheet.selection__documents_document__handler__frozen_spreadsheet
 msgid "Frozen Spreadsheet"
-msgstr ""
+msgstr "Planilha congelada"
 
 #. module: documents_spreadsheet
 #. odoo-python
 #: code:addons/documents_spreadsheet/models/documents_access.py:0
 msgid "Frozen Spreadsheets can not be editable."
-msgstr ""
+msgstr "As planilhas congeladas não podem ser editadas."
 
 #. module: documents_spreadsheet
 #. odoo-python
 #: code:addons/documents_spreadsheet/models/documents_document.py:0
 msgid "Frozen at %(date)s: %(name)s"
-msgstr ""
+msgstr "Congelado em %(date)s: %(name)s"
 
 #. module: documents_spreadsheet
 #. odoo-python
 #: code:addons/documents_spreadsheet/models/documents_document.py:0
 msgid "Frozen spreadsheets"
-msgstr ""
+msgstr "Planilhas congeladas"
+
+#. module: documents_spreadsheet
+#: model:ir.model,name:documents_spreadsheet.model_ir_http
+msgid "HTTP Routing"
+msgstr "Roteamento HTTP"
 
 #. module: documents_spreadsheet
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_document__handler
@@ -228,6 +267,12 @@ msgstr "Operador"
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_template__id
 msgid "ID"
 msgstr "ID"
+
+#. module: documents_spreadsheet
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/static/src/documents_control_panel/documents_control_panel.xml:0
+msgid "Insert in spreadsheet"
+msgstr "Inserir em planilha"
 
 #. module: documents_spreadsheet
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_save_spreadsheet_template__write_uid
@@ -247,6 +292,12 @@ msgstr "Última atualização em"
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_contributor__last_update_date
 msgid "Last update date"
 msgstr "Data da última atualização"
+
+#. module: documents_spreadsheet
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/demo/files/pipeline_dashboard.json:0
+msgid "Lost Opportunities by Stage"
+msgstr "Oportunidades perdidas por estágio"
 
 #. module: documents_spreadsheet
 #: model_terms:ir.ui.view,arch_db:documents_spreadsheet.spreadsheet_template_view_tree
@@ -279,7 +330,13 @@ msgstr "Nova planilha criada em Documentos"
 #. module: documents_spreadsheet
 #. odoo-javascript
 #. odoo-python
-#: code:addons/documents_spreadsheet/models/spreadsheet_template.py:0
+#: code:addons/documents_spreadsheet/models/documents_document.py:0
+#: code:addons/documents_spreadsheet/static/src/bundle/actions/spreadsheet_action.js:0
+msgid "New spreadsheet created in My Drive"
+msgstr "Nova planilha criada no Meu Drive"
+
+#. module: documents_spreadsheet
+#. odoo-javascript
 #: code:addons/documents_spreadsheet/static/src/bundle/actions/spreadsheet_template/spreadsheet_template_action.js:0
 msgid "New spreadsheet template created"
 msgstr "Novo modelo de planilha criado"
@@ -289,6 +346,18 @@ msgstr "Novo modelo de planilha criado"
 #: code:addons/documents_spreadsheet/static/src/documents_view/documents_spreadsheet_controller_mixin.js:0
 msgid "Open with Odoo Spreadsheet"
 msgstr "Abrir com o Odoo Planilhas"
+
+#. module: documents_spreadsheet
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/demo/files/pipeline_dashboard.json:0
+msgid "Opportunities by Stage"
+msgstr "Oportunidades por estágio"
+
+#. module: documents_spreadsheet
+#. odoo-python
+#: code:addons/documents_spreadsheet/models/documents_document.py:0
+msgid "Portal users cannot be the owner of a spreadsheet."
+msgstr "Os usuários do Portal não podem ser proprietários de uma planilha."
 
 #. module: documents_spreadsheet
 #. odoo-javascript
@@ -311,7 +380,7 @@ msgstr "Salvar como modelo"
 #. odoo-javascript
 #: code:addons/documents_spreadsheet/static/src/documents_control_panel/documents_control_panel.js:0
 msgid "Select one and only one spreadsheet"
-msgstr ""
+msgstr "Selecione uma e somente uma planilha"
 
 #. module: documents_spreadsheet
 #. odoo-javascript
@@ -428,6 +497,8 @@ msgstr "Planilhas"
 #: code:addons/documents_spreadsheet/models/documents_access.py:0
 msgid "Spreadsheets can not be shared in edit mode to non-internal users."
 msgstr ""
+"As planilhas não podem ser compartilhadas no modo de edição com usuários não "
+"internos."
 
 #. module: documents_spreadsheet
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_spreadsheet_cell_thread__template_id
@@ -442,6 +513,26 @@ msgstr "Nome do modelo"
 #. module: documents_spreadsheet
 #. odoo-python
 #: code:addons/documents_spreadsheet/models/documents_document.py:0
+msgid ""
+"The company for a folder cannot be changed if it is already used as the "
+"spreadsheet workspace for at least one other company: %s"
+msgstr ""
+"A empresa de uma pasta não poderá ser alterada se já estiver sendo usada "
+"como espaço de trabalho de planilha por pelo menos outra empresa: %s"
+
+#. module: documents_spreadsheet
+#. odoo-python
+#: code:addons/documents_spreadsheet/models/res_company.py:0
+msgid ""
+"The company of %(folder)s should either be undefined or set to %(company)s. "
+"Otherwise, it is not possible to link the workspace to the company."
+msgstr ""
+"A empresa de %(folder)s deve ser indefinida ou definida como %(company)s. "
+"Caso contrário, não será possível vincular o espaço de trabalho à empresa."
+
+#. module: documents_spreadsheet
+#. odoo-python
+#: code:addons/documents_spreadsheet/models/documents_document.py:0
 msgid "The file is not a xlsx file"
 msgstr "O arquivo não é um arquivo xlsx"
 
@@ -451,7 +542,7 @@ msgstr "O arquivo não é um arquivo xlsx"
 #: code:addons/documents_spreadsheet/static/src/documents_permission_panel/documents_member_invite.js:0
 #: code:addons/documents_spreadsheet/static/src/documents_permission_panel/documents_partner_access.js:0
 msgid "The frozen spreadsheets are readonly."
-msgstr ""
+msgstr "As planilhas congeladas são somente leitura."
 
 #. module: documents_spreadsheet
 #. odoo-python
@@ -463,9 +554,11 @@ msgstr "A planilha que você está tentando acessar não existe."
 #. odoo-javascript
 #: code:addons/documents_spreadsheet/static/src/documents_permission_panel/documents_access_settings.js:0
 msgid ""
-"The spreadsheets can not be shared in edit mode with a link, change Internal"
-" to give write access."
+"The spreadsheets can not be shared in edit mode with a link, change Internal "
+"to give write access."
 msgstr ""
+"As planilhas não podem ser compartilhadas no modo de edição com um link, "
+"altere Interno para dar acesso de gravação."
 
 #. module: documents_spreadsheet
 #. odoo-python
@@ -483,6 +576,8 @@ msgstr "O arquivo xlsx é muito grande"
 #: model_terms:ir.ui.view,arch_db:documents_spreadsheet.documents_error_live_data
 msgid "This spreadsheet contains live data, only internal users can view it."
 msgstr ""
+"Esta planilha contém dados em tempo real, somente usuários internos podem "
+"visualizá-la."
 
 #. module: documents_spreadsheet
 #: model:ir.model.fields,field_description:documents_spreadsheet.field_documents_document__thumbnail
@@ -495,6 +590,8 @@ msgstr "Miniatura"
 #: model:ir.model.constraint,message:documents_spreadsheet.constraint_documents_document_spreadsheet_access_via_link
 msgid "To share a spreadsheet in edit mode, add the user in the accesses"
 msgstr ""
+"Para compartilhar uma planilha no modo de edição, adicione o usuário nos "
+"acessos"
 
 #. module: documents_spreadsheet
 #. odoo-javascript
@@ -529,14 +626,20 @@ msgstr "Espaço de trabalho"
 #. module: documents_spreadsheet
 #. odoo-python
 #: code:addons/documents_spreadsheet/models/documents_document.py:0
+msgid "You are not allowed to freeze spreadsheets in Company"
+msgstr "Não é permitido congelar planilhas na Empresa"
+
+#. module: documents_spreadsheet
+#. odoo-python
+#: code:addons/documents_spreadsheet/models/documents_document.py:0
 msgid "You can not edit a frozen spreadsheet"
-msgstr ""
+msgstr "Não é possível editar uma planilha congelada"
 
 #. module: documents_spreadsheet
 #. odoo-javascript
 #: code:addons/documents_spreadsheet/static/src/bundle/actions/spreadsheet_action.js:0
 msgid "You can not freeze a frozen spreadsheet"
-msgstr ""
+msgstr "Não é possível congelar uma planilha congelada"
 
 #. module: documents_spreadsheet
 #. odoo-javascript
@@ -544,9 +647,17 @@ msgstr ""
 #: code:addons/documents_spreadsheet/static/src/documents_permission_panel/documents_partner_access.js:0
 msgid "You can not share spreadsheet in edit mode to non-internal user."
 msgstr ""
+"Não é possível compartilhar a planilha no modo de edição com um usuário não "
+"interno."
 
 #. module: documents_spreadsheet
 #. odoo-python
 #: code:addons/documents_spreadsheet/models/documents_document.py:0
 msgid "You don't have access to this document"
 msgstr "Você não tem acesso a esse documento"
+
+#. module: documents_spreadsheet
+#. odoo-javascript
+#: code:addons/documents_spreadsheet/demo/files/pipeline_dashboard.json:0
+msgid "of target"
+msgstr "of target"

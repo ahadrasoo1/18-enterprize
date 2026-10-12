@@ -48,6 +48,9 @@ export class PivotAutofillPlugin extends UIPlugin {
             this.getters.getActiveSheetId(),
             tokens
         );
+        if (args.some((arg) => arg === undefined)) {
+            return formula;
+        }
         const evaluatedArgs = args.map((arg) => arg.toString());
         const pivotId = this.getters.getPivotId(evaluatedArgs[0]);
         if (!pivotId) {
@@ -89,6 +92,9 @@ export class PivotAutofillPlugin extends UIPlugin {
         if (functionName === "PIVOT.VALUE") {
             builder = this._autofillPivotValue.bind(this);
         } else if (functionName === "PIVOT.HEADER") {
+            const nonPositionalArgs = evaluatedArgs.map((arg) =>
+                arg.startsWith("#") ? arg.slice(1) : arg
+            );
             if (evaluatedArgs.length === 1) {
                 // Total
                 if (isColumn) {
@@ -99,7 +105,7 @@ export class PivotAutofillPlugin extends UIPlugin {
                     builder = this._autofillPivotColHeader.bind(this);
                 }
             } else if (
-                definition.rows.map((row) => row.nameWithGranularity).includes(evaluatedArgs[1])
+                definition.rows.map((row) => row.nameWithGranularity).includes(nonPositionalArgs[1])
             ) {
                 builder = this._autofillPivotRowHeader.bind(this);
             } else {
@@ -200,7 +206,11 @@ export class PivotAutofillPlugin extends UIPlugin {
                 // Date
                 const group = this._getGroupOfFirstDate(definition, "COLUMN");
                 cols = currentElement.cols;
-                cols[0] = this._incrementDate(cols[0], group, increment);
+                const value = this._incrementDate(cols[0], group, increment);
+                if (value === undefined) {
+                    return "";
+                }
+                cols[0] = value;
                 measure = cols.pop();
             } else {
                 const currentColIndex = this._getColMeasureIndex(table, currentElement.cols);
@@ -231,7 +241,11 @@ export class PivotAutofillPlugin extends UIPlugin {
                 }
                 const group = this._getGroupOfFirstDate(definition, "ROW");
                 rows = currentElement.rows;
-                rows[0] = this._incrementDate(rows[0], group, increment);
+                const value = this._incrementDate(rows[0], group, increment);
+                if (value === undefined) {
+                    return "";
+                }
+                rows[0] = value;
             } else {
                 const currentRowIndex = this._getRowIndex(table, currentElement.rows);
                 if (currentRowIndex === -1) {
@@ -310,7 +324,11 @@ export class PivotAutofillPlugin extends UIPlugin {
                 // Date
                 const group = this._getGroupOfFirstDate(definition, "COLUMN");
                 groupValues = currentElement.cols;
-                groupValues[0] = this._incrementDate(groupValues[0], group, increment);
+                const value = this._incrementDate(groupValues[0], group, increment);
+                if (value === undefined) {
+                    return "";
+                }
+                groupValues[0] = value;
             } else {
                 const rowIndex = currentElement.cols.length - 1;
                 const nextColIndex = currentColIndex + increment;
@@ -343,19 +361,39 @@ export class PivotAutofillPlugin extends UIPlugin {
             if (nextRowIndex >= groupLevels + 1) {
                 // Targeting a value
                 const rowIndex = nextRowIndex - groupLevels - 1;
-                const measureCell = this._getCellFromMeasureRowAtIndex(table, currentColIndex);
-                const cols = [...measureCell.values];
+                let cols;
+                if (currentColIndex >= 0) {
+                    cols = [...this._getCellFromMeasureRowAtIndex(table, currentColIndex).values];
+                } else if (groupLevels > 1) {
+                    return "";
+                } else {
+                    // Autofilling value not present in the original table
+                    cols = [
+                        ...currentElement.cols,
+                        ...this._getCellFromMeasureRowAtIndex(table, 0).values.slice(
+                            currentElement.cols.length
+                        ),
+                    ];
+                }
                 const measure = cols.pop();
                 const rows = [...this._getCellsFromRowAtIndex(table, rowIndex).values];
                 return this._createPivotFormula(pivotId, rows, cols, definition, measure);
             } else {
                 // Targeting a col.header
-                const groupValues = this._getNextColCell(
-                    table,
-                    currentColIndex,
-                    nextRowIndex
-                ).values;
-
+                let groupValues;
+                if (currentColIndex >= 0) {
+                    groupValues = this._getNextColCell(table, currentColIndex, nextRowIndex).values;
+                } else if (groupLevels > 1) {
+                    return "";
+                } else {
+                    // Autofilling value not present in the original table
+                    groupValues = [
+                        ...currentElement.cols,
+                        ...this._getNextColCell(table, 0, nextRowIndex).values.slice(
+                            currentElement.cols.length
+                        ),
+                    ];
+                }
                 return this._createPivotFormula(pivotId, [], groupValues, definition);
             }
         }
@@ -420,7 +458,11 @@ export class PivotAutofillPlugin extends UIPlugin {
                 // Date
                 const group = this._getGroupOfFirstDate(definition, "ROW");
                 rows = currentElement.rows;
-                rows[0] = this._incrementDate(rows[0], group, increment);
+                const value = this._incrementDate(rows[0], group, increment);
+                if (value === undefined) {
+                    return "";
+                }
+                rows[0] = value;
             } else {
                 const nextIndex = currentIndex + increment;
                 if (currentIndex === -1 || nextIndex < 0 || nextIndex >= table.rows.length) {
@@ -649,10 +691,18 @@ export class PivotAutofillPlugin extends UIPlugin {
     _tooltipHeader(dataSource, domain) {
         const subDomain = dataSource.parseArgsToPivotDomain(domain);
         if (!domainHasNoRecordAtThisPosition(subDomain)) {
-            const formattedValue = dataSource.getPivotHeaderFormattedValue(subDomain);
+            const formattedValue = this._getPivotHeaderFormattedValue(dataSource, subDomain);
             return { value: formattedValue };
         } else {
             return { value: "" };
+        }
+    }
+
+    _getPivotHeaderFormattedValue(dataSource, domain) {
+        try {
+            return dataSource.getPivotHeaderFormattedValue(domain);
+        } catch {
+            return _t("Unknown");
         }
     }
 

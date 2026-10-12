@@ -7,6 +7,7 @@ from lxml import etree
 from num2words import num2words
 
 from odoo import api, fields, models, _
+from odoo.tools.sql import column_exists, create_column
 from odoo.tools.float_utils import float_repr, float_round
 from odoo.exceptions import UserError, ValidationError
 
@@ -106,6 +107,29 @@ class AccountMove(models.Model):
         string="Legend",
         store=True, readonly=False, compute='_compute_l10n_pe_edi_legend_value',
         help="Peru: Specific operation type value.")
+
+    def _auto_init(self):
+        cr = self.env.cr
+
+        # Skip the computation of the field `l10n_pe_edi_legend_value` at the module installation
+        if not column_exists(cr, "account_move", "l10n_pe_edi_legend_value"):
+            create_column(cr, "account_move", "l10n_pe_edi_legend_value", "varchar")
+
+        # Skip the computation of the field `l10n_pe_edi_operation_type` at the module installation
+        if not column_exists(cr, "account_move", "l10n_pe_edi_operation_type"):
+            create_column(cr, "account_move", "l10n_pe_edi_operation_type", "varchar")
+
+            cr.execute("""
+                UPDATE account_move
+                SET l10n_pe_edi_operation_type = '0101'
+                FROM res_company
+                JOIN res_country ON res_country.id = res_company.account_fiscal_country_id
+                WHERE res_company.id = account_move.company_id
+                   AND move_type IN ('out_invoice', 'out_refund')
+                   AND res_country.code = 'PE';
+            """)
+
+        return super()._auto_init()
 
     @api.constrains('name', 'company_id', 'move_type')
     def _prevent_invoices_with_same_edi_filename(self):
@@ -218,7 +242,7 @@ class AccountMove(models.Model):
 
         return {
             'id': 'Detraccion',
-            'currency': self.currency_id,
+            'currency': self.company_id.currency_id,
             'payment_means_id': line.product_id.l10n_pe_withhold_code,
             'payee_financial_account': national_bank_account_number,
             'payment_means_code': '999',
@@ -291,6 +315,9 @@ class AccountMove(models.Model):
                 break
 
         serie_folio = self._l10n_pe_edi_get_serie_folio()
+        partner_identification_type = self.partner_id.l10n_latam_identification_type_id.l10n_pe_vat_code
+        if not partner_identification_type and self.partner_id.country_id and self.partner_id.country_code != 'PE':
+            partner_identification_type = '0'
         qr_code_values = [
             self.company_id.vat,
             self.company_id.partner_id.l10n_latam_identification_type_id.l10n_pe_vat_code,
@@ -299,7 +326,7 @@ class AccountMove(models.Model):
             igv_tax_amount,
             str(self.amount_total),
             fields.Date.to_string(self.date),
-            self.partner_id.l10n_latam_identification_type_id.l10n_pe_vat_code,
+            partner_identification_type,
             self.commercial_partner_id.vat or '00000000',
             signature_hash,
         ]

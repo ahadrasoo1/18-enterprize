@@ -16,6 +16,10 @@
         }
     }
 
+    .o_control_panel_breadcrumbs {
+        flex-basis: min-content;
+    }
+
     //------------------------------------------------------------------------------------------------------------------
     // Sections
     //------------------------------------------------------------------------------------------------------------------
@@ -62,7 +66,7 @@
         > thead {
             > tr {
                 th:first-child {
-                    color: lightgrey;
+                    color: var(--AccountReport-muted-data-color, $o-gray-300);
                 }
                 th:not(:first-child) {
                     text-align: center;
@@ -126,27 +130,6 @@
         }
     }
 
-    table.budget-striped {
-        //!\\ Changes the background of every even column starting with the 3rd one
-        > thead > tr:not(:first-child) {
-            & > th:nth-child(6n+5), & > th:nth-child(6n+6), & > th:nth-child(6n+7) {
-                background: $o-gray-100;
-            }
-        }
-        > tbody {
-            > tr:not(.line_level_0):not(.empty) {
-                & > td:nth-child(6n+5), & > td:nth-child(6n+6), & > td:nth-child(6n+7) {
-                    background: $o-gray-100;
-                }
-            }
-            > tr.line_level_0 {
-                & > td:nth-child(6n+5), & > td:nth-child(6n+6), & > td:nth-child(6n+7) {
-                    background: $o-gray-300;
-                }
-            }
-        }
-    }
-
     thead.sticky {
         background-color: $o-view-background-color;
         position: sticky;
@@ -158,11 +141,14 @@
     // Line
     //------------------------------------------------------------------------------------------------------------------
     .line_name {
+        vertical-align: middle;
         > .wrapper {
             display: flex;
+            align-items: center;
 
             > .content {
                 display: flex;
+                align-items: center;
                 sup { top: auto }
             }
         }
@@ -172,11 +158,15 @@
     }
 
     .line_cell {
+        vertical-align: middle;
         > .wrapper {
             display: flex;
             align-items: center;
 
-            > .content { display: flex }
+            > .content {
+                display: flex;
+                align-items: center;
+            }
         }
 
         &.date > .wrapper { justify-content: center }
@@ -383,8 +373,6 @@
             max-width: 75%; //!\\ Not the same as 'width' because of 'display: flex'
             min-width: 75%; //!\\ Not the same as 'width' because of 'display: flex'
         }
-
-        > code { color: $o-enterprise-color }
     }
 
     > .totals_separator { margin: .25rem 1rem }
